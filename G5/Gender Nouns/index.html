@@ -1,232 +1,386 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Noun Gender Spinner Game</title>
 <style>
-body {
-  font-family: Arial, sans-serif;
-  text-align: center;
-  background: linear-gradient(135deg, #a8d8ff, #e6f3ff);
-  margin: 0;
-  padding: 20px;
+*{box-sizing:border-box}
+body{
+margin:0;
+font-family:Arial,sans-serif;
+overflow-x:hidden;
+background:linear-gradient(135deg,#102542,#1b3c73,#2a5298);
+color:white;
+text-align:center;
+min-height:100vh;
 }
 
-h1 {
-  color: #1b3cff;
+#splash{
+position:fixed;
+inset:0;
+background:#081426;
+display:flex;
+justify-content:center;
+align-items:center;
+z-index:9999;
+animation:fadeOut 1s ease 4s forwards;
 }
 
-#wheel {
-  width: 300px;
-  height: 300px;
-  border-radius: 50%;
-  border: 8px solid #333;
-  transition: transform 4s cubic-bezier(.17,.67,.83,.67);
-  background: white;
+#splash img{
+width:220px;
+max-width:80%;
+animation:pulse 2s infinite;
 }
 
-#spinBtn {
-  padding: 12px 25px;
-  font-size: 18px;
-  border: none;
-  border-radius: 10px;
-  background: #4CAF50;
-  color: white;
-  cursor: pointer;
-  margin-top: 15px;
+@keyframes fadeOut{
+to{opacity:0;visibility:hidden}
 }
 
-#spinBtn:hover {
-  transform: scale(1.05);
+@keyframes pulse{
+0%,100%{transform:scale(1)}
+50%{transform:scale(1.08)}
 }
 
-button.option {
-  margin: 10px;
-  padding: 10px 20px;
-  font-size: 16px;
-  border-radius: 10px;
-  border: none;
-  background: #ff6b6b;
-  color: white;
-  cursor: pointer;
+.stars{
+position:fixed;
+inset:0;
+pointer-events:none;
+overflow:hidden;
 }
 
-button.option:hover {
-  transform: scale(1.05);
+.star{
+position:absolute;
+width:3px;
+height:3px;
+background:white;
+border-radius:50%;
+animation:twinkle 4s linear infinite;
+opacity:.7;
 }
 
-#noun {
-  font-size: 32px;
-  font-weight: bold;
-  margin: 20px;
-  color: #222;
+@keyframes twinkle{
+0%{transform:translateY(0);opacity:.3}
+50%{opacity:1}
+100%{transform:translateY(-20px);opacity:.3}
 }
 
-#result {
-  font-size: 22px;
-  margin-top: 15px;
+.container{
+padding:20px;
+max-width:900px;
+margin:auto;
 }
 
-#score {
-  font-size: 18px;
-  margin-top: 10px;
+h1{
+font-size:clamp(2rem,4vw,3rem);
+margin-top:20px;
 }
 
-.bounce {
-  animation: bounce 0.6s;
+.game-card{
+background:rgba(255,255,255,0.1);
+backdrop-filter:blur(10px);
+border-radius:24px;
+padding:20px;
+box-shadow:0 8px 30px rgba(0,0,0,0.3);
 }
 
-@keyframes bounce {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.2); }
-  100% { transform: scale(1); }
+#wheel{
+width:300px;
+height:300px;
+border-radius:50%;
+border:8px solid white;
+background:white;
+transition:transform 4s cubic-bezier(.17,.67,.83,.67);
+}
+
+.pointer{
+font-size:40px;
+position:absolute;
+top:-18px;
+left:50%;
+transform:translateX(-50%);
+z-index:5;
+}
+
+#spinBtn{
+padding:14px 28px;
+font-size:18px;
+border:none;
+border-radius:14px;
+background:#ffd166;
+color:#222;
+font-weight:bold;
+cursor:pointer;
+margin-top:20px;
+transition:.3s;
+}
+
+#spinBtn:hover{
+transform:scale(1.05);
+}
+
+.options{
+display:flex;
+flex-wrap:wrap;
+justify-content:center;
+gap:12px;
+margin-top:20px;
+}
+
+button.option{
+padding:12px 18px;
+border:none;
+border-radius:14px;
+font-size:16px;
+font-weight:bold;
+background:#ffffff;
+color:#222;
+cursor:pointer;
+transition:.3s;
+}
+
+button.option:hover{
+transform:translateY(-2px);
+}
+
+#noun{
+font-size:38px;
+font-weight:bold;
+margin-top:20px;
+min-height:50px;
+}
+
+#result{
+font-size:22px;
+margin-top:15px;
+min-height:40px;
+}
+
+#score{
+font-size:20px;
+margin-top:12px;
+}
+
+.cross{
+animation:shake .4s;
+color:#ff8080;
+}
+
+@keyframes shake{
+0%,100%{transform:translateX(0)}
+25%{transform:translateX(-5px)}
+75%{transform:translateX(5px)}
+}
+
+.confetti{
+position:fixed;
+font-size:20px;
+animation:fall 2s linear forwards;
+pointer-events:none;
+}
+
+@keyframes fall{
+0%{transform:translateY(-10px) rotate(0deg);opacity:1}
+100%{transform:translateY(100vh) rotate(360deg);opacity:0}
+}
+
+@media(max-width:600px){
+#wheel{
+width:260px;
+height:260px;
+}
+#noun{
+font-size:30px;
+}
 }
 </style>
 </head>
-
 <body>
 
-<h1>🎡 Noun Gender Spinner Game</h1>
-<p>Spin the wheel and guess the noun gender!</p>
+<div id="splash">
+<img src="assets/logo.png" alt="Innovine Logo">
+</div>
+
+<div class="stars" id="stars"></div>
+
+<div class="container">
+<h1>🎡 Noun Gender Spinner</h1>
+<div class="game-card">
+<p>Spin the wheel and identify the noun gender!</p>
 
 <div style="position:relative;width:320px;margin:auto;">
-  <div style="font-size:40px;position:absolute;top:-18px;left:50%;transform:translateX(-50%);z-index:10;">
-    ⬇️
-  </div>
-  <canvas id="wheel" width="300" height="300"></canvas>
+<div class="pointer">⬇️</div>
+<canvas id="wheel" width="300" height="300"></canvas>
 </div>
 
 <button id="spinBtn" onclick="spinWheel()">SPIN</button>
 
 <div id="noun"></div>
 
-<div>
-  <button class="option" onclick="check('Masculine')">Masculine</button>
-  <button class="option" onclick="check('Feminine')">Feminine</button>
-  <button class="option" onclick="check('Common')">Common</button>
-  <button class="option" onclick="check('Neuter')">Neuter</button>
+<div class="options">
+<button class="option" onclick="check('Masculine')">Masculine</button>
+<button class="option" onclick="check('Feminine')">Feminine</button>
+<button class="option" onclick="check('Common')">Common</button>
+<button class="option" onclick="check('Neuter')">Neuter</button>
 </div>
 
 <div id="result"></div>
-<div id="score"></div>
+<div id="score">Score: 0</div>
+</div>
+</div>
+
+<audio id="correctSound" src="assets/correct.mp3"></audio>
+<audio id="wrongSound" src="assets/wrong.mp3"></audio>
+<audio id="clapSound" src="assets/freesound_community-claps-44774.mp3"></audio>
 
 <script>
-
-const nouns = [
-  {word:'King', gender:'Masculine'},
-  {word:'Queen', gender:'Feminine'},
-  {word:'Teacher', gender:'Common'},
-  {word:'Baby', gender:'Common'},
-  {word:'Lion', gender:'Masculine'},
-  {word:'Lioness', gender:'Feminine'},
-  {word:'Table', gender:'Neuter'},
-  {word:'Boy', gender:'Masculine'},
-  {word:'Girl', gender:'Feminine'},
-  {word:'Book', gender:'Neuter'}
+const nouns=[
+{word:'King',gender:'Masculine',explanation:'A king is a male ruler.'},
+{word:'Queen',gender:'Feminine',explanation:'A queen is a female ruler.'},
+{word:'Teacher',gender:'Common',explanation:'A teacher can be male or female.'},
+{word:'Baby',gender:'Common',explanation:'A baby can be a boy or girl.'},
+{word:'Lion',gender:'Masculine',explanation:'Lion refers to a male lion.'},
+{word:'Lioness',gender:'Feminine',explanation:'Lioness refers to a female lion.'},
+{word:'Table',gender:'Neuter',explanation:'A table is a non-living thing.'},
+{word:'Boy',gender:'Masculine',explanation:'Boy refers to a male child.'},
+{word:'Girl',gender:'Feminine',explanation:'Girl refers to a female child.'},
+{word:'Book',gender:'Neuter',explanation:'A book is a non-living object.'}
 ];
 
-const colors = [
-  '#ff9999', '#99ccff', '#99ff99', '#ffd699', '#d9b3ff',
-  '#ffb3d9', '#ffff99', '#b3ffff', '#ffcc99', '#c2f0c2'
-];
+const colors=['#ff9aa2','#ffdac1','#e2f0cb','#b5ead7','#c7ceea','#ffd6a5','#fdffb6','#a0c4ff','#ffc6ff','#d0f4de'];
 
-const canvas = document.getElementById('wheel');
-const ctx = canvas.getContext('2d');
-const radius = 150;
-const arc = Math.PI * 2 / nouns.length;
+const canvas=document.getElementById('wheel');
+const ctx=canvas.getContext('2d');
+const radius=150;
+const arc=(Math.PI*2)/nouns.length;
 
-function drawWheel() {
-  for (let i = 0; i < nouns.length; i++) {
+let currentNoun=null;
+let currentRotation=0;
+let score=0;
+let wrongAttempts=0;
 
-    // Start drawing from top instead of right side
-    let angle = (i * arc) - (Math.PI / 2);
+function drawWheel(){
+for(let i=0;i<nouns.length;i++){
+let angle=(i*arc)-(Math.PI/2);
 
-    ctx.beginPath();
-    ctx.moveTo(radius, radius);
-    ctx.arc(radius, radius, radius, angle, angle + arc);
-    ctx.fillStyle = colors[i];
-    ctx.fill();
-    ctx.stroke();
+ctx.beginPath();
+ctx.moveTo(radius,radius);
+ctx.arc(radius,radius,radius,angle,angle+arc);
+ctx.fillStyle=colors[i];
+ctx.fill();
+ctx.strokeStyle='#fff';
+ctx.lineWidth=2;
+ctx.stroke();
 
-    // Draw text correctly inside slice
-    ctx.save();
-    ctx.translate(radius, radius);
-    ctx.rotate(angle + arc / 2);
-    ctx.textAlign = 'right';
-    ctx.fillStyle = '#000';
-    ctx.font = '16px Arial';
-    ctx.fillText(nouns[i].word, radius - 20, 5);
-    ctx.restore();
-  }
+ctx.save();
+ctx.translate(radius,radius);
+ctx.rotate(angle+arc/2);
+ctx.textAlign='right';
+ctx.fillStyle='#222';
+ctx.font='bold 16px Arial';
+ctx.fillText(nouns[i].word,radius-20,5);
+ctx.restore();
+}
 }
 
-// Draw the wheel when the page loads
- drawWheel();
+drawWheel();
 
-let currentNoun = null;
-let score = 0;
-let currentRotation = 0;
+function spinWheel(){
+wrongAttempts=0;
+document.getElementById('result').innerHTML='';
 
-function spinWheel() {
-  const wheel = document.getElementById('wheel');
+const wheel=document.getElementById('wheel');
+const selectedIndex=Math.floor(Math.random()*nouns.length);
+currentNoun=nouns[selectedIndex];
 
-  // Pick random noun
-  const selectedIndex = Math.floor(Math.random() * nouns.length);
-  currentNoun = nouns[selectedIndex];
+const sectionAngle=360/nouns.length;
+const stopAngle=360-(selectedIndex*sectionAngle)-(sectionAngle/2);
 
-  // Each section size
-  const sectionAngle = 360 / nouns.length;
+wheel.style.transition='none';
+wheel.style.transform='rotate(0deg)';
 
-  // Exact angle to bring selected slice to top arrow
-  const stopAngle = 360 - (selectedIndex * sectionAngle) - (sectionAngle / 2);
+setTimeout(()=>{
+wheel.style.transition='transform 4s cubic-bezier(.17,.67,.83,.67)';
+currentRotation=1800+stopAngle;
+wheel.style.transform=`rotate(${currentRotation}deg)`;
 
-  // Reset rotation first for accuracy
-  wheel.style.transition = 'none';
-  wheel.style.transform = 'rotate(0deg)';
-
-  setTimeout(() => {
-    wheel.style.transition = 'transform 4s cubic-bezier(.17,.67,.83,.67)';
-
-    // Add spins + exact stop angle
-    currentRotation = 1800 + stopAngle;
-
-    wheel.style.transform = `rotate(${currentRotation}deg)`;
-
-    setTimeout(() => {
-      document.getElementById('noun').innerText = currentNoun.word;
-    }, 4000);
-
-  }, 50);
+setTimeout(()=>{
+document.getElementById('noun').innerText=currentNoun.word;
+},4000);
+},50);
 }
 
-function check(answer) {
-  if (!currentNoun) {
-    document.getElementById('result').innerText = '🎯 Spin the wheel first!';
-    return;
-  }
-
-  let result = document.getElementById('result');
-
-  if (answer === currentNoun.gender) {
-    result.innerText = '🎉 Correct!';
-    result.classList.add('bounce');
-    score++;
-  } else {
-    result.innerText = '❌ Wrong! Correct: ' + currentNoun.gender;
-  }
-
-  setTimeout(() => {
-    result.classList.remove('bounce');
-  }, 500);
-
-  document.getElementById('score').innerText = 'Score: ' + score;
+function check(answer){
+if(!currentNoun){
+document.getElementById('result').innerHTML='🎯 Spin the wheel first!';
+return;
 }
 
-// Simple runtime tests
-console.assert(nouns.length === 10, 'Test Failed: Nouns array should contain 10 items');
-console.assert(typeof spinWheel === 'function', 'Test Failed: spinWheel function missing');
-console.assert(typeof check === 'function', 'Test Failed: check function missing');
+const result=document.getElementById('result');
 
+if(answer===currentNoun.gender){
+score++;
+result.innerHTML='🎉 Correct! Amazing job!';
+result.className='';
+playCorrect();
+createConfetti();
+}else{
+wrongAttempts++;
+result.className='cross';
+playWrong();
+
+if(wrongAttempts>=2){
+result.innerHTML=`❌ Correct Answer: <b>${currentNoun.gender}</b><br>${currentNoun.explanation}`;
+}else{
+result.innerHTML='❌ Try again!';
+}
+}
+
+document.getElementById('score').innerText=`Score: ${score}`;
+}
+
+function playCorrect(){
+document.getElementById('correctSound').play();
+document.getElementById('clapSound').play();
+}
+
+function playWrong(){
+document.getElementById('wrongSound').play();
+}
+
+function createConfetti(){
+for(let i=0;i<20;i++){
+const conf=document.createElement('div');
+conf.classList.add('confetti');
+conf.innerHTML='⭐';
+conf.style.left=Math.random()*100+'vw';
+conf.style.top='-10px';
+conf.style.fontSize=(Math.random()*20+10)+'px';
+document.body.appendChild(conf);
+
+setTimeout(()=>{
+conf.remove();
+},2000);
+}
+}
+
+function createStars(){
+const stars=document.getElementById('stars');
+for(let i=0;i<60;i++){
+const star=document.createElement('div');
+star.classList.add('star');
+star.style.left=Math.random()*100+'vw';
+star.style.top=Math.random()*100+'vh';
+star.style.animationDelay=Math.random()*4+'s';
+stars.appendChild(star);
+}
+}
+
+createStars();
+
+console.assert(nouns.length===10,'Nouns array should contain 10 items');
+console.assert(typeof spinWheel==='function','spinWheel missing');
+console.assert(typeof check==='function','check missing');
 </script>
-
 </body>
 </html>
