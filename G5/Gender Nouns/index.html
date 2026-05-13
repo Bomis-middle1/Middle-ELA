@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Noun Gender Spinner Game</title>
+<style>
+body {
+  font-family: Arial, sans-serif;
+  text-align: center;
+  background: linear-gradient(135deg, #a8d8ff, #e6f3ff);
+  margin: 0;
+  padding: 20px;
+}
+
+h1 {
+  color: #1b3cff;
+}
+
+#wheel {
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  border: 8px solid #333;
+  transition: transform 4s cubic-bezier(.17,.67,.83,.67);
+  background: white;
+}
+
+#spinBtn {
+  padding: 12px 25px;
+  font-size: 18px;
+  border: none;
+  border-radius: 10px;
+  background: #4CAF50;
+  color: white;
+  cursor: pointer;
+  margin-top: 15px;
+}
+
+#spinBtn:hover {
+  transform: scale(1.05);
+}
+
+button.option {
+  margin: 10px;
+  padding: 10px 20px;
+  font-size: 16px;
+  border-radius: 10px;
+  border: none;
+  background: #ff6b6b;
+  color: white;
+  cursor: pointer;
+}
+
+button.option:hover {
+  transform: scale(1.05);
+}
+
+#noun {
+  font-size: 32px;
+  font-weight: bold;
+  margin: 20px;
+  color: #222;
+}
+
+#result {
+  font-size: 22px;
+  margin-top: 15px;
+}
+
+#score {
+  font-size: 18px;
+  margin-top: 10px;
+}
+
+.bounce {
+  animation: bounce 0.6s;
+}
+
+@keyframes bounce {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+</style>
+</head>
+
+<body>
+
+<h1>🎡 Noun Gender Spinner Game</h1>
+<p>Spin the wheel and guess the noun gender!</p>
+
+<div style="position:relative;width:320px;margin:auto;">
+  <div style="font-size:40px;position:absolute;top:-18px;left:50%;transform:translateX(-50%);z-index:10;">
+    ⬇️
+  </div>
+  <canvas id="wheel" width="300" height="300"></canvas>
+</div>
+
+<button id="spinBtn" onclick="spinWheel()">SPIN</button>
+
+<div id="noun"></div>
+
+<div>
+  <button class="option" onclick="check('Masculine')">Masculine</button>
+  <button class="option" onclick="check('Feminine')">Feminine</button>
+  <button class="option" onclick="check('Common')">Common</button>
+  <button class="option" onclick="check('Neuter')">Neuter</button>
+</div>
+
+<div id="result"></div>
+<div id="score"></div>
+
+<script>
+
+const nouns = [
+  {word:'King', gender:'Masculine'},
+  {word:'Queen', gender:'Feminine'},
+  {word:'Teacher', gender:'Common'},
+  {word:'Baby', gender:'Common'},
+  {word:'Lion', gender:'Masculine'},
+  {word:'Lioness', gender:'Feminine'},
+  {word:'Table', gender:'Neuter'},
+  {word:'Boy', gender:'Masculine'},
+  {word:'Girl', gender:'Feminine'},
+  {word:'Book', gender:'Neuter'}
+];
+
+const colors = [
+  '#ff9999', '#99ccff', '#99ff99', '#ffd699', '#d9b3ff',
+  '#ffb3d9', '#ffff99', '#b3ffff', '#ffcc99', '#c2f0c2'
+];
+
+const canvas = document.getElementById('wheel');
+const ctx = canvas.getContext('2d');
+const radius = 150;
+const arc = Math.PI * 2 / nouns.length;
+
+function drawWheel() {
+  for (let i = 0; i < nouns.length; i++) {
+
+    // Start drawing from top instead of right side
+    let angle = (i * arc) - (Math.PI / 2);
+
+    ctx.beginPath();
+    ctx.moveTo(radius, radius);
+    ctx.arc(radius, radius, radius, angle, angle + arc);
+    ctx.fillStyle = colors[i];
+    ctx.fill();
+    ctx.stroke();
+
+    // Draw text correctly inside slice
+    ctx.save();
+    ctx.translate(radius, radius);
+    ctx.rotate(angle + arc / 2);
+    ctx.textAlign = 'right';
+    ctx.fillStyle = '#000';
+    ctx.font = '16px Arial';
+    ctx.fillText(nouns[i].word, radius - 20, 5);
+    ctx.restore();
+  }
+}
+
+// Draw the wheel when the page loads
+ drawWheel();
+
+let currentNoun = null;
+let score = 0;
+let currentRotation = 0;
+
+function spinWheel() {
+  const wheel = document.getElementById('wheel');
+
+  // Pick random noun
+  const selectedIndex = Math.floor(Math.random() * nouns.length);
+  currentNoun = nouns[selectedIndex];
+
+  // Each section size
+  const sectionAngle = 360 / nouns.length;
+
+  // Exact angle to bring selected slice to top arrow
+  const stopAngle = 360 - (selectedIndex * sectionAngle) - (sectionAngle / 2);
+
+  // Reset rotation first for accuracy
+  wheel.style.transition = 'none';
+  wheel.style.transform = 'rotate(0deg)';
+
+  setTimeout(() => {
+    wheel.style.transition = 'transform 4s cubic-bezier(.17,.67,.83,.67)';
+
+    // Add spins + exact stop angle
+    currentRotation = 1800 + stopAngle;
+
+    wheel.style.transform = `rotate(${currentRotation}deg)`;
+
+    setTimeout(() => {
+      document.getElementById('noun').innerText = currentNoun.word;
+    }, 4000);
+
+  }, 50);
+}
+
+function check(answer) {
+  if (!currentNoun) {
+    document.getElementById('result').innerText = '🎯 Spin the wheel first!';
+    return;
+  }
+
+  let result = document.getElementById('result');
+
+  if (answer === currentNoun.gender) {
+    result.innerText = '🎉 Correct!';
+    result.classList.add('bounce');
+    score++;
+  } else {
+    result.innerText = '❌ Wrong! Correct: ' + currentNoun.gender;
+  }
+
+  setTimeout(() => {
+    result.classList.remove('bounce');
+  }, 500);
+
+  document.getElementById('score').innerText = 'Score: ' + score;
+}
+
+// Simple runtime tests
+console.assert(nouns.length === 10, 'Test Failed: Nouns array should contain 10 items');
+console.assert(typeof spinWheel === 'function', 'Test Failed: spinWheel function missing');
+console.assert(typeof check === 'function', 'Test Failed: check function missing');
+
+</script>
+
+</body>
+</html>
