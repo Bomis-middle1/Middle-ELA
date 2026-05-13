@@ -10,8 +10,8 @@ body{
 margin:0;
 font-family:Arial,sans-serif;
 overflow-x:hidden;
-background:linear-gradient(135deg,#102542,#1b3c73,#2a5298);
-color:white;
+background:linear-gradient(135deg,#fef6e4,#dff6ff,#fce1ff);
+color:#333;
 text-align:center;
 min-height:100vh;
 }
@@ -19,7 +19,7 @@ min-height:100vh;
 #splash{
 position:fixed;
 inset:0;
-background:#081426;
+background:#ffffff;
 display:flex;
 justify-content:center;
 align-items:center;
@@ -30,7 +30,7 @@ animation:fadeOut 1s ease 4s forwards;
 #splash img{
 width:220px;
 max-width:80%;
-animation:pulse 2s infinite;
+animation:none;
 }
 
 @keyframes fadeOut{
@@ -51,9 +51,9 @@ overflow:hidden;
 
 .star{
 position:absolute;
-width:3px;
-height:3px;
-background:white;
+width:4px;
+height:4px;
+background:#fff4d6;f;
 border-radius:50%;
 animation:twinkle 4s linear infinite;
 opacity:.7;
@@ -77,11 +77,11 @@ margin-top:20px;
 }
 
 .game-card{
-background:rgba(255,255,255,0.1);
+background:rgba(255,255,255,0.75);
 backdrop-filter:blur(10px);
 border-radius:24px;
 padding:20px;
-box-shadow:0 8px 30px rgba(0,0,0,0.3);
+box-shadow:0 6px 20px rgba(0,0,0,0.12);
 }
 
 #wheel{
@@ -89,7 +89,7 @@ width:300px;
 height:300px;
 border-radius:50%;
 border:8px solid white;
-background:white;
+background:#fff4d6;
 transition:transform 4s cubic-bezier(.17,.67,.83,.67);
 }
 
@@ -107,7 +107,7 @@ padding:14px 28px;
 font-size:18px;
 border:none;
 border-radius:14px;
-background:#ffd166;
+background:#7bd389;
 color:#222;
 font-weight:bold;
 cursor:pointer;
@@ -133,7 +133,7 @@ border:none;
 border-radius:14px;
 font-size:16px;
 font-weight:bold;
-background:#ffffff;
+background:#fff9f0;
 color:#222;
 cursor:pointer;
 transition:.3s;
@@ -163,7 +163,7 @@ margin-top:12px;
 
 .cross{
 animation:shake .4s;
-color:#ff8080;
+color:#e76f51;
 }
 
 @keyframes shake{
@@ -204,9 +204,9 @@ font-size:30px;
 <div class="stars" id="stars"></div>
 
 <div class="container">
-<h1>🎡 Noun Gender Spinner</h1>
+<h1>🎡 Noun Gender Spinner Game</h1>
 <div class="game-card">
-<p>Spin the wheel and identify the noun gender!</p>
+<p>Spin the wheel and choose the correct noun gender!</p>
 
 <div style="position:relative;width:320px;margin:auto;">
 <div class="pointer">⬇️</div>
@@ -247,7 +247,7 @@ const nouns=[
 {word:'Book',gender:'Neuter',explanation:'A book is a non-living object.'}
 ];
 
-const colors=['#ff9aa2','#ffdac1','#e2f0cb','#b5ead7','#c7ceea','#ffd6a5','#fdffb6','#a0c4ff','#ffc6ff','#d0f4de'];
+const colors=['#ffd6a5','#fdffb6','#caffbf','#9bf6ff','#a0c4ff','#bdb2ff','#ffc6ff','#ffadad','#d0f4de','#fef9c3'];
 
 const canvas=document.getElementById('wheel');
 const ctx=canvas.getContext('2d');
@@ -366,7 +366,7 @@ conf.remove();
 
 function createStars(){
 const stars=document.getElementById('stars');
-for(let i=0;i<60;i++){
+for(let i=0;i<25;i++){
 const star=document.createElement('div');
 star.classList.add('star');
 star.style.left=Math.random()*100+'vw';
