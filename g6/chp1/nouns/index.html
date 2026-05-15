@@ -3,9 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Noun Snake Adventure - Grade 6 ELA</title>
 
+<!-- PRELOAD AUDIO -->
+<link rel="preload" href="assets/correct.mp3" as="audio">
+<link rel="preload" href="assets/wrong.mp3" as="audio">
+<link rel="preload" href="assets/clapping.mp3" as="audio">
+
 <style>
+
 *{
     margin:0;
     padding:0;
@@ -20,7 +27,64 @@ body{
     justify-content:center;
     align-items:center;
     padding:10px;
+    overflow-x:hidden;
 }
+
+/* START SCREEN */
+
+.start-screen{
+    position:fixed;
+    inset:0;
+    background:linear-gradient(135deg,#74ebd5,#ACB6E5);
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    z-index:99999;
+    text-align:center;
+    padding:20px;
+}
+
+.start-logo{
+    width:220px;
+    margin-bottom:20px;
+    animation:floatLogo 2s infinite alternate;
+}
+
+@keyframes floatLogo{
+    from{
+        transform:translateY(0px);
+    }
+    to{
+        transform:translateY(-10px);
+    }
+}
+
+.start-text{
+    font-size:20px;
+    margin-bottom:25px;
+    color:#333;
+    font-weight:bold;
+    max-width:500px;
+}
+
+.start-btn{
+    background:#ff5722;
+    color:white;
+    border:none;
+    padding:18px 35px;
+    border-radius:18px;
+    font-size:22px;
+    font-weight:bold;
+    cursor:pointer;
+    box-shadow:0 6px 15px rgba(0,0,0,0.2);
+}
+
+.start-btn:active{
+    transform:scale(0.95);
+}
+
+/* MAIN GAME */
 
 .game-container{
     width:100%;
@@ -30,11 +94,7 @@ body{
     padding:20px;
     text-align:center;
     box-shadow:0 10px 25px rgba(0,0,0,0.2);
-}
-
-.logo{
-    width:120px;
-    margin-bottom:10px;
+    display:none;
 }
 
 h1{
@@ -47,6 +107,8 @@ h1{
     color:#444;
     font-weight:bold;
 }
+
+/* TOP BAR */
 
 .top-bar{
     display:flex;
@@ -63,14 +125,32 @@ h1{
     color:#333;
 }
 
+/* PROGRESS STARS */
+
+.stars-container{
+    width:100%;
+    margin-top:10px;
+    font-size:28px;
+    letter-spacing:5px;
+    color:#ccc;
+}
+
+.star-filled{
+    color:gold;
+}
+
+/* GAME CANVAS */
+
 canvas{
     background:#d4f7d4;
     border:5px solid #4caf50;
     border-radius:12px;
     width:100%;
-    max-width:600px;
+    max-width:400px;
     touch-action:none;
 }
+
+/* MOBILE CONTROLS */
 
 .controls{
     margin-top:15px;
@@ -94,6 +174,8 @@ canvas{
 .controls button:active{
     transform:scale(0.95);
 }
+
+/* QUIZ */
 
 .quiz-modal{
     position:fixed;
@@ -148,6 +230,8 @@ canvas{
     background:#1e88e5;
 }
 
+/* FEEDBACK */
+
 .feedback{
     margin-top:15px;
     font-size:22px;
@@ -165,13 +249,29 @@ canvas{
 }
 
 @keyframes bounce{
-    from{transform:scale(1);}
-    to{transform:scale(1.1);}
+    from{
+        transform:scale(1);
+    }
+    to{
+        transform:scale(1.1);
+    }
 }
+
+/* END SCREEN */
 
 .game-over{
     display:none;
     margin-top:20px;
+}
+
+.game-over h2{
+    color:#4caf50;
+    margin-bottom:10px;
+}
+
+.game-over p{
+    font-size:22px;
+    margin-top:10px;
 }
 
 .restart-btn{
@@ -185,9 +285,13 @@ canvas{
     cursor:pointer;
 }
 
+/* VOLUME */
+
 .volume-control{
     margin-top:10px;
 }
+
+/* MOBILE */
 
 @media(max-width:600px){
 
@@ -202,16 +306,43 @@ canvas{
     .controls{
         grid-template-columns:repeat(3,70px);
     }
+
+    .start-logo{
+        width:180px;
+    }
+
+    .stars-container{
+        font-size:22px;
+    }
+
 }
+
 </style>
 </head>
 
 <body>
 
-<div class="game-container">
+<!-- START SCREEN -->
 
-    <!-- YOUR LOGO -->
-    <img src="assets/innovine-logo.png" class="logo">
+<div id="startScreen" class="start-screen">
+
+    <img src="assets/innovine-logo.png" class="start-logo">
+
+    <h1>🐍 Noun Snake Adventure</h1>
+
+    <p class="start-text">
+        Help the snake collect apples 🍎 and answer noun questions correctly!
+    </p>
+
+    <button id="startBtn" class="start-btn">
+        ▶ TAP TO START
+    </button>
+
+</div>
+
+<!-- GAME -->
+
+<div class="game-container" id="gameContainer">
 
     <h1>🐍 Noun Snake Adventure</h1>
 
@@ -231,12 +362,26 @@ canvas{
 
     </div>
 
-    <canvas id="gameCanvas" width="600" height="600"></canvas>
+    <!-- STARS -->
+
+    <div class="stars-container" id="starsContainer">
+        ⭐ ⭐ ⭐ ⭐ ⭐ ⭐ ⭐ ⭐ ⭐ ⭐
+    </div>
+
+    <br>
+
+    <!-- GAME CANVAS -->
+
+    <canvas id="gameCanvas" width="400" height="400"></canvas>
+
+    <!-- VOLUME -->
 
     <div class="volume-control">
         🔊 Volume:
         <input type="range" id="volumeSlider" min="0" max="1" step="0.1" value="1">
     </div>
+
+    <!-- MOBILE CONTROLS -->
 
     <div class="controls">
 
@@ -250,11 +395,20 @@ canvas{
 
     </div>
 
+    <!-- GAME OVER -->
+
     <div class="game-over" id="gameOver">
 
-        <h2>🎉 Great Job!</h2>
+        <h2>🏆 Noun Master!</h2>
 
-        <p>Your Final Score: <span id="finalScore"></span></p>
+        <p>
+            You completed the challenge!
+        </p>
+
+        <p>
+            Final Score:
+            <span id="finalScore"></span>
+        </p>
 
         <button class="restart-btn" onclick="restartGame()">
             Restart Game
@@ -264,7 +418,7 @@ canvas{
 
 </div>
 
-<!-- QUIZ MODAL -->
+<!-- QUIZ -->
 
 <div class="quiz-modal" id="quizModal">
 
@@ -284,14 +438,31 @@ canvas{
 
 <script>
 
+/* START BUTTON */
+
+const startBtn = document.getElementById("startBtn");
+
+startBtn.addEventListener("click", ()=>{
+
+    document.getElementById("startScreen").style.display = "none";
+
+    document.getElementById("gameContainer").style.display = "block";
+
+    startGame();
+
+});
+
+/* CANVAS */
+
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
-/* SLOWER + EASIER */
+/* GAME SETTINGS */
+
 const box = 30;
 
 let snake = [
-    {x: 300, y: 300}
+    {x: 180, y: 180}
 ];
 
 let food = randomFood();
@@ -306,10 +477,14 @@ let foodsEaten = 0;
 
 let currentQuestionIndex = 0;
 
+/* ELEMENTS */
+
 const scoreDisplay = document.getElementById("score");
+
 const questionDisplay = document.getElementById("questionCount");
 
 const quizModal = document.getElementById("quizModal");
+
 const quizQuestion = document.getElementById("quizQuestion");
 
 const optionsContainer = document.getElementById("optionsContainer");
@@ -321,6 +496,8 @@ const finalScore = document.getElementById("finalScore");
 const gameOverDiv = document.getElementById("gameOver");
 
 const volumeSlider = document.getElementById("volumeSlider");
+
+const starsContainer = document.getElementById("starsContainer");
 
 /* QUESTIONS */
 
@@ -393,11 +570,11 @@ answer:"water"
 
 ];
 
-/* RANDOMIZE QUESTIONS */
+/* RANDOMIZE */
 
 questions = questions.sort(() => Math.random() - 0.5);
 
-/* YOUR LOCAL SOUND FILES */
+/* AUDIO */
 
 const correctSound = new Audio("assets/correct.mp3");
 
@@ -405,7 +582,7 @@ const wrongSound = new Audio("assets/wrong.mp3");
 
 const clapSound = new Audio("assets/clapping.mp3");
 
-/* VOLUME CONTROL */
+/* VOLUME */
 
 function updateVolume(){
 
@@ -419,14 +596,39 @@ volumeSlider.addEventListener("input", updateVolume);
 
 updateVolume();
 
+/* STARS */
+
+function updateStars(){
+
+    let starsHTML = "";
+
+    for(let i=0; i<10; i++){
+
+        if(i < currentQuestionIndex){
+
+            starsHTML += `<span class="star-filled">⭐</span>`;
+
+        } else {
+
+            starsHTML += `⭐`;
+
+        }
+
+    }
+
+    starsContainer.innerHTML = starsHTML;
+
+}
+
 /* DRAW GAME */
 
 function draw(){
 
     ctx.fillStyle = "#d4f7d4";
+
     ctx.fillRect(0,0,canvas.width,canvas.height);
 
-    /* DRAW SNAKE */
+    /* SNAKE */
 
     for(let i=0;i<snake.length;i++){
 
@@ -436,7 +638,7 @@ function draw(){
 
     }
 
-    /* DRAW FOOD */
+    /* FOOD */
 
     ctx.fillStyle = "#ff1744";
 
@@ -450,11 +652,14 @@ function draw(){
     let snakeY = snake[0].y;
 
     if(direction === "LEFT") snakeX -= box;
+
     if(direction === "UP") snakeY -= box;
+
     if(direction === "RIGHT") snakeX += box;
+
     if(direction === "DOWN") snakeY += box;
 
-    /* FOOD EATEN */
+    /* EAT FOOD */
 
     if(snakeX === food.x && snakeY === food.y){
 
@@ -465,8 +670,6 @@ function draw(){
         scoreDisplay.textContent = score;
 
         food = randomFood();
-
-        /* QUESTION AFTER EVERY 3 APPLES */
 
         if(foodsEaten % 3 === 0 && currentQuestionIndex < questions.length){
 
@@ -487,7 +690,7 @@ function draw(){
         y: snakeY
     };
 
-    /* WALL COLLISION */
+    /* COLLISION */
 
     if(
         snakeX < 0 ||
@@ -511,8 +714,8 @@ function draw(){
 function randomFood(){
 
     return{
-        x: Math.floor(Math.random()*20)*box,
-        y: Math.floor(Math.random()*20)*box
+        x: Math.floor(Math.random()*13)*box,
+        y: Math.floor(Math.random()*13)*box
     };
 
 }
@@ -523,7 +726,8 @@ function collision(head,array){
 
     for(let i=0;i<array.length;i++){
 
-        if(head.x === array[i].x && head.y === array[i].y){
+        if(head.x === array[i].x &&
+           head.y === array[i].y){
 
             return true;
 
@@ -535,38 +739,46 @@ function collision(head,array){
 
 }
 
-/* KEYBOARD CONTROLS */
+/* KEYBOARD */
 
 document.addEventListener("keydown",event=>{
 
-    if(event.key === "ArrowLeft" && direction !== "RIGHT")
+    if(event.key === "ArrowLeft" &&
+       direction !== "RIGHT")
         direction = "LEFT";
 
-    else if(event.key === "ArrowUp" && direction !== "DOWN")
+    else if(event.key === "ArrowUp" &&
+            direction !== "DOWN")
         direction = "UP";
 
-    else if(event.key === "ArrowRight" && direction !== "LEFT")
+    else if(event.key === "ArrowRight" &&
+            direction !== "LEFT")
         direction = "RIGHT";
 
-    else if(event.key === "ArrowDown" && direction !== "UP")
+    else if(event.key === "ArrowDown" &&
+            direction !== "UP")
         direction = "DOWN";
 
 });
 
-/* MOBILE CONTROLS */
+/* MOBILE BUTTONS */
 
 function changeDirection(dir){
 
-    if(dir === "LEFT" && direction !== "RIGHT")
+    if(dir === "LEFT" &&
+       direction !== "RIGHT")
         direction = "LEFT";
 
-    if(dir === "UP" && direction !== "DOWN")
+    if(dir === "UP" &&
+       direction !== "DOWN")
         direction = "UP";
 
-    if(dir === "RIGHT" && direction !== "LEFT")
+    if(dir === "RIGHT" &&
+       direction !== "LEFT")
         direction = "RIGHT";
 
-    if(dir === "DOWN" && direction !== "UP")
+    if(dir === "DOWN" &&
+       direction !== "UP")
         direction = "DOWN";
 
 }
@@ -609,19 +821,37 @@ function checkAnswer(selected){
 
     if(selected === q.answer){
 
-        feedback.innerHTML = "✅ Correct! Great Job!";
+        feedback.innerHTML =
+        "✅ Correct! Great Job!";
 
-        feedback.className = "feedback correct";
+        feedback.className =
+        "feedback correct";
 
         score += 20;
 
+        /* PLAY CORRECT + CLAP */
+
+        correctSound.currentTime = 0;
+        clapSound.currentTime = 0;
+
         correctSound.play();
+        clapSound.play();
+
+        /* CONFETTI */
+
+        launchConfetti();
 
     } else {
 
-        feedback.innerHTML = "❌ Oops! Try the next one!";
+        feedback.innerHTML =
+        "❌ Oops! Try the next one!";
 
-        feedback.className = "feedback wrong";
+        feedback.className =
+        "feedback wrong";
+
+        /* WRONG SOUND */
+
+        wrongSound.currentTime = 0;
 
         wrongSound.play();
 
@@ -631,7 +861,10 @@ function checkAnswer(selected){
 
     currentQuestionIndex++;
 
-    questionDisplay.textContent = currentQuestionIndex;
+    questionDisplay.textContent =
+    currentQuestionIndex;
+
+    updateStars();
 
     setTimeout(()=>{
 
@@ -643,12 +876,73 @@ function checkAnswer(selected){
 
         } else {
 
-            /* VERY SLOW SPEED */
             game = setInterval(draw,350);
 
         }
 
     },1500);
+
+}
+
+/* CONFETTI */
+
+function launchConfetti(){
+
+    for(let i=0; i<80; i++){
+
+        const confetti =
+        document.createElement("div");
+
+        confetti.style.position = "fixed";
+
+        confetti.style.width = "10px";
+        confetti.style.height = "10px";
+
+        confetti.style.backgroundColor =
+        `hsl(${Math.random()*360},100%,50%)`;
+
+        confetti.style.left =
+        Math.random()*window.innerWidth + "px";
+
+        confetti.style.top = "-20px";
+
+        confetti.style.zIndex = "9999";
+
+        confetti.style.borderRadius = "50%";
+
+        confetti.style.pointerEvents = "none";
+
+        document.body.appendChild(confetti);
+
+        let fall = Math.random()*5 + 5;
+
+        let drift = (Math.random()-0.5)*4;
+
+        let position = -20;
+
+        const interval = setInterval(()=>{
+
+            position += fall;
+
+            confetti.style.top =
+            position + "px";
+
+            confetti.style.left =
+            parseFloat(confetti.style.left)
+            + drift + "px";
+
+            if(position >
+               window.innerHeight){
+
+                clearInterval(interval);
+
+                confetti.remove();
+
+            }
+
+        },20);
+
+    }
 
 }
 
@@ -658,7 +952,11 @@ function endGame(){
 
     clearInterval(game);
 
+    clapSound.currentTime = 0;
+
     clapSound.play();
+
+    launchConfetti();
 
     gameOverDiv.style.display = "block";
 
@@ -676,8 +974,11 @@ function restartGame(){
 
 /* START GAME */
 
-/* VERY SLOW FOR GRADE 6 */
-game = setInterval(draw,350);
+function startGame(){
+
+    game = setInterval(draw,350);
+
+}
 
 </script>
 
