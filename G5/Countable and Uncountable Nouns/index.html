@@ -147,7 +147,7 @@ function spawnBalloon(noun) {
   balloon.style.animation = `floatUp ${5 + Math.random()*3}s linear forwards`;
   balloon.dataset.word = noun.word;
   balloon.dataset.type = noun.type;
-  balloon.innerText = noun.word;
+  balloon.innerText = noun.word; // CSS-only label
 
   balloon.addEventListener('click', () => checkBalloon(balloon));
 
