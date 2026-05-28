@@ -71,72 +71,75 @@ text-align:center; color:white; padding:20px; z-index:5000; display:none;
 </div>
 
 <div id="feedback"></div>
+
 </div>
 
 <script>
-// Audio
+// AUDIO
 const correctSound = new Audio("assets/correct.mp3");
 const wrongSound = new Audio("assets/wrong.mp3");
 const clapSound = new Audio("assets/freesound_community-claps-44774.mp3");
 
-// Words
+// WORDS
 let words = [
-{word:"happy", type:"adj"}, {word:"run", type:"not"}, {word:"tall", type:"adj"},
-{word:"dog", type:"not"}, {word:"beautiful", type:"adj"}, {word:"quickly", type:"not"},
-{word:"red", type:"adj"}, {word:"jump", type:"not"}, {word:"blue", type:"adj"},
-{word:"eat", type:"not"}, {word:"angry", type:"adj"}, {word:"school", type:"not"},
-{word:"delicious", type:"adj"}, {word:"write", type:"not"}, {word:"soft", type:"adj"},
-{word:"tree", type:"not"}, {word:"bright", type:"adj"}, {word:"play", type:"not"}
+{word:"happy", type:"adj"}, {word:"tall", type:"adj"}, {word:"beautiful", type:"adj"}, {word:"red", type:"adj"}, {word:"blue", type:"adj"}, {word:"delicious", type:"adj"}, {word:"angry", type:"adj"}, {word:"quick", type:"adj"}, {word:"soft", type:"adj"}, {word:"bright", type:"adj"},
+{word:"run", type:"not"}, {word:"dog", type:"not"}, {word:"eat", type:"not"}, {word:"jump", type:"not"}, {word:"apple", type:"not"}, {word:"quickly", type:"not"}, {word:"school", type:"not"}, {word:"write", type:"not"}, {word:"tree", type:"not"}, {word:"play", type:"not"}
 ];
 
 let score = 0;
 let placedWords = 0;
 const maxWords = 10;
 
+// Copy of words for random picking
+let remainingWords = [...words];
+
 const gameArea = document.getElementById("gameArea");
 const adjBin = document.getElementById("adjBin");
 const notAdjBin = document.getElementById("notAdjBin");
 const feedback = document.getElementById("feedback");
 
+// Shuffle helper
 function shuffleArray(array){ return array.sort(()=>Math.random()-0.5); }
 
-// Start Game
+// START GAME
 function startGame(){
 document.getElementById("logoScreen").style.display="none";
 loadWord();
 }
 
-// Load Word
+// LOAD WORD
 function loadWord(){
-if(placedWords>=maxWords){ endGame(); return; }
-shuffleArray(words);
-const w = words[placedWords];
+if(placedWords>=maxWords || remainingWords.length===0){ endGame(); return; }
+
+const randomIndex = Math.floor(Math.random() * remainingWords.length);
+const w = remainingWords[randomIndex];
+remainingWords.splice(randomIndex,1);
+
 const wordDiv = document.createElement("div");
 wordDiv.classList.add("word");
 wordDiv.innerText = w.word;
 wordDiv.style.top = "100px";
 wordDiv.style.left = Math.random()*(window.innerWidth-150)+"px";
-wordDiv.draggable=true;
+wordDiv.draggable = true;
 gameArea.appendChild(wordDiv);
 
 wordDiv.addEventListener("dragstart",(e)=>{
-e.dataTransfer.setData("text/plain", placedWords);
+e.dataTransfer.setData("text/plain", w.word);
 });
 
 adjBin.addEventListener("dragover",(e)=>e.preventDefault());
 notAdjBin.addEventListener("dragover",(e)=>e.preventDefault());
 
-adjBin.addEventListener("drop",(e)=>dropWord(e,"adj"));
-notAdjBin.addEventListener("drop",(e)=>dropWord(e,"not"));
+adjBin.addEventListener("drop",(e)=>dropWord(e,"adj",w));
+notAdjBin.addEventListener("drop",(e)=>dropWord(e,"not",w));
 }
 
-// Drop Word
-function dropWord(e,binType){
+// DROP WORD
+function dropWord(e,binType,w){
 e.preventDefault();
-const index = e.dataTransfer.getData("text/plain");
-const w = words[index];
 const wordDivs = document.getElementsByClassName("word");
-const wordDiv = wordDivs[index];
+for(let div of wordDivs){ if(div.innerText===w.word){ div.remove(); break; } }
+
 if(w.type===binType){
 score++;
 try{ correctSound.play(); clapSound.play(); } catch(e){}
@@ -150,13 +153,13 @@ feedback.innerText="❌ Wrong!";
 feedback.style.display="block";
 setTimeout(()=>{feedback.style.display="none";},1000);
 }
-wordDiv.remove();
+
 placedWords++;
 document.getElementById("score").innerText = score;
 setTimeout(loadWord,500);
 }
 
-// Confetti
+// CONFETTI
 function createConfetti(){
 for(let i=0;i<20;i++){
 const conf = document.createElement("div");
@@ -169,7 +172,7 @@ setTimeout(()=>{conf.remove();},4000);
 }
 }
 
-// End Game
+// END GAME
 function endGame(){
 document.getElementById("endScreen").style.display="flex";
 document.getElementById("finalText").innerHTML=`You sorted <b>${score}</b> adjectives correctly!`;
