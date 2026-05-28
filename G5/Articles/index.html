@@ -9,12 +9,14 @@ body {
   font-family: Arial, sans-serif;
   margin:0;
   padding:0;
-  background: linear-gradient(135deg,#ffefd5,#d1f0ff);
+  background: linear-gradient(135deg,#fff6d1,#ffd1e0,#d1f0ff);
   min-height:100vh;
   display:flex;
   flex-direction:column;
   align-items:center;
 }
+
+/* Splash Logo */
 #splash {
   position:fixed;
   inset:0;
@@ -28,8 +30,10 @@ body {
 #splash img { width:220px; max-width:80%; }
 @keyframes fadeOut{ to {opacity:0; visibility:hidden;} }
 
-h1 { color:#2b4eff; margin:20px; text-align:center; }
-#instructions-screen {
+h1 { margin:20px; color:#2b4eff; text-align:center; }
+
+/* Instructions */
+#instructions-screen{
   width:90%; max-width:700px;
   background:#ffffffcc; padding:20px;
   border-radius:12px; margin-bottom:20px;
@@ -43,6 +47,7 @@ h1 { color:#2b4eff; margin:20px; text-align:center; }
 }
 #start-btn:hover { background:linear-gradient(145deg,#33ccff,#66ff99); }
 
+/* Game area */
 #game-area {
   width:90%; max-width:900px;
   min-height:500px; background:#ffffffaa;
@@ -50,32 +55,44 @@ h1 { color:#2b4eff; margin:20px; text-align:center; }
   position:relative; overflow:hidden;
 }
 
-#path { position:relative; width:100%; height:400px; background: linear-gradient(180deg,#a6f0c6,#f0f7a6); border-radius:10px; margin-bottom:20px; }
+/* Path */
+#path {
+  position:relative;
+  width:100%;
+  height:300px;
+  background: linear-gradient(180deg,#a6f0c6,#f0f7a6);
+  border-radius:10px;
+  margin-bottom:20px;
+}
 
+/* Character */
 .character {
   width:50px; height:50px;
   background: radial-gradient(circle,#ffcc66,#ff6699);
   border-radius:50%;
-  position:absolute; top:330px; left:10px;
+  position:absolute; bottom:10px; left:0px;
   display:flex; justify-content:center; align-items:center;
   font-weight:bold; color:white; font-size:24px;
   animation:bounce 0.5s infinite alternate;
 }
-
 @keyframes bounce{
   0%{transform:translateY(0);}
   100%{transform:translateY(-10px);}
 }
 
+/* Treasure chest */
 .treasure {
-  width:120px; height:60px;
+  width:180px; height:60px;
   background: linear-gradient(145deg,#ff9966,#ffcc66);
-  border-radius:8px; text-align:center;
-  line-height:60px; font-weight:bold; color:white;
-  position:absolute;
+  border-radius:8px;
+  text-align:center;
+  line-height:60px;
+  font-weight:bold; color:white;
+  position:absolute; bottom:10px;
   cursor:pointer;
 }
 
+/* Sentence and choices */
 #sentence { font-size:18px; margin-bottom:10px; }
 #choices button {
   padding:10px 20px; margin:5px;
@@ -88,8 +105,8 @@ h1 { color:#2b4eff; margin:20px; text-align:center; }
 }
 #choices button:hover { transform:scale(1.05); background:linear-gradient(145deg,#3399ff,#66ccff); }
 
-#result { margin-top:10px; font-size:18px; color:#2b4eff; min-height:24px; }
-#score { margin-top:10px; font-size:20px; color:#333; }
+#result{ margin-top:10px; font-size:18px; color:#2b4eff; min-height:24px; }
+#score{ margin-top:10px; font-size:20px; color:#333; }
 </style>
 </head>
 <body>
@@ -120,7 +137,7 @@ h1 { color:#2b4eff; margin:20px; text-align:center; }
 <audio id="wrong-sound" src="assets/wrong.mp3"></audio>
 
 <script>
-// Sample sentences with missing article
+// Sentences with missing articles
 const questions = [
   {sentence:"I saw ___ elephant in the zoo.", answer:"an"},
   {sentence:"She wants to buy ___ apple.", answer:"an"},
@@ -139,7 +156,8 @@ const questions = [
   {sentence:"He wore ___ hat.", answer:"a"}
 ];
 
-let current=0; let score=0;
+let current = 0;
+let score = 0;
 
 const startBtn = document.getElementById('start-btn');
 const instructionsScreen = document.getElementById('instructions-screen');
@@ -150,14 +168,14 @@ const resultEl = document.getElementById('result');
 const scoreEl = document.getElementById('score');
 const correctSound = document.getElementById('correct-sound');
 const wrongSound = document.getElementById('wrong-sound');
+const char = document.getElementById('char');
 
-// Shuffle helper
-function shuffle(arr){return arr.sort(()=>Math.random()-0.5);}
+function shuffle(array){return array.sort(()=>Math.random()-0.5);}
 
-// Load next sentence
+// Load a question and show choices
 function loadQuestion(){
   if(current>=questions.length){
-    sentenceEl.innerText="Game Completed!";
+    sentenceEl.innerText="Treasure Hunt Completed!";
     choicesEl.innerHTML="";
     return;
   }
@@ -167,8 +185,8 @@ function loadQuestion(){
   let options = shuffle(["a","an","The"]);
   options.forEach(opt=>{
     const btn=document.createElement('button');
-    btn.innerText = opt;
-    btn.onclick = ()=>checkAnswer(opt,q.answer);
+    btn.innerText=opt;
+    btn.onclick=()=>checkAnswer(opt,q.answer);
     choicesEl.appendChild(btn);
   });
   resultEl.innerText="";
@@ -184,17 +202,32 @@ function checkAnswer(selected, correct){
     resultEl.innerText="Wrong!";
     wrongSound.play();
   }
-  scoreEl.innerText=`Score: ${score} / ${questions.length}`;
+  scoreEl.innerText = `Score: ${score} / ${questions.length}`;
   current++;
   setTimeout(loadQuestion,800);
 }
 
+// Animate character along path
+function animateCharacter(){
+  let pos = 0;
+  const interval = setInterval(()=>{
+    if(pos>800 || current>=questions.length){
+      clearInterval(interval);
+      return;
+    }
+    char.style.left = pos+"px";
+    pos+=5;
+  },50);
+}
+
+// Start game
 startBtn.onclick = ()=>{
   instructionsScreen.style.display="none";
   gameArea.style.display="block";
+  shuffle(questions);
   loadQuestion();
+  animateCharacter();
 };
 </script>
-
 </body>
 </html>
