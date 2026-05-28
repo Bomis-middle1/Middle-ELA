@@ -8,16 +8,12 @@
 * {margin:0; padding:0; box-sizing:border-box; font-family:Arial,sans-serif;}
 body {overflow:hidden; background:linear-gradient(to bottom,#0d1b2a,#1b263b,#415a77);}
 #gameArea {position:relative; width:100vw; height:100vh; overflow:hidden;}
-
-/* LOGO SCREEN */
 #logoScreen{
 position:absolute; width:100%; height:100%; background:white;
 display:flex; justify-content:center; align-items:center; flex-direction:column; z-index:9999;
 }
 #logoScreen img{width:260px; max-width:80%;}
 #logoText{margin-top:20px; font-size:32px; font-weight:bold; color:#333;}
-
-/* BINS */
 #bins{
 position:absolute; bottom:40px; width:100%; display:flex; justify-content:space-around; z-index:100;
 }
@@ -28,34 +24,25 @@ color:#e65100; user-select:none;
 }
 .word{position:absolute; padding:12px 20px; background:#4caf50; color:white;
 border-radius:12px; font-size:22px; cursor:pointer; user-select:none; transition:0.2s;}
-
-/* SCOREBOARD */
 #scoreBoard{
 position:absolute; top:15px; left:15px; background:white; padding:12px 18px; border-radius:15px;
 font-size:20px; font-weight:bold; z-index:200;
 }
-
-/* CONFETTI */
 .confetti{position:absolute; width:12px; height:12px; animation:fall 3s linear forwards;}
 @keyframes fall{
 from{transform:translateY(-100px) rotate(0deg);}
 to{transform:translateY(100vh) rotate(720deg); opacity:0;}
 }
-
-/* FEEDBACK */
 #feedback{
 position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
 font-size:40px; font-weight:bold; color:white; text-shadow:2px 2px 5px black;
 display:none; z-index:3000;
 }
-
-/* END SCREEN */
 #endScreen{
 position:absolute; width:100%; height:100%; background:rgba(0,0,0,0.85);
 display:flex; justify-content:center; align-items:center; flex-direction:column;
 text-align:center; color:white; padding:20px; z-index:5000; display:none;
 }
-
 @media(max-width:768px){
 .word{font-size:18px; padding:10px 15px;}
 .bin{font-size:24px; height:120px;}
@@ -65,45 +52,41 @@ text-align:center; color:white; padding:20px; z-index:5000; display:none;
 <body>
 <div id="gameArea">
 
-<!-- LOGO -->
 <div id="logoScreen">
 <img src="assets/logo.png" alt="Innovine Logo">
 <div id="logoText">Innovine Learning Adventures</div>
 </div>
 
-<!-- END SCREEN -->
 <div id="endScreen">
 <h1>🏆 Sorting Complete! 🏆</h1>
 <h2 id="finalText" style="margin-top:20px;"></h2>
 <button class="mainBtn" onclick="restartGame()">Play Again</button>
 </div>
 
-<!-- SCOREBOARD -->
 <div id="scoreBoard">Correct: <span id="score">0</span>/10</div>
 
-<!-- BINS -->
 <div id="bins">
 <div class="bin" id="adjBin">Adjective</div>
 <div class="bin" id="notAdjBin">Not Adjective</div>
 </div>
 
-<!-- FEEDBACK -->
 <div id="feedback"></div>
-
 </div>
 
 <script>
-// AUDIO
+// Audio
 const correctSound = new Audio("assets/correct.mp3");
 const wrongSound = new Audio("assets/wrong.mp3");
 const clapSound = new Audio("assets/freesound_community-claps-44774.mp3");
 
-// WORDS
+// Words
 let words = [
-{word:"happy", type:"adj"}, {word:"run", type:"not"}, {word:"tall", type:"adj"}, 
-{word:"dog", type:"not"}, {word:"beautiful", type:"adj"}, {word:"quickly", type:"not"}, 
-{word:"red", type:"adj"}, {word:"jump", type:"not"}, {word:"blue", type:"adj"}, 
-{word:"eat", type:"not"}
+{word:"happy", type:"adj"}, {word:"run", type:"not"}, {word:"tall", type:"adj"},
+{word:"dog", type:"not"}, {word:"beautiful", type:"adj"}, {word:"quickly", type:"not"},
+{word:"red", type:"adj"}, {word:"jump", type:"not"}, {word:"blue", type:"adj"},
+{word:"eat", type:"not"}, {word:"angry", type:"adj"}, {word:"school", type:"not"},
+{word:"delicious", type:"adj"}, {word:"write", type:"not"}, {word:"soft", type:"adj"},
+{word:"tree", type:"not"}, {word:"bright", type:"adj"}, {word:"play", type:"not"}
 ];
 
 let score = 0;
@@ -115,16 +98,15 @@ const adjBin = document.getElementById("adjBin");
 const notAdjBin = document.getElementById("notAdjBin");
 const feedback = document.getElementById("feedback");
 
-// SHUFFLE
 function shuffleArray(array){ return array.sort(()=>Math.random()-0.5); }
 
-// START GAME FUNCTION
+// Start Game
 function startGame(){
 document.getElementById("logoScreen").style.display="none";
 loadWord();
 }
 
-// LOAD WORD
+// Load Word
 function loadWord(){
 if(placedWords>=maxWords){ endGame(); return; }
 shuffleArray(words);
@@ -148,7 +130,7 @@ adjBin.addEventListener("drop",(e)=>dropWord(e,"adj"));
 notAdjBin.addEventListener("drop",(e)=>dropWord(e,"not"));
 }
 
-// DROP WORD
+// Drop Word
 function dropWord(e,binType){
 e.preventDefault();
 const index = e.dataTransfer.getData("text/plain");
@@ -156,8 +138,7 @@ const w = words[index];
 const wordDivs = document.getElementsByClassName("word");
 const wordDiv = wordDivs[index];
 if(w.type===binType){
-score++; 
-// only play audio after interaction
+score++;
 try{ correctSound.play(); clapSound.play(); } catch(e){}
 createConfetti();
 feedback.innerText="🎉 Correct!";
@@ -175,7 +156,7 @@ document.getElementById("score").innerText = score;
 setTimeout(loadWord,500);
 }
 
-// CONFETTI
+// Confetti
 function createConfetti(){
 for(let i=0;i<20;i++){
 const conf = document.createElement("div");
@@ -188,7 +169,7 @@ setTimeout(()=>{conf.remove();},4000);
 }
 }
 
-// END GAME
+// End Game
 function endGame(){
 document.getElementById("endScreen").style.display="flex";
 document.getElementById("finalText").innerHTML=`You sorted <b>${score}</b> adjectives correctly!`;
@@ -196,7 +177,7 @@ document.getElementById("finalText").innerHTML=`You sorted <b>${score}</b> adjec
 
 function restartGame(){ location.reload(); }
 
-// AUTOMATICALLY START GAME AFTER 5 SECONDS
+// Automatically start game after 5 seconds
 setTimeout(startGame, 5000);
 </script>
 </body>
