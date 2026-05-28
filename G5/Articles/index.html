@@ -3,28 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Treasure Hunt for Articles</title>
+<title>Articles Treasure Hunt</title>
 <style>
-body {
-  font-family: Arial, sans-serif;
-  margin:0;
-  padding:0;
-  background: linear-gradient(135deg,#fff6d1,#ffd1e0,#d1f0ff);
-  min-height:100vh;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-}
+* { box-sizing: border-box; margin:0; padding:0; font-family:Arial,sans-serif; }
+body { background: linear-gradient(135deg,#fff6d1,#d1f0ff); overflow:hidden; display:flex; flex-direction:column; align-items:center; min-height:100vh; }
 
 /* Splash Logo */
 #splash {
-  position:fixed;
-  inset:0;
-  background:#fff9f0;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  z-index:9999;
+  position:fixed; inset:0; background:#fff9f0; display:flex; justify-content:center; align-items:center; z-index:9999;
   animation:fadeOut 1s ease 4s forwards;
 }
 #splash img { width:220px; max-width:80%; }
@@ -34,77 +20,34 @@ h1 { margin:20px; color:#2b4eff; text-align:center; }
 
 /* Instructions */
 #instructions-screen{
-  width:90%; max-width:700px;
-  background:#ffffffcc; padding:20px;
-  border-radius:12px; margin-bottom:20px;
-  text-align:center;
-  font-size:18px;
+  width:90%; max-width:700px; background:#ffffffcc; padding:20px; border-radius:12px; margin-bottom:20px; text-align:center; font-size:18px;
 }
-#start-btn {
-  padding:10px 20px; font-size:16px;
-  background:linear-gradient(145deg,#66ff99,#33ccff);
-  color:white; border:none; border-radius:10px; cursor:pointer;
+#start-btn{
+  padding:10px 20px; font-size:16px; background:linear-gradient(145deg,#66ff99,#33ccff); color:white; border:none; border-radius:10px; cursor:pointer;
 }
 #start-btn:hover { background:linear-gradient(145deg,#33ccff,#66ff99); }
 
-/* Game area */
+/* Game Area */
 #game-area {
-  width:90%; max-width:900px;
-  min-height:500px; background:#ffffffaa;
-  border-radius:15px; padding:20px; display:none;
-  position:relative; overflow:hidden;
+  width:90%; max-width:900px; min-height:500px; background:#ffffffaa; border-radius:15px; padding:20px; display:none; position:relative; overflow:hidden;
 }
 
 /* Path */
-#path {
-  position:relative;
-  width:100%;
-  height:300px;
-  background: linear-gradient(180deg,#a6f0c6,#f0f7a6);
-  border-radius:10px;
-  margin-bottom:20px;
-}
+#path { position:relative; width:100%; height:300px; background: linear-gradient(180deg,#a6f0c6,#f0f7a6); border-radius:10px; margin-bottom:20px; }
 
 /* Character */
-.character {
-  width:50px; height:50px;
-  background: radial-gradient(circle,#ffcc66,#ff6699);
-  border-radius:50%;
-  position:absolute; bottom:10px; left:0px;
-  display:flex; justify-content:center; align-items:center;
-  font-weight:bold; color:white; font-size:24px;
-  animation:bounce 0.5s infinite alternate;
-}
-@keyframes bounce{
-  0%{transform:translateY(0);}
-  100%{transform:translateY(-10px);}
-}
+.character { width:50px; height:50px; background: radial-gradient(circle,#ffcc66,#ff6699); border-radius:50%; position:absolute; bottom:10px; left:0px; display:flex; justify-content:center; align-items:center; font-weight:bold; color:white; font-size:24px; animation:bounce 0.5s infinite alternate; }
+@keyframes bounce{0%{transform:translateY(0);}100%{transform:translateY(-10px);}}
 
-/* Treasure chest */
-.treasure {
-  width:180px; height:60px;
-  background: linear-gradient(145deg,#ff9966,#ffcc66);
-  border-radius:8px;
-  text-align:center;
-  line-height:60px;
-  font-weight:bold; color:white;
-  position:absolute; bottom:10px;
-  cursor:pointer;
-}
+/* Falling item */
+.item{ position:absolute; font-size:36px; background:linear-gradient(145deg,#ff9966,#ffcc66); border-radius:8px; text-align:center; line-height:50px; font-weight:bold; width:180px; height:50px; cursor:pointer; }
 
 /* Sentence and choices */
 #sentence { font-size:18px; margin-bottom:10px; }
-#choices button {
-  padding:10px 20px; margin:5px;
-  font-size:16px; font-weight:bold;
-  border-radius:8px; border:none;
-  cursor:pointer;
-  background:linear-gradient(145deg,#66ccff,#3399ff);
-  color:white;
-  transition: transform 0.2s;
-}
-#choices button:hover { transform:scale(1.05); background:linear-gradient(145deg,#3399ff,#66ccff); }
+#choices button { padding:10px 20px; margin:5px; font-size:16px; font-weight:bold; border-radius:8px; border:none; cursor:pointer; background:linear-gradient(145deg,#66ccff,#3399ff); color:white; transition: transform 0.2s;}
+#choices button:hover{transform:scale(1.05); background:linear-gradient(145deg,#3399ff,#66ccff);}
 
+/* Feedback & Score */
 #result{ margin-top:10px; font-size:18px; color:#2b4eff; min-height:24px; }
 #score{ margin-top:10px; font-size:20px; color:#333; }
 </style>
@@ -112,14 +55,14 @@ h1 { margin:20px; color:#2b4eff; text-align:center; }
 <body>
 
 <div id="splash">
-  <img src="assets/logo.png" alt="Innovine Logo">
+  <img src="assets/innovine-logo.png" alt="Innovine Logo">
 </div>
 
-<h1>Treasure Hunt for Articles</h1>
+<h1>Articles Treasure Hunt</h1>
 
 <div id="instructions-screen">
 <h2>Instructions</h2>
-<p>Click the correct article (a, an, the) to collect the treasure!</p>
+<p>Move the bucket to catch falling sentences and select the correct article (a, an, the)!</p>
 <button id="start-btn">Start Game</button>
 </div>
 
@@ -135,9 +78,10 @@ h1 { margin:20px; color:#2b4eff; text-align:center; }
 
 <audio id="correct-sound" src="assets/correct.mp3"></audio>
 <audio id="wrong-sound" src="assets/wrong.mp3"></audio>
+<audio id="clap-sound" src="assets/clapping.mp3"></audio>
 
 <script>
-// Sentences with missing articles
+// Article sentences
 const questions = [
   {sentence:"I saw ___ elephant in the zoo.", answer:"an"},
   {sentence:"She wants to buy ___ apple.", answer:"an"},
@@ -156,78 +100,88 @@ const questions = [
   {sentence:"He wore ___ hat.", answer:"a"}
 ];
 
-let current = 0;
-let score = 0;
-
+let current=0, score=0, bucketX=window.innerWidth/2, gameRunning=false;
 const startBtn = document.getElementById('start-btn');
 const instructionsScreen = document.getElementById('instructions-screen');
 const gameArea = document.getElementById('game-area');
+const char = document.getElementById('char');
 const sentenceEl = document.getElementById('sentence');
 const choicesEl = document.getElementById('choices');
 const resultEl = document.getElementById('result');
 const scoreEl = document.getElementById('score');
 const correctSound = document.getElementById('correct-sound');
 const wrongSound = document.getElementById('wrong-sound');
-const char = document.getElementById('char');
+const clapSound = document.getElementById('clap-sound');
 
-function shuffle(array){return array.sort(()=>Math.random()-0.5);}
+function moveBucket() {
+  if(bucketX<50) bucketX=50;
+  if(bucketX>window.innerWidth-50) bucketX=window.innerWidth-50;
+  char.style.left=bucketX+"px";
+}
 
-// Load a question and show choices
-function loadQuestion(){
-  if(current>=questions.length){
-    sentenceEl.innerText="Treasure Hunt Completed!";
-    choicesEl.innerHTML="";
-    return;
-  }
-  const q = questions[current];
-  sentenceEl.innerText = q.sentence;
+document.addEventListener("keydown", e=>{
+  if(e.key==="ArrowLeft") bucketX-=45;
+  if(e.key==="ArrowRight") bucketX+=45;
+  moveBucket();
+});
+document.addEventListener("touchstart", e=>{
+  if(e.touches[0].clientX<window.innerWidth/2) bucketX-=55;
+  else bucketX+=55;
+  moveBucket();
+});
+
+function spawnItem(){
+  if(!gameRunning) return;
+  const item = document.createElement("div");
+  item.classList.add("item");
+  const q=questions[Math.floor(Math.random()*questions.length)];
+  item.innerText=q.sentence.replace("___","___");
+  item.dataset.answer=q.answer;
+  item.style.left=Math.random()*(window.innerWidth-180)+"px";
+  item.style.top="-60px";
+  gameArea.appendChild(item);
+  let speed=2+Math.random()*2;
+  let fall=setInterval(()=>{
+    let top=parseFloat(item.style.top);
+    top+=speed;
+    item.style.top=top+"px";
+    const b=char.getBoundingClientRect();
+    const i=item.getBoundingClientRect();
+    if(i.left<b.right && i.right>b.left && i.top<b.bottom && i.bottom>b.top){
+      item.remove();
+      clearInterval(fall);
+      showChoices(q);
+    }
+    if(top>window.innerHeight){ item.remove(); clearInterval(fall); }
+  },20);
+}
+
+function showChoices(q){
+  sentenceEl.innerText=q.sentence;
   choicesEl.innerHTML="";
-  let options = shuffle(["a","an","The"]);
-  options.forEach(opt=>{
-    const btn=document.createElement('button');
+  ["a","an","The"].forEach(opt=>{
+    const btn=document.createElement("button");
     btn.innerText=opt;
     btn.onclick=()=>checkAnswer(opt,q.answer);
     choicesEl.appendChild(btn);
   });
-  resultEl.innerText="";
 }
 
-// Check answer
 function checkAnswer(selected, correct){
-  if(selected===correct){
-    resultEl.innerText="Correct!";
-    correctSound.play();
-    score++;
-  } else {
-    resultEl.innerText="Wrong!";
-    wrongSound.play();
-  }
-  scoreEl.innerText = `Score: ${score} / ${questions.length}`;
+  if(selected===correct){ resultEl.innerText="Correct!"; correctSound.play(); clapSound.play(); score++; }
+  else{ resultEl.innerText="Wrong!"; wrongSound.play(); }
+  scoreEl.innerText=`Score: ${score} / ${questions.length}`;
   current++;
-  setTimeout(loadQuestion,800);
+  setTimeout(spawnItem,800);
 }
 
-// Animate character along path
-function animateCharacter(){
-  let pos = 0;
-  const interval = setInterval(()=>{
-    if(pos>800 || current>=questions.length){
-      clearInterval(interval);
-      return;
-    }
-    char.style.left = pos+"px";
-    pos+=5;
-  },50);
-}
-
-// Start game
-startBtn.onclick = ()=>{
+startBtn.onclick=()=>{
   instructionsScreen.style.display="none";
   gameArea.style.display="block";
-  shuffle(questions);
-  loadQuestion();
-  animateCharacter();
+  gameRunning=true;
+  spawnItem();
 };
 </script>
+
 </body>
 </html>
