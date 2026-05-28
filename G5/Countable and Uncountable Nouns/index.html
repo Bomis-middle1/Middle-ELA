@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Countable & Uncountable Nouns - Prick the Balloon</title>
+<style>
+* { box-sizing: border-box; margin:0; padding:0; }
+body {
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg, #fef6e4, #dff6ff, #fce1ff);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-x: hidden;
+  position: relative;
+}
+#splash {
+  position: fixed;
+  inset: 0;
+  background: #fff9f0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  animation: fadeOut 1s ease 4s forwards;
+}
+#splash img { width: 220px; max-width: 80%; }
+
+@keyframes fadeOut { to { opacity:0; visibility:hidden; } }
+
+h1 { margin-top: 20px; color: #2b4eff; text-align: center; }
+#instructions { margin: 10px 20px; font-size: 18px; color:#333; text-align:center; }
+#game-area {
+  position: relative;
+  width: 90%;
+  max-width: 800px;
+  height: 500px;
+  margin-top: 20px;
+  border: 3px dashed #c3c3ff;
+  border-radius: 15px;
+  background: #ffffffaa;
+  overflow: hidden;
+}
+.balloon {
+  position: absolute;
+  width: 100px;
+  height: 140px;
+  cursor: pointer;
+  transition: transform 0.2s;
+  z-index:1;
+}
+.balloon img { width: 100%; height: auto; }
+.balloon:hover { transform: scale(1.1); }
+#score { margin-top: 15px; font-size: 20px; color:#333; }
+#result { margin-top:10px; font-size:18px; color:#2b4eff; min-height:24px; }
+
+@keyframes floatUp {
+  0% { bottom: -150px; }
+  100% { bottom: 500px; }
+}
+
+.star {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  pointer-events:none;
+  opacity:0.8;
+  animation: floatStar linear infinite;
+}
+@keyframes floatStar {
+  0% { transform: translateY(0px) rotate(0deg); opacity:0.8; }
+  100% { transform: translateY(-600px) rotate(360deg); opacity:0; }
+}
+</style>
+</head>
+<body>
+
+<div id="splash">
+  <img src="assets/logo.png" alt="Innovine Logo">
+</div>
+
+<h1>Countable & Uncountable Nouns</h1>
+<p id="instructions">Prick the balloons with <strong>Countable</strong> nouns! Two attempts per balloon.</p>
+
+<div id="game-area"></div>
+
+<div id="result"></div>
+<div id="score">Score: 0</div>
+
+<audio id="correct-sound" src="assets/correct.mp3"></audio>
+<audio id="wrong-sound" src="assets/wrong.mp3"></audio>
+
+<script>
+const nouns = [
+  {word:"Apple", type:"Countable"},
+  {word:"Water", type:"Uncountable"},
+  {word:"Book", type:"Countable"},
+  {word:"Milk", type:"Uncountable"},
+  {word:"Pencil", type:"Countable"},
+  {word:"Rice", type:"Uncountable"},
+  {word:"Chair", type:"Countable"},
+  {word:"Sugar", type:"Uncountable"},
+  {word:"Orange", type:"Countable"},
+  {word:"Juice", type:"Uncountable"}
+];
+
+let score = 0;
+let attempts = {};
+const gameArea = document.getElementById('game-area');
+
+function spawnBalloon(noun) {
+  const balloon = document.createElement('div');
+  balloon.className = 'balloon';
+  balloon.style.left = Math.random() * (gameArea.offsetWidth - 100) + 'px';
+  balloon.style.bottom = '-150px';
+  balloon.style.animation = `floatUp ${5 + Math.random()*3}s linear forwards`;
+  balloon.dataset.word = noun.word;
+  balloon.dataset.type = noun.type;
+
+  // Balloon image
+  const img = document.createElement('img');
+  img.src = 'assets/balloon.png';
+  balloon.appendChild(img);
+
+  // Label
+  const label = document.createElement('div');
+  label.style.position='absolute';
+  label.style.width='100%';
+  label.style.bottom='10px';
+  label.style.textAlign='center';
+  label.style.fontWeight='bold';
+  label.style.color='#fff';
+  label.style.textShadow='1px 1px 2px #000';
+  label.innerText = noun.word;
+  balloon.appendChild(label);
+
+  balloon.addEventListener('click', () => checkBalloon(balloon));
+
+  gameArea.appendChild(balloon);
+
+  balloon.addEventListener('animationend', () => {
+    if(balloon.parentNode) gameArea.removeChild(balloon);
+  });
+}
+
+function createStar(x, y) {
+  const star = document.createElement('img');
+  star.src = 'assets/star.png';
+  star.className = 'star';
+  star.style.left = x + 'px';
+  star.style.bottom = y + 'px';
+  star.style.width = '20px';
+  star.style.height = '20px';
+  star.style.animationDuration = (1 + Math.random()*1) + 's';
+  gameArea.appendChild(star);
+  setTimeout(()=> star.remove(), 1200);
+}
+
+function checkBalloon(balloon) {
+  const word = balloon.dataset.word;
+  const type = balloon.dataset.type;
+
+  attempts[word] = attempts[word] ? attempts[word] + 1 : 1;
+
+  if(type === "Countable") {
+    document.getElementById('result').innerText = "Correct!";
+    document.getElementById('correct-sound').play();
+    score++;
+    for(let i=0;i<8;i++) createStar(balloon.offsetLeft + 50, balloon.offsetTop + 70); // confetti
+    balloon.remove();
+  } else {
+    document.getElementById('result').innerText = attempts[word] >= 2 
+      ? `Wrong! '${word}' is Uncountable.` 
+      : "Try again!";
+    document.getElementById('wrong-sound').play();
+    if(attempts[word] >= 2) balloon.remove();
+  }
+  document.getElementById('score').innerText = "Score: " + score;
+}
+
+// Spawn balloons randomly every 1.5 sec
+setInterval(() => {
+  const noun = nouns[Math.floor(Math.random() * nouns.length)];
+  spawnBalloon(noun);
+}, 1500);
+
+// Floating stars in background
+setInterval(() => {
+  const x = Math.random()*gameArea.offsetWidth;
+  const y = -20;
+  const star = document.createElement('img');
+  star.src = 'assets/star.png';
+  star.className = 'star';
+  star.style.left = x + 'px';
+  star.style.bottom = y + 'px';
+  star.style.animationDuration = (5 + Math.random()*5) + 's';
+  gameArea.appendChild(star);
+  setTimeout(()=> star.remove(), 7000);
+}, 800);
+
+</script>
+</body>
+</html>
