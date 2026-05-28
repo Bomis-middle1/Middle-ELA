@@ -16,6 +16,8 @@ body {
   justify-content: flex-start;
   overflow-x: hidden;
 }
+
+/* Splash Logo */
 #splash {
   position: fixed;
   inset: 0;
@@ -30,6 +32,8 @@ body {
 @keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
 
 h1 { margin-top: 20px; color: #2b4eff; text-align: center; }
+
+/* Instructions */
 #instructions-screen {
   width: 90%;
   max-width: 600px;
@@ -52,6 +56,7 @@ h1 { margin-top: 20px; color: #2b4eff; text-align: center; }
 }
 #start-btn:hover { background-color: #45a049; }
 
+/* Game Area */
 #game-area {
   position: relative;
   width: 90%;
@@ -62,9 +67,10 @@ h1 { margin-top: 20px; color: #2b4eff; text-align: center; }
   border-radius: 15px;
   background: #ffffffaa;
   overflow: hidden;
-  display:none;
+  display:none; /* hidden until start */
 }
 
+/* Balloon CSS-only */
 .balloon {
   position: absolute;
   width: 100px;
@@ -95,20 +101,23 @@ h1 { margin-top: 20px; color: #2b4eff; text-align: center; }
 </head>
 <body>
 
+<!-- Splash Logo -->
 <div id="splash">
   <img src="assets/logo.png" alt="Innovine Logo">
 </div>
 
 <h1>Countable & Uncountable Nouns</h1>
 
+<!-- Instructions -->
 <div id="instructions-screen">
   <h2>How to Play</h2>
   <p>Click on the balloons that have <strong>Countable nouns</strong> written on them.</p>
   <p>Avoid the balloons with <strong>Uncountable nouns</strong>!</p>
-  <p>You get <strong>2 attempts</strong> per balloon. If you click a wrong balloon twice, it will disappear.</p>
+  <p>You get <strong>2 attempts</strong> per balloon. Wrong clicks remove the balloon after 2 tries.</p>
   <button id="start-btn">Start Game</button>
 </div>
 
+<!-- Game Area -->
 <div id="game-area"></div>
 
 <div id="result"></div>
@@ -118,6 +127,7 @@ h1 { margin-top: 20px; color: #2b4eff; text-align: center; }
 <audio id="wrong-sound" src="assets/wrong.mp3"></audio>
 
 <script>
+// Nouns Data
 const nouns = [
   {word:"Apple", type:"Countable"},
   {word:"Water", type:"Uncountable"},
@@ -139,6 +149,7 @@ const gameArea = document.getElementById('game-area');
 const startBtn = document.getElementById('start-btn');
 const instructionsScreen = document.getElementById('instructions-screen');
 
+// Spawn Balloon
 function spawnBalloon(noun) {
   const balloon = document.createElement('div');
   balloon.className = 'balloon';
@@ -158,6 +169,7 @@ function spawnBalloon(noun) {
   });
 }
 
+// Check Balloon
 function checkBalloon(balloon) {
   const word = balloon.dataset.word;
   const type = balloon.dataset.type;
@@ -179,6 +191,7 @@ function checkBalloon(balloon) {
   document.getElementById('score').innerText = "Score: " + score;
 }
 
+// Start Game
 startBtn.addEventListener('click', () => {
   instructionsScreen.style.display = 'none';
   gameArea.style.display = 'block';
