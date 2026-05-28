@@ -6,18 +6,22 @@
 <title>Verb Detective Game</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif;}
-body{background:linear-gradient(to bottom,#0d1b2a,#1b263b,#415a77);overflow:hidden;}
+body{background:linear-gradient(to bottom,#FFD580,#FF8C69,#FFB6C1);overflow:hidden;}
 #gameArea{position:relative;width:100vw;height:100vh;}
 /* Logo Screen */
 #logoScreen{position:absolute;width:100%;height:100%;background:white;display:flex;justify-content:center;align-items:center;flex-direction:column;z-index:9999;}
 #logoScreen img{width:260px;max-width:80%;}
 #logoText{margin-top:20px;font-size:32px;font-weight:bold;color:#333;}
+/* Detective Image */
+#detectiveImg{position:absolute;bottom:10px;left:10px;width:150px;z-index:400;animation: detectiveMove 2s infinite alternate;}
+@keyframes detectiveMove{0%{transform:translateX(0);}100%{transform:translateX(10px);}}
+
 /* Instructions */
 #instructions{position:absolute;top:15px;width:100%;text-align:center;font-size:22px;color:white;z-index:500;}
 /* Sentence */
-#sentence{position:absolute;top:60px;width:100%;text-align:center;font-size:28px;color:#ffeb3b;z-index:500; margin-left:120px; margin-right:20px;}
+#sentence{position:absolute;top:60px;width:100%;text-align:center;font-size:28px;color:#1a1a1a;z-index:500; margin-left:180px; margin-right:20px;}
 /* Buttons */
-.options{position:absolute;bottom:80px;width:100%;display:flex;justify-content:space-around;z-index:500;margin-left:120px;margin-right:20px;}
+.options{position:absolute;bottom:80px;width:100%;display:flex;justify-content:space-around;z-index:500;margin-left:180px;margin-right:20px;}
 .optionBtn{padding:16px 34px;font-size:22px;border:none;border-radius:18px;background:#ff9800;color:white;cursor:pointer;transition:0.3s;}
 .optionBtn:hover{transform:scale(1.05);background:#f57c00;}
 /* Scoreboard */
@@ -26,20 +30,7 @@ body{background:linear-gradient(to bottom,#0d1b2a,#1b263b,#415a77);overflow:hidd
 #feedback{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:40px;font-weight:bold;color:white;text-shadow:2px 2px 5px black;display:none;z-index:3000;}
 /* End Screen */
 #endScreen{position:absolute;width:100%;height:100%;background:rgba(0,0,0,0.85);display:flex;justify-content:center;align-items:center;flex-direction:column;text-align:center;color:white;z-index:5000;display:none;}
-/* CSS Detective */
-#detective{position:absolute;bottom:20px;left:20px;width:100px;height:160px;z-index:400;}
-.hat{width:70px;height:20px;background:brown;border-radius:10px 10px 0 0;position:absolute;top:0;left:15px;}
-.head{width:50px;height:50px;background:#f9c9b6;border-radius:50%;position:absolute;top:20px;left:25px;}
-.body{width:60px;height:70px;background:#555;position:absolute;top:70px;left:20px;border-radius:10px;}
-.arm{width:15px;height:50px;background:#555;position:absolute;top:70px;border-radius:10px;}
-.arm.left{left:-5px;transform:rotate(-20deg);}
-.arm.right{left:70px;transform:rotate(20deg);}
-.magnifier{width:20px;height:20px;border:4px solid black;border-radius:50%;position:absolute;top:90px;left:70px;}
-.magnifier::after{content:'';width:15px;height:4px;background:black;position:absolute;top:15px;left:18px;}
-/* Confetti */
-.confetti{position:absolute;width:12px;height:12px;animation:fall 3s linear forwards;}
-@keyframes fall{from{transform:translateY(-100px) rotate(0deg);}to{transform:translateY(100vh) rotate(720deg);opacity:0;}}
-@media(max-width:768px){#sentence{font-size:24px;margin-left:100px;} .optionBtn{font-size:18px;padding:12px 20px;}}
+@media(max-width:768px){#sentence{font-size:24px;margin-left:150px;} .optionBtn{font-size:18px;padding:12px 20px;}}
 </style>
 </head>
 <body>
@@ -51,15 +42,8 @@ body{background:linear-gradient(to bottom,#0d1b2a,#1b263b,#415a77);overflow:hidd
 <div id="logoText">Innovine Learning Adventures</div>
 </div>
 
-<!-- CSS Detective -->
-<div id="detective">
-  <div class="hat"></div>
-  <div class="head"></div>
-  <div class="body"></div>
-  <div class="arm left"></div>
-  <div class="arm right"></div>
-  <div class="magnifier"></div>
-</div>
+<!-- Detective Image -->
+<img src="assets/348f3379-bf5f-4ced-ad64-25fed9c0a9db.png" id="detectiveImg" alt="Detective">
 
 <!-- Instructions -->
 <div id="instructions">Read the sentence and click the verb that does not agree with the subject.</div>
@@ -95,7 +79,7 @@ const correctSound = new Audio("assets/correct.mp3");
 const wrongSound = new Audio("assets/wrong.mp3");
 const clapSound = new Audio("assets/freesound_community-claps-44774.mp3");
 
-// 20 challenging sentences (Main/Auxiliary)
+// 20 challenging sentences
 let sentences = [
 {sentence:"She ___ decided to join the competition.", options:["has","run","do"], answer:"has"},
 {sentence:"They ___ finished the project before the deadline.", options:["have","work","eat"], answer:"have"},
@@ -131,7 +115,6 @@ const endScreen = document.getElementById("endScreen");
 const finalText = document.getElementById("finalText");
 const btns = [document.getElementById("btn1"), document.getElementById("btn2"), document.getElementById("btn3")];
 
-// Button events
 btns.forEach((btn,i)=>btn.addEventListener("click",()=>checkAnswer(btn.textContent)));
 
 function nextSentence(){
@@ -139,10 +122,7 @@ function nextSentence(){
     let remaining = sentences.filter(s=>!usedSentences.includes(s));
     currentSentence = remaining[Math.floor(Math.random()*remaining.length)];
     usedSentences.push(currentSentence);
-
     sentenceDiv.textContent = currentSentence.sentence;
-
-    // Randomize options
     let opts = [...currentSentence.options].sort(()=>Math.random()-0.5);
     for(let i=0;i<3;i++){ btns[i].textContent = opts[i]; }
 }
@@ -186,7 +166,6 @@ function endGame(){
 
 function restartGame(){ location.reload(); }
 
-// Automatically start game after 5 seconds
 setTimeout(()=>{
     document.getElementById("logoScreen").style.display="none";
     nextSentence();
