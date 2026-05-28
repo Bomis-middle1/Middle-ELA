@@ -9,6 +9,7 @@
 body {overflow:hidden; background:linear-gradient(to bottom,#0d1b2a,#1b263b,#415a77);}
 #gameArea {position:relative; width:100vw; height:100vh; overflow:hidden;}
 
+/* LOGO SCREEN */
 #logoScreen{
 position:absolute; width:100%; height:100%; background:white;
 display:flex; justify-content:center; align-items:center; flex-direction:column; z-index:9999;
@@ -16,15 +17,17 @@ display:flex; justify-content:center; align-items:center; flex-direction:column;
 #logoScreen img{width:260px; max-width:80%;}
 #logoText{margin-top:20px; font-size:32px; font-weight:bold; color:#333;}
 
-#startScreen, #endScreen{
+/* START SCREEN */
+#startScreen{
 position:absolute; width:100%; height:100%; background:rgba(0,0,0,0.85);
 display:flex; justify-content:center; align-items:center; flex-direction:column;
-text-align:center; color:white; padding:20px; z-index:5000;
+text-align:center; color:white; padding:20px; z-index:5000; display:none;
 }
 .mainBtn{padding:16px 34px; font-size:22px; border:none; border-radius:18px;
 background:#ff9800; color:white; cursor:pointer; margin-top:25px; transition:0.3s;}
 .mainBtn:hover{transform:scale(1.05); background:#f57c00;}
 
+/* BINS */
 #bins{
 position:absolute; bottom:40px; width:100%; display:flex; justify-content:space-around; z-index:100;
 }
@@ -36,21 +39,31 @@ color:#e65100; user-select:none;
 .word{position:absolute; padding:12px 20px; background:#4caf50; color:white;
 border-radius:12px; font-size:22px; cursor:pointer; user-select:none; transition:0.2s;}
 
+/* SCOREBOARD */
 #scoreBoard{
 position:absolute; top:15px; left:15px; background:white; padding:12px 18px; border-radius:15px;
 font-size:20px; font-weight:bold; z-index:200;
 }
 
+/* CONFETTI */
 .confetti{position:absolute; width:12px; height:12px; animation:fall 3s linear forwards;}
 @keyframes fall{
 from{transform:translateY(-100px) rotate(0deg);}
 to{transform:translateY(100vh) rotate(720deg); opacity:0;}
 }
 
+/* FEEDBACK */
 #feedback{
 position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
 font-size:40px; font-weight:bold; color:white; text-shadow:2px 2px 5px black;
 display:none; z-index:3000;
+}
+
+/* END SCREEN */
+#endScreen{
+position:absolute; width:100%; height:100%; background:rgba(0,0,0,0.85);
+display:flex; justify-content:center; align-items:center; flex-direction:column;
+text-align:center; color:white; padding:20px; z-index:5000; display:none;
 }
 
 @media(max-width:768px){
@@ -61,14 +74,15 @@ display:none; z-index:3000;
 </head>
 <body>
 <div id="gameArea">
-<!-- Logo -->
+
+<!-- LOGO -->
 <div id="logoScreen">
-<img src="assets/logo.png">
+<img src="assets/logo.png" alt="Innovine Logo">
 <div id="logoText">Innovine Learning Adventures</div>
 </div>
 
-<!-- Start Screen -->
-<div id="startScreen" style="display:none;">
+<!-- START SCREEN -->
+<div id="startScreen">
 <h1 style="font-size:52px;">🎯 Adjective Sorter Adventure</h1>
 <p style="margin-top:20px;font-size:24px; max-width:700px;">
 Drag each word into the correct bin: <b>Adjective</b> or <b>Not Adjective</b>.
@@ -76,31 +90,34 @@ Drag each word into the correct bin: <b>Adjective</b> or <b>Not Adjective</b>.
 <button class="mainBtn" onclick="startGame()">Start Sorting!</button>
 </div>
 
-<!-- End Screen -->
-<div id="endScreen" style="display:none;">
+<!-- END SCREEN -->
+<div id="endScreen">
 <h1>🏆 Sorting Complete! 🏆</h1>
 <h2 id="finalText" style="margin-top:20px;"></h2>
 <button class="mainBtn" onclick="restartGame()">Play Again</button>
 </div>
 
-<!-- Score -->
+<!-- SCOREBOARD -->
 <div id="scoreBoard">Correct: <span id="score">0</span>/10</div>
 
-<!-- Bins -->
+<!-- BINS -->
 <div id="bins">
 <div class="bin" id="adjBin">Adjective</div>
 <div class="bin" id="notAdjBin">Not Adjective</div>
 </div>
 
-<!-- Feedback -->
+<!-- FEEDBACK -->
 <div id="feedback"></div>
+
 </div>
 
 <script>
+// AUDIO
 const correctSound = new Audio("assets/correct.mp3");
 const wrongSound = new Audio("assets/wrong.mp3");
 const clapSound = new Audio("assets/freesound_community-claps-44774.mp3");
 
+// WORDS
 let words = [
 {word:"happy", type:"adj"}, {word:"run", type:"not"}, {word:"tall", type:"adj"}, 
 {word:"dog", type:"not"}, {word:"beautiful", type:"adj"}, {word:"quickly", type:"not"}, 
@@ -108,9 +125,9 @@ let words = [
 {word:"eat", type:"not"}
 ];
 
-let score=0;
-let placedWords=0;
-const maxWords=10;
+let score = 0;
+let placedWords = 0;
+const maxWords = 10;
 
 const gameArea = document.getElementById("gameArea");
 const adjBin = document.getElementById("adjBin");
@@ -119,12 +136,14 @@ const feedback = document.getElementById("feedback");
 
 function shuffleArray(array){ return array.sort(()=>Math.random()-0.5); }
 
+// START GAME FUNCTION
 function startGame(){
 document.getElementById("logoScreen").style.display="none";
 document.getElementById("startScreen").style.display="none";
 loadWord();
 }
 
+// LOAD WORD
 function loadWord(){
 if(placedWords>=maxWords){ endGame(); return; }
 shuffleArray(words);
@@ -148,6 +167,7 @@ adjBin.addEventListener("drop",(e)=>dropWord(e,"adj"));
 notAdjBin.addEventListener("drop",(e)=>dropWord(e,"not"));
 }
 
+// DROP WORD
 function dropWord(e,binType){
 e.preventDefault();
 const index = e.dataTransfer.getData("text/plain");
@@ -167,10 +187,11 @@ setTimeout(()=>{feedback.style.display="none";},1000);
 }
 wordDiv.remove();
 placedWords++;
-document.getElementById("score").innerText=score;
+document.getElementById("score").innerText = score;
 setTimeout(loadWord,500);
 }
 
+// CONFETTI
 function createConfetti(){
 for(let i=0;i<20;i++){
 const conf = document.createElement("div");
@@ -183,6 +204,7 @@ setTimeout(()=>{conf.remove();},4000);
 }
 }
 
+// END GAME
 function endGame(){
 document.getElementById("endScreen").style.display="flex";
 document.getElementById("finalText").innerHTML=`You sorted <b>${score}</b> adjectives correctly!`;
@@ -190,6 +212,7 @@ document.getElementById("finalText").innerHTML=`You sorted <b>${score}</b> adjec
 
 function restartGame(){ location.reload(); }
 
+// SHOW START SCREEN AFTER 5 SECONDS
 setTimeout(()=>{ document.getElementById("startScreen").style.display="flex"; },5000);
 </script>
 </body>
