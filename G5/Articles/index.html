@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Treasure Hunt for Articles</title>
 <style>
-/* Keep all your previous CSS exactly the same */
+/* Keeping all CSS from your last file exactly as it was */
 body {
   font-family: Arial, sans-serif;
   margin:0;
@@ -77,7 +77,7 @@ h1 { margin:20px; color:#2b4eff; text-align:center; }
 <audio id="clap-sound" src="assets/clapping.mp3"></audio>
 
 <script>
-// ONLY changed the questions to Articles
+// === ONLY CHANGED QUESTIONS TO ARTICLES ===
 const questions = [
   {sentence:"I saw ___ elephant in the zoo.", answer:"an"},
   {sentence:"She wants to buy ___ apple.", answer:"an"},
@@ -153,19 +153,18 @@ function spawnItem(){
 }
 
 function showChoices(q){
-  sentenceEl.innerText=q.sentence;
-  choicesEl.innerHTML="";
+  sentenceEl.innerText = q.sentence;
+  choicesEl.innerHTML = "";
   ["a","an","The"].forEach(opt=>{
-    const btn=document.createElement('button');
-    btn.innerText=opt;
-    btn.onclick=()=>checkAnswer(opt,q.answer);
+    const btn = document.createElement('button');
+    btn.innerText = opt;
+    btn.onclick = ()=>checkAnswer(opt,q.answer);
     choicesEl.appendChild(btn);
   });
 }
 
 function checkAnswer(selected, correct){
   if(selected===correct){
-    itemCollected = true;
     resultEl.innerText="Correct!";
     correctSound.play();
     clapSound.play();
@@ -179,7 +178,7 @@ function checkAnswer(selected, correct){
   setTimeout(spawnItem,800);
 }
 
-startBtn.onclick=()=>{
+startBtn.onclick = ()=>{
   instructionsScreen.style.display="none";
   gameArea.style.display="block";
   gameRunning=true;
