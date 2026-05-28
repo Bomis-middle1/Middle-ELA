@@ -1,4 +1,5 @@
 
+```html id="newfullgame"
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,15 +8,17 @@
 <title>Temple Treasure Grammar Adventure</title>
 
 <style>
+
 *{
+    margin:0;
+    padding:0;
     box-sizing:border-box;
 }
 
 body{
-    margin:0;
     overflow:hidden;
-    font-family:Arial, sans-serif;
-    background:#87ceeb;
+    font-family:Arial,sans-serif;
+    background:#87CEEB;
 }
 
 #gameArea{
@@ -23,26 +26,31 @@ body{
     width:100vw;
     height:100vh;
     overflow:hidden;
-    background:linear-gradient(to bottom,#87CEEB,#d8ffb0);
+    background:linear-gradient(to bottom,#87ceeb,#dfffb0);
 }
 
-#sun{
+#logoScreen{
     position:absolute;
-    width:100px;
-    height:100px;
-    background:gold;
-    border-radius:50%;
-    top:30px;
-    right:40px;
-}
-
-.cloud{
-    position:absolute;
-    width:120px;
-    height:60px;
+    width:100%;
+    height:100%;
     background:white;
-    border-radius:50px;
-    opacity:0.9;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    z-index:1000;
+    flex-direction:column;
+}
+
+#logoScreen img{
+    width:250px;
+    max-width:80%;
+}
+
+#logoText{
+    margin-top:20px;
+    font-size:28px;
+    font-weight:bold;
+    color:#333;
 }
 
 #ground{
@@ -51,28 +59,28 @@ body{
     width:100%;
     height:120px;
     background:#8B5A2B;
-    border-top:8px solid #5f9c38;
+    border-top:8px solid #4caf50;
 }
 
 #player{
     position:absolute;
-    width:65px;
-    height:65px;
+    width:70px;
+    height:70px;
     left:80px;
     bottom:120px;
-    font-size:50px;
+    font-size:55px;
     display:flex;
     justify-content:center;
     align-items:center;
-    transition:transform 0.1s;
+    z-index:20;
 }
 
 .coin{
     position:absolute;
     width:40px;
     height:40px;
-    border-radius:50%;
     background:gold;
+    border-radius:50%;
     display:flex;
     justify-content:center;
     align-items:center;
@@ -83,9 +91,9 @@ body{
     position:absolute;
     width:45px;
     height:70px;
-    background:#6d4c41;
-    bottom:120px;
+    background:#5d4037;
     border-radius:10px;
+    bottom:120px;
 }
 
 #scoreBoard{
@@ -105,10 +113,9 @@ body{
     top:10px;
     right:10px;
     background:white;
-    padding:10px;
+    padding:12px;
     border-radius:15px;
     z-index:50;
-    font-weight:bold;
 }
 
 #questionBox{
@@ -121,9 +128,9 @@ body{
     background:white;
     border-radius:25px;
     padding:25px;
-    text-align:center;
-    z-index:200;
     display:none;
+    z-index:200;
+    text-align:center;
     box-shadow:0 0 20px rgba(0,0,0,0.3);
 }
 
@@ -143,11 +150,10 @@ body{
     color:white;
     font-size:18px;
     cursor:pointer;
-    transition:0.2s;
 }
 
 .optionBtn:hover{
-    transform:scale(1.03);
+    background:#1e88e5;
 }
 
 #feedback{
@@ -174,18 +180,18 @@ body{
 
 @keyframes shake{
     0%{transform:translateX(0);}
-    20%{transform:translateX(-10px);}
-    40%{transform:translateX(10px);}
-    60%{transform:translateX(-10px);}
-    80%{transform:translateX(10px);}
+    25%{transform:translateX(-10px);}
+    50%{transform:translateX(10px);}
+    75%{transform:translateX(-10px);}
     100%{transform:translateX(0);}
 }
 
-#startScreen,#endScreen{
+#startScreen,
+#endScreen{
     position:absolute;
     width:100%;
     height:100%;
-    background:rgba(0,0,0,0.75);
+    background:rgba(0,0,0,0.7);
     color:white;
     display:flex;
     flex-direction:column;
@@ -222,9 +228,8 @@ body{
 
 .confettiPiece{
     position:absolute;
-    width:10px;
-    height:10px;
-    background:red;
+    width:12px;
+    height:12px;
     animation:fall 2s linear forwards;
 }
 
@@ -248,15 +253,16 @@ body{
     }
 
     #player{
-        font-size:42px;
         width:55px;
         height:55px;
+        font-size:42px;
     }
 
     #scoreBoard{
         font-size:16px;
     }
 }
+
 </style>
 </head>
 
@@ -264,11 +270,10 @@ body{
 
 <div id="gameArea">
 
-<div id="sun"></div>
-
-<div class="cloud" style="top:50px;left:100px;"></div>
-<div class="cloud" style="top:120px;left:350px;"></div>
-<div class="cloud" style="top:80px;left:700px;"></div>
+<div id="logoScreen">
+<img src="assets/innovine-logo.png">
+<div id="logoText">Innovine Learning Adventures</div>
+</div>
 
 <div id="ground"></div>
 
@@ -292,39 +297,49 @@ Volume
 
 <div id="confetti"></div>
 
-<div id="startScreen">
+<div id="startScreen" style="display:none;">
+
 <h1>💎 Temple Treasure Grammar Adventure 💎</h1>
 
-<p>
-Run, collect treasure, and answer grammar questions about
+<p style="margin-top:20px;">
+Collect treasure and answer grammar questions about
 Subjects and Predicates!
 </p>
 
-<p>
-Desktop: Press SPACE or ↑ to jump<br>
-Mobile: Tap anywhere to jump
+<p style="margin-top:20px;">
+Desktop: SPACE or ↑ to jump<br>
+Mobile: Tap screen to jump
 </p>
 
 <button class="mainBtn" onclick="startGame()">
 Start Adventure
 </button>
+
 </div>
 
 <div id="endScreen" style="display:none;">
+
 <h1>🎉 Adventure Complete! 🎉</h1>
 
-<h2 id="finalMessage"></h2>
+<h2 id="finalMessage" style="margin-top:20px;"></h2>
 
 <button class="mainBtn" onclick="restartGame()">
 Restart Game
 </button>
+
 </div>
 
 </div>
 
 <script>
 
+setTimeout(()=>{
+    document.getElementById("logoScreen").style.display="none";
+    document.getElementById("startScreen").style.display="flex";
+},5000);
+
 const player = document.getElementById("player");
+
 const questionBox = document.getElementById("questionBox");
 const questionText = document.getElementById("questionText");
 const optionsDiv = document.getElementById("options");
@@ -335,10 +350,17 @@ const questionCount = document.getElementById("questionCount");
 
 const volumeSlider = document.getElementById("volumeSlider");
 
+const correctSound = new Audio("assets/correct.mp3");
+const wrongSound = new Audio("assets/wrong.mp3");
+const clapSound = new Audio("assets/clapping.mp3");
+
 let gameRunning = false;
+
 let jumping = false;
 let velocity = 0;
-let gravity = 0.9;
+const gravity = 0.8;
+
+let playerY = 120;
 
 let coins = 0;
 let currentQuestion = 0;
@@ -459,27 +481,16 @@ a:2
 
 questions.sort(()=>Math.random()-0.5);
 
-function playTone(freq,duration){
+function updateVolumes(){
 
-    const audioCtx = new(window.AudioContext || window.webkitAudioContext)();
-
-    const oscillator = audioCtx.createOscillator();
-    const gainNode = audioCtx.createGain();
-
-    oscillator.connect(gainNode);
-    gainNode.connect(audioCtx.destination);
-
-    oscillator.frequency.value = freq;
-    oscillator.type = "sine";
-
-    gainNode.gain.value = volumeSlider.value;
-
-    oscillator.start();
-
-    setTimeout(()=>{
-        oscillator.stop();
-    },duration);
+    correctSound.volume = volumeSlider.value;
+    wrongSound.volume = volumeSlider.value;
+    clapSound.volume = volumeSlider.value;
 }
+
+volumeSlider.addEventListener("input",updateVolumes);
+
+updateVolumes();
 
 function startGame(){
 
@@ -497,20 +508,21 @@ function jump(){
 
     if(!jumping){
 
-        velocity = -16;
+        velocity = -18;
         jumping = true;
-
-        playTone(400,120);
     }
 }
 
 document.addEventListener("keydown",(e)=>{
+
     if(e.code==="Space" || e.code==="ArrowUp"){
+
         jump();
     }
 });
 
 document.addEventListener("touchstart",()=>{
+
     jump();
 });
 
@@ -518,18 +530,18 @@ function gameLoop(){
 
     if(!gameRunning) return;
 
-    let bottom = parseInt(window.getComputedStyle(player).bottom);
-
     velocity += gravity;
 
-    player.style.bottom = (bottom - velocity) + "px";
+    playerY -= velocity;
 
-    if(bottom <= 120){
+    if(playerY <= 120){
 
-        player.style.bottom = "120px";
-
+        playerY = 120;
+        velocity = 0;
         jumping = false;
     }
+
+    player.style.bottom = playerY + "px";
 
     requestAnimationFrame(gameLoop);
 }
@@ -545,7 +557,7 @@ function spawnCoin(){
     coin.innerHTML = "💰";
 
     coin.style.left = "100%";
-    coin.style.top = (180 + Math.random()*220) + "px";
+    coin.style.top = (180 + Math.random()*180) + "px";
 
     document.getElementById("gameArea").appendChild(coin);
 
@@ -553,7 +565,9 @@ function spawnCoin(){
 
         let left = parseInt(coin.style.left);
 
-        coin.style.left = (left - 6) + "px";
+        left -= 3;
+
+        coin.style.left = left + "px";
 
         const c = coin.getBoundingClientRect();
         const p = player.getBoundingClientRect();
@@ -587,7 +601,7 @@ function spawnCoin(){
 
     },20);
 
-    setTimeout(spawnCoin,1800);
+    setTimeout(spawnCoin,2600);
 }
 
 function spawnObstacle(){
@@ -606,7 +620,9 @@ function spawnObstacle(){
 
         let left = parseInt(obstacle.style.left);
 
-        obstacle.style.left = (left - 7) + "px";
+        left -= 4;
+
+        obstacle.style.left = left + "px";
 
         const o = obstacle.getBoundingClientRect();
         const p = player.getBoundingClientRect();
@@ -618,15 +634,13 @@ function spawnObstacle(){
             o.bottom > p.top
         ){
 
-            player.style.transform = "scale(0.9)";
-
-            setTimeout(()=>{
-                player.style.transform = "scale(1)";
-            },200);
-
             coins = Math.max(0,coins-1);
 
             coinCount.innerText = coins;
+
+            obstacle.remove();
+
+            clearInterval(move);
         }
 
         if(left < -50){
@@ -638,7 +652,7 @@ function spawnObstacle(){
 
     },20);
 
-    setTimeout(spawnObstacle,2600);
+    setTimeout(spawnObstacle,3500);
 }
 
 function showQuestion(){
@@ -676,7 +690,8 @@ function checkAnswer(selected,correct){
         feedback.innerText = "✅ Correct!";
         feedback.className = "correctAnim";
 
-        playTone(700,200);
+        correctSound.play();
+        clapSound.play();
 
         createConfetti();
 
@@ -685,7 +700,7 @@ function checkAnswer(selected,correct){
         feedback.innerText = "❌ Wrong!";
         feedback.className = "wrongAnim";
 
-        playTone(200,300);
+        wrongSound.play();
     }
 
     currentQuestion++;
@@ -707,7 +722,7 @@ function checkAnswer(selected,correct){
             requestAnimationFrame(gameLoop);
         }
 
-    },1400);
+    },1700);
 }
 
 function createConfetti(){
@@ -731,7 +746,9 @@ function createConfetti(){
         confetti.appendChild(piece);
 
         setTimeout(()=>{
+
             piece.remove();
+
         },3000);
     }
 }
@@ -756,4 +773,4 @@ function restartGame(){
 
 </body>
 </html>
-
+```
