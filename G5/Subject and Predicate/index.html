@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Subject and Predicate - Drag and Drop</title>
+<style>
+* { box-sizing: border-box; margin:0; padding:0; }
+body {
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg, #fef6e4, #dff6ff, #fce1ff);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+}
+h1 { color:#2b4eff; margin: 20px; text-align:center; }
+#instructions {
+  width: 90%; max-width: 600px;
+  background: #ffffffcc; padding:15px;
+  border-radius: 12px; margin-bottom: 20px;
+  text-align:center; font-size: 18px;
+}
+#game-area {
+  width: 90%; max-width: 800px;
+  display:flex; flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+  min-height: 400px;
+}
+.subject {
+  width: 150px;
+  padding: 10px;
+  background: linear-gradient(145deg,#ff9999,#ff4d4d);
+  color:white; font-weight:bold;
+  border-radius: 12px;
+  cursor: grab;
+  text-align:center;
+  user-select:none;
+}
+.predicate {
+  width: 200px;
+  min-height: 50px;
+  padding: 10px;
+  background: linear-gradient(145deg,#99ccff,#4d94ff);
+  color:white; font-weight:bold;
+  border-radius: 12px;
+  text-align:center;
+  margin:10px;
+}
+.predicate.drag-over { outline: 3px dashed #ffcc00; }
+#result { margin-top:15px; font-size:18px; min-height:24px; color:#2b4eff; }
+#score { margin-top:10px; font-size:20px; }
+</style>
+</head>
+<body>
+
+<h1>Subject and Predicate</h1>
+<div id="instructions">
+Drag each <strong>subject</strong> to match the correct <strong>predicate</strong>.
+</div>
+
+<div id="game-area">
+  <!-- Subjects -->
+  <div class="subject" draggable="true" data-predicate="ran fast">The dog</div>
+  <div class="subject" draggable="true" data-predicate="is very tall">My brother</div>
+  <div class="subject" draggable="true" data-predicate="sings beautifully">The singer</div>
+
+  <!-- Predicates -->
+  <div class="predicate" data-subject="The dog">???</div>
+  <div class="predicate" data-subject="My brother">???</div>
+  <div class="predicate" data-subject="The singer">???</div>
+</div>
+
+<div id="result"></div>
+<div id="score">Score: 0 / 3</div>
+
+<audio id="correct-sound" src="assets/correct.mp3"></audio>
+<audio id="wrong-sound" src="assets/wrong.mp3"></audio>
+
+<script>
+const subjects = document.querySelectorAll('.subject');
+const predicates = document.querySelectorAll('.predicate');
+const result = document.getElementById('result');
+const scoreEl = document.getElementById('score');
+let score = 0;
+
+subjects.forEach(sub => {
+  sub.addEventListener('dragstart', e => {
+    e.dataTransfer.setData('text/plain', sub.dataset.predicate);
+    e.dataTransfer.setData('text/subject', sub.innerText);
+  });
+});
+
+predicates.forEach(pred => {
+  pred.addEventListener('dragover', e => e.preventDefault());
+  pred.addEventListener('dragenter', e => pred.classList.add('drag-over'));
+  pred.addEventListener('dragleave', e => pred.classList.remove('drag-over'));
+  pred.addEventListener('drop', e => {
+    e.preventDefault();
+    pred.classList.remove('drag-over');
+    const draggedPredicate = e.dataTransfer.getData('text/plain');
+    const draggedSubject = e.dataTransfer.getData('text/subject');
+
+    if(pred.dataset.subject === draggedSubject){
+      pred.innerText = draggedPredicate;
+      result.innerText = "Correct!";
+      score++;
+      document.querySelector(`.subject[draggable][data-predicate='${draggedPredicate}']`).style.display='none';
+    } else {
+      result.innerText = "Try again!";
+    }
+    scoreEl.innerText = `Score: ${score} / 3`;
+  });
+});
+</script>
+
+</body>
+</html>
