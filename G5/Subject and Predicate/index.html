@@ -15,7 +15,6 @@ body {
   align-items: center;
   justify-content: flex-start;
 }
-
 /* Splash Logo */
 #splash {
   position: fixed;
@@ -34,7 +33,7 @@ h1 { color:#2b4eff; margin: 20px; text-align:center; }
 
 /* Instructions */
 #instructions-screen {
-  width: 90%; max-width: 600px;
+  width: 90%; max-width: 700px;
   background: #ffffffcc; padding:15px;
   border-radius: 12px; margin-bottom: 20px;
   text-align:center; font-size: 18px;
@@ -54,36 +53,38 @@ h1 { color:#2b4eff; margin: 20px; text-align:center; }
 
 /* Game Area */
 #game-area {
-  width: 90%; max-width: 800px;
+  width: 90%; max-width: 900px;
   display:flex; flex-wrap: wrap;
   justify-content: center;
   gap: 20px;
-  min-height: 400px;
+  min-height: 500px;
   display: none;
 }
 
 /* Draggable Subjects */
 .subject {
-  width: 150px;
+  width: 180px;
   padding: 10px;
-  background: linear-gradient(145deg,#ff9999,#ff4d4d);
+  background: linear-gradient(135deg,#ffcc66,#ff9966);
   color:white; font-weight:bold;
   border-radius: 12px;
   cursor: grab;
   text-align:center;
   user-select:none;
+  box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
 }
 
 /* Droppable Predicates */
 .predicate {
-  width: 200px;
+  width: 250px;
   min-height: 50px;
   padding: 10px;
-  background: linear-gradient(145deg,#99ccff,#4d94ff);
+  background: linear-gradient(145deg,#66ccff,#3399ff);
   color:white; font-weight:bold;
   border-radius: 12px;
   text-align:center;
   margin:10px;
+  box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
 }
 .predicate.drag-over { outline: 3px dashed #ffcc00; }
 
@@ -104,25 +105,49 @@ h1 { color:#2b4eff; margin: 20px; text-align:center; }
 <div id="instructions-screen">
   <h2>How to Play</h2>
   <p>Drag each <strong>subject</strong> to match the correct <strong>predicate</strong>.</p>
-  <p>Make sure the subject matches exactly. You get <strong>2 attempts</strong> per match.</p>
+  <p>Each correct match plays a sound. Wrong matches play a different sound. Score updates automatically.</p>
   <button id="start-btn">Start Game</button>
 </div>
 
 <!-- Game Area -->
 <div id="game-area">
   <!-- Subjects -->
-  <div class="subject" draggable="true" data-predicate="ran fast">The dog</div>
-  <div class="subject" draggable="true" data-predicate="is very tall">My brother</div>
-  <div class="subject" draggable="true" data-predicate="sings beautifully">The singer</div>
+  <div class="subject" draggable="true" data-predicate="climbed the tall tree quietly">The curious cat</div>
+  <div class="subject" draggable="true" data-predicate="organized the classroom efficiently">Our diligent class monitor</div>
+  <div class="subject" draggable="true" data-predicate="scored the winning goal yesterday">The team of players</div>
+  <div class="subject" draggable="true" data-predicate="wrote an inspiring story last week">My favorite author</div>
+  <div class="subject" draggable="true" data-predicate="conducted a successful experiment">The young scientist</div>
+  <div class="subject" draggable="true" data-predicate="are flying kites under the sun">The children in the park</div>
+  <div class="subject" draggable="true" data-predicate="welcomed the new students politely">Our school principal</div>
+  <div class="subject" draggable="true" data-predicate="watered the plants carefully">The old gardener</div>
+  <div class="subject" draggable="true" data-predicate="are chirping melodiously">The birds in the sky</div>
+  <div class="subject" draggable="true" data-predicate="is helping me with homework">My best friend</div>
+  <div class="subject" draggable="true" data-predicate="harvested the crops before the rain">The hardworking farmer</div>
+  <div class="subject" draggable="true" data-predicate="performed on stage beautifully">The famous singer</div>
+  <div class="subject" draggable="true" data-predicate="is laughing softly in the cradle">The tiny baby</div>
+  <div class="subject" draggable="true" data-predicate="completed the science project perfectly">The students of class 5B</div>
+  <div class="subject" draggable="true" data-predicate="baked delicious cookies for everyone">The cheerful neighbor</div>
 
   <!-- Predicates -->
-  <div class="predicate" data-subject="The dog">???</div>
-  <div class="predicate" data-subject="My brother">???</div>
-  <div class="predicate" data-subject="The singer">???</div>
+  <div class="predicate" data-subject="The curious cat">climbed the tall tree quietly</div>
+  <div class="predicate" data-subject="Our diligent class monitor">organized the classroom efficiently</div>
+  <div class="predicate" data-subject="The team of players">scored the winning goal yesterday</div>
+  <div class="predicate" data-subject="My favorite author">wrote an inspiring story last week</div>
+  <div class="predicate" data-subject="The young scientist">conducted a successful experiment</div>
+  <div class="predicate" data-subject="The children in the park">are flying kites under the sun</div>
+  <div class="predicate" data-subject="Our school principal">welcomed the new students politely</div>
+  <div class="predicate" data-subject="The old gardener">watered the plants carefully</div>
+  <div class="predicate" data-subject="The birds in the sky">are chirping melodiously</div>
+  <div class="predicate" data-subject="My best friend">is helping me with homework</div>
+  <div class="predicate" data-subject="The hardworking farmer">harvested the crops before the rain</div>
+  <div class="predicate" data-subject="The famous singer">performed on stage beautifully</div>
+  <div class="predicate" data-subject="The tiny baby">is laughing softly in the cradle</div>
+  <div class="predicate" data-subject="The students of class 5B">completed the science project perfectly</div>
+  <div class="predicate" data-subject="The cheerful neighbor">baked delicious cookies for everyone</div>
 </div>
 
 <div id="result"></div>
-<div id="score">Score: 0 / 3</div>
+<div id="score">Score: 0 / 15</div>
 
 <audio id="correct-sound" src="assets/correct.mp3"></audio>
 <audio id="wrong-sound" src="assets/wrong.mp3"></audio>
@@ -154,16 +179,18 @@ predicates.forEach(pred => {
     if(pred.dataset.subject === draggedSubject){
       pred.innerText = draggedPredicate;
       result.innerText = "Correct!";
+      document.getElementById('correct-sound').play();
       score++;
-      document.querySelector(`.subject[draggable][data-predicate='${draggedPredicate}']`).style.display='none';
+      subElement = document.querySelector(`.subject[draggable][data-predicate='${draggedPredicate}']`);
+      if(subElement) subElement.style.display='none';
     } else {
       result.innerText = "Try again!";
+      document.getElementById('wrong-sound').play();
     }
-    scoreEl.innerText = `Score: ${score} / 3`;
+    scoreEl.innerText = `Score: ${score} / 15`;
   });
 });
 
-// Start Game
 document.getElementById('start-btn').addEventListener('click', () => {
   document.getElementById('instructions-screen').style.display = 'none';
   document.getElementById('game-area').style.display = 'flex';
