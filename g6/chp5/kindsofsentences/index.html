@@ -1,10 +1,11 @@
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🎬 Movie Scene Madness</title>
+<title>🍿 Popcorn Catch Cinema</title>
 
 <style>
 
@@ -17,16 +18,18 @@ font-family:Arial,sans-serif;
 
 body{
 overflow:hidden;
-background:#222;
+background:black;
 }
 
 /* GAME AREA */
 
-#game{
+#gameArea{
 position:relative;
 width:100vw;
 height:100vh;
 overflow:hidden;
+background:
+linear-gradient(to bottom,#0d1b2a,#1b263b,#415a77);
 }
 
 /* LOGO */
@@ -37,9 +40,9 @@ width:100%;
 height:100%;
 background:white;
 display:flex;
-flex-direction:column;
 justify-content:center;
 align-items:center;
+flex-direction:column;
 z-index:9999;
 }
 
@@ -55,20 +58,20 @@ font-weight:bold;
 color:#333;
 }
 
-/* START SCREEN */
+/* START & END */
 
 #startScreen,
 #endScreen{
 position:absolute;
 width:100%;
 height:100%;
-background:rgba(0,0,0,0.8);
-color:white;
+background:rgba(0,0,0,0.85);
 display:flex;
-flex-direction:column;
 justify-content:center;
 align-items:center;
+flex-direction:column;
 text-align:center;
+color:white;
 padding:20px;
 z-index:5000;
 }
@@ -88,79 +91,49 @@ margin-top:25px;
 background:#f57c00;
 }
 
-/* SCENE */
+/* CINEMA */
 
-#scene{
+#screen{
 position:absolute;
-width:100%;
-height:100%;
-transition:background 1s;
+top:40px;
+left:50%;
+transform:translateX(-50%);
+width:80%;
+height:120px;
+background:#eeeeee;
+border:10px solid #444;
+border-radius:20px;
+box-shadow:0 0 20px rgba(255,255,255,0.4);
 display:flex;
 justify-content:center;
 align-items:center;
-flex-direction:column;
-padding:20px;
+font-size:34px;
+font-weight:bold;
+color:#222;
 }
 
-/* CHARACTER */
+/* PLAYER */
 
-#character{
-font-size:110px;
-animation:bounce 2s infinite;
-}
-
-/* SPEECH BUBBLE */
-
-#speechBubble{
-margin-top:20px;
-background:white;
-padding:25px;
-border-radius:25px;
-max-width:750px;
-font-size:28px;
-text-align:center;
-position:relative;
-box-shadow:0 0 20px rgba(0,0,0,0.3);
-animation:popIn 0.5s;
-}
-
-#speechBubble::after{
-content:"";
-position:absolute;
-bottom:-20px;
-left:50%;
-transform:translateX(-50%);
-border-width:20px;
-border-style:solid;
-border-color:white transparent transparent transparent;
-}
-
-/* OPTIONS */
-
-#options{
+#bucket{
 position:absolute;
 bottom:30px;
-width:95%;
-max-width:900px;
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:15px;
+left:50%;
+transform:translateX(-50%);
+font-size:75px;
+transition:left 0.08s linear;
 }
 
-.optionBtn{
-padding:18px;
-border:none;
-border-radius:18px;
-font-size:20px;
-cursor:pointer;
-background:#4caf50;
-color:white;
-transition:0.3s;
+/* FALLING ITEMS */
+
+.item{
+position:absolute;
+font-size:45px;
+animation:spin 3s linear infinite;
 }
 
-.optionBtn:hover{
-transform:scale(1.05);
-background:#388e3c;
+@keyframes spin{
+from{transform:rotate(0deg);}
+to{transform:rotate(360deg);}
 }
 
 /* SCORE */
@@ -184,31 +157,77 @@ position:absolute;
 top:15px;
 right:15px;
 background:white;
-padding:10px 15px;
+padding:12px;
 border-radius:15px;
 z-index:100;
+}
+
+/* QUESTION BOX */
+
+#questionBox{
+position:absolute;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+width:92%;
+max-width:650px;
+background:#fff8e1;
+padding:28px;
+border-radius:25px;
+display:none;
+z-index:4000;
+box-shadow:0 0 25px rgba(0,0,0,0.5);
+animation:popIn 0.5s;
+}
+
+#questionTitle{
+font-size:30px;
+color:#e65100;
+margin-bottom:18px;
+text-align:center;
+}
+
+#questionText{
+font-size:24px;
+line-height:1.5;
+margin-bottom:20px;
+color:#333;
+}
+
+.optionBtn{
+width:100%;
+padding:16px;
+margin:10px 0;
+border:none;
+border-radius:15px;
+background:#4caf50;
+color:white;
+font-size:18px;
+cursor:pointer;
+transition:0.3s;
+}
+
+.optionBtn:hover{
+background:#388e3c;
+transform:scale(1.02);
 }
 
 /* FEEDBACK */
 
 #feedback{
-position:absolute;
-top:50%;
-left:50%;
-transform:translate(-50%,-50%);
-font-size:70px;
+text-align:center;
+font-size:30px;
 font-weight:bold;
-display:none;
-z-index:2000;
+margin-top:18px;
 }
 
 .correct{
-color:#00e676;
-animation:zoom 0.6s;
+color:green;
+animation:zoom 0.5s;
 }
 
 .wrong{
-color:#ff1744;
+color:red;
 animation:shake 0.5s;
 }
 
@@ -221,37 +240,6 @@ height:12px;
 animation:fall 3s linear forwards;
 }
 
-/* ANIMATIONS */
-
-@keyframes bounce{
-0%,100%{transform:translateY(0);}
-50%{transform:translateY(-15px);}
-}
-
-@keyframes popIn{
-from{
-transform:scale(0.5);
-opacity:0;
-}
-to{
-transform:scale(1);
-opacity:1;
-}
-}
-
-@keyframes zoom{
-0%{transform:translate(-50%,-50%) scale(0.5);}
-100%{transform:translate(-50%,-50%) scale(1.2);}
-}
-
-@keyframes shake{
-0%{transform:translate(-50%,-50%) translateX(0);}
-25%{transform:translate(-50%,-50%) translateX(-10px);}
-50%{transform:translate(-50%,-50%) translateX(10px);}
-75%{transform:translate(-50%,-50%) translateX(-10px);}
-100%{transform:translate(-50%,-50%) translateX(0);}
-}
-
 @keyframes fall{
 from{
 transform:translateY(-100px) rotate(0deg);
@@ -262,26 +250,53 @@ opacity:0;
 }
 }
 
+@keyframes zoom{
+0%{transform:scale(0.5);}
+100%{transform:scale(1.2);}
+}
+
+@keyframes shake{
+0%{transform:translateX(0);}
+25%{transform:translateX(-10px);}
+50%{transform:translateX(10px);}
+75%{transform:translateX(-10px);}
+100%{transform:translateX(0);}
+}
+
+@keyframes popIn{
+from{
+transform:translate(-50%,-50%) scale(0.5);
+opacity:0;
+}
+to{
+transform:translate(-50%,-50%) scale(1);
+opacity:1;
+}
+}
+
 /* MOBILE */
 
 @media(max-width:768px){
 
-#character{
-font-size:75px;
+#bucket{
+font-size:60px;
 }
 
-#speechBubble{
-font-size:20px;
-padding:18px;
+.item{
+font-size:38px;
+}
+
+#questionText{
+font-size:19px;
 }
 
 .optionBtn{
 font-size:16px;
-padding:14px;
 }
 
-#options{
-grid-template-columns:1fr;
+#screen{
+font-size:24px;
+height:100px;
 }
 
 }
@@ -291,7 +306,7 @@ grid-template-columns:1fr;
 
 <body>
 
-<div id="game">
+<div id="gameArea">
 
 <!-- LOGO -->
 
@@ -304,14 +319,14 @@ grid-template-columns:1fr;
 
 <div id="startScreen" style="display:none;">
 
-<h1 style="font-size:50px;">🎬 Movie Scene Madness</h1>
+<h1 style="font-size:52px;">🍿 Popcorn Catch Cinema</h1>
 
 <p style="margin-top:20px;font-size:24px;max-width:700px;">
-Watch hilarious movie scenes and identify the type of sentence each character says!
+Catch movie snacks and unlock hilarious movie sentence scenes!
 </p>
 
 <button class="mainBtn" onclick="startGame()">
-Start Movie
+Start Movie Night
 </button>
 
 </div>
@@ -320,9 +335,9 @@ Start Movie
 
 <div id="endScreen" style="display:none;">
 
-<h1>🏆 Movie Complete! 🏆</h1>
+<h1>🏆 Movie Night Complete! 🏆</h1>
 
-<h2 id="finalScore" style="margin-top:20px;"></h2>
+<h2 id="finalText" style="margin-top:20px;"></h2>
 
 <button class="mainBtn" onclick="restartGame()">
 Play Again
@@ -330,23 +345,39 @@ Play Again
 
 </div>
 
-<!-- SCENE -->
+<!-- CINEMA SCREEN -->
 
-<div id="scene">
+<div id="screen">
+🎬 Catch the Snacks!
+</div>
+
+<!-- SCORE -->
 
 <div id="scoreBoard">
-Scene: <span id="sceneNumber">1</span>/10 |
-Score: <span id="score">0</span>
+Snacks: <span id="snackCount">0</span> |
+Questions: <span id="questionCount">0</span>/10
 </div>
+
+<!-- VOLUME -->
 
 <div id="volumeBox">
 Volume
 <input type="range" id="volumeSlider" min="0" max="1" step="0.1" value="1">
 </div>
 
-<div id="character"></div>
+<!-- PLAYER -->
 
-<div id="speechBubble"></div>
+<div id="bucket">🍿</div>
+
+<!-- QUESTIONS -->
+
+<div id="questionBox">
+
+<div id="questionTitle">
+🎬 Movie Scene Challenge
+</div>
+
+<div id="questionText"></div>
 
 <div id="options"></div>
 
@@ -387,101 +418,104 @@ volumeSlider.addEventListener("input",updateVolume);
 
 updateVolume();
 
+/* GAME VARIABLES */
+
+const bucket = document.getElementById("bucket");
+
+let bucketX = window.innerWidth / 2;
+
+let gameRunning = false;
+
+let snacks = 0;
+let currentQuestion = 0;
+
 /* QUESTIONS */
 
 const questions = [
 
 {
-bg:"#42a5f5",
-char:"🦸",
-text:`"Watch out for the falling helicopter!"`,
-answer:"Imperative"
+q:`🦸 A superhero shouts:<br><br>
+"Watch out for the falling helicopter!"<br><br>
+What type of sentence is this?`,
+o:["Declarative","Imperative","Interrogative","Exclamatory"],
+a:1
 },
 
 {
-bg:"#ff7043",
-char:"🍕",
-text:`"My biggest pizza is ruined!"`,
-answer:"Exclamatory"
+q:`🍕 A chef screams:<br><br>
+"My biggest pizza is ruined!"<br><br>
+What type of sentence is this?`,
+o:["Declarative","Imperative","Interrogative","Exclamatory"],
+a:3
 },
 
 {
-bg:"#7e57c2",
-char:"👽",
-text:`"Why is Earth food so spicy?"`,
-answer:"Interrogative"
+q:`👽 An alien asks:<br><br>
+"Why is Earth food so spicy?"<br><br>
+What type of sentence is this?`,
+o:["Declarative","Imperative","Interrogative","Exclamatory"],
+a:2
 },
 
 {
-bg:"#26a69a",
-char:"🕵️",
-text:`"The missing diamond was hidden in the library."`,
-answer:"Declarative"
+q:`🕵️ A detective says:<br><br>
+"The missing diamond was hidden in the library."<br><br>
+What type of sentence is this?`,
+o:["Declarative","Imperative","Interrogative","Exclamatory"],
+a:0
 },
 
 {
-bg:"#66bb6a",
-char:"⚽",
-text:`"Pass the ball right now!"`,
-answer:"Imperative"
+q:`⚽ A coach yells:<br><br>
+"Pass the ball right now!"<br><br>
+What type of sentence is this?`,
+o:["Declarative","Imperative","Interrogative","Exclamatory"],
+a:1
 },
 
 {
-bg:"#ec407a",
-char:"🎢",
-text:`"This is the best ride ever!"`,
-answer:"Exclamatory"
+q:`🎢 A kid shouts:<br><br>
+"This is the best ride ever!"<br><br>
+What type of sentence is this?`,
+o:["Declarative","Imperative","Interrogative","Exclamatory"],
+a:3
 },
 
 {
-bg:"#5c6bc0",
-char:"🚀",
-text:`"Can you see the meteor shower from there?"`,
-answer:"Interrogative"
+q:`🚀 An astronaut asks:<br><br>
+"Can you see the meteor shower from there?"<br><br>
+What type of sentence is this?`,
+o:["Declarative","Imperative","Interrogative","Exclamatory"],
+a:2
 },
 
 {
-bg:"#8d6e63",
-char:"🧪",
-text:`"The experiment begins after lunch."`,
-answer:"Declarative"
+q:`🧪 A scientist says:<br><br>
+"The experiment begins after lunch."<br><br>
+What type of sentence is this?`,
+o:["Declarative","Imperative","Interrogative","Exclamatory"],
+a:0
 },
 
 {
-bg:"#ffa726",
-char:"🏴‍☠️",
-text:`"Lower the sails immediately!"`,
-answer:"Imperative"
+q:`🏴‍☠️ A pirate captain orders:<br><br>
+"Lower the sails immediately!"<br><br>
+What type of sentence is this?`,
+o:["Declarative","Imperative","Interrogative","Exclamatory"],
+a:1
 },
 
 {
-bg:"#ab47bc",
-char:"🎭",
-text:`"Wow, everyone is clapping for us!"`,
-answer:"Exclamatory"
+q:`🎭 A student says:<br><br>
+"Wow, everyone is clapping for us!"<br><br>
+What type of sentence is this?`,
+o:["Declarative","Imperative","Interrogative","Exclamatory"],
+a:3
 }
 
 ];
 
-/* RANDOMIZE */
-
 questions.sort(()=>Math.random()-0.5);
-
-/* VARIABLES */
-
-let current = 0;
-let score = 0;
-
-/* ELEMENTS */
-
-const scene = document.getElementById("scene");
-const character = document.getElementById("character");
-const speechBubble = document.getElementById("speechBubble");
-const optionsDiv = document.getElementById("options");
-const feedback = document.getElementById("feedback");
-
-const sceneNumber = document.getElementById("sceneNumber");
-const scoreText = document.getElementById("score");
 
 /* START */
 
@@ -489,36 +523,148 @@ function startGame(){
 
 document.getElementById("startScreen").style.display="none";
 
-loadQuestion();
+gameRunning = true;
+
+spawnItems();
 
 }
 
-/* LOAD QUESTION */
+/* MOVEMENT */
 
-function loadQuestion(){
+document.addEventListener("keydown",(e)=>{
 
-const q = questions[current];
+if(e.key==="ArrowLeft"){
 
-scene.style.background = q.bg;
+bucketX -= 40;
 
-character.innerHTML = q.char;
+}
 
-speechBubble.innerHTML = q.text;
+if(e.key==="ArrowRight"){
 
-sceneNumber.innerText = current + 1;
+bucketX += 40;
+
+}
+
+limitBucket();
+
+});
+
+document.addEventListener("touchstart",(e)=>{
+
+if(e.touches[0].clientX < window.innerWidth/2){
+
+bucketX -= 45;
+
+}else{
+
+bucketX += 45;
+
+}
+
+limitBucket();
+
+});
+
+function limitBucket(){
+
+if(bucketX < 40) bucketX = 40;
+
+if(bucketX > window.innerWidth-40)
+bucketX = window.innerWidth-40;
+
+bucket.style.left = bucketX + "px";
+
+}
+
+/* ITEMS */
+
+const snacksList = ["🍿","🥤","🍫","🍬"];
+
+function spawnItems(){
+
+if(!gameRunning) return;
+
+const item = document.createElement("div");
+
+item.classList.add("item");
+
+item.innerHTML =
+snacksList[Math.floor(Math.random()*snacksList.length)];
+
+item.style.left =
+Math.random()*(window.innerWidth-60)+"px";
+
+item.style.top = "-60px";
+
+document.getElementById("gameArea").appendChild(item);
+
+let fall = setInterval(()=>{
+
+let top = parseInt(item.style.top);
+
+top += 4;
+
+item.style.top = top + "px";
+
+const i = item.getBoundingClientRect();
+const b = bucket.getBoundingClientRect();
+
+if(
+i.left < b.right &&
+i.right > b.left &&
+i.top < b.bottom &&
+i.bottom > b.top
+){
+
+snacks++;
+
+document.getElementById("snackCount").innerText = snacks;
+
+item.remove();
+
+clearInterval(fall);
+
+if(snacks % 4 === 0 && currentQuestion < 10){
+
+showQuestion();
+
+}
+
+}
+
+if(top > window.innerHeight){
+
+item.remove();
+
+clearInterval(fall);
+
+}
+
+},20);
+
+setTimeout(spawnItems,1200);
+
+}
+
+/* QUESTIONS */
+
+function showQuestion(){
+
+gameRunning = false;
+
+document.getElementById("questionBox").style.display="block";
+
+const q = questions[currentQuestion];
+
+document.getElementById("questionText").innerHTML = q.q;
+
+const optionsDiv = document.getElementById("options");
 
 optionsDiv.innerHTML = "";
 
-const options = [
-"Declarative",
-"Imperative",
-"Interrogative",
-"Exclamatory"
-];
+document.getElementById("feedback").innerHTML = "";
 
-options.sort(()=>Math.random()-0.5);
-
-options.forEach(option=>{
+q.o.forEach((option,index)=>{
 
 const btn = document.createElement("button");
 
@@ -526,7 +672,7 @@ btn.classList.add("optionBtn");
 
 btn.innerHTML = option;
 
-btn.onclick = ()=>checkAnswer(option,q.answer);
+btn.onclick = ()=>checkAnswer(index,q.a);
 
 optionsDiv.appendChild(btn);
 
@@ -534,17 +680,13 @@ optionsDiv.appendChild(btn);
 
 }
 
-/* CHECK */
+/* ANSWERS */
 
 function checkAnswer(selected,correct){
 
-feedback.style.display = "block";
+const feedback = document.getElementById("feedback");
 
 if(selected === correct){
-
-score++;
-
-scoreText.innerText = score;
 
 feedback.innerHTML = "🎉 Correct!";
 feedback.className = "correct";
@@ -563,19 +705,24 @@ wrongSound.play();
 
 }
 
+currentQuestion++;
+
+document.getElementById("questionCount").innerText =
+currentQuestion;
+
 setTimeout(()=>{
 
-feedback.style.display = "none";
+document.getElementById("questionBox").style.display="none";
 
-current++;
-
-if(current >= questions.length){
+if(currentQuestion >= 10){
 
 endGame();
 
 }else{
 
-loadQuestion();
+gameRunning = true;
+
+spawnItems();
 
 }
 
@@ -594,8 +741,6 @@ const conf = document.createElement("div");
 conf.classList.add("confetti");
 
 conf.style.left = Math.random()*100 + "%";
-
-conf.style.top = "-20px";
 
 conf.style.background =
 `hsl(${Math.random()*360},100%,50%)`;
@@ -619,10 +764,13 @@ conf.remove();
 
 function endGame(){
 
+gameRunning = false;
+
 document.getElementById("endScreen").style.display="flex";
 
-document.getElementById("finalScore").innerHTML =
-"You got <b>" + score + "/10</b> scenes correct!";
+document.getElementById("finalText").innerHTML =
+"You collected <b>" + snacks +
+"</b> movie snacks and completed all 10 sentence challenges!";
 
 }
 
@@ -638,4 +786,6 @@ location.reload();
 
 </body>
 </html>
+
+
 
