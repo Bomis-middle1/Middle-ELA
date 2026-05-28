@@ -10,20 +10,27 @@ body {
   font-family: Arial, sans-serif;
   background: linear-gradient(135deg,#fff6d1,#ffd1e0,#d1f0ff);
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  overflow-x:hidden;
+  position:relative;
 }
 
-/* Stars in background */
-body::before{
+/* Floating stars */
+body::before {
   content:'';
   position:fixed;
   top:0; left:0;
   width:100%; height:100%;
   background-image: radial-gradient(circle,#fff7 1px,#fff0 1px);
-  background-size: 20px 20px;
+  background-size: 25px 25px;
   pointer-events:none;
+  animation: moveStars 20s linear infinite;
+}
+@keyframes moveStars{
+  0%{background-position:0 0;}
+  100%{background-position:1000px 500px;}
 }
 
 /* Splash Logo */
@@ -49,13 +56,10 @@ h1 { margin:20px; color:#2b4eff; text-align:center; }
   border-radius:12px; margin-bottom:20px;
   text-align:center; font-size:18px;
 }
-#instructions-screen h2 { color:#2b4eff; margin-bottom:10px; }
-#instructions-screen p { margin-bottom:15px; }
 #start-btn{
   padding:10px 20px; font-size:16px;
   background: linear-gradient(145deg,#66ff99,#33ccff);
-  color:white;
-  border:none; border-radius:10px; cursor:pointer;
+  color:white; border:none; border-radius:10px; cursor:pointer;
 }
 #start-btn:hover { background: linear-gradient(145deg,#33ccff,#66ff99); }
 
@@ -66,18 +70,24 @@ h1 { margin:20px; color:#2b4eff; text-align:center; }
   padding:20px; display:none; position:relative;
 }
 
-/* Question + Mascot */
+/* Question + mascot */
 #question-container{
   display:flex; justify-content:space-between; align-items:center;
   margin-bottom:20px; flex-wrap:wrap;
 }
 #question { font-size:20px; font-weight:bold; flex:1; }
+/* CSS mascot */
 #mascot{
   width:80px; height:80px;
   background: radial-gradient(circle,#ffcc66,#ff6699);
   border-radius:50%; display:flex; justify-content:center; align-items:center;
   animation:bounce 1s infinite alternate, wiggle 2s infinite alternate;
   font-size:28px; font-weight:bold; color:white; margin-left:15px;
+  position:relative;
+}
+#mascot::after{
+  content:"👀"; position:absolute; top:10px; left:15px;
+  font-size:18px;
 }
 
 /* Mascot Animations */
@@ -91,7 +101,7 @@ h1 { margin:20px; color:#2b4eff; text-align:center; }
   100%{transform:translateY(-15px) rotate(-10deg);}
 }
 
-/* Answer Buttons */
+/* Answer buttons */
 .answer-btn{
   width:100%; max-width:400px; padding:12px;
   margin:10px 0; font-size:16px;
@@ -102,14 +112,12 @@ h1 { margin:20px; color:#2b4eff; text-align:center; }
 }
 .answer-btn:hover{ transform:scale(1.05); background:linear-gradient(145deg,#ffcc66,#ff9966); }
 
-/* Feedback & Score */
 #result{ margin-top:15px; font-size:18px; min-height:24px; color:#2b4eff; }
 #score{ margin-top:10px; font-size:20px; color:#333; }
 </style>
 </head>
 <body>
 
-<!-- Splash Logo -->
 <div id="splash">
   <img src="assets/logo.png" alt="Innovine Logo">
 </div>
@@ -126,7 +134,7 @@ h1 { margin:20px; color:#2b4eff; text-align:center; }
 <div id="game-area">
   <div id="question-container">
     <div id="question"></div>
-    <div id="mascot">😊</div>
+    <div id="mascot"></div>
   </div>
   <div id="answers"></div>
   <div id="result"></div>
@@ -137,7 +145,6 @@ h1 { margin:20px; color:#2b4eff; text-align:center; }
 <audio id="wrong-sound" src="assets/wrong.mp3"></audio>
 
 <script>
-// 15 sample sentences
 const questions = [
   {sentence:"I enjoy reading novels.", type:"Declarative"},
   {sentence:"Did you finish your homework?", type:"Interrogative"},
@@ -169,7 +176,6 @@ const scoreEl = document.getElementById('score');
 const correctSound = document.getElementById('correct-sound');
 const wrongSound = document.getElementById('wrong-sound');
 
-// Shuffle function
 function shuffle(array){
   for(let i=array.length-1;i>0;i--){
     const j = Math.floor(Math.random()*(i+1));
@@ -178,7 +184,6 @@ function shuffle(array){
   return array;
 }
 
-// Load next question
 function loadQuestion(){
   resultEl.innerText="";
   answersEl.innerHTML="";
@@ -200,7 +205,6 @@ function loadQuestion(){
   });
 }
 
-// Check answer
 function checkAnswer(selected, correct){
   if(selected===correct){
     resultEl.innerText="Correct!";
