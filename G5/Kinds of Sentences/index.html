@@ -8,11 +8,22 @@
 * { box-sizing: border-box; margin:0; padding:0; }
 body {
   font-family: Arial, sans-serif;
-  background: linear-gradient(135deg,#fef6e4,#dff6ff,#fce1ff);
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  min-height:100vh;
+  background: linear-gradient(135deg,#fff6d1,#ffd1e0,#d1f0ff);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Stars in background */
+body::before{
+  content:'';
+  position:fixed;
+  top:0; left:0;
+  width:100%; height:100%;
+  background-image: radial-gradient(circle,#fff7 1px,#fff0 1px);
+  background-size: 20px 20px;
+  pointer-events:none;
 }
 
 /* Splash Logo */
@@ -42,19 +53,20 @@ h1 { margin:20px; color:#2b4eff; text-align:center; }
 #instructions-screen p { margin-bottom:15px; }
 #start-btn{
   padding:10px 20px; font-size:16px;
-  background-color:#4caf50; color:white;
+  background: linear-gradient(145deg,#66ff99,#33ccff);
+  color:white;
   border:none; border-radius:10px; cursor:pointer;
 }
-#start-btn:hover { background-color:#45a049; }
+#start-btn:hover { background: linear-gradient(145deg,#33ccff,#66ff99); }
 
 /* Game Area */
 #game-area { 
-  width:90%; max-width:900px; min-height:400px;
+  width:90%; max-width:900px; min-height:500px;
   background:#ffffffaa; border-radius:15px;
   padding:20px; display:none; position:relative;
 }
 
-/* Question + Mascot container */
+/* Question + Mascot */
 #question-container{
   display:flex; justify-content:space-between; align-items:center;
   margin-bottom:20px; flex-wrap:wrap;
@@ -62,31 +74,36 @@ h1 { margin:20px; color:#2b4eff; text-align:center; }
 #question { font-size:20px; font-weight:bold; flex:1; }
 #mascot{
   width:80px; height:80px;
-  background: radial-gradient(circle,#ffcc66,#ff9966);
+  background: radial-gradient(circle,#ffcc66,#ff6699);
   border-radius:50%; display:flex; justify-content:center; align-items:center;
-  animation:bounce 1s infinite alternate;
-  font-size:24px; font-weight:bold; color:white; margin-left:15px;
+  animation:bounce 1s infinite alternate, wiggle 2s infinite alternate;
+  font-size:28px; font-weight:bold; color:white; margin-left:15px;
 }
 
-/* Bounce animation */
+/* Mascot Animations */
 @keyframes bounce{
   0%{transform:translateY(0);}
-  100%{transform:translateY(-20px);}
+  100%{transform:translateY(-15px);}
+}
+@keyframes wiggle{
+  0%{transform:translateY(-15px) rotate(-10deg);}
+  50%{transform:translateY(-10px) rotate(10deg);}
+  100%{transform:translateY(-15px) rotate(-10deg);}
 }
 
-/* Answer buttons */
+/* Answer Buttons */
 .answer-btn{
   width:100%; max-width:400px; padding:12px;
   margin:10px 0; font-size:16px;
-  background:linear-gradient(145deg,#66ccff,#3399ff);
+  background:linear-gradient(145deg,#ff9966,#ffcc66);
   color:white; border:none; border-radius:12px;
   cursor:pointer; font-weight:bold;
-  transition: transform 0.2s;
+  transition: transform 0.2s, background 0.3s;
 }
-.answer-btn:hover{ transform:scale(1.05); }
+.answer-btn:hover{ transform:scale(1.05); background:linear-gradient(145deg,#ffcc66,#ff9966); }
 
 /* Feedback & Score */
-#result{ margin-top:15px; font-size:18px; color:#2b4eff; min-height:24px; }
+#result{ margin-top:15px; font-size:18px; min-height:24px; color:#2b4eff; }
 #score{ margin-top:10px; font-size:20px; color:#333; }
 </style>
 </head>
@@ -101,8 +118,8 @@ h1 { margin:20px; color:#2b4eff; text-align:center; }
 
 <div id="instructions-screen">
   <h2>Instructions</h2>
-  <p>Read the sentence carefully and select its type: Declarative, Interrogative, Imperative, or Exclamatory.</p>
-  <p>Correct answers play a sound, wrong answers play another sound.</p>
+  <p>Read the sentence and select its type: Declarative, Interrogative, Imperative, or Exclamatory.</p>
+  <p>Correct answers play a sound; wrong answers play another sound. Score updates automatically.</p>
   <button id="start-btn">Start Quiz</button>
 </div>
 
@@ -120,23 +137,23 @@ h1 { margin:20px; color:#2b4eff; text-align:center; }
 <audio id="wrong-sound" src="assets/wrong.mp3"></audio>
 
 <script>
-// Sample 15 sentences for Kinds of Sentences
+// 15 sample sentences
 const questions = [
-  {sentence:"I love reading books.", type:"Declarative"},
-  {sentence:"Is it going to rain today?", type:"Interrogative"},
-  {sentence:"Please close the door.", type:"Imperative"},
-  {sentence:"What a beautiful sunset!", type:"Exclamatory"},
-  {sentence:"She finished her homework on time.", type:"Declarative"},
-  {sentence:"Can you help me with this problem?", type:"Interrogative"},
-  {sentence:"Sit down and listen carefully.", type:"Imperative"},
-  {sentence:"Wow! That was amazing!", type:"Exclamatory"},
-  {sentence:"The cat is sleeping on the sofa.", type:"Declarative"},
-  {sentence:"Did you see that movie last night?", type:"Interrogative"},
-  {sentence:"Turn off the lights before leaving.", type:"Imperative"},
-  {sentence:"Hurray! We won the match!", type:"Exclamatory"},
-  {sentence:"My mother baked a cake.", type:"Declarative"},
-  {sentence:"Where did you put my pen?", type:"Interrogative"},
-  {sentence:"Don’t touch that!", type:"Imperative"}
+  {sentence:"I enjoy reading novels.", type:"Declarative"},
+  {sentence:"Did you finish your homework?", type:"Interrogative"},
+  {sentence:"Close the window, please.", type:"Imperative"},
+  {sentence:"What a magnificent painting!", type:"Exclamatory"},
+  {sentence:"The children are playing in the garden.", type:"Declarative"},
+  {sentence:"Can you solve this puzzle?", type:"Interrogative"},
+  {sentence:"Write your name on the board.", type:"Imperative"},
+  {sentence:"Wow! That was incredible!", type:"Exclamatory"},
+  {sentence:"My dog loves to chase balls.", type:"Declarative"},
+  {sentence:"Have you seen my notebook?", type:"Interrogative"},
+  {sentence:"Stand up and stretch.", type:"Imperative"},
+  {sentence:"Hurrah! We won the match!", type:"Exclamatory"},
+  {sentence:"The teacher explained the lesson clearly.", type:"Declarative"},
+  {sentence:"Where did you put the keys?", type:"Interrogative"},
+  {sentence:"Don't touch the wet paint!", type:"Imperative"}
 ];
 
 let current = 0;
@@ -205,6 +222,5 @@ startBtn.addEventListener('click',()=>{
   loadQuestion();
 });
 </script>
-
 </body>
 </html>
