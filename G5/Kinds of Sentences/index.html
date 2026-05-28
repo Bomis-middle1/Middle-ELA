@@ -1,1 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kinds of Sentences Quiz</title>
+<style>
+* { box-sizing: border-box; margin:0; padding:0; }
+body {
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg,#fef6e4,#dff6ff,#fce1ff);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  min-height:100vh;
+}
 
+/* Splash Logo */
+#splash {
+  position:fixed;
+  inset:0;
+  background:#fff9f0;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  z-index:9999;
+  animation:fadeOut 1s ease 4s forwards;
+}
+#splash img { width:220px; max-width:80%; }
+@keyframes fadeOut{ to {opacity:0; visibility:hidden;} }
+
+h1 { margin:20px; color:#2b4eff; text-align:center; }
+
+/* Instructions */
+#instructions-screen{
+  width:90%; max-width:700px;
+  background:#ffffffcc; padding:15px;
+  border-radius:12px; margin-bottom:20px;
+  text-align:center; font-size:18px;
+}
+#instructions-screen h2 { color:#2b4eff; margin-bottom:10px; }
+#instructions-screen p { margin-bottom:15px; }
+#start-btn{
+  padding:10px 20px; font-size:16px;
+  background-color:#4caf50; color:white;
+  border:none; border-radius:10px; cursor:pointer;
+}
+#start-btn:hover { background-color:#45a049; }
+
+/* Game Area */
+#game-area { 
+  width:90%; max-width:900px; min-height:400px;
+  background:#ffffffaa; border-radius:15px;
+  padding:20px; display:none; position:relative;
+}
+
+/* Question + Mascot container */
+#question-container{
+  display:flex; justify-content:space-between; align-items:center;
+  margin-bottom:20px; flex-wrap:wrap;
+}
+#question { font-size:20px; font-weight:bold; flex:1; }
+#mascot{
+  width:80px; height:80px;
+  background: radial-gradient(circle,#ffcc66,#ff9966);
+  border-radius:50%; display:flex; justify-content:center; align-items:center;
+  animation:bounce 1s infinite alternate;
+  font-size:24px; font-weight:bold; color:white; margin-left:15px;
+}
+
+/* Bounce animation */
+@keyframes bounce{
+  0%{transform:translateY(0);}
+  100%{transform:translateY(-20px);}
+}
+
+/* Answer buttons */
+.answer-btn{
+  width:100%; max-width:400px; padding:12px;
+  margin:10px 0; font-size:16px;
+  background:linear-gradient(145deg,#66ccff,#3399ff);
+  color:white; border:none; border-radius:12px;
+  cursor:pointer; font-weight:bold;
+  transition: transform 0.2s;
+}
+.answer-btn:hover{ transform:scale(1.05); }
+
+/* Feedback & Score */
+#result{ margin-top:15px; font-size:18px; color:#2b4eff; min-height:24px; }
+#score{ margin-top:10px; font-size:20px; color:#333; }
+</style>
+</head>
+<body>
+
+<!-- Splash Logo -->
+<div id="splash">
+  <img src="assets/logo.png" alt="Innovine Logo">
+</div>
+
+<h1>Kinds of Sentences Quiz</h1>
+
+<div id="instructions-screen">
+  <h2>Instructions</h2>
+  <p>Read the sentence carefully and select its type: Declarative, Interrogative, Imperative, or Exclamatory.</p>
+  <p>Correct answers play a sound, wrong answers play another sound.</p>
+  <button id="start-btn">Start Quiz</button>
+</div>
+
+<div id="game-area">
+  <div id="question-container">
+    <div id="question"></div>
+    <div id="mascot">😊</div>
+  </div>
+  <div id="answers"></div>
+  <div id="result"></div>
+  <div id="score">Score: 0 / 15</div>
+</div>
+
+<audio id="correct-sound" src="assets/correct.mp3"></audio>
+<audio id="wrong-sound" src="assets/wrong.mp3"></audio>
+
+<script>
+// Sample 15 sentences for Kinds of Sentences
+const questions = [
+  {sentence:"I love reading books.", type:"Declarative"},
+  {sentence:"Is it going to rain today?", type:"Interrogative"},
+  {sentence:"Please close the door.", type:"Imperative"},
+  {sentence:"What a beautiful sunset!", type:"Exclamatory"},
+  {sentence:"She finished her homework on time.", type:"Declarative"},
+  {sentence:"Can you help me with this problem?", type:"Interrogative"},
+  {sentence:"Sit down and listen carefully.", type:"Imperative"},
+  {sentence:"Wow! That was amazing!", type:"Exclamatory"},
+  {sentence:"The cat is sleeping on the sofa.", type:"Declarative"},
+  {sentence:"Did you see that movie last night?", type:"Interrogative"},
+  {sentence:"Turn off the lights before leaving.", type:"Imperative"},
+  {sentence:"Hurray! We won the match!", type:"Exclamatory"},
+  {sentence:"My mother baked a cake.", type:"Declarative"},
+  {sentence:"Where did you put my pen?", type:"Interrogative"},
+  {sentence:"Don’t touch that!", type:"Imperative"}
+];
+
+let current = 0;
+let score = 0;
+
+const startBtn = document.getElementById('start-btn');
+const instructionsScreen = document.getElementById('instructions-screen');
+const gameArea = document.getElementById('game-area');
+const questionEl = document.getElementById('question');
+const answersEl = document.getElementById('answers');
+const resultEl = document.getElementById('result');
+const scoreEl = document.getElementById('score');
+const correctSound = document.getElementById('correct-sound');
+const wrongSound = document.getElementById('wrong-sound');
+
+// Shuffle function
+function shuffle(array){
+  for(let i=array.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [array[i],array[j]]=[array[j],array[i]];
+  }
+  return array;
+}
+
+// Load next question
+function loadQuestion(){
+  resultEl.innerText="";
+  answersEl.innerHTML="";
+  if(current >= questions.length){
+    questionEl.innerText="Quiz Completed!";
+    answersEl.innerHTML="";
+    return;
+  }
+  const q = questions[current];
+  questionEl.innerText = q.sentence;
+
+  const options = shuffle(["Declarative","Interrogative","Imperative","Exclamatory"]);
+  options.forEach(opt=>{
+    const btn = document.createElement('button');
+    btn.innerText = opt;
+    btn.className = "answer-btn";
+    btn.addEventListener('click',()=>checkAnswer(opt,q.type));
+    answersEl.appendChild(btn);
+  });
+}
+
+// Check answer
+function checkAnswer(selected, correct){
+  if(selected===correct){
+    resultEl.innerText="Correct!";
+    correctSound.play();
+    score++;
+  } else {
+    resultEl.innerText="Wrong!";
+    wrongSound.play();
+  }
+  scoreEl.innerText = `Score: ${score} / ${questions.length}`;
+  current++;
+  setTimeout(loadQuestion,800);
+}
+
+startBtn.addEventListener('click',()=>{
+  instructionsScreen.style.display="none";
+  gameArea.style.display="block";
+  shuffle(questions);
+  loadQuestion();
+});
+</script>
+
+</body>
+</html>
