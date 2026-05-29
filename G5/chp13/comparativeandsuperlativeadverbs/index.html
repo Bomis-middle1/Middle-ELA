@@ -3,35 +3,169 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Hot Air Balloon Adverb Game</title>
-<link rel="stylesheet" href="style.css">
+<title>Hot Air Balloon Adverbs Game</title>
+<style>
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(to top, #a1c4fd, #c2e9fb); /* sky gradient */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    height: 100vh;
+    overflow: hidden;
+  }
+  header {
+    width: 100%;
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    background-color: rgba(255, 255, 255, 0.8);
+  }
+  header img {
+    height: 60px;
+  }
+  header h1 {
+    margin-left: 20px;
+    font-size: 22px;
+    color: #333;
+  }
+  #score {
+    position: absolute;
+    top: 80px;
+    left: 20px;
+    background: white;
+    padding: 5px 15px;
+    border-radius: 10px;
+    font-weight: bold;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+  }
+  #question {
+    margin-top: 120px;
+    font-size: 22px;
+    text-align: center;
+  }
+  #answers {
+    margin-top: 20px;
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .answer-btn {
+    padding: 15px 25px;
+    background-color: orange;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 18px;
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+  .answer-btn:hover {
+    transform: scale(1.05);
+  }
+  #balloon {
+    position: absolute;
+    bottom: 20px;
+    width: 100px;
+    transition: bottom 0.5s ease;
+  }
+  #finishMessage {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 32px;
+    font-weight: bold;
+    color: #ff4500;
+    display: none;
+    text-align: center;
+  }
+</style>
 </head>
 <body>
-<div id="logo-screen">
-    <img src="assets/logo.png" alt="Logo" id="logo">
-</div>
+<header>
+  <img src="assets/logo.png" alt="Logo">
+  <h1>Hot Air Balloon Adverbs Game</h1>
+</header>
 
-<div id="game-container">
-    <div id="score-board">Score: <span id="score">0</span></div>
-    <div id="sentence"></div>
-    <div id="options">
-        <button class="option-btn" onclick="checkAnswer(this)">Option 1</button>
-        <button class="option-btn" onclick="checkAnswer(this)">Option 2</button>
-        <button class="option-btn" onclick="checkAnswer(this)">Option 3</button>
-        <button class="option-btn" onclick="checkAnswer(this)">Option 4</button>
-    </div>
-
-    <div id="track-container">
-        <div id="track">
-            <img src="assets/boy1.png" id="balloon" alt="Balloon">
-        </div>
-    </div>
-</div>
+<div id="score">Score: 0/15</div>
+<div id="question">Select the correct adverb to dash forward!</div>
+<div id="answers"></div>
+<img id="balloon" src="assets/balloon.png" alt="Balloon">
+<div id="finishMessage">🎉 You’ve reached the top! 🎉</div>
 
 <audio id="correctSound" src="assets/correct.mp3"></audio>
 <audio id="wrongSound" src="assets/wrong.mp3"></audio>
 <audio id="clapSound" src="assets/freesound_community-claps-44774.mp3"></audio>
 
-<script src="game.js"></script>
+<script>
+const questions = [
+  {q: "We will meet ___ at the park.", options: ["quickly", "small", "here", "red"], answer: "quickly"},
+  {q: "She sings ___ in the choir.", options: ["loudly", "later", "fastest", "soft"], answer: "loudly"},
+  {q: "The rabbit hopped ___ across the garden.", options: ["slowly", "larger", "happily", "highest"], answer: "slowly"},
+  {q: "He ran ___ to catch the bus.", options: ["quickly", "tall", "yesterday", "strong"], answer: "quickly"},
+  {q: "Birds fly ___ in the sky.", options: ["high", "red", "softly", "bright"], answer: "high"},
+  {q: "The baby laughed ___ at the clown.", options: ["happily", "smaller", "here", "early"], answer: "happily"},
+  {q: "She finished the race ___ than anyone else.", options: ["faster", "later", "low", "soft"], answer: "faster"},
+  {q: "The wind blows ___ during the storm.", options: ["strongly", "yesterday", "fastest", "softly"], answer: "strongly"},
+  {q: "He whispered ___ so no one would hear.", options: ["softly", "high", "louder", "brightly"], answer: "softly"},
+  {q: "They arrived ___ at the party.", options: ["early", "quickly", "brightly", "happily"], answer: "early"},
+  {q: "She painted ___ on the canvas.", options: ["carefully", "larger", "high", "fastest"], answer: "carefully"},
+  {q: "The train moved ___ along the tracks.", options: ["smoothly", "red", "slowly", "brightly"], answer: "smoothly"},
+  {q: "He completed his homework ___ than yesterday.", options: ["faster", "high", "early", "slowly"], answer: "faster"},
+  {q: "The dog barked ___ at the stranger.", options: ["loudly", "softly", "fast", "highest"], answer: "loudly"},
+  {q: "She danced ___ across the stage.", options: ["gracefully", "quickly", "red", "small"], answer: "gracefully"}
+];
+
+let current = 0;
+let score = 0;
+
+const questionEl = document.getElementById('question');
+const answersEl = document.getElementById('answers');
+const balloon = document.getElementById('balloon');
+const scoreEl = document.getElementById('score');
+const finishEl = document.getElementById('finishMessage');
+const correctSound = document.getElementById('correctSound');
+const wrongSound = document.getElementById('wrongSound');
+const clapSound = document.getElementById('clapSound');
+
+function loadQuestion() {
+  if(current >= questions.length){
+    finishEl.style.display = "block";
+    clapSound.play();
+    return;
+  }
+  const q = questions[current];
+  questionEl.textContent = q.q;
+  answersEl.innerHTML = '';
+  q.options.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.textContent = opt;
+    btn.className = 'answer-btn';
+    btn.onclick = () => checkAnswer(opt);
+    answersEl.appendChild(btn);
+  });
+}
+
+function checkAnswer(selected) {
+  const q = questions[current];
+  if(selected === q.answer){
+    score++;
+    correctSound.play();
+    balloon.style.bottom = `${20 + (current+1)*50}px`;
+  } else {
+    wrongSound.play();
+  }
+  current++;
+  scoreEl.textContent = `Score: ${score}/${questions.length}`;
+  setTimeout(loadQuestion, 500);
+}
+
+// Initial load
+loadQuestion();
+</script>
 </body>
 </html>
