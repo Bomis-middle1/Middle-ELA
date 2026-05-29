@@ -1,1 +1,905 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🚦 Traffic Command Center</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
+body{
+overflow:hidden;
+background:#87ceeb;
+}
+
+#gameArea{
+position:relative;
+width:100vw;
+height:100vh;
+overflow:hidden;
+background:linear-gradient(to bottom,#64b5f6,#e3f2fd);
+}
+
+/* LOGO SCREEN */
+
+#logoScreen{
+position:absolute;
+width:100%;
+height:100%;
+background:white;
+display:flex;
+justify-content:center;
+align-items:center;
+flex-direction:column;
+z-index:9999;
+}
+
+#logoScreen img{
+width:260px;
+max-width:80%;
+}
+
+#logoText{
+margin-top:20px;
+font-size:34px;
+font-weight:bold;
+color:#333;
+}
+
+/* START + END */
+
+#startScreen,
+#endScreen{
+position:absolute;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.85);
+display:flex;
+justify-content:center;
+align-items:center;
+flex-direction:column;
+text-align:center;
+padding:20px;
+color:white;
+z-index:5000;
+}
+
+.mainBtn{
+padding:16px 36px;
+font-size:22px;
+border:none;
+border-radius:18px;
+background:#ff9800;
+color:white;
+cursor:pointer;
+margin-top:25px;
+transition:0.3s;
+}
+
+.mainBtn:hover{
+transform:scale(1.05);
+}
+
+/* TITLE */
+
+#titleBox{
+position:absolute;
+top:10px;
+left:50%;
+transform:translateX(-50%);
+width:92%;
+background:white;
+padding:15px;
+border-radius:20px;
+font-size:28px;
+font-weight:bold;
+text-align:center;
+color:#0d47a1;
+border:6px solid #ffca28;
+z-index:100;
+}
+
+/* SCORE */
+
+#scoreBoard{
+position:absolute;
+top:100px;
+left:20px;
+background:white;
+padding:12px 18px;
+border-radius:15px;
+font-size:18px;
+font-weight:bold;
+z-index:200;
+line-height:1.7;
+}
+
+/* VOLUME */
+
+#volumeBox{
+position:absolute;
+top:100px;
+right:20px;
+background:white;
+padding:12px;
+border-radius:15px;
+z-index:200;
+}
+
+/* CITY */
+
+#cityArea{
+position:absolute;
+top:180px;
+left:50%;
+transform:translateX(-50%);
+width:94%;
+height:58%;
+background:#b3e5fc;
+border-radius:25px;
+border:8px solid #1976d2;
+overflow:hidden;
+}
+
+/* ROADS */
+
+.roadH{
+position:absolute;
+top:50%;
+left:0;
+width:100%;
+height:120px;
+background:#424242;
+transform:translateY(-50%);
+}
+
+.roadV{
+position:absolute;
+left:50%;
+top:0;
+width:120px;
+height:100%;
+background:#424242;
+transform:translateX(-50%);
+}
+
+/* LANE MARKS */
+
+.lineH{
+position:absolute;
+top:50%;
+left:0;
+width:100%;
+height:8px;
+background:repeating-linear-gradient(
+to right,
+white 0px,
+white 30px,
+transparent 30px,
+transparent 60px
+);
+transform:translateY(-50%);
+}
+
+.lineV{
+position:absolute;
+left:50%;
+top:0;
+width:8px;
+height:100%;
+background:repeating-linear-gradient(
+to bottom,
+white 0px,
+white 30px,
+transparent 30px,
+transparent 60px
+);
+transform:translateX(-50%);
+}
+
+/* TRAFFIC LIGHT */
+
+#trafficLight{
+position:absolute;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+width:80px;
+height:220px;
+background:#212121;
+border-radius:20px;
+display:flex;
+flex-direction:column;
+justify-content:space-around;
+align-items:center;
+padding:10px;
+z-index:100;
+}
+
+.light{
+width:45px;
+height:45px;
+border-radius:50%;
+background:#555;
+}
+
+.redActive{
+background:red;
+box-shadow:0 0 20px red;
+}
+
+.yellowActive{
+background:yellow;
+box-shadow:0 0 20px yellow;
+}
+
+.greenActive{
+background:lime;
+box-shadow:0 0 20px lime;
+}
+
+/* VEHICLES */
+
+.vehicle{
+position:absolute;
+font-size:55px;
+transition:2s linear;
+z-index:50;
+}
+
+/* QUESTION */
+
+#questionBox{
+position:absolute;
+bottom:20px;
+left:50%;
+transform:translateX(-50%);
+width:94%;
+max-width:850px;
+background:#fff8e1;
+padding:20px;
+border-radius:25px;
+z-index:1000;
+box-shadow:0 0 20px rgba(0,0,0,0.4);
+}
+
+#questionText{
+font-size:24px;
+line-height:1.6;
+margin-bottom:15px;
+color:#333;
+text-align:center;
+}
+
+.optionContainer{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:12px;
+}
+
+.optionBtn{
+padding:15px;
+border:none;
+border-radius:15px;
+background:#4caf50;
+color:white;
+font-size:18px;
+cursor:pointer;
+transition:0.3s;
+}
+
+.optionBtn:hover{
+background:#388e3c;
+transform:scale(1.03);
+}
+
+/* FEEDBACK */
+
+#feedback{
+position:absolute;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+background:white;
+padding:30px;
+border-radius:25px;
+width:90%;
+max-width:600px;
+display:none;
+z-index:9999;
+text-align:center;
+box-shadow:0 0 25px rgba(0,0,0,0.5);
+animation:pop 0.4s;
+}
+
+#feedbackTitle{
+font-size:36px;
+margin-bottom:15px;
+font-weight:bold;
+}
+
+#feedbackText{
+font-size:22px;
+line-height:1.6;
+}
+
+/* CONFETTI */
+
+.confetti{
+position:absolute;
+width:12px;
+height:12px;
+animation:fall 3s linear forwards;
+}
+
+@keyframes fall{
+from{
+transform:translateY(-100px) rotate(0deg);
+}
+to{
+transform:translateY(100vh) rotate(720deg);
+opacity:0;
+}
+}
+
+@keyframes pop{
+from{
+transform:translate(-50%,-50%) scale(0.5);
+opacity:0;
+}
+to{
+transform:translate(-50%,-50%) scale(1);
+opacity:1;
+}
+}
+
+/* MOBILE */
+
+@media(max-width:768px){
+
+#titleBox{
+font-size:18px;
+}
+
+#questionText{
+font-size:18px;
+}
+
+.optionBtn{
+font-size:15px;
+}
+
+.vehicle{
+font-size:38px;
+}
+
+#trafficLight{
+width:60px;
+height:180px;
+}
+
+.light{
+width:35px;
+height:35px;
+}
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="gameArea">
+
+<!-- LOGO -->
+
+<div id="logoScreen">
+
+<img src="assets/innovine-logo.png">
+
+<div id="logoText">
+Innovine Learning Adventures
+</div>
+
+</div>
+
+<!-- START -->
+
+<div id="startScreen" style="display:none;">
+
+<h1 style="font-size:50px;">
+🚦 Traffic Command Center
+</h1>
+
+<p style="margin-top:20px;font-size:24px;max-width:700px;">
+Control the city traffic by answering adverb questions correctly!
+</p>
+
+<button class="mainBtn" onclick="startGame()">
+Start Controlling Traffic
+</button>
+
+</div>
+
+<!-- END -->
+
+<div id="endScreen" style="display:none;">
+
+<h1>🏆 City Traffic Restored! 🏆</h1>
+
+<h2 id="finalText" style="margin-top:20px; line-height:1.8;"></h2>
+
+<button class="mainBtn" onclick="restartGame()">
+Play Again
+</button>
+
+</div>
+
+<!-- TITLE -->
+
+<div id="titleBox">
+🚗 Answer Correctly To Control Traffic Safely!
+</div>
+
+<!-- SCORE -->
+
+<div id="scoreBoard">
+✅ Correct: <span id="correctScore">0</span><br>
+❌ Wrong: <span id="wrongScore">0</span><br>
+📘 Question: <span id="questionNumber">0</span>/10
+</div>
+
+<!-- VOLUME -->
+
+<div id="volumeBox">
+Volume
+<input type="range" id="volumeSlider"
+min="0" max="1" step="0.1" value="1">
+</div>
+
+<!-- CITY -->
+
+<div id="cityArea">
+
+<div class="roadH"></div>
+<div class="roadV"></div>
+
+<div class="lineH"></div>
+<div class="lineV"></div>
+
+<!-- TRAFFIC LIGHT -->
+
+<div id="trafficLight">
+
+<div id="redLight" class="light redActive"></div>
+<div id="yellowLight" class="light"></div>
+<div id="greenLight" class="light"></div>
+
+</div>
+
+<!-- VEHICLES -->
+
+<div id="car1" class="vehicle"
+style="top:46%; left:-80px;">
+🚗
+</div>
+
+<div id="car2" class="vehicle"
+style="top:20%; left:47%;">
+🚌
+</div>
+
+</div>
+
+<!-- QUESTION -->
+
+<div id="questionBox">
+
+<div id="questionText"></div>
+
+<div class="optionContainer" id="options"></div>
+
+</div>
+
+<!-- FEEDBACK -->
+
+<div id="feedback">
+
+<div id="feedbackTitle"></div>
+
+<div id="feedbackText"></div>
+
+</div>
+
+</div>
+
+<script>
+
+/* LOGO */
+
+setTimeout(()=>{
+
+document.getElementById("logoScreen").style.display="none";
+document.getElementById("startScreen").style.display="flex";
+
+},5000);
+
+/* AUDIO */
+
+const correctSound = new Audio("assets/correct.mp3");
+const wrongSound = new Audio("assets/wrong.mp3");
+
+const volumeSlider =
+document.getElementById("volumeSlider");
+
+function updateVolume(){
+
+correctSound.volume = volumeSlider.value;
+wrongSound.volume = volumeSlider.value;
+
+}
+
+volumeSlider.addEventListener("input",updateVolume);
+
+updateVolume();
+
+/* DATA */
+
+let currentQuestion = 0;
+let correct = 0;
+let wrong = 0;
+
+const questions = [
+
+{
+q:"🚑 The ambulance reached the hospital ___ because the roads were empty.",
+o:["slowly","quickly","tomorrow","upstairs"],
+a:1,
+e:"'Quickly' explains how the ambulance moved."
+},
+
+{
+q:"🚕 The taxi driver picked up the passengers. ___, he drove to the airport.",
+o:["Carefully","Next","Loudly","Outside"],
+a:1,
+e:"'Next' shows sequence."
+},
+
+{
+q:"🚗 The biker rode too ___ and nearly crashed into a fruit cart.",
+o:["wildly","tomorrow","inside","finally"],
+a:0,
+e:"'Wildly' describes how the biker rode."
+},
+
+{
+q:"🚌 First the bus stopped. ___, the passengers entered.",
+o:["Then","Quietly","Yesterday","Everywhere"],
+a:0,
+e:"'Then' shows order of actions."
+},
+
+{
+q:"🚓 The police officer spoke ___ to calm the crowd.",
+o:["softly","next","outside","tomorrow"],
+a:0,
+e:"'Softly' explains how the officer spoke."
+},
+
+{
+q:"🚦 The traffic lights turned red. ___, all the vehicles stopped.",
+o:["Finally","Immediately","Yesterday","Upstairs"],
+a:1,
+e:"'Immediately' tells when the vehicles stopped."
+},
+
+{
+q:"🚚 The delivery truck arrived late. ___, the store had already closed.",
+o:["Carefully","Sadly","First","Tomorrow"],
+a:1,
+e:"'Sadly' describes the situation."
+},
+
+{
+q:"🏍️ The racer checked his helmet. ___, he started the race.",
+o:["Then","Loudly","Everywhere","Slowly"],
+a:0,
+e:"'Then' correctly shows sequence."
+},
+
+{
+q:"🚑 The paramedics worked ___ during the emergency.",
+o:["calmly","yesterday","outside","next"],
+a:0,
+e:"'Calmly' explains how they worked."
+},
+
+{
+q:"🚦 First the road was blocked. ___, workers repaired it. Finally, traffic moved again.",
+o:["Carefully","Next","Tomorrow","Inside"],
+a:1,
+e:"'Next' continues the sequence."
+}
+
+];
+
+/* START */
+
+function startGame(){
+
+document.getElementById("startScreen").style.display="none";
+
+loadQuestion();
+
+}
+
+/* LOAD QUESTION */
+
+function loadQuestion(){
+
+moveTraffic();
+
+const q = questions[currentQuestion];
+
+document.getElementById("questionText").innerHTML =
+q.q;
+
+const options =
+document.getElementById("options");
+
+options.innerHTML = "";
+
+q.o.forEach((option,index)=>{
+
+const btn = document.createElement("button");
+
+btn.classList.add("optionBtn");
+
+btn.innerHTML = option;
+
+btn.onclick = ()=>checkAnswer(index);
+
+options.appendChild(btn);
+
+});
+
+}
+
+/* TRAFFIC */
+
+function moveTraffic(){
+
+const car1 =
+document.getElementById("car1");
+
+const car2 =
+document.getElementById("car2");
+
+resetLights();
+
+document.getElementById("greenLight")
+.classList.add("greenActive");
+
+car1.style.left = "110%";
+
+car2.style.top = "110%";
+
+setTimeout(()=>{
+
+car1.style.transition = "none";
+car2.style.transition = "none";
+
+car1.style.left = "-80px";
+car2.style.top = "-80px";
+
+setTimeout(()=>{
+
+car1.style.transition = "2s linear";
+car2.style.transition = "2s linear";
+
+},100);
+
+},2500);
+
+}
+
+/* LIGHTS */
+
+function resetLights(){
+
+document.getElementById("redLight")
+.className = "light";
+
+document.getElementById("yellowLight")
+.className = "light";
+
+document.getElementById("greenLight")
+.className = "light";
+
+}
+
+/* CHECK ANSWER */
+
+function checkAnswer(selected){
+
+const q = questions[currentQuestion];
+
+const feedback =
+document.getElementById("feedback");
+
+feedback.style.display = "block";
+
+if(selected === q.a){
+
+correct++;
+
+document.getElementById("correctScore")
+.innerHTML = correct;
+
+correctSound.play();
+
+createConfetti();
+
+document.getElementById("feedbackTitle")
+.innerHTML = "✅ Correct!";
+
+document.getElementById("feedbackTitle")
+.style.color = "green";
+
+document.getElementById("feedbackText")
+.innerHTML = q.e;
+
+}else{
+
+wrong++;
+
+document.getElementById("wrongScore")
+.innerHTML = wrong;
+
+wrongSound.play();
+
+resetLights();
+
+document.getElementById("redLight")
+.classList.add("redActive");
+
+document.getElementById("feedbackTitle")
+.innerHTML = "❌ Traffic Jam!";
+
+document.getElementById("feedbackTitle")
+.style.color = "red";
+
+document.getElementById("feedbackText")
+.innerHTML =
+`
+Correct Answer:
+<b>${q.o[q.a]}</b>
+<br><br>
+${q.e}
+`;
+
+}
+
+document.getElementById("questionNumber")
+.innerHTML = currentQuestion + 1;
+
+setTimeout(()=>{
+
+feedback.style.display = "none";
+
+currentQuestion++;
+
+if(currentQuestion >= 10){
+
+endGame();
+
+}else{
+
+loadQuestion();
+
+}
+
+},2500);
+
+}
+
+/* CONFETTI */
+
+function createConfetti(){
+
+for(let i=0;i<40;i++){
+
+const conf =
+document.createElement("div");
+
+conf.classList.add("confetti");
+
+conf.style.left =
+Math.random()*100 + "%";
+
+conf.style.background =
+`hsl(${Math.random()*360},100%,50%)`;
+
+conf.style.animationDuration =
+(2 + Math.random()*2)+"s";
+
+document.body.appendChild(conf);
+
+setTimeout(()=>{
+
+conf.remove();
+
+},4000);
+
+}
+
+}
+
+/* END */
+
+function endGame(){
+
+document.getElementById("endScreen")
+.style.display = "flex";
+
+let percentage =
+Math.round((correct / 10) * 100);
+
+let message = "";
+
+if(correct === 10){
+
+message =
+"🌟 PERFECT! You controlled the city flawlessly!";
+
+}else if(correct >= 8){
+
+message =
+"🚦 Amazing Driving Control Skills!";
+
+}else if(correct >= 6){
+
+message =
+"🚗 Great Job Managing Traffic!";
+
+}else{
+
+message =
+"🎉 Nice Effort! The city is moving safely again!";
+}
+
+document.getElementById("finalText")
+.innerHTML =
+`
+🏆 Correct Answers: ${correct}/10<br><br>
+
+❌ Wrong Answers: ${wrong}<br><br>
+
+⭐ Score Percentage: ${percentage}%<br><br>
+
+${message}
+`;
+
+}
+
+/* RESTART */
+
+function restartGame(){
+
+location.reload();
+
+}
+
+</script>
+
+</body>
+</html>
