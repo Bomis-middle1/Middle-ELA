@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -410,8 +409,6 @@ font-size:34px;
 
 <div id="gameArea">
 
-<!-- CLOUDS -->
-
 <script>
 for(let i=0;i<8;i++){
 
@@ -497,7 +494,7 @@ Volume
 <div id="problemEmoji">🔩</div>
 
 <div id="problemText">
-Loose bolts need tightening!
+The Ferris wheel is wobbling dangerously!
 </div>
 
 </div>
@@ -574,7 +571,7 @@ const rides = [
 ride:"🎡",
 animation:"spin",
 problemEmoji:"🔩",
-problem:"Loose bolts need tightening!",
+problem:"The Ferris wheel is wobbling dangerously!",
 tool:"wrench"
 },
 
@@ -582,7 +579,7 @@ tool:"wrench"
 ride:"🎢",
 animation:"bounce",
 problemEmoji:"⚙️",
-problem:"Broken gear must be replaced!",
+problem:"The rollercoaster engine is making grinding noises!",
 tool:"gear"
 },
 
@@ -590,7 +587,7 @@ tool:"gear"
 ride:"🏴‍☠️",
 animation:"swing",
 problemEmoji:"🔋",
-problem:"The ride battery ran out!",
+problem:"The pirate ship suddenly lost all power!",
 tool:"battery"
 },
 
@@ -598,7 +595,7 @@ tool:"battery"
 ride:"👻",
 animation:"flash",
 problemEmoji:"🪛",
-problem:"Power wires are disconnected!",
+problem:"The haunted house lights keep flickering!",
 tool:"screwdriver"
 },
 
@@ -606,7 +603,7 @@ tool:"screwdriver"
 ride:"🚗",
 animation:"bounce",
 problemEmoji:"🔩",
-problem:"Bumper wheels are loose!",
+problem:"The bumper cars are shaking wildly!",
 tool:"wrench"
 },
 
@@ -614,7 +611,7 @@ tool:"wrench"
 ride:"🎠",
 animation:"spin",
 problemEmoji:"⚙️",
-problem:"Carousel engine gear cracked!",
+problem:"The carousel suddenly stopped spinning!",
 tool:"gear"
 },
 
@@ -622,7 +619,7 @@ tool:"gear"
 ride:"💦",
 animation:"flash",
 problemEmoji:"🔋",
-problem:"Water ride power battery is dead!",
+problem:"The water ride won't turn on anymore!",
 tool:"battery"
 },
 
@@ -630,7 +627,7 @@ tool:"battery"
 ride:"🚀",
 animation:"bounce",
 problemEmoji:"🪛",
-problem:"Rocket ride control panel is loose!",
+problem:"The rocket ride control panel is hanging loose!",
 tool:"screwdriver"
 },
 
@@ -638,7 +635,7 @@ tool:"screwdriver"
 ride:"🎯",
 animation:"spin",
 problemEmoji:"⚙️",
-problem:"Target machine gear stopped working!",
+problem:"The target machine suddenly jammed!",
 tool:"gear"
 },
 
@@ -646,7 +643,7 @@ tool:"gear"
 ride:"🎆",
 animation:"flash",
 problemEmoji:"🔋",
-problem:"Fireworks system lost power!",
+problem:"The fireworks system refuses to start!",
 tool:"battery"
 }
 
@@ -777,6 +774,24 @@ r.problemEmoji;
 
 document.getElementById("problemText").innerHTML =
 r.problem;
+
+shuffleTools();
+
+}
+
+/* SHUFFLE TOOLS */
+
+function shuffleTools(){
+
+const toolbox = document.getElementById("toolBox");
+
+for(let i = toolbox.children.length; i >= 0; i--){
+
+toolbox.appendChild(
+toolbox.children[Math.random() * i | 0]
+);
+
+}
 
 }
 
