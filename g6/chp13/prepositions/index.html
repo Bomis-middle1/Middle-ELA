@@ -1,0 +1,1009 @@
+<!--
+=========================================================
+🕵️ MUSEUM HEIST ESCAPE
+TOPIC: PREPOSITIONS
+- Place
+- Time
+- Movement
+
+📁 REQUIRED FILES:
+
+project-folder/
+│
+├── index.html
+│
+└── assets/
+    ├── innovine-logo.png
+    ├── correct.mp3
+    └── wrong.mp3
+
+=========================================================
+🌐 GITHUB PAGES SETUP
+=========================================================
+
+1. Save this file as:
+   index.html
+
+2. Create folder:
+   assets
+
+3. Put these inside assets:
+   innovine-logo.png
+   correct.mp3
+   wrong.mp3
+
+4. Upload to GitHub
+
+5. Settings → Pages
+
+6. Select:
+   main branch + root
+
+7. SAVE
+
+=========================================================
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>🕵️ Museum Heist Escape</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
+body{
+overflow:hidden;
+background:#111;
+}
+
+#gameArea{
+position:relative;
+width:100vw;
+height:100vh;
+overflow:hidden;
+background:linear-gradient(to bottom,#263238,#000);
+}
+
+/* LOGO */
+
+#logoScreen{
+position:absolute;
+width:100%;
+height:100%;
+background:white;
+display:flex;
+justify-content:center;
+align-items:center;
+flex-direction:column;
+z-index:9999;
+}
+
+#logoScreen img{
+width:260px;
+max-width:80%;
+}
+
+#logoText{
+margin-top:20px;
+font-size:34px;
+font-weight:bold;
+color:#333;
+}
+
+/* START + END */
+
+#startScreen,
+#endScreen{
+position:absolute;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.9);
+display:flex;
+justify-content:center;
+align-items:center;
+flex-direction:column;
+text-align:center;
+padding:20px;
+color:white;
+z-index:5000;
+}
+
+.mainBtn{
+padding:16px 34px;
+font-size:22px;
+border:none;
+border-radius:18px;
+background:#ff9800;
+color:white;
+cursor:pointer;
+margin-top:25px;
+transition:0.3s;
+}
+
+.mainBtn:hover{
+transform:scale(1.05);
+}
+
+/* TITLE */
+
+#titleBox{
+position:absolute;
+top:10px;
+left:50%;
+transform:translateX(-50%);
+width:92%;
+background:#212121;
+padding:15px;
+border-radius:20px;
+font-size:28px;
+font-weight:bold;
+text-align:center;
+color:#ffeb3b;
+border:5px solid #ff9800;
+z-index:100;
+}
+
+/* SCORE */
+
+#scoreBoard{
+position:absolute;
+top:100px;
+left:20px;
+background:#212121;
+color:white;
+padding:12px 18px;
+border-radius:15px;
+font-size:18px;
+font-weight:bold;
+z-index:200;
+line-height:1.7;
+border:3px solid #ff9800;
+}
+
+/* VOLUME */
+
+#volumeBox{
+position:absolute;
+top:100px;
+right:20px;
+background:#212121;
+color:white;
+padding:12px;
+border-radius:15px;
+z-index:200;
+border:3px solid #ff9800;
+}
+
+/* MUSEUM */
+
+#museumArea{
+position:absolute;
+top:170px;
+left:50%;
+transform:translateX(-50%);
+width:95%;
+height:52%;
+background:#37474f;
+border-radius:25px;
+border:8px solid #607d8b;
+overflow:hidden;
+}
+
+/* ROOMS */
+
+.room{
+position:absolute;
+background:#455a64;
+border:4px solid #90a4ae;
+border-radius:20px;
+}
+
+#room1{
+width:28%;
+height:38%;
+top:5%;
+left:3%;
+}
+
+#room2{
+width:28%;
+height:38%;
+top:5%;
+left:36%;
+}
+
+#room3{
+width:28%;
+height:38%;
+top:5%;
+left:69%;
+}
+
+#room4{
+width:28%;
+height:38%;
+bottom:5%;
+left:20%;
+}
+
+#room5{
+width:28%;
+height:38%;
+bottom:5%;
+left:52%;
+}
+
+/* ARTIFACTS */
+
+.artifact{
+position:absolute;
+font-size:50px;
+animation:glow 2s infinite;
+}
+
+@keyframes glow{
+0%{
+transform:scale(1);
+filter:drop-shadow(0 0 5px yellow);
+}
+50%{
+transform:scale(1.1);
+filter:drop-shadow(0 0 15px cyan);
+}
+100%{
+transform:scale(1);
+filter:drop-shadow(0 0 5px yellow);
+}
+}
+
+/* DETECTIVE */
+
+#detective{
+position:absolute;
+bottom:20px;
+left:30px;
+font-size:80px;
+transition:1s;
+z-index:500;
+}
+
+/* FOOTPRINTS */
+
+.footprint{
+position:absolute;
+font-size:30px;
+opacity:0.7;
+animation:fade 2s infinite;
+}
+
+@keyframes fade{
+0%{opacity:0.2;}
+50%{opacity:1;}
+100%{opacity:0.2;}
+}
+
+/* LASERS */
+
+.laser{
+position:absolute;
+background:red;
+box-shadow:0 0 15px red;
+animation:blink 1s infinite;
+}
+
+#laser1{
+top:48%;
+left:0;
+width:100%;
+height:4px;
+}
+
+#laser2{
+left:50%;
+top:0;
+width:4px;
+height:100%;
+}
+
+@keyframes blink{
+0%{opacity:0.3;}
+50%{opacity:1;}
+100%{opacity:0.3;}
+}
+
+/* QUESTION */
+
+#questionBox{
+position:absolute;
+bottom:10px;
+left:50%;
+transform:translateX(-50%);
+width:94%;
+max-width:900px;
+background:#fff8e1;
+padding:20px;
+border-radius:25px;
+z-index:1000;
+box-shadow:0 0 20px rgba(0,0,0,0.5);
+}
+
+#questionText{
+font-size:22px;
+line-height:1.6;
+margin-bottom:18px;
+color:#333;
+text-align:center;
+}
+
+.optionContainer{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:12px;
+}
+
+.optionBtn{
+padding:15px;
+border:none;
+border-radius:15px;
+background:#0288d1;
+color:white;
+font-size:18px;
+cursor:pointer;
+transition:0.3s;
+}
+
+.optionBtn:hover{
+background:#01579b;
+transform:scale(1.03);
+}
+
+/* FEEDBACK */
+
+#feedbackPopup{
+position:absolute;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+background:white;
+padding:30px;
+border-radius:25px;
+width:90%;
+max-width:650px;
+display:none;
+z-index:9999;
+text-align:center;
+box-shadow:0 0 30px rgba(0,0,0,0.5);
+animation:popup 0.4s;
+}
+
+#feedbackTitle{
+font-size:36px;
+margin-bottom:15px;
+font-weight:bold;
+}
+
+#feedbackText{
+font-size:22px;
+line-height:1.6;
+color:#333;
+}
+
+@keyframes popup{
+from{
+transform:translate(-50%,-50%) scale(0.5);
+opacity:0;
+}
+to{
+transform:translate(-50%,-50%) scale(1);
+opacity:1;
+}
+}
+
+/* CONFETTI */
+
+.confetti{
+position:absolute;
+width:12px;
+height:12px;
+animation:fall 3s linear forwards;
+}
+
+@keyframes fall{
+from{
+transform:translateY(-100px) rotate(0deg);
+}
+to{
+transform:translateY(100vh) rotate(720deg);
+opacity:0;
+}
+}
+
+/* MOBILE */
+
+@media(max-width:768px){
+
+#titleBox{
+font-size:18px;
+}
+
+#questionText{
+font-size:17px;
+}
+
+.optionBtn{
+font-size:15px;
+padding:12px;
+}
+
+.artifact{
+font-size:35px;
+}
+
+#detective{
+font-size:60px;
+}
+
+#feedbackTitle{
+font-size:28px;
+}
+
+#feedbackText{
+font-size:18px;
+}
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="gameArea">
+
+<!-- LOGO -->
+
+<div id="logoScreen">
+
+<img src="assets/innovine-logo.png">
+
+<div id="logoText">
+Innovine Learning Adventures
+</div>
+
+</div>
+
+<!-- START -->
+
+<div id="startScreen"
+style="display:none;">
+
+<h1 style="font-size:50px;">
+🕵️ Museum Heist Escape
+</h1>
+
+<p style="margin-top:20px;font-size:24px;max-width:700px;">
+Solve preposition clues to catch the thief and escape the museum!
+</p>
+
+<button class="mainBtn"
+onclick="startGame()">
+Start Mission
+</button>
+
+</div>
+
+<!-- END -->
+
+<div id="endScreen"
+style="display:none;">
+
+<h1>🏆 Mission Complete! 🏆</h1>
+
+<h2 id="finalText"
+style="margin-top:20px; line-height:1.8;"></h2>
+
+<button class="mainBtn"
+onclick="restartGame()">
+Play Again
+</button>
+
+</div>
+
+<!-- TITLE -->
+
+<div id="titleBox">
+🔦 Solve Preposition Clues To Catch The Thief!
+</div>
+
+<!-- SCORE -->
+
+<div id="scoreBoard">
+✅ Correct: <span id="correctScore">0</span><br>
+❌ Wrong: <span id="wrongScore">0</span><br>
+📘 Question: <span id="questionNumber">0</span>/10
+</div>
+
+<!-- VOLUME -->
+
+<div id="volumeBox">
+Volume
+<input type="range"
+id="volumeSlider"
+min="0"
+max="1"
+step="0.1"
+value="1">
+</div>
+
+<!-- MUSEUM -->
+
+<div id="museumArea">
+
+<div class="room" id="room1"></div>
+<div class="room" id="room2"></div>
+<div class="room" id="room3"></div>
+<div class="room" id="room4"></div>
+<div class="room" id="room5"></div>
+
+<div class="artifact"
+style="top:40px;left:8%;">
+🗿
+</div>
+
+<div class="artifact"
+style="top:40px;left:40%;">
+💎
+</div>
+
+<div class="artifact"
+style="top:40px;left:74%;">
+🖼️
+</div>
+
+<div class="artifact"
+style="bottom:50px;left:28%;">
+🏺
+</div>
+
+<div class="artifact"
+style="bottom:50px;left:60%;">
+👑
+</div>
+
+<div class="footprint"
+style="top:46%;left:18%;">
+👣
+</div>
+
+<div class="footprint"
+style="top:46%;left:35%;">
+👣
+</div>
+
+<div class="footprint"
+style="top:46%;left:52%;">
+👣
+</div>
+
+<div class="footprint"
+style="top:46%;left:70%;">
+👣
+</div>
+
+<div id="laser1" class="laser"></div>
+<div id="laser2" class="laser"></div>
+
+<div id="detective">
+🕵️
+</div>
+
+</div>
+
+<!-- QUESTION -->
+
+<div id="questionBox">
+
+<div id="questionText"></div>
+
+<div class="optionContainer"
+id="options"></div>
+
+</div>
+
+<!-- FEEDBACK -->
+
+<div id="feedbackPopup">
+
+<div id="feedbackTitle"></div>
+
+<div id="feedbackText"></div>
+
+</div>
+
+</div>
+
+<script>
+
+/* LOGO */
+
+setTimeout(()=>{
+
+document.getElementById("logoScreen")
+.style.display="none";
+
+document.getElementById("startScreen")
+.style.display="flex";
+
+},5000);
+
+/* AUDIO */
+
+const correctSound =
+new Audio("assets/correct.mp3");
+
+const wrongSound =
+new Audio("assets/wrong.mp3");
+
+const volumeSlider =
+document.getElementById("volumeSlider");
+
+function updateVolume(){
+
+correctSound.volume =
+volumeSlider.value;
+
+wrongSound.volume =
+volumeSlider.value;
+
+}
+
+volumeSlider.addEventListener(
+"input",
+updateVolume
+);
+
+updateVolume();
+
+/* QUESTIONS */
+
+const questions = [
+
+{
+q:"🗿 The thief hid ___ the giant dinosaur skeleton.",
+o:["under","through","during","across"],
+a:0,
+e:"'Under' shows place below something."
+},
+
+{
+q:"🚪 The detective ran ___ the secret tunnel.",
+o:["through","between","at","before"],
+a:0,
+e:"'Through' shows movement from one side to another."
+},
+
+{
+q:"🕰️ The security alarm rings ___ midnight.",
+o:["at","beside","across","under"],
+a:0,
+e:"'At' is used for exact times."
+},
+
+{
+q:"🖼️ The painting hangs ___ two windows.",
+o:["between","into","during","through"],
+a:0,
+e:"'Between' shows position in the middle of two things."
+},
+
+{
+q:"🏃 Arrange the chase correctly:<br><br>1. The thief jumped across the table<br>2. The guard entered the room<br>3. The thief escaped through the window",
+o:[
+"2 → 1 → 3",
+"1 → 3 → 2",
+"3 → 2 → 1",
+"2 → 3 → 1"
+],
+a:0,
+e:"The guard enters, the thief jumps, then escapes."
+},
+
+{
+q:"👑 The crown is hidden ___ the glass case.",
+o:["inside","before","during","across"],
+a:0,
+e:"'Inside' shows place within something."
+},
+
+{
+q:"🚨 The detective arrived ___ the museum opened.",
+o:["before","under","through","between"],
+a:0,
+e:"'Before' shows earlier time."
+},
+
+{
+q:"🕵️ The thief climbed ___ the staircase and disappeared.",
+o:["up","during","at","beside"],
+a:0,
+e:"'Up' shows upward movement."
+},
+
+{
+q:"🏺 The ancient vase stands ___ the statue and the painting.",
+o:["between","through","after","into"],
+a:0,
+e:"'Between' is used for two surrounding objects."
+},
+
+{
+q:"💎 The thief escaped ___ the crowd during the festival.",
+o:["through","under","at","before"],
+a:0,
+e:"'Through' shows movement within a group."
+}
+
+];
+
+/* VARIABLES */
+
+let currentQuestion = 0;
+let correct = 0;
+let wrong = 0;
+
+/* START */
+
+function startGame(){
+
+document.getElementById("startScreen")
+.style.display="none";
+
+loadQuestion();
+
+}
+
+/* LOAD QUESTION */
+
+function loadQuestion(){
+
+moveDetective();
+
+const q = questions[currentQuestion];
+
+document.getElementById("questionText")
+.innerHTML = q.q;
+
+const options =
+document.getElementById("options");
+
+options.innerHTML = "";
+
+q.o.forEach((option,index)=>{
+
+const btn =
+document.createElement("button");
+
+btn.classList.add("optionBtn");
+
+btn.innerHTML = option;
+
+btn.onclick = ()=>checkAnswer(index);
+
+options.appendChild(btn);
+
+});
+
+}
+
+/* MOVE DETECTIVE */
+
+function moveDetective(){
+
+const detective =
+document.getElementById("detective");
+
+const randomX =
+Math.random()*70 + 10;
+
+const randomY =
+Math.random()*40 + 20;
+
+detective.style.left =
+randomX + "%";
+
+detective.style.top =
+randomY + "%";
+
+}
+
+/* CHECK ANSWER */
+
+function checkAnswer(selected){
+
+const q = questions[currentQuestion];
+
+const popup =
+document.getElementById("feedbackPopup");
+
+popup.style.display = "block";
+
+if(selected === q.a){
+
+correct++;
+
+document.getElementById("correctScore")
+.innerHTML = correct;
+
+correctSound.play();
+
+createConfetti();
+
+document.getElementById("feedbackTitle")
+.innerHTML = "✅ Clue Solved!";
+
+document.getElementById("feedbackTitle")
+.style.color = "green";
+
+document.getElementById("feedbackText")
+.innerHTML = q.e;
+
+document.getElementById("laser1")
+.style.display = "none";
+
+document.getElementById("laser2")
+.style.display = "none";
+
+}else{
+
+wrong++;
+
+document.getElementById("wrongScore")
+.innerHTML = wrong;
+
+wrongSound.play();
+
+document.getElementById("feedbackTitle")
+.innerHTML = "❌ Alarm Triggered!";
+
+document.getElementById("feedbackTitle")
+.style.color = "red";
+
+document.getElementById("feedbackText")
+.innerHTML =
+`
+Correct Answer:<br><br>
+<b>${q.o[q.a]}</b><br><br>
+${q.e}
+`;
+
+document.getElementById("laser1")
+.style.display = "block";
+
+document.getElementById("laser2")
+.style.display = "block";
+
+}
+
+document.getElementById("questionNumber")
+.innerHTML = currentQuestion + 1;
+
+setTimeout(()=>{
+
+popup.style.display = "none";
+
+currentQuestion++;
+
+if(currentQuestion >= 10){
+
+endGame();
+
+}else{
+
+loadQuestion();
+
+}
+
+},2500);
+
+}
+
+/* CONFETTI */
+
+function createConfetti(){
+
+for(let i=0;i<40;i++){
+
+const conf =
+document.createElement("div");
+
+conf.classList.add("confetti");
+
+conf.style.left =
+Math.random()*100 + "%";
+
+conf.style.background =
+`hsl(${Math.random()*360},100%,50%)`;
+
+conf.style.animationDuration =
+(2 + Math.random()*2)+"s";
+
+document.body.appendChild(conf);
+
+setTimeout(()=>{
+conf.remove();
+},4000);
+
+}
+
+}
+
+/* END */
+
+function endGame(){
+
+document.getElementById("endScreen")
+.style.display = "flex";
+
+let percentage =
+Math.round((correct / 10) * 100);
+
+let message = "";
+
+if(correct === 10){
+
+message =
+"🌟 PERFECT DETECTIVE WORK! The thief has been caught!";
+
+}else if(correct >= 8){
+
+message =
+"🕵️ Amazing Investigation Skills!";
+
+}else if(correct >= 6){
+
+message =
+"👏 Great Museum Detective Work!";
+
+}else{
+
+message =
+"🎉 Nice Try! The museum is safe again!";
+}
+
+document.getElementById("finalText")
+.innerHTML =
+`
+🏆 Correct Answers: ${correct}/10<br><br>
+
+❌ Wrong Answers: ${wrong}<br><br>
+
+⭐ Score Percentage: ${percentage}%<br><br>
+
+${message}
+`;
+
+}
+
+/* RESTART */
+
+function restartGame(){
+
+location.reload();
+
+}
+
+</script>
+
+</body>
+</html>
