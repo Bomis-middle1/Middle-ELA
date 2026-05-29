@@ -24,8 +24,7 @@ position:relative;
 width:100vw;
 height:100vh;
 overflow:hidden;
-background:
-linear-gradient(to bottom,#64b5f6,#e1f5fe);
+background:linear-gradient(to bottom,#64b5f6,#e1f5fe);
 }
 
 /* CLOUDS */
@@ -39,12 +38,8 @@ animation:moveCloud linear infinite;
 }
 
 @keyframes moveCloud{
-from{
-transform:translateX(-300px);
-}
-to{
-transform:translateX(120vw);
-}
+from{transform:translateX(-300px);}
+to{transform:translateX(120vw);}
 }
 
 /* LOGO */
@@ -135,9 +130,10 @@ left:20px;
 background:white;
 padding:12px 18px;
 border-radius:15px;
-font-size:20px;
+font-size:18px;
 font-weight:bold;
 z-index:200;
+line-height:1.6;
 }
 
 /* VOLUME */
@@ -156,11 +152,11 @@ z-index:200;
 
 #rideArea{
 position:absolute;
-top:170px;
+top:180px;
 left:50%;
 transform:translateX(-50%);
 width:94%;
-height:62%;
+height:58%;
 background:#fffde7;
 border-radius:30px;
 border:8px solid #42a5f5;
@@ -171,7 +167,7 @@ overflow:hidden;
 
 #rideEmoji{
 position:absolute;
-top:40px;
+top:30px;
 left:50%;
 transform:translateX(-50%);
 font-size:140px;
@@ -218,7 +214,7 @@ to{opacity:0.2;}
 
 #problemBox{
 position:absolute;
-top:240px;
+top:220px;
 left:50%;
 transform:translateX(-50%);
 background:white;
@@ -226,7 +222,7 @@ padding:20px;
 border-radius:20px;
 border:5px dashed red;
 text-align:center;
-width:80%;
+width:82%;
 max-width:650px;
 }
 
@@ -267,18 +263,35 @@ transform:scale(1.1);
 background:#fff9c4;
 }
 
-/* MESSAGE */
+/* POPUP */
 
-#repairMessage{
+#feedbackPopup{
 position:absolute;
 top:50%;
 left:50%;
 transform:translate(-50%,-50%);
-font-size:60px;
-font-weight:bold;
+width:90%;
+max-width:650px;
+background:white;
+padding:30px;
+border-radius:25px;
 display:none;
-z-index:500;
-text-shadow:0 0 20px white;
+z-index:9000;
+text-align:center;
+box-shadow:0 0 30px rgba(0,0,0,0.5);
+animation:popup 0.4s;
+}
+
+#feedbackTitle{
+font-size:38px;
+margin-bottom:15px;
+font-weight:bold;
+}
+
+#feedbackText{
+font-size:24px;
+line-height:1.6;
+color:#333;
 }
 
 /* QUESTION */
@@ -391,8 +404,12 @@ font-size:18px;
 font-size:16px;
 }
 
-#repairMessage{
-font-size:34px;
+#feedbackTitle{
+font-size:28px;
+}
+
+#feedbackText{
+font-size:18px;
 }
 
 }
@@ -467,8 +484,9 @@ Play Again
 <!-- SCORE -->
 
 <div id="scoreBoard">
-Repairs: <span id="repairCount">0</span> |
-Questions: <span id="questionCount">0</span>/10
+✅ Correct: <span id="correctScore">0</span><br>
+❌ Wrong: <span id="wrongScore">0</span><br>
+📘 Question: <span id="questionNumber">0</span>/10
 </div>
 
 <!-- VOLUME -->
@@ -485,14 +503,10 @@ Volume
 <div id="rideEmoji">🎡</div>
 
 <div id="problemBox">
-
 <div id="problemText">
 The Ferris wheel is wobbling dangerously!
 </div>
-
 </div>
-
-<div id="repairMessage"></div>
 
 </div>
 
@@ -518,6 +532,16 @@ The Ferris wheel is wobbling dangerously!
 <div id="questionText"></div>
 
 <div id="options"></div>
+
+</div>
+
+<!-- FEEDBACK -->
+
+<div id="feedbackPopup">
+
+<div id="feedbackTitle"></div>
+
+<div id="feedbackText"></div>
 
 </div>
 
@@ -554,9 +578,13 @@ volumeSlider.addEventListener("input",updateVolume);
 
 updateVolume();
 
-/* DATA */
+/* SCORE */
 
 let level = 0;
+let correctCount = 0;
+let wrongCount = 0;
+
+/* RIDES */
 
 const rides = [
 
@@ -632,97 +660,103 @@ tool:"battery"
 
 ];
 
+/* QUESTIONS */
+
 const questions = [
 
 {
-q:`🎢 Which sentence sounds BEST?`,
+q:"🎢 Which sentence sounds BEST?",
 o:[
 "The workers fixing the track arrived quickly.",
 "The workers fixeding the track arrived quickly.",
 "The workers fix the track arriving quickly.",
 "The workers to fixing the track arrived."
 ],
-a:0
+a:0,
+e:"'Fixing' is correctly used as a non-finite verb."
 },
 
 {
-q:`👻 The visitors screamed loudly after seeing the ghost jumping from the ceiling.<br><br>
-What was the ghost doing?`,
+q:"👻 The visitors screamed loudly after seeing the ghost jumping from the ceiling.<br><br>What was the ghost doing?",
 o:["screamed","seeing","jumping","loudly"],
-a:2
+a:2,
+e:"'Jumping' tells us the ghost's action."
 },
 
 {
-q:`💦 Which sentence sounds WRONG?`,
+q:"💦 Which sentence sounds WRONG?",
 o:[
 "Running near the ride is dangerous.",
 "The children waiting in line were excited.",
 "The operator checking the ride smiled.",
 "The visitors slippinged near the pool laughed."
 ],
-a:3
+a:3,
+e:"'Slippinged' is not a real verb form."
 },
 
 {
-q:`🎡 Mia stood near the Ferris wheel, eating popcorn while watching fireworks.<br><br>
-Which action happened at the same time?`,
+q:"🎡 Mia stood near the Ferris wheel, eating popcorn while watching fireworks.<br><br>Which action happened at the same time?",
 o:["stood","Ferris wheel","eating","fireworks"],
-a:2
+a:2,
+e:"'Eating' happened while Mia stood there."
 },
 
 {
-q:`🏴‍☠️ The pirate ride stopped moving after making a strange sound.<br><br>
-What happened FIRST?`,
+q:"🏴‍☠️ The pirate ride stopped moving after making a strange sound.<br><br>What happened FIRST?",
 o:[
 "stopped moving",
 "making a strange sound",
 "pirate ride",
 "strange"
 ],
-a:1
+a:1,
+e:"The strange sound happened before the ride stopped."
 },
 
 {
-q:`🎠 Which announcement sounds BEST?`,
+q:"🎠 Which announcement sounds BEST?",
 o:[
 "The clown dancing near the carousel waved happily.",
 "The clown danceding near the carousel waved happily.",
 "The clown dance near the carousel waving happily.",
 "The clown to dancing near the carousel waved."
 ],
-a:0
+a:0,
+e:"'Dancing' is correctly used here."
 },
 
 {
-q:`🍿 The popcorn machine exploded while cooking snacks.<br><br>
-What was the machine doing before exploding?`,
+q:"🍿 The popcorn machine exploded while cooking snacks.<br><br>What was the machine doing before exploding?",
 o:["exploded","visitors","cooking","snacks"],
-a:2
+a:2,
+e:"The machine was cooking snacks first."
 },
 
 {
-q:`🚗 The children raced around the arena, trying to avoid crashing.<br><br>
-What were the children trying to do?`,
+q:"🚗 The children raced around the arena, trying to avoid crashing.<br><br>What were the children trying to do?",
 o:["raced","avoid crashing","arena","children"],
-a:1
+a:1,
+e:"They were trying to avoid crashing."
 },
 
 {
-q:`🎩 The magician opened the giant box, hoping to surprise the audience.<br><br>
-What was the magician hoping to do?`,
+q:"🎩 The magician opened the giant box, hoping to surprise the audience.<br><br>What was the magician hoping to do?",
 o:["opened","hoping","surprise the audience","audience"],
-a:2
+a:2,
+e:"The magician wanted to surprise the audience."
 },
 
 {
-q:`⚡ Which sentence sounds most natural?`,
+q:"⚡ Which sentence sounds most natural?",
 o:[
 "Checking the rollercoaster carefully, the engineer found the problem.",
 "The engineer checkinged the rollercoaster found the problem.",
 "Checking the rollercoaster, the engineer finding the problem.",
 "To checking the rollercoaster, the engineer found the problem."
 ],
-a:0
+a:0,
+e:"'Checking' is correctly used as a non-finite verb."
 }
 
 ];
@@ -759,7 +793,7 @@ shuffleTools();
 
 }
 
-/* SHUFFLE TOOLS */
+/* SHUFFLE */
 
 function shuffleTools(){
 
@@ -795,55 +829,22 @@ const correctTool = rides[level].tool;
 
 if(tool === correctTool){
 
-repairSuccess();
-
-}else{
-
-wrongSound.play();
-
-document.getElementById("problemBox").style.borderColor =
-"red";
-
-setTimeout(()=>{
-
-document.getElementById("problemBox").style.borderColor =
-"red";
-
-},500);
-
-}
-
-}
-
-/* SUCCESS */
-
-function repairSuccess(){
-
 correctSound.play();
 clapSound.play();
 
 createConfetti();
 
-document.getElementById("repairCount").innerText =
-level + 1;
-
-const msg = document.getElementById("repairMessage");
-
-msg.style.display = "block";
-msg.style.color = "#2e7d32";
-msg.innerHTML = "🎉 RIDE ACTIVATED!";
-
-setTimeout(()=>{
-
-msg.style.display = "none";
-
 showQuestion();
 
-},1500);
+}else{
+
+wrongSound.play();
 
 }
 
-/* QUESTION */
+}
+
+/* SHOW QUESTION */
 
 function showQuestion(){
 
@@ -868,7 +869,7 @@ btn.classList.add("optionBtn");
 
 btn.innerHTML = option;
 
-btn.onclick = ()=>checkAnswer(index,q.a);
+btn.onclick = ()=>checkAnswer(index,q);
 
 optionsDiv.appendChild(btn);
 
@@ -878,27 +879,66 @@ optionsDiv.appendChild(btn);
 
 /* CHECK ANSWER */
 
-function checkAnswer(selected,correct){
+function checkAnswer(selected,q){
 
-if(selected === correct){
+document.getElementById("questionBox").style.display =
+"none";
+
+const popup =
+document.getElementById("feedbackPopup");
+
+popup.style.display = "block";
+
+if(selected === q.a){
+
+correctCount++;
+
+document.getElementById("correctScore").innerHTML =
+correctCount;
 
 correctSound.play();
 
 createConfetti();
 
+document.getElementById("feedbackTitle").innerHTML =
+"✅ Correct!";
+
+document.getElementById("feedbackTitle").style.color =
+"green";
+
+document.getElementById("feedbackText").innerHTML =
+q.e;
+
 }else{
+
+wrongCount++;
+
+document.getElementById("wrongScore").innerHTML =
+wrongCount;
 
 wrongSound.play();
 
+document.getElementById("feedbackTitle").innerHTML =
+"❌ Incorrect!";
+
+document.getElementById("feedbackTitle").style.color =
+"red";
+
+document.getElementById("feedbackText").innerHTML =
+`
+Correct Answer:<br><br>
+<b>${q.o[q.a]}</b><br><br>
+${q.e}
+`;
+
 }
 
-document.getElementById("questionCount").innerText =
+document.getElementById("questionNumber").innerHTML =
 level + 1;
 
 setTimeout(()=>{
 
-document.getElementById("questionBox").style.display =
-"none";
+popup.style.display = "none";
 
 level++;
 
@@ -912,7 +952,7 @@ loadLevel();
 
 }
 
-},1200);
+},2500);
 
 }
 
@@ -951,8 +991,30 @@ function endGame(){
 document.getElementById("endScreen").style.display =
 "flex";
 
+let message = "";
+
+if(correctCount === 10){
+
+message = "🌟 Grammar Genius! Perfect Score!";
+
+}else if(correctCount >= 8){
+
+message = "🚀 Excellent Engineer! Amazing Job!";
+
+}else if(correctCount >= 6){
+
+message = "🎡 Great Work! Keep Practicing!";
+
+}else{
+
+message = "💪 Nice Try! Practice More To Improve!";
+}
+
 document.getElementById("finalText").innerHTML =
-"You rebuilt all 10 attractions and mastered finite & non-finite verbs!";
+`
+Final Score: ${correctCount}/10<br><br>
+${message}
+`;
 
 }
 
