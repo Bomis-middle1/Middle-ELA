@@ -1,41 +1,45 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Adverbs Balloon Pop Quiz</title>
+<title>Adverbs Treasure Hunt Game</title>
 <style>
-  body { margin:0; font-family: Arial; background:#cceeff; overflow:hidden; }
-  #logoScreen { position:fixed; top:0; left:0; width:100%; height:100%; background:white; display:flex; justify-content:center; align-items:center; z-index:100; }
-  #gameContainer { display:none; width:100%; height:100vh; position:relative; overflow:hidden; }
-  h2 { text-align:center; margin:10px; }
-  .balloon { position:absolute; width:60px; height:80px; background:red; border-radius:50% 50% 50% 50%; cursor:pointer; display:flex; justify-content:center; align-items:center; color:white; font-weight:bold; font-size:18px; animation-name:rise; animation-timing-function: linear; animation-iteration-count: 1; }
-  @keyframes rise { 0%{ bottom:-100px } 100%{ bottom:100vh } }
-  #questionBox { display:none; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); background:white; padding:20px; border-radius:10px; text-align:center; width:80%; max-width:400px; box-shadow:0 0 15px #0003; z-index:50; }
-  #questionBox button { margin:5px; padding:10px 20px; font-size:16px; cursor:pointer; }
-  #feedback { margin-top:10px; font-weight:bold; }
-  #restartBtn { display:none; margin:20px auto; padding:10px 30px; font-size:18px; cursor:pointer; position:absolute; left:50%; transform:translateX(-50%); top:70%; }
-  #volumeSlider { position:absolute; bottom:10px; left:50%; transform:translateX(-50%); }
+body { margin:0; font-family: Arial; background: #cceeff; overflow:hidden; }
+#logoScreen { position:fixed; top:0; left:0; width:100%; height:100%; background:white; display:flex; justify-content:center; align-items:center; z-index:100; }
+#gameContainer { display:none; width:100%; height:100vh; position:relative; overflow:hidden; }
+h2 { text-align:center; margin:10px; }
+#player { position:absolute; bottom:20px; left:50px; width:60px; height:80px; z-index:10; transition: bottom 0.3s; }
+.coin { position:absolute; width:50px; height:50px; z-index:5; cursor:pointer; }
+#questionBox { display:none; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); background:white; padding:20px; border-radius:10px; text-align:center; width:80%; max-width:400px; box-shadow:0 0 15px #0003; z-index:50; }
+#questionBox button { margin:5px; padding:10px 20px; font-size:16px; cursor:pointer; }
+#feedback { margin-top:10px; font-weight:bold; }
+#restartBtn { display:none; margin:20px auto; padding:10px 30px; font-size:18px; cursor:pointer; position:absolute; left:50%; transform:translateX(-50%); top:70%; }
+#volumeSlider { position:absolute; bottom:10px; left:50%; transform:translateX(-50%); }
+#treasure { position:absolute; bottom:20px; left:50%; width:100px; height:100px; transform:translateX(-50%); display:none; }
 </style>
 </head>
 <body>
 
-<!-- Logo -->
+<!-- Logo Screen -->
 <div id="logoScreen">
   <img src="assets/innovine-logo.png" alt="Innovine Logo" width="200">
 </div>
 
-<!-- Game -->
+<!-- Game Container -->
 <div id="gameContainer">
-  <h2>🎈 Adverbs Balloon Pop Quiz 🎈</h2>
+  <h2>🎯 Adverbs Treasure Hunt Adventure 🎯</h2>
+  <img id="player" src="assets/player.png" alt="Player">
+  <div id="coinsArea"></div>
 
-  <!-- Question -->
   <div id="questionBox">
     <div id="questionText"></div>
     <div id="optionsContainer"></div>
     <div id="feedback"></div>
   </div>
 
+  <img id="treasure" src="assets/treasure.png" alt="Treasure">
   <button id="restartBtn">Restart Adventure</button>
   <input type="range" id="volumeSlider" min="0" max="1" step="0.1" value="0.8">
 </div>
@@ -43,8 +47,10 @@
 <!-- Sounds -->
 <audio id="correctSound" src="assets/correct.mp3"></audio>
 <audio id="wrongSound" src="assets/wrong.mp3"></audio>
+<audio id="clapSound" src="assets/clapping.mp3"></audio>
 
 <script>
+// --- Questions ---
 const questions = [
   {q:"You’re running from mischievous monkeys. How do you run?", options:["quickly","slowly","yesterday","there"], answer:"quickly"},
   {q:"You shout across the mountain. How?", options:["loudly","carefully","softly","very"], answer:"loudly"},
@@ -58,71 +64,76 @@ const questions = [
   {q:"Open treasure chest. How do you celebrate?", options:["joyfully","yesterday","often","carefully"], answer:"joyfully"}
 ];
 
+// --- Variables ---
 let currentQ = 0;
 const gameContainer = document.getElementById('gameContainer');
+const player = document.getElementById('player');
+const coinsArea = document.getElementById('coinsArea');
 const questionBox = document.getElementById('questionBox');
 const questionText = document.getElementById('questionText');
 const optionsContainer = document.getElementById('optionsContainer');
 const feedback = document.getElementById('feedback');
 const restartBtn = document.getElementById('restartBtn');
+const treasure = document.getElementById('treasure');
 const correctSound = document.getElementById('correctSound');
 const wrongSound = document.getElementById('wrongSound');
+const clapSound = document.getElementById('clapSound');
 const volumeSlider = document.getElementById('volumeSlider');
 
 volumeSlider.oninput = ()=>{
   correctSound.volume = volumeSlider.value;
   wrongSound.volume = volumeSlider.value;
+  clapSound.volume = volumeSlider.value;
 };
 correctSound.volume = volumeSlider.value;
 wrongSound.volume = volumeSlider.value;
+clapSound.volume = volumeSlider.value;
 
-// --- Show Logo ---
+// --- Logo Screen ---
 setTimeout(()=>{
   document.getElementById('logoScreen').style.display='none';
   gameContainer.style.display='block';
-  spawnBalloon();
+  spawnCoin();
 },5000);
 
-// --- Spawn Balloon ---
-function spawnBalloon(){
+// --- Spawn Coin ---
+function spawnCoin(){
   if(currentQ >= questions.length){
     endGame();
     return;
   }
-  const balloon = document.createElement('div');
-  balloon.className='balloon';
-  balloon.style.left = Math.random()*80 + "%";
-  balloon.textContent = currentQ+1;
-  balloon.style.background = randomColor();
-  balloon.style.animationDuration = (6 + Math.random()*4) + "s"; // slower
-  gameContainer.appendChild(balloon);
+  coinsArea.innerHTML = '';
+  const coin = document.createElement('img');
+  coin.src = 'assets/coin.png';
+  coin.className = 'coin';
+  coin.style.left = Math.random()*80 + "%";
+  coin.style.bottom = "20px";
+  coinsArea.appendChild(coin);
 
-  balloon.addEventListener('click', ()=>{
-    showQuestion(currentQ, balloon);
+  // Animate coin rising
+  let pos = 20;
+  const id = setInterval(()=>{
+    pos += 1;
+    coin.style.bottom = pos + "px";
+    if(pos>400) { clearInterval(id); spawnCoin(); }
+  }, 20);
+
+  // Click coin to answer question
+  coin.addEventListener('click', ()=>{
+    showQuestion(currentQ, coin, id);
   });
-
-  // Remove balloon if it goes off screen
-  setTimeout(()=>{ 
-    if(gameContainer.contains(balloon)) gameContainer.removeChild(balloon); 
-    if(currentQ<questions.length) spawnBalloon();
-  }, parseFloat(balloon.style.animationDuration)*1000);
-}
-
-// --- Random Color ---
-function randomColor(){
-  const colors = ['red','orange','yellow','green','blue','purple','pink'];
-  return colors[Math.floor(Math.random()*colors.length)];
 }
 
 // --- Show Question ---
-function showQuestion(index, balloon){
+function showQuestion(index, coin, intervalId){
+  clearInterval(intervalId);
   const q = questions[index];
   questionText.textContent = q.q;
   optionsContainer.innerHTML = '';
   q.options.forEach(opt=>{
     const btn = document.createElement('button');
     btn.textContent = opt;
-    btn.onclick = ()=>checkAnswer(opt, balloon);
+    btn.onclick = ()=>checkAnswer(opt, coin);
     optionsContainer.appendChild(btn);
   });
   questionBox.style.display='block';
@@ -130,16 +141,16 @@ function showQuestion(index, balloon){
 }
 
 // --- Check Answer ---
-function checkAnswer(ans, balloon){
+function checkAnswer(ans, coin){
   const q = questions[currentQ];
   if(ans === q.answer){
     feedback.textContent = "Correct! 🎉";
     feedback.style.color = "green";
     correctSound.currentTime = 0; correctSound.play();
     questionBox.style.display='none';
-    if(balloon && gameContainer.contains(balloon)) gameContainer.removeChild(balloon);
+    if(coin && coinsArea.contains(coin)) coinsArea.removeChild(coin);
     currentQ++;
-    spawnBalloon();
+    spawnCoin();
   } else {
     feedback.textContent = "Oops! Try again.";
     feedback.style.color = "red";
@@ -150,16 +161,27 @@ function checkAnswer(ans, balloon){
 // --- End Game ---
 function endGame(){
   questionBox.style.display='none';
+  treasure.style.display='block';
+  clapSound.currentTime = 0; clapSound.play();
   restartBtn.style.display='block';
-  alert("🎊 Congratulations! You popped all the balloons and finished the adventure! 🎊");
 }
 
 // --- Restart ---
 restartBtn.onclick = ()=>{
-  currentQ=0;
+  currentQ = 0;
+  treasure.style.display='none';
   restartBtn.style.display='none';
-  spawnBalloon();
+  spawnCoin();
 }
+
+// --- Player Jump ---
+function jump(){
+  player.style.bottom='150px';
+  setTimeout(()=>{ player.style.bottom='20px'; },400);
+}
+document.addEventListener('keydown', e=>{ if(e.code==='Space') jump(); });
+document.addEventListener('touchstart', jump);
 </script>
+
 </body>
 </html>
