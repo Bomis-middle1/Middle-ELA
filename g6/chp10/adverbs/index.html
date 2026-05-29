@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Treasure Hunt Adverb Adventure</title>
+<style>
+  body { margin:0; font-family: Arial; overflow-x:hidden; background:#cceeff; }
+  #logoScreen { position:fixed; top:0; left:0; width:100%; height:100%; background:white; display:flex; justify-content:center; align-items:center; z-index:10; }
+  #gameContainer { display:none; padding:10px; }
+  #player { position:relative; width:50px; height:50px; background:red; margin:20px auto; transition: bottom 0.3s; }
+  #coins { position:relative; width:100%; height:50px; overflow:hidden; margin:10px 0; }
+  .coin { width:30px; height:30px; background:gold; border-radius:50%; position:absolute; top:0; animation:coinMove 5s linear infinite; }
+  @keyframes coinMove { 0%{left:100%} 100%{left:-50px} }
+  #questionBox { display:none; background:white; padding:15px; border-radius:10px; text-align:center; margin:20px; box-shadow:0 0 10px #0003; }
+  #questionBox button { margin:5px; padding:10px 20px; font-size:16px; cursor:pointer; }
+  #feedback { margin-top:10px; font-weight:bold; }
+  #restartBtn { display:none; margin:20px auto; padding:10px 30px; font-size:18px; cursor:pointer; }
+</style>
+</head>
+<body>
+
+<!-- Logo Screen -->
+<div id="logoScreen">
+  <img src="assets/innovine-logo.png" alt="Innovine Logo" width="200">
+</div>
+
+<!-- Game Container -->
+<div id="gameContainer">
+  <h2>Treasure Hunt Adventure: Solve Adverb Challenges!</h2>
+  <div id="player"></div>
+  <div id="coins"></div>
+
+  <!-- Question Box -->
+  <div id="questionBox">
+    <div id="questionText"></div>
+    <div id="optionsContainer"></div>
+    <div id="feedback"></div>
+  </div>
+
+  <!-- Restart -->
+  <button id="restartBtn">Restart Adventure</button>
+
+  <!-- Volume -->
+  <div style="margin:10px;">Sound Volume: <input type="range" id="volumeSlider" min="0" max="1" step="0.1" value="0.8"></div>
+</div>
+
+<!-- Sounds -->
+<audio id="correctSound" src="assets/correct.mp3"></audio>
+<audio id="wrongSound" src="assets/wrong.mp3"></audio>
+
+<script>
+// --- Intro Logo ---
+setTimeout(()=>{ 
+  document.getElementById('logoScreen').style.display='none';
+  document.getElementById('gameContainer').style.display='block';
+  startGame();
+},5000);
+
+// --- Game Variables ---
+const questions = [
+  {q:"You’re running from mischievous monkeys. How do you run?", options:["quickly","slowly","yesterday","there"], answer:"quickly"},
+  {q:"You shout across the mountain. How?", options:["loudly","carefully","softly","very"], answer:"loudly"},
+  {q:"Tiptoe past a sleeping dragon. How?", options:["quietly","yesterday","everywhere","often"], answer:"quietly"},
+  {q:"Flashlight flickers in cave. When do you turn it on?", options:["immediately","cleverly","very","tomorrow"], answer:"immediately"},
+  {q:"Squirrel hides backpack. Where?", options:["behind the tree","quickly","loudly","yesterday"], answer:"behind the tree"},
+  {q:"Dance at festival. How?", options:["gracefully","there","sometimes","very"], answer:"gracefully"},
+  {q:"Solve riddle from statue. How?", options:["cleverly","carefully","often","when"], answer:"cleverly"},
+  {q:"Throw magic rope across river. How?", options:["accurately","there","yesterday","always"], answer:"accurately"},
+  {q:"Sneak past pirates. How?", options:["silently","cleverly","very","now"], answer:"silently"},
+  {q:"Open treasure chest. How do you celebrate?", options:["joyfully","yesterday","often","carefully"], answer:"joyfully"}
+];
+
+let currentQ = 0;
+const player = document.getElementById('player');
+const coinsDiv = document.getElementById('coins');
+const questionBox = document.getElementById('questionBox');
+const questionText = document.getElementById('questionText');
+const optionsContainer = document.getElementById('optionsContainer');
+const feedback = document.getElementById('feedback');
+const restartBtn = document.getElementById('restartBtn');
+const correctSound = document.getElementById('correctSound');
+const wrongSound = document.getElementById('wrongSound');
+const volumeSlider = document.getElementById('volumeSlider');
+
+correctSound.volume = volumeSlider.value;
+wrongSound.volume = volumeSlider.value;
+volumeSlider.oninput = ()=>{ correctSound.volume=volumeSlider.value; wrongSound.volume=volumeSlider.value; }
+
+// --- Game Start ---
+function startGame(){
+  spawnCoin();
+}
+
+// --- Coin Spawning ---
+function spawnCoin(){
+  coinsDiv.innerHTML='';
+  const coin = document.createElement('div');
+  coin.className='coin';
+  coinsDiv.appendChild(coin);
+  coin.addEventListener('click', ()=>{ showQuestion(); });
+}
+
+// --- Show Question ---
+function showQuestion(){
+  if(currentQ>=questions.length){
+    endGame();
+    return;
+  }
+  const q = questions[currentQ];
+  questionText.textContent = q.q;
+  optionsContainer.innerHTML='';
+  q.options.forEach(opt=>{
+    const btn = document.createElement('button');
+    btn.textContent = opt;
+    btn.onclick = ()=>checkAnswer(opt);
+    optionsContainer.appendChild(btn);
+  });
+  questionBox.style.display='block';
+  feedback.textContent='';
+}
+
+// --- Check Answer ---
+function checkAnswer(ans){
+  const q = questions[currentQ];
+  if(ans===q.answer){
+    feedback.textContent='Correct! 🎉';
+    feedback.style.color='green';
+    correctSound.currentTime=0; correctSound.play();
+    currentQ++;
+    questionBox.style.display='none';
+    spawnCoin();
+  } else {
+    feedback.textContent='Oops! Try again.';
+    feedback.style.color='red';
+    wrongSound.currentTime=0; wrongSound.play();
+  }
+}
+
+// --- End Game ---
+function endGame(){
+  questionBox.style.display='none';
+  restartBtn.style.display='block';
+  alert("🎊 Congratulations! You found the treasure! 🎊");
+}
+
+// --- Restart ---
+restartBtn.onclick = ()=>{ 
+  currentQ=0; restartBtn.style.display='none'; spawnCoin(); 
+}
+
+// --- Player Jump ---
+document.addEventListener('keydown', e=>{
+  if(e.code==='Space'){
+    player.style.bottom='100px';
+    setTimeout(()=>{ player.style.bottom='0px'; },400);
+  }
+});
+document.addEventListener('touchstart', ()=>{
+  player.style.bottom='100px';
+  setTimeout(()=>{ player.style.bottom='0px'; },400);
+});
+</script>
+</body>
+</html>
