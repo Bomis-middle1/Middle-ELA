@@ -3,47 +3,41 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Treasure Hunt Adverb Game</title>
+<title>Adverbs Balloon Pop Quiz</title>
 <style>
-  body { margin:0; font-family: Arial; background:#cceeff; overflow-x:hidden; }
+  body { margin:0; font-family: Arial; background:#cceeff; overflow:hidden; }
   #logoScreen { position:fixed; top:0; left:0; width:100%; height:100%; background:white; display:flex; justify-content:center; align-items:center; z-index:100; }
-  #gameContainer { display:none; padding:10px; text-align:center; }
-  #player { position:relative; width:50px; height:50px; background:red; margin:20px auto; transition: bottom 0.3s; }
-  #coinArea { position:relative; width:100%; height:80px; margin:10px 0; }
-  .coin { width:40px; height:40px; background:gold; border-radius:50%; position:absolute; top:20px; cursor:pointer; animation:coinMove 8s linear infinite; }
-  @keyframes coinMove { 0%{left:100%} 100%{left:-50px} }
-  #questionBox { display:none; background:white; padding:15px; border-radius:10px; text-align:center; margin:20px; box-shadow:0 0 10px #0003; }
+  #gameContainer { display:none; width:100%; height:100vh; position:relative; overflow:hidden; }
+  h2 { text-align:center; margin:10px; }
+  .balloon { position:absolute; width:60px; height:80px; background:red; border-radius:50% 50% 50% 50%; cursor:pointer; display:flex; justify-content:center; align-items:center; color:white; font-weight:bold; font-size:18px; animation-name:rise; animation-timing-function: linear; animation-iteration-count: 1; }
+  @keyframes rise { 0%{ bottom:-100px } 100%{ bottom:100vh } }
+  #questionBox { display:none; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); background:white; padding:20px; border-radius:10px; text-align:center; width:80%; max-width:400px; box-shadow:0 0 15px #0003; z-index:50; }
   #questionBox button { margin:5px; padding:10px 20px; font-size:16px; cursor:pointer; }
   #feedback { margin-top:10px; font-weight:bold; }
-  #restartBtn { display:none; margin:20px auto; padding:10px 30px; font-size:18px; cursor:pointer; }
-  #volumeSlider { margin-top:10px; }
+  #restartBtn { display:none; margin:20px auto; padding:10px 30px; font-size:18px; cursor:pointer; position:absolute; left:50%; transform:translateX(-50%); top:70%; }
+  #volumeSlider { position:absolute; bottom:10px; left:50%; transform:translateX(-50%); }
 </style>
 </head>
 <body>
 
-<!-- Logo Screen -->
+<!-- Logo -->
 <div id="logoScreen">
   <img src="assets/innovine-logo.png" alt="Innovine Logo" width="200">
 </div>
 
-<!-- Game Container -->
+<!-- Game -->
 <div id="gameContainer">
-  <h2>Treasure Hunt Adventure: Solve Adverb Challenges!</h2>
-  <div id="player"></div>
-  <div id="coinArea"></div>
+  <h2>🎈 Adverbs Balloon Pop Quiz 🎈</h2>
 
-  <!-- Question Box -->
+  <!-- Question -->
   <div id="questionBox">
     <div id="questionText"></div>
     <div id="optionsContainer"></div>
     <div id="feedback"></div>
   </div>
 
-  <!-- Restart -->
   <button id="restartBtn">Restart Adventure</button>
-
-  <!-- Volume Control -->
-  <div>Sound Volume: <input type="range" id="volumeSlider" min="0" max="1" step="0.1" value="0.8"></div>
+  <input type="range" id="volumeSlider" min="0" max="1" step="0.1" value="0.8">
 </div>
 
 <!-- Sounds -->
@@ -65,8 +59,7 @@ const questions = [
 ];
 
 let currentQ = 0;
-const player = document.getElementById('player');
-const coinArea = document.getElementById('coinArea');
+const gameContainer = document.getElementById('gameContainer');
 const questionBox = document.getElementById('questionBox');
 const questionText = document.getElementById('questionText');
 const optionsContainer = document.getElementById('optionsContainer');
@@ -83,38 +76,53 @@ volumeSlider.oninput = ()=>{
 correctSound.volume = volumeSlider.value;
 wrongSound.volume = volumeSlider.value;
 
-// --- Logo Screen ---
+// --- Show Logo ---
 setTimeout(()=>{
   document.getElementById('logoScreen').style.display='none';
-  document.getElementById('gameContainer').style.display='block';
-  spawnCoin();
+  gameContainer.style.display='block';
+  spawnBalloon();
 },5000);
 
-// --- Spawn Coin ---
-function spawnCoin(){
-  coinArea.innerHTML='';
-  const coin = document.createElement('div');
-  coin.className='coin';
-  coin.style.top = Math.random()*40 + "px";
-  coinArea.appendChild(coin);
-
-  // Click coin to trigger question
-  coin.addEventListener('click', ()=>{ showQuestion(); });
-}
-
-// --- Show Question ---
-function showQuestion(){
-  if(currentQ>=questions.length){
+// --- Spawn Balloon ---
+function spawnBalloon(){
+  if(currentQ >= questions.length){
     endGame();
     return;
   }
-  const q = questions[currentQ];
+  const balloon = document.createElement('div');
+  balloon.className='balloon';
+  balloon.style.left = Math.random()*80 + "%";
+  balloon.textContent = currentQ+1;
+  balloon.style.background = randomColor();
+  balloon.style.animationDuration = (6 + Math.random()*4) + "s"; // slower
+  gameContainer.appendChild(balloon);
+
+  balloon.addEventListener('click', ()=>{
+    showQuestion(currentQ, balloon);
+  });
+
+  // Remove balloon if it goes off screen
+  setTimeout(()=>{ 
+    if(gameContainer.contains(balloon)) gameContainer.removeChild(balloon); 
+    if(currentQ<questions.length) spawnBalloon();
+  }, parseFloat(balloon.style.animationDuration)*1000);
+}
+
+// --- Random Color ---
+function randomColor(){
+  const colors = ['red','orange','yellow','green','blue','purple','pink'];
+  return colors[Math.floor(Math.random()*colors.length)];
+}
+
+// --- Show Question ---
+function showQuestion(index, balloon){
+  const q = questions[index];
   questionText.textContent = q.q;
-  optionsContainer.innerHTML='';
+  optionsContainer.innerHTML = '';
   q.options.forEach(opt=>{
     const btn = document.createElement('button');
     btn.textContent = opt;
-    btn.onclick = ()=>checkAnswer(opt);
+    btn.onclick = ()=>checkAnswer(opt, balloon);
     optionsContainer.appendChild(btn);
   });
   questionBox.style.display='block';
@@ -122,19 +130,20 @@ function showQuestion(){
 }
 
 // --- Check Answer ---
-function checkAnswer(ans){
+function checkAnswer(ans, balloon){
   const q = questions[currentQ];
-  if(ans===q.answer){
+  if(ans === q.answer){
     feedback.textContent = "Correct! 🎉";
     feedback.style.color = "green";
-    correctSound.currentTime=0; correctSound.play();
+    correctSound.currentTime = 0; correctSound.play();
     questionBox.style.display='none';
+    if(balloon && gameContainer.contains(balloon)) gameContainer.removeChild(balloon);
     currentQ++;
-    spawnCoin();
+    spawnBalloon();
   } else {
     feedback.textContent = "Oops! Try again.";
     feedback.style.color = "red";
-    wrongSound.currentTime=0; wrongSound.play();
+    wrongSound.currentTime = 0; wrongSound.play();
   }
 }
 
@@ -142,26 +151,15 @@ function checkAnswer(ans){
 function endGame(){
   questionBox.style.display='none';
   restartBtn.style.display='block';
-  alert("🎊 Congratulations! You found the treasure! 🎊");
+  alert("🎊 Congratulations! You popped all the balloons and finished the adventure! 🎊");
 }
 
-// --- Restart Game ---
+// --- Restart ---
 restartBtn.onclick = ()=>{
   currentQ=0;
   restartBtn.style.display='none';
-  spawnCoin();
+  spawnBalloon();
 }
-
-// --- Player Jump ---
-function jump(){
-  player.style.bottom='100px';
-  setTimeout(()=>{ player.style.bottom='0px'; },400);
-}
-document.addEventListener('keydown', e=>{
-  if(e.code==='Space') jump();
-});
-document.addEventListener('touchstart', jump);
-
 </script>
 </body>
 </html>
