@@ -2,12 +2,21 @@
 <!--
 =========================================================
 🎭 TALENT SHOW CHAOS
-TOPIC: CONJUNCTIONS
-- Coordinating
-- Subordinating
-- Correlative
+FIXED VERSION
+✅ MP3 AUDIO FIXED
+✅ AUDIO NOW RESTARTS PROPERLY
+✅ MOBILE AUDIO COMPATIBLE
+✅ SOUND OVERLAP FIXED
+✅ FULL CODE
 
-📁 REQUIRED FILES:
+TOPIC:
+- Coordinating Conjunctions
+- Subordinating Conjunctions
+- Correlative Conjunctions
+
+=========================================================
+📁 REQUIRED FILES
+=========================================================
 
 project-folder/
 │
@@ -19,36 +28,15 @@ project-folder/
     └── wrong.mp3
 
 =========================================================
-🌐 GITHUB PAGES SETUP
-=========================================================
-
-1. Save as:
-   index.html
-
-2. Create folder:
-   assets
-
-3. Put inside assets:
-   innovine-logo.png
-   correct.mp3
-   wrong.mp3
-
-4. Upload to GitHub
-
-5. Settings → Pages
-
-6. Select:
-   main branch + root
-
-7. SAVE
-
-=========================================================
 -->
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
 <meta charset="UTF-8">
+
 <meta name="viewport"
 content="width=device-width, initial-scale=1.0">
 
@@ -65,7 +53,7 @@ font-family:Arial,sans-serif;
 
 body{
 overflow:hidden;
-background:#111;
+background:black;
 }
 
 #gameArea{
@@ -109,7 +97,7 @@ color:#333;
 position:absolute;
 width:100%;
 height:100%;
-background:rgba(0,0,0,0.9);
+background:rgba(0,0,0,0.92);
 display:flex;
 justify-content:center;
 align-items:center;
@@ -130,6 +118,7 @@ color:white;
 cursor:pointer;
 margin-top:25px;
 transition:0.3s;
+font-weight:bold;
 }
 
 .mainBtn:hover{
@@ -210,7 +199,7 @@ width:50%;
 height:100%;
 background:#b71c1c;
 z-index:50;
-transition:1s;
+transition:1.5s;
 }
 
 #curtainLeft{
@@ -229,7 +218,7 @@ border-left:4px solid gold;
 position:absolute;
 width:120px;
 height:120px;
-background:rgba(255,255,0,0.2);
+background:rgba(255,255,0,0.25);
 border-radius:50%;
 filter:blur(15px);
 animation:pulse 2s infinite;
@@ -266,7 +255,7 @@ animation:bounce 2s infinite;
 }
 
 #dancer{
-left:40%;
+left:42%;
 bottom:20px;
 animation:dance 1.5s infinite;
 }
@@ -291,12 +280,12 @@ animation:bounce 2s infinite;
 
 /* APPLAUSE */
 
-#applauseBarContainer{
+#applauseContainer{
 position:absolute;
 top:15px;
 left:50%;
 transform:translateX(-50%);
-width:50%;
+width:55%;
 height:28px;
 background:#333;
 border-radius:20px;
@@ -309,6 +298,23 @@ height:100%;
 width:0%;
 background:linear-gradient(to right,#4caf50,#ffeb3b);
 transition:0.5s;
+}
+
+/* SCENE */
+
+#sceneText{
+position:absolute;
+bottom:120px;
+left:50%;
+transform:translateX(-50%);
+width:90%;
+background:rgba(0,0,0,0.85);
+color:white;
+padding:16px;
+border-radius:20px;
+font-size:24px;
+text-align:center;
+z-index:900;
 }
 
 /* QUESTION */
@@ -351,28 +357,12 @@ color:white;
 font-size:18px;
 cursor:pointer;
 transition:0.3s;
+font-weight:bold;
 }
 
 .optionBtn:hover{
 background:#6a1b9a;
 transform:scale(1.03);
-}
-
-/* SCENE TEXT */
-
-#sceneText{
-position:absolute;
-bottom:120px;
-left:50%;
-transform:translateX(-50%);
-width:90%;
-background:rgba(0,0,0,0.8);
-color:white;
-padding:15px;
-border-radius:20px;
-font-size:24px;
-text-align:center;
-z-index:900;
 }
 
 /* FEEDBACK */
@@ -531,7 +521,7 @@ Play Again
 <!-- TITLE -->
 
 <div id="titleBox">
-🎤 Fix The Stage Problems Using Conjunctions!
+🎤 Fix Stage Problems Using Conjunctions!
 </div>
 
 <!-- SCORE -->
@@ -545,7 +535,7 @@ Play Again
 <!-- VOLUME -->
 
 <div id="volumeBox">
-Volume
+🔊 Volume
 <input type="range"
 id="volumeSlider"
 min="0"
@@ -570,7 +560,7 @@ id="spot1"></div>
 <div class="spotlight"
 id="spot2"></div>
 
-<div id="applauseBarContainer">
+<div id="applauseContainer">
 <div id="applauseBar"></div>
 </div>
 
@@ -594,7 +584,7 @@ id="drummer">
 <!-- SCENE -->
 
 <div id="sceneText">
-The crowd is waiting for the show...
+The crowd is waiting...
 </div>
 
 <!-- QUESTION -->
@@ -634,13 +624,32 @@ document.getElementById("startScreen")
 
 },5000);
 
-/* AUDIO */
+/* AUDIO FIX */
 
 const correctSound =
 new Audio("assets/correct.mp3");
 
 const wrongSound =
 new Audio("assets/wrong.mp3");
+
+correctSound.preload = "auto";
+wrongSound.preload = "auto";
+
+function playCorrect(){
+
+correctSound.pause();
+correctSound.currentTime = 0;
+correctSound.play();
+
+}
+
+function playWrong(){
+
+wrongSound.pause();
+wrongSound.currentTime = 0;
+wrongSound.play();
+
+}
 
 const volumeSlider =
 document.getElementById("volumeSlider");
@@ -671,7 +680,7 @@ scene:"🎤 The singer forgot the lyrics. The audience still clapped loudly.",
 q:"The singer forgot the lyrics, ___ the audience still clapped loudly.",
 o:["but","because","either","unless"],
 a:0,
-e:"'But' shows contrast between the two ideas."
+e:"'But' shows contrast."
 },
 
 {
@@ -679,7 +688,7 @@ scene:"💃 The music started suddenly. The dancers rushed onto the stage.",
 q:"___ the music started, the dancers rushed onto the stage.",
 o:["When","Nor","But","Both"],
 a:0,
-e:"'When' connects the action to the time it happened."
+e:"'When' connects the action to time."
 },
 
 {
@@ -687,23 +696,23 @@ scene:"🥁 The drummer was missing. The guitarist was also missing.",
 q:"___ the drummer nor the guitarist arrived on time.",
 o:["Either","Neither","Although","Because"],
 a:1,
-e:"'Neither...nor' is a correlative conjunction pair."
+e:"'Neither...nor' is correlative."
 },
 
 {
 scene:"🎸 The band practiced hard. They won the talent trophy.",
-q:"The band practiced hard, ___ they won the talent trophy.",
+q:"The band practiced hard, ___ they won the trophy.",
 o:["so","unless","neither","although"],
 a:0,
 e:"'So' shows result."
 },
 
 {
-scene:"🎭 The curtains opened. The comedian entered the stage.",
-q:"___ the curtains opened, the comedian entered the stage.",
+scene:"🎭 The curtains opened. The comedian entered.",
+q:"___ the curtains opened, the comedian entered.",
 o:["After","Either","But","Nor"],
 a:0,
-e:"'After' shows sequence of events."
+e:"'After' shows sequence."
 },
 
 {
@@ -711,7 +720,7 @@ scene:"🎤 The singer was nervous. She performed brilliantly.",
 q:"The singer was nervous, ___ she performed brilliantly.",
 o:["but","because","neither","unless"],
 a:0,
-e:"'But' shows contrast."
+e:"'But' joins opposite ideas."
 },
 
 {
@@ -719,19 +728,19 @@ scene:"💡 The lights failed. The dancers continued performing.",
 q:"The lights failed, ___ the dancers continued performing.",
 o:["but","before","either","since"],
 a:0,
-e:"'But' joins opposite ideas."
+e:"'But' shows contrast."
 },
 
 {
-scene:"🎸 The guitarist tuned his instrument. The drummer checked the speakers.",
-q:"___ the guitarist and the drummer prepared carefully, the show started smoothly.",
+scene:"🎸 The guitarist tuned his instrument. The drummer checked speakers.",
+q:"___ the guitarist and drummer prepared carefully, the show started smoothly.",
 o:["Because","Neither","But","Or"],
 a:0,
-e:"'Because' explains the reason."
+e:"'Because' explains reason."
 },
 
 {
-scene:"🎆 The audience cheered loudly. Fireworks exploded above the stage.",
+scene:"🎆 The audience cheered loudly. Fireworks exploded.",
 q:"The audience cheered loudly, ___ fireworks exploded above the stage.",
 o:["and","unless","although","neither"],
 a:0,
@@ -743,12 +752,10 @@ scene:"🎭 The magician could perform. The comedian could perform.",
 q:"___ the magician or the comedian could host the finale.",
 o:["Either","Neither","Although","Because"],
 a:0,
-e:"'Either...or' offers two choices."
+e:"'Either...or' offers choices."
 }
 
 ];
-
-/* VARIABLES */
 
 let currentQuestion = 0;
 let correct = 0;
@@ -779,7 +786,7 @@ document.getElementById("curtainRight")
 
 }
 
-/* PLAY SCENE FIRST */
+/* PLAY SCENE */
 
 function playScene(){
 
@@ -798,7 +805,7 @@ loadQuestion();
 
 }
 
-/* ANIMATION */
+/* STAGE ANIMATION */
 
 function animateStage(){
 
@@ -869,7 +876,7 @@ options.appendChild(btn);
 
 }
 
-/* CHECK */
+/* CHECK ANSWER */
 
 function checkAnswer(selected){
 
@@ -890,7 +897,7 @@ correct++;
 document.getElementById("correctScore")
 .innerHTML = correct;
 
-correctSound.play();
+playCorrect();
 
 createConfetti();
 
@@ -912,7 +919,7 @@ wrong++;
 document.getElementById("wrongScore")
 .innerHTML = wrong;
 
-wrongSound.play();
+playWrong();
 
 document.getElementById("feedbackTitle")
 .innerHTML = "❌ Stage Disaster!";
@@ -959,30 +966,27 @@ playScene();
 
 function updateApplause(){
 
-const applause =
-document.getElementById("applauseBar");
-
-applause.style.width =
+document.getElementById("applauseBar")
+.style.width =
 (correct * 10) + "%";
 
 }
 
-/* WRONG EFFECT */
+/* WRONG FLASH */
 
 function flashStage(){
 
 const stage =
 document.getElementById("stageArea");
 
-stage.style.background =
-"red";
+stage.style.background = "darkred";
 
 setTimeout(()=>{
 
 stage.style.background =
 "linear-gradient(to bottom,#4e342e,#212121)";
 
-},500);
+},600);
 
 }
 
@@ -1031,7 +1035,7 @@ let message = "";
 if(correct === 10){
 
 message =
-"🌟 PERFECT SHOW! The audience gave a standing ovation!";
+"🌟 PERFECT SHOW! Standing ovation from the audience!";
 
 }else if(correct >= 8){
 
@@ -1046,7 +1050,7 @@ message =
 }else{
 
 message =
-"🎉 Nice Try! The performers still had fun!";
+"🎉 Nice Try! The audience still enjoyed the show!";
 }
 
 document.getElementById("finalText")
