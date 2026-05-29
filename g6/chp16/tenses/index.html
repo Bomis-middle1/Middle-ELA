@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>⏰ Time Machine Chaos</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
+body{
+overflow:hidden;
+background:black;
+touch-action:none;
+}
+
+/* GAME AREA */
+
+#gameArea{
+position:relative;
+width:100vw;
+height:100vh;
+overflow:hidden;
+background:
+linear-gradient(to bottom,#000428,#004e92);
+}
+
+/* STARS */
+
+.star{
+position:absolute;
+background:white;
+border-radius:50%;
+opacity:0.8;
+animation:twinkle 2s infinite alternate;
+}
+
+@keyframes twinkle{
+from{opacity:0.2;}
+to{opacity:1;}
+}
+
+/* LOGO */
+
+#logoScreen{
+position:absolute;
+width:100%;
+height:100%;
+background:white;
+display:flex;
+justify-content:center;
+align-items:center;
+flex-direction:column;
+z-index:9999;
+}
+
+#logoScreen img{
+width:260px;
+max-width:80%;
+}
+
+#logoText{
+margin-top:20px;
+font-size:34px;
+font-weight:bold;
+color:#333;
+}
+
+/* START + END */
+
+#startScreen,
+#endScreen{
+position:absolute;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.9);
+display:flex;
+justify-content:center;
+align-items:center;
+flex-direction:column;
+color:white;
+text-align:center;
+padding:20px;
+z-index:5000;
+}
+
+.mainBtn{
+padding:18px 36px;
+font-size:24px;
+border:none;
+border-radius:20px;
+background:#ffeb3b;
+cursor:pointer;
+font-weight:bold;
+margin-top:25px;
+transition:0.3s;
+}
+
+.mainBtn:hover{
+transform:scale(1.05);
+}
+
+/* TITLE */
+
+#title{
+position:absolute;
+top:20px;
+left:50%;
+transform:translateX(-50%);
+background:#111;
+padding:12px 25px;
+border-radius:18px;
+color:#00e5ff;
+font-size:28px;
+font-weight:bold;
+border:3px solid white;
+z-index:1000;
+}
+
+/* SCORE */
+
+#scoreBoard{
+position:absolute;
+top:90px;
+left:10px;
+background:#111;
+padding:14px;
+border-radius:15px;
+color:white;
+line-height:1.7;
+border:3px solid cyan;
+z-index:1000;
+}
+
+/* ENERGY BAR */
+
+#energyContainer{
+position:absolute;
+top:90px;
+right:10px;
+width:240px;
+height:30px;
+background:#222;
+border-radius:20px;
+overflow:hidden;
+border:3px solid white;
+z-index:1000;
+}
+
+#energyBar{
+height:100%;
+width:0%;
+background:lime;
+transition:0.3s;
+}
+
+/* PLAYER */
+
+#scanner{
+position:absolute;
+bottom:60px;
+left:50%;
+transform:translateX(-50%);
+font-size:80px;
+z-index:200;
+transition:0.05s linear;
+}
+
+/* PORTALS */
+
+.portal{
+position:absolute;
+font-size:55px;
+user-select:none;
+animation:spin 3s linear infinite;
+}
+
+@keyframes spin{
+from{transform:rotate(0deg);}
+to{transform:rotate(360deg);}
+}
+
+/* QUESTION */
+
+#questionBox{
+position:absolute;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+width:92%;
+max-width:850px;
+background:#fff8e1;
+padding:25px;
+border-radius:25px;
+display:none;
+z-index:7000;
+box-shadow:0 0 30px rgba(0,0,0,0.6);
+}
+
+#questionText{
+font-size:24px;
+margin-bottom:20px;
+line-height:1.6;
+text-align:center;
+color:#333;
+}
+
+.optionContainer{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:12px;
+}
+
+.optionBtn{
+padding:15px;
+border:none;
+border-radius:15px;
+background:#00695c;
+color:white;
+font-size:18px;
+cursor:pointer;
+font-weight:bold;
+transition:0.3s;
+}
+
+.optionBtn:hover{
+transform:scale(1.03);
+background:#004d40;
+}
+
+/* FEEDBACK */
+
+#feedback{
+position:absolute;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+background:white;
+padding:30px;
+border-radius:25px;
+display:none;
+z-index:9000;
+width:90%;
+max-width:600px;
+text-align:center;
+}
+
+#feedbackTitle{
+font-size:34px;
+font-weight:bold;
+margin-bottom:15px;
+}
+
+#feedbackText{
+font-size:22px;
+line-height:1.6;
+}
+
+/* CONFETTI */
+
+.confetti{
+position:absolute;
+width:12px;
+height:12px;
+animation:fall 3s linear forwards;
+}
+
+@keyframes fall{
+
+from{
+transform:translateY(-100px) rotate(0deg);
+}
+
+to{
+transform:translateY(100vh) rotate(720deg);
+opacity:0;
+}
+
+}
+
+@media(max-width:768px){
+
+#scanner{
+font-size:60px;
+}
+
+.portal{
+font-size:40px;
+}
+
+#questionText{
+font-size:18px;
+}
+
+.optionBtn{
+font-size:15px;
+padding:12px;
+}
+
+#title{
+font-size:18px;
+}
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="gameArea">
+
+<!-- LOGO -->
+
+<div id="logoScreen">
+
+<img src="assets/innovine-logo.png">
+
+<div id="logoText">
+Innovine Learning Adventures
+</div>
+
+</div>
+
+<!-- START -->
+
+<div id="startScreen" style="display:none;">
+
+<h1 style="font-size:52px;">
+⏰ Time Machine Chaos
+</h1>
+
+<p style="font-size:24px; margin-top:20px; max-width:800px;">
+Collect stable time portals, avoid paradox bombs, and repair the timeline using correct tenses!
+</p>
+
+<button class="mainBtn"
+onclick="startGame()">
+START MISSION
+</button>
+
+</div>
+
+<!-- END -->
+
+<div id="endScreen" style="display:none;">
+
+<h1>🏆 TIMELINE SAVED!</h1>
+
+<h2 id="finalText"
+style="margin-top:20px; line-height:1.8;"></h2>
+
+<button class="mainBtn"
+onclick="location.reload()">
+PLAY AGAIN
+</button>
+
+</div>
+
+<!-- TITLE -->
+
+<div id="title">
+🌀 Tenses Time Repair Mission
+</div>
+
+<!-- SCORE -->
+
+<div id="scoreBoard">
+
+⚡ Score:
+<span id="score">0</span>
+
+<br>
+
+✅ Correct:
+<span id="correct">0</span>
+
+<br>
+
+❌ Wrong:
+<span id="wrong">0</span>
+
+</div>
+
+<!-- ENERGY -->
+
+<div id="energyContainer">
+<div id="energyBar"></div>
+</div>
+
+<!-- PLAYER -->
+
+<div id="scanner">
+⌛
+</div>
+
+<!-- QUESTION -->
+
+<div id="questionBox">
+
+<div id="questionText"></div>
+
+<div class="optionContainer"
+id="options"></div>
+
+</div>
+
+<!-- FEEDBACK -->
+
+<div id="feedback">
+
+<div id="feedbackTitle"></div>
+
+<div id="feedbackText"></div>
+
+</div>
+
+</div>
+
+<script>
+
+/* STARS */
+
+for(let i=0;i<100;i++){
+
+const star=document.createElement("div");
+
+star.classList.add("star");
+
+star.style.width=Math.random()*3+"px";
+star.style.height=star.style.width;
+
+star.style.left=Math.random()*100+"%";
+star.style.top=Math.random()*100+"%";
+
+star.style.animationDelay=Math.random()*3+"s";
+
+document.body.appendChild(star);
+
+}
+
+/* LOGO */
+
+setTimeout(function(){
+
+document.getElementById("logoScreen")
+.style.display="none";
+
+document.getElementById("startScreen")
+.style.display="flex";
+
+},5000);
+
+/* AUDIO */
+
+const correctSound =
+new Audio("assets/correct.mp3");
+
+const wrongSound =
+new Audio("assets/wrong.mp3");
+
+const clapSound =
+new Audio("assets/clapping.mp3");
+
+/* VARIABLES */
+
+let scanner =
+document.getElementById("scanner");
+
+let scannerX =
+window.innerWidth/2;
+
+let score=0;
+let correct=0;
+let wrong=0;
+
+let energy=0;
+
+let gameRunning=false;
+
+/* PORTALS */
+
+const goodPortals=[
+"🌀","💎","⚡","⌛"
+];
+
+const badPortals=[
+"💣","☠️","🕳️"
+];
+
+/* QUESTIONS */
+
+const questions=[
+
+{
+q:"Yesterday, the dinosaur ___ the school bus.",
+o:["chases","chased","is chasing","will chase"],
+a:1,
+e:"Simple Past shows completed action in the past."
+},
+
+{
+q:"Right now, the astronauts ___ dinner on Mars.",
+o:["eat","were eating","are eating","will eat"],
+a:2,
+e:"Present Continuous shows action happening now."
+},
+
+{
+q:"By 2050, scientists ___ flying classrooms.",
+o:["built","build","will have built","are building"],
+a:2,
+e:"Future Perfect shows completed future action."
+},
+
+{
+q:"Last night, the robots ___ disco music.",
+o:["were playing","play","will play","has played"],
+a:0,
+e:"Past Continuous shows an ongoing past action."
+},
+
+{
+q:"The king ___ the magic sandwich already.",
+o:["eats","has eaten","will eat","eat"],
+a:1,
+e:"Present Perfect shows completed action connected to the present."
+}
+
+];
+
+let currentQuestion=0;
+
+/* START */
+
+function startGame(){
+
+correctSound.play().then(function(){
+correctSound.pause();
+correctSound.currentTime=0;
+});
+
+wrongSound.play().then(function(){
+wrongSound.pause();
+wrongSound.currentTime=0;
+});
+
+document.getElementById("startScreen")
+.style.display="none";
+
+gameRunning=true;
+
+spawnPortal();
+
+}
+
+/* MOVE */
+
+document.addEventListener("mousemove",function(e){
+
+scannerX=e.clientX;
+moveScanner();
+
+});
+
+document.addEventListener("touchmove",function(e){
+
+scannerX=e.touches[0].clientX;
+moveScanner();
+
+});
+
+function moveScanner(){
+
+scanner.style.left=scannerX+"px";
+
+}
+
+/* SPAWN */
+
+function spawnPortal(){
+
+if(!gameRunning) return;
+
+const portal=document.createElement("div");
+
+portal.classList.add("portal");
+
+const isBad=Math.random()<0.25;
+
+portal.innerHTML=isBad
+? badPortals[Math.floor(Math.random()*badPortals.length)]
+: goodPortals[Math.floor(Math.random()*goodPortals.length)];
+
+portal.dataset.bad=isBad;
+
+portal.style.left=
+Math.random()*(window.innerWidth-60)+"px";
+
+portal.style.top="-60px";
+
+portal.y=-60;
+
+document.getElementById("gameArea")
+.appendChild(portal);
+
+let speed=3+Math.random()*2;
+
+const fall=setInterval(function(){
+
+portal.y+=speed;
+
+portal.style.top=portal.y+"px";
+
+const portalRect=
+portal.getBoundingClientRect();
+
+const scannerRect=
+scanner.getBoundingClientRect();
+
+if(
+
+portalRect.bottom>=scannerRect.top &&
+portalRect.left<scannerRect.right &&
+portalRect.right>scannerRect.left
+
+){
+
+if(portal.dataset.bad==="true"){
+
+score-=10;
+
+wrongSound.currentTime=0;
+wrongSound.play();
+
+}else{
+
+score+=10;
+
+energy+=20;
+
+correctSound.currentTime=0;
+correctSound.play();
+
+createConfetti();
+
+}
+
+updateBoard();
+
+portal.remove();
+
+clearInterval(fall);
+
+if(energy>=100){
+
+gameRunning=false;
+
+setTimeout(function(){
+
+showQuestion();
+
+},500);
+
+}
+
+}
+
+if(portal.y>window.innerHeight){
+
+portal.remove();
+clearInterval(fall);
+
+}
+
+},20);
+
+setTimeout(spawnPortal,900);
+
+}
+
+/* UPDATE */
+
+function updateBoard(){
+
+document.getElementById("score")
+.innerHTML=score;
+
+document.getElementById("energyBar")
+.style.width=energy+"%";
+
+}
+
+/* QUESTIONS */
+
+function showQuestion(){
+
+document.getElementById("questionBox")
+.style.display="block";
+
+const q=questions[currentQuestion];
+
+document.getElementById("questionText")
+.innerHTML=q.q;
+
+const options=
+document.getElementById("options");
+
+options.innerHTML="";
+
+q.o.forEach(function(option,index){
+
+const btn=
+document.createElement("button");
+
+btn.classList.add("optionBtn");
+
+btn.innerHTML=option;
+
+btn.onclick=function(){
+
+checkAnswer(index);
+
+};
+
+options.appendChild(btn);
+
+});
+
+}
+
+/* CHECK */
+
+function checkAnswer(selected){
+
+document.getElementById("questionBox")
+.style.display="none";
+
+const q=questions[currentQuestion];
+
+document.getElementById("feedback")
+.style.display="block";
+
+if(selected===q.a){
+
+correct++;
+
+score+=50;
+
+correctSound.currentTime=0;
+correctSound.play();
+
+createConfetti();
+
+document.getElementById("feedbackTitle")
+.innerHTML="✅ TIMELINE REPAIRED!";
+
+document.getElementById("feedbackTitle")
+.style.color="green";
+
+document.getElementById("feedbackText")
+.innerHTML=q.e;
+
+}else{
+
+wrong++;
+
+wrongSound.currentTime=0;
+wrongSound.play();
+
+document.getElementById("feedbackTitle")
+.innerHTML="❌ TIMELINE DAMAGED!";
+
+document.getElementById("feedbackTitle")
+.style.color="red";
+
+document.getElementById("feedbackText")
+.innerHTML=
+"Correct Answer: <b>"
++ q.o[q.a]
++ "</b><br><br>"
++ q.e;
+
+}
+
+document.getElementById("correct")
+.innerHTML=correct;
+
+document.getElementById("wrong")
+.innerHTML=wrong;
+
+updateBoard();
+
+currentQuestion++;
+
+setTimeout(function(){
+
+document.getElementById("feedback")
+.style.display="none";
+
+energy=0;
+
+document.getElementById("energyBar")
+.style.width="0%";
+
+if(currentQuestion>=questions.length){
+
+endGame();
+
+}else{
+
+gameRunning=true;
+spawnPortal();
+
+}
+
+},2500);
+
+}
+
+/* END */
+
+function endGame(){
+
+clapSound.play();
+
+document.getElementById("endScreen")
+.style.display="flex";
+
+let percent=
+Math.round((correct/questions.length)*100);
+
+document.getElementById("finalText")
+.innerHTML=
+
+"⭐ Final Score: "+score+
+
+"<br><br>✅ Correct Answers: "+correct+
+
+"<br><br>❌ Wrong Answers: "+wrong+
+
+"<br><br>🏆 Accuracy: "+percent+"%";
+
+}
+
+/* CONFETTI */
+
+function createConfetti(){
+
+for(let i=0;i<20;i++){
+
+const conf=
+document.createElement("div");
+
+conf.classList.add("confetti");
+
+conf.style.left=
+Math.random()*100+"%";
+
+conf.style.background=
+"hsl("+Math.random()*360+",100%,50%)";
+
+document.body.appendChild(conf);
+
+setTimeout(function(){
+
+conf.remove();
+
+},3000);
+
+}
+
+}
+
+</script>
+
+</body>
+</html>
