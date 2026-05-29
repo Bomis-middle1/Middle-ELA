@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Prepositions Quiz Game</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(to bottom, #ffe6f0, #cce6ff);
+    text-align: center;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Splash screen */
+  #splash {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+  }
+  #splash img {
+    width: 250px;
+  }
+
+  #game-container {
+    display: none;
+    padding: 20px;
+  }
+
+  h2 {
+    margin-top: 20px;
+  }
+
+  #score {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: white;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-weight: bold;
+  }
+
+  .options {
+    margin-top: 20px;
+  }
+
+  .options button {
+    padding: 12px 20px;
+    margin: 10px;
+    font-size: 16px;
+    background-color: orange;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .options button:hover {
+    background-color: darkorange;
+  }
+
+  #finish {
+    font-size: 24px;
+    font-weight: bold;
+    color: green;
+    display: none;
+    margin-top: 30px;
+  }
+</style>
+</head>
+<body>
+
+<!-- Splash -->
+<div id="splash">
+  <img src="assets/logo.png" alt="Innovine Logo">
+</div>
+
+<div id="game-container">
+  <div id="score">Score: 0</div>
+  <h2 id="question-text">Question will appear here</h2>
+  <div class="options">
+    <button id="option0"></button>
+    <button id="option1"></button>
+    <button id="option2"></button>
+    <button id="option3"></button>
+  </div>
+  <div id="finish">🎉 Congratulations! You completed the quiz! 🎉</div>
+</div>
+
+<audio id="correct-sound" src="assets/correct.mp3"></audio>
+<audio id="wrong-sound" src="assets/wrong.mp3"></audio>
+
+<script>
+const questions = [
+  {q: "The cat is ___ the table.", options: ["on", "under", "beside", "over"], answer: 0},
+  {q: "He walked ___ the park.", options: ["in", "between", "on", "over"], answer: 0},
+  {q: "The book is ___ the shelf.", options: ["on", "under", "beside", "over"], answer: 0},
+  {q: "She is standing ___ the two chairs.", options: ["between", "on", "under", "over"], answer: 0},
+  {q: "The dog ran ___ the garden.", options: ["through", "over", "on", "in"], answer: 0},
+  {q: "I put my keys ___ my bag.", options: ["in", "on", "under", "between"], answer: 0},
+  {q: "The bird is flying ___ the tree.", options: ["over", "under", "beside", "between"], answer: 0},
+  {q: "He hid ___ the curtain.", options: ["behind", "in", "on", "beside"], answer: 0},
+  {q: "The ball rolled ___ the hill.", options: ["down", "up", "beside", "in"], answer: 0},
+  {q: "She walked ___ the river.", options: ["along", "on", "over", "under"], answer: 0},
+  {q: "The pen is ___ the notebook.", options: ["inside", "on", "under", "over"], answer: 0},
+  {q: "The children are playing ___ the garden.", options: ["in", "on", "over", "beside"], answer: 0}
+];
+
+let current = 0;
+let score = 0;
+
+const questionText = document.getElementById("question-text");
+const optionButtons = [0,1,2,3].map(i => document.getElementById("option"+i));
+const correctSound = document.getElementById("correct-sound");
+const wrongSound = document.getElementById("wrong-sound");
+const scoreDiv = document.getElementById("score");
+const finishDiv = document.getElementById("finish");
+
+function showQuestion() {
+  if(current >= questions.length) {
+    finishDiv.style.display = "block";
+    return;
+  }
+  const q = questions[current];
+  questionText.textContent = q.q;
+  q.options.forEach((opt,i) => optionButtons[i].textContent = opt);
+}
+
+optionButtons.forEach((btn,i) => {
+  btn.addEventListener("click", () => {
+    if(i === questions[current].answer) {
+      correctSound.play();
+      score++;
+    } else {
+      wrongSound.play();
+    }
+    current++;
+    scoreDiv.textContent = "Score: " + score;
+    showQuestion();
+  });
+});
+
+// Show splash for 5 seconds
+setTimeout(() => {
+  document.getElementById("splash").style.display = "none";
+  document.getElementById("game-container").style.display = "block";
+  showQuestion();
+}, 5000);
+</script>
+
+</body>
+</html>
