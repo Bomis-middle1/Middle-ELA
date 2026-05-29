@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hot Air Balloon Adverb Game</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="logo-screen">
+    <img src="assets/logo.png" alt="Logo" id="logo">
+</div>
+
+<div id="game-container">
+    <div id="score-board">Score: <span id="score">0</span></div>
+    <div id="sentence"></div>
+    <div id="options">
+        <button class="option-btn" onclick="checkAnswer(this)">Option 1</button>
+        <button class="option-btn" onclick="checkAnswer(this)">Option 2</button>
+        <button class="option-btn" onclick="checkAnswer(this)">Option 3</button>
+        <button class="option-btn" onclick="checkAnswer(this)">Option 4</button>
+    </div>
+
+    <div id="track-container">
+        <div id="track">
+            <img src="assets/boy1.png" id="balloon" alt="Balloon">
+        </div>
+    </div>
+</div>
+
+<audio id="correctSound" src="assets/correct.mp3"></audio>
+<audio id="wrongSound" src="assets/wrong.mp3"></audio>
+<audio id="clapSound" src="assets/freesound_community-claps-44774.mp3"></audio>
+
+<script src="game.js"></script>
+</body>
+</html>
