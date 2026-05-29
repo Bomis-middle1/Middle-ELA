@@ -1,1 +1,806 @@
 
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Breaking Newsroom Chaos</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
+body{
+overflow:hidden;
+background:#111;
+touch-action:none;
+}
+
+#gameArea{
+position:relative;
+width:100vw;
+height:100vh;
+overflow:hidden;
+background:linear-gradient(to bottom,#263238,#000);
+color:white;
+}
+
+/* LOGO SCREEN */
+
+#logoScreen{
+position:absolute;
+width:100%;
+height:100%;
+background:white;
+display:flex;
+justify-content:center;
+align-items:center;
+flex-direction:column;
+z-index:9999;
+}
+
+#logoScreen img{
+width:260px;
+max-width:80%;
+}
+
+#logoText{
+margin-top:20px;
+font-size:34px;
+font-weight:bold;
+color:#333;
+}
+
+/* START + END */
+
+#startScreen,
+#endScreen{
+position:absolute;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.92);
+display:flex;
+justify-content:center;
+align-items:center;
+flex-direction:column;
+text-align:center;
+padding:20px;
+z-index:5000;
+}
+
+.mainBtn{
+padding:18px 36px;
+font-size:24px;
+border:none;
+border-radius:20px;
+background:#ffeb3b;
+cursor:pointer;
+font-weight:bold;
+margin-top:25px;
+transition:0.3s;
+}
+
+.mainBtn:hover{
+transform:scale(1.05);
+}
+
+/* TITLE */
+
+#title{
+position:absolute;
+top:15px;
+left:50%;
+transform:translateX(-50%);
+background:#b71c1c;
+padding:14px 28px;
+border-radius:18px;
+font-size:28px;
+font-weight:bold;
+border:4px solid white;
+z-index:1000;
+}
+
+/* SCORE */
+
+#scoreBoard{
+position:absolute;
+top:85px;
+left:10px;
+background:#111;
+padding:14px;
+border-radius:15px;
+line-height:1.8;
+border:3px solid yellow;
+z-index:1000;
+}
+
+/* NEWS EMOJI */
+
+#newsScene{
+position:absolute;
+top:150px;
+left:50%;
+transform:translateX(-50%);
+font-size:120px;
+animation:bounce 2s infinite;
+}
+
+@keyframes bounce{
+
+0%{transform:translateX(-50%) translateY(0);}
+50%{transform:translateX(-50%) translateY(-15px);}
+100%{transform:translateX(-50%) translateY(0);}
+
+}
+
+/* DROP ZONES */
+
+#zones{
+position:absolute;
+top:340px;
+width:100%;
+display:flex;
+justify-content:space-around;
+padding:20px;
+gap:20px;
+}
+
+.zone{
+width:42%;
+min-height:180px;
+background:#263238;
+border:4px dashed white;
+border-radius:25px;
+padding:15px;
+text-align:center;
+}
+
+.zone h2{
+margin-bottom:15px;
+color:#ffeb3b;
+}
+
+/* CARDS */
+
+#cardsContainer{
+position:absolute;
+bottom:20px;
+width:100%;
+display:flex;
+justify-content:center;
+gap:15px;
+flex-wrap:wrap;
+padding:15px;
+}
+
+.card{
+background:white;
+color:black;
+padding:14px;
+border-radius:18px;
+font-size:18px;
+font-weight:bold;
+max-width:260px;
+text-align:center;
+touch-action:none;
+user-select:none;
+cursor:grab;
+position:relative;
+transition:0.2s;
+}
+
+/* FEEDBACK */
+
+#feedback{
+position:absolute;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+background:white;
+color:black;
+padding:30px;
+border-radius:25px;
+display:none;
+z-index:9000;
+width:90%;
+max-width:600px;
+text-align:center;
+}
+
+#feedbackTitle{
+font-size:34px;
+font-weight:bold;
+margin-bottom:15px;
+}
+
+#feedbackText{
+font-size:22px;
+line-height:1.6;
+}
+
+/* MOBILE */
+
+@media(max-width:768px){
+
+#newsScene{
+font-size:80px;
+top:170px;
+}
+
+.zone{
+width:46%;
+min-height:150px;
+}
+
+.card{
+font-size:15px;
+max-width:180px;
+}
+
+#title{
+font-size:18px;
+}
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div id="gameArea">
+
+<!-- LOGO -->
+
+<div id="logoScreen">
+
+<img src="assets/innovine-logo.png">
+
+<div id="logoText">
+Innovine Learning Adventures
+</div>
+
+</div>
+
+<!-- START -->
+
+<div id="startScreen" style="display:none;">
+
+<h1 style="font-size:52px;">
+📰 Breaking Newsroom Chaos
+</h1>
+
+<p style="font-size:24px; margin-top:20px; max-width:850px;">
+Drag the correct ACTIVE and PASSIVE voice reports into the correct newsroom folders!
+</p>
+
+<button class="mainBtn" onclick="startGame()">
+START REPORTING
+</button>
+
+</div>
+
+<!-- END -->
+
+<div id="endScreen" style="display:none;">
+
+<h1>🏆 CHIEF NEWS REPORTER!</h1>
+
+<h2 id="finalText"
+style="margin-top:20px; line-height:1.8;"></h2>
+
+<button class="mainBtn"
+onclick="location.reload()">
+PLAY AGAIN
+</button>
+
+</div>
+
+<!-- TITLE -->
+
+<div id="title">
+🚨 Active & Passive Voice Newsroom
+</div>
+
+<!-- SCORE -->
+
+<div id="scoreBoard">
+
+⭐ Score:
+<span id="score">0</span>
+
+<br>
+
+✅ Correct:
+<span id="correct">0</span>
+
+<br>
+
+❌ Wrong:
+<span id="wrong">0</span>
+
+</div>
+
+<!-- EMOJI -->
+
+<div id="newsScene">
+🦖
+</div>
+
+<!-- ZONES -->
+
+<div id="zones">
+
+<div class="zone" id="activeZone">
+
+<h2>ACTIVE VOICE</h2>
+
+</div>
+
+<div class="zone" id="passiveZone">
+
+<h2>PASSIVE VOICE</h2>
+
+</div>
+
+</div>
+
+<!-- CARDS -->
+
+<div id="cardsContainer"></div>
+
+<!-- FEEDBACK -->
+
+<div id="feedback">
+
+<div id="feedbackTitle"></div>
+
+<div id="feedbackText"></div>
+
+</div>
+
+</div>
+
+<script>
+
+/* LOGO */
+
+setTimeout(function(){
+
+document.getElementById("logoScreen").style.display="none";
+
+document.getElementById("startScreen").style.display="flex";
+
+},5000);
+
+/* AUDIO */
+
+const correctSound = new Audio("assets/correct.mp3");
+const wrongSound = new Audio("assets/wrong.mp3");
+const clapSound = new Audio("assets/clapping.mp3");
+
+/* VARIABLES */
+
+let score=0;
+let correct=0;
+let wrong=0;
+
+let currentRound=0;
+let completedDrops=0;
+
+let activeCard=null;
+let offsetX=0;
+let offsetY=0;
+
+/* QUESTIONS */
+
+const rounds=[
+
+{
+emoji:"🍕",
+active:"The monkey stole 300 pizzas.",
+passive:"300 pizzas were stolen by the monkey.",
+fake:[
+"The pizzas monkey stealing.",
+"Was monkey pizzas by."
+]
+},
+
+{
+emoji:"🤖",
+active:"The robot broke the school gate.",
+passive:"The school gate was broken by the robot.",
+fake:[
+"Broken school robot gate.",
+"The gate breaking robot."
+]
+},
+
+{
+emoji:"🦖",
+active:"The dinosaur destroyed the museum.",
+passive:"The museum was destroyed by the dinosaur.",
+fake:[
+"Destroyed dinosaur museum by.",
+"The museum destroying dinosaur."
+]
+},
+
+{
+emoji:"👽",
+active:"Aliens kidnapped the principal.",
+passive:"The principal was kidnapped by aliens.",
+fake:[
+"Aliens kidnapping principal by.",
+"The principal aliens kidnapped was."
+]
+},
+
+{
+emoji:"🍰",
+active:"Ravi smashed the giant cake.",
+passive:"The giant cake was smashed by Ravi.",
+fake:[
+"Cake Ravi smashing giant.",
+"Was giant smashed cake."
+]
+}
+
+];
+
+/* START GAME */
+
+function startGame(){
+
+unlockAudio();
+
+document.getElementById("startScreen").style.display="none";
+
+loadRound();
+
+}
+
+/* UNLOCK AUDIO */
+
+function unlockAudio(){
+
+correctSound.play().then(()=>{
+correctSound.pause();
+correctSound.currentTime=0;
+});
+
+wrongSound.play().then(()=>{
+wrongSound.pause();
+wrongSound.currentTime=0;
+});
+
+clapSound.play().then(()=>{
+clapSound.pause();
+clapSound.currentTime=0;
+});
+
+}
+
+/* LOAD ROUND */
+
+function loadRound(){
+
+completedDrops=0;
+
+const round=rounds[currentRound];
+
+document.getElementById("newsScene").innerHTML=round.emoji;
+
+document.getElementById("activeZone").innerHTML=
+"<h2>ACTIVE VOICE</h2>";
+
+document.getElementById("passiveZone").innerHTML=
+"<h2>PASSIVE VOICE</h2>";
+
+const cards=[
+
+{
+text:round.active,
+type:"active"
+},
+
+{
+text:round.passive,
+type:"passive"
+},
+
+{
+text:round.fake[0],
+type:"fake"
+},
+
+{
+text:round.fake[1],
+type:"fake"
+}
+
+];
+
+/* SHUFFLE */
+
+cards.sort(()=>Math.random()-0.5);
+
+const container=
+document.getElementById("cardsContainer");
+
+container.innerHTML="";
+
+cards.forEach(function(data){
+
+const card=document.createElement("div");
+
+card.classList.add("card");
+
+card.innerHTML=data.text;
+
+card.dataset.type=data.type;
+
+enableDrag(card);
+
+container.appendChild(card);
+
+});
+
+}
+
+/* DRAGGING */
+
+function enableDrag(card){
+
+card.addEventListener("pointerdown",startDrag);
+
+function startDrag(e){
+
+activeCard=card;
+
+offsetX=
+e.clientX-card.getBoundingClientRect().left;
+
+offsetY=
+e.clientY-card.getBoundingClientRect().top;
+
+card.style.position="absolute";
+card.style.zIndex="9999";
+
+moveCard(e);
+
+document.addEventListener("pointermove",moveCard);
+
+document.addEventListener("pointerup",stopDrag);
+
+}
+
+function moveCard(e){
+
+if(!activeCard) return;
+
+activeCard.style.left=
+(e.clientX-offsetX)+"px";
+
+activeCard.style.top=
+(e.clientY-offsetY)+"px";
+
+}
+
+function stopDrag(){
+
+document.removeEventListener("pointermove",moveCard);
+
+document.removeEventListener("pointerup",stopDrag);
+
+checkDrop(activeCard);
+
+activeCard=null;
+
+}
+
+}
+
+/* CHECK DROP */
+
+function checkDrop(card){
+
+const activeZone=
+document.getElementById("activeZone");
+
+const passiveZone=
+document.getElementById("passiveZone");
+
+const cardRect=
+card.getBoundingClientRect();
+
+const activeRect=
+activeZone.getBoundingClientRect();
+
+const passiveRect=
+passiveZone.getBoundingClientRect();
+
+if(intersects(cardRect,activeRect)){
+
+handleDrop(card,"active",activeZone);
+return;
+
+}
+
+if(intersects(cardRect,passiveRect)){
+
+handleDrop(card,"passive",passiveZone);
+return;
+
+}
+
+resetCard(card);
+
+}
+
+/* INTERSECTION */
+
+function intersects(a,b){
+
+return !(
+
+a.right < b.left ||
+a.left > b.right ||
+a.bottom < b.top ||
+a.top > b.bottom
+
+);
+
+}
+
+/* HANDLE DROP */
+
+function handleDrop(card,target,zone){
+
+if(card.dataset.type===target){
+
+correct++;
+score+=50;
+
+correctSound.currentTime=0;
+correctSound.play();
+
+zone.appendChild(card);
+
+card.style.position="relative";
+card.style.left="0";
+card.style.top="0";
+
+card.style.background="#a5d6a7";
+
+completedDrops++;
+
+showFeedback(
+"✅ CORRECT REPORT!",
+"Excellent newsroom editing!"
+);
+
+if(completedDrops>=2){
+
+setTimeout(nextRound,1500);
+
+}
+
+}else{
+
+wrong++;
+score-=10;
+
+wrongSound.currentTime=0;
+wrongSound.play();
+
+showFeedback(
+"❌ FAKE NEWS!",
+"This sentence does not belong there."
+);
+
+resetCard(card);
+
+}
+
+updateScore();
+
+}
+
+/* RESET CARD */
+
+function resetCard(card){
+
+card.style.position="relative";
+card.style.left="0";
+card.style.top="0";
+
+document.getElementById("cardsContainer")
+.appendChild(card);
+
+}
+
+/* SCORE */
+
+function updateScore(){
+
+document.getElementById("score").innerHTML=score;
+
+document.getElementById("correct").innerHTML=correct;
+
+document.getElementById("wrong").innerHTML=wrong;
+
+}
+
+/* FEEDBACK */
+
+function showFeedback(title,text){
+
+document.getElementById("feedback").style.display="block";
+
+document.getElementById("feedbackTitle").innerHTML=title;
+
+document.getElementById("feedbackText").innerHTML=text;
+
+setTimeout(function(){
+
+document.getElementById("feedback").style.display="none";
+
+},1200);
+
+}
+
+/* NEXT ROUND */
+
+function nextRound(){
+
+currentRound++;
+
+if(currentRound>=rounds.length){
+
+endGame();
+
+}else{
+
+loadRound();
+
+}
+
+}
+
+/* END GAME */
+
+function endGame(){
+
+clapSound.play();
+
+document.getElementById("endScreen").style.display="flex";
+
+let percent=
+Math.round((correct/(rounds.length*2))*100);
+
+document.getElementById("finalText").innerHTML=
+
+"⭐ Final Score: "+score+
+
+"<br><br>✅ Correct Reports: "+correct+
+
+"<br><br>❌ Fake News Mistakes: "+wrong+
+
+"<br><br>🏆 Accuracy: "+percent+"%";
+
+}
+
+</script>
+
+</body>
+</html>
