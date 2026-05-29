@@ -230,11 +230,6 @@ width:80%;
 max-width:650px;
 }
 
-#problemEmoji{
-font-size:60px;
-margin-bottom:10px;
-}
-
 #problemText{
 font-size:24px;
 font-weight:bold;
@@ -466,7 +461,7 @@ Play Again
 <!-- TITLE -->
 
 <div id="titleBox">
-🔧 Repair the Correct Problem Using the Correct Tool!
+🔧 Observe the Ride Problem and Choose the Correct Tool!
 </div>
 
 <!-- SCORE -->
@@ -490,8 +485,6 @@ Volume
 <div id="rideEmoji">🎡</div>
 
 <div id="problemBox">
-
-<div id="problemEmoji">🔩</div>
 
 <div id="problemText">
 The Ferris wheel is wobbling dangerously!
@@ -570,7 +563,6 @@ const rides = [
 {
 ride:"🎡",
 animation:"spin",
-problemEmoji:"🔩",
 problem:"The Ferris wheel is wobbling dangerously!",
 tool:"wrench"
 },
@@ -578,7 +570,6 @@ tool:"wrench"
 {
 ride:"🎢",
 animation:"bounce",
-problemEmoji:"⚙️",
 problem:"The rollercoaster engine is making grinding noises!",
 tool:"gear"
 },
@@ -586,7 +577,6 @@ tool:"gear"
 {
 ride:"🏴‍☠️",
 animation:"swing",
-problemEmoji:"🔋",
 problem:"The pirate ship suddenly lost all power!",
 tool:"battery"
 },
@@ -594,7 +584,6 @@ tool:"battery"
 {
 ride:"👻",
 animation:"flash",
-problemEmoji:"🪛",
 problem:"The haunted house lights keep flickering!",
 tool:"screwdriver"
 },
@@ -602,7 +591,6 @@ tool:"screwdriver"
 {
 ride:"🚗",
 animation:"bounce",
-problemEmoji:"🔩",
 problem:"The bumper cars are shaking wildly!",
 tool:"wrench"
 },
@@ -610,7 +598,6 @@ tool:"wrench"
 {
 ride:"🎠",
 animation:"spin",
-problemEmoji:"⚙️",
 problem:"The carousel suddenly stopped spinning!",
 tool:"gear"
 },
@@ -618,7 +605,6 @@ tool:"gear"
 {
 ride:"💦",
 animation:"flash",
-problemEmoji:"🔋",
 problem:"The water ride won't turn on anymore!",
 tool:"battery"
 },
@@ -626,7 +612,6 @@ tool:"battery"
 {
 ride:"🚀",
 animation:"bounce",
-problemEmoji:"🪛",
 problem:"The rocket ride control panel is hanging loose!",
 tool:"screwdriver"
 },
@@ -634,7 +619,6 @@ tool:"screwdriver"
 {
 ride:"🎯",
 animation:"spin",
-problemEmoji:"⚙️",
 problem:"The target machine suddenly jammed!",
 tool:"gear"
 },
@@ -642,7 +626,6 @@ tool:"gear"
 {
 ride:"🎆",
 animation:"flash",
-problemEmoji:"🔋",
 problem:"The fireworks system refuses to start!",
 tool:"battery"
 }
@@ -768,9 +751,6 @@ rideEmoji.innerHTML = r.ride;
 setTimeout(()=>{
 rideEmoji.classList.add(r.animation);
 },100);
-
-document.getElementById("problemEmoji").innerHTML =
-r.problemEmoji;
 
 document.getElementById("problemText").innerHTML =
 r.problem;
