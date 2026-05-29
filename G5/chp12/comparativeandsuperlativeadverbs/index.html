@@ -5,178 +5,172 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Hot Air Balloon Adverbs Game</title>
 <style>
-  body, html {
+body {
     margin: 0;
-    padding: 0;
     font-family: Arial, sans-serif;
-    height: 100%;
-    background: linear-gradient(to top, #c0e0ff, #f9d6f0);
-    overflow: hidden;
-    text-align: center;
-  }
+    background: linear-gradient(to bottom, #ffe0f0, #cce0ff);
+    overflow-x: hidden;
+}
 
-  #logoScreen {
+#logo-container {
     position: fixed;
-    top:0; left:0; right:0; bottom:0;
-    background:white;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    flex-direction: column;
-    z-index: 1000;
-  }
-
-  #logoScreen img {
-    width: 200px;
-    margin-bottom: 20px;
-  }
-
-  #gameContainer {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
     display: none;
-    width: 100%;
-    height: 100%;
-    position: relative;
-  }
+}
 
-  #score {
+#score {
     position: absolute;
     top: 10px;
     left: 10px;
     background: white;
-    padding: 10px 15px;
+    padding: 8px 12px;
     border-radius: 10px;
     font-weight: bold;
-    z-index: 100;
-  }
+}
 
-  #question {
-    margin-top: 50px;
+#question-container {
+    text-align: center;
+    margin-top: 80px;
     font-size: 24px;
     font-weight: bold;
-  }
+}
 
-  #balloon {
+#game-container {
+    position: relative;
+    width: 100%;
+    height: 80vh;
+    overflow: hidden;
+    margin-top: 20px;
+}
+
+#balloon {
     position: absolute;
-    bottom: 20px;
+    bottom: 0;
     left: 50%;
     transform: translateX(-50%);
     width: 80px;
-    transition: bottom 0.5s linear;
-  }
+    transition: bottom 0.6s;
+    z-index: 2;
+}
 
-  #options {
-    position: absolute;
-    bottom: 10px;
-    width: 100%;
+#options {
     display: flex;
     justify-content: center;
-    gap: 20px;
+    gap: 15px;
+    margin-top: 10px;
     flex-wrap: wrap;
-  }
+}
 
-  .optionBtn {
-    background: orange;
-    color: white;
+.option-btn {
+    padding: 12px 18px;
+    background-color: orange;
     border: none;
-    padding: 12px 20px;
     border-radius: 10px;
-    font-size: 18px;
+    color: white;
+    font-weight: bold;
     cursor: pointer;
-    transition: transform 0.2s;
-  }
+    transition: 0.3s;
+}
 
-  .optionBtn:hover {
-    transform: scale(1.1);
-  }
+.option-btn:hover {
+    background-color: darkorange;
+}
 </style>
 </head>
 <body>
 
-<div id="logoScreen">
-  <img src="assets/logo.png" alt="Innovine Logo">
-  <h2>Innovine Learning Adventures</h2>
+<!-- Innovine Logo -->
+<div id="logo-container">
+    <img src="assets/logo.png" alt="Innovine Logo" width="300">
 </div>
 
-<div id="gameContainer">
-  <div id="score">Score: 0</div>
-  <div id="question">Question goes here</div>
-  <img id="balloon" src="assets/balloon.png" alt="Hot Air Balloon">
-  <div id="options">
-    <button class="optionBtn" id="opt1">Option 1</button>
-    <button class="optionBtn" id="opt2">Option 2</button>
-    <button class="optionBtn" id="opt3">Option 3</button>
-    <button class="optionBtn" id="opt4">Option 4</button>
-  </div>
+<div id="score">Score: 0</div>
+
+<div id="question-container"></div>
+
+<div id="game-container">
+    <img id="balloon" src="assets/balloon.png" alt="Balloon">
 </div>
 
-<audio id="correctAudio" src="assets/correct.mp3"></audio>
-<audio id="wrongAudio" src="assets/wrong.mp3"></audio>
+<div id="options"></div>
+
+<audio id="correct-sound" src="assets/correct.mp3"></audio>
+<audio id="wrong-sound" src="assets/wrong.mp3"></audio>
+<audio id="applause-sound" src="assets/freesound_community-claps-44774.mp3"></audio>
 
 <script>
-const logoScreen = document.getElementById("logoScreen");
-const gameContainer = document.getElementById("gameContainer");
-const scoreEl = document.getElementById("score");
-const questionEl = document.getElementById("question");
-const balloon = document.getElementById("balloon");
-const options = Array.from(document.getElementsByClassName("optionBtn"));
-const correctAudio = document.getElementById("correctAudio");
-const wrongAudio = document.getElementById("wrongAudio");
-
-let score = 0;
-let balloonBottom = 20;
-let questionIndex = 0;
-
 const questions = [
-  { q: "We will meet ___ at the park.", opts: ["quickly","softly","slow","here"], ans: "quickly" },
-  { q: "He ran ___ to catch the bus.", opts: ["quickly","hard","late","small"], ans: "quickly" },
-  { q: "She answered the question ___", opts: ["clearly","often","loud","red"], ans: "clearly" },
-  { q: "They completed their homework ___", opts: ["carefully","far","slow","red"], ans: "carefully" },
-  { q: "The dog barked ___ all night.", opts: ["loudly","quickly","small","red"], ans: "loudly" },
-  { q: "I slept ___ last night.", opts: ["peacefully","early","soft","here"], ans: "peacefully" },
-  { q: "The baby cried ___", opts: ["loudly","carefully","fast","red"], ans: "loudly" },
-  { q: "She spoke ___ during the presentation.", opts: ["confidently","far","soft","here"], ans: "confidently" },
-  { q: "He walked ___ through the park.", opts: ["slowly","quickly","here","red"], ans: "slowly" },
-  { q: "The teacher explained the lesson ___", opts: ["clearly","soft","fast","here"], ans: "clearly" }
+    {q: "We will meet ___ at the park.", options: ["quickly", "slowly", "happy", "red"], answer: "quickly"},
+    {q: "She ran ___ to catch the bus.", options: ["fast", "big", "loud", "green"], answer: "fast"},
+    {q: "He speaks ___ than his brother.", options: ["more clearly", "tall", "yellow", "careful"], answer: "more clearly"},
+    {q: "They worked ___ to finish the project.", options: ["harder", "small", "funny", "blue"], answer: "harder"},
+    {q: "I will visit ___ next month.", options: ["soon", "happy", "green", "big"], answer: "soon"},
+    {q: "The bird sings ___ in the morning.", options: ["louder", "fast", "red", "blue"], answer: "louder"},
+    {q: "She swims ___ than her friend.", options: ["better", "small", "careful", "soft"], answer: "better"},
+    {q: "He answered the questions ___.", options: ["quickly", "yellow", "round", "tall"], answer: "quickly"},
+    {q: "The baby slept ___ in the afternoon.", options: ["quietly", "happy", "orange", "strong"], answer: "quietly"},
+    {q: "They completed the game ___ than before.", options: ["faster", "slow", "red", "big"], answer: "faster"},
 ];
 
+let score = 0;
+let current = 0;
+
+const balloon = document.getElementById('balloon');
+const questionContainer = document.getElementById('question-container');
+const optionsDiv = document.getElementById('options');
+const scoreDiv = document.getElementById('score');
+const logo = document.getElementById('logo-container');
+
 function startGame() {
-  logoScreen.style.display = "none";
-  gameContainer.style.display = "block";
-  showQuestion();
+    // Show logo for 5 seconds
+    logo.style.display = 'block';
+    setTimeout(() => {
+        logo.style.display = 'none';
+        showQuestion();
+    }, 5000);
 }
 
 function showQuestion() {
-  if(questionIndex >= questions.length) {
-    alert("Well done! Your final score is: " + score);
-    questionIndex = 0;
-    score = 0;
-    balloonBottom = 20;
-    balloon.style.bottom = balloonBottom + "px";
-  }
-  const q = questions[questionIndex];
-  questionEl.textContent = q.q;
-  options.forEach((btn,i)=>{
-    btn.textContent = q.opts[i];
-    btn.onclick = () => checkAnswer(q.opts[i]);
-  });
+    if(current >= questions.length) {
+        questionContainer.innerHTML = "🎉 Well done! You finished the game!";
+        optionsDiv.innerHTML = '';
+        document.getElementById('applause-sound').play();
+        return;
+    }
+
+    const q = questions[current];
+    questionContainer.textContent = q.q;
+
+    optionsDiv.innerHTML = '';
+    q.options.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.textContent = opt;
+        btn.classList.add('option-btn');
+        btn.onclick = () => checkAnswer(opt);
+        optionsDiv.appendChild(btn);
+    });
 }
 
 function checkAnswer(selected) {
-  const q = questions[questionIndex];
-  if(selected === q.ans) {
-    correctAudio.play();
-    score += 1;
-    balloonBottom += 50;
-    balloon.style.bottom = balloonBottom + "px";
-  } else {
-    wrongAudio.play();
-  }
-  scoreEl.textContent = "Score: " + score;
-  questionIndex++;
-  setTimeout(showQuestion, 500);
+    const correct = questions[current].answer;
+    if(selected === correct) {
+        score++;
+        scoreDiv.textContent = "Score: " + score;
+        document.getElementById('correct-sound').play();
+        // Move balloon upward
+        let currentBottom = parseInt(window.getComputedStyle(balloon).bottom);
+        balloon.style.bottom = (currentBottom + 60) + "px";
+    } else {
+        document.getElementById('wrong-sound').play();
+    }
+    current++;
+    setTimeout(showQuestion, 600);
 }
 
-setTimeout(startGame, 5000);
+startGame();
 </script>
 
 </body>
