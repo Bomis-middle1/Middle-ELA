@@ -1,1 +1,975 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎢 Theme Park Rebuilder</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
+body{
+overflow:hidden;
+background:#90caf9;
+}
+
+#gameArea{
+position:relative;
+width:100vw;
+height:100vh;
+overflow:hidden;
+background:
+linear-gradient(to bottom,#64b5f6,#e1f5fe);
+}
+
+/* CLOUDS */
+
+.cloud{
+position:absolute;
+background:white;
+border-radius:50px;
+opacity:0.9;
+animation:moveCloud linear infinite;
+}
+
+@keyframes moveCloud{
+from{
+transform:translateX(-300px);
+}
+to{
+transform:translateX(120vw);
+}
+}
+
+/* LOGO */
+
+#logoScreen{
+position:absolute;
+width:100%;
+height:100%;
+background:white;
+display:flex;
+justify-content:center;
+align-items:center;
+flex-direction:column;
+z-index:9999;
+}
+
+#logoScreen img{
+width:260px;
+max-width:80%;
+}
+
+#logoText{
+margin-top:20px;
+font-size:32px;
+font-weight:bold;
+color:#333;
+}
+
+/* START + END */
+
+#startScreen,
+#endScreen{
+position:absolute;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.85);
+display:flex;
+justify-content:center;
+align-items:center;
+flex-direction:column;
+text-align:center;
+padding:20px;
+color:white;
+z-index:5000;
+}
+
+.mainBtn{
+padding:16px 34px;
+font-size:22px;
+border:none;
+border-radius:18px;
+background:#ff9800;
+color:white;
+cursor:pointer;
+margin-top:25px;
+transition:0.3s;
+}
+
+.mainBtn:hover{
+transform:scale(1.05);
+}
+
+/* TITLE */
+
+#titleBox{
+position:absolute;
+top:15px;
+left:50%;
+transform:translateX(-50%);
+width:92%;
+background:white;
+padding:15px;
+border-radius:20px;
+font-size:28px;
+font-weight:bold;
+text-align:center;
+color:#6a1b9a;
+border:6px solid #ffca28;
+z-index:100;
+}
+
+/* SCORE */
+
+#scoreBoard{
+position:absolute;
+top:100px;
+left:20px;
+background:white;
+padding:12px 18px;
+border-radius:15px;
+font-size:20px;
+font-weight:bold;
+z-index:200;
+}
+
+/* VOLUME */
+
+#volumeBox{
+position:absolute;
+top:100px;
+right:20px;
+background:white;
+padding:12px;
+border-radius:15px;
+z-index:200;
+}
+
+/* RIDE AREA */
+
+#rideArea{
+position:absolute;
+top:170px;
+left:50%;
+transform:translateX(-50%);
+width:94%;
+height:62%;
+background:#fffde7;
+border-radius:30px;
+border:8px solid #42a5f5;
+overflow:hidden;
+}
+
+/* RIDE */
+
+#rideEmoji{
+position:absolute;
+top:40px;
+left:50%;
+transform:translateX(-50%);
+font-size:140px;
+transition:0.5s;
+}
+
+.spin{
+animation:spinRide 2s infinite linear;
+}
+
+.swing{
+animation:swingRide 1s infinite alternate ease-in-out;
+}
+
+.bounce{
+animation:bounceRide 1s infinite alternate;
+}
+
+.flash{
+animation:flashRide 0.5s infinite alternate;
+}
+
+@keyframes spinRide{
+from{transform:translateX(-50%) rotate(0deg);}
+to{transform:translateX(-50%) rotate(360deg);}
+}
+
+@keyframes swingRide{
+from{transform:translateX(-50%) rotate(-15deg);}
+to{transform:translateX(-50%) rotate(15deg);}
+}
+
+@keyframes bounceRide{
+from{transform:translateX(-50%) translateY(0);}
+to{transform:translateX(-50%) translateY(-30px);}
+}
+
+@keyframes flashRide{
+from{opacity:1;}
+to{opacity:0.2;}
+}
+
+/* PROBLEM */
+
+#problemBox{
+position:absolute;
+top:240px;
+left:50%;
+transform:translateX(-50%);
+background:white;
+padding:20px;
+border-radius:20px;
+border:5px dashed red;
+text-align:center;
+width:80%;
+max-width:650px;
+}
+
+#problemEmoji{
+font-size:60px;
+margin-bottom:10px;
+}
+
+#problemText{
+font-size:24px;
+font-weight:bold;
+color:#d32f2f;
+}
+
+/* TOOLBOX */
+
+#toolBox{
+position:absolute;
+bottom:20px;
+width:100%;
+display:flex;
+justify-content:center;
+gap:20px;
+flex-wrap:wrap;
+}
+
+.tool{
+width:90px;
+height:90px;
+background:white;
+border-radius:20px;
+display:flex;
+justify-content:center;
+align-items:center;
+font-size:50px;
+cursor:pointer;
+border:5px solid #29b6f6;
+transition:0.3s;
+}
+
+.tool:hover{
+transform:scale(1.1);
+background:#fff9c4;
+}
+
+/* MESSAGE */
+
+#repairMessage{
+position:absolute;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+font-size:60px;
+font-weight:bold;
+display:none;
+z-index:500;
+text-shadow:0 0 20px white;
+}
+
+/* QUESTION */
+
+#questionBox{
+position:absolute;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+width:92%;
+max-width:700px;
+background:#fff8e1;
+padding:25px;
+border-radius:25px;
+display:none;
+z-index:8000;
+box-shadow:0 0 30px rgba(0,0,0,0.5);
+animation:popup 0.5s;
+}
+
+#questionTitle{
+font-size:30px;
+color:#e65100;
+margin-bottom:15px;
+text-align:center;
+}
+
+#questionText{
+font-size:22px;
+line-height:1.6;
+margin-bottom:20px;
+color:#333;
+}
+
+.optionBtn{
+width:100%;
+padding:15px;
+margin:10px 0;
+border:none;
+border-radius:15px;
+background:#4caf50;
+color:white;
+font-size:18px;
+cursor:pointer;
+transition:0.3s;
+}
+
+.optionBtn:hover{
+background:#388e3c;
+transform:scale(1.03);
+}
+
+/* CONFETTI */
+
+.confetti{
+position:absolute;
+width:12px;
+height:12px;
+animation:fall 3s linear forwards;
+}
+
+@keyframes fall{
+from{
+transform:translateY(-100px) rotate(0deg);
+}
+to{
+transform:translateY(100vh) rotate(720deg);
+opacity:0;
+}
+}
+
+@keyframes popup{
+from{
+transform:translate(-50%,-50%) scale(0.5);
+opacity:0;
+}
+to{
+transform:translate(-50%,-50%) scale(1);
+opacity:1;
+}
+}
+
+/* MOBILE */
+
+@media(max-width:768px){
+
+#titleBox{
+font-size:20px;
+}
+
+#rideEmoji{
+font-size:90px;
+}
+
+#problemText{
+font-size:18px;
+}
+
+.tool{
+width:70px;
+height:70px;
+font-size:38px;
+}
+
+#questionText{
+font-size:18px;
+}
+
+.optionBtn{
+font-size:16px;
+}
+
+#repairMessage{
+font-size:34px;
+}
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="gameArea">
+
+<!-- CLOUDS -->
+
+<script>
+for(let i=0;i<8;i++){
+
+document.write(`
+<div class="cloud"
+style="
+width:${120+Math.random()*100}px;
+height:${50+Math.random()*30}px;
+top:${Math.random()*35}%;
+left:${Math.random()*100}%;
+animation-duration:${25+Math.random()*20}s;
+"></div>
+`);
+
+}
+</script>
+
+<!-- LOGO -->
+
+<div id="logoScreen">
+<img src="assets/innovine-logo.png">
+<div id="logoText">Innovine Learning Adventures</div>
+</div>
+
+<!-- START -->
+
+<div id="startScreen" style="display:none;">
+
+<h1 style="font-size:52px;">🎢 Theme Park Rebuilder</h1>
+
+<p style="margin-top:20px;font-size:24px;max-width:700px;">
+Repair broken rides using the correct tools and solve exciting verb challenges!
+</p>
+
+<button class="mainBtn" onclick="startGame()">
+Start Rebuilding
+</button>
+
+</div>
+
+<!-- END -->
+
+<div id="endScreen" style="display:none;">
+
+<h1>🏆 Theme Park Fully Reopened! 🏆</h1>
+
+<h2 id="finalText" style="margin-top:20px;"></h2>
+
+<button class="mainBtn" onclick="restartGame()">
+Play Again
+</button>
+
+</div>
+
+<!-- TITLE -->
+
+<div id="titleBox">
+🔧 Repair the Correct Problem Using the Correct Tool!
+</div>
+
+<!-- SCORE -->
+
+<div id="scoreBoard">
+Repairs: <span id="repairCount">0</span> |
+Questions: <span id="questionCount">0</span>/10
+</div>
+
+<!-- VOLUME -->
+
+<div id="volumeBox">
+Volume
+<input type="range" id="volumeSlider" min="0" max="1" step="0.1" value="1">
+</div>
+
+<!-- RIDE AREA -->
+
+<div id="rideArea">
+
+<div id="rideEmoji">🎡</div>
+
+<div id="problemBox">
+
+<div id="problemEmoji">🔩</div>
+
+<div id="problemText">
+Loose bolts need tightening!
+</div>
+
+</div>
+
+<div id="repairMessage"></div>
+
+</div>
+
+<!-- TOOLBOX -->
+
+<div id="toolBox">
+
+<div class="tool" data-tool="wrench">🔧</div>
+<div class="tool" data-tool="screwdriver">🪛</div>
+<div class="tool" data-tool="battery">🔋</div>
+<div class="tool" data-tool="gear">⚙️</div>
+
+</div>
+
+<!-- QUESTION -->
+
+<div id="questionBox">
+
+<div id="questionTitle">
+⚡ Verb Challenge
+</div>
+
+<div id="questionText"></div>
+
+<div id="options"></div>
+
+</div>
+
+</div>
+
+<script>
+
+/* LOGO */
+
+setTimeout(()=>{
+
+document.getElementById("logoScreen").style.display="none";
+document.getElementById("startScreen").style.display="flex";
+
+},5000);
+
+/* AUDIO */
+
+const correctSound = new Audio("assets/correct.mp3");
+const wrongSound = new Audio("assets/wrong.mp3");
+const clapSound = new Audio("assets/clapping.mp3");
+
+const volumeSlider = document.getElementById("volumeSlider");
+
+function updateVolume(){
+
+correctSound.volume = volumeSlider.value;
+wrongSound.volume = volumeSlider.value;
+clapSound.volume = volumeSlider.value;
+
+}
+
+volumeSlider.addEventListener("input",updateVolume);
+
+updateVolume();
+
+/* DATA */
+
+let level = 0;
+
+const rides = [
+
+{
+ride:"🎡",
+animation:"spin",
+problemEmoji:"🔩",
+problem:"Loose bolts need tightening!",
+tool:"wrench"
+},
+
+{
+ride:"🎢",
+animation:"bounce",
+problemEmoji:"⚙️",
+problem:"Broken gear must be replaced!",
+tool:"gear"
+},
+
+{
+ride:"🏴‍☠️",
+animation:"swing",
+problemEmoji:"🔋",
+problem:"The ride battery ran out!",
+tool:"battery"
+},
+
+{
+ride:"👻",
+animation:"flash",
+problemEmoji:"🪛",
+problem:"Power wires are disconnected!",
+tool:"screwdriver"
+},
+
+{
+ride:"🚗",
+animation:"bounce",
+problemEmoji:"🔩",
+problem:"Bumper wheels are loose!",
+tool:"wrench"
+},
+
+{
+ride:"🎠",
+animation:"spin",
+problemEmoji:"⚙️",
+problem:"Carousel engine gear cracked!",
+tool:"gear"
+},
+
+{
+ride:"💦",
+animation:"flash",
+problemEmoji:"🔋",
+problem:"Water ride power battery is dead!",
+tool:"battery"
+},
+
+{
+ride:"🚀",
+animation:"bounce",
+problemEmoji:"🪛",
+problem:"Rocket ride control panel is loose!",
+tool:"screwdriver"
+},
+
+{
+ride:"🎯",
+animation:"spin",
+problemEmoji:"⚙️",
+problem:"Target machine gear stopped working!",
+tool:"gear"
+},
+
+{
+ride:"🎆",
+animation:"flash",
+problemEmoji:"🔋",
+problem:"Fireworks system lost power!",
+tool:"battery"
+}
+
+];
+
+const questions = [
+
+{
+q:`🎢 Which sentence sounds BEST?`,
+o:[
+"The workers fixing the track arrived quickly.",
+"The workers fixeding the track arrived quickly.",
+"The workers fix the track arriving quickly.",
+"The workers to fixing the track arrived."
+],
+a:0
+},
+
+{
+q:`👻 The visitors screamed loudly after seeing the ghost jumping from the ceiling.<br><br>
+What was the ghost doing?`,
+o:["screamed","seeing","jumping","loudly"],
+a:2
+},
+
+{
+q:`💦 Which sentence sounds WRONG?`,
+o:[
+"Running near the ride is dangerous.",
+"The children waiting in line were excited.",
+"The operator checking the ride smiled.",
+"The visitors slippinged near the pool laughed."
+],
+a:3
+},
+
+{
+q:`🎡 Mia stood near the Ferris wheel, eating popcorn while watching fireworks.<br><br>
+Which action happened at the same time?`,
+o:["stood","Ferris wheel","eating","fireworks"],
+a:2
+},
+
+{
+q:`🏴‍☠️ The pirate ride stopped moving after making a strange sound.<br><br>
+What happened FIRST?`,
+o:[
+"stopped moving",
+"making a strange sound",
+"pirate ride",
+"strange"
+],
+a:1
+},
+
+{
+q:`🎠 Which announcement sounds BEST?`,
+o:[
+"The clown dancing near the carousel waved happily.",
+"The clown danceding near the carousel waved happily.",
+"The clown dance near the carousel waving happily.",
+"The clown to dancing near the carousel waved."
+],
+a:0
+},
+
+{
+q:`🍿 The popcorn machine exploded while cooking snacks.<br><br>
+What was the machine doing before exploding?`,
+o:["exploded","visitors","cooking","snacks"],
+a:2
+},
+
+{
+q:`🚗 The children raced around the arena, trying to avoid crashing.<br><br>
+What were the children trying to do?`,
+o:["raced","avoid crashing","arena","children"],
+a:1
+},
+
+{
+q:`🎩 The magician opened the giant box, hoping to surprise the audience.<br><br>
+What was the magician hoping to do?`,
+o:["opened","hoping","surprise the audience","audience"],
+a:2
+},
+
+{
+q:`⚡ Which sentence sounds most natural?`,
+o:[
+"Checking the rollercoaster carefully, the engineer found the problem.",
+"The engineer checkinged the rollercoaster found the problem.",
+"Checking the rollercoaster, the engineer finding the problem.",
+"To checking the rollercoaster, the engineer found the problem."
+],
+a:0
+}
+
+];
+
+/* START */
+
+function startGame(){
+
+document.getElementById("startScreen").style.display="none";
+
+loadLevel();
+
+}
+
+/* LOAD LEVEL */
+
+function loadLevel(){
+
+const r = rides[level];
+
+const rideEmoji = document.getElementById("rideEmoji");
+
+rideEmoji.className = "";
+rideEmoji.innerHTML = r.ride;
+
+setTimeout(()=>{
+rideEmoji.classList.add(r.animation);
+},100);
+
+document.getElementById("problemEmoji").innerHTML =
+r.problemEmoji;
+
+document.getElementById("problemText").innerHTML =
+r.problem;
+
+}
+
+/* TOOL CLICK */
+
+document.querySelectorAll(".tool").forEach(tool=>{
+
+tool.addEventListener("click",()=>{
+
+checkTool(tool.dataset.tool);
+
+});
+
+});
+
+/* CHECK TOOL */
+
+function checkTool(tool){
+
+const correctTool = rides[level].tool;
+
+if(tool === correctTool){
+
+repairSuccess();
+
+}else{
+
+wrongSound.play();
+
+document.getElementById("problemBox").style.borderColor =
+"red";
+
+setTimeout(()=>{
+
+document.getElementById("problemBox").style.borderColor =
+"red";
+
+},500);
+
+}
+
+}
+
+/* SUCCESS */
+
+function repairSuccess(){
+
+correctSound.play();
+clapSound.play();
+
+createConfetti();
+
+document.getElementById("repairCount").innerText =
+level + 1;
+
+const msg = document.getElementById("repairMessage");
+
+msg.style.display = "block";
+msg.style.color = "#2e7d32";
+msg.innerHTML = "🎉 RIDE ACTIVATED!";
+
+setTimeout(()=>{
+
+msg.style.display = "none";
+
+showQuestion();
+
+},1500);
+
+}
+
+/* QUESTION */
+
+function showQuestion(){
+
+document.getElementById("questionBox").style.display =
+"block";
+
+const q = questions[level];
+
+document.getElementById("questionText").innerHTML =
+q.q;
+
+const optionsDiv =
+document.getElementById("options");
+
+optionsDiv.innerHTML = "";
+
+q.o.forEach((option,index)=>{
+
+const btn = document.createElement("button");
+
+btn.classList.add("optionBtn");
+
+btn.innerHTML = option;
+
+btn.onclick = ()=>checkAnswer(index,q.a);
+
+optionsDiv.appendChild(btn);
+
+});
+
+}
+
+/* CHECK ANSWER */
+
+function checkAnswer(selected,correct){
+
+if(selected === correct){
+
+correctSound.play();
+
+createConfetti();
+
+}else{
+
+wrongSound.play();
+
+}
+
+document.getElementById("questionCount").innerText =
+level + 1;
+
+setTimeout(()=>{
+
+document.getElementById("questionBox").style.display =
+"none";
+
+level++;
+
+if(level >= 10){
+
+endGame();
+
+}else{
+
+loadLevel();
+
+}
+
+},1200);
+
+}
+
+/* CONFETTI */
+
+function createConfetti(){
+
+for(let i=0;i<40;i++){
+
+const conf = document.createElement("div");
+
+conf.classList.add("confetti");
+
+conf.style.left = Math.random()*100 + "%";
+
+conf.style.background =
+`hsl(${Math.random()*360},100%,50%)`;
+
+conf.style.animationDuration =
+(2 + Math.random()*2)+"s";
+
+document.body.appendChild(conf);
+
+setTimeout(()=>{
+conf.remove();
+},4000);
+
+}
+
+}
+
+/* END */
+
+function endGame(){
+
+document.getElementById("endScreen").style.display =
+"flex";
+
+document.getElementById("finalText").innerHTML =
+"You rebuilt all 10 attractions and mastered finite & non-finite verbs!";
+
+}
+
+/* RESTART */
+
+function restartGame(){
+
+location.reload();
+
+}
+
+</script>
+
+</body>
+</html>
