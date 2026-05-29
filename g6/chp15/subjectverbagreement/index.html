@@ -1,41 +1,8 @@
 
-<!--
-=========================================================
-🍔 CRAZY RESTAURANT RUSH - REAL PLAYABLE VERSION
-TOPIC: SUBJECT VERB AGREEMENT
-
-✅ REAL GAMEPLAY
-✅ CHEF MOVEMENT
-✅ CATCH FOOD
-✅ SCORE SYSTEM
-✅ QUESTIONS AS REWARDS
-✅ correct.mp3 WORKING
-✅ wrong.mp3 WORKING
-✅ Innovine Logo
-✅ Mobile Friendly
-✅ GitHub Compatible
-
-=========================================================
-📁 REQUIRED FILES
-=========================================================
-
-project-folder/
-│
-├── index.html
-│
-└── assets/
-    ├── innovine-logo.png
-    ├── correct.mp3
-    └── wrong.mp3
-
-=========================================================
--->
-
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -64,7 +31,7 @@ overflow:hidden;
 background:linear-gradient(to bottom,#ff7043,#bf360c);
 }
 
-/* LOGO */
+/* LOGO SCREEN */
 
 #logoScreen{
 position:absolute;
@@ -97,7 +64,7 @@ color:#333;
 position:absolute;
 width:100%;
 height:100%;
-background:rgba(0,0,0,0.9);
+background:rgba(0,0,0,0.92);
 display:flex;
 justify-content:center;
 align-items:center;
@@ -117,9 +84,14 @@ background:#ffeb3b;
 cursor:pointer;
 font-weight:bold;
 margin-top:25px;
+transition:0.3s;
 }
 
-/* HUD */
+.mainBtn:hover{
+transform:scale(1.05);
+}
+
+/* SCORE */
 
 #scoreBoard{
 position:absolute;
@@ -131,9 +103,11 @@ padding:12px 18px;
 border-radius:15px;
 font-size:18px;
 z-index:1000;
-line-height:1.6;
+line-height:1.7;
 border:3px solid yellow;
 }
+
+/* VOLUME */
 
 #volumeBox{
 position:absolute;
@@ -147,7 +121,25 @@ z-index:1000;
 border:3px solid yellow;
 }
 
-/* GAME */
+/* TITLE */
+
+#title{
+position:absolute;
+top:75px;
+left:50%;
+transform:translateX(-50%);
+background:#212121;
+padding:12px 22px;
+border-radius:18px;
+font-size:26px;
+font-weight:bold;
+color:#ffeb3b;
+border:4px solid white;
+z-index:1000;
+text-align:center;
+}
+
+/* KITCHEN */
 
 #kitchen{
 position:absolute;
@@ -155,17 +147,22 @@ bottom:0;
 width:100%;
 height:160px;
 background:#3e2723;
+border-top:8px solid #ffeb3b;
 }
+
+/* CHEF */
 
 #chef{
 position:absolute;
-bottom:40px;
+bottom:50px;
 left:50%;
 transform:translateX(-50%);
 font-size:80px;
 transition:0.08s linear;
 z-index:200;
 }
+
+/* FOOD */
 
 .food{
 position:absolute;
@@ -195,6 +192,7 @@ font-size:24px;
 margin-bottom:20px;
 line-height:1.6;
 text-align:center;
+color:#333;
 }
 
 .optionContainer{
@@ -212,10 +210,12 @@ color:white;
 font-size:18px;
 cursor:pointer;
 font-weight:bold;
+transition:0.3s;
 }
 
 .optionBtn:hover{
 background:#d84315;
+transform:scale(1.03);
 }
 
 /* FEEDBACK */
@@ -256,13 +256,16 @@ animation:fall 3s linear forwards;
 }
 
 @keyframes fall{
+
 from{
 transform:translateY(-100px) rotate(0deg);
 }
+
 to{
 transform:translateY(100vh) rotate(720deg);
 opacity:0;
 }
+
 }
 
 /* MOBILE */
@@ -286,10 +289,14 @@ font-size:15px;
 padding:12px;
 }
 
+#title{
+font-size:18px;
+top:85px;
+}
+
 }
 
 </style>
-
 </head>
 
 <body>
@@ -312,16 +319,15 @@ Innovine Learning Adventures
 
 <div id="startScreen" style="display:none;">
 
-<h1 style="font-size:50px;">
+<h1 style="font-size:52px;">
 🍔 Crazy Restaurant Rush
 </h1>
 
 <p style="font-size:24px; margin-top:20px; max-width:700px;">
-Catch food orders, avoid burnt food, and answer grammar questions to save the restaurant!
+Catch delicious food, avoid dangerous items, and answer grammar questions to earn bonus points!
 </p>
 
-<button class="mainBtn"
-onclick="startGame()">
+<button class="mainBtn" onclick="startGame()">
 START GAME
 </button>
 
@@ -341,6 +347,12 @@ onclick="location.reload()">
 PLAY AGAIN
 </button>
 
+</div>
+
+<!-- TITLE -->
+
+<div id="title">
+🍟 Subject Verb Agreement Kitchen Challenge
 </div>
 
 <!-- SCORE -->
@@ -414,85 +426,60 @@ id="options"></div>
 
 /* LOGO */
 
-setTimeout(()=>{
+setTimeout(function(){
 
-document.getElementById("logoScreen")
-.style.display="none";
-
-document.getElementById("startScreen")
-.style.display="flex";
+document.getElementById("logoScreen").style.display="none";
+document.getElementById("startScreen").style.display="flex";
 
 },5000);
 
 /* AUDIO */
 
-const correctSound =
-new Audio("assets/correct.mp3");
-
-const wrongSound =
-new Audio("assets/wrong.mp3");
+const correctSound = new Audio("assets/correct.mp3");
+const wrongSound = new Audio("assets/wrong.mp3");
+const clapSound = new Audio("assets/clapping.mp3");
 
 correctSound.preload="auto";
 wrongSound.preload="auto";
+clapSound.preload="auto";
 
-function playCorrect(){
-
-correctSound.pause();
-correctSound.currentTime=0;
-correctSound.play();
-
-}
-
-function playWrong(){
-
-wrongSound.pause();
-wrongSound.currentTime=0;
-wrongSound.play();
-
-}
+/* VOLUME */
 
 const volumeSlider =
 document.getElementById("volumeSlider");
 
-function updateVolume(){
+volumeSlider.addEventListener("input",function(){
 
-correctSound.volume =
-volumeSlider.value;
+correctSound.volume = volumeSlider.value;
+wrongSound.volume = volumeSlider.value;
+clapSound.volume = volumeSlider.value;
 
-wrongSound.volume =
-volumeSlider.value;
+});
 
-}
-
-volumeSlider.addEventListener(
-"input",
-updateVolume
-);
-
-updateVolume();
-
-/* GAME */
+/* VARIABLES */
 
 let chef =
 document.getElementById("chef");
 
+let chefX =
+window.innerWidth/2;
+
 let score = 0;
 let correct = 0;
 let wrong = 0;
+let catches = 0;
 
 let gameRunning = false;
 
-let chefX = window.innerWidth / 2;
+/* FOOD */
 
 const foods = [
-"🍔","🍕","🍟","🥤","🌭","🧁"
+"🍔","🍕","🍟","🥤","🌭","🧁","🍩"
 ];
 
 const badFoods = [
-"🔥","💣","🗑️"
+"🔥","💣","☠️"
 ];
-
-let catches = 0;
 
 /* QUESTIONS */
 
@@ -541,6 +528,25 @@ let currentQuestion = 0;
 
 function startGame(){
 
+/* UNLOCK AUDIO */
+
+correctSound.play().then(function(){
+correctSound.pause();
+correctSound.currentTime=0;
+});
+
+wrongSound.play().then(function(){
+wrongSound.pause();
+wrongSound.currentTime=0;
+});
+
+clapSound.play().then(function(){
+clapSound.pause();
+clapSound.currentTime=0;
+});
+
+/* START GAME */
+
 document.getElementById("startScreen")
 .style.display="none";
 
@@ -552,7 +558,7 @@ spawnFood();
 
 /* MOVE CHEF */
 
-document.addEventListener("mousemove",(e)=>{
+document.addEventListener("mousemove",function(e){
 
 chefX = e.clientX;
 
@@ -560,7 +566,7 @@ moveChef();
 
 });
 
-document.addEventListener("touchmove",(e)=>{
+document.addEventListener("touchmove",function(e){
 
 chefX = e.touches[0].clientX;
 
@@ -570,12 +576,11 @@ moveChef();
 
 function moveChef(){
 
-chef.style.left =
-chefX + "px";
+chef.style.left = chefX + "px";
 
 }
 
-/* FOOD */
+/* SPAWN FOOD */
 
 function spawnFood(){
 
@@ -601,16 +606,20 @@ Math.random() * (window.innerWidth - 60) + "px";
 
 food.style.top = "-60px";
 
+food.y = -60;
+
 document.getElementById("gameArea")
 .appendChild(food);
 
 let speed =
 3 + Math.random()*2;
 
-const fall = setInterval(()=>{
+const fall = setInterval(function(){
+
+food.y += speed;
 
 food.style.top =
-(food.offsetTop + speed) + "px";
+food.y + "px";
 
 const foodRect =
 food.getBoundingClientRect();
@@ -630,9 +639,14 @@ if(food.dataset.bad === "true"){
 
 score -= 10;
 
-playWrong();
+wrongSound.currentTime=0;
+wrongSound.play();
 
-flashRed();
+document.body.style.background="darkred";
+
+setTimeout(function(){
+document.body.style.background="#111";
+},200);
 
 }else{
 
@@ -640,7 +654,8 @@ score += 10;
 
 catches++;
 
-playCorrect();
+correctSound.currentTime=0;
+correctSound.play();
 
 createConfetti();
 
@@ -656,7 +671,7 @@ if(catches >= 5){
 
 gameRunning = false;
 
-setTimeout(()=>{
+setTimeout(function(){
 
 showQuestion();
 
@@ -666,9 +681,10 @@ showQuestion();
 
 }
 
-if(food.offsetTop > window.innerHeight){
+if(food.y > window.innerHeight){
 
 food.remove();
+
 clearInterval(fall);
 
 }
@@ -688,22 +704,6 @@ document.getElementById("score")
 
 }
 
-/* FLASH */
-
-function flashRed(){
-
-document.body.style.background =
-"darkred";
-
-setTimeout(()=>{
-
-document.body.style.background =
-"#111";
-
-},300);
-
-}
-
 /* QUESTIONS */
 
 function showQuestion(){
@@ -711,7 +711,8 @@ function showQuestion(){
 document.getElementById("questionBox")
 .style.display="block";
 
-const q = questions[currentQuestion];
+const q =
+questions[currentQuestion];
 
 document.getElementById("questionText")
 .innerHTML = q.q;
@@ -721,7 +722,7 @@ document.getElementById("options");
 
 options.innerHTML = "";
 
-q.o.forEach((option,index)=>{
+q.o.forEach(function(option,index){
 
 const btn =
 document.createElement("button");
@@ -730,7 +731,11 @@ btn.classList.add("optionBtn");
 
 btn.innerHTML = option;
 
-btn.onclick = ()=>checkAnswer(index);
+btn.onclick = function(){
+
+checkAnswer(index);
+
+};
 
 options.appendChild(btn);
 
@@ -738,12 +743,15 @@ options.appendChild(btn);
 
 }
 
+/* CHECK ANSWER */
+
 function checkAnswer(selected){
 
 document.getElementById("questionBox")
 .style.display="none";
 
-const q = questions[currentQuestion];
+const q =
+questions[currentQuestion];
 
 document.getElementById("feedback")
 .style.display="block";
@@ -754,53 +762,53 @@ correct++;
 
 score += 50;
 
-playCorrect();
+correctSound.currentTime=0;
+correctSound.play();
 
 createConfetti();
 
 document.getElementById("feedbackTitle")
-.innerHTML = "✅ BONUS EARNED!";
+.innerHTML="✅ BONUS POINTS!";
 
 document.getElementById("feedbackTitle")
-.style.color = "green";
+.style.color="green";
 
 document.getElementById("feedbackText")
-.innerHTML = q.e;
+.innerHTML=q.e;
 
 }else{
 
 wrong++;
 
-playWrong();
+wrongSound.currentTime=0;
+wrongSound.play();
 
 document.getElementById("feedbackTitle")
-.innerHTML = "❌ WRONG ORDER!";
+.innerHTML="❌ WRONG ORDER!";
 
 document.getElementById("feedbackTitle")
-.style.color = "red";
+.style.color="red";
 
 document.getElementById("feedbackText")
-.innerHTML =
-`
-Correct Answer:
-<b>${q.o[q.a]}</b>
-<br><br>
-${q.e}
-`;
+.innerHTML=
+"Correct Answer: <b>"
++ q.o[q.a]
++ "</b><br><br>"
++ q.e;
 
 }
 
 document.getElementById("correct")
-.innerHTML = correct;
+.innerHTML=correct;
 
 document.getElementById("wrong")
-.innerHTML = wrong;
+.innerHTML=wrong;
 
 updateScore();
 
 currentQuestion++;
 
-setTimeout(()=>{
+setTimeout(function(){
 
 document.getElementById("feedback")
 .style.display="none";
@@ -823,9 +831,11 @@ spawnFood();
 
 }
 
-/* END */
+/* END GAME */
 
 function endGame(){
+
+clapSound.play();
 
 document.getElementById("endScreen")
 .style.display="flex";
@@ -834,19 +844,15 @@ let percent =
 Math.round((correct/questions.length)*100);
 
 document.getElementById("finalText")
-.innerHTML =
-`
-⭐ Final Score: ${score}
-<br><br>
+.innerHTML=
 
-✅ Correct Answers: ${correct}
-<br><br>
+"⭐ Final Score: " + score +
 
-❌ Wrong Answers: ${wrong}
-<br><br>
+"<br><br>✅ Correct Answers: " + correct +
 
-🏆 Accuracy: ${percent}%
-`;
+"<br><br>❌ Wrong Answers: " + wrong +
+
+"<br><br>🏆 Accuracy: " + percent + "%";
 
 }
 
@@ -865,12 +871,14 @@ conf.style.left =
 Math.random()*100 + "%";
 
 conf.style.background =
-`hsl(${Math.random()*360},100%,50%)`;
+"hsl(" + Math.random()*360 + ",100%,50%)";
 
 document.body.appendChild(conf);
 
-setTimeout(()=>{
+setTimeout(function(){
+
 conf.remove();
+
 },3000);
 
 }
