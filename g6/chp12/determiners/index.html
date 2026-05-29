@@ -1,0 +1,879 @@
+<!--
+=========================================================
+🛒 SUPERMARKET SWEEP CHALLENGE
+TOPIC: DETERMINERS
+Articles, Demonstratives, Quantifiers,
+Some/Any, Few/Little/Many
+
+📁 REQUIRED FILES:
+
+project-folder/
+│
+├── index.html
+│
+└── assets/
+    ├── innovine-logo.png
+    ├── correct.mp3
+    └── wrong.mp3
+
+=========================================================
+🌐 GITHUB PAGES INSTRUCTIONS
+=========================================================
+
+1. Save this file as:
+   index.html
+
+2. Create folder:
+   assets
+
+3. Put inside assets:
+   innovine-logo.png
+   correct.mp3
+   wrong.mp3
+
+4. Upload to GitHub repository
+
+5. Go to:
+   Settings → Pages
+
+6. Select:
+   main branch + root
+
+7. Save
+
+=========================================================
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>🛒 Supermarket Sweep Challenge</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
+body{
+overflow:hidden;
+background:#ffe082;
+}
+
+#gameArea{
+position:relative;
+width:100vw;
+height:100vh;
+overflow:hidden;
+background:linear-gradient(to bottom,#fff8e1,#ffe082);
+}
+
+/* LOGO */
+
+#logoScreen{
+position:absolute;
+width:100%;
+height:100%;
+background:white;
+display:flex;
+justify-content:center;
+align-items:center;
+flex-direction:column;
+z-index:9999;
+}
+
+#logoScreen img{
+width:260px;
+max-width:80%;
+}
+
+#logoText{
+margin-top:20px;
+font-size:34px;
+font-weight:bold;
+color:#333;
+}
+
+/* START + END */
+
+#startScreen,
+#endScreen{
+position:absolute;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.85);
+display:flex;
+justify-content:center;
+align-items:center;
+flex-direction:column;
+text-align:center;
+padding:20px;
+color:white;
+z-index:5000;
+}
+
+.mainBtn{
+padding:16px 34px;
+font-size:22px;
+border:none;
+border-radius:18px;
+background:#ff9800;
+color:white;
+cursor:pointer;
+margin-top:25px;
+transition:0.3s;
+}
+
+.mainBtn:hover{
+transform:scale(1.05);
+}
+
+/* TITLE */
+
+#titleBox{
+position:absolute;
+top:10px;
+left:50%;
+transform:translateX(-50%);
+width:92%;
+background:white;
+padding:15px;
+border-radius:20px;
+font-size:28px;
+font-weight:bold;
+text-align:center;
+color:#e65100;
+border:6px solid #ffca28;
+z-index:100;
+}
+
+/* SCORE */
+
+#scoreBoard{
+position:absolute;
+top:100px;
+left:20px;
+background:white;
+padding:12px 18px;
+border-radius:15px;
+font-size:18px;
+font-weight:bold;
+z-index:200;
+line-height:1.7;
+box-shadow:0 0 10px rgba(0,0,0,0.3);
+}
+
+/* VOLUME */
+
+#volumeBox{
+position:absolute;
+top:100px;
+right:20px;
+background:white;
+padding:12px;
+border-radius:15px;
+z-index:200;
+box-shadow:0 0 10px rgba(0,0,0,0.3);
+}
+
+/* STORE */
+
+#storeArea{
+position:absolute;
+top:170px;
+left:50%;
+transform:translateX(-50%);
+width:95%;
+height:52%;
+background:#fffde7;
+border-radius:25px;
+border:8px solid #f9a825;
+overflow:hidden;
+}
+
+/* SHELVES */
+
+.shelf{
+position:absolute;
+width:100%;
+height:100px;
+background:#8d6e63;
+left:0;
+border-top:8px solid #5d4037;
+}
+
+#shelf1{top:40px;}
+#shelf2{top:180px;}
+#shelf3{top:320px;}
+
+/* PRODUCTS */
+
+.product{
+position:absolute;
+font-size:55px;
+animation:bounce 2s infinite;
+cursor:pointer;
+transition:0.3s;
+}
+
+.product:hover{
+transform:scale(1.2);
+}
+
+/* SHOPPING CART */
+
+#cart{
+position:absolute;
+bottom:10px;
+left:30px;
+font-size:95px;
+animation:cartMove 3s infinite alternate;
+}
+
+@keyframes cartMove{
+from{
+transform:translateX(0px);
+}
+to{
+transform:translateX(50px);
+}
+}
+
+@keyframes bounce{
+0%{transform:translateY(0);}
+50%{transform:translateY(-10px);}
+100%{transform:translateY(0);}
+}
+
+/* QUESTION */
+
+#questionBox{
+position:absolute;
+bottom:10px;
+left:50%;
+transform:translateX(-50%);
+width:94%;
+max-width:900px;
+background:#fff8e1;
+padding:20px;
+border-radius:25px;
+z-index:1000;
+box-shadow:0 0 20px rgba(0,0,0,0.4);
+}
+
+#questionText{
+font-size:22px;
+line-height:1.6;
+margin-bottom:18px;
+color:#333;
+text-align:center;
+}
+
+.optionContainer{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:12px;
+}
+
+.optionBtn{
+padding:15px;
+border:none;
+border-radius:15px;
+background:#43a047;
+color:white;
+font-size:18px;
+cursor:pointer;
+transition:0.3s;
+}
+
+.optionBtn:hover{
+background:#2e7d32;
+transform:scale(1.03);
+}
+
+/* FEEDBACK */
+
+#feedbackPopup{
+position:absolute;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+background:white;
+padding:30px;
+border-radius:25px;
+width:90%;
+max-width:650px;
+display:none;
+z-index:9999;
+text-align:center;
+box-shadow:0 0 30px rgba(0,0,0,0.5);
+animation:popup 0.4s;
+}
+
+#feedbackTitle{
+font-size:36px;
+margin-bottom:15px;
+font-weight:bold;
+}
+
+#feedbackText{
+font-size:22px;
+line-height:1.6;
+color:#333;
+}
+
+@keyframes popup{
+from{
+transform:translate(-50%,-50%) scale(0.5);
+opacity:0;
+}
+to{
+transform:translate(-50%,-50%) scale(1);
+opacity:1;
+}
+}
+
+/* CONFETTI */
+
+.confetti{
+position:absolute;
+width:12px;
+height:12px;
+animation:fall 3s linear forwards;
+}
+
+@keyframes fall{
+from{
+transform:translateY(-100px) rotate(0deg);
+}
+to{
+transform:translateY(100vh) rotate(720deg);
+opacity:0;
+}
+}
+
+/* MOBILE */
+
+@media(max-width:768px){
+
+#titleBox{
+font-size:18px;
+}
+
+#questionText{
+font-size:17px;
+}
+
+.optionBtn{
+font-size:15px;
+padding:12px;
+}
+
+.product{
+font-size:38px;
+}
+
+#cart{
+font-size:70px;
+}
+
+#feedbackTitle{
+font-size:28px;
+}
+
+#feedbackText{
+font-size:18px;
+}
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="gameArea">
+
+<!-- LOGO -->
+
+<div id="logoScreen">
+
+<img src="assets/innovine-logo.png">
+
+<div id="logoText">
+Innovine Learning Adventures
+</div>
+
+</div>
+
+<!-- START -->
+
+<div id="startScreen"
+style="display:none;">
+
+<h1 style="font-size:50px;">
+🛒 Supermarket Sweep Challenge
+</h1>
+
+<p style="margin-top:20px;font-size:24px;max-width:700px;">
+Help customers shop by choosing the correct determiners!
+</p>
+
+<button class="mainBtn"
+onclick="startGame()">
+Start Shopping
+</button>
+
+</div>
+
+<!-- END -->
+
+<div id="endScreen"
+style="display:none;">
+
+<h1>🏆 Shopping Complete! 🏆</h1>
+
+<h2 id="finalText"
+style="margin-top:20px; line-height:1.8;"></h2>
+
+<button class="mainBtn"
+onclick="restartGame()">
+Play Again
+</button>
+
+</div>
+
+<!-- TITLE -->
+
+<div id="titleBox">
+🛒 Choose The Correct Determiner To Fill The Shopping Cart!
+</div>
+
+<!-- SCORE -->
+
+<div id="scoreBoard">
+✅ Correct: <span id="correctScore">0</span><br>
+❌ Wrong: <span id="wrongScore">0</span><br>
+📘 Question: <span id="questionNumber">0</span>/10
+</div>
+
+<!-- VOLUME -->
+
+<div id="volumeBox">
+Volume
+<input type="range"
+id="volumeSlider"
+min="0"
+max="1"
+step="0.1"
+value="1">
+</div>
+
+<!-- STORE -->
+
+<div id="storeArea">
+
+<div class="shelf" id="shelf1"></div>
+<div class="shelf" id="shelf2"></div>
+<div class="shelf" id="shelf3"></div>
+
+<div class="product"
+style="top:10px;left:8%;">🍎</div>
+
+<div class="product"
+style="top:10px;left:28%;">🥛</div>
+
+<div class="product"
+style="top:10px;left:48%;">🍪</div>
+
+<div class="product"
+style="top:10px;left:68%;">🍕</div>
+
+<div class="product"
+style="top:150px;left:18%;">🧃</div>
+
+<div class="product"
+style="top:150px;left:42%;">🍞</div>
+
+<div class="product"
+style="top:150px;left:66%;">🥚</div>
+
+<div class="product"
+style="top:290px;left:15%;">🍌</div>
+
+<div class="product"
+style="top:290px;left:40%;">🧀</div>
+
+<div class="product"
+style="top:290px;left:70%;">🍫</div>
+
+<div id="cart">
+🛒
+</div>
+
+</div>
+
+<!-- QUESTION -->
+
+<div id="questionBox">
+
+<div id="questionText"></div>
+
+<div class="optionContainer"
+id="options"></div>
+
+</div>
+
+<!-- FEEDBACK -->
+
+<div id="feedbackPopup">
+
+<div id="feedbackTitle"></div>
+
+<div id="feedbackText"></div>
+
+</div>
+
+</div>
+
+<script>
+
+/* LOGO */
+
+setTimeout(()=>{
+
+document.getElementById("logoScreen")
+.style.display="none";
+
+document.getElementById("startScreen")
+.style.display="flex";
+
+},5000);
+
+/* AUDIO */
+
+const correctSound =
+new Audio("assets/correct.mp3");
+
+const wrongSound =
+new Audio("assets/wrong.mp3");
+
+const volumeSlider =
+document.getElementById("volumeSlider");
+
+function updateVolume(){
+
+correctSound.volume =
+volumeSlider.value;
+
+wrongSound.volume =
+volumeSlider.value;
+
+}
+
+volumeSlider.addEventListener(
+"input",
+updateVolume
+);
+
+updateVolume();
+
+/* QUESTIONS */
+
+const questions = [
+
+{
+q:"🍎 The fruit shelf is almost empty. We have only ___ apples left.",
+o:["many","few","little","those"],
+a:1,
+e:"'Few' is used for countable nouns like apples."
+},
+
+{
+q:"🥛 There isn't ___ milk left for breakfast.",
+o:["many","these","any","few"],
+a:2,
+e:"'Any' is used in negative sentences."
+},
+
+{
+q:"🍪 The bakery made ___ cookies for the festival because thousands of people are coming.",
+o:["little","many","this","few"],
+a:1,
+e:"'Many' is used for a large number of countable nouns."
+},
+
+{
+q:"🧀 Grandma added only ___ cheese to the pasta because she wanted it light.",
+o:["little","many","those","few"],
+a:0,
+e:"'Little' is used for small amounts of uncountable nouns."
+},
+
+{
+q:"🍕 Can you pass me ___ pizza near your plate?",
+o:["that","those","many","few"],
+a:0,
+e:"'That' refers to a singular object farther away."
+},
+
+{
+q:"🧃 We bought ___ juice boxes for the school picnic.",
+o:["much","many","little","this"],
+a:1,
+e:"'Many' is used with countable plural nouns."
+},
+
+{
+q:"🍌 Mom pointed nearby and said, 'Please pack ___ bananas into the basket.'",
+o:["these","that","little","any"],
+a:0,
+e:"'These' refers to plural objects nearby."
+},
+
+{
+q:"🍫 There are ___ chocolates left in the box, so everyone can take one!",
+o:["few","many","little","that"],
+a:1,
+e:"'Many' means a large number."
+},
+
+{
+q:"🍞 Is there ___ bread left in the kitchen?",
+o:["some","those","any","few"],
+a:2,
+e:"'Any' is commonly used in questions."
+},
+
+{
+q:"🥚 We still have ___ eggs, so we can bake a cake.",
+o:["few","little","some","that"],
+a:2,
+e:"'Some' is used for an unspecified quantity in positive sentences."
+}
+
+];
+
+/* VARIABLES */
+
+let currentQuestion = 0;
+let correct = 0;
+let wrong = 0;
+
+/* START */
+
+function startGame(){
+
+document.getElementById("startScreen")
+.style.display="none";
+
+loadQuestion();
+
+}
+
+/* LOAD QUESTION */
+
+function loadQuestion(){
+
+const q = questions[currentQuestion];
+
+document.getElementById("questionText")
+.innerHTML = q.q;
+
+const options =
+document.getElementById("options");
+
+options.innerHTML = "";
+
+q.o.forEach((option,index)=>{
+
+const btn =
+document.createElement("button");
+
+btn.classList.add("optionBtn");
+
+btn.innerHTML = option;
+
+btn.onclick = ()=>checkAnswer(index);
+
+options.appendChild(btn);
+
+});
+
+}
+
+/* CHECK ANSWER */
+
+function checkAnswer(selected){
+
+const q = questions[currentQuestion];
+
+const popup =
+document.getElementById("feedbackPopup");
+
+popup.style.display = "block";
+
+if(selected === q.a){
+
+correct++;
+
+document.getElementById("correctScore")
+.innerHTML = correct;
+
+correctSound.play();
+
+createConfetti();
+
+document.getElementById("feedbackTitle")
+.innerHTML = "✅ Correct Shopping Choice!";
+
+document.getElementById("feedbackTitle")
+.style.color = "green";
+
+document.getElementById("feedbackText")
+.innerHTML = q.e;
+
+}else{
+
+wrong++;
+
+document.getElementById("wrongScore")
+.innerHTML = wrong;
+
+wrongSound.play();
+
+document.getElementById("feedbackTitle")
+.innerHTML = "❌ Oops! Wrong Item!";
+
+document.getElementById("feedbackTitle")
+.style.color = "red";
+
+document.getElementById("feedbackText")
+.innerHTML =
+`
+Correct Answer:<br><br>
+<b>${q.o[q.a]}</b><br><br>
+${q.e}
+`;
+
+}
+
+document.getElementById("questionNumber")
+.innerHTML = currentQuestion + 1;
+
+setTimeout(()=>{
+
+popup.style.display = "none";
+
+currentQuestion++;
+
+if(currentQuestion >= 10){
+
+endGame();
+
+}else{
+
+loadQuestion();
+
+}
+
+},2500);
+
+}
+
+/* CONFETTI */
+
+function createConfetti(){
+
+for(let i=0;i<40;i++){
+
+const conf =
+document.createElement("div");
+
+conf.classList.add("confetti");
+
+conf.style.left =
+Math.random()*100 + "%";
+
+conf.style.background =
+`hsl(${Math.random()*360},100%,50%)`;
+
+conf.style.animationDuration =
+(2 + Math.random()*2)+"s";
+
+document.body.appendChild(conf);
+
+setTimeout(()=>{
+conf.remove();
+},4000);
+
+}
+
+}
+
+/* END */
+
+function endGame(){
+
+document.getElementById("endScreen")
+.style.display = "flex";
+
+let percentage =
+Math.round((correct / 10) * 100);
+
+let message = "";
+
+if(correct === 10){
+
+message =
+"🌟 PERFECT SHOPPING! Every customer is happy!";
+
+}else if(correct >= 8){
+
+message =
+"🛒 Amazing Determiner Skills!";
+
+}else if(correct >= 6){
+
+message =
+"👏 Great Grocery Work!";
+
+}else{
+
+message =
+"🎉 Nice Try! The supermarket shelves are stocked again!";
+}
+
+document.getElementById("finalText")
+.innerHTML =
+`
+🏆 Correct Answers: ${correct}/10<br><br>
+
+❌ Wrong Answers: ${wrong}<br><br>
+
+⭐ Score Percentage: ${percentage}%<br><br>
+
+${message}
+`;
+
+}
+
+/* RESTART */
+
+function restartGame(){
+
+location.reload();
+
+}
+
+</script>
+
+</body>
+</html>
