@@ -1,20 +1,19 @@
 
 <!--
 =========================================================
-🍔 CRAZY RESTAURANT RUSH
-SUBJECT VERB AGREEMENT GAME
+🍔 CRAZY RESTAURANT RUSH - REAL PLAYABLE VERSION
+TOPIC: SUBJECT VERB AGREEMENT
 
-✅ REAL PLAYABLE GAME
+✅ REAL GAMEPLAY
 ✅ CHEF MOVEMENT
 ✅ CATCH FOOD
 ✅ SCORE SYSTEM
 ✅ QUESTIONS AS REWARDS
 ✅ correct.mp3 WORKING
 ✅ wrong.mp3 WORKING
-✅ clapping.mp3 WORKING
-✅ Innovine Logo for 5 Seconds
+✅ Innovine Logo
 ✅ Mobile Friendly
-✅ GitHub Pages Compatible
+✅ GitHub Compatible
 
 =========================================================
 📁 REQUIRED FILES
@@ -27,8 +26,7 @@ project-folder/
 └── assets/
     ├── innovine-logo.png
     ├── correct.mp3
-    ├── wrong.mp3
-    └── clapping.mp3
+    └── wrong.mp3
 
 =========================================================
 -->
@@ -39,9 +37,7 @@ project-folder/
 <head>
 
 <meta charset="UTF-8">
-
-<meta name="viewport"
-content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Crazy Restaurant Rush</title>
 
@@ -101,7 +97,7 @@ color:#333;
 position:absolute;
 width:100%;
 height:100%;
-background:rgba(0,0,0,0.92);
+background:rgba(0,0,0,0.9);
 display:flex;
 justify-content:center;
 align-items:center;
@@ -121,14 +117,9 @@ background:#ffeb3b;
 cursor:pointer;
 font-weight:bold;
 margin-top:25px;
-transition:0.3s;
 }
 
-.mainBtn:hover{
-transform:scale(1.05);
-}
-
-/* SCORE */
+/* HUD */
 
 #scoreBoard{
 position:absolute;
@@ -140,11 +131,9 @@ padding:12px 18px;
 border-radius:15px;
 font-size:18px;
 z-index:1000;
-line-height:1.7;
+line-height:1.6;
 border:3px solid yellow;
 }
-
-/* VOLUME */
 
 #volumeBox{
 position:absolute;
@@ -158,7 +147,7 @@ z-index:1000;
 border:3px solid yellow;
 }
 
-/* GAME AREA */
+/* GAME */
 
 #kitchen{
 position:absolute;
@@ -166,14 +155,11 @@ bottom:0;
 width:100%;
 height:160px;
 background:#3e2723;
-border-top:8px solid #ffeb3b;
 }
-
-/* CHEF */
 
 #chef{
 position:absolute;
-bottom:50px;
+bottom:40px;
 left:50%;
 transform:translateX(-50%);
 font-size:80px;
@@ -181,29 +167,10 @@ transition:0.08s linear;
 z-index:200;
 }
 
-/* FOOD */
-
 .food{
 position:absolute;
 font-size:55px;
 user-select:none;
-}
-
-/* TITLE */
-
-#title{
-position:absolute;
-top:75px;
-left:50%;
-transform:translateX(-50%);
-background:#212121;
-padding:12px 22px;
-border-radius:18px;
-font-size:26px;
-font-weight:bold;
-color:#ffeb3b;
-border:4px solid white;
-z-index:1000;
 }
 
 /* QUESTION */
@@ -228,7 +195,6 @@ font-size:24px;
 margin-bottom:20px;
 line-height:1.6;
 text-align:center;
-color:#333;
 }
 
 .optionContainer{
@@ -246,12 +212,10 @@ color:white;
 font-size:18px;
 cursor:pointer;
 font-weight:bold;
-transition:0.3s;
 }
 
 .optionBtn:hover{
 background:#d84315;
-transform:scale(1.03);
 }
 
 /* FEEDBACK */
@@ -292,16 +256,13 @@ animation:fall 3s linear forwards;
 }
 
 @keyframes fall{
-
 from{
 transform:translateY(-100px) rotate(0deg);
 }
-
 to{
 transform:translateY(100vh) rotate(720deg);
 opacity:0;
 }
-
 }
 
 /* MOBILE */
@@ -323,11 +284,6 @@ font-size:18px;
 .optionBtn{
 font-size:15px;
 padding:12px;
-}
-
-#title{
-font-size:18px;
-top:85px;
 }
 
 }
@@ -354,15 +310,14 @@ Innovine Learning Adventures
 
 <!-- START -->
 
-<div id="startScreen"
-style="display:none;">
+<div id="startScreen" style="display:none;">
 
-<h1 style="font-size:52px;">
+<h1 style="font-size:50px;">
 🍔 Crazy Restaurant Rush
 </h1>
 
 <p style="font-size:24px; margin-top:20px; max-width:700px;">
-Catch food orders, avoid dangerous items, and answer grammar questions to earn bonus points!
+Catch food orders, avoid burnt food, and answer grammar questions to save the restaurant!
 </p>
 
 <button class="mainBtn"
@@ -374,8 +329,7 @@ START GAME
 
 <!-- END -->
 
-<div id="endScreen"
-style="display:none;">
+<div id="endScreen" style="display:none;">
 
 <h1>🏆 RESTAURANT SAVED!</h1>
 
@@ -387,12 +341,6 @@ onclick="location.reload()">
 PLAY AGAIN
 </button>
 
-</div>
-
-<!-- TITLE -->
-
-<div id="title">
-🍟 Subject Verb Agreement Kitchen Challenge
 </div>
 
 <!-- SCORE -->
@@ -464,7 +412,7 @@ id="options"></div>
 
 <script>
 
-/* LOGO SCREEN */
+/* LOGO */
 
 setTimeout(()=>{
 
@@ -484,14 +432,8 @@ new Audio("assets/correct.mp3");
 const wrongSound =
 new Audio("assets/wrong.mp3");
 
-const clapSound =
-new Audio("assets/clapping.mp3");
-
 correctSound.preload="auto";
 wrongSound.preload="auto";
-clapSound.preload="auto";
-
-/* AUDIO FUNCTIONS */
 
 function playCorrect(){
 
@@ -509,8 +451,6 @@ wrongSound.play();
 
 }
 
-/* VOLUME */
-
 const volumeSlider =
 document.getElementById("volumeSlider");
 
@@ -522,9 +462,6 @@ volumeSlider.value;
 wrongSound.volume =
 volumeSlider.value;
 
-clapSound.volume =
-volumeSlider.value;
-
 }
 
 volumeSlider.addEventListener(
@@ -534,31 +471,28 @@ updateVolume
 
 updateVolume();
 
-/* GAME VARIABLES */
+/* GAME */
 
 let chef =
 document.getElementById("chef");
-
-let chefX =
-window.innerWidth / 2;
 
 let score = 0;
 let correct = 0;
 let wrong = 0;
 
-let catches = 0;
-
 let gameRunning = false;
 
-/* FOOD */
+let chefX = window.innerWidth / 2;
 
 const foods = [
-"🍔","🍕","🍟","🥤","🌭","🧁","🍩","🥞"
+"🍔","🍕","🍟","🥤","🌭","🧁"
 ];
 
 const badFoods = [
-"🔥","💣","🗑️","☠️"
+"🔥","💣","🗑️"
 ];
+
+let catches = 0;
 
 /* QUESTIONS */
 
@@ -568,14 +502,14 @@ const questions = [
 q:"The burgers on Table 4 ___ frozen.",
 o:["is","are","am","be"],
 a:1,
-e:"'Burgers' is plural, so we use 'are'."
+e:"'Burgers' is plural."
 },
 
 {
 q:"The milkshake with extra pickles ___ disgusting!",
 o:["taste","tastes","are","have"],
 a:1,
-e:"The subject is singular: 'milkshake'."
+e:"'Milkshake' is singular."
 },
 
 {
@@ -603,28 +537,9 @@ e:"'Cookies' is plural."
 
 let currentQuestion = 0;
 
-/* START GAME */
+/* START */
 
 function startGame(){
-
-/* UNLOCK AUDIO */
-
-correctSound.play().then(()=>{
-correctSound.pause();
-correctSound.currentTime=0;
-}).catch(()=>{});
-
-wrongSound.play().then(()=>{
-wrongSound.pause();
-wrongSound.currentTime=0;
-}).catch(()=>{});
-
-clapSound.play().then(()=>{
-clapSound.pause();
-clapSound.currentTime=0;
-}).catch(()=>{});
-
-/* START */
 
 document.getElementById("startScreen")
 .style.display="none";
@@ -660,7 +575,7 @@ chefX + "px";
 
 }
 
-/* SPAWN FOOD */
+/* FOOD */
 
 function spawnFood(){
 
@@ -754,7 +669,6 @@ showQuestion();
 if(food.offsetTop > window.innerHeight){
 
 food.remove();
-
 clearInterval(fall);
 
 }
@@ -797,8 +711,7 @@ function showQuestion(){
 document.getElementById("questionBox")
 .style.display="block";
 
-const q =
-questions[currentQuestion];
+const q = questions[currentQuestion];
 
 document.getElementById("questionText")
 .innerHTML = q.q;
@@ -825,15 +738,12 @@ options.appendChild(btn);
 
 }
 
-/* CHECK ANSWER */
-
 function checkAnswer(selected){
 
 document.getElementById("questionBox")
 .style.display="none";
 
-const q =
-questions[currentQuestion];
+const q = questions[currentQuestion];
 
 document.getElementById("feedback")
 .style.display="block";
@@ -849,7 +759,7 @@ playCorrect();
 createConfetti();
 
 document.getElementById("feedbackTitle")
-.innerHTML = "✅ BONUS POINTS!";
+.innerHTML = "✅ BONUS EARNED!";
 
 document.getElementById("feedbackTitle")
 .style.color = "green";
@@ -913,11 +823,9 @@ spawnFood();
 
 }
 
-/* END GAME */
+/* END */
 
 function endGame(){
-
-clapSound.play();
 
 document.getElementById("endScreen")
 .style.display="flex";
