@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -133,7 +134,8 @@ border-radius:15px;
 font-size:18px;
 font-weight:bold;
 z-index:200;
-line-height:1.6;
+line-height:1.7;
+box-shadow:0 0 10px rgba(0,0,0,0.2);
 }
 
 /* VOLUME */
@@ -146,6 +148,7 @@ background:white;
 padding:12px;
 border-radius:15px;
 z-index:200;
+box-shadow:0 0 10px rgba(0,0,0,0.2);
 }
 
 /* RIDE AREA */
@@ -224,6 +227,7 @@ border:5px dashed red;
 text-align:center;
 width:82%;
 max-width:650px;
+transition:0.3s;
 }
 
 #problemText{
@@ -256,42 +260,12 @@ font-size:50px;
 cursor:pointer;
 border:5px solid #29b6f6;
 transition:0.3s;
+user-select:none;
 }
 
 .tool:hover{
 transform:scale(1.1);
 background:#fff9c4;
-}
-
-/* POPUP */
-
-#feedbackPopup{
-position:absolute;
-top:50%;
-left:50%;
-transform:translate(-50%,-50%);
-width:90%;
-max-width:650px;
-background:white;
-padding:30px;
-border-radius:25px;
-display:none;
-z-index:9000;
-text-align:center;
-box-shadow:0 0 30px rgba(0,0,0,0.5);
-animation:popup 0.4s;
-}
-
-#feedbackTitle{
-font-size:38px;
-margin-bottom:15px;
-font-weight:bold;
-}
-
-#feedbackText{
-font-size:24px;
-line-height:1.6;
-color:#333;
 }
 
 /* QUESTION */
@@ -342,6 +316,37 @@ transition:0.3s;
 .optionBtn:hover{
 background:#388e3c;
 transform:scale(1.03);
+}
+
+/* FEEDBACK POPUP */
+
+#feedbackPopup{
+position:absolute;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+width:90%;
+max-width:650px;
+background:white;
+padding:30px;
+border-radius:25px;
+display:none;
+z-index:9000;
+text-align:center;
+box-shadow:0 0 30px rgba(0,0,0,0.5);
+animation:popup 0.4s;
+}
+
+#feedbackTitle{
+font-size:38px;
+margin-bottom:15px;
+font-weight:bold;
+}
+
+#feedbackText{
+font-size:22px;
+line-height:1.6;
+color:#333;
 }
 
 /* CONFETTI */
@@ -422,6 +427,7 @@ font-size:18px;
 <div id="gameArea">
 
 <script>
+
 for(let i=0;i<8;i++){
 
 document.write(`
@@ -436,6 +442,7 @@ animation-duration:${25+Math.random()*20}s;
 `);
 
 }
+
 </script>
 
 <!-- LOGO -->
@@ -467,7 +474,7 @@ Start Rebuilding
 
 <h1>🏆 Theme Park Fully Reopened! 🏆</h1>
 
-<h2 id="finalText" style="margin-top:20px;"></h2>
+<h2 id="finalText" style="margin-top:20px; line-height:1.8;"></h2>
 
 <button class="mainBtn" onclick="restartGame()">
 Play Again
@@ -496,7 +503,7 @@ Volume
 <input type="range" id="volumeSlider" min="0" max="1" step="0.1" value="1">
 </div>
 
-<!-- RIDE AREA -->
+<!-- GAME -->
 
 <div id="rideArea">
 
@@ -578,13 +585,11 @@ volumeSlider.addEventListener("input",updateVolume);
 
 updateVolume();
 
-/* SCORE */
+/* GAME DATA */
 
 let level = 0;
 let correctCount = 0;
 let wrongCount = 0;
-
-/* RIDES */
 
 const rides = [
 
@@ -659,8 +664,6 @@ tool:"battery"
 }
 
 ];
-
-/* QUESTIONS */
 
 const questions = [
 
@@ -838,7 +841,43 @@ showQuestion();
 
 }else{
 
+wrongCount++;
+
+document.getElementById("wrongScore").innerHTML =
+wrongCount;
+
 wrongSound.play();
+
+const popup =
+document.getElementById("feedbackPopup");
+
+popup.style.display = "block";
+
+document.getElementById("feedbackTitle").innerHTML =
+"❌ Wrong Tool!";
+
+document.getElementById("feedbackTitle").style.color =
+"red";
+
+document.getElementById("feedbackText").innerHTML =
+"This ride needs a different repair tool. Look carefully and try again!";
+
+const box =
+document.getElementById("problemBox");
+
+box.style.transform =
+"translateX(-50%) scale(1.05)";
+
+box.style.borderColor = "red";
+
+setTimeout(()=>{
+
+popup.style.display = "none";
+
+box.style.transform =
+"translateX(-50%) scale(1)";
+
+},1500);
 
 }
 
@@ -984,35 +1023,47 @@ conf.remove();
 
 }
 
-/* END */
+/* END GAME */
 
 function endGame(){
 
 document.getElementById("endScreen").style.display =
 "flex";
 
+let percentage =
+Math.round((correctCount / 10) * 100);
+
 let message = "";
 
 if(correctCount === 10){
 
-message = "🌟 Grammar Genius! Perfect Score!";
+message =
+"🌟 PERFECT! You are a Theme Park Grammar Master!";
 
 }else if(correctCount >= 8){
 
-message = "🚀 Excellent Engineer! Amazing Job!";
+message =
+"🚀 Amazing Work! You repaired the park brilliantly!";
 
 }else if(correctCount >= 6){
 
-message = "🎡 Great Work! Keep Practicing!";
+message =
+"🎡 Great Job! The visitors are enjoying the rides again!";
 
 }else{
 
-message = "💪 Nice Try! Practice More To Improve!";
+message =
+"🎉 Nice Effort! You helped reopen the theme park!";
 }
 
 document.getElementById("finalText").innerHTML =
 `
-Final Score: ${correctCount}/10<br><br>
+🏆 Correct Answers: ${correctCount}/10<br><br>
+
+❌ Wrong Answers: ${wrongCount}<br><br>
+
+⭐ Score Percentage: ${percentage}%<br><br>
+
 ${message}
 `;
 
