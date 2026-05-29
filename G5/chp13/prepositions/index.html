@@ -5,20 +5,49 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Prepositions Game</title>
 <style>
-    body {
+    body, html {
         margin: 0;
         padding: 0;
+        height: 100%;
         font-family: Arial, sans-serif;
-        background: linear-gradient(to bottom, #fddde6, #cceeff);
+    }
+
+    /* Splash screen */
+    #splash {
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        background-color: #ffffff;
         display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        flex-direction: column;
+    }
+
+    #splash img {
+        width: 300px;
+        height: auto;
+    }
+
+    #splash h1 {
+        margin-top: 20px;
+        font-size: 2rem;
+        color: #1d1d1d;
+    }
+
+    /* Game screen */
+    #game {
+        display: none;
         flex-direction: column;
         align-items: center;
         justify-content: flex-start;
-        height: 100vh;
+        min-height: 100vh;
+        background: linear-gradient(to bottom, #fddde6, #cceeff);
+        padding-top: 20px;
     }
 
     .scoreboard {
-        margin-top: 20px;
         padding: 10px 20px;
         font-size: 2rem;
         font-weight: bold;
@@ -59,40 +88,84 @@
         background-color: #ff8c00;
     }
 
-    .container {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        width: 100%;
-    }
 </style>
 </head>
 <body>
 
-<div class="scoreboard" id="scoreboard">Score: 0</div>
+<!-- Splash Screen -->
+<div id="splash">
+    <img src="assets/logo.png" alt="Innovine Logo">
+    <h1>Welcome to Prepositions Game!</h1>
+</div>
 
-<div class="question" id="question">The dog ran ___ the garden.</div>
-
-<div class="options">
-    <button class="option-btn" onclick="checkAnswer('through')">through</button>
-    <button class="option-btn" onclick="checkAnswer('over')">over</button>
-    <button class="option-btn" onclick="checkAnswer('on')">on</button>
-    <button class="option-btn" onclick="checkAnswer('in')">in</button>
+<!-- Game Screen -->
+<div id="game" class="container">
+    <div class="scoreboard" id="scoreboard">Score: 0</div>
+    <div class="question" id="question"></div>
+    <div class="options">
+        <button class="option-btn" id="opt1" onclick="checkAnswer(this)">Option 1</button>
+        <button class="option-btn" id="opt2" onclick="checkAnswer(this)">Option 2</button>
+        <button class="option-btn" id="opt3" onclick="checkAnswer(this)">Option 3</button>
+        <button class="option-btn" id="opt4" onclick="checkAnswer(this)">Option 4</button>
+    </div>
 </div>
 
 <script>
 let score = 0;
-const correctAnswer = "through";
+let currentQ = 0;
 
-function checkAnswer(answer) {
-    if(answer === correctAnswer) {
+// 12 Prepositions Questions
+const questions = [
+    {q:"The dog ran ___ the garden.", options:["through","over","on","in"], answer:"through"},
+    {q:"The cat is hiding ___ the table.", options:["under","on","in","over"], answer:"under"},
+    {q:"We walked ___ the bridge.", options:["across","on","in","over"], answer:"across"},
+    {q:"He put the book ___ the shelf.", options:["on","in","over","under"], answer:"on"},
+    {q:"The bird is flying ___ the sky.", options:["in","under","over","on"], answer:"in"},
+    {q:"She jumped ___ the puddle.", options:["over","through","on","in"], answer:"over"},
+    {q:"The keys are ___ the drawer.", options:["in","on","under","over"], answer:"in"},
+    {q:"The plane flew ___ the mountains.", options:["over","through","under","in"], answer:"over"},
+    {q:"The ball rolled ___ the hill.", options:["down","over","under","in"], answer:"down"},
+    {q:"We hid ___ the curtain.", options:["behind","on","in","over"], answer:"behind"},
+    {q:"He climbed ___ the ladder.", options:["up","over","on","through"], answer:"up"},
+    {q:"The picture is hanging ___ the wall.", options:["on","over","under","in"], answer:"on"},
+];
+
+// Load question
+function loadQuestion() {
+    if(currentQ >= questions.length) {
+        alert("Game Over! Your score: " + score + "/" + questions.length);
+        currentQ = 0;
+        score = 0;
+        document.getElementById('scoreboard').innerText = 'Score: ' + score;
+    }
+    document.getElementById('question').innerText = questions[currentQ].q;
+    document.getElementById('opt1').innerText = questions[currentQ].options[0];
+    document.getElementById('opt2').innerText = questions[currentQ].options[1];
+    document.getElementById('opt3').innerText = questions[currentQ].options[2];
+    document.getElementById('opt4').innerText = questions[currentQ].options[3];
+}
+
+// Check answer
+function checkAnswer(btn) {
+    if(btn.innerText === questions[currentQ].answer) {
         score++;
         alert("Correct!");
     } else {
         alert("Wrong!");
     }
+    currentQ++;
     document.getElementById('scoreboard').innerText = 'Score: ' + score;
+    loadQuestion();
 }
+
+// Show splash for 5 seconds then game
+window.onload = function() {
+    setTimeout(() => {
+        document.getElementById('splash').style.display = 'none';
+        document.getElementById('game').style.display = 'flex';
+        loadQuestion();
+    }, 5000); // 5 seconds splash
+};
 </script>
 
 </body>
