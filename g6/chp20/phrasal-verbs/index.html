@@ -8,9 +8,10 @@
 <style>
 body { margin:0; font-family: Arial; background:#87ceeb; overflow:hidden; }
 #logoScreen { position:fixed; top:0; left:0; width:100%; height:100%; display:flex; justify-content:center; align-items:center; background:white; z-index:100;}
+#instructions { position:fixed; top:0; left:0; width:100%; height:100%; display:flex; flex-direction:column; justify-content:center; align-items:center; background:#fefefe; z-index:101; text-align:center; padding:20px; font-size:18px;}
 #gameContainer { display:none; width:100%; height:100vh; position:relative; overflow:hidden;}
 #track { position:absolute; bottom:50px; left:0; width:100%; height:150px; background:#333; }
-#car { position:absolute; bottom:60px; left:50px; width:60px; height:40px; background:red; border-radius:5px; transition:left 0.3s; }
+#car { position:absolute; bottom:60px; left:50px; width:60px; height:40px; transition:left 0.3s; z-index:10;}
 #questionBox { display:none; position:absolute; top:30%; left:50%; transform:translate(-50%,-50%); width:320px; background:white; padding:20px; border-radius:10px; text-align:center; box-shadow:0 0 15px #0003; z-index:50; }
 #questionBox button { margin:5px; padding:10px 15px; cursor:pointer;}
 #feedback { margin-top:10px; font-weight:bold;}
@@ -24,13 +25,28 @@ body { margin:0; font-family: Arial; background:#87ceeb; overflow:hidden; }
 </head>
 <body>
 
+<!-- Logo -->
 <div id="logoScreen">
 <img src="assets/innovine-logo.png" alt="Innovine Logo" width="200">
 </div>
 
+<!-- Instructions -->
+<div id="instructions">
+<h2>🏎️ Phrasal Verb Racing Game 🏎️</h2>
+<p>Instructions:</p>
+<ul>
+<li>Click Start to begin the race.</li>
+<li>Each checkpoint presents a sentence with a missing phrasal verb.</li>
+<li>Select the correct phrasal verb to speed up your car!</li>
+<li>Wrong answers slow your car.</li>
+<li>Reach the finish line to win the treasure!</li>
+</ul>
+<button id="startBtn">Start Race</button>
+</div>
+
 <div id="gameContainer">
 <div id="track"></div>
-<div id="car"></div>
+<img id="car" src="assets/car.png" alt="Race Car">
 <div id="finishLine"></div>
 <div id="treasure">🏆</div>
 <div id="questionBox">
@@ -69,6 +85,8 @@ let optionsContainer = document.getElementById('optionsContainer');
 let feedback = document.getElementById('feedback');
 let treasure = document.getElementById('treasure');
 let restartBtn = document.getElementById('restartBtn');
+let instructions = document.getElementById('instructions');
+let startBtn = document.getElementById('startBtn');
 const correctSound = document.getElementById('correctSound');
 const wrongSound = document.getElementById('wrongSound');
 const clapSound = document.getElementById('clapSound');
@@ -83,12 +101,13 @@ correctSound.volume = volumeSlider.value;
 wrongSound.volume = volumeSlider.value;
 clapSound.volume = volumeSlider.value;
 
-// --- Logo Splash ---
-setTimeout(()=>{
+// --- Start Game ---
+startBtn.onclick = ()=>{
+  instructions.style.display='none';
   document.getElementById('logoScreen').style.display='none';
   document.getElementById('gameContainer').style.display='block';
   showQuestion(currentQuestionIndex);
-},5000);
+};
 
 // --- Show Question ---
 function showQuestion(index){
@@ -133,6 +152,8 @@ function checkAnswer(selected){
       treasure.style.display='block';
       clapSound.currentTime=0; clapSound.play();
       restartBtn.style.display='block';
+    } else {
+      showQuestion(currentQuestionIndex); // Ensures next question appears
     }
   } else {
     feedback.textContent="Try again!";
