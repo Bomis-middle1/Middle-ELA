@@ -4,171 +4,118 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Phrasal Verb Snake Game - Final</title>
+<title>Drag and Drop Phrasal Verbs - Grade 6</title>
 <style>
-body { margin:0; font-family:Arial; background:#87ceeb; overflow:hidden; }
-#logoScreen { position:fixed; top:0; left:0; width:100%; height:100%; display:flex; justify-content:center; align-items:center; background:white; z-index:100;}
-#gameContainer { display:none; position:relative; width:100%; height:100vh; overflow:hidden; }
-#snakeCanvas { display:block; margin:auto; background:#87ceeb; }
-#questionBox { position:absolute; top:10px; left:50%; transform:translateX(-50%); width:300px; background:white; border-radius:10px; padding:15px; text-align:center; z-index:50;}
-#questionText { font-weight:bold; margin-bottom:10px; }
-button.optionBtn { display:block; width:80%; margin:5px auto; padding:8px; border:none; border-radius:5px; background:#eee; cursor:pointer; font-size:14px; }
-button.optionBtn:hover { background:#ddd; }
-#feedback { text-align:center; font-weight:bold; margin-top:10px; font-size:16px; }
-#restartBtn { display:none; margin:20px auto; padding:10px 20px; font-size:18px; cursor:pointer; background:#4caf50; color:white; border:none; border-radius:5px; display:block;}
-.particle { position:absolute; width:6px; height:6px; background:linear-gradient(to right,#ff0,#f0f); border-radius:50%; pointer-events:none; animation: floatParticle 1s linear forwards;}
-@keyframes floatParticle {0%{opacity:1; transform:translate(0,0);} 100%{opacity:0; transform:translate(calc(-50px + 100px*var(--randX)),-50px);}}
+body { margin:0; font-family: Arial; background: #87ceeb; display:flex; justify-content:center; align-items:center; height:100vh; }
+#gameContainer { background: #fff; width: 90%; max-width: 500px; padding:20px; border-radius:10px; box-shadow:0 0 10px #aaa; text-align:center; }
+#question { font-weight:bold; font-size:18px; margin-bottom:15px; }
+.options { display:flex; flex-wrap:wrap; justify-content:center; gap:10px; }
+.option { background:#ffeb3b; padding:10px 15px; border-radius:5px; cursor:pointer; user-select:none; font-size:16px; min-width:80px; text-align:center; }
+.option.wiggle { animation: wiggle 0.5s; }
+@keyframes wiggle { 0%{transform:rotate(0deg);} 25%{transform:rotate(-10deg);} 50%{transform:rotate(10deg);} 75%{transform:rotate(-10deg);} 100%{transform:rotate(0deg);} }
+#feedback { margin-top:15px; font-weight:bold; height:24px; }
+#tick { display:none; font-size:30px; color:green; margin-top:10px; }
+#restartBtn { display:none; margin-top:20px; padding:10px 20px; font-size:18px; cursor:pointer; background:#4caf50; color:white; border:none; border-radius:5px; }
+.confetti-piece { position:absolute; width:8px; height:8px; background:linear-gradient(to right,#ff0,#f0f); top:0; animation: fall 2s linear forwards;}
+@keyframes fall {0%{transform:translateY(0);} 100%{transform:translateY(400px); opacity:0;}}
 </style>
 </head>
 <body>
 
-<div id="logoScreen">
-<img src="assets/innovine-logo.png" alt="Innovine Logo" width="200">
-</div>
-
 <div id="gameContainer">
-<canvas id="snakeCanvas" width="400" height="400"></canvas>
-<div id="questionBox">
-<div id="questionText"></div>
-<div id="optionsContainer"></div>
+<div id="question"></div>
+<div class="options" id="optionsContainer"></div>
 <div id="feedback"></div>
-</div>
+<div id="tick">✔</div>
 <button id="restartBtn">Play Again</button>
+</div>
 
 <audio id="correctSound" src="assets/correct.mp3"></audio>
 <audio id="wrongSound" src="assets/wrong.mp3"></audio>
 <audio id="clapSound" src="assets/clapping.mp3"></audio>
-</div>
 
 <script>
-// --- Questions ---
 const questions = [
-{sentence:"He couldn’t ___ the heavy box by himself.", options:["pick up","break down","turn on"], answer:"pick up"},
-{sentence:"She wants to ___ her old clothes to charity.", options:["give away","put off","look after"], answer:"give away"},
-{sentence:"We need to ___ the meeting to next week.", options:["put off","pick up","break up"], answer:"put off"},
-{sentence:"The children will ___ the playground at noon.", options:["run into","leave","break down"], answer:"leave"},
-{sentence:"Can you ___ the music for a moment?", options:["turn off","turn down","pick up"], answer:"turn off"},
-{sentence:"I accidentally ___ my keys in the car.", options:["locked up","ran into","look after"], answer:"locked up"},
-{sentence:"The car suddenly ___ in the middle of the road.", options:["broke down","look up","pick up"], answer:"broke down"},
-{sentence:"He tried to ___ the conversation with a joke.", options:["break up","lighten up","give away"], answer:"lighten up"},
-{sentence:"Please ___ the lights when you leave the room.", options:["turn off","put off","pick up"], answer:"turn off"},
-{sentence:"We need to ___ the project before the deadline.", options:["finish up","look after","give away"], answer:"finish up"}
+  {q:"He couldn’t ___ the heavy box by himself.", correct:"pick up", wrong:["break down","turn on"]},
+  {q:"She wants to ___ her old clothes to charity.", correct:"give away", wrong:["put off","look after"]},
+  {q:"We need to ___ the meeting to next week.", correct:"put off", wrong:["pick up","break up"]},
+  {q:"The children will ___ the playground at noon.", correct:"leave", wrong:["run into","break down"]},
+  {q:"Can you ___ the music for a moment?", correct:"turn off", wrong:["turn down","pick up"]},
+  {q:"I accidentally ___ my keys in the car.", correct:"locked up", wrong:["ran into","look after"]},
+  {q:"The car suddenly ___ in the middle of the road.", correct:"broke down", wrong:["look up","pick up"]},
+  {q:"He tried to ___ the conversation with a joke.", correct:"lighten up", wrong:["break up","give away"]},
+  {q:"Please ___ the lights when you leave the room.", correct:"turn off", wrong:["put off","pick up"]},
+  {q:"We need to ___ the project before the deadline.", correct:"finish up", wrong:["look after","give away"]}
 ];
 
-let currentQuestion = 0;
-const canvas = document.getElementById("snakeCanvas");
-const ctx = canvas.getContext("2d");
-const box = 20;
-let snake = [{x:5*box, y:5*box}];
-let direction = "RIGHT"; // initial direction
-let gameInterval;
-
-const questionText = document.getElementById("questionText");
+let currentQ=0, wrongAttempts=0;
+const questionEl = document.getElementById("question");
 const optionsContainer = document.getElementById("optionsContainer");
 const feedback = document.getElementById("feedback");
+const tick = document.getElementById("tick");
 const restartBtn = document.getElementById("restartBtn");
-const correctSound = document.getElementById("correctSound");
-const wrongSound = document.getElementById("wrongSound");
-const clapSound = document.getElementById("clapSound");
+const correctSound=document.getElementById("correctSound");
+const wrongSound=document.getElementById("wrongSound");
+const clapSound=document.getElementById("clapSound");
 
-// --- Controls ---
-document.addEventListener("keydown", function(e){
-  if(e.key==="ArrowLeft" && direction!="RIGHT") direction="LEFT";
-  else if(e.key==="ArrowRight" && direction!="LEFT") direction="RIGHT";
-  else if(e.key==="ArrowUp" && direction!="DOWN") direction="UP";
-  else if(e.key==="ArrowDown" && direction!="UP") direction="DOWN";
-});
-
-// --- Particle effect ---
-function createParticles(x,y){
-  for(let i=0;i<10;i++){
-    const p = document.createElement('div');
-    p.className='particle';
-    p.style.left=x+'px';
-    p.style.top=y+'px';
-    p.style.setProperty('--randX', Math.random());
-    document.body.appendChild(p);
-    setTimeout(()=>document.body.removeChild(p),1000);
-  }
-}
-
-// --- Show Question ---
 function showQuestion(){
-  const q = questions[currentQuestion];
-  questionText.textContent=q.sentence;
+  tick.style.display="none";
+  wrongAttempts=0;
+  const q = questions[currentQ];
+  questionEl.textContent = q.q;
   optionsContainer.innerHTML="";
-  q.options.sort(()=>Math.random()-0.5).forEach(opt=>{
-    const btn=document.createElement("button");
-    btn.className="optionBtn";
+  const options = [q.correct,...q.wrong].sort(()=>Math.random()-0.5);
+  options.forEach(opt=>{
+    const btn = document.createElement("div");
+    btn.className="option";
     btn.textContent=opt;
-    btn.onclick=()=>checkAnswer(opt);
+    btn.onclick = ()=>checkAnswer(btn,opt,q.correct);
     optionsContainer.appendChild(btn);
   });
   feedback.textContent="";
 }
 
-// --- Check Answer ---
-function checkAnswer(selected){
-  const correct = questions[currentQuestion].answer;
-  if(selected===correct){
-    feedback.textContent="Correct! 🎉";
+function checkAnswer(btn,opt,correct){
+  if(opt===correct){
+    feedback.textContent="Good Job! 🎉";
     feedback.style.color="green";
+    tick.style.display="block";
     correctSound.currentTime=0; correctSound.play();
-    // grow snake
-    snake.push({...snake[snake.length-1]});
-  }else{
-    feedback.textContent="Wrong! ❌";
-    feedback.style.color="red";
+    setTimeout(nextQuestion,800);
+  } else {
+    wrongAttempts++;
     wrongSound.currentTime=0; wrongSound.play();
+    btn.classList.add("wiggle");
+    setTimeout(()=>btn.classList.remove("wiggle"),500);
   }
-  currentQuestion++;
-  if(currentQuestion>=questions.length){
-    feedback.textContent="🎉 You finished all questions!";
+}
+
+function nextQuestion(){
+  currentQ++;
+  if(currentQ>=questions.length){
+    showConfetti();
+    feedback.textContent="🎉 You completed all questions!";
     clapSound.currentTime=0; clapSound.play();
     restartBtn.style.display="block";
-  }else{
-    setTimeout(showQuestion,500);
-  }
+  } else showQuestion();
 }
 
-// --- Draw Snake ---
-function draw(){
-  ctx.fillStyle="#87ceeb";
-  ctx.fillRect(0,0,canvas.width,canvas.height);
-
-  for(let i=0;i<snake.length;i++){
-    ctx.fillStyle=(i===0)?"#ff4136":"#ff7979";
-    ctx.fillRect(snake[i].x, snake[i].y, box, box);
+function showConfetti(){
+  for(let i=0;i<50;i++){
+    const c = document.createElement("div");
+    c.className="confetti-piece";
+    c.style.left=Math.random()*window.innerWidth+"px";
+    c.style.background=`hsl(${Math.random()*360},100%,50%)`;
+    document.body.appendChild(c);
+    setTimeout(()=>document.body.removeChild(c),2000);
   }
-
-  let snakeX = snake[0].x;
-  let snakeY = snake[0].y;
-  if(direction=="LEFT") snakeX-=box;
-  else if(direction=="RIGHT") snakeX+=box;
-  else if(direction=="UP") snakeY-=box;
-  else if(direction=="DOWN") snakeY+=box;
-
-  // Collision with wall
-  if(snakeX<0 || snakeY<0 || snakeX>=canvas.width || snakeY>=canvas.height){
-    clearInterval(gameInterval);
-    alert("Game Over!");
-    restartBtn.style.display="block";
-    return;
-  }
-
-  snake.pop();
-  snake.unshift({x:snakeX, y:snakeY});
 }
-
-// --- Start Game ---
-setTimeout(()=>{
-  document.getElementById("logoScreen").style.display="none";
-  document.getElementById("gameContainer").style.display="block";
-  showQuestion();
-  gameInterval=setInterval(draw,150);
-},5000);
 
 restartBtn.onclick=()=>location.reload();
+
+// start the first question
+showQuestion();
 </script>
+
 </body>
 </html>
