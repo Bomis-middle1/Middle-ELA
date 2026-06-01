@@ -5,13 +5,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sentence Builder Adventure - Grade 7</title>
+<title>Sentence Elements Drag and Drop</title>
 <style>
-body { margin:0; font-family:Arial; background:#e8f5e9; display:flex; justify-content:center; align-items:center; height:100vh; }
-#logoScreen { position:fixed; top:0; left:0; width:100%; height:100%; display:flex; justify-content:center; align-items:center; background:white; z-index:100;}
+body { margin:0; font-family:Arial; background:#e8f5e9; display:flex; justify-content:center; align-items:center; height:100vh; overflow:hidden; }
+#logoScreen { position:fixed; top:0; left:0; width:100%; height:100%; display:flex; justify-content:center; align-items:center; background:white; z-index:100; }
 #gameContainer { display:none; width:95%; max-width:600px; text-align:center; padding:20px; background:#fff; border-radius:10px; box-shadow:0 0 10px #aaa; position:relative; }
 #sentence { font-size:18px; font-weight:bold; margin-bottom:15px; }
-.blank { display:inline-block; width:140px; border-bottom:2px solid #000; margin:0 5px; font-weight:bold; cursor:pointer; }
+.blank { display:inline-block; width:160px; border-bottom:2px solid #000; margin:0 5px; font-weight:bold; cursor:pointer; min-height:24px; }
 .options { display:flex; flex-wrap:wrap; justify-content:center; gap:10px; margin-top:15px; }
 .option { background:#ffeb3b; padding:8px 12px; border-radius:5px; cursor:pointer; user-select:none; min-width:80px; text-align:center; }
 .option.wiggle { animation: wiggle 0.5s; }
@@ -43,18 +43,18 @@ body { margin:0; font-family:Arial; background:#e8f5e9; display:flex; justify-co
 <audio id="clapSound" src="assets/clapping.mp3"></audio>
 
 <script>
-// --- Creative sentences for interactive learning ---
+// --- Questions ---
 const sentences = [
-  {text:"___ ___ ___ a giant sandcastle on the beach.", blanks:["subject","predicate","object"], options:["The kids","built","a giant sandcastle","She","painted","a picture","The cat","chased","the mouse"]},
-  {text:"___ ___ ___ a delicious smoothie in the kitchen.", blanks:["subject","predicate","object"], options:["Mom","made","a delicious smoothie","Ali","wrote","a letter","The dog","barked","loudly"]},
-  {text:"___ ___ ___ across the finish line in record time.", blanks:["subject","predicate","complement"], options:["The athlete","ran","fast","The teacher","explained","clearly","The sun","shines","brightly"]},
-  {text:"___ ___ ___ for the surprise birthday party.", blanks:["subject","predicate","object"], options:["Sarah","prepared","a cake","He","solved","the puzzle","The team","won","the match"]},
-  {text:"___ ___ ___ to help the lost kitten.", blanks:["subject","predicate","complement"], options:["The volunteers","ran","quickly","The students","studied","hard","The sun","rises","early"]},
-  {text:"___ ___ ___ a note on the fridge.", blanks:["subject","predicate","object"], options:["Ali","pinned","a note","The bird","sang","a song","She","watched","TV"]},
-  {text:"___ ___ ___ a funny story for the class.", blanks:["subject","predicate","object"], options:["The teacher","told","a funny story","He","ran","quickly","They","built","a house"]},
-  {text:"___ ___ ___ very loudly during the play.", blanks:["subject","predicate","complement"], options:["The actor","spoke","clearly","She","painted","beautifully","The kids","jumped","high"]},
-  {text:"___ ___ ___ a huge pile of homework.", blanks:["subject","predicate","object"], options:["The students","finished","a huge pile of homework","Mom","cooked","dinner","The dog","chased","the cat"]},
-  {text:"___ ___ ___ the new software smoothly.", blanks:["subject","predicate","complement"], options:["The programmer","installed","the software","Ali","wrote","a letter","The team","won","easily"]}
+  {text:"The little girl skipped happily to school.", ask:"subject", options:["The little girl","skipped happily","to school","Ali","ran fast"]},
+  {text:"The dog barked loudly at the stranger.", ask:"predicate", options:["The dog","barked loudly","at the stranger","jumped high"]},
+  {text:"Ali finished his homework before dinner.", ask:"object", options:["Ali","finished","his homework","before dinner"]},
+  {text:"The sun shines brightly in the sky.", ask:"complement", options:["The sun","shines","brightly","in the sky"]},
+  {text:"The students cheered for the winning team.", ask:"subject", options:["The students","cheered","for the winning team","They"]},
+  {text:"She painted a beautiful landscape yesterday.", ask:"predicate", options:["She","painted","a beautiful landscape","yesterday"]},
+  {text:"My father bought a new car last week.", ask:"object", options:["My father","bought","a new car","last week"]},
+  {text:"The chef cooked the meal perfectly.", ask:"complement", options:["The chef","cooked","the meal","perfectly"]},
+  {text:"Tom and Jerry ran across the garden.", ask:"subject", options:["Tom and Jerry","ran","across the garden","quickly"]},
+  {text:"The wind blew the leaves all over the yard.", ask:"predicate", options:["The wind","blew","the leaves","all over the yard"]}
 ];
 
 let current=0;
@@ -67,16 +67,12 @@ const correctSound=document.getElementById("correctSound");
 const wrongSound=document.getElementById("wrongSound");
 const clapSound=document.getElementById("clapSound");
 
-// --- Show current sentence ---
 function showSentence(){
   tick.style.display="none";
   feedback.textContent="";
   const s = sentences[current];
-  let displayed = s.text;
-  s.blanks.forEach(b=> displayed = displayed.replace("___","<span class='blank'>___</span>"));
-  sentenceEl.innerHTML = displayed;
-
-  // Show options
+  sentenceEl.innerHTML = s.text.replace(s.ask==="subject"?"The little girl":"The dog","<span class='blank'>___</span>");
+  
   optionsContainer.innerHTML="";
   const opts = s.options.sort(()=>Math.random()-0.5);
   opts.forEach(opt=>{
@@ -88,19 +84,19 @@ function showSentence(){
   });
 }
 
-// --- Check answer ---
-function checkAnswer(btn,opt,sentence){
-  const correctWords = sentence.options.slice(0,sentence.blanks.length);
-  if(correctWords.includes(opt)){
+function checkAnswer(btn,opt,s){
+  let correctWord;
+  if(s.ask==="subject") correctWord = s.options[0];
+  else if(s.ask==="predicate") correctWord = s.options[1];
+  else if(s.ask==="object") correctWord = s.options[2];
+  else if(s.ask==="complement") correctWord = s.options[3];
+
+  if(opt===correctWord){
     feedback.textContent="Good Job! 🎉";
     feedback.style.color="green";
     tick.style.display="block";
     correctSound.currentTime=0; correctSound.play();
-    btn.remove();
-    sentence.options = sentence.options.filter(w=>w!==opt);
-    if(sentence.options.length <= sentence.options.length - sentence.blanks.length){
-      setTimeout(nextSentence,800);
-    }
+    setTimeout(nextSentence,800);
   } else {
     feedback.textContent="Try Again! ❌";
     feedback.style.color="red";
@@ -110,38 +106,23 @@ function checkAnswer(btn,opt,sentence){
   }
 }
 
-// --- Next sentence ---
 function nextSentence(){
   current++;
   if(current>=sentences.length){
-    feedback.textContent="🎉 You completed all sentences!";
+    feedback.textContent="🎉 You completed all questions!";
     clapSound.currentTime=0; clapSound.play();
     restartBtn.style.display="block";
   } else showSentence();
 }
 
-// --- Confetti ---
-function createConfetti(){
-  for(let i=0;i<20;i++){
-    const c=document.createElement("div");
-    c.className="confetti-piece";
-    c.style.left=Math.random()*window.innerWidth+"px";
-    c.style.background=`hsl(${Math.random()*360},100%,50%)`;
-    document.body.appendChild(c);
-    setTimeout(()=>c.remove(),1500);
-  }
-}
-
-// --- Restart ---
 restartBtn.onclick=()=>location.reload();
 
-// --- Logo splash ---
+// Logo splash
 setTimeout(()=>{
   document.getElementById("logoScreen").style.display="none";
   document.getElementById("gameContainer").style.display="block";
   showSentence();
 },5000);
 </script>
-
 </body>
 </html>
