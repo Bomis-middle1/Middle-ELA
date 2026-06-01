@@ -1,1 +1,141 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Idiom Adventure Path - Grade 6</title>
+<style>
+body { margin:0; font-family:Arial; background:#f0f8ff; display:flex; justify-content:center; align-items:center; height:100vh; }
+#logoScreen { position:fixed; top:0; left:0; width:100%; height:100%; display:flex; justify-content:center; align-items:center; background:white; z-index:100;}
+#gameContainer { display:none; background:#fff; width:90%; max-width:600px; padding:20px; border-radius:10px; box-shadow:0 0 10px #aaa; text-align:center; position:relative;}
+#path { position:relative; height:200px; background:#cceeff; margin-bottom:20px; border-radius:10px; overflow:hidden;}
+#player { position:absolute; width:40px; height:40px; background:#ff4136; border-radius:50%; top:80px; left:0;}
+#question { font-weight:bold; font-size:16px; margin-bottom:10px; }
+.options { display:flex; flex-wrap:wrap; justify-content:center; gap:10px; margin-top:10px;}
+.option { background:#ffeb3b; padding:10px 15px; border-radius:5px; cursor:pointer; user-select:none; min-width:90px; text-align:center;}
+.option.wiggle { animation: wiggle 0.5s; }
+@keyframes wiggle {0%{transform:rotate(0deg);}25%{transform:rotate(-10deg);}50%{transform:rotate(10deg);}75%{transform:rotate(-10deg);}100%{transform:rotate(0deg);}}
+#feedback { margin-top:10px; height:24px; font-weight:bold; }
+#tick { display:none; font-size:30px; color:green; margin-top:10px; }
+#restartBtn { display:none; margin-top:20px; padding:10px 20px; font-size:18px; cursor:pointer; background:#4caf50; color:white; border:none; border-radius:5px; }
+.confetti-piece { position:absolute; width:8px; height:8px; border-radius:50%; top:0; animation: fall 2s linear forwards;}
+@keyframes fall {0%{transform:translateY(0);} 100%{transform:translateY(200px); opacity:0;}}
+</style>
+</head>
+<body>
+
+<div id="logoScreen">
+<img src="assets/innovine-logo.png" alt="Innovine Logo" width="200">
+</div>
+
+<div id="gameContainer">
+<div id="path"><div id="player"></div></div>
+<div id="question"></div>
+<div class="options" id="optionsContainer"></div>
+<div id="feedback"></div>
+<div id="tick">✔</div>
+<button id="restartBtn">Play Again</button>
+</div>
+
+<audio id="correctSound" src="assets/correct.mp3"></audio>
+<audio id="wrongSound" src="assets/wrong.mp3"></audio>
+<audio id="clapSound" src="assets/clapping.mp3"></audio>
+
+<script>
+const questions = [
+{q:"After fixing the roof perfectly, John really ___", correct:"hit the nail on the head", wrong:["bite the bullet","pull someone's leg","kick the bucket","burn the midnight oil","cry over spilt milk","cost an arm and a leg","break the ice","barking up the wrong tree","in hot water"]},
+{q:"She accepted the difficult task without complaining, she had to ___", correct:"bite the bullet", wrong:["hit the nail on the head","pull someone's leg","kick the bucket","burn the midnight oil","cry over spilt milk","cost an arm and a leg","break the ice","barking up the wrong tree","in hot water"]},
+{q:"I stayed up studying all night for the test, I really ___", correct:"burn the midnight oil", wrong:["hit the nail on the head","bite the bullet","pull someone's leg","kick the bucket","cry over spilt milk","cost an arm and a leg","break the ice","barking up the wrong tree","in hot water"]},
+{q:"Don’t worry about the mistake, there’s no use ___", correct:"cry over spilt milk", wrong:["hit the nail on the head","bite the bullet","pull someone's leg","kick the bucket","burn the midnight oil","cost an arm and a leg","break the ice","barking up the wrong tree","in hot water"]},
+{q:"The old car finally broke down; it’s about to ___", correct:"kick the bucket", wrong:["hit the nail on the head","bite the bullet","pull someone's leg","burn the midnight oil","cry over spilt milk","cost an arm and a leg","break the ice","barking up the wrong tree","in hot water"]},
+{q:"That new phone was very expensive, it really ___", correct:"cost an arm and a leg", wrong:["hit the nail on the head","bite the bullet","pull someone's leg","kick the bucket","burn the midnight oil","cry over spilt milk","break the ice","barking up the wrong tree","in hot water"]},
+{q:"To start the conversation, he told a funny joke to ___", correct:"break the ice", wrong:["hit the nail on the head","bite the bullet","pull someone's leg","kick the bucket","burn the midnight oil","cry over spilt milk","cost an arm and a leg","barking up the wrong tree","in hot water"]},
+{q:"She’s accusing the wrong person, she’s ___", correct:"barking up the wrong tree", wrong:["hit the nail on the head","bite the bullet","pull someone's leg","kick the bucket","burn the midnight oil","cry over spilt milk","break the ice","cost an arm and a leg","in hot water"]},
+{q:"He tricked his friend jokingly, he wanted to ___", correct:"pull someone's leg", wrong:["hit the nail on the head","bite the bullet","kick the bucket","burn the midnight oil","cry over spilt milk","cost an arm and a leg","break the ice","barking up the wrong tree","in hot water"]},
+{q:"After cheating, he was really ___", correct:"in hot water", wrong:["hit the nail on the head","bite the bullet","pull someone's leg","kick the bucket","burn the midnight oil","cry over spilt milk","cost an arm and a leg","break the ice","barking up the wrong tree"]}
+];
+
+let currentQ=0, wrongAttempts=0;
+const questionEl = document.getElementById("question");
+const optionsContainer = document.getElementById("optionsContainer");
+const feedback = document.getElementById("feedback");
+const tick = document.getElementById("tick");
+const player = document.getElementById("player");
+const restartBtn = document.getElementById("restartBtn");
+const correctSound=document.getElementById("correctSound");
+const wrongSound=document.getElementById("wrongSound");
+const clapSound=document.getElementById("clapSound");
+
+function showQuestion(){
+  tick.style.display="none";
+  wrongAttempts=0;
+  const q = questions[currentQ];
+  questionEl.textContent = q.q;
+  optionsContainer.innerHTML="";
+  const opts = [q.correct,...q.wrong].sort(()=>Math.random()-0.5);
+  opts.forEach(opt=>{
+    const btn = document.createElement("div");
+    btn.className="option";
+    btn.textContent=opt;
+    btn.onclick = ()=>checkAnswer(btn,opt,q.correct);
+    optionsContainer.appendChild(btn);
+  });
+  feedback.textContent="";
+}
+
+function checkAnswer(btn,opt,correct){
+  if(opt===correct){
+    feedback.textContent="Good Job! 🎉";
+    feedback.style.color="green";
+    tick.style.display="block";
+    correctSound.currentTime=0; correctSound.play();
+    movePlayer();
+    setTimeout(nextQuestion,800);
+  } else {
+    wrongAttempts++;
+    wrongSound.currentTime=0; wrongSound.play();
+    btn.classList.add("wiggle");
+    setTimeout(()=>btn.classList.remove("wiggle"),500);
+  }
+}
+
+function movePlayer(){
+  const step = 50; // distance to move along path
+  const currentLeft = parseInt(player.style.left||0);
+  player.style.left = (currentLeft + step) + "px";
+}
+
+function nextQuestion(){
+  currentQ++;
+  if(currentQ>=questions.length){
+    showConfetti();
+    feedback.textContent="🎉 You completed all questions!";
+    clapSound.currentTime=0; clapSound.play();
+    restartBtn.style.display="block";
+  } else showQuestion();
+}
+
+function showConfetti(){
+  for(let i=0;i<50;i++){
+    const c = document.createElement("div");
+    c.className="confetti-piece";
+    c.style.left=Math.random()*window.innerWidth+"px";
+    c.style.background=`hsl(${Math.random()*360},100%,50%)`;
+    document.body.appendChild(c);
+    setTimeout(()=>document.body.removeChild(c),2000);
+  }
+}
+
+restartBtn.onclick=()=>location.reload();
+
+// Show logo for 5 seconds
+setTimeout(()=>{
+  document.getElementById("logoScreen").style.display="none";
+  document.getElementById("gameContainer").style.display="block";
+  showQuestion();
+},5000);
+</script>
+
+</body>
+</html>
