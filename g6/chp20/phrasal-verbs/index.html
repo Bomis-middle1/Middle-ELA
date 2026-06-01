@@ -4,41 +4,41 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Phrasal Verb Maze Runner</title>
+<title>Phrasal Verb Racing Game</title>
 <style>
-body { margin:0; font-family: Arial; background:#e6f7ff; overflow:hidden; }
+body { margin:0; font-family: Arial; background:#87ceeb; overflow:hidden; }
 #logoScreen { position:fixed; top:0; left:0; width:100%; height:100%; display:flex; justify-content:center; align-items:center; background:white; z-index:100;}
 #gameContainer { display:none; width:100%; height:100vh; position:relative; overflow:hidden;}
-#maze { position:relative; width:100%; height:80%; background:#b3e0ff; margin-top:20px; border:3px solid #007acc; }
-.cell { width:50px; height:50px; float:left; box-sizing:border-box; border:1px solid #007acc; position:relative; }
-.wall { background:#007acc; }
-#player { width:40px; height:40px; background:#ff4136; position:absolute; transition:left 0.2s, top 0.2s; z-index:10; border-radius:5px; }
-#questionBox { display:none; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:300px; background:white; padding:20px; border-radius:10px; text-align:center; box-shadow:0 0 15px #0003; z-index:50; }
+#track { position:absolute; bottom:50px; left:0; width:100%; height:150px; background:#333; }
+#car { position:absolute; bottom:60px; left:50px; width:60px; height:40px; background:red; border-radius:5px; transition:left 0.3s; }
+#questionBox { display:none; position:absolute; top:30%; left:50%; transform:translate(-50%,-50%); width:320px; background:white; padding:20px; border-radius:10px; text-align:center; box-shadow:0 0 15px #0003; z-index:50; }
 #questionBox button { margin:5px; padding:10px 15px; cursor:pointer;}
 #feedback { margin-top:10px; font-weight:bold;}
-#treasure { position:absolute; bottom:20px; left:50%; width:60px; height:60px; transform:translateX(-50%); display:none; background:gold; border-radius:50%; text-align:center; line-height:60px; font-weight:bold;}
-#restartBtn { position:absolute; display:none; left:50%; top:90%; transform:translateX(-50%); padding:10px 20px; font-size:18px; cursor:pointer;}
-#volumeSlider { position:absolute; bottom:10px; left:50%; transform:translateX(-50%);}
+#finishLine { position:absolute; top:50px; right:50px; width:50px; height:150px; background:gold; border-radius:5px;}
+#treasure { position:absolute; top:50px; right:100px; width:60px; height:60px; display:none; background:gold; border-radius:50%; text-align:center; line-height:60px; font-weight:bold;}
+#restartBtn { position:absolute; display:none; left:50%; top:80%; transform:translateX(-50%); padding:10px 20px; font-size:18px; cursor:pointer;}
 .particle { position:absolute; width:6px; height:6px; background:linear-gradient(to right,#ff0,#f0f); border-radius:50%; pointer-events:none; animation: floatParticle 1s linear forwards;}
-@keyframes floatParticle {0%{opacity:1; transform:translate(0,0);} 100%{opacity:0; transform:translate(calc(-50px + 100px*var(--randX)),-100px);}}
+@keyframes floatParticle {0%{opacity:1; transform:translate(0,0);} 100%{opacity:0; transform:translate(calc(-50px + 100px*var(--randX)),-50px);}}
+#volumeSlider { position:absolute; bottom:10px; left:50%; transform:translateX(-50%);}
 </style>
 </head>
 <body>
 
 <div id="logoScreen">
-  <img src="assets/innovine-logo.png" alt="Innovine Logo" width="200">
+<img src="assets/innovine-logo.png" alt="Innovine Logo" width="200">
 </div>
 
 <div id="gameContainer">
-<div id="maze"></div>
-<div id="player"></div>
+<div id="track"></div>
+<div id="car"></div>
+<div id="finishLine"></div>
+<div id="treasure">🏆</div>
 <div id="questionBox">
 <div id="questionText"></div>
 <div id="optionsContainer"></div>
 <div id="feedback"></div>
 </div>
-<div id="treasure">🏆</div>
-<button id="restartBtn">Restart Game</button>
+<button id="restartBtn">Restart Race</button>
 <input type="range" id="volumeSlider" min="0" max="1" step="0.1" value="0.8">
 
 <audio id="correctSound" src="assets/correct.mp3"></audio>
@@ -47,13 +47,7 @@ body { margin:0; font-family: Arial; background:#e6f7ff; overflow:hidden; }
 </div>
 
 <script>
-// --- Maze Setup ---
-const mazeRows = 8;
-const mazeCols = 10;
-const maze = document.getElementById('maze');
-let player = document.getElementById('player');
-const cellSize = 50;
-
+// --- Questions ---
 const questions = [
   {sentence:"He couldn’t ___ the heavy box by himself.", options:["pick up","break down","turn on"], answer:"pick up"},
   {sentence:"She wants to ___ her old clothes to charity.", options:["give away","put off","look after"], answer:"give away"},
@@ -68,15 +62,13 @@ const questions = [
 ];
 
 let currentQuestionIndex = 0;
-let playerPos = {row:0,col:0};
-let cellElements = [];
-
-const questionBox = document.getElementById('questionBox');
-const questionText = document.getElementById('questionText');
-const optionsContainer = document.getElementById('optionsContainer');
-const feedback = document.getElementById('feedback');
-const treasure = document.getElementById('treasure');
-const restartBtn = document.getElementById('restartBtn');
+let car = document.getElementById('car');
+let questionBox = document.getElementById('questionBox');
+let questionText = document.getElementById('questionText');
+let optionsContainer = document.getElementById('optionsContainer');
+let feedback = document.getElementById('feedback');
+let treasure = document.getElementById('treasure');
+let restartBtn = document.getElementById('restartBtn');
 const correctSound = document.getElementById('correctSound');
 const wrongSound = document.getElementById('wrongSound');
 const clapSound = document.getElementById('clapSound');
@@ -91,39 +83,31 @@ correctSound.volume = volumeSlider.value;
 wrongSound.volume = volumeSlider.value;
 clapSound.volume = volumeSlider.value;
 
-// --- Logo splash ---
+// --- Logo Splash ---
 setTimeout(()=>{
   document.getElementById('logoScreen').style.display='none';
   document.getElementById('gameContainer').style.display='block';
-  createMaze();
-  updatePlayerPosition();
+  showQuestion(currentQuestionIndex);
 },5000);
 
-// --- Create Maze ---
-function createMaze(){
-  maze.innerHTML='';
-  cellElements = [];
-  for(let r=0;r<mazeRows;r++){
-    for(let c=0;c<mazeCols;c++){
-      const cell = document.createElement('div');
-      cell.className='cell';
-      cell.style.width=cellSize+'px';
-      cell.style.height=cellSize+'px';
-      maze.appendChild(cell);
-      cellElements.push({row:r,col:c,el:cell});
-    }
-  }
+// --- Show Question ---
+function showQuestion(index){
+  questionBox.style.display='block';
+  questionText.textContent=questions[index].sentence;
+  optionsContainer.innerHTML='';
+  feedback.innerHTML='';
+  const opts = [...questions[index].options].sort(()=>Math.random()-0.5);
+  opts.forEach(opt=>{
+    const btn = document.createElement('button');
+    btn.textContent=opt;
+    btn.onclick = ()=>checkAnswer(opt);
+    optionsContainer.appendChild(btn);
+  });
 }
 
-// --- Player Position ---
-function updatePlayerPosition(){
-  player.style.left = playerPos.col*cellSize + 5 + 'px';
-  player.style.top = playerPos.row*cellSize + 5 + 'px';
-}
-
-// --- Particle effect ---
+// --- Particle Effect ---
 function createParticles(x,y){
-  for(let i=0;i<10;i++){
+  for(let i=0;i<15;i++){
     const p = document.createElement('div');
     p.className='particle';
     p.style.left = x+'px';
@@ -134,21 +118,6 @@ function createParticles(x,y){
   }
 }
 
-// --- Show Question ---
-function showQuestion(){
-  questionBox.style.display='block';
-  questionText.textContent=questions[currentQuestionIndex].sentence;
-  optionsContainer.innerHTML='';
-  feedback.innerHTML='';
-  const opts = [...questions[currentQuestionIndex].options].sort(()=>Math.random()-0.5);
-  opts.forEach(opt=>{
-    const btn = document.createElement('button');
-    btn.textContent=opt;
-    btn.onclick = ()=>checkAnswer(opt);
-    optionsContainer.appendChild(btn);
-  });
-}
-
 // --- Check Answer ---
 function checkAnswer(selected){
   const correct = questions[currentQuestionIndex].answer;
@@ -156,9 +125,9 @@ function checkAnswer(selected){
     feedback.textContent="Correct! 🎉";
     feedback.style.color="green";
     correctSound.currentTime=0; correctSound.play();
-    createParticles(player.offsetLeft,player.offsetTop);
+    createParticles(car.offsetLeft,car.offsetTop);
     questionBox.style.display='none';
-    movePlayerForward();
+    moveCarForward();
     currentQuestionIndex++;
     if(currentQuestionIndex===questions.length){
       treasure.style.display='block';
@@ -172,32 +141,19 @@ function checkAnswer(selected){
   }
 }
 
-// --- Move Player ---
-function movePlayerForward(){
-  if(playerPos.col<mazeCols-1){
-    playerPos.col++;
-  } else if(playerPos.row<mazeRows-1){
-    playerPos.row++;
-    playerPos.col=0;
-  }
-  updatePlayerPosition();
+// --- Move Car ---
+function moveCarForward(){
+  let currentLeft = parseInt(car.style.left) || 50;
+  car.style.left = (currentLeft + 60) + 'px';
 }
-
-// --- Key Controls (optional for desktop) ---
-document.addEventListener('keydown', e=>{
-  if(e.key==='ArrowRight' && playerPos.col<mazeCols-1){playerPos.col++; updatePlayerPosition();}
-  if(e.key==='ArrowLeft' && playerPos.col>0){playerPos.col--; updatePlayerPosition();}
-  if(e.key==='ArrowDown' && playerPos.row<mazeRows-1){playerPos.row++; updatePlayerPosition();}
-  if(e.key==='ArrowUp' && playerPos.row>0){playerPos.row--; updatePlayerPosition();}
-});
 
 // --- Restart ---
 restartBtn.onclick = ()=>{
-  playerPos={row:0,col:0};
-  updatePlayerPosition();
+  currentQuestionIndex=0;
+  car.style.left = '50px';
   treasure.style.display='none';
   restartBtn.style.display='none';
-  currentQuestionIndex=0;
+  showQuestion(currentQuestionIndex);
 }
 </script>
 </body>
