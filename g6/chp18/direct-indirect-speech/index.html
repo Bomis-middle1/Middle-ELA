@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Magic Scroll Rescue - Direct & Indirect Speech</title>
+<title>Temple Scroll Sentence Builder</title>
 <style>
 body { margin:0; font-family: Arial; background:#f0f8ff; overflow:hidden; }
 #logoScreen { position:fixed; top:0; left:0; width:100%; height:100%; background:white; display:flex; justify-content:center; align-items:center; z-index:100; }
@@ -13,9 +13,10 @@ h2 { text-align:center; margin:10px; }
 #ladder { position:absolute; bottom:50px; left:50%; transform:translateX(-50%); width:80px; height:500px; background:#a0522d; border-radius:10px; }
 .step { width:80px; height:20px; background:#deb887; margin:10px 0; border-radius:5px; text-align:center; line-height:20px; color:#fff; font-weight:bold; }
 #player { position:absolute; width:60px; height:80px; z-index:10; left:50%; transform:translateX(-50%); bottom:50px; transition: bottom 0.3s; }
-.scroll { position:absolute; width:150px; height:50px; background:#ffe4b5; border-radius:10px; text-align:center; line-height:50px; font-weight:bold; cursor:pointer; left:50%; transform:translateX(-50%); top:20px; z-index:5; }
-#questionBox { display:none; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); background:white; padding:20px; border-radius:10px; width:80%; max-width:400px; text-align:center; box-shadow:0 0 15px #0003; z-index:50; }
-#questionBox button { margin:5px; padding:10px 20px; font-size:16px; cursor:pointer; }
+#scroll { position:absolute; width:150px; height:50px; background:#ffe4b5; border-radius:10px; text-align:center; line-height:50px; font-weight:bold; cursor:pointer; left:50%; transform:translateX(-50%); top:20px; z-index:5; }
+.word { display:inline-block; padding:5px 10px; margin:5px; background:#ffcc00; border-radius:5px; cursor:pointer; user-select:none; }
+#dropZone { min-height:40px; background:#ddd; border:2px dashed #aaa; margin:10px auto; padding:5px; width:90%; text-align:left; border-radius:5px; }
+#questionBox { display:none; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); background:white; padding:20px; border-radius:10px; width:90%; max-width:400px; text-align:center; box-shadow:0 0 15px #0003; z-index:50; }
 #feedback { margin-top:10px; font-weight:bold; }
 #treasure { position:absolute; bottom:20px; left:50%; width:120px; height:120px; transform:translateX(-50%); display:none; z-index:20; }
 #restartBtn { display:none; position:absolute; left:50%; transform:translateX(-50%); top:70%; padding:10px 30px; font-size:18px; cursor:pointer; }
@@ -24,59 +25,52 @@ h2 { text-align:center; margin:10px; }
 </head>
 <body>
 
-<!-- Logo -->
 <div id="logoScreen">
   <img src="assets/innovine-logo.png" alt="Innovine Logo" width="200">
 </div>
 
-<!-- Game -->
 <div id="gameContainer">
-  <h2>🪄 Magic Scroll Rescue - Direct & Indirect Speech 🪄</h2>
-  <div id="ladder"></div>
-  <img id="player" src="assets/player.png" alt="Player">
-  
-  <div class="scroll" id="scroll">Click Me!</div>
+<h2>🪄 Temple Scroll Sentence Builder 🪄</h2>
+<div id="ladder"></div>
+<img id="player" src="assets/player.png" alt="Player">
+<div id="scroll">Click Scroll</div>
 
-  <div id="questionBox">
-    <div id="questionText"></div>
-    <div id="optionsContainer"></div>
-    <div id="feedback"></div>
-  </div>
-
-  <img id="treasure" src="assets/treasure.png" alt="Treasure">
-  <button id="restartBtn">Restart Adventure</button>
-  <input type="range" id="volumeSlider" min="0" max="1" step="0.1" value="0.8">
+<div id="questionBox">
+<div id="dropZone">Drag words here in order...</div>
+<div id="wordPool"></div>
+<button id="submitBtn">Submit</button>
+<div id="feedback"></div>
 </div>
+
+<img id="treasure" src="assets/treasure.png" alt="Treasure">
+<button id="restartBtn">Restart Adventure</button>
+<input type="range" id="volumeSlider" min="0" max="1" step="0.1" value="0.8">
 
 <audio id="correctSound" src="assets/correct.mp3"></audio>
 <audio id="wrongSound" src="assets/wrong.mp3"></audio>
 <audio id="clapSound" src="assets/clapping.mp3"></audio>
+</div>
 
 <script>
-// --- Questions ---
+// Questions simplified
 const questions = [
-  {q:'“I can juggle five mangoes!” he shouts. Convert it.', options:["He proudly said that he could juggle five mangoes.","He shouted that he could not juggle.","He ignored it.","He quickly ran away."], answer:"He proudly said that he could juggle five mangoes."},
-  {q:'“Catch the balloon before it flies away!” says the clown.', options:["The clown instructed us to catch the balloon before it flew away.","The clown told us to ignore it.","The clown ran away.","The clown shouted nothing."], answer:"The clown instructed us to catch the balloon before it flew away."},
-  {q:'“Don’t come too close to the tiger!” squawks a parrot.', options:["The parrot warned us not to come too close to the tiger.","The parrot said nothing.","The parrot moved away.","The parrot ran."], answer:"The parrot warned us not to come too close to the tiger."},
-  {q:'“We found the hidden treasure!” yells a pirate.', options:["The pirate shouted that they had found the hidden treasure.","The pirate asked a question.","The pirate ignored it.","The pirate hid."], answer:"The pirate shouted that they had found the hidden treasure."},
-  {q:'“Taste this, it’s really sweet!” says your sister.', options:["She said that it was really sweet and asked me to taste it.","She ignored it.","She shouted.","She quickly ran away."], answer:"She said that it was really sweet and asked me to taste it."},
-  {q:'“Why did your volcano erupt?” asks the teacher.', options:["The teacher asked why our volcano had erupted.","The teacher ignored.","The teacher shouted.","The teacher left."], answer:"The teacher asked why our volcano had erupted."},
-  {q:'“Watch carefully, or you’ll miss the trick!” announces the magician.', options:["The magician told us to watch carefully or we would miss the trick.","The magician said nothing.","The magician ran away.","The magician shouted loudly."], answer:"The magician told us to watch carefully or we would miss the trick."},
-  {q:'“I am late because of the traffic!” complains your friend.', options:["He said that he was late because of the traffic.","He ignored it.","He ran away.","He shouted loudly."], answer:"He said that he was late because of the traffic."},
-  {q:'“Pass the ball quickly!” shouts the coach.', options:["The coach instructed the players to pass the ball quickly.","The coach ignored them.","The coach shouted nonsense.","The coach laughed."], answer:"The coach instructed the players to pass the ball quickly."},
-  {q:'“Don’t open the gifts until I count to ten!” says someone.', options:["They asked us not to open the gifts until they counted to ten.","They ignored us.","They opened them.","They shouted loudly."], answer:"They asked us not to open the gifts until they counted to ten."}
+  {words:["Ravi","said","that","he","was","happy"], answer:"Ravi said that he was happy"},
+  {words:["Mother","told","us","not","to","touch","the","vase"], answer:"Mother told us not to touch the vase"},
+  {words:["Anna","said","that","they","would","meet","the","next","day"], answer:"Anna said that they would meet the next day"},
+  {words:["Ali","said","that","he","could","run","fast"], answer:"Ali said that he could run fast"},
+  {words:["The","teacher","asked","us","to","open","the","book","now"], answer:"The teacher asked us to open the book now"}
 ];
 
 let currentQ = 0;
-const gameContainer = document.getElementById('gameContainer');
+const player = document.getElementById('player');
 const scroll = document.getElementById('scroll');
 const questionBox = document.getElementById('questionBox');
-const questionText = document.getElementById('questionText');
-const optionsContainer = document.getElementById('optionsContainer');
+const dropZone = document.getElementById('dropZone');
+const wordPool = document.getElementById('wordPool');
+const submitBtn = document.getElementById('submitBtn');
 const feedback = document.getElementById('feedback');
-const restartBtn = document.getElementById('restartBtn');
 const treasure = document.getElementById('treasure');
-const player = document.getElementById('player');
+const restartBtn = document.getElementById('restartBtn');
 const correctSound = document.getElementById('correctSound');
 const wrongSound = document.getElementById('wrongSound');
 const clapSound = document.getElementById('clapSound');
@@ -91,79 +85,81 @@ correctSound.volume = volumeSlider.value;
 wrongSound.volume = volumeSlider.value;
 clapSound.volume = volumeSlider.value;
 
-// --- Logo ---
+// Logo splash
 setTimeout(()=>{
   document.getElementById('logoScreen').style.display='none';
-  gameContainer.style.display='block';
-  positionScroll();
+  document.getElementById('gameContainer').style.display='block';
 },5000);
 
-// --- Position Scroll ---
-function positionScroll(){
-  scroll.style.top = "50px";
-  scroll.style.left = "50%";
-}
-
-// --- Scroll click to open question ---
+// Scroll click
 scroll.addEventListener('click', ()=>{
   showQuestion(currentQ);
 });
 
-// --- Show Question ---
+// Show question
 function showQuestion(index){
   questionBox.style.display='block';
-  const q = questions[index];
-  questionText.textContent = q.q;
-  optionsContainer.innerHTML = '';
-  q.options.forEach(opt=>{
-    const btn = document.createElement('button');
-    btn.textContent = opt;
-    btn.onclick = ()=>checkAnswer(opt);
-    optionsContainer.appendChild(btn);
+  dropZone.innerHTML="";
+  wordPool.innerHTML="";
+  feedback.innerHTML="";
+  let words = [...questions[index].words];
+  words.sort(()=>Math.random()-0.5); // shuffle
+  words.forEach(w=>{
+    let span = document.createElement('span');
+    span.className="word";
+    span.textContent=w;
+    span.draggable=true;
+    span.addEventListener('dragstart', dragStart);
+    wordPool.appendChild(span);
   });
-  feedback.textContent='';
 }
 
-// --- Check Answer ---
-function checkAnswer(ans){
-  const q = questions[currentQ];
-  if(ans===q.answer){
+// Drag & Drop
+let dragged;
+function dragStart(e){ dragged=e.target; }
+dropZone.addEventListener('dragover', e=>e.preventDefault());
+dropZone.addEventListener('drop', e=>{
+  e.preventDefault();
+  dropZone.appendChild(dragged);
+});
+
+// Submit
+submitBtn.addEventListener('click', ()=>{
+  let formed = Array.from(dropZone.children).map(c=>c.textContent).join(" ");
+  if(formed===questions[currentQ].answer){
     feedback.textContent="Correct! 🎉";
     feedback.style.color="green";
     correctSound.currentTime=0; correctSound.play();
     questionBox.style.display='none';
-    scroll.style.display='none';
-    player.style.bottom = 50 + currentQ*60 + "px"; // climb ladder
     currentQ++;
+    player.style.bottom=50+currentQ*60+"px";
     if(currentQ<questions.length){
       scroll.style.display='block';
-      positionScroll();
-    } else {
+    }else{
       endGame();
     }
-  } else {
-    feedback.textContent="Oops! Try again.";
+  }else{
+    feedback.textContent="Try again!";
     feedback.style.color="red";
     wrongSound.currentTime=0; wrongSound.play();
   }
-}
+});
 
-// --- End Game ---
+// End Game
 function endGame(){
   treasure.style.display='block';
   clapSound.currentTime=0; clapSound.play();
   restartBtn.style.display='block';
 }
 
-// --- Restart ---
-restartBtn.onclick = ()=>{
+// Restart
+restartBtn.addEventListener('click', ()=>{
   currentQ=0;
   treasure.style.display='none';
   restartBtn.style.display='none';
-  player.style.bottom = "50px";
+  player.style.bottom="50px";
   scroll.style.display='block';
-  positionScroll();
-};
+});
 </script>
 </body>
 </html>
