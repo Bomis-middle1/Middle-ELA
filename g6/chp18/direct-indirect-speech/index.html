@@ -1,20 +1,23 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Magic Speech Bubbles - Direct & Indirect Speech</title>
+<title>Magic Scroll Rescue - Direct & Indirect Speech</title>
 <style>
 body { margin:0; font-family: Arial; background:#f0f8ff; overflow:hidden; }
 #logoScreen { position:fixed; top:0; left:0; width:100%; height:100%; background:white; display:flex; justify-content:center; align-items:center; z-index:100; }
 #gameContainer { display:none; width:100%; height:100vh; position:relative; overflow:hidden; }
 h2 { text-align:center; margin:10px; }
-.bubble { position:absolute; width:200px; padding:10px; background:#ffcc00; border-radius:50px; text-align:center; color:#000; font-weight:bold; cursor:pointer; animation-name:rise; animation-timing-function:linear; animation-iteration-count:1; }
-@keyframes rise { 0%{ bottom:-50px } 100%{ bottom:100vh } }
+#ladder { position:absolute; bottom:50px; left:50%; transform:translateX(-50%); width:80px; height:500px; background:#a0522d; border-radius:10px; }
+.step { width:80px; height:20px; background:#deb887; margin:10px 0; border-radius:5px; text-align:center; line-height:20px; color:#fff; font-weight:bold; }
+#player { position:absolute; width:60px; height:80px; z-index:10; left:50%; transform:translateX(-50%); bottom:50px; transition: bottom 0.3s; }
+.scroll { position:absolute; width:150px; height:50px; background:#ffe4b5; border-radius:10px; text-align:center; line-height:50px; font-weight:bold; cursor:pointer; left:50%; transform:translateX(-50%); top:20px; z-index:5; }
 #questionBox { display:none; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); background:white; padding:20px; border-radius:10px; width:80%; max-width:400px; text-align:center; box-shadow:0 0 15px #0003; z-index:50; }
 #questionBox button { margin:5px; padding:10px 20px; font-size:16px; cursor:pointer; }
 #feedback { margin-top:10px; font-weight:bold; }
-#treasure { position:absolute; bottom:20px; left:50%; width:120px; height:120px; transform:translateX(-50%); display:none; }
+#treasure { position:absolute; bottom:20px; left:50%; width:120px; height:120px; transform:translateX(-50%); display:none; z-index:20; }
 #restartBtn { display:none; position:absolute; left:50%; transform:translateX(-50%); top:70%; padding:10px 30px; font-size:18px; cursor:pointer; }
 #volumeSlider { position:absolute; bottom:10px; left:50%; transform:translateX(-50%); }
 </style>
@@ -28,8 +31,11 @@ h2 { text-align:center; margin:10px; }
 
 <!-- Game -->
 <div id="gameContainer">
-  <h2>🎇 Magic Speech Bubbles Adventure 🎇</h2>
-  <div id="bubblesArea"></div>
+  <h2>🪄 Magic Scroll Rescue - Direct & Indirect Speech 🪄</h2>
+  <div id="ladder"></div>
+  <img id="player" src="assets/player.png" alt="Player">
+  
+  <div class="scroll" id="scroll">Click Me!</div>
 
   <div id="questionBox">
     <div id="questionText"></div>
@@ -47,28 +53,30 @@ h2 { text-align:center; margin:10px; }
 <audio id="clapSound" src="assets/clapping.mp3"></audio>
 
 <script>
+// --- Questions ---
 const questions = [
-  {q:"“I can juggle five mangoes!” he shouts. How to report?", options:["He proudly said that he could juggle five mangoes.","He shouted that he could not juggle.","He ignored it.","He quickly ran away."], answer:"He proudly said that he could juggle five mangoes."},
-  {q:"“Catch the balloon before it flies away!” says the clown.", options:["The clown instructed us to catch the balloon before it flew away.","The clown told us to ignore it.","The clown ran away.","The clown shouted nothing."], answer:"The clown instructed us to catch the balloon before it flew away."},
-  {q:"“Don’t come too close to the tiger!” squawks a parrot.", options:["The parrot warned us not to come too close to the tiger.","The parrot said nothing.","The parrot moved away.","The parrot ran."], answer:"The parrot warned us not to come too close to the tiger."},
-  {q:"“We found the hidden treasure!” yells a pirate.", options:["The pirate shouted that they had found the hidden treasure.","The pirate asked a question.","The pirate ignored it.","The pirate hid."], answer:"The pirate shouted that they had found the hidden treasure."},
-  {q:"“Taste this, it’s really sweet!” says your sister.", options:["She said that it was really sweet and asked me to taste it.","She ignored it.","She shouted.","She quickly ran away."], answer:"She said that it was really sweet and asked me to taste it."},
-  {q:"“Why did your volcano erupt?” asks the teacher.", options:["The teacher asked why our volcano had erupted.","The teacher ignored.","The teacher shouted.","The teacher left."], answer:"The teacher asked why our volcano had erupted."},
-  {q:"“Watch carefully, or you’ll miss the trick!” announces the magician.", options:["The magician told us to watch carefully or we would miss the trick.","The magician said nothing.","The magician ran away.","The magician shouted loudly."], answer:"The magician told us to watch carefully or we would miss the trick."},
-  {q:"“I am late because of the traffic!” complains your friend.", options:["He said that he was late because of the traffic.","He ignored it.","He ran away.","He shouted loudly."], answer:"He said that he was late because of the traffic."},
-  {q:"“Pass the ball quickly!” shouts the coach.", options:["The coach instructed the players to pass the ball quickly.","The coach ignored them.","The coach shouted nonsense.","The coach laughed."], answer:"The coach instructed the players to pass the ball quickly."},
-  {q:"“Don’t open the gifts until I count to ten!” says someone.", options:["They asked us not to open the gifts until they counted to ten.","They ignored us.","They opened them.","They shouted loudly."], answer:"They asked us not to open the gifts until they counted to ten."}
+  {q:'“I can juggle five mangoes!” he shouts. Convert it.', options:["He proudly said that he could juggle five mangoes.","He shouted that he could not juggle.","He ignored it.","He quickly ran away."], answer:"He proudly said that he could juggle five mangoes."},
+  {q:'“Catch the balloon before it flies away!” says the clown.', options:["The clown instructed us to catch the balloon before it flew away.","The clown told us to ignore it.","The clown ran away.","The clown shouted nothing."], answer:"The clown instructed us to catch the balloon before it flew away."},
+  {q:'“Don’t come too close to the tiger!” squawks a parrot.', options:["The parrot warned us not to come too close to the tiger.","The parrot said nothing.","The parrot moved away.","The parrot ran."], answer:"The parrot warned us not to come too close to the tiger."},
+  {q:'“We found the hidden treasure!” yells a pirate.', options:["The pirate shouted that they had found the hidden treasure.","The pirate asked a question.","The pirate ignored it.","The pirate hid."], answer:"The pirate shouted that they had found the hidden treasure."},
+  {q:'“Taste this, it’s really sweet!” says your sister.', options:["She said that it was really sweet and asked me to taste it.","She ignored it.","She shouted.","She quickly ran away."], answer:"She said that it was really sweet and asked me to taste it."},
+  {q:'“Why did your volcano erupt?” asks the teacher.', options:["The teacher asked why our volcano had erupted.","The teacher ignored.","The teacher shouted.","The teacher left."], answer:"The teacher asked why our volcano had erupted."},
+  {q:'“Watch carefully, or you’ll miss the trick!” announces the magician.', options:["The magician told us to watch carefully or we would miss the trick.","The magician said nothing.","The magician ran away.","The magician shouted loudly."], answer:"The magician told us to watch carefully or we would miss the trick."},
+  {q:'“I am late because of the traffic!” complains your friend.', options:["He said that he was late because of the traffic.","He ignored it.","He ran away.","He shouted loudly."], answer:"He said that he was late because of the traffic."},
+  {q:'“Pass the ball quickly!” shouts the coach.', options:["The coach instructed the players to pass the ball quickly.","The coach ignored them.","The coach shouted nonsense.","The coach laughed."], answer:"The coach instructed the players to pass the ball quickly."},
+  {q:'“Don’t open the gifts until I count to ten!” says someone.', options:["They asked us not to open the gifts until they counted to ten.","They ignored us.","They opened them.","They shouted loudly."], answer:"They asked us not to open the gifts until they counted to ten."}
 ];
 
 let currentQ = 0;
 const gameContainer = document.getElementById('gameContainer');
-const bubblesArea = document.getElementById('bubblesArea');
+const scroll = document.getElementById('scroll');
 const questionBox = document.getElementById('questionBox');
 const questionText = document.getElementById('questionText');
 const optionsContainer = document.getElementById('optionsContainer');
 const feedback = document.getElementById('feedback');
 const restartBtn = document.getElementById('restartBtn');
 const treasure = document.getElementById('treasure');
+const player = document.getElementById('player');
 const correctSound = document.getElementById('correctSound');
 const wrongSound = document.getElementById('wrongSound');
 const clapSound = document.getElementById('clapSound');
@@ -83,72 +91,65 @@ correctSound.volume = volumeSlider.value;
 wrongSound.volume = volumeSlider.value;
 clapSound.volume = volumeSlider.value;
 
-// --- Logo Splash ---
+// --- Logo ---
 setTimeout(()=>{
   document.getElementById('logoScreen').style.display='none';
   gameContainer.style.display='block';
-  spawnBubble();
+  positionScroll();
 },5000);
 
-// --- Spawn Bubble ---
-function spawnBubble(){
-  if(currentQ>=questions.length){
-    endGame();
-    return;
-  }
-  const bubble = document.createElement('div');
-  bubble.className='bubble';
-  bubble.style.left = Math.random()*70 + "%";
-  bubble.textContent = "💬";
-  bubble.style.animationDuration = (6+Math.random()*3)+"s";
-  bubblesArea.appendChild(bubble);
-
-  bubble.addEventListener('click', ()=>{
-    showQuestion(currentQ, bubble);
-  });
-
-  setTimeout(()=>{ 
-    if(bubblesArea.contains(bubble)) bubblesArea.removeChild(bubble);
-    if(currentQ<questions.length) spawnBubble();
-  }, parseFloat(bubble.style.animationDuration)*1000);
+// --- Position Scroll ---
+function positionScroll(){
+  scroll.style.top = "50px";
+  scroll.style.left = "50%";
 }
 
+// --- Scroll click to open question ---
+scroll.addEventListener('click', ()=>{
+  showQuestion(currentQ);
+});
+
 // --- Show Question ---
-function showQuestion(index, bubble){
+function showQuestion(index){
   questionBox.style.display='block';
   const q = questions[index];
   questionText.textContent = q.q;
-  optionsContainer.innerHTML='';
+  optionsContainer.innerHTML = '';
   q.options.forEach(opt=>{
     const btn = document.createElement('button');
     btn.textContent = opt;
-    btn.onclick = ()=>checkAnswer(opt,bubble);
+    btn.onclick = ()=>checkAnswer(opt);
     optionsContainer.appendChild(btn);
   });
   feedback.textContent='';
 }
 
 // --- Check Answer ---
-function checkAnswer(ans,bubble){
+function checkAnswer(ans){
   const q = questions[currentQ];
   if(ans===q.answer){
-    feedback.textContent = "Correct! 🎉";
-    feedback.style.color = "green";
+    feedback.textContent="Correct! 🎉";
+    feedback.style.color="green";
     correctSound.currentTime=0; correctSound.play();
     questionBox.style.display='none';
-    if(bubble && bubblesArea.contains(bubble)) bubblesArea.removeChild(bubble);
+    scroll.style.display='none';
+    player.style.bottom = 50 + currentQ*60 + "px"; // climb ladder
     currentQ++;
-    spawnBubble();
+    if(currentQ<questions.length){
+      scroll.style.display='block';
+      positionScroll();
+    } else {
+      endGame();
+    }
   } else {
-    feedback.textContent = "Oops! Try again.";
-    feedback.style.color = "red";
+    feedback.textContent="Oops! Try again.";
+    feedback.style.color="red";
     wrongSound.currentTime=0; wrongSound.play();
   }
 }
 
 // --- End Game ---
 function endGame(){
-  questionBox.style.display='none';
   treasure.style.display='block';
   clapSound.currentTime=0; clapSound.play();
   restartBtn.style.display='block';
@@ -159,8 +160,10 @@ restartBtn.onclick = ()=>{
   currentQ=0;
   treasure.style.display='none';
   restartBtn.style.display='none';
-  spawnBubble();
-}
+  player.style.bottom = "50px";
+  scroll.style.display='block';
+  positionScroll();
+};
 </script>
 </body>
 </html>
