@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Punctuation Pop Balloon Game - Grade 7</title>
+<style>
+body { margin:0; font-family:Arial; background:#f0f8ff; display:flex; justify-content:center; align-items:center; height:100vh; overflow:hidden; }
+#logoScreen, #instructionScreen, #gameContainer { width:100%; max-width:600px; text-align:center; padding:20px; position:absolute; top:0; left:0; }
+#logoScreen { height:100%; display:flex; justify-content:center; align-items:center; background:white; z-index:100; }
+#instructionScreen { display:none; background:#fff; border-radius:10px; box-shadow:0 0 10px #aaa; z-index:99; }
+#gameContainer { display:none; background:#fff; border-radius:10px; box-shadow:0 0 10px #aaa; z-index:98; position:relative; height:80vh; }
+#sentence { font-size:18px; font-weight:bold; margin-bottom:10px; }
+#feedback { margin-top:10px; font-weight:bold; height:24px; }
+#restartBtn { display:none; margin-top:20px; padding:10px 20px; font-size:18px; cursor:pointer; background:#4caf50; color:white; border:none; border-radius:5px; }
+.balloon { position:absolute; width:60px; height:60px; border-radius:50%; background:#ffeb3b; display:flex; justify-content:center; align-items:center; cursor:pointer; font-weight:bold; font-size:20px; user-select:none; }
+.balloon.wiggle { animation: wiggle 0.5s; }
+@keyframes wiggle {0%{transform:rotate(0deg);}25%{transform:rotate(-10deg);}50%{transform:rotate(10deg);}75%{transform:rotate(-10deg);}100%{transform:rotate(0deg);}}
+.confetti-piece { position:absolute; width:8px; height:8px; border-radius:50%; top:0; animation: fall 2s linear forwards;}
+@keyframes fall {0%{transform:translateY(0);}100%{transform:translateY(400px); opacity:0;}}
+</style>
+</head>
+<body>
+
+<div id="logoScreen">
+<img src="assets/innovine-logo.png" alt="Innovine Logo" width="200">
+</div>
+
+<div id="instructionScreen">
+<h2>Punctuation Pop!</h2>
+<p>Click on the correct punctuation mark floating up the screen.</p>
+<p>Correct answers pop the balloon ✔, wrong answers wiggle ❌.</p>
+<p>Complete all 10 sentences to finish the game!</p>
+</div>
+
+<div id="gameContainer">
+<div id="sentence"></div>
+<div id="feedback"></div>
+<button id="restartBtn">Play Again</button>
+</div>
+
+<audio id="correctSound" src="assets/correct.mp3"></audio>
+<audio id="wrongSound" src="assets/wrong.mp3"></audio>
+<audio id="clapSound" src="assets/clapping.mp3"></audio>
+
+<script>
+const questions = [
+{q:"I like ice cream ___", options:[".","!","?","..."], answer:"."},
+{q:"What is your name ___", options:[".","!","?","…"], answer:"?"},
+{q:"Wow that was amazing ___", options:[".","!","?","…"], answer:"!"},
+{q:"She said ___ 'I am tired'", options:[".","!","?","\""], answer:"\""},
+{q:"He bought apples ___ oranges and bananas", options:[".","!","?",","], answer:","},
+{q:"Remember the rule ___ always be kind", options:[".","!","?",";"], answer:";"},
+{q:"Johns book is on the table ___", options:[".","!","?","'"], answer:"'"},
+{q:"My mother said ___ 'Come here'", options:[".","!","?","\""], answer:"\""},
+{q:"The teacher asked ___ Who wants to answer", options:[".","!","?","\""], answer:"?"},
+{q:"Ali is very smart ___ he always helps friends", options:[".","!","?",";"], answer:";"}
+];
+
+let current = 0;
+const container = document.getElementById("gameContainer");
+const sentenceEl = document.getElementById("sentence");
+const feedback = document.getElementById("feedback");
+const restartBtn = document.getElementById("restartBtn");
+const correctSound = document.getElementById("correctSound");
+const wrongSound = document.getElementById("wrongSound");
+const clapSound = document.getElementById("clapSound");
+
+function showQuestion(){
+  feedback.textContent="";
+  const q = questions[current];
+  sentenceEl.textContent = q.q;
+
+  // remove existing balloons
+  document.querySelectorAll(".balloon").forEach(b=>b.remove());
+
+  // create floating balloons
+  q.options.sort(()=>Math.random()-0.5).forEach((opt,i)=>{
+    const balloon = document.createElement("div");
+    balloon.className="balloon";
+    balloon.textContent=opt;
+    balloon.style.left = (i*80 + 20) + "px";
+    balloon.style.bottom = "0px";
+    container.appendChild(balloon);
+
+    balloon.onclick = ()=>checkAnswer(opt,q.answer,balloon);
+    floatBalloon(balloon);
+  });
+}
+
+function floatBalloon(balloon){
+  let pos = 0;
+  const interval = setInterval(()=>{
+    pos += 1; // speed of float
+    balloon.style.bottom = pos + "px";
+    if(pos > container.offsetHeight) { clearInterval(interval); balloon.remove(); }
+  }, 30);
+}
+
+function checkAnswer(selected, correct, balloon){
+  if(selected===correct){
+    feedback.textContent="Good Job! ✔";
+    feedback.style.color="green";
+    correctSound.currentTime=0; correctSound.play();
+    balloon.remove();
+    createConfetti();
+    setTimeout(nextQuestion,800);
+  } else {
+    feedback.textContent="Try Again! ❌";
+    feedback.style.color="red";
+    balloon.classList.add("wiggle");
+    wrongSound.currentTime=0; wrongSound.play();
+    setTimeout(()=>balloon.classList.remove("wiggle"),500);
+  }
+}
+
+function nextQuestion(){
+  current++;
+  if(current >= questions.length){
+    feedback.textContent="🎉 You completed all questions!";
+    clapSound.currentTime=0; clapSound.play();
+    restartBtn.style.display="block";
+  } else showQuestion();
+}
+
+restartBtn.onclick = ()=>location.reload();
+
+function createConfetti(){
+  for(let i=0;i<20;i++){
+    const c = document.createElement("div");
+    c.className="confetti-piece";
+    c.style.left = Math.random()*window.innerWidth+"px";
+    c.style.background = `hsl(${Math.random()*360},100%,50%)`;
+    document.body.appendChild(c);
+    setTimeout(()=>c.remove(),1500);
+  }
+}
+
+// --- Logo + Instructions ---
+setTimeout(()=>{
+  document.getElementById("logoScreen").style.display="none";
+  document.getElementById("instructionScreen").style.display="block";
+  setTimeout(()=>{
+    document.getElementById("instructionScreen").style.display="none";
+    container.style.display="block";
+    showQuestion();
+  },5000);
+},5000);
+</script>
+</body>
+</html>
