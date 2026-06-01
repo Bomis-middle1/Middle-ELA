@@ -9,19 +9,20 @@
 body { margin:0; font-family: Arial; background:#e0f7fa; overflow:hidden; }
 #logoScreen { position:fixed; top:0; left:0; width:100%; height:100%; display:flex; justify-content:center; align-items:center; background:white; z-index:100;}
 #gameContainer { display:none; width:100%; height:100vh; position:relative; overflow:hidden;}
-#player { position:absolute; bottom:20px; left:50%; transform:translateX(-50%); width:60px; height:80px; transition: left 0.5s;}
+#player { position:absolute; bottom:20px; left:50%; transform:translateX(-50%); width:60px; height:80px; transition:left 0.5s;}
 .chest { position:absolute; width:100px; height:80px; background:#ffeb3b; border-radius:10px; cursor:pointer; text-align:center; line-height:80px; font-weight:bold; }
 #questionBox { display:none; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:300px; background:white; padding:20px; border-radius:10px; text-align:center; box-shadow:0 0 15px #0003; z-index:50; }
 #questionBox button { margin:5px; padding:10px 15px; cursor:pointer;}
 #feedback { margin-top:10px; font-weight:bold;}
-#treasure { position:absolute; bottom:50px; left:50%; transform:translateX(-50%); width:120px; height:120px; display:none;}
+#treasure { position:absolute; bottom:50px; left:50%; transform:translateX(-50%); width:120px; height:120px; display:none; z-index:20;}
 #restartBtn { position:absolute; display:none; left:50%; top:70%; transform:translateX(-50%); padding:10px 20px; font-size:18px; cursor:pointer;}
 #volumeSlider { position:absolute; bottom:10px; left:50%; transform:translateX(-50%);}
+.particle { position:absolute; width:8px; height:8px; background:linear-gradient(to right, #ff0,#f0f); border-radius:50%; pointer-events:none; animation: floatParticle 1s linear forwards;}
+@keyframes floatParticle { 0%{opacity:1; transform:translate(0,0);} 100%{opacity:0; transform:translate(calc(-50px + 100px*var(--randX)), -80px);}}
 </style>
 </head>
 <body>
 
-<!-- Logo -->
 <div id="logoScreen">
   <img src="assets/innovine-logo.png" alt="Innovine Logo" width="200">
 </div>
@@ -34,6 +35,7 @@ body { margin:0; font-family: Arial; background:#e0f7fa; overflow:hidden; }
 <div id="optionsContainer"></div>
 <div id="feedback"></div>
 </div>
+
 <button id="restartBtn">Restart Adventure</button>
 <input type="range" id="volumeSlider" min="0" max="1" step="0.1" value="0.8">
 
@@ -43,13 +45,18 @@ body { margin:0; font-family: Arial; background:#e0f7fa; overflow:hidden; }
 </div>
 
 <script>
-// --- Questions ---
+// --- 10 Questions ---
 const questions = [
   {sentence:"I know who won the race.", type:"noun clause"},
   {sentence:"This is the book that I borrowed.", type:"adjective clause"},
   {sentence:"He ran fast because he wanted to catch the bus.", type:"adverb clause"},
   {sentence:"The man who called yesterday is my uncle.", type:"adjective clause"},
-  {sentence:"I will wait until he returns.", type:"adverb clause"}
+  {sentence:"I will wait until he returns.", type:"adverb clause"},
+  {sentence:"I heard the rumor that he had won the prize.", type:"noun clause"},
+  {sentence:"She stayed home because she was feeling sick.", type:"adverb clause"},
+  {sentence:"The student who answered all questions correctly got a medal.", type:"adjective clause"},
+  {sentence:"Do you know who is coming?", type:"noun clause"},
+  {sentence:"This is the house where I grew up.", type:"adjective clause"}
 ];
 
 let player = document.getElementById('player');
@@ -76,7 +83,7 @@ correctSound.volume = volumeSlider.value;
 wrongSound.volume = volumeSlider.value;
 clapSound.volume = volumeSlider.value;
 
-// --- Logo Splash ---
+// Logo splash
 setTimeout(()=>{
   document.getElementById('logoScreen').style.display='none';
   gameContainer.style.display='block';
@@ -114,12 +121,26 @@ function openChest(index,chest){
   });
 }
 
+// --- Particle Effect ---
+function createParticles(x,y){
+  for(let i=0;i<15;i++){
+    const p = document.createElement('div');
+    p.className='particle';
+    p.style.left = x+'px';
+    p.style.top = y+'px';
+    p.style.setProperty('--randX', Math.random());
+    document.body.appendChild(p);
+    setTimeout(()=>document.body.removeChild(p),1000);
+  }
+}
+
 // --- Check Answer ---
 function checkAnswer(selected,correct,chest,index){
   if(selected===correct){
     feedback.textContent="Correct! 🎉";
     feedback.style.color="green";
     correctSound.currentTime=0; correctSound.play();
+    createParticles(chest.offsetLeft+50,chest.offsetTop);
     questionBox.style.display='none';
     chest.style.background="#8bc34a";
     chest.style.pointerEvents="none";
