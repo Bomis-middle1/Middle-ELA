@@ -1,22 +1,20 @@
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Phrasal Verb Racing Game</title>
+<title>Phrasal Verb Popcorn Catch - Clean</title>
 <style>
 body { margin:0; font-family: Arial; background:#87ceeb; overflow:hidden; }
 #logoScreen { position:fixed; top:0; left:0; width:100%; height:100%; display:flex; justify-content:center; align-items:center; background:white; z-index:100;}
 #instructions { position:fixed; top:0; left:0; width:100%; height:100%; display:flex; flex-direction:column; justify-content:center; align-items:center; background:#fefefe; z-index:101; text-align:center; padding:20px; font-size:18px;}
 #gameContainer { display:none; width:100%; height:100vh; position:relative; overflow:hidden;}
-#track { position:absolute; bottom:50px; left:0; width:100%; height:150px; background:#333; }
-#car { position:absolute; bottom:60px; left:50px; width:60px; height:40px; transition:left 0.3s; z-index:10;}
-#questionBox { display:none; position:absolute; top:30%; left:50%; transform:translate(-50%,-50%); width:320px; background:white; padding:20px; border-radius:10px; text-align:center; box-shadow:0 0 15px #0003; z-index:50; }
-#questionBox button { margin:5px; padding:10px 15px; cursor:pointer;}
-#feedback { margin-top:10px; font-weight:bold;}
-#finishLine { position:absolute; top:50px; right:50px; width:50px; height:150px; background:gold; border-radius:5px;}
-#treasure { position:absolute; top:50px; right:100px; width:60px; height:60px; display:none; background:gold; border-radius:50%; text-align:center; line-height:60px; font-weight:bold;}
+#player { position:absolute; bottom:10px; left:50%; transform:translateX(-50%); width:60px; height:60px; background:url('assets/player.png') no-repeat center/contain; z-index:10; }
+.kernel { position:absolute; width:120px; height:40px; background:#ffeb3b; border-radius:5px; text-align:center; line-height:40px; font-weight:bold; cursor:pointer; }
+#feedback { position:absolute; top:10px; left:50%; transform:translateX(-50%); font-weight:bold; font-size:20px; z-index:50; }
+#treasure { position:absolute; top:50px; left:50%; transform:translateX(-50%); width:60px; height:60px; display:none; background:gold; border-radius:50%; text-align:center; line-height:60px; font-weight:bold;}
 #restartBtn { position:absolute; display:none; left:50%; top:80%; transform:translateX(-50%); padding:10px 20px; font-size:18px; cursor:pointer;}
 .particle { position:absolute; width:6px; height:6px; background:linear-gradient(to right,#ff0,#f0f); border-radius:50%; pointer-events:none; animation: floatParticle 1s linear forwards;}
 @keyframes floatParticle {0%{opacity:1; transform:translate(0,0);} 100%{opacity:0; transform:translate(calc(-50px + 100px*var(--randX)),-50px);}}
@@ -25,36 +23,27 @@ body { margin:0; font-family: Arial; background:#87ceeb; overflow:hidden; }
 </head>
 <body>
 
-<!-- Logo -->
 <div id="logoScreen">
 <img src="assets/innovine-logo.png" alt="Innovine Logo" width="200">
 </div>
 
-<!-- Instructions -->
 <div id="instructions">
-<h2>🏎️ Phrasal Verb Racing Game 🏎️</h2>
+<h2>🍿 Phrasal Verb Popcorn Catch 🍿</h2>
 <p>Instructions:</p>
 <ul>
-<li>Click Start to begin the race.</li>
-<li>Each checkpoint presents a sentence with a missing phrasal verb.</li>
-<li>Select the correct phrasal verb to speed up your car!</li>
-<li>Wrong answers slow your car.</li>
-<li>Reach the finish line to win the treasure!</li>
+<li>Move your player left and right to catch the correct popcorn kernels.</li>
+<li>Each kernel shows a phrasal verb to complete a sentence.</li>
+<li>Catch the correct ones to score points!</li>
+<li>Catch all correct kernels to reach the treasure!</li>
 </ul>
-<button id="startBtn">Start Race</button>
+<button id="startBtn">Start Game</button>
 </div>
 
 <div id="gameContainer">
-<div id="track"></div>
-<img id="car" src="assets/car.png" alt="Race Car">
-<div id="finishLine"></div>
-<div id="treasure">🏆</div>
-<div id="questionBox">
-<div id="questionText"></div>
-<div id="optionsContainer"></div>
 <div id="feedback"></div>
-</div>
-<button id="restartBtn">Restart Race</button>
+<div id="player"></div>
+<div id="treasure">🏆</div>
+<button id="restartBtn">Restart Game</button>
 <input type="range" id="volumeSlider" min="0" max="1" step="0.1" value="0.8">
 
 <audio id="correctSound" src="assets/correct.mp3"></audio>
@@ -63,34 +52,31 @@ body { margin:0; font-family: Arial; background:#87ceeb; overflow:hidden; }
 </div>
 
 <script>
-// --- Questions ---
 const questions = [
-  {sentence:"He couldn’t ___ the heavy box by himself.", options:["pick up","break down","turn on"], answer:"pick up"},
-  {sentence:"She wants to ___ her old clothes to charity.", options:["give away","put off","look after"], answer:"give away"},
-  {sentence:"We need to ___ the meeting to next week.", options:["put off","pick up","break up"], answer:"put off"},
-  {sentence:"The children will ___ the playground at noon.", options:["run into","leave","break down"], answer:"leave"},
-  {sentence:"Can you ___ the music for a moment?", options:["turn off","turn down","pick up"], answer:"turn off"},
-  {sentence:"I accidentally ___ my keys in the car.", options:["locked up","ran into","look after"], answer:"locked up"},
-  {sentence:"The car suddenly ___ in the middle of the road.", options:["broke down","look up","pick up"], answer:"broke down"},
-  {sentence:"He tried to ___ the conversation with a joke.", options:["break up","lighten up","give away"], answer:"lighten up"},
-  {sentence:"Please ___ the lights when you leave the room.", options:["turn off","put off","pick up"], answer:"turn off"},
-  {sentence:"We need to ___ the project before the deadline.", options:["finish up","look after","give away"], answer:"finish up"}
+  {sentence:"He couldn’t ___ the heavy box by himself.", correct:"pick up", wrong:["break down","turn on"]},
+  {sentence:"She wants to ___ her old clothes to charity.", correct:"give away", wrong:["put off","look after"]},
+  {sentence:"We need to ___ the meeting to next week.", correct:"put off", wrong:["pick up","break up"]},
+  {sentence:"The children will ___ the playground at noon.", correct:"leave", wrong:["run into","break down"]},
+  {sentence:"Can you ___ the music for a moment?", correct:"turn off", wrong:["turn down","pick up"]},
+  {sentence:"I accidentally ___ my keys in the car.", correct:"locked up", wrong:["ran into","look after"]},
+  {sentence:"The car suddenly ___ in the middle of the road.", correct:"broke down", wrong:["look up","pick up"]},
+  {sentence:"He tried to ___ the conversation with a joke.", correct:"lighten up", wrong:["break up","give away"]},
+  {sentence:"Please ___ the lights when you leave the room.", correct:"turn off", wrong:["put off","pick up"]},
+  {sentence:"We need to ___ the project before the deadline.", correct:"finish up", wrong:["look after","give away"]}
 ];
 
-let currentQuestionIndex = 0;
-let car = document.getElementById('car');
-let questionBox = document.getElementById('questionBox');
-let questionText = document.getElementById('questionText');
-let optionsContainer = document.getElementById('optionsContainer');
+let currentQuestion = 0;
+let player = document.getElementById('player');
+let gameContainer = document.getElementById('gameContainer');
 let feedback = document.getElementById('feedback');
+let startBtn = document.getElementById('startBtn');
+let instructions = document.getElementById('instructions');
 let treasure = document.getElementById('treasure');
 let restartBtn = document.getElementById('restartBtn');
-let instructions = document.getElementById('instructions');
-let startBtn = document.getElementById('startBtn');
-const correctSound = document.getElementById('correctSound');
-const wrongSound = document.getElementById('wrongSound');
-const clapSound = document.getElementById('clapSound');
-const volumeSlider = document.getElementById('volumeSlider');
+let correctSound = document.getElementById('correctSound');
+let wrongSound = document.getElementById('wrongSound');
+let clapSound = document.getElementById('clapSound');
+let volumeSlider = document.getElementById('volumeSlider');
 
 volumeSlider.oninput = ()=>{
   correctSound.volume = volumeSlider.value;
@@ -101,80 +87,81 @@ correctSound.volume = volumeSlider.value;
 wrongSound.volume = volumeSlider.value;
 clapSound.volume = volumeSlider.value;
 
-// --- Start Game ---
+// Player movement
+let playerLeft = window.innerWidth/2-30;
+player.style.left = playerLeft+'px';
+document.addEventListener('keydown', e=>{
+  if(e.key==='ArrowLeft'){ playerLeft -= 20; if(playerLeft<0) playerLeft=0; player.style.left=playerLeft+'px'; }
+  if(e.key==='ArrowRight'){ playerLeft += 20; if(playerLeft>window.innerWidth-60) playerLeft=window.innerWidth-60; player.style.left=playerLeft+'px'; }
+});
+
+// Start game
 startBtn.onclick = ()=>{
   instructions.style.display='none';
   document.getElementById('logoScreen').style.display='none';
-  document.getElementById('gameContainer').style.display='block';
-  showQuestion(currentQuestionIndex);
+  gameContainer.style.display='block';
+  spawnNextKernel();
 };
 
-// --- Show Question ---
-function showQuestion(index){
-  questionBox.style.display='block';
-  questionText.textContent=questions[index].sentence;
-  optionsContainer.innerHTML='';
-  feedback.innerHTML='';
-  const opts = [...questions[index].options].sort(()=>Math.random()-0.5);
-  opts.forEach(opt=>{
-    const btn = document.createElement('button');
-    btn.textContent=opt;
-    btn.onclick = ()=>checkAnswer(opt);
-    optionsContainer.appendChild(btn);
-  });
-}
-
-// --- Particle Effect ---
+// Particle effect
 function createParticles(x,y){
-  for(let i=0;i<15;i++){
+  for(let i=0;i<10;i++){
     const p = document.createElement('div');
     p.className='particle';
-    p.style.left = x+'px';
-    p.style.top = y+'px';
+    p.style.left=x+'px';
+    p.style.top=y+'px';
     p.style.setProperty('--randX', Math.random());
     document.body.appendChild(p);
     setTimeout(()=>document.body.removeChild(p),1000);
   }
 }
 
-// --- Check Answer ---
-function checkAnswer(selected){
-  const correct = questions[currentQuestionIndex].answer;
-  if(selected===correct){
-    feedback.textContent="Correct! 🎉";
-    feedback.style.color="green";
-    correctSound.currentTime=0; correctSound.play();
-    createParticles(car.offsetLeft,car.offsetTop);
-    questionBox.style.display='none';
-    moveCarForward();
-    currentQuestionIndex++;
-    if(currentQuestionIndex===questions.length){
-      treasure.style.display='block';
-      clapSound.currentTime=0; clapSound.play();
-      restartBtn.style.display='block';
-    } else {
-      showQuestion(currentQuestionIndex); // Ensures next question appears
-    }
-  } else {
-    feedback.textContent="Try again!";
-    feedback.style.color="red";
-    wrongSound.currentTime=0; wrongSound.play();
+// Spawn kernels sequentially
+function spawnNextKernel(){
+  if(currentQuestion >= questions.length){
+    treasure.style.display='block';
+    clapSound.currentTime=0; clapSound.play();
+    restartBtn.style.display='block';
+    return;
   }
+  feedback.textContent="";
+  const q = questions[currentQuestion];
+  // Spawn 3-5 options per wave
+  const options = [q.correct, ...q.wrong].sort(()=>Math.random()-0.5);
+  options.forEach((opt,i)=>{
+    const kernel = document.createElement('div');
+    kernel.className='kernel';
+    kernel.textContent=opt;
+    kernel.style.left = 50 + i*150 + 'px';
+    kernel.style.top = '-50px';
+    gameContainer.appendChild(kernel);
+    let fallInterval = setInterval(()=>{
+      let top = parseInt(kernel.style.top);
+      if(top>window.innerHeight-100){ kernel.remove(); clearInterval(fallInterval); }
+      else { kernel.style.top = top + 2 + 'px'; }
+
+      // Collision
+      let kernelRect = kernel.getBoundingClientRect();
+      let playerRect = player.getBoundingClientRect();
+      if(!(playerRect.right<kernelRect.left || playerRect.left>kernelRect.right || playerRect.bottom<kernelRect.top || playerRect.top>kernelRect.bottom)){
+        if(kernel.textContent===q.correct){
+          createParticles(kernelRect.left+60,kernelRect.top+20);
+          correctSound.currentTime=0; correctSound.play();
+          feedback.textContent="Correct! 🎉"; feedback.style.color="green";
+        } else {
+          wrongSound.currentTime=0; wrongSound.play();
+          feedback.textContent="Wrong! ❌"; feedback.style.color="red";
+        }
+        kernel.remove(); clearInterval(fallInterval);
+        if(i===options.length-1){ currentQuestion++; setTimeout(spawnNextKernel,500); }
+      }
+    },20);
+  });
 }
 
-// --- Move Car ---
-function moveCarForward(){
-  let currentLeft = parseInt(car.style.left) || 50;
-  car.style.left = (currentLeft + 60) + 'px';
-}
-
-// --- Restart ---
+// Restart
 restartBtn.onclick = ()=>{
-  currentQuestionIndex=0;
-  car.style.left = '50px';
-  treasure.style.display='none';
-  restartBtn.style.display='none';
-  showQuestion(currentQuestionIndex);
+  location.reload();
 }
 </script>
 </body>
