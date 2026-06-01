@@ -1,1 +1,171 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Treasure Match Grammar Quest</title>
+<style>
+body{margin:0;font-family:Arial,sans-serif;background:linear-gradient(#6fd3ff,#fff3a6);overflow-x:hidden}
+#splash{position:fixed;inset:0;background:#fff;display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:9999}
+#splash img{max-width:220px}
+.container{max-width:1000px;margin:auto;padding:10px;text-align:center}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.card{height:90px;background:#ffcc4d;border-radius:12px;display:flex;justify-content:center;align-items:center;font-size:36px;cursor:pointer}
+.card.flipped{background:white}
+#questionBox{display:none;background:white;padding:15px;border-radius:12px;margin-top:15px}
+.option{display:block;margin:8px;padding:10px;background:#dff5ff;border:none;border-radius:8px;width:100%}
+#endScreen{display:none}
+.coin{position:fixed;font-size:30px;animation:float 3s linear forwards}
+@keyframes float{from{transform:translateY(0)}to{transform:translateY(-220px);opacity:0}}
+.correct{animation:pop .7s}
+@keyframes pop{50%{transform:scale(1.2)}}
+@media(max-width:600px){.grid{grid-template-columns:repeat(4,1fr)} .card{height:70px}}
+</style>
+</head>
+<body>
+<div id="splash">
+<img src="assets/innovine-logo.png">
+<h1>Treasure Match Grammar Quest</h1>
+<p>Active & Passive Voice</p>
+</div>
+
+<div class="container">
+<h2>Treasure Match Grammar Quest</h2>
+<label>Volume <input type="range" id="vol" min="0" max="1" step="0.1" value="1"></label>
+<p>Matches: <span id="matches">0</span>/8 | Score: <span id="score">0</span></p>
+
+<div id="game" class="grid"></div>
+
+<div id="questionBox">
+<h3 id="q"></h3>
+<div id="opts"></div>
+</div>
+
+<div id="endScreen">
+<h2>🎉 Grammar Master! 🎉</h2>
+<p id="final"></p>
+<button onclick="location.reload()">Restart Game</button>
+</div>
+</div>
+
+<audio id="correctSound" src="assets/correct.mp3"></audio>
+<audio id="wrongSound" src="assets/wrong.mp3"></audio>
+<audio id="clapSound" src="assets/clapping.mp3"></audio>
+
+<script>
+setTimeout(()=>document.getElementById("splash").style.display="none",5000);
+
+const questions=[
+{q:"Which sentence is active voice?",a:"Maya baked the cake.",o:["The cake was baked by Maya.","Maya baked the cake.","The cake had been baked by Maya.","The cake is being baked by Maya."]},
+{q:"Which sentence is passive voice?",a:"The ball was kicked by Liam.",o:["Liam kicked the ball.","The dog chased the cat.","The ball was kicked by Liam.","Sarah cleaned her room."]},
+{q:"The project was completed by the students. This is:",a:"Passive voice",o:["Active voice","Passive voice","A command","Future tense"]},
+{q:"Choose the active voice version.",a:"Jake broke the window.",o:["Jake broke the window.","The window broke Jake.","Jake was broken by the window.","The window has broken."]},
+{q:"Choose the passive voice version.",a:"The meal was prepared by the chef.",o:["The meal prepared the chef.","The meal was prepared by the chef.","The chef was prepared by the meal.","The meal prepares the chef."]},
+{q:"I washed the dishes. This sentence is:",a:"Active voice",o:["Passive voice","Active voice","A question","Future tense"]},
+{q:"Which focuses more on the action?",a:"The picture was painted by Emma.",o:["Emma painted the picture.","The picture was painted by Emma.","Emma is painting the picture.","Emma will paint the picture."]},
+{q:"All classroom windows were cleaned yesterday. This is:",a:"Passive voice",o:["Active voice","Passive voice","A command","Present tense"]},
+{q:"Which sentence is active voice?",a:"The teacher checked the homework.",o:["The homework was checked by the teacher.","The teacher checked the homework.","The homework is checked by the teacher.","The homework had been checked by the teacher."]},
+{q:"The hall was decorated by the students.",a:"The hall was decorated by the students.",o:["The students decorated the hall.","The hall was decorated by the students.","The students are decorating the hall.","The students will decorate the hall."]}
+];
+
+questions.sort(()=>Math.random()-0.5);
+
+const emojis=["💎","💰","🪙","🏆","⭐","🔑","💎","🏆"];
+let cards=[...emojis,...emojis].sort(()=>Math.random()-0.5);
+let first=null,lock=false,matches=0,score=0,qIndex=0;
+
+const game=document.getElementById("game");
+
+cards.forEach((e,i)=>{
+ let c=document.createElement("div");
+ c.className="card";
+ c.dataset.val=e;
+ c.innerHTML="❓";
+ c.onclick=()=>flip(c);
+ game.appendChild(c);
+});
+
+function flip(card){
+ if(lock||card.classList.contains("flipped")) return;
+ card.classList.add("flipped");
+ card.innerHTML=card.dataset.val;
+
+ if(!first){first=card;return;}
+
+ lock=true;
+ if(first.dataset.val===card.dataset.val){
+   matches++;
+   document.getElementById("matches").textContent=matches;
+   setTimeout(()=>{
+      askQuestion();
+      first=null;lock=false;
+   },500);
+ }else{
+   setTimeout(()=>{
+      first.classList.remove("flipped"); first.innerHTML="❓";
+      card.classList.remove("flipped"); card.innerHTML="❓";
+      first=null; lock=false;
+   },900);
+ }
+}
+
+function askQuestion(){
+ if(qIndex>=questions.length && matches<8) return;
+ let box=document.getElementById("questionBox");
+ box.style.display="block";
+ let q=questions[qIndex];
+ document.getElementById("q").textContent=q.q;
+ let opts=document.getElementById("opts");
+ opts.innerHTML="";
+ q.o.sort(()=>Math.random()-0.5).forEach(opt=>{
+   let b=document.createElement("button");
+   b.className="option";
+   b.textContent=opt;
+   b.onclick=()=>answer(opt===q.a,b);
+   opts.appendChild(b);
+ });
+}
+
+function answer(correct,btn){
+ const vol=document.getElementById("vol").value;
+ document.getElementById("correctSound").volume=vol;
+ document.getElementById("wrongSound").volume=vol;
+
+ if(correct){
+   document.getElementById("correctSound").play();
+   btn.classList.add("correct");
+   score++;
+   document.getElementById("score").textContent=score;
+   coin();
+ }else{
+   document.getElementById("wrongSound").play();
+ }
+
+ qIndex++;
+ setTimeout(()=>{
+   document.getElementById("questionBox").style.display="none";
+   if(matches===8){
+      finish();
+   }
+ },1200);
+}
+
+function coin(){
+ let c=document.createElement("div");
+ c.className="coin";
+ c.innerHTML="🪙";
+ c.style.left=(Math.random()*80+10)+"%";
+ c.style.bottom="50px";
+ document.body.appendChild(c);
+ setTimeout(()=>c.remove(),3000);
+}
+
+function finish(){
+ document.getElementById("clapSound").play();
+ document.getElementById("endScreen").style.display="block";
+ document.getElementById("final").innerHTML="Score: "+score+"/10";
+}
+</script>
+</body>
+</html>
