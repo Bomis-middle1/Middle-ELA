@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phrasal Verb Rocket Rescue</title>
+<style>
+body { margin:0; font-family: Arial; background:#001f3f; overflow:hidden; }
+#logoScreen { position:fixed; top:0; left:0; width:100%; height:100%; display:flex; justify-content:center; align-items:center; background:white; z-index:100;}
+#gameContainer { display:none; width:100%; height:100vh; position:relative; overflow:hidden;}
+#player { position:absolute; bottom:20px; left:50%; transform:translateX(-50%); width:60px; height:80px; transition:left 0.5s;}
+.rocket { position:absolute; width:80px; height:100px; background:#ff4136; border-radius:10px; cursor:pointer; text-align:center; line-height:100px; color:white; font-weight:bold; }
+#questionBox { display:none; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:300px; background:white; padding:20px; border-radius:10px; text-align:center; box-shadow:0 0 15px #0003; z-index:50; }
+#questionBox button { margin:5px; padding:10px 15px; cursor:pointer;}
+#feedback { margin-top:10px; font-weight:bold;}
+#treasure { position:absolute; bottom:50px; left:50%; transform:translateX(-50%); width:120px; height:120px; display:none; background:gold; border-radius:50%; text-align:center; line-height:120px; font-weight:bold; color:white;}
+#restartBtn { position:absolute; display:none; left:50%; top:70%; transform:translateX(-50%); padding:10px 20px; font-size:18px; cursor:pointer;}
+.particle { position:absolute; width:6px; height:6px; background:linear-gradient(to right, #ff0,#f0f); border-radius:50%; pointer-events:none; animation: floatParticle 1s linear forwards;}
+@keyframes floatParticle { 0%{opacity:1; transform:translate(0,0);} 100%{opacity:0; transform:translate(calc(-50px + 100px*var(--randX)),-100px);}}
+#volumeSlider { position:absolute; bottom:10px; left:50%; transform:translateX(-50%);}
+</style>
+</head>
+<body>
+
+<div id="logoScreen">
+  <img src="assets/innovine-logo.png" alt="Innovine Logo" width="200">
+</div>
+
+<div id="gameContainer">
+<img id="player" src="assets/player.png" alt="Player">
+<div id="treasure">🎉</div>
+<div id="questionBox">
+<div id="questionText"></div>
+<div id="optionsContainer"></div>
+<div id="feedback"></div>
+</div>
+
+<button id="restartBtn">Restart Adventure</button>
+<input type="range" id="volumeSlider" min="0" max="1" step="0.1" value="0.8">
+
+<audio id="correctSound" src="assets/correct.mp3"></audio>
+<audio id="wrongSound" src="assets/wrong.mp3"></audio>
+<audio id="clapSound" src="assets/clapping.mp3"></audio>
+</div>
+
+<script>
+// --- Phrasal Verb Questions ---
+const questions = [
+  {sentence:"He couldn’t ___ the heavy box by himself.", options:["pick up","break down","turn on"], answer:"pick up"},
+  {sentence:"She wants to ___ her old clothes to charity.", options:["give away","put off","look after"], answer:"give away"},
+  {sentence:"We need to ___ the meeting to next week.", options:["put off","pick up","break up"], answer:"put off"},
+  {sentence:"The children will ___ the playground at noon.", options:["run into","leave","break down"], answer:"leave"},
+  {sentence:"Can you ___ the music for a moment?", options:["turn off","turn down","pick up"], answer:"turn off"},
+  {sentence:"I accidentally ___ my keys in the car.", options:["locked up","ran into","look after"], answer:"locked up"},
+  {sentence:"The car suddenly ___ in the middle of the road.", options:["broke down","look up","pick up"], answer:"broke down"},
+  {sentence:"He tried to ___ the conversation with a joke.", options:["break up","lighten up","give away"], answer:"lighten up"},
+  {sentence:"Please ___ the lights when you leave the room.", options:["turn off","put off","pick up"], answer:"turn off"},
+  {sentence:"We need to ___ the project before the deadline.", options:["finish up","look after","give away"], answer:"finish up"}
+];
+
+let player = document.getElementById('player');
+let questionBox = document.getElementById('questionBox');
+let questionText = document.getElementById('questionText');
+let optionsContainer = document.getElementById('optionsContainer');
+let feedback = document.getElementById('feedback');
+let treasure = document.getElementById('treasure');
+let restartBtn = document.getElementById('restartBtn');
+let gameContainer = document.getElementById('gameContainer');
+let rocketIndex = 0;
+let rockets = [];
+const correctSound = document.getElementById('correctSound');
+const wrongSound = document.getElementById('wrongSound');
+const clapSound = document.getElementById('clapSound');
+const volumeSlider = document.getElementById('volumeSlider');
+
+volumeSlider.oninput = ()=>{
+  correctSound.volume = volumeSlider.value;
+  wrongSound.volume = volumeSlider.value;
+  clapSound.volume = volumeSlider.value;
+};
+correctSound.volume = volumeSlider.value;
+wrongSound.volume = volumeSlider.value;
+clapSound.volume = volumeSlider.value;
+
+// Logo splash
+setTimeout(()=>{
+  document.getElementById('logoScreen').style.display='none';
+  gameContainer.style.display='block';
+  createRockets();
+},5000);
+
+// --- Create Rockets ---
+function createRockets(){
+  const spacing = window.innerWidth/(questions.length+1);
+  questions.forEach((q,i)=>{
+    const rocket = document.createElement('div');
+    rocket.className='rocket';
+    rocket.textContent="🚀";
+    rocket.style.left=(spacing*(i+1)-40)+'px';
+    rocket.style.top="200px";
+    rocket.onclick = ()=>openRocket(i,rocket);
+    gameContainer.appendChild(rocket);
+    rockets.push(rocket);
+  });
+}
+
+// --- Open Rocket Question ---
+function openRocket(index,rocket){
+  questionBox.style.display='block';
+  questionText.textContent=questions[index].sentence;
+  optionsContainer.innerHTML='';
+  feedback.innerHTML='';
+  const opts = [...questions[index].options].sort(()=>Math.random()-0.5);
+  opts.forEach(opt=>{
+    const btn = document.createElement('button');
+    btn.textContent=opt;
+    btn.onclick = ()=>checkAnswer(opt,questions[index].answer,rocket,index);
+    optionsContainer.appendChild(btn);
+  });
+}
+
+// --- Particle Effect ---
+function createParticles(x,y){
+  for(let i=0;i<15;i++){
+    const p = document.createElement('div');
+    p.className='particle';
+    p.style.left = x+'px';
+    p.style.top = y+'px';
+    p.style.setProperty('--randX', Math.random());
+    document.body.appendChild(p);
+    setTimeout(()=>document.body.removeChild(p),1000);
+  }
+}
+
+// --- Check Answer ---
+function checkAnswer(selected,correct,rocket,index){
+  if(selected===correct){
+    feedback.textContent="Correct! 🎉";
+    feedback.style.color="green";
+    correctSound.currentTime=0; correctSound.play();
+    createParticles(rocket.offsetLeft+40,rocket.offsetTop);
+    questionBox.style.display='none';
+    rocket.style.background="#4caf50";
+    rocket.style.pointerEvents="none";
+    movePlayer(index);
+  } else {
+    feedback.textContent="Try again!";
+    feedback.style.color="red";
+    wrongSound.currentTime=0; wrongSound.play();
+  }
+}
+
+// --- Move Player ---
+function movePlayer(index){
+  player.style.left = rockets[index].style.left;
+  rocketIndex++;
+  if(rocketIndex===questions.length){
+    treasure.style.display='block';
+    clapSound.currentTime=0; clapSound.play();
+    restartBtn.style.display='block';
+  }
+}
+
+// --- Restart ---
+restartBtn.onclick = ()=>{
+  rocketIndex=0;
+  player.style.left="50%";
+  treasure.style.display='none';
+  restartBtn.style.display='none';
+  rockets.forEach(r=>{
+    r.style.background="#ff4136";
+    r.style.pointerEvents="auto";
+  });
+}
+</script>
+</body>
+</html>
