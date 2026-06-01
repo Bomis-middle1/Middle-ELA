@@ -4,46 +4,26 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Phrasal Verb Popcorn Catch - Clean</title>
+<title>Phrasal Verb Popcorn Catch - Arcade</title>
 <style>
 body { margin:0; font-family: Arial; background:#87ceeb; overflow:hidden; }
-#logoScreen { position:fixed; top:0; left:0; width:100%; height:100%; display:flex; justify-content:center; align-items:center; background:white; z-index:100;}
-#instructions { position:fixed; top:0; left:0; width:100%; height:100%; display:flex; flex-direction:column; justify-content:center; align-items:center; background:#fefefe; z-index:101; text-align:center; padding:20px; font-size:18px;}
-#gameContainer { display:none; width:100%; height:100vh; position:relative; overflow:hidden;}
-#player { position:absolute; bottom:10px; left:50%; transform:translateX(-50%); width:60px; height:60px; background:url('assets/player.png') no-repeat center/contain; z-index:10; }
-.kernel { position:absolute; width:120px; height:40px; background:#ffeb3b; border-radius:5px; text-align:center; line-height:40px; font-weight:bold; cursor:pointer; }
+#gameContainer { position:relative; width:100%; height:100vh; overflow:hidden; }
+#player { position:absolute; bottom:10px; left:50%; width:60px; height:60px; background:#ff4136; border-radius:5px; transform:translateX(-50%);}
+.kernel { position:absolute; width:150px; height:40px; background:#ffeb3b; border-radius:5px; text-align:center; line-height:40px; font-weight:bold; cursor:pointer; }
 #feedback { position:absolute; top:10px; left:50%; transform:translateX(-50%); font-weight:bold; font-size:20px; z-index:50; }
 #treasure { position:absolute; top:50px; left:50%; transform:translateX(-50%); width:60px; height:60px; display:none; background:gold; border-radius:50%; text-align:center; line-height:60px; font-weight:bold;}
 #restartBtn { position:absolute; display:none; left:50%; top:80%; transform:translateX(-50%); padding:10px 20px; font-size:18px; cursor:pointer;}
 .particle { position:absolute; width:6px; height:6px; background:linear-gradient(to right,#ff0,#f0f); border-radius:50%; pointer-events:none; animation: floatParticle 1s linear forwards;}
 @keyframes floatParticle {0%{opacity:1; transform:translate(0,0);} 100%{opacity:0; transform:translate(calc(-50px + 100px*var(--randX)),-50px);}}
-#volumeSlider { position:absolute; bottom:10px; left:50%; transform:translateX(-50%);}
 </style>
 </head>
 <body>
 
-<div id="logoScreen">
-<img src="assets/innovine-logo.png" alt="Innovine Logo" width="200">
-</div>
-
-<div id="instructions">
-<h2>🍿 Phrasal Verb Popcorn Catch 🍿</h2>
-<p>Instructions:</p>
-<ul>
-<li>Move your player left and right to catch the correct popcorn kernels.</li>
-<li>Each kernel shows a phrasal verb to complete a sentence.</li>
-<li>Catch the correct ones to score points!</li>
-<li>Catch all correct kernels to reach the treasure!</li>
-</ul>
-<button id="startBtn">Start Game</button>
-</div>
-
 <div id="gameContainer">
-<div id="feedback"></div>
 <div id="player"></div>
+<div id="feedback"></div>
 <div id="treasure">🏆</div>
-<button id="restartBtn">Restart Game</button>
-<input type="range" id="volumeSlider" min="0" max="1" step="0.1" value="0.8">
+<button id="restartBtn">Play Again</button>
 
 <audio id="correctSound" src="assets/correct.mp3"></audio>
 <audio id="wrongSound" src="assets/wrong.mp3"></audio>
@@ -65,103 +45,85 @@ const questions = [
 ];
 
 let currentQuestion = 0;
-let player = document.getElementById('player');
-let gameContainer = document.getElementById('gameContainer');
-let feedback = document.getElementById('feedback');
-let startBtn = document.getElementById('startBtn');
-let instructions = document.getElementById('instructions');
-let treasure = document.getElementById('treasure');
-let restartBtn = document.getElementById('restartBtn');
-let correctSound = document.getElementById('correctSound');
-let wrongSound = document.getElementById('wrongSound');
-let clapSound = document.getElementById('clapSound');
-let volumeSlider = document.getElementById('volumeSlider');
+const player = document.getElementById('player');
+const feedback = document.getElementById('feedback');
+const treasure = document.getElementById('treasure');
+const restartBtn = document.getElementById('restartBtn');
+const gameContainer = document.getElementById('gameContainer');
+const correctSound = document.getElementById('correctSound');
+const wrongSound = document.getElementById('wrongSound');
+const clapSound = document.getElementById('clapSound');
 
-volumeSlider.oninput = ()=>{
-  correctSound.volume = volumeSlider.value;
-  wrongSound.volume = volumeSlider.value;
-  clapSound.volume = volumeSlider.value;
-};
-correctSound.volume = volumeSlider.value;
-wrongSound.volume = volumeSlider.value;
-clapSound.volume = volumeSlider.value;
+let playerLeft = window.innerWidth/2 - 30;
+player.style.left = playerLeft + 'px';
 
 // Player movement
-let playerLeft = window.innerWidth/2-30;
-player.style.left = playerLeft+'px';
 document.addEventListener('keydown', e=>{
   if(e.key==='ArrowLeft'){ playerLeft -= 20; if(playerLeft<0) playerLeft=0; player.style.left=playerLeft+'px'; }
   if(e.key==='ArrowRight'){ playerLeft += 20; if(playerLeft>window.innerWidth-60) playerLeft=window.innerWidth-60; player.style.left=playerLeft+'px'; }
 });
-
-// Start game
-startBtn.onclick = ()=>{
-  instructions.style.display='none';
-  document.getElementById('logoScreen').style.display='none';
-  gameContainer.style.display='block';
-  spawnNextKernel();
-};
 
 // Particle effect
 function createParticles(x,y){
   for(let i=0;i<10;i++){
     const p = document.createElement('div');
     p.className='particle';
-    p.style.left=x+'px';
-    p.style.top=y+'px';
+    p.style.left = x+'px';
+    p.style.top = y+'px';
     p.style.setProperty('--randX', Math.random());
-    document.body.appendChild(p);
-    setTimeout(()=>document.body.removeChild(p),1000);
+    gameContainer.appendChild(p);
+    setTimeout(()=>gameContainer.removeChild(p),1000);
   }
 }
 
 // Spawn kernels sequentially
-function spawnNextKernel(){
+function spawnKernel(){
   if(currentQuestion >= questions.length){
     treasure.style.display='block';
     clapSound.currentTime=0; clapSound.play();
     restartBtn.style.display='block';
+    feedback.textContent = "🎉 You caught all phrasal verbs!";
     return;
   }
-  feedback.textContent="";
+
   const q = questions[currentQuestion];
-  // Spawn 3-5 options per wave
-  const options = [q.correct, ...q.wrong].sort(()=>Math.random()-0.5);
+  const options = [q.correct,...q.wrong].sort(()=>Math.random()-0.5);
+  
   options.forEach((opt,i)=>{
     const kernel = document.createElement('div');
     kernel.className='kernel';
-    kernel.textContent=opt;
-    kernel.style.left = 50 + i*150 + 'px';
+    kernel.textContent = opt;
+    kernel.style.left = 50 + i*160 + 'px';
     kernel.style.top = '-50px';
     gameContainer.appendChild(kernel);
-    let fallInterval = setInterval(()=>{
+    
+    const fallInterval = setInterval(()=>{
       let top = parseInt(kernel.style.top);
       if(top>window.innerHeight-100){ kernel.remove(); clearInterval(fallInterval); }
       else { kernel.style.top = top + 2 + 'px'; }
 
-      // Collision
       let kernelRect = kernel.getBoundingClientRect();
       let playerRect = player.getBoundingClientRect();
       if(!(playerRect.right<kernelRect.left || playerRect.left>kernelRect.right || playerRect.bottom<kernelRect.top || playerRect.top>kernelRect.bottom)){
         if(kernel.textContent===q.correct){
-          createParticles(kernelRect.left+60,kernelRect.top+20);
-          correctSound.currentTime=0; correctSound.play();
           feedback.textContent="Correct! 🎉"; feedback.style.color="green";
+          correctSound.currentTime=0; correctSound.play();
+          createParticles(kernelRect.left+60,kernelRect.top+20);
         } else {
-          wrongSound.currentTime=0; wrongSound.play();
           feedback.textContent="Wrong! ❌"; feedback.style.color="red";
+          wrongSound.currentTime=0; wrongSound.play();
         }
         kernel.remove(); clearInterval(fallInterval);
-        if(i===options.length-1){ currentQuestion++; setTimeout(spawnNextKernel,500); }
+        if(i===options.length-1){ currentQuestion++; setTimeout(spawnKernel,500); }
       }
     },20);
   });
 }
 
+spawnKernel();
+
 // Restart
-restartBtn.onclick = ()=>{
-  location.reload();
-}
+restartBtn.onclick = ()=>{ location.reload(); }
 </script>
 </body>
 </html>
