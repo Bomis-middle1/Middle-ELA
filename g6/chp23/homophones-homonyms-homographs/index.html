@@ -1,1 +1,146 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Balloon Pop Homophones</title>
+<style>
+body { margin:0; font-family:Arial; background:#87ceeb; overflow:hidden; display:flex; justify-content:center; align-items:center; height:100vh; }
+#logoScreen { position:fixed; top:0; left:0; width:100%; height:100%; display:flex; justify-content:center; align-items:center; background:white; z-index:100;}
+#gameContainer { display:none; width:100%; max-width:500px; position:relative; text-align:center; }
+#question { font-weight:bold; font-size:18px; margin-bottom:10px; color:#222; }
+.balloon { position:absolute; width:80px; height:80px; border-radius:50%; background:#ffeb3b; display:flex; justify-content:center; align-items:center; cursor:pointer; user-select:none; font-weight:bold; color:#222; box-shadow:0 0 5px #000; }
+.balloon.wiggle { animation: wiggle 0.5s; }
+@keyframes wiggle {0%{transform:rotate(0deg);}25%{transform:rotate(-10deg);}50%{transform:rotate(10deg);}75%{transform:rotate(-10deg);}100%{transform:rotate(0deg);}}
+#feedback { margin-top:10px; height:24px; font-weight:bold; }
+#tick { display:none; font-size:30px; color:green; margin-top:10px; }
+#restartBtn { display:none; margin-top:20px; padding:10px 20px; font-size:18px; cursor:pointer; background:#4caf50; color:white; border:none; border-radius:5px; }
+.confetti-piece { position:absolute; width:8px; height:8px; border-radius:50%; top:0; animation: fall 2s linear forwards;}
+@keyframes fall {0%{transform:translateY(0);}100%{transform:translateY(400px); opacity:0;}}
+</style>
+</head>
+<body>
+
+<div id="logoScreen">
+<img src="assets/innovine-logo.png" alt="Innovine Logo" width="200">
+</div>
+
+<div id="gameContainer">
+<div id="question"></div>
+<div id="feedback"></div>
+<button id="restartBtn">Play Again</button>
+</div>
+
+<audio id="correctSound" src="assets/correct.mp3"></audio>
+<audio id="wrongSound" src="assets/wrong.mp3"></audio>
+<audio id="clapSound" src="assets/clapping.mp3"></audio>
+
+<script>
+const questions = [
+{q:"Which word completes the sentence? 'I went to the sea to see the ___.'", correct:"see", wrong:["sea","bee","tree"]},
+{q:"Choose the correct homophone: 'The wind made a loud ___.'", correct:"sigh", wrong:["sci","sai","sye"]},
+{q:"Select the correct word: 'I will ___ the cake tomorrow.'", correct:"bake", wrong:["break","beak","back"]},
+{q:"Pick the correct word: 'He wore a red ___.'", correct:"tie", wrong:["tye","tiee","thy"]},
+{q:"Which word fits? 'The knight fought bravely with his ___.'", correct:"sword", wrong:["swore","soared","sward"]},
+{q:"Choose the correct homophone: 'She heard a loud ___ in the night.'", correct:"knight", wrong:["night","nigh","nite"]},
+{q:"Fill in: 'He will ___ the ball to his teammate.'", correct:"throw", wrong:["throe","thru","thro"]},
+{q:"Pick the correct word: 'I saw a ___ in the tree.'", correct:"hare", wrong:["hair","hear","her"]},
+{q:"Which word completes? 'Please ___ the letter carefully.'", correct:"write", wrong:["right","rite","writ"]},
+{q:"Choose the correct homophone: 'He wore a ___ on his foot.'", correct:"sole", wrong:["soul","sol","soll"]}
+];
+
+let currentQ=0;
+const gameContainer = document.getElementById("gameContainer");
+const questionEl = document.getElementById("question");
+const feedback = document.getElementById("feedback");
+const restartBtn = document.getElementById("restartBtn");
+const correctSound = document.getElementById("correctSound");
+const wrongSound = document.getElementById("wrongSound");
+const clapSound = document.getElementById("clapSound");
+
+// --- Show question ---
+function showQuestion(){
+  feedback.textContent="";
+  questionEl.textContent = questions[currentQ].q;
+
+  // Remove old balloons
+  document.querySelectorAll(".balloon").forEach(b=>b.remove());
+
+  // Create balloons with options
+  const opts = [questions[currentQ].correct,...questions[currentQ].wrong].sort(()=>Math.random()-0.5);
+  opts.forEach((opt,i)=>{
+    const b = document.createElement("div");
+    b.className="balloon";
+    b.textContent=opt;
+    b.style.left=10 + i*90 + "px";
+    b.style.top="300px";
+    gameContainer.appendChild(b);
+
+    b.onclick = ()=>checkAnswer(b,opt,questions[currentQ].correct);
+    animateBalloon(b);
+  });
+}
+
+// --- Balloon animation (slower) ---
+function animateBalloon(balloon){
+  let pos = 300;
+  const interval = setInterval(()=>{
+    pos -= 1; // slower upward movement
+    balloon.style.top = pos + "px";
+    if(pos < 0){ clearInterval(interval); balloon.remove(); }
+  }, 40); // slower interval for better readability
+}
+
+// --- Check answer ---
+function checkAnswer(balloon,opt,correct){
+  if(opt===correct){
+    feedback.textContent="Good Job! 🎉";
+    feedback.style.color="green";
+    correctSound.currentTime=0; correctSound.play();
+    createConfetti();
+    setTimeout(nextQuestion,800);
+  } else {
+    feedback.textContent="Try Again! ❌";
+    feedback.style.color="red";
+    balloon.classList.add("wiggle");
+    wrongSound.currentTime=0; wrongSound.play();
+    setTimeout(()=>balloon.classList.remove("wiggle"),500);
+  }
+}
+
+// --- Next question ---
+function nextQuestion(){
+  currentQ++;
+  if(currentQ>=questions.length){
+    feedback.textContent="🎉 You completed all questions!";
+    clapSound.currentTime=0; clapSound.play();
+    restartBtn.style.display="block";
+  } else showQuestion();
+}
+
+// --- Confetti effect ---
+function createConfetti(){
+  for(let i=0;i<20;i++){
+    const c = document.createElement("div");
+    c.className="confetti-piece";
+    c.style.left=Math.random()*window.innerWidth+"px";
+    c.style.background=`hsl(${Math.random()*360},100%,50%)`;
+    document.body.appendChild(c);
+    setTimeout(()=>document.body.removeChild(c),1500);
+  }
+}
+
+// --- Restart ---
+restartBtn.onclick=()=>location.reload();
+
+// --- Start with logo ---
+setTimeout(()=>{
+  document.getElementById("logoScreen").style.display="none";
+  gameContainer.style.display="block";
+  showQuestion();
+},5000);
+</script>
+
+</body>
+</html>
