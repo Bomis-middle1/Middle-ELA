@@ -1,1 +1,264 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Active vs Passive Voice Game</title>
+
+<style>
+body{
+margin:0;
+font-family:Arial;
+background:linear-gradient(#6fd3ff,#fff3a6);
+text-align:center;
+}
+
+#splash{
+position:fixed;
+inset:0;
+background:white;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+z-index:9999;
+}
+
+#splash img{
+width:180px;
+}
+
+.container{
+max-width:800px;
+margin:auto;
+padding:15px;
+}
+
+button{
+width:100%;
+padding:12px;
+margin:8px 0;
+border:none;
+border-radius:10px;
+background:#e3f2ff;
+font-size:16px;
+cursor:pointer;
+}
+
+button:hover{
+background:#cde9ff;
+}
+
+.correctAnim{
+animation:pop 0.5s;
+background:#b6f7c2 !important;
+}
+
+.wrongAnim{
+background:#ffb3b3 !important;
+}
+
+@keyframes pop{
+50%{transform:scale(1.1);}
+}
+
+#questionBox{
+background:white;
+padding:15px;
+border-radius:12px;
+margin-top:20px;
+}
+
+#end{
+display:none;
+background:white;
+padding:20px;
+border-radius:12px;
+margin-top:20px;
+}
+
+.coin{
+position:fixed;
+font-size:25px;
+animation:floatUp 2.5s linear forwards;
+}
+
+@keyframes floatUp{
+0%{transform:translateY(0);}
+100%{transform:translateY(-200px);opacity:0;}
+}
+</style>
+</head>
+
+<body>
+
+<!-- SPLASH -->
+<div id="splash">
+<img src="assets/innovine-logo.png">
+<h2>Active & Passive Voice</h2>
+<p>Loading Game...</p>
+</div>
+
+<div class="container">
+
+<h2>Grammar Quest</h2>
+
+<label>Volume: 
+<input type="range" id="vol" min="0" max="1" step="0.1" value="1">
+</label>
+
+<p>Score: <span id="score">0</span>/10</p>
+
+<div id="questionBox">
+<h3 id="q"></h3>
+<div id="options"></div>
+</div>
+
+<div id="end">
+<h2>🎉 Game Over!</h2>
+<p id="result"></p>
+<button onclick="location.reload()">Restart</button>
+</div>
+
+</div>
+
+<!-- SOUNDS -->
+<audio id="correctSound" src="assets/correct.mp3"></audio>
+<audio id="wrongSound" src="assets/wrong.mp3"></audio>
+<audio id="clapSound" src="assets/clapping.mp3"></audio>
+
+<script>
+
+setTimeout(()=>{
+document.getElementById("splash").style.display="none";
+},5000);
+
+const questions = [
+{
+q:"Which sentence is active voice?",
+a:"Maya baked the cake.",
+o:["The cake was baked by Maya.","Maya baked the cake.","The cake is baked by Maya.","The cake had been baked by Maya."]
+},
+{
+q:"Which sentence is passive voice?",
+a:"The ball was kicked by Liam.",
+o:["Liam kicked the ball.","The ball was kicked by Liam.","Liam is kicking the ball.","Liam will kick the ball."]
+},
+{
+q:"The project was completed by the students. This is:",
+a:"Passive voice",
+o:["Active voice","Passive voice","Future tense","Command"]
+},
+{
+q:"Choose active voice:",
+a:"Jake broke the window.",
+o:["Jake broke the window.","The window was broken by Jake.","Jake was broken by window.","Window breaks Jake."]
+},
+{
+q:"Choose passive voice:",
+a:"The meal was prepared by the chef.",
+o:["Chef prepared meal.","The meal was prepared by the chef.","Chef is preparing meal.","Meal prepares chef."]
+},
+{
+q:"I washed the dishes. This is:",
+a:"Active voice",
+o:["Passive voice","Active voice","Question","Command"]
+},
+{
+q:"Which focuses on action more than doer?",
+a:"The picture was painted by Emma.",
+o:["Emma painted the picture.","The picture was painted by Emma.","Emma paints picture.","Emma will paint picture."]
+},
+{
+q:"All windows were cleaned yesterday. This is:",
+a:"Passive voice",
+o:["Active voice","Passive voice","Question","Exclamation"]
+},
+{
+q:"Which is active voice?",
+a:"The teacher checked the homework.",
+o:["Homework was checked by teacher.","The teacher checked the homework.","Homework is checked.","Homework checked teacher."]
+},
+{
+q:"Why use passive voice?",
+a:"To focus on action/result",
+o:["To hide meaning","To focus on action/result","To make sentences wrong","To shorten words"]
+}
+];
+
+let index = 0;
+let score = 0;
+
+function loadQ(){
+let q = questions[index];
+document.getElementById("q").innerText = q.q;
+
+let optBox = document.getElementById("options");
+optBox.innerHTML = "";
+
+q.o.sort(()=>Math.random()-0.5).forEach(opt=>{
+let btn = document.createElement("button");
+btn.innerText = opt;
+
+btn.onclick = ()=>{
+checkAnswer(opt, q.a, btn);
+};
+
+optBox.appendChild(btn);
+});
+}
+
+function checkAnswer(selected, correct, btn){
+
+let vol = document.getElementById("vol").value;
+document.getElementById("correctSound").volume = vol;
+document.getElementById("wrongSound").volume = vol;
+
+if(selected === correct){
+btn.classList.add("correctAnim");
+document.getElementById("correctSound").play();
+score++;
+document.getElementById("score").innerText = score;
+coin();
+}
+else{
+btn.classList.add("wrongAnim");
+document.getElementById("wrongSound").play();
+}
+
+setTimeout(()=>{
+index++;
+
+if(index < questions.length){
+loadQ();
+}
+else{
+endGame();
+}
+},1000);
+}
+
+function coin(){
+let c = document.createElement("div");
+c.className = "coin";
+c.innerHTML = "🪙";
+c.style.left = Math.random()*80 + "%";
+document.body.appendChild(c);
+
+setTimeout(()=>c.remove(),2500);
+}
+
+function endGame(){
+document.getElementById("clapSound").play();
+document.getElementById("questionBox").style.display="none";
+document.getElementById("end").style.display="block";
+document.getElementById("result").innerText = "Score: " + score + "/10";
+}
+
+setTimeout(loadQ, 5000);
+
+</script>
+
+</body>
+</html>
