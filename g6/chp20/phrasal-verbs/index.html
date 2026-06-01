@@ -1,23 +1,26 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Phrasal Verb Rocket Rescue</title>
+<title>Phrasal Verb Maze Runner</title>
 <style>
-body { margin:0; font-family: Arial; background:#001f3f; overflow:hidden; }
+body { margin:0; font-family: Arial; background:#e6f7ff; overflow:hidden; }
 #logoScreen { position:fixed; top:0; left:0; width:100%; height:100%; display:flex; justify-content:center; align-items:center; background:white; z-index:100;}
 #gameContainer { display:none; width:100%; height:100vh; position:relative; overflow:hidden;}
-#player { position:absolute; bottom:20px; left:50%; transform:translateX(-50%); width:60px; height:80px; transition:left 0.5s;}
-.rocket { position:absolute; width:80px; height:100px; background:#ff4136; border-radius:10px; cursor:pointer; text-align:center; line-height:100px; color:white; font-weight:bold; }
+#maze { position:relative; width:100%; height:80%; background:#b3e0ff; margin-top:20px; border:3px solid #007acc; }
+.cell { width:50px; height:50px; float:left; box-sizing:border-box; border:1px solid #007acc; position:relative; }
+.wall { background:#007acc; }
+#player { width:40px; height:40px; background:#ff4136; position:absolute; transition:left 0.2s, top 0.2s; z-index:10; border-radius:5px; }
 #questionBox { display:none; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:300px; background:white; padding:20px; border-radius:10px; text-align:center; box-shadow:0 0 15px #0003; z-index:50; }
 #questionBox button { margin:5px; padding:10px 15px; cursor:pointer;}
 #feedback { margin-top:10px; font-weight:bold;}
-#treasure { position:absolute; bottom:50px; left:50%; transform:translateX(-50%); width:120px; height:120px; display:none; background:gold; border-radius:50%; text-align:center; line-height:120px; font-weight:bold; color:white;}
-#restartBtn { position:absolute; display:none; left:50%; top:70%; transform:translateX(-50%); padding:10px 20px; font-size:18px; cursor:pointer;}
-.particle { position:absolute; width:6px; height:6px; background:linear-gradient(to right, #ff0,#f0f); border-radius:50%; pointer-events:none; animation: floatParticle 1s linear forwards;}
-@keyframes floatParticle { 0%{opacity:1; transform:translate(0,0);} 100%{opacity:0; transform:translate(calc(-50px + 100px*var(--randX)),-100px);}}
+#treasure { position:absolute; bottom:20px; left:50%; width:60px; height:60px; transform:translateX(-50%); display:none; background:gold; border-radius:50%; text-align:center; line-height:60px; font-weight:bold;}
+#restartBtn { position:absolute; display:none; left:50%; top:90%; transform:translateX(-50%); padding:10px 20px; font-size:18px; cursor:pointer;}
 #volumeSlider { position:absolute; bottom:10px; left:50%; transform:translateX(-50%);}
+.particle { position:absolute; width:6px; height:6px; background:linear-gradient(to right,#ff0,#f0f); border-radius:50%; pointer-events:none; animation: floatParticle 1s linear forwards;}
+@keyframes floatParticle {0%{opacity:1; transform:translate(0,0);} 100%{opacity:0; transform:translate(calc(-50px + 100px*var(--randX)),-100px);}}
 </style>
 </head>
 <body>
@@ -27,15 +30,15 @@ body { margin:0; font-family: Arial; background:#001f3f; overflow:hidden; }
 </div>
 
 <div id="gameContainer">
-<img id="player" src="assets/player.png" alt="Player">
-<div id="treasure">🎉</div>
+<div id="maze"></div>
+<div id="player"></div>
 <div id="questionBox">
 <div id="questionText"></div>
 <div id="optionsContainer"></div>
 <div id="feedback"></div>
 </div>
-
-<button id="restartBtn">Restart Adventure</button>
+<div id="treasure">🏆</div>
+<button id="restartBtn">Restart Game</button>
 <input type="range" id="volumeSlider" min="0" max="1" step="0.1" value="0.8">
 
 <audio id="correctSound" src="assets/correct.mp3"></audio>
@@ -44,7 +47,13 @@ body { margin:0; font-family: Arial; background:#001f3f; overflow:hidden; }
 </div>
 
 <script>
-// --- Phrasal Verb Questions ---
+// --- Maze Setup ---
+const mazeRows = 8;
+const mazeCols = 10;
+const maze = document.getElementById('maze');
+let player = document.getElementById('player');
+const cellSize = 50;
+
 const questions = [
   {sentence:"He couldn’t ___ the heavy box by himself.", options:["pick up","break down","turn on"], answer:"pick up"},
   {sentence:"She wants to ___ her old clothes to charity.", options:["give away","put off","look after"], answer:"give away"},
@@ -58,16 +67,16 @@ const questions = [
   {sentence:"We need to ___ the project before the deadline.", options:["finish up","look after","give away"], answer:"finish up"}
 ];
 
-let player = document.getElementById('player');
-let questionBox = document.getElementById('questionBox');
-let questionText = document.getElementById('questionText');
-let optionsContainer = document.getElementById('optionsContainer');
-let feedback = document.getElementById('feedback');
-let treasure = document.getElementById('treasure');
-let restartBtn = document.getElementById('restartBtn');
-let gameContainer = document.getElementById('gameContainer');
-let rocketIndex = 0;
-let rockets = [];
+let currentQuestionIndex = 0;
+let playerPos = {row:0,col:0};
+let cellElements = [];
+
+const questionBox = document.getElementById('questionBox');
+const questionText = document.getElementById('questionText');
+const optionsContainer = document.getElementById('optionsContainer');
+const feedback = document.getElementById('feedback');
+const treasure = document.getElementById('treasure');
+const restartBtn = document.getElementById('restartBtn');
 const correctSound = document.getElementById('correctSound');
 const wrongSound = document.getElementById('wrongSound');
 const clapSound = document.getElementById('clapSound');
@@ -82,46 +91,39 @@ correctSound.volume = volumeSlider.value;
 wrongSound.volume = volumeSlider.value;
 clapSound.volume = volumeSlider.value;
 
-// Logo splash
+// --- Logo splash ---
 setTimeout(()=>{
   document.getElementById('logoScreen').style.display='none';
-  gameContainer.style.display='block';
-  createRockets();
+  document.getElementById('gameContainer').style.display='block';
+  createMaze();
+  updatePlayerPosition();
 },5000);
 
-// --- Create Rockets ---
-function createRockets(){
-  const spacing = window.innerWidth/(questions.length+1);
-  questions.forEach((q,i)=>{
-    const rocket = document.createElement('div');
-    rocket.className='rocket';
-    rocket.textContent="🚀";
-    rocket.style.left=(spacing*(i+1)-40)+'px';
-    rocket.style.top="200px";
-    rocket.onclick = ()=>openRocket(i,rocket);
-    gameContainer.appendChild(rocket);
-    rockets.push(rocket);
-  });
+// --- Create Maze ---
+function createMaze(){
+  maze.innerHTML='';
+  cellElements = [];
+  for(let r=0;r<mazeRows;r++){
+    for(let c=0;c<mazeCols;c++){
+      const cell = document.createElement('div');
+      cell.className='cell';
+      cell.style.width=cellSize+'px';
+      cell.style.height=cellSize+'px';
+      maze.appendChild(cell);
+      cellElements.push({row:r,col:c,el:cell});
+    }
+  }
 }
 
-// --- Open Rocket Question ---
-function openRocket(index,rocket){
-  questionBox.style.display='block';
-  questionText.textContent=questions[index].sentence;
-  optionsContainer.innerHTML='';
-  feedback.innerHTML='';
-  const opts = [...questions[index].options].sort(()=>Math.random()-0.5);
-  opts.forEach(opt=>{
-    const btn = document.createElement('button');
-    btn.textContent=opt;
-    btn.onclick = ()=>checkAnswer(opt,questions[index].answer,rocket,index);
-    optionsContainer.appendChild(btn);
-  });
+// --- Player Position ---
+function updatePlayerPosition(){
+  player.style.left = playerPos.col*cellSize + 5 + 'px';
+  player.style.top = playerPos.row*cellSize + 5 + 'px';
 }
 
-// --- Particle Effect ---
+// --- Particle effect ---
 function createParticles(x,y){
-  for(let i=0;i<15;i++){
+  for(let i=0;i<10;i++){
     const p = document.createElement('div');
     p.className='particle';
     p.style.left = x+'px';
@@ -132,17 +134,37 @@ function createParticles(x,y){
   }
 }
 
+// --- Show Question ---
+function showQuestion(){
+  questionBox.style.display='block';
+  questionText.textContent=questions[currentQuestionIndex].sentence;
+  optionsContainer.innerHTML='';
+  feedback.innerHTML='';
+  const opts = [...questions[currentQuestionIndex].options].sort(()=>Math.random()-0.5);
+  opts.forEach(opt=>{
+    const btn = document.createElement('button');
+    btn.textContent=opt;
+    btn.onclick = ()=>checkAnswer(opt);
+    optionsContainer.appendChild(btn);
+  });
+}
+
 // --- Check Answer ---
-function checkAnswer(selected,correct,rocket,index){
+function checkAnswer(selected){
+  const correct = questions[currentQuestionIndex].answer;
   if(selected===correct){
     feedback.textContent="Correct! 🎉";
     feedback.style.color="green";
     correctSound.currentTime=0; correctSound.play();
-    createParticles(rocket.offsetLeft+40,rocket.offsetTop);
+    createParticles(player.offsetLeft,player.offsetTop);
     questionBox.style.display='none';
-    rocket.style.background="#4caf50";
-    rocket.style.pointerEvents="none";
-    movePlayer(index);
+    movePlayerForward();
+    currentQuestionIndex++;
+    if(currentQuestionIndex===questions.length){
+      treasure.style.display='block';
+      clapSound.currentTime=0; clapSound.play();
+      restartBtn.style.display='block';
+    }
   } else {
     feedback.textContent="Try again!";
     feedback.style.color="red";
@@ -151,26 +173,31 @@ function checkAnswer(selected,correct,rocket,index){
 }
 
 // --- Move Player ---
-function movePlayer(index){
-  player.style.left = rockets[index].style.left;
-  rocketIndex++;
-  if(rocketIndex===questions.length){
-    treasure.style.display='block';
-    clapSound.currentTime=0; clapSound.play();
-    restartBtn.style.display='block';
+function movePlayerForward(){
+  if(playerPos.col<mazeCols-1){
+    playerPos.col++;
+  } else if(playerPos.row<mazeRows-1){
+    playerPos.row++;
+    playerPos.col=0;
   }
+  updatePlayerPosition();
 }
+
+// --- Key Controls (optional for desktop) ---
+document.addEventListener('keydown', e=>{
+  if(e.key==='ArrowRight' && playerPos.col<mazeCols-1){playerPos.col++; updatePlayerPosition();}
+  if(e.key==='ArrowLeft' && playerPos.col>0){playerPos.col--; updatePlayerPosition();}
+  if(e.key==='ArrowDown' && playerPos.row<mazeRows-1){playerPos.row++; updatePlayerPosition();}
+  if(e.key==='ArrowUp' && playerPos.row>0){playerPos.row--; updatePlayerPosition();}
+});
 
 // --- Restart ---
 restartBtn.onclick = ()=>{
-  rocketIndex=0;
-  player.style.left="50%";
+  playerPos={row:0,col:0};
+  updatePlayerPosition();
   treasure.style.display='none';
   restartBtn.style.display='none';
-  rockets.forEach(r=>{
-    r.style.background="#ff4136";
-    r.style.pointerEvents="auto";
-  });
+  currentQuestionIndex=0;
 }
 </script>
 </body>
