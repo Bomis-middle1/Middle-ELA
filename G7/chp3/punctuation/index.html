@@ -14,7 +14,46 @@ body { margin:0; font-family:Arial; background:#f0f8ff; display:flex; justify-co
 #sentence { font-size:18px; font-weight:bold; margin-bottom:10px; }
 #feedback { margin-top:10px; font-weight:bold; height:24px; }
 #restartBtn { display:none; margin-top:20px; padding:10px 20px; font-size:18px; cursor:pointer; background:#4caf50; color:white; border:none; border-radius:5px; }
-.balloon { position:absolute; width:60px; height:60px; border-radius:50%; background:#ffeb3b; display:flex; justify-content:center; align-items:center; cursor:pointer; font-weight:bold; font-size:20px; user-select:none; }
+
+/* Balloon Styles */
+.balloon {
+  position:absolute;
+  width:60px;
+  height:80px;
+  border-radius:50% 50% 50% 50% / 60% 60% 40% 40%;
+  background: radial-gradient(circle at 30% 30%, #ffeb3b 0%, #f9c600 70%);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  cursor:pointer;
+  font-weight:bold;
+  font-size:20px;
+  user-select:none;
+  color:#000;
+}
+/* Balloon Knot */
+.balloon::after {
+  content:'';
+  position:absolute;
+  bottom:-8px;
+  left:50%;
+  transform:translateX(-50%);
+  width:6px;
+  height:6px;
+  background:#ffeb3b;
+  border-radius:50%;
+}
+/* Balloon String */
+.balloon::before {
+  content:'';
+  position:absolute;
+  bottom:-60px;
+  left:50%;
+  transform:translateX(-50%);
+  width:2px;
+  height:60px;
+  background:#888;
+}
 .balloon.wiggle { animation: wiggle 0.5s; }
 @keyframes wiggle {0%{transform:rotate(0deg);}25%{transform:rotate(-10deg);}50%{transform:rotate(10deg);}75%{transform:rotate(-10deg);}100%{transform:rotate(0deg);}}
 .confetti-piece { position:absolute; width:8px; height:8px; border-radius:50%; top:0; animation: fall 2s linear forwards;}
@@ -45,20 +84,21 @@ body { margin:0; font-family:Arial; background:#f0f8ff; display:flex; justify-co
 <audio id="clapSound" src="assets/clapping.mp3"></audio>
 
 <script>
+// --- Grade 7 punctuation questions ---
 const questions = [
-{q:"I like ice cream ___", options:[".","!","?","..."], answer:"."},
-{q:"What is your name ___", options:[".","!","?","…"], answer:"?"},
-{q:"Wow that was amazing ___", options:[".","!","?","…"], answer:"!"},
-{q:"She said ___ 'I am tired'", options:[".","!","?","\""], answer:"\""},
-{q:"He bought apples ___ oranges and bananas", options:[".","!","?",","], answer:","},
-{q:"Remember the rule ___ always be kind", options:[".","!","?",";"], answer:";"},
-{q:"Johns book is on the table ___", options:[".","!","?","'"], answer:"'"},
-{q:"My mother said ___ 'Come here'", options:[".","!","?","\""], answer:"\""},
-{q:"The teacher asked ___ Who wants to answer", options:[".","!","?","\""], answer:"?"},
-{q:"Ali is very smart ___ he always helps friends", options:[".","!","?",";"], answer:";"}
+{q:"I can’t believe it ___", options:[".","!","?"], answer:"!"},
+{q:"Where is the library ___", options:[".","?","!"], answer:"?"},
+{q:"John’s book is on the table ___", options:[".","'","!"], answer:"."},
+{q:"“Please sit down,” said the teacher ___", options:[".","!","\""], answer:"\""},
+{q:"She bought apples ___ oranges ___ and bananas ___", options:[",",".",";"], answer:","},
+{q:"Remember: always check your work ___", options:[".","!",";"], answer:":"},
+{q:"Did you finish your homework ___", options:["?","!","."], answer:"?"},
+{q:"Wow ___ that was an amazing performance ___", options:["!","?","."], answer:"!"},
+{q:"I visited Paris last summer ___ it was wonderful ___", options:[".",";",","], answer:"."},
+{q:"Sarah said ___ “I will be late today” ___", options:[".","\"","'"], answer:"\""}
 ];
 
-let current = 0;
+let current=0;
 const container = document.getElementById("gameContainer");
 const sentenceEl = document.getElementById("sentence");
 const feedback = document.getElementById("feedback");
@@ -72,18 +112,17 @@ function showQuestion(){
   const q = questions[current];
   sentenceEl.textContent = q.q;
 
-  // remove existing balloons
+  // Remove old balloons
   document.querySelectorAll(".balloon").forEach(b=>b.remove());
 
-  // create floating balloons
+  // Create floating balloons
   q.options.sort(()=>Math.random()-0.5).forEach((opt,i)=>{
     const balloon = document.createElement("div");
     balloon.className="balloon";
     balloon.textContent=opt;
-    balloon.style.left = (i*80 + 20) + "px";
+    balloon.style.left = (i*100 + 50) + "px";
     balloon.style.bottom = "0px";
     container.appendChild(balloon);
-
     balloon.onclick = ()=>checkAnswer(opt,q.answer,balloon);
     floatBalloon(balloon);
   });
@@ -92,7 +131,7 @@ function showQuestion(){
 function floatBalloon(balloon){
   let pos = 0;
   const interval = setInterval(()=>{
-    pos += 1; // speed of float
+    pos += 1; // speed
     balloon.style.bottom = pos + "px";
     if(pos > container.offsetHeight) { clearInterval(interval); balloon.remove(); }
   }, 30);
@@ -117,7 +156,7 @@ function checkAnswer(selected, correct, balloon){
 
 function nextQuestion(){
   current++;
-  if(current >= questions.length){
+  if(current>=questions.length){
     feedback.textContent="🎉 You completed all questions!";
     clapSound.currentTime=0; clapSound.play();
     restartBtn.style.display="block";
