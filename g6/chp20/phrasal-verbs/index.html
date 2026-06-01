@@ -1,46 +1,143 @@
 
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Phrasal Verb Snake Game</title>
+<title>Phrasal Verb Snake Quiz</title>
+
 <style>
-body { margin:0; background:#f0f8ff; font-family:Arial; }
-#logoScreen { position:fixed; top:0; left:0; width:100%; height:100%; display:flex; justify-content:center; align-items:center; background:white; z-index:100;}
-#gameContainer { display:none; position:relative; width:100%; height:100vh; overflow:hidden; background:#87ceeb; }
-#snakeCanvas { background:#87ceeb; display:block; margin:auto; }
-#questionBox { position:absolute; top:20px; left:50%; transform:translateX(-50%); background:white; padding:15px; border-radius:10px; text-align:center; width:300px; z-index:50; }
-#questionText { font-weight:bold; margin-bottom:10px; }
-button.optionBtn { display:block; width:80%; margin:5px auto; padding:8px; border:none; border-radius:5px; background:#eee; cursor:pointer; font-size:14px; }
-button.optionBtn:hover { background:#ddd; }
-#feedback { text-align:center; font-weight:bold; margin-top:10px; font-size:16px; }
-#restartBtn { display:none; margin:20px auto; padding:10px 20px; font-size:18px; cursor:pointer; background:#4caf50; color:white; border:none; border-radius:5px; display:block;}
+body {
+  margin: 0;
+  font-family: Arial;
+  background: #87ceeb;
+  overflow: hidden;
+}
+
+/* LOGO SCREEN */
+#logoScreen {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: white;
+  z-index: 1000;
+}
+
+/* GAME AREA */
+#gameContainer {
+  display: none;
+  width: 100%;
+  height: 100vh;
+  position: relative;
+}
+
+#snakeCanvas {
+  display: block;
+  margin: auto;
+  background: #87ceeb;
+}
+
+/* QUESTION BOX */
+#questionBox {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 320px;
+  background: white;
+  border-radius: 12px;
+  padding: 12px;
+  text-align: center;
+  z-index: 10;
+}
+
+#questionText {
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+button.optionBtn {
+  display: block;
+  width: 85%;
+  margin: 6px auto;
+  padding: 8px;
+  border: none;
+  border-radius: 6px;
+  background: #eee;
+  cursor: pointer;
+}
+
+button.optionBtn:hover {
+  background: #ddd;
+}
+
+#feedback {
+  margin-top: 8px;
+  font-weight: bold;
+}
+
+/* RESTART BUTTON FIXED */
+#restartBtn {
+  display: none;
+  margin: 20px auto;
+  padding: 12px 18px;
+  font-size: 16px;
+  background: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+/* PARTICLES */
+.particle {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background: linear-gradient(to right, #ff0, #f0f);
+  border-radius: 50%;
+  pointer-events: none;
+  animation: float 1s linear forwards;
+}
+
+@keyframes float {
+  0% { opacity: 1; transform: translate(0,0); }
+  100% { opacity: 0; transform: translate(calc(-40px + 80px*var(--r)), -60px); }
+}
 </style>
 </head>
+
 <body>
 
-<!-- Logo -->
+<!-- LOGO -->
 <div id="logoScreen">
-<img src="assets/innovine-logo.png" alt="Innovine Logo" width="200">
+  <img src="assets/innovine-logo.png" width="200">
 </div>
 
+<!-- GAME -->
 <div id="gameContainer">
-<canvas id="snakeCanvas" width="400" height="400"></canvas>
-<div id="questionBox">
-<div id="questionText"></div>
-<div id="optionsContainer"></div>
-<div id="feedback"></div>
-</div>
-<button id="restartBtn">Play Again</button>
-<audio id="correctSound" src="assets/correct.mp3"></audio>
-<audio id="wrongSound" src="assets/wrong.mp3"></audio>
-<audio id="clapSound" src="assets/clapping.mp3"></audio>
+  <canvas id="snakeCanvas" width="400" height="400"></canvas>
+
+  <div id="questionBox">
+    <div id="questionText"></div>
+    <div id="optionsContainer"></div>
+    <div id="feedback"></div>
+  </div>
+
+  <button id="restartBtn">Play Again</button>
+
+  <audio id="correctSound" src="assets/correct.mp3"></audio>
+  <audio id="wrongSound" src="assets/wrong.mp3"></audio>
+  <audio id="clapSound" src="assets/clapping.mp3"></audio>
 </div>
 
 <script>
-// --- Questions ---
+
+// ---------------- QUESTIONS ----------------
 const questions = [
   {sentence:"He couldn’t ___ the heavy box by himself.", options:["pick up","break down","turn on"], answer:"pick up"},
   {sentence:"She wants to ___ her old clothes to charity.", options:["give away","put off","look after"], answer:"give away"},
@@ -54,146 +151,140 @@ const questions = [
   {sentence:"We need to ___ the project before the deadline.", options:["finish up","look after","give away"], answer:"finish up"}
 ];
 
+// ---------------- STATE ----------------
 let currentQuestion = 0;
-const canvas = document.getElementById("snakeCanvas");
-const ctx = canvas.getContext("2d");
+let direction = "RIGHT";
 const box = 20;
-let snake = [];
-snake[0]={x:10*box, y:10*box};
-let food = {};
-let direction;
-let game;
-let questionAnswered = false;
 
-const questionText = document.getElementById("questionText");
-const optionsContainer = document.getElementById("optionsContainer");
-const feedback = document.getElementById("feedback");
-const restartBtn = document.getElementById("restartBtn");
-const correctSound = document.getElementById("correctSound");
-const wrongSound = document.getElementById("wrongSound");
-const clapSound = document.getElementById("clapSound");
+let snake = [{x:200, y:200}];
 
-// --- Show first question ---
-function showQuestion(){
-    questionAnswered=false;
-    const q = questions[currentQuestion];
-    questionText.textContent = q.sentence;
-    optionsContainer.innerHTML="";
-    q.options.sort(()=>Math.random()-0.5).forEach(opt=>{
-        const btn = document.createElement("button");
-        btn.textContent=opt;
-        btn.className="optionBtn";
-        btn.onclick = ()=>checkAnswer(opt);
-        optionsContainer.appendChild(btn);
-    });
-    feedback.textContent="";
-}
+let canvas = document.getElementById("snakeCanvas");
+let ctx = canvas.getContext("2d");
 
-// --- Check answer ---
-function checkAnswer(selected){
-    const correct = questions[currentQuestion].answer;
-    if(selected===correct){
-        feedback.textContent="Correct! 🎉";
-        feedback.style.color="green";
-        correctSound.currentTime=0; correctSound.play();
-        questionAnswered=true;
-        // grow snake by adding a new segment
-        snake.push({x:snake[snake.length-1].x, y:snake[snake.length-1].y});
-    }else{
-        feedback.textContent="Wrong! ❌";
-        feedback.style.color="red";
-        wrongSound.currentTime=0; wrongSound.play();
-        questionAnswered=false;
-    }
-}
+let correctSound = document.getElementById("correctSound");
+let wrongSound = document.getElementById("wrongSound");
+let clapSound = document.getElementById("clapSound");
 
-// --- Control snake ---
-document.addEventListener("keydown",function(event){
-    if(event.key==="ArrowLeft" && direction!="RIGHT") direction="LEFT";
-    else if(event.key==="ArrowUp" && direction!="DOWN") direction="UP";
-    else if(event.key==="ArrowRight" && direction!="LEFT") direction="RIGHT";
-    else if(event.key==="ArrowDown" && direction!="UP") direction="DOWN";
+let restartBtn = document.getElementById("restartBtn");
+
+// ---------------- AUDIO UNLOCK FIX ----------------
+document.addEventListener("click", () => {
+  [correctSound, wrongSound, clapSound].forEach(a => {
+    a.play().then(()=>a.pause()).catch(()=>{});
+  });
+}, { once:true });
+
+// ---------------- CONTROLS ----------------
+document.addEventListener("keydown", (e) => {
+  if(e.key==="ArrowLeft" && direction!=="RIGHT") direction="LEFT";
+  if(e.key==="ArrowRight" && direction!=="LEFT") direction="RIGHT";
+  if(e.key==="ArrowUp" && direction!=="DOWN") direction="UP";
+  if(e.key==="ArrowDown" && direction!=="UP") direction="DOWN";
 });
 
-// --- Spawn food ---
-function spawnFood(){
-    food.x = Math.floor(Math.random()*20)*box;
-    food.y = Math.floor(Math.random()*20)*box;
+// ---------------- PARTICLES ----------------
+function particles(x,y){
+  for(let i=0;i<10;i++){
+    let p=document.createElement("div");
+    p.className="particle";
+    p.style.left=x+"px";
+    p.style.top=y+"px";
+    p.style.setProperty("--r", Math.random());
+    document.body.appendChild(p);
+    setTimeout(()=>p.remove(),1000);
+  }
 }
 
-// --- Draw function ---
+// ---------------- QUESTION UI ----------------
+function showQuestion(){
+  let q = questions[currentQuestion];
+  document.getElementById("questionText").textContent = q.sentence;
+
+  let container = document.getElementById("optionsContainer");
+  container.innerHTML = "";
+
+  q.options.sort(()=>Math.random()-0.5).forEach(opt=>{
+    let btn=document.createElement("button");
+    btn.className="optionBtn";
+    btn.textContent=opt;
+    btn.onclick=()=>checkAnswer(opt);
+    container.appendChild(btn);
+  });
+
+  document.getElementById("feedback").textContent="";
+}
+
+// ---------------- ANSWER ----------------
+function checkAnswer(opt){
+  let q = questions[currentQuestion];
+
+  if(opt === q.answer){
+    document.getElementById("feedback").textContent="Correct 🎉";
+    document.getElementById("feedback").style.color="green";
+
+    correctSound.play();
+    snake.push({...snake[snake.length-1]});
+    particles(200,200);
+
+  } else {
+    document.getElementById("feedback").textContent="Wrong ❌";
+    document.getElementById("feedback").style.color="red";
+    wrongSound.play();
+  }
+
+  currentQuestion++;
+
+  if(currentQuestion >= questions.length){
+    clapSound.play();
+    document.getElementById("feedback").textContent="🎉 Finished!";
+    restartBtn.style.display="block";
+  } else {
+    setTimeout(showQuestion, 600);
+  }
+}
+
+// ---------------- DRAW SNAKE ----------------
 function draw(){
-    ctx.fillStyle="#87ceeb";
-    ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle="#87ceeb";
+  ctx.fillRect(0,0,400,400);
 
-    for(let i=0;i<snake.length;i++){
-        ctx.fillStyle = (i===0)?"#ff4136":"#ff7979";
-        ctx.fillRect(snake[i].x,snake[i].y,box,box);
-    }
+  for(let i=0;i<snake.length;i++){
+    ctx.fillStyle = i===0 ? "#ff4136" : "#ff7979";
+    ctx.fillRect(snake[i].x, snake[i].y, box, box);
+  }
 
-    ctx.fillStyle="yellow";
-    ctx.fillRect(food.x,food.y,box,box);
+  let head = {...snake[0]};
 
-    // old head position
-    let snakeX = snake[0].x;
-    let snakeY = snake[0].y;
+  if(direction==="LEFT") head.x -= box;
+  if(direction==="RIGHT") head.x += box;
+  if(direction==="UP") head.y -= box;
+  if(direction==="DOWN") head.y += box;
 
-    if(direction=="LEFT") snakeX -= box;
-    if(direction=="RIGHT") snakeX += box;
-    if(direction=="UP") snakeY -= box;
-    if(direction=="DOWN") snakeY += box;
+  if(head.x<0 || head.y<0 || head.x>=400 || head.y>=400){
+    alert("Game Over!");
+    restartBtn.style.display="block";
+    clearInterval(loop);
+    return;
+  }
 
-    // Collision
-    if(snakeX<0 || snakeY<0 || snakeX>=canvas.width || snakeY>=canvas.height || collision(snakeX,snakeY,snake)){
-        clearInterval(game);
-        alert("Game Over!");
-        restartBtn.style.display="block";
-        return;
-    }
-
-    // Eating food
-    if(snakeX==food.x && snakeY==food.y){
-        if(questionAnswered){
-            spawnFood();
-            currentQuestion++;
-            if(currentQuestion>=questions.length){
-                clearInterval(game);
-                clapSound.currentTime=0; clapSound.play();
-                alert("Congratulations! You finished all questions!");
-                restartBtn.style.display="block";
-                return;
-            }else showQuestion();
-        }else{
-            // if food eaten without answering correctly, do not grow
-            spawnFood();
-        }
-    }else{
-        snake.pop();
-    }
-
-    let newHead={x:snakeX,y:snakeY};
-    snake.unshift(newHead);
+  snake.pop();
+  snake.unshift(head);
 }
 
-// --- Collision with self ---
-function collision(x,y,array){
-    for(let i=0;i<array.length;i++){
-        if(array[i].x==x && array[i].y==y) return true;
-    }
-    return false;
-}
+// ---------------- START ----------------
+let loop;
 
-// --- Start game ---
 setTimeout(()=>{
-    document.getElementById("logoScreen").style.display="none";
-    document.getElementById("gameContainer").style.display="block";
-    spawnFood();
-    showQuestion();
-    game=setInterval(draw,150);
-},5000);
+  document.getElementById("logoScreen").style.display="none";
+  document.getElementById("gameContainer").style.display="block";
 
-restartBtn.onclick=()=>location.reload();
+  showQuestion();
+  loop = setInterval(draw, 140);
+}, 5000);
+
+// ---------------- RESTART ----------------
+restartBtn.onclick = () => location.reload();
+
 </script>
-
 </body>
 </html>
