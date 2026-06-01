@@ -1,1 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Subject-Verb Agreement Game - Grade 7</title>
+<style>
+body { margin:0; font-family:Arial; background:#f0f8ff; display:flex; justify-content:center; align-items:center; height:100vh; overflow:hidden; }
+#logoScreen, #instructionScreen, #gameContainer { width:100%; max-width:600px; text-align:center; padding:20px; position:absolute; top:0; left:0; }
+#logoScreen { height:100%; display:flex; justify-content:center; align-items:center; background:white; z-index:100; }
+#instructionScreen { display:none; background:#fff; border-radius:10px; box-shadow:0 0 10px #aaa; z-index:99; }
+#gameContainer { display:none; background:#fff; border-radius:10px; box-shadow:0 0 10px #aaa; z-index:98; }
+#sentence { font-size:18px; font-weight:bold; margin-bottom:15px; }
+.option { background:#ffeb3b; padding:8px 12px; border-radius:5px; cursor:pointer; user-select:none; min-width:80px; text-align:center; margin:5px; display:inline-block; }
+.option.wiggle { animation: wiggle 0.5s; }
+@keyframes wiggle {0%{transform:rotate(0deg);}25%{transform:rotate(-10deg);}50%{transform:rotate(10deg);}75%{transform:rotate(-10deg);}100%{transform:rotate(0deg);}}
+#feedback { margin-top:10px; font-weight:bold; height:24px; }
+#tick { display:none; font-size:30px; color:green; margin-top:10px; }
+#restartBtn { display:none; margin-top:20px; padding:10px 20px; font-size:18px; cursor:pointer; background:#4caf50; color:white; border:none; border-radius:5px; }
+.confetti-piece { position:absolute; width:8px; height:8px; border-radius:50%; top:0; animation: fall 2s linear forwards;}
+@keyframes fall {0%{transform:translateY(0);}100%{transform:translateY(400px); opacity:0;}}
+</style>
+</head>
+<body>
 
+<!-- Logo -->
+<div id="logoScreen">
+<img src="assets/innovine-logo.png" alt="Innovine Logo" width="200">
+</div>
+
+<!-- Instruction Screen -->
+<div id="instructionScreen">
+<h2>Subject-Verb Agreement Game!</h2>
+<p>Click on the correct verb that agrees with the subject in the sentence.</p>
+<p>Correct answers show a green tick ✔, wrong answers wiggle ❌.</p>
+<p>Complete all sentences to win the game!</p>
+</div>
+
+<!-- Game Container -->
+<div id="gameContainer">
+<div id="sentence"></div>
+<div id="optionsContainer"></div>
+<div id="feedback"></div>
+<div id="tick">✔</div>
+<button id="restartBtn">Play Again</button>
+</div>
+
+<audio id="correctSound" src="assets/correct.mp3"></audio>
+<audio id="wrongSound" src="assets/wrong.mp3"></audio>
+<audio id="clapSound" src="assets/clapping.mp3"></audio>
+
+<script>
+const questions = [
+{q:"The cat ___ on the wall.", options:["is","are","were"], answer:"is"},
+{q:"My friends ___ going to the park.", options:["is","are","was"], answer:"are"},
+{q:"The teacher ___ very strict.", options:["is","are","were"], answer:"is"},
+{q:"The dogs ___ barking loudly.", options:["is","are","was"], answer:"are"},
+{q:"Neither of the boys ___ ready for the test.", options:["is","are","were"], answer:"is"},
+{q:"Each of the players ___ a medal.", options:["has","have","had"], answer:"has"},
+{q:"The flowers in the garden ___ beautiful.", options:["is","are","was"], answer:"are"},
+{q:"One of my sisters ___ coming tomorrow.", options:["is","are","were"], answer:"is"},
+{q:"The news ___ shocking yesterday.", options:["was","were","is"], answer:"was"},
+{q:"Ten dollars ___ enough to buy this book.", options:["is","are","was"], answer:"is"}
+];
+
+let current = 0;
+const sentenceEl = document.getElementById("sentence");
+const optionsContainer = document.getElementById("optionsContainer");
+const feedback = document.getElementById("feedback");
+const tick = document.getElementById("tick");
+const restartBtn = document.getElementById("restartBtn");
+const correctSound = document.getElementById("correctSound");
+const wrongSound = document.getElementById("wrongSound");
+const clapSound = document.getElementById("clapSound");
+
+function showQuestion(){
+  tick.style.display="none";
+  feedback.textContent="";
+  const q = questions[current];
+  sentenceEl.textContent = q.q;
+  optionsContainer.innerHTML="";
+  const shuffled = q.options.sort(()=>Math.random()-0.5);
+  shuffled.forEach(opt=>{
+    const btn = document.createElement("div");
+    btn.className="option";
+    btn.textContent=opt;
+    btn.onclick = ()=>checkAnswer(opt,q.answer,btn);
+    optionsContainer.appendChild(btn);
+  });
+}
+
+function checkAnswer(selected, correct, btn){
+  if(selected === correct){
+    feedback.textContent="Good Job! 🎉";
+    feedback.style.color="green";
+    tick.style.display="block";
+    correctSound.currentTime=0; correctSound.play();
+    setTimeout(nextQuestion,800);
+  } else {
+    feedback.textContent="Try Again! ❌";
+    feedback.style.color="red";
+    btn.classList.add("wiggle");
+    wrongSound.currentTime=0; wrongSound.play();
+    setTimeout(()=>btn.classList.remove("wiggle"),500);
+  }
+}
+
+function nextQuestion(){
+  current++;
+  if(current>=questions.length){
+    feedback.textContent="🎉 You completed all questions!";
+    clapSound.currentTime=0; clapSound.play();
+    restartBtn.style.display="block";
+  } else showQuestion();
+}
+
+restartBtn.onclick = ()=>location.reload();
+
+// Logo and instruction flow
+setTimeout(()=>{
+  document.getElementById("logoScreen").style.display="none";
+  document.getElementById("instructionScreen").style.display="block";
+
+  setTimeout(()=>{
+    document.getElementById("instructionScreen").style.display="none";
+    document.getElementById("gameContainer").style.display="block";
+    showQuestion();
+  },5000);
+
+},5000);
+</script>
+</body>
+</html>
