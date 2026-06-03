@@ -3,17 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Adjective Championship</title>
+<title>Adjective Arena Championship</title>
 
 <style>
 *{box-sizing:border-box}
 body{
   margin:0;
   font-family:Arial, sans-serif;
-  background:linear-gradient(135deg,#fff3c4,#dff6ff,#f5ddff);
+  background:linear-gradient(135deg,#1f1c5c,#4b2c82,#ffb347);
   min-height:100vh;
   overflow:hidden;
-  color:#3b2f2f;
+  color:#fff;
 }
 .screen{
   display:none;
@@ -23,109 +23,183 @@ body{
   justify-content:center;
   flex-direction:column;
   text-align:center;
-  padding:20px;
+  padding:18px;
+  position:relative;
 }
 .active{display:flex}
 
 .logo{
-  max-width:280px;
   width:60%;
+  max-width:280px;
+  animation:pulse 1.5s infinite alternate;
+}
+@keyframes pulse{
+  from{transform:scale(1)}
+  to{transform:scale(1.06)}
 }
 
 .card{
   width:95%;
-  max-width:850px;
+  max-width:950px;
   background:#ffffffee;
-  border-radius:28px;
-  padding:24px;
-  box-shadow:0 8px 24px #00000022;
+  color:#2d2340;
+  border-radius:30px;
+  padding:22px;
+  box-shadow:0 10px 30px #00000055;
+  position:relative;
+  z-index:2;
 }
 
-h1{font-size:38px;margin:10px 0;color:#6a3d9a}
-h2{font-size:26px;margin:10px 0}
-p{font-size:19px;line-height:1.5}
+h1{
+  font-size:40px;
+  margin:8px 0;
+  color:#5a189a;
+}
+h2{
+  font-size:25px;
+  margin:8px 0;
+  color:#3c096c;
+}
+p{
+  font-size:18px;
+  line-height:1.5;
+}
 
 button{
   border:none;
   border-radius:18px;
-  padding:14px 24px;
+  padding:14px 25px;
   margin:10px;
   font-size:18px;
   font-weight:bold;
-  background:#ffbf69;
-  color:#3b2f2f;
+  background:#ffb703;
+  color:#2d2340;
   cursor:pointer;
-  box-shadow:0 5px 0 #d88b32;
+  box-shadow:0 5px 0 #d88900;
 }
-button:active{transform:translateY(3px);box-shadow:0 2px 0 #d88b32}
+button:active{
+  transform:translateY(3px);
+  box-shadow:0 2px 0 #d88900;
+}
+
+.arena{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin:10px 0 15px;
+}
+.player,.boss{
+  width:120px;
+  height:120px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:60px;
+  background:linear-gradient(135deg,#caf0f8,#ffd6ff);
+  border:5px solid #fff;
+  box-shadow:0 6px 18px #00000033;
+}
+.player.win{
+  animation:jump .5s;
+}
+.boss.hit{
+  animation:hit .4s;
+}
+@keyframes jump{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-25px)}
+}
+@keyframes hit{
+  0%,100%{transform:translateX(0)}
+  25%{transform:translateX(-12px)}
+  75%{transform:translateX(12px)}
+}
+
+.vs{
+  font-size:35px;
+  font-weight:bold;
+  color:#e63946;
+}
 
 .topbar{
   display:flex;
   justify-content:space-between;
-  align-items:center;
-  gap:10px;
-  margin-bottom:12px;
   flex-wrap:wrap;
+  gap:8px;
+  margin-bottom:10px;
 }
 .badge{
-  background:#e8f7ff;
-  padding:10px 16px;
-  border-radius:20px;
+  background:#edf6f9;
+  color:#2d2340;
+  padding:9px 14px;
+  border-radius:18px;
   font-weight:bold;
+  font-size:15px;
 }
-.progressOuter{
+
+.healthOuter,.progressOuter{
   width:100%;
   height:18px;
-  background:#eee;
-  border-radius:20px;
+  background:#ddd;
+  border-radius:30px;
   overflow:hidden;
-  margin:15px 0;
+  margin:10px 0;
+}
+.healthInner{
+  height:100%;
+  width:100%;
+  background:linear-gradient(90deg,#ef233c,#ffb703);
 }
 .progressInner{
   height:100%;
   width:0%;
-  background:linear-gradient(90deg,#90be6d,#43aa8b);
+  background:linear-gradient(90deg,#80ed99,#38b000);
 }
 
 .questionBox{
-  background:#fff6dd;
-  border:3px dashed #ffbf69;
+  background:#fff4d6;
+  border:3px dashed #ffb703;
   border-radius:22px;
-  padding:18px;
-  margin:15px 0;
-  font-size:24px;
+  padding:15px;
+  margin:12px 0;
+}
+.question{
+  font-size:23px;
   font-weight:bold;
 }
 .sentence{
-  font-size:23px;
+  font-size:21px;
   margin-top:8px;
-  color:#4d3b3b;
+  color:#4a3b3b;
 }
 
 .options{
   display:grid;
   grid-template-columns:repeat(2,1fr);
-  gap:14px;
-  margin-top:20px;
+  gap:12px;
+  margin-top:16px;
 }
 .option{
-  background:#f3e8ff;
-  border:3px solid #b892ff;
-  border-radius:20px;
-  padding:18px;
-  font-size:21px;
+  background:#e0c3fc;
+  border:3px solid #9d4edd;
+  border-radius:18px;
+  padding:15px;
+  font-size:19px;
   font-weight:bold;
   cursor:pointer;
   transition:.2s;
 }
-.option:hover{transform:scale(1.03)}
+.option:hover{
+  transform:scale(1.03);
+}
 .correct{
-  background:#caffbf!important;
-  border-color:#48a868!important;
+  background:#b7efc5!important;
+  border-color:#2d6a4f!important;
 }
 .wrong{
   background:#ffccd5!important;
-  border-color:#e63946!important;
+  border-color:#d90429!important;
   animation:shake .3s;
 }
 .glow{
@@ -137,32 +211,36 @@ button:active{transform:translateY(3px);box-shadow:0 2px 0 #d88b32}
   75%{transform:translateX(8px)}
 }
 @keyframes glow{
-  from{box-shadow:0 0 8px #48a868}
-  to{box-shadow:0 0 22px #48a868}
+  from{box-shadow:0 0 8px #2d6a4f}
+  to{box-shadow:0 0 24px #2d6a4f}
 }
 
 .feedback{
-  min-height:35px;
-  font-size:22px;
+  min-height:30px;
+  font-size:21px;
   font-weight:bold;
-  margin-top:12px;
+  margin-top:10px;
 }
 
 .trophy{
   font-size:90px;
-  animation:bounce 1s infinite alternate;
+  animation:trophyBounce 1s infinite alternate;
 }
-@keyframes bounce{
-  from{transform:translateY(0)}
-  to{transform:translateY(-15px)}
+@keyframes trophyBounce{
+  from{transform:translateY(0) rotate(-3deg)}
+  to{transform:translateY(-14px) rotate(3deg)}
 }
 
-.confetti{
+.confetti,.sparkle,.streamer{
   position:fixed;
+  z-index:1;
+  pointer-events:none;
+}
+.confetti{
   width:10px;
   height:10px;
   top:-20px;
-  animation:fall 3s linear forwards;
+  animation:fall 3.2s linear forwards;
 }
 @keyframes fall{
   to{
@@ -170,14 +248,63 @@ button:active{transform:translateY(3px);box-shadow:0 2px 0 #d88b32}
     opacity:0;
   }
 }
+.sparkle{
+  font-size:28px;
+  animation:spark 1s ease-out forwards;
+}
+@keyframes spark{
+  from{transform:scale(.5);opacity:1}
+  to{transform:scale(2) translateY(-60px);opacity:0}
+}
+.streamer{
+  width:8px;
+  height:70px;
+  border-radius:20px;
+  top:-80px;
+  animation:streamFall 4s linear forwards;
+}
+@keyframes streamFall{
+  to{
+    transform:translateY(115vh) rotate(360deg);
+    opacity:0;
+  }
+}
 
-@media(max-width:600px){
+.levelFlash{
+  position:fixed;
+  top:20px;
+  left:50%;
+  transform:translateX(-50%);
+  background:#ffb703;
+  color:#2d2340;
+  font-size:22px;
+  font-weight:bold;
+  padding:14px 25px;
+  border-radius:25px;
+  z-index:10;
+  animation:flash 1.2s forwards;
+}
+@keyframes flash{
+  0%{opacity:0;transform:translateX(-50%) scale(.8)}
+  30%{opacity:1;transform:translateX(-50%) scale(1.05)}
+  100%{opacity:0;transform:translateX(-50%) scale(1)}
+}
+
+@media(max-width:650px){
   h1{font-size:30px}
-  .questionBox{font-size:20px}
-  .sentence{font-size:19px}
+  h2{font-size:21px}
+  .arena{margin:5px 0}
+  .player,.boss{
+    width:82px;
+    height:82px;
+    font-size:42px;
+  }
+  .vs{font-size:26px}
+  .question{font-size:19px}
+  .sentence{font-size:18px}
   .options{grid-template-columns:1fr}
-  .option{font-size:18px;padding:14px}
-  .card{padding:18px}
+  .option{font-size:17px;padding:13px}
+  .card{padding:16px}
 }
 </style>
 </head>
@@ -194,10 +321,10 @@ button:active{transform:translateY(3px);box-shadow:0 2px 0 #d88b32}
 
 <div id="startScreen" class="screen">
   <div class="card">
-    <h1>Adjective Championship</h1>
-    <p>Play 10 levels and become an Adjective Champion!</p>
-    <p>You will get <b>2 chances</b> for each question.</p>
-    <button onclick="startGame()">Start Game</button>
+    <h1>Adjective Arena Championship</h1>
+    <p>Enter the grammar arena and defeat the Adjective Boss!</p>
+    <p>Read each sentence carefully. Choose the correct answer. You get <b>2 chances</b> for every challenge.</p>
+    <button onclick="startGame()">Enter Arena</button>
   </div>
 </div>
 
@@ -213,25 +340,35 @@ button:active{transform:translateY(3px);box-shadow:0 2px 0 #d88b32}
       <div class="progressInner" id="progressBar"></div>
     </div>
 
+    <div class="arena">
+      <div class="player" id="player">🧑‍🎓</div>
+      <div class="vs">VS</div>
+      <div class="boss" id="boss">👹</div>
+    </div>
+
+    <div class="healthOuter">
+      <div class="healthInner" id="bossHealth"></div>
+    </div>
+
     <h2 id="typeTitle"></h2>
 
     <div class="questionBox">
-      <div id="questionText"></div>
+      <div class="question" id="questionText"></div>
       <div class="sentence" id="sentenceText"></div>
     </div>
 
     <div class="options" id="optionsBox"></div>
 
     <div class="feedback" id="feedback"></div>
-    <button id="nextBtn" onclick="nextQuestion()" style="display:none;">Next Level</button>
+    <button id="nextBtn" onclick="nextQuestion()" style="display:none;">Next Challenge</button>
   </div>
 </div>
 
 <div id="endScreen" class="screen">
   <div class="card">
     <div class="trophy">🏆</div>
-    <h1>Well Done!</h1>
-    <h2>You are an Adjective Champion!</h2>
+    <h1>Victory!</h1>
+    <h2>You are the Grammar Champion!</h2>
     <p id="finalScore"></p>
     <button onclick="restartGame()">Play Again</button>
   </div>
@@ -240,74 +377,74 @@ button:active{transform:translateY(3px);box-shadow:0 2px 0 #d88b32}
 <script>
 const questions = [
   {
-    type:"Quality Adjective",
-    question:"Which word tells the quality of the noun?",
-    sentence:"The brave boy helped the old man.",
-    options:["brave","boy","helped","man"],
-    answer:"brave"
+    type:"Level 1: Quality Adjectives",
+    question:"Identify the adjective of quality.",
+    sentence:"The ancient temple stood silently beside the river.",
+    options:["ancient","temple","silently","river"],
+    answer:"ancient"
   },
   {
-    type:"Quantity Adjective",
-    question:"Which word shows quantity?",
-    sentence:"There is some milk in the glass.",
-    options:["glass","some","milk","there"],
-    answer:"some"
+    type:"Level 2: Quantity Adjectives",
+    question:"Which word shows an indefinite quantity?",
+    sentence:"Several students submitted their projects before the deadline.",
+    options:["students","several","submitted","deadline"],
+    answer:"several"
   },
   {
-    type:"Number Adjective",
-    question:"Which word shows number?",
-    sentence:"Five birds are sitting on the tree.",
-    options:["birds","tree","five","sitting"],
-    answer:"five"
+    type:"Level 3: Number Adjectives",
+    question:"Which word shows a definite number?",
+    sentence:"The committee selected three representatives for the event.",
+    options:["committee","selected","three","event"],
+    answer:"three"
   },
   {
-    type:"Demonstrative Adjective",
-    question:"Which word points to a noun?",
-    sentence:"This book belongs to Riya.",
-    options:["this","book","belongs","Riya"],
-    answer:"this"
+    type:"Level 4: Demonstrative Adjectives",
+    question:"Which word points out a specific noun?",
+    sentence:"Those paintings were created by local artists.",
+    options:["those","paintings","created","local"],
+    answer:"those"
   },
   {
-    type:"Interrogative Adjective",
+    type:"Level 5: Interrogative Adjectives",
     question:"Which word asks a question about a noun?",
-    sentence:"Which colour do you like?",
-    options:["like","colour","which","you"],
-    answer:"which"
+    sentence:"Whose notebook was left in the laboratory?",
+    options:["whose","left","laboratory","notebook"],
+    answer:"whose"
   },
   {
-    type:"Possessive Adjective",
+    type:"Level 6: Possessive Adjectives",
     question:"Which word shows ownership?",
-    sentence:"My bag is on the table.",
-    options:["my","bag","table","on"],
-    answer:"my"
+    sentence:"Their performance impressed the entire audience.",
+    options:["their","performance","entire","audience"],
+    answer:"their"
   },
   {
-    type:"Proper Adjective",
+    type:"Level 7: Proper Adjectives",
     question:"Which adjective is formed from a proper noun?",
-    sentence:"We enjoyed Italian food.",
-    options:["food","Italian","enjoyed","we"],
-    answer:"Italian"
+    sentence:"The Japanese garden attracted many visitors.",
+    options:["garden","Japanese","many","visitors"],
+    answer:"Japanese"
   },
   {
-    type:"Distributive Adjective",
-    question:"Which word refers to people or things one by one?",
-    sentence:"Each child received a gift.",
-    options:["gift","child","each","received"],
-    answer:"each"
+    type:"Level 8: Distributive Adjectives",
+    question:"Which word refers to members of a group individually?",
+    sentence:"Every participant received a certificate after the workshop.",
+    options:["participant","certificate","every","workshop"],
+    answer:"every"
   },
   {
-    type:"Emphasising Adjective",
-    question:"Which word gives emphasis to the noun?",
-    sentence:"I saw the same movie yesterday.",
-    options:["same","movie","saw","yesterday"],
-    answer:"same"
+    type:"Level 9: Emphasising Adjectives",
+    question:"Which word gives special emphasis to the noun?",
+    sentence:"The principal herself appreciated the students.",
+    options:["principal","herself","appreciated","students"],
+    answer:"herself"
   },
   {
-    type:"Mixed Challenge",
-    question:"Identify the adjective type of the word 'our'.",
-    sentence:"Our school has a big playground.",
-    options:["Quality Adjective","Possessive Adjective","Number Adjective","Proper Adjective"],
-    answer:"Possessive Adjective"
+    type:"Final Level: Mixed Challenge",
+    question:"What type of adjective is the word 'Indian'?",
+    sentence:"Indian classical music has a rich history.",
+    options:["Quality Adjective","Proper Adjective","Possessive Adjective","Distributive Adjective"],
+    answer:"Proper Adjective"
   }
 ];
 
@@ -346,7 +483,7 @@ function loadQuestion(){
 
   const q = questions[current];
 
-  document.getElementById("levelText").innerText = "Level " + (current + 1) + " / " + questions.length;
+  document.getElementById("levelText").innerText = "Challenge " + (current + 1) + " / " + questions.length;
   document.getElementById("scoreText").innerText = "Score: " + score;
   document.getElementById("attemptText").innerText = "Chances: " + chances;
   document.getElementById("typeTitle").innerText = q.type;
@@ -354,7 +491,11 @@ function loadQuestion(){
   document.getElementById("sentenceText").innerText = q.sentence;
   document.getElementById("feedback").innerText = "";
   document.getElementById("nextBtn").style.display = "none";
-  document.getElementById("progressBar").style.width = ((current) / questions.length * 100) + "%";
+
+  document.getElementById("progressBar").style.width = (current / questions.length * 100) + "%";
+  document.getElementById("bossHealth").style.width = ((questions.length-current) / questions.length * 100) + "%";
+
+  showLevelFlash(q.type);
 
   const optionsBox = document.getElementById("optionsBox");
   optionsBox.innerHTML = "";
@@ -376,10 +517,16 @@ function checkAnswer(element, selected){
   if(selected === q.answer){
     locked = true;
     score++;
+
     element.classList.add("correct");
-    document.getElementById("feedback").innerText = "Correct! Good job!";
+    document.getElementById("feedback").innerText = "Power Hit! Correct answer!";
     document.getElementById("scoreText").innerText = "Score: " + score;
+
     playSound("correctSound");
+    playerCelebrate();
+    bossHit();
+    sparkleBurst();
+
     document.getElementById("nextBtn").style.display = "inline-block";
   } else {
     chances--;
@@ -389,7 +536,7 @@ function checkAnswer(element, selected){
     document.getElementById("attemptText").innerText = "Chances: " + chances;
 
     if(chances > 0){
-      document.getElementById("feedback").innerText = "Try again!";
+      document.getElementById("feedback").innerText = "Careful! One more chance.";
     } else {
       locked = true;
       document.getElementById("feedback").innerText = "Correct answer: " + q.answer;
@@ -421,9 +568,9 @@ function endGame(){
   gameScreen.classList.remove("active");
   endScreen.classList.add("active");
   document.getElementById("finalScore").innerText = "Your Score: " + score + " / " + questions.length;
-  document.getElementById("progressBar").style.width = "100%";
   playSound("clapSound");
   launchConfetti();
+  launchStreamers();
 }
 
 function restartGame(){
@@ -434,8 +581,42 @@ function restartGame(){
   loadQuestion();
 }
 
+function playerCelebrate(){
+  const player = document.getElementById("player");
+  player.classList.add("win");
+  setTimeout(()=>player.classList.remove("win"),500);
+}
+
+function bossHit(){
+  const boss = document.getElementById("boss");
+  boss.classList.add("hit");
+  setTimeout(()=>boss.classList.remove("hit"),450);
+}
+
+function sparkleBurst(){
+  for(let i=0;i<16;i++){
+    const sparkle = document.createElement("div");
+    sparkle.className = "sparkle";
+    sparkle.innerText = "✨";
+    sparkle.style.left = (45 + Math.random()*20) + "vw";
+    sparkle.style.top = (35 + Math.random()*25) + "vh";
+    document.body.appendChild(sparkle);
+
+    setTimeout(()=>sparkle.remove(),1000);
+  }
+}
+
+function showLevelFlash(text){
+  const flash = document.createElement("div");
+  flash.className = "levelFlash";
+  flash.innerText = text;
+  document.body.appendChild(flash);
+
+  setTimeout(()=>flash.remove(),1300);
+}
+
 function launchConfetti(){
-  for(let i=0;i<80;i++){
+  for(let i=0;i<100;i++){
     const confetti = document.createElement("div");
     confetti.className = "confetti";
     confetti.style.left = Math.random()*100 + "vw";
@@ -444,14 +625,25 @@ function launchConfetti(){
     confetti.style.borderRadius = Math.random() > 0.5 ? "50%" : "0";
     document.body.appendChild(confetti);
 
-    setTimeout(()=>{
-      confetti.remove();
-    },4000);
+    setTimeout(()=>confetti.remove(),4000);
+  }
+}
+
+function launchStreamers(){
+  for(let i=0;i<35;i++){
+    const streamer = document.createElement("div");
+    streamer.className = "streamer";
+    streamer.style.left = Math.random()*100 + "vw";
+    streamer.style.background = randomColor();
+    streamer.style.animationDelay = Math.random()*1.8 + "s";
+    document.body.appendChild(streamer);
+
+    setTimeout(()=>streamer.remove(),4500);
   }
 }
 
 function randomColor(){
-  const colors = ["#ff595e","#ffca3a","#8ac926","#1982c4","#6a4c93","#ff99c8"];
+  const colors = ["#ff595e","#ffca3a","#8ac926","#1982c4","#6a4c93","#ff99c8","#00bbf9"];
   return colors[Math.floor(Math.random()*colors.length)];
 }
 </script>
