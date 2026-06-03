@@ -1,16 +1,17 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Past Tense Conveyor Game</title>
+<title>Past Tense Conveyor Game - Jumbled</title>
 <style>
 body{margin:0;font-family:Arial,sans-serif;background:#1a1a2e;color:#fff;overflow:hidden;}
 #logoScreen,#gameScreen,#endScreen{display:none;width:100%;height:100vh;align-items:center;justify-content:center;flex-direction:column;}
 #logoScreen img{width:200px;margin-top:50px;}
 h1{color:#ffd60a;text-align:center;margin:10px;}
 #scoreText{margin:10px;}
-#conveyor{position:relative;width:100%;height:500px;overflow:hidden;border-top:2px solid #fff;border-bottom:2px solid #fff;margin:10px 0;}
+#conveyor{position:relative;width:100%;height:300px;overflow:hidden;border-top:2px solid #fff;border-bottom:2px solid #fff;margin:10px 0;}
 .sentence{position:absolute;padding:10px 15px;background:#ff6f61;color:#fff;border-radius:12px;cursor:grab;white-space:nowrap;font-weight:bold;}
 .binContainer{display:flex;justify-content:space-around;width:100%;margin-top:20px;}
 .bin{width:22%;padding:40px;background:#ffb703;color:#2d2340;border-radius:12px;text-align:center;font-weight:bold;min-height:120px;}
@@ -50,20 +51,22 @@ button{padding:10px 16px;margin-top:20px;border-radius:12px;border:none;backgrou
 <audio id="clapSound" src="assets/clapping.mp3"></audio>
 
 <script>
-const sentences=[
-  {text:"I visited Paris last year.",type:"Simple"},
-  {text:"I was visiting Paris when it rained.",type:"Continuous"},
-  {text:"I had visited Paris before I went to Rome.",type:"Perfect"},
-  {text:"I had been visiting Paris for hours before I left.",type:"PerfectContinuous"},
-  {text:"She was reading when I called.",type:"Continuous"},
-  {text:"He finished his homework.",type:"Simple"},
-  {text:"They had left before the party started.",type:"Perfect"},
-  {text:"She had been studying for 3 hours.",type:"PerfectContinuous"},
-  {text:"We played football yesterday.",type:"Simple"},
-  {text:"He was cooking dinner.",type:"Continuous"}
+// Full 10 sentences
+let sentences=[
+  {text:"I visited Paris last year.", type:"Simple"},
+  {text:"I was visiting Paris when it rained.", type:"Continuous"},
+  {text:"I had visited Paris before I went to Rome.", type:"Perfect"},
+  {text:"I had been visiting Paris for hours before I left.", type:"PerfectContinuous"},
+  {text:"She was reading when I called.", type:"Continuous"},
+  {text:"He finished his homework.", type:"Simple"},
+  {text:"They had left before the party started.", type:"Perfect"},
+  {text:"She had been studying for 3 hours.", type:"PerfectContinuous"},
+  {text:"We played football yesterday.", type:"Simple"},
+  {text:"He was cooking dinner.", type:"Continuous"}
 ];
 
 let score=0;
+let current=0;
 const conveyor=document.getElementById('conveyor');
 const scoreText=document.getElementById('scoreText');
 const logoScreen=document.getElementById('logoScreen');
@@ -74,20 +77,28 @@ const correctAudio=document.getElementById('correctSound');
 const wrongAudio=document.getElementById('wrongSound');
 const clapAudio=document.getElementById('clapSound');
 
-// Show logo for 5 seconds
+// Shuffle helper
+function shuffle(array){
+  for(let i=array.length-1;i>0;i--){
+    let j=Math.floor(Math.random()*(i+1));
+    [array[i],array[j]]=[array[j],array[i]];
+  }
+  return array;
+}
+
+// Logo 5 sec
 logoScreen.style.display='flex';
 setTimeout(()=>{
   logoScreen.style.display='none';
   gameScreen.style.display='flex';
-  startGame();
+  sentences = shuffle(sentences); // shuffle at start
+  showNextSentence();
 },5000);
 
-function startGame(){
-  score=0;
-  scoreText.innerText=`Score: ${score}`;
+function showNextSentence(){
   conveyor.innerHTML='';
-  let shuffled = sentences.sort(()=>Math.random()-0.5);
-  shuffled.forEach((s,i)=>{createSentenceBox(s,i);});
+  if(current>=sentences.length){ endGame(); return; }
+  createSentenceBox(sentences[current],0);
 }
 
 function createSentenceBox(s,i){
@@ -95,44 +106,44 @@ function createSentenceBox(s,i){
   div.className='sentence';
   div.innerText=s.text;
   div.dataset.type=s.type;
-  div.style.top = 50 + i*45 + 'px'; // spread out vertically
+  div.style.top = 100 + 'px';
   div.style.left = conveyor.offsetWidth +'px';
   div.draggable = true;
-  div.ondragstart = e=>{e.dataTransfer.setData("text", s.type); e.dataTransfer.setData("id", i);}
+  div.ondragstart = e=>{
+    e.dataTransfer.setData("text", s.type);
+    e.dataTransfer.setData("id", i);
+  }
   conveyor.appendChild(div);
   moveSentence(div);
 }
 
 function moveSentence(div){
   let interval=setInterval(()=>{
-    let left = parseFloat(div.style.left);
-    left -= 1; // faster but readable
-    if(left < -div.offsetWidth){
-      div.remove();
-      clearInterval(interval);
-      checkEnd();
-    } else div.style.left = left+'px';
-  },15); // slightly faster than before
+    let left=parseFloat(div.style.left);
+    left-=1; // speed reasonable
+    if(left < -div.offsetWidth){ div.remove(); clearInterval(interval);}
+    else div.style.left=left+'px';
+  },15);
 }
 
-// Bins
 ['SimpleBin','ContinuousBin','PerfectBin','PerfectContinuousBin'].forEach(id=>{
   const bin=document.getElementById(id);
   bin.ondragover = e=>e.preventDefault();
   bin.ondrop = e=>{
     const type = e.dataTransfer.getData("text");
-    const boxId = e.dataTransfer.getData("id");
-    const div=document.querySelectorAll('.sentence')[boxId];
-    if((type==='Simple' && id==='SimpleBin') ||
-       (type==='Continuous' && id==='ContinuousBin') ||
-       (type==='Perfect' && id==='PerfectBin') ||
+    const div=document.querySelector('.sentence');
+    if(!div) return;
+    if((type==='Simple' && id==='SimpleBin')||
+       (type==='Continuous' && id==='ContinuousBin')||
+       (type==='Perfect' && id==='PerfectBin')||
        (type==='PerfectContinuous' && id==='PerfectContinuousBin')){
       div.remove();
       createStreamer(div);
       score++;
       scoreText.innerText=`Score: ${score}`;
+      current++;
       correctAudio.currentTime=0; correctAudio.play();
-      checkEnd();
+      setTimeout(showNextSentence,500);
     } else{
       wrongAudio.currentTime=0; wrongAudio.play();
       div.style.background="#ffccd5";
@@ -147,28 +158,26 @@ function createStreamer(div){
     s.className='streamer';
     s.style.left = div.offsetLeft + Math.random()*50 +'px';
     s.style.top = div.offsetTop + Math.random()*50 +'px';
-    gameScreen.appendChild(s);
+    document.body.appendChild(s);
     setTimeout(()=>{s.remove()},1000);
-  }
-}
-
-function checkEnd(){
-  if(document.querySelectorAll('.sentence').length===0){
-    endGame();
   }
 }
 
 function endGame(){
   gameScreen.style.display='none';
   endScreen.style.display='flex';
-  finalScore.innerText=`Your Score: ${score}`;
+  finalScore.innerText=`Your Score: ${score} / ${sentences.length}`;
   clapAudio.play();
 }
 
 function restartGame(){
+  current=0;
+  score=0;
   endScreen.style.display='none';
   gameScreen.style.display='flex';
-  startGame();
+  scoreText.innerText=`Score: 0`;
+  sentences = shuffle(sentences); // reshuffle
+  showNextSentence();
 }
 </script>
 </body>
