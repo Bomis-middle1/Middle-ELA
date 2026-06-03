@@ -22,6 +22,7 @@
     flex-direction: column; text-align: center; padding: 20px;
   }
   #splash img {width:300px; max-width:40%;}
+  #instructions img {width:200px; margin-bottom:20px;}
   #instructions h1 {font-size: 2.5rem; margin-bottom: 20px;}
   #instructions p {font-size: 1.5rem; margin-bottom: 20px;}
   #instructions button {padding: 15px 25px; font-size: 1.2rem; cursor: pointer; border-radius:10px;}
@@ -40,8 +41,8 @@
 
   .chalk-text {
     color: #fff;
-    font-size: 3rem; /* larger text */
-    font-weight: bold; /* bold */
+    font-size: 3rem; 
+    font-weight: bold; 
     text-shadow: 0 0 2px #fff, 0 0 5px #fff, 0 0 10px #fff;
   }
 </style>
@@ -55,6 +56,7 @@
 
 <!-- Instructions -->
 <div id="instructions">
+  <img src="assets/logo.png" alt="Innovine Logo">
   <h1>Idioms Pictionary</h1>
   <p>Draw the idioms in your notebook!!!</p>
   <button onclick="startGame()">Start Drawing!</button>
@@ -134,7 +136,7 @@ function startGame(){
   startTimer();
 }
 
-// Show instructions after 5 seconds splash
+// Automatically hide splash after 5 seconds and show instructions
 setTimeout(()=>{
   splash.style.display='none';
   instructions.style.display='flex';
