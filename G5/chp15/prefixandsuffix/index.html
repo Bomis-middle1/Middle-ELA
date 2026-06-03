@@ -6,7 +6,7 @@
 <title>Grade 5 Prefix & Suffix Factory</title>
 <style>
   * {box-sizing: border-box; margin:0; padding:0; font-family: Arial, sans-serif;}
-  body, html {height:100%; width:100%; background: linear-gradient(to right, #f0f8ff, #ffe4e1);}
+  body, html {height:100%; width:100%; background: linear-gradient(to right, #f0f8ff, #ffe4e1); overflow-x:hidden;}
   
   /* Splash */
   #splash {
@@ -27,24 +27,28 @@
 
   /* Conveyor Belt */
   #belt-container {
-    position: relative; width:90%; max-width:800px; height:100px; margin:50px auto; background:#ccc; border-radius:20px; overflow:hidden;
+    position: relative; width:100%; height:120px; margin-top:50px; overflow:hidden; border-radius:20px;
+    background: repeating-linear-gradient(
+      to right,
+      #ccc 0 40px,
+      #bbb 40px 80px
+    );
+    animation: beltMove 4s linear infinite;
   }
-  #belt {
-    position:absolute; left:0; top:0; height:100%; display:flex; align-items:center; transition:left 0.5s;
+  @keyframes beltMove {
+    0% {background-position-x:0;}
+    100% {background-position-x:80px;}
   }
-  .word-block {
-    min-width:150px; height:60px; background:#ffebcd; margin:0 10px; border-radius:10px; display:flex; justify-content:center; align-items:center; font-weight:bold; font-size:1.2rem; box-shadow:0 2px 5px rgba(0,0,0,0.2);
-  }
+
+  /* Character */
+  #character {position:absolute; width:60px; height:60px; bottom:30px; left:20px; transition:left 0.5s; z-index:10;}
 
   /* End Screen */
   #endScreen {
     display:none; position:absolute; top:0; left:0; width:100%; height:100%;
-    background: rgba(0,0,0,0.7); justify-content:center; align-items:center; color:#fff; font-size:2rem; flex-direction:column;
+    background: rgba(0,0,0,0.7); justify-content:center; align-items:center; color:#fff; font-size:2rem; flex-direction:column; display:flex;
   }
   #endScreen button {margin-top:20px; padding:10px 20px; font-size:1.2rem; cursor:pointer; border-radius:8px;}
-
-  /* Character */
-  #character {position:absolute; width:60px; height:60px; bottom:90px; left:20px; transition:left 0.5s;}
 </style>
 </head>
 <body>
@@ -61,9 +65,6 @@
   <div id="options"></div>
 
   <div id="belt-container">
-    <div id="belt">
-      <!-- Word blocks inserted dynamically -->
-    </div>
     <img id="character" src="assests/character.png" alt="Character">
   </div>
 </div>
@@ -85,7 +86,6 @@ const game = document.getElementById('game');
 const endScreen = document.getElementById('endScreen');
 const questionEl = document.getElementById('question');
 const optionsEl = document.getElementById('options');
-const belt = document.getElementById('belt');
 const character = document.getElementById('character');
 
 const correctSound = document.getElementById('correctSound');
@@ -111,17 +111,6 @@ const questions = [
   {q:"Add a suffix to 'friend' to make it 'friendly'", options:["-ly","-ness","-er","-ful"], answer:"-ly"}
 ];
 
-// Dynamically create belt word blocks
-function createBelt(){
-  belt.innerHTML = '';
-  questions.forEach((q,i)=>{
-    const block = document.createElement('div');
-    block.className = 'word-block';
-    block.textContent = q.q.split(" ")[0]; // first word as visual
-    belt.appendChild(block);
-  });
-}
-
 // Show current question
 function showQuestion(){
   const q = questions[currentQ];
@@ -139,9 +128,9 @@ function showQuestion(){
 // Check answer
 function checkAnswer(selected){
   const q = questions[currentQ];
-  if(selected===q.answer){
+  if(selected === q.answer){
     correctSound.play();
-    score++; 
+    score++;
     document.getElementById('score').textContent = "Score: "+score;
     moveCharacter();
   } else {
@@ -154,10 +143,11 @@ function checkAnswer(selected){
   else finishGame();
 }
 
-// Move character along belt
+// Move character forward
 function moveCharacter(){
-  const moveX = (belt.children[currentQ].offsetLeft || 0);
-  character.style.left = moveX+"px";
+  const containerWidth = document.getElementById('belt-container').offsetWidth;
+  const step = containerWidth / questions.length;
+  character.style.left = step*score + "px";
 }
 
 // Finish game
@@ -170,11 +160,9 @@ function finishGame(){
 setTimeout(()=>{
   splash.style.display='none';
   game.style.display='block';
-  createBelt();
   showQuestion();
 },5000);
 
 </script>
-
 </body>
 </html>
