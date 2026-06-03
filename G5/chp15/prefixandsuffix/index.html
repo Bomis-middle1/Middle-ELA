@@ -32,11 +32,6 @@
   #character-container {position:absolute; bottom:10px; left:20px; display:flex; flex-direction:column; align-items:center; z-index:10;}
   #character {width:100px; height:100px;}
   #callout {margin-top:10px; padding:5px 10px; background:#fff; border-radius:10px; font-size:1.5rem; min-width:140px; text-align:center; visibility:hidden;}
-
-  /* End Screen */
-  #endScreen {display:none; position:absolute; top:0; left:0; width:100%; height:100%;
-    background: rgba(0,0,0,0.7); justify-content:center; align-items:center; color:#fff; font-size:2rem; flex-direction:column; display:flex;}
-  #endScreen button {margin-top:20px; padding:15px 25px; font-size:1.5rem; cursor:pointer; border-radius:10px;}
 </style>
 </head>
 <body>
@@ -56,10 +51,6 @@
   </div>
 </div>
 
-<div id="endScreen">
-  <button onclick="location.reload()">Play Again</button>
-</div>
-
 <audio id="correctSound" src="assests/correct.mp3"></audio>
 <audio id="wrongSound" src="assests/wrong.mp3"></audio>
 <audio id="applause" src="assests/freesound_community-claps-44774.mp3"></audio>
@@ -67,7 +58,6 @@
 <script>
 const splash = document.getElementById('splash');
 const game = document.getElementById('game');
-const endScreen = document.getElementById('endScreen');
 const questionEl = document.getElementById('question');
 const optionsEl = document.getElementById('options');
 const callout = document.getElementById('callout');
@@ -96,6 +86,7 @@ const questions = [
 ];
 
 function showQuestion(){
+  if(currentQ >= questions.length) return; // Stop after last question
   const q = questions[currentQ];
   questionEl.textContent = q.q;
   optionsEl.innerHTML = '';
@@ -126,11 +117,7 @@ function checkAnswer(selected){
   setTimeout(() => {
     callout.style.visibility = "hidden";
     currentQ++;
-    if(currentQ < questions.length){
-      showQuestion();
-    } else {
-      endScreen.style.display = "flex";  // Only shows Play Again button
-    }
+    showQuestion(); // show next question if any
   }, 1000);
 }
 
