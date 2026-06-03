@@ -3,185 +3,145 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Infinitives, Gerunds & Participles Game</title>
+<title>Infinitives, Gerunds & Participles Quiz</title>
 <style>
 body{margin:0;font-family:Arial,sans-serif;background:#140f3d;color:#fff;display:flex;align-items:center;justify-content:center;flex-direction:column;height:100vh;}
-#logoScreen, #gameScreen, #mcqBox, #endScreen{display:none;align-items:center;justify-content:center;flex-direction:column;}
-#logoScreen img{width:200px;}
+#logoScreen, #quizScreen, #endScreen{display:none;align-items:center;justify-content:center;flex-direction:column;}
+#logoScreen img{width:200px;margin-top:50px;}
 h1{color:#ffd60a;text-align:center;}
-#wordBox{margin:20px;padding:20px 30px;background:#fff4d6;color:#2d2340;font-size:28px;border-radius:12px;cursor:pointer;}
-#instruction{margin:10px;font-weight:bold;}
-#scoreText{margin-top:10px;}
+#questionBox{background:#fff4d6;color:#2d2340;padding:20px;border-radius:12px;max-width:500px;margin-top:20px;text-align:left;}
+button{padding:10px 16px;margin:8px;border-radius:12px;border:none;background:#ffb703;color:#2d2340;font-weight:bold;cursor:pointer;width:90%;font-size:16px;}
 .correct{background:#b7efc5;}
 .wrong{background:#ffccd5;}
-button{padding:10px 16px;margin-top:12px;border-radius:12px;border:none;background:#ffb703;color:#2d2340;font-weight:bold;cursor:pointer;}
-#optionsBox button{display:block;margin:8px;width:80%;font-size:16px;}
-.feedback{margin-top:10px;font-weight:bold;}
+#feedback{margin-top:10px;font-weight:bold;}
+#endScreen{display:none;text-align:center;margin-top:20px;}
 </style>
 </head>
 <body>
 
+<!-- Logo -->
 <div id="logoScreen">
 <img src="assets/innovine-logo.png" alt="Logo">
+<h2>Loading Game...</h2>
 </div>
 
-<div id="gameScreen">
-<h1>Infinitives, Gerunds & Participles</h1>
-<div id="instruction">Tap the <span id="targetType">Gerund</span></div>
-<div id="wordBox"></div>
-<div id="scoreText">Correct taps: 0 | MCQs answered: 0/10</div>
-</div>
-
-<div id="mcqBox">
+<!-- Quiz -->
+<div id="quizScreen">
+<h1>Infinitives, Gerunds & Participles Quiz</h1>
+<div id="scoreText">Question 1 of 10</div>
+<div id="questionBox">
 <div id="questionText"></div>
 <div id="optionsBox"></div>
-<div class="feedback" id="feedback"></div>
-<button onclick="closeMCQ()">Continue</button>
+<div id="feedback"></div>
+</div>
 </div>
 
+<!-- End Screen -->
 <div id="endScreen">
-<h1>Well Done!</h1>
+<h1>Quiz Completed!</h1>
 <p id="finalScore"></p>
-<button onclick="restartGame()">Play Again</button>
+<button onclick="restartQuiz()">Play Again</button>
 </div>
 
+<!-- Audio -->
 <audio id="correctSound" src="assets/correct.mp3"></audio>
 <audio id="wrongSound" src="assets/wrong.mp3"></audio>
 <audio id="clapSound" src="assets/clapping.mp3"></audio>
 
 <script>
-// Word balloons
-const words=[
-  {word:"to run",type:"Infinitive"},
-  {word:"running",type:"Gerund"},
-  {word:"broken",type:"Participle"},
-  {word:"to eat",type:"Infinitive"},
-  {word:"swimming",type:"Gerund"},
-  {word:"painted",type:"Participle"},
-  {word:"to write",type:"Infinitive"},
-  {word:"singing",type:"Gerund"},
-  {word:"fallen",type:"Participle"}
-];
-
-const targetTypes=["Infinitive","Gerund","Participle"];
-let currentTarget="Gerund";
-let correctTaps=0;
-let mcqIndex=0;
-let score=0;
-
-// MCQs from your list
+// MCQs exactly as you provided
 const mcqs=[
-{q:"The infinitive in: 'Riya wants to learn coding.'",opts:["wants","learn","to learn","coding"],ans:"to learn"},
-{q:"Which word is a gerund? 'Swimming every morning makes Aryan energetic.'",opts:["morning","energetic","feel","Swimming"],ans:"Swimming"},
-{q:"Find the participle: 'The excited fans cheered.'",opts:["fans","goal","cheered","excited"],ans:"excited"},
-{q:"Which option contains an infinitive?",opts:["Dancing is fun","To dance is fun","Danced happily","Dancing happily"],ans:"To dance is fun"},
-{q:"The gerund in: 'Playing video games can improve skills.'",opts:["improve","skills","Playing","games"],ans:"Playing"},
-{q:"Choose the participle: 'The barking dog woke everyone.'",opts:["woke","barking","everyone","dog"],ans:"barking"},
-{q:"What is the underlined phrase? 'To watch the science show.'",opts:["Gerund","Participle","Infinitive Phrase","Noun Phrase"],ans:"Infinitive Phrase"},
-{q:"Identify the gerund: 'Maya enjoys painting superheroes.'",opts:["enjoys","superheroes","notebook","painting"],ans:"painting"},
-{q:"Find the participle: 'The broken skateboard lay beside the ramp.'",opts:["lay","beside","broken","ramp"],ans:"broken"},
-{q:"Which sentence contains a gerund?","opts":["I want to travel","Running helps me stay fit","The tired player rested","She plans to win"],ans:"Running helps me stay fit"}
+{q:'The infinitive in the sentence is: "Riya wants to learn coding during her summer vacation."',opts:["wants","learn","to learn","coding"],ans:"to learn"},
+{q:'Which word is a gerund? "Swimming every morning makes Aryan feel energetic."',opts:["morning","energetic","feel","Swimming"],ans:"Swimming"},
+{q:'Find the participle in the sentence: "The excited fans cheered loudly after the goal."',opts:["fans","goal","cheered","excited"],ans:"excited"},
+{q:'Which option contains an infinitive?',opts:["Dancing is fun.","To dance is fun.","Danced happily.","Dancing happily."],ans:"To dance is fun."},
+{q:'The gerund in the sentence is: "Playing video games can improve problem-solving skills."',opts:["improve","skills","Playing","games"],ans:"Playing"},
+{q:'Choose the participle: "The barking dog woke everyone up."',opts:["woke","barking","everyone","dog"],ans:"barking"},
+{q:'What is the underlined phrase? "The students gathered early to watch the science show."',opts:["Gerund","Participle","Infinitive Phrase","Noun Phrase"],ans:"Infinitive Phrase"},
+{q:'Identify the gerund: "Maya enjoys painting superheroes in her notebook."',opts:["enjoys","superheroes","notebook","painting"],ans:"painting"},
+{q:'Find the participle: "The broken skateboard lay beside the ramp."',opts:["lay","beside","broken","ramp"],ans:"broken"},
+{q:'Which sentence contains a gerund?',opts:["I want to travel the world.","Running helps me stay fit.","The tired player rested.","She plans to win."],ans:"Running helps me stay fit."}
 ];
+
+let currentQ=0;
+let score=0;
 
 // DOM elements
 const logoScreen=document.getElementById('logoScreen');
-const gameScreen=document.getElementById('gameScreen');
-const mcqBox=document.getElementById('mcqBox');
-const endScreen=document.getElementById('endScreen');
-const wordBox=document.getElementById('wordBox');
-const targetSpan=document.getElementById('targetType');
+const quizScreen=document.getElementById('quizScreen');
+const questionText=document.getElementById('questionText');
+const optionsBox=document.getElementById('optionsBox');
+const feedback=document.getElementById('feedback');
 const scoreText=document.getElementById('scoreText');
+const endScreen=document.getElementById('endScreen');
 const finalScore=document.getElementById('finalScore');
 const correctAudio=document.getElementById('correctSound');
 const wrongAudio=document.getElementById('wrongSound');
 const clapAudio=document.getElementById('clapSound');
 
-// Show logo 5 sec
+// Show logo first
 logoScreen.style.display='flex';
 setTimeout(()=>{
   logoScreen.style.display='none';
-  gameScreen.style.display='flex';
-  nextWord();
+  quizScreen.style.display='flex';
+  showQuestion();
 },5000);
 
-// Next word
-function nextWord(){
-  if(correctTaps>=10){
-    gameScreen.style.display='none';
-    endScreen.style.display='flex';
-    finalScore.innerText=`Correct taps: ${correctTaps} | MCQs answered: ${mcqIndex}`;
-    clapAudio.play();
-    return;
-  }
-  currentTarget=targetTypes[Math.floor(Math.random()*3)];
-  targetSpan.innerText=currentTarget;
-  const w=words[Math.floor(Math.random()*words.length)];
-  wordBox.innerText=w.word;
-  wordBox.dataset.type=w.type;
-  wordBox.style.background="#fff4d6";
-}
-
-// Tap word
-wordBox.onclick=function(){
-  if(this.dataset.type===currentTarget){
-    this.style.background="#b7efc5";
-    correctAudio.currentTime=0; correctAudio.play();
-    correctTaps++;
-    score++;
-  } else{
-    this.style.background="#ffccd5";
-    wrongAudio.currentTime=0; wrongAudio.play();
-  }
-  scoreText.innerText=`Correct taps: ${correctTaps} | MCQs answered: ${mcqIndex}`;
-  if(correctTaps>0 && correctTaps%3===0 && mcqIndex<mcqs.length) showMCQ();
-  setTimeout(nextWord,600);
-}
-
-// MCQ functions
-function showMCQ(){
-  mcqBox.style.display='block';
-  const q=mcqs[mcqIndex];
-  document.getElementById('questionText').innerText=q.q;
-  const optionsBox=document.getElementById('optionsBox');
+// Show current question
+function showQuestion(){
+  feedback.innerText="";
+  const q=mcqs[currentQ];
+  questionText.innerText=q.q;
   optionsBox.innerHTML='';
   q.opts.forEach(opt=>{
     const btn=document.createElement('button');
     btn.innerText=opt;
-    btn.onclick=()=>checkMCQ(opt,btn);
+    btn.onclick=()=>checkAnswer(opt,btn);
     optionsBox.appendChild(btn);
   });
-  document.getElementById('feedback').innerText='';
+  scoreText.innerText=`Question ${currentQ+1} of ${mcqs.length}`;
 }
 
-function checkMCQ(selected,btn){
-  const q=mcqs[mcqIndex];
+// Check answer
+function checkAnswer(selected,btn){
+  const q=mcqs[currentQ];
   const buttons=document.querySelectorAll('#optionsBox button');
   buttons.forEach(b=>b.disabled=true);
   if(selected===q.ans){
     btn.classList.add('correct');
-    document.getElementById('feedback').innerText='Correct!';
+    feedback.innerText="Correct!";
     correctAudio.currentTime=0; correctAudio.play();
+    score++;
   } else{
     btn.classList.add('wrong');
-    document.getElementById('feedback').innerText='Wrong! Correct: '+q.ans;
+    feedback.innerText="Wrong! Correct: "+q.ans;
     wrongAudio.currentTime=0; wrongAudio.play();
     buttons.forEach(b=>{if(b.innerText===q.ans) b.classList.add('correct');});
   }
-  mcqIndex++;
+  setTimeout(nextQuestion,1200);
 }
 
-function closeMCQ(){
-  mcqBox.style.display='none';
+// Next question
+function nextQuestion(){
+  currentQ++;
+  if(currentQ>=mcqs.length){
+    quizScreen.style.display='none';
+    endScreen.style.display='flex';
+    finalScore.innerText=`You scored ${score} / ${mcqs.length}`;
+    clapAudio.play();
+  } else{
+    showQuestion();
+  }
 }
 
 // Restart
-function restartGame(){
-  correctTaps=0;
-  mcqIndex=0;
+function restartQuiz(){
+  currentQ=0;
   score=0;
   endScreen.style.display='none';
-  gameScreen.style.display='flex';
-  scoreText.innerText=`Correct taps: 0 | MCQs answered: 0/10`;
-  nextWord();
+  quizScreen.style.display='flex';
+  showQuestion();
 }
 </script>
+</body>
+</html>
