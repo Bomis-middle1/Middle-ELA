@@ -1,1 +1,189 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Modals Snake Game</title>
+<style>
+body{margin:0;font-family:Arial,sans-serif;background:#140f3d;color:#fff;display:flex;align-items:center;justify-content:center;height:100vh;flex-direction:column;}
+canvas{background:#342070;display:block;margin:20px auto;border:4px solid #ffb347;border-radius:12px;}
+.card{background:#ffffffee;color:#2d2340;border-radius:25px;padding:20px;box-shadow:0 10px 25px #00000055;text-align:center;max-width:500px;width:90%;}
+button{border:none;border-radius:12px;padding:10px 20px;margin:8px;font-weight:bold;background:#ffb703;color:#2d2340;cursor:pointer;}
+.correct{background:#b7efc5;}
+.wrong{background:#ffccd5;}
+.optionBtn{border:3px solid #52b788;border-radius:12px;padding:8px 12px;margin:5px;cursor:pointer;}
+.feedback{min-height:25px;font-weight:bold;margin-top:8px;}
+.trophy{font-size:60px;margin-bottom:12px;color:#ffd60a;}
+</style>
+</head>
+<body>
+
+<h1>Modals Snake Adventure</h1>
+<canvas id="gameCanvas" width="400" height="400"></canvas>
+<div id="scoreText">Apples eaten: 0 | MCQs answered: 0/10</div>
+
+<!-- MCQ Modal -->
+<div id="mcqBox" class="card" style="display:none;">
+  <div id="questionText"></div>
+  <div id="optionsBox"></div>
+  <div class="feedback" id="feedback"></div>
+  <button onclick="closeMCQ()">Continue</button>
+</div>
+
+<!-- End Screen -->
+<div id="endScreen" class="card" style="display:none;">
+  <div class="trophy">🏆</div>
+  <h2>Congratulations!</h2>
+  <p id="finalScore"></p>
+  <button onclick="restartGame()">Play Again</button>
+</div>
+
+<audio id="correctSound" src="assets/correct.mp3"></audio>
+<audio id="wrongSound" src="assets/wrong.mp3"></audio>
+
+<script>
+// Snake Game Setup
+const canvas=document.getElementById('gameCanvas');
+const ctx=canvas.getContext('2d');
+const box=20; // grid size
+let snake=[{x:9*box,y:9*box}];
+let dir='RIGHT';
+let food={};
+let apples=0;
+let mcqIndex=0;
+
+const mcqs=[
+  {q:"You ___ complete your homework before dinner.",opts:["must","might","may"],ans:"must"},
+  {q:"She said she ___ help us with the project tomorrow.",opts:["can","could","shall"],ans:"could"},
+  {q:"It ___ rain later, so take an umbrella.",opts:["may","would","must"],ans:"may"},
+  {q:"You ___ not enter the lab without safety glasses.",opts:["needn’t","must","could"],ans:"must"},
+  {q:"I ___ like to join you for the movie.",opts:["would","can","shall"],ans:"would"},
+  {q:"We ___ finish the work on time if we start now.",opts:["shall","will","might"],ans:"will"},
+  {q:"He ___ be at the library; I’m not sure.",opts:["might","should","must"],ans:"might"},
+  {q:"You ___ practice more to improve your score.",opts:["should","can","would"],ans:"should"},
+  {q:"She said I ___ go if I wanted.",opts:["might","needn’t","ought to"],ans:"might"},
+  {q:"You ___ eat too much sugar; it’s not healthy.",opts:["must","needn’t","could"],ans:"needn’t"}
+];
+
+function spawnFood(){
+  food.x=Math.floor(Math.random()*20)*box;
+  food.y=Math.floor(Math.random()*20)*box;
+}
+
+document.addEventListener('keydown',direction);
+function direction(event){
+  if(event.keyCode==37 && dir!='RIGHT') dir='LEFT';
+  else if(event.keyCode==38 && dir!='DOWN') dir='UP';
+  else if(event.keyCode==39 && dir!='LEFT') dir='RIGHT';
+  else if(event.keyCode==40 && dir!='UP') dir='DOWN';
+}
+
+function draw(){
+  ctx.fillStyle="#342070";
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+
+  // Draw snake
+  for(let i=0;i<snake.length;i++){
+    ctx.fillStyle=i===0?"#ffb703":"#fff";
+    ctx.fillRect(snake[i].x,snake[i].y,box,box);
+  }
+
+  // Draw food
+  ctx.fillStyle="#ff595e";
+  ctx.fillRect(food.x,food.y,box,box);
+
+  // Move snake
+  let snakeX=snake[0].x;
+  let snakeY=snake[0].y;
+
+  if(dir==='LEFT') snakeX-=box;
+  if(dir==='RIGHT') snakeX+=box;
+  if(dir==='UP') snakeY-=box;
+  if(dir==='DOWN') snakeY+=box;
+
+  // Snake eats food
+  if(snakeX===food.x && snakeY===food.y){
+    apples++;
+    spawnFood();
+    document.getElementById('scoreText').innerText=`Apples eaten: ${apples} | MCQs answered: ${mcqIndex}/10`;
+    snake.unshift({x:snakeX,y:snakeY});
+    // show MCQ after every 3 apples
+    if(apples%3===0 && mcqIndex<10) showMCQ();
+  }else{
+    snake.pop();
+    snake.unshift({x:snakeX,y:snakeY});
+  }
+
+  // Collision with walls
+  if(snakeX<0 || snakeY<0 || snakeX>=canvas.width || snakeY>=canvas.height || collision()){
+    clearInterval(game);
+    alert("Game Over! Refresh to restart.");
+  }
+}
+
+function collision(){
+  for(let i=1;i<snake.length;i++){
+    if(snake[0].x===snake[i].x && snake[0].y===snake[i].y) return true;
+  }
+  return false;
+}
+
+spawnFood();
+let game=setInterval(draw,150);
+
+// MCQ Functions
+function showMCQ(){
+  clearInterval(game); // pause snake
+  const boxDiv=document.getElementById('mcqBox');
+  boxDiv.style.display='block';
+  document.getElementById('feedback').innerText='';
+  const q=mcqs[mcqIndex];
+  document.getElementById('questionText').innerText=q.q;
+  const optionsBox=document.getElementById('optionsBox');
+  optionsBox.innerHTML='';
+  q.opts.forEach(opt=>{
+    const btn=document.createElement('button');
+    btn.className='optionBtn';
+    btn.innerText=opt;
+    btn.onclick=()=>checkMCQ(opt,btn);
+    optionsBox.appendChild(btn);
+  });
+}
+
+function checkMCQ(selected,btn){
+  const q=mcqs[mcqIndex];
+  const buttons=document.querySelectorAll('#optionsBox .optionBtn');
+  buttons.forEach(b=>b.disabled=true);
+  if(selected===q.ans){
+    btn.classList.add('correct');
+    document.getElementById('feedback').innerText='Correct!';
+    document.getElementById('correctSound').play();
+  }else{
+    btn.classList.add('wrong');
+    document.getElementById('feedback').innerText='Wrong! Correct: '+q.ans;
+    document.getElementById('wrongSound').play();
+    buttons.forEach(b=>{if(b.innerText===q.ans)b.classList.add('correct');});
+  }
+  mcqIndex++;
+}
+
+function closeMCQ(){
+  document.getElementById('mcqBox').style.display='none';
+  if(mcqIndex>=10){
+    document.getElementById('gameCanvas').style.display='none';
+    document.getElementById('endScreen').style.display='block';
+    document.getElementById('finalScore').innerText=`Apples eaten: ${apples} | MCQs correct: ${mcqIndex}`;
+    document.getElementById('clapSound').play();
+  }else{
+    game=setInterval(draw,150); // resume snake
+    document.getElementById('scoreText').innerText=`Apples eaten: ${apples} | MCQs answered: ${mcqIndex}/10`;
+  }
+}
+
+function restartGame(){
+  location.reload();
+}
+</script>
+</body>
+</html>
