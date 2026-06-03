@@ -1,1 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grade 5 Prefix & Suffix Factory</title>
+<style>
+  * {box-sizing: border-box; margin:0; padding:0; font-family: Arial, sans-serif;}
+  body, html {height:100%; width:100%; background: linear-gradient(to right, #f0f8ff, #ffe4e1);}
+  
+  /* Splash */
+  #splash {
+    position: fixed; top:0; left:0; width:100%; height:100%;
+    background:#fff; display:flex; justify-content:center; align-items:center; z-index:100;
+  }
+  #splash img {width: 300px; max-width:40%;}
 
+  /* Game */
+  #game {display:none; width:100%; height:100%; padding:20px; position:relative;}
+  #score {position:absolute; top:10px; left:10px; background:#fff; padding:5px 15px; border-radius:8px; font-size:1.2rem;}
+  #question {text-align:center; font-size:1.5rem; font-weight:bold; margin-top:50px;}
+  
+  /* Options */
+  #options {display:flex; justify-content:center; gap:15px; flex-wrap: wrap; margin-top:20px;}
+  .option {background:orange; border:none; padding:15px 25px; font-size:1.2rem; border-radius:10px; cursor:pointer; transition:0.2s;}
+  .option:hover {transform: scale(1.05);}
+
+  /* Conveyor Belt */
+  #belt-container {
+    position: relative; width:90%; max-width:800px; height:100px; margin:50px auto; background:#ccc; border-radius:20px; overflow:hidden;
+  }
+  #belt {
+    position:absolute; left:0; top:0; height:100%; display:flex; align-items:center; transition:left 0.5s;
+  }
+  .word-block {
+    min-width:150px; height:60px; background:#ffebcd; margin:0 10px; border-radius:10px; display:flex; justify-content:center; align-items:center; font-weight:bold; font-size:1.2rem; box-shadow:0 2px 5px rgba(0,0,0,0.2);
+  }
+
+  /* End Screen */
+  #endScreen {
+    display:none; position:absolute; top:0; left:0; width:100%; height:100%;
+    background: rgba(0,0,0,0.7); justify-content:center; align-items:center; color:#fff; font-size:2rem; flex-direction:column;
+  }
+  #endScreen button {margin-top:20px; padding:10px 20px; font-size:1.2rem; cursor:pointer; border-radius:8px;}
+
+  /* Character */
+  #character {position:absolute; width:60px; height:60px; bottom:90px; left:20px; transition:left 0.5s;}
+</style>
+</head>
+<body>
+
+<!-- Splash -->
+<div id="splash">
+  <img src="assests/logo.png" alt="Innovine Logo">
+</div>
+
+<!-- Game -->
+<div id="game">
+  <div id="score">Score: 0</div>
+  <div id="question">Question</div>
+  <div id="options"></div>
+
+  <div id="belt-container">
+    <div id="belt">
+      <!-- Word blocks inserted dynamically -->
+    </div>
+    <img id="character" src="assests/character.png" alt="Character">
+  </div>
+</div>
+
+<!-- End Screen -->
+<div id="endScreen">
+  <div>🎉 Congratulations! You completed the factory! 🎉</div>
+  <button onclick="location.reload()">Play Again</button>
+</div>
+
+<!-- Audio -->
+<audio id="correctSound" src="assests/correct.mp3"></audio>
+<audio id="wrongSound" src="assests/wrong.mp3"></audio>
+<audio id="applause" src="assests/freesound_community-claps-44774.mp3"></audio>
+
+<script>
+const splash = document.getElementById('splash');
+const game = document.getElementById('game');
+const endScreen = document.getElementById('endScreen');
+const questionEl = document.getElementById('question');
+const optionsEl = document.getElementById('options');
+const belt = document.getElementById('belt');
+const character = document.getElementById('character');
+
+const correctSound = document.getElementById('correctSound');
+const wrongSound = document.getElementById('wrongSound');
+const applause = document.getElementById('applause');
+
+let score = 0;
+let currentQ = 0;
+
+// Prefix & Suffix questions
+const questions = [
+  {q:"Add a prefix to 'happy' to mean 'not happy'", options:["un-","re-","dis-","pre-"], answer:"un-"},
+  {q:"Add a prefix to 'place' to mean 'again'", options:["re-","un-","dis-","mis-"], answer:"re-"},
+  {q:"Add a prefix to 'appear' to mean 'not appear'", options:["dis-","re-","un-","pre-"], answer:"dis-"},
+  {q:"Add a prefix to 'legal' to mean 'not legal'", options:["il-","un-","dis-","in-"], answer:"il-"},
+  {q:"Add a prefix to 'correct' to mean 'wrong'", options:["in-","un-","dis-","re-"], answer:"in-"},
+  {q:"Add a suffix to 'help' to make a noun", options:["-er","-ful","-less","-ing"], answer:"-er"},
+  {q:"Add a suffix to 'joy' to make an adjective", options:["-ful","-less","-er","-ly"], answer:"-ful"},
+  {q:"Add a suffix to 'hope' to make a noun", options:["-ful","-less","-ness","-ly"], answer:"-ness"},
+  {q:"Add a suffix to 'quick' to make an adverb", options:["-ly","-ness","-ful","-er"], answer:"-ly"},
+  {q:"Add a suffix to 'teach' to mean 'one who teaches'", options:["-er","-ness","-ly","-ful"], answer:"-er"},
+  {q:"Add a suffix to 'care' to mean 'without care'", options:["-ful","-less","-ly","-ness"], answer:"-less"},
+  {q:"Add a suffix to 'friend' to make it 'friendly'", options:["-ly","-ness","-er","-ful"], answer:"-ly"}
+];
+
+// Dynamically create belt word blocks
+function createBelt(){
+  belt.innerHTML = '';
+  questions.forEach((q,i)=>{
+    const block = document.createElement('div');
+    block.className = 'word-block';
+    block.textContent = q.q.split(" ")[0]; // first word as visual
+    belt.appendChild(block);
+  });
+}
+
+// Show current question
+function showQuestion(){
+  const q = questions[currentQ];
+  questionEl.textContent = q.q;
+  optionsEl.innerHTML = '';
+  q.options.forEach(opt=>{
+    const btn = document.createElement('button');
+    btn.textContent = opt;
+    btn.className = 'option';
+    btn.onclick = ()=>checkAnswer(opt);
+    optionsEl.appendChild(btn);
+  });
+}
+
+// Check answer
+function checkAnswer(selected){
+  const q = questions[currentQ];
+  if(selected===q.answer){
+    correctSound.play();
+    score++; 
+    document.getElementById('score').textContent = "Score: "+score;
+    moveCharacter();
+  } else {
+    wrongSound.play();
+    character.style.transform += " rotate(-10deg)";
+    setTimeout(()=>{character.style.transform = character.style.transform.replace(" rotate(-10deg)","");},200);
+  }
+  currentQ++;
+  if(currentQ<questions.length) showQuestion();
+  else finishGame();
+}
+
+// Move character along belt
+function moveCharacter(){
+  const moveX = (belt.children[currentQ].offsetLeft || 0);
+  character.style.left = moveX+"px";
+}
+
+// Finish game
+function finishGame(){
+  applause.play();
+  endScreen.style.display="flex";
+}
+
+// Splash to Game
+setTimeout(()=>{
+  splash.style.display='none';
+  game.style.display='block';
+  createBelt();
+  showQuestion();
+},5000);
+
+</script>
+
+</body>
+</html>
