@@ -3,52 +3,46 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Balloon Click Grammar Game</title>
+<title>Infinitives, Gerunds, Participles Tap Game</title>
 <style>
 body{margin:0;font-family:Arial,sans-serif;background:#140f3d;color:#fff;display:flex;align-items:center;justify-content:center;flex-direction:column;height:100vh;}
-h1{color:#ffd60a;margin-top:10px;text-align:center;}
-#instruction{margin:10px;font-weight:bold;font-size:18px;}
-#gameArea{position:relative;width:400px;height:500px;background:#342070;border:4px solid #ffb347;border-radius:12px;overflow:hidden;margin-top:10px;}
-.balloon{position:absolute;width:80px;height:100px;background:#ff595e;border-radius:40px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:bold;font-size:14px;cursor:pointer;user-select:none;transition:transform 0.2s;}
+#logoScreen, #gameScreen, #endScreen{display:none;align-items:center;justify-content:center;flex-direction:column;}
+#logoScreen img{width:200px;}
+h1{color:#ffd60a;text-align:center;}
+#wordBox{margin:20px;padding:20px 30px;background:#fff4d6;color:#2d2340;font-size:28px;border-radius:12px;cursor:pointer;}
+#instruction{margin:10px;font-weight:bold;}
 #scoreText{margin-top:10px;}
-#mcqBox{background:#fff4d6;color:#2d2340;padding:15px;border-radius:15px;max-width:400px;text-align:center;display:none;margin-top:15px;}
-button{padding:8px 12px;margin:5px;border-radius:12px;border:none;background:#ffb703;color:#2d2340;font-weight:bold;cursor:pointer;}
 .correct{background:#b7efc5;}
 .wrong{background:#ffccd5;}
-.feedback{min-height:25px;margin-top:8px;font-weight:bold;}
-#endScreen{display:none;text-align:center;margin-top:20px;}
-.trophy{font-size:60px;margin-bottom:12px;color:#ffd60a;}
-.sparkle{position:fixed;font-size:28px;animation:spark 1s ease-out forwards;}
-@keyframes spark{from{transform:scale(.5) translateY(0);opacity:1}to{transform:scale(2) translateY(-60px);opacity:0}}
+button{padding:10px 16px;margin-top:12px;border-radius:12px;border:none;background:#ffb703;color:#2d2340;font-weight:bold;cursor:pointer;}
 </style>
 </head>
 <body>
 
-<h1>Infinitives, Gerunds & Participles</h1>
-<div id="instruction">Click all <span id="targetType">Gerunds</span></div>
-<div id="scoreText">Correct clicks: 0 | MCQs answered: 0/10</div>
-<div id="gameArea"></div>
+<div id="logoScreen">
+  <img src="assets/innovine-logo.png" alt="Innovine Logo">
+</div>
 
-<div id="mcqBox">
-  <div id="questionText"></div>
-  <div id="optionsBox"></div>
-  <div class="feedback" id="feedback"></div>
-  <button onclick="closeMCQ()">Continue</button>
+<div id="gameScreen">
+<h1>Infinitives, Gerunds & Participles</h1>
+<div id="instruction">Tap the <span id="targetType">Gerund</span></div>
+<div id="wordBox"></div>
+<div id="scoreText">Score: 0 / 10</div>
 </div>
 
 <div id="endScreen">
-  <div class="trophy">🏆</div>
-  <h2>Well Done!</h2>
-  <p id="finalScore"></p>
-  <button onclick="restartGame()">Play Again</button>
+<h1>Well Done!</h1>
+<p id="finalScore"></p>
+<button onclick="restartGame()">Play Again</button>
 </div>
 
+<!-- Audio assets -->
 <audio id="correctSound" src="assets/correct.mp3"></audio>
 <audio id="wrongSound" src="assets/wrong.mp3"></audio>
-<audio id="clapSound" src="assets/freesound_community-claps-44774.mp3"></audio>
+<audio id="clapSound" src="assets/clapping.mp3"></audio>
 
 <script>
-// Balloon word list
+// Word list
 const words=[
   {word:"to run",type:"Infinitive"},
   {word:"running",type:"Gerund"},
@@ -64,129 +58,74 @@ const words=[
   {word:"opened",type:"Participle"}
 ];
 
-// MCQs
-const mcqs=[
-  {q:"She loves ___ in the park.",opts:["to run","running","broken"],ans:"running"},
-  {q:"The vase ___ yesterday.",opts:["to eat","broken","painted"],ans:"broken"},
-  {q:"I want ___ a story.",opts:["to write","singing","fallen"],ans:"to write"},
-  {q:"He enjoys ___ every morning.",opts:["to run","running","painted"],ans:"running"},
-  {q:"The door was ___ by the painter.",opts:["broken","painted","fallen"],ans:"painted"},
-  {q:"They decided ___ abroad.",opts:["to eat","to run","to write"],ans:"to run"},
-  {q:"___ in the water is fun.",opts:["Swimming","to run","painted"],ans:"Swimming"},
-  {q:"The leaves had ___ from the tree.",opts:["fallen","running","to write"],ans:"fallen"},
-  {q:"He likes ___ songs.",opts:["singing","to eat","broken"],ans:"singing"},
-  {q:"I plan ___ tomorrow.",opts:["to eat","to write","painted"],ans:"to write"}
-];
-
-let targetTypes=["Infinitive","Gerund","Participle"];
+const targetTypes=["Infinitive","Gerund","Participle"];
 let currentTarget="Gerund";
-let correctClicks=0;
-let mcqIndex=0;
 let score=0;
+let rounds=0;
 
-const gameArea=document.getElementById('gameArea');
+const logoScreen=document.getElementById('logoScreen');
+const gameScreen=document.getElementById('gameScreen');
+const endScreen=document.getElementById('endScreen');
+const wordBox=document.getElementById('wordBox');
+const targetSpan=document.getElementById('targetType');
+const scoreText=document.getElementById('scoreText');
+const finalScore=document.getElementById('finalScore');
+const correctAudio=document.getElementById('correctSound');
+const wrongAudio=document.getElementById('wrongSound');
+const clapAudio=document.getElementById('clapSound');
 
-// Generate balloons
-function spawnBalloons(){
-  gameArea.innerHTML='';
-  for(let i=0;i<6;i++){
-    const b=document.createElement('div');
-    b.className='balloon';
-    const w=words[Math.floor(Math.random()*words.length)];
-    b.dataset.type=w.type;
-    b.dataset.word=w.word;
-    b.innerText=w.word;
-    b.style.left=Math.random()*(gameArea.clientWidth-60)+'px';
-    b.style.top=Math.random()*(gameArea.clientHeight-80)+'px';
-    b.onclick=function(){checkBalloon(b);}
-    gameArea.appendChild(b);
+// Show logo for 5 seconds
+logoScreen.style.display='flex';
+setTimeout(()=>{
+  logoScreen.style.display='none';
+  gameScreen.style.display='flex';
+  nextWord();
+},5000);
+
+// Next word
+function nextWord(){
+  if(rounds>=10){
+    gameScreen.style.display='none';
+    endScreen.style.display='flex';
+    finalScore.innerText=`Score: ${score} / 10`;
+    clapAudio.play();
+    return;
   }
+  currentTarget=targetTypes[Math.floor(Math.random()*3)];
+  targetSpan.innerText=currentTarget;
+  const w=words[Math.floor(Math.random()*words.length)];
+  wordBox.innerText=w.word;
+  wordBox.dataset.type=w.type;
+  wordBox.style.background="#fff4d6";
 }
 
-// Check balloon click
-function checkBalloon(b){
-  if(b.dataset.type===currentTarget){
-    b.remove();
-    correctClicks++;
+// Word tap
+wordBox.onclick=function(){
+  const type=this.dataset.type;
+  if(type===currentTarget){
+    this.style.background="#b7efc5";
     score++;
-    document.getElementById('correctSound').play();
-    sparkleEffect();
-    document.getElementById('scoreText').innerText=`Correct clicks: ${correctClicks} | MCQs answered: ${mcqIndex}/10`;
-    if(correctClicks%3===0 && mcqIndex<10) showMCQ();
+    correctAudio.currentTime=0;
+    correctAudio.play();
   } else{
-    document.getElementById('feedback').innerText='Wrong balloon! Try again.';
-    document.getElementById('wrongSound').play();
-    setTimeout(()=>{document.getElementById('feedback').innerText='';},1000);
+    this.style.background="#ffccd5";
+    wrongAudio.currentTime=0;
+    wrongAudio.play();
   }
+  rounds++;
+  scoreText.innerText=`Score: ${score} / 10`;
+  setTimeout(nextWord,600);
 }
 
-// MCQ functions
-function showMCQ(){
-  document.getElementById('mcqBox').style.display='block';
-  const q=mcqs[mcqIndex];
-  document.getElementById('questionText').innerText=q.q;
-  const optionsBox=document.getElementById('optionsBox');
-  optionsBox.innerHTML='';
-  q.opts.forEach(opt=>{
-    const btn=document.createElement('button');
-    btn.innerText=opt;
-    btn.onclick=()=>checkMCQ(opt,btn);
-    optionsBox.appendChild(btn);
-  });
-  document.getElementById('feedback').innerText='';
-}
-
-function checkMCQ(selected,btn){
-  const q=mcqs[mcqIndex];
-  const buttons=document.querySelectorAll('#optionsBox button');
-  buttons.forEach(b=>b.disabled=true);
-  if(selected===q.ans){
-    btn.classList.add('correct');
-    document.getElementById('feedback').innerText='Correct!';
-    document.getElementById('correctSound').play();
-  }else{
-    btn.classList.add('wrong');
-    document.getElementById('feedback').innerText='Wrong! Correct: '+q.ans;
-    document.getElementById('wrongSound').play();
-    buttons.forEach(b=>{if(b.innerText===q.ans)b.classList.add('correct');});
-  }
-  mcqIndex++;
-}
-
-function closeMCQ(){
-  document.getElementById('mcqBox').style.display='none';
-  if(mcqIndex>=10){
-    gameArea.style.display='none';
-    document.getElementById('endScreen').style.display='block';
-    document.getElementById('finalScore').innerText=`Correct clicks: ${correctClicks} | MCQs correct: ${score}`;
-    document.getElementById('clapSound').play();
-  } else{
-    // Pick new target type randomly
-    currentTarget=targetTypes[Math.floor(Math.random()*targetTypes.length)];
-    document.getElementById('targetType').innerText=currentTarget;
-    spawnBalloons();
-  }
-}
-
-function sparkleEffect(){
-  for(let i=0;i<8;i++){
-    const s=document.createElement('div');
-    s.className='sparkle';
-    s.innerText='✨';
-    s.style.left=(Math.random()*80+10)+'vw';
-    s.style.top=(Math.random()*80+10)+'px';
-    document.body.appendChild(s);
-    setTimeout(()=>s.remove(),800);
-  }
-}
-
+// Restart
 function restartGame(){
-  location.reload();
+  score=0;
+  rounds=0;
+  endScreen.style.display='none';
+  gameScreen.style.display='flex';
+  scoreText.innerText=`Score: 0 / 10`;
+  nextWord();
 }
-
-// Initialize game
-document.getElementById('targetType').innerText=currentTarget;
-spawnBalloons();
 </script>
 </body>
 </html>
