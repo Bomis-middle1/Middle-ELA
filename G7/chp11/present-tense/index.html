@@ -4,17 +4,20 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Present Tense Classifier</title>
+<title>Present Tense Box Pop Game</title>
 <style>
-body{margin:0;font-family:Arial,sans-serif;background:#140f3d;color:#fff;display:flex;align-items:center;justify-content:center;flex-direction:column;height:100vh;}
-#logoScreen,#quizScreen,#endScreen{display:none;align-items:center;justify-content:center;flex-direction:column;}
+body{margin:0;font-family:Arial,sans-serif;background:#140f3d;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;overflow:hidden;}
+#logoScreen,#gameScreen,#endScreen{display:none;align-items:center;justify-content:center;flex-direction:column;width:100%;height:100vh;}
 #logoScreen img{width:200px;margin-top:50px;}
-h1{color:#ffd60a;text-align:center;}
-#questionBox{background:#fff4d6;color:#2d2340;padding:20px;border-radius:12px;max-width:600px;margin-top:20px;text-align:center;}
-button{padding:10px 16px;margin:8px;border-radius:12px;border:none;background:#ffb703;color:#2d2340;font-weight:bold;cursor:pointer;width:80%;font-size:16px;}
-button.correct{background:#b7efc5;}
-button.wrong{background:#ffccd5;}
-#feedback{margin-top:10px;font-weight:bold;}
+h1{color:#ffd60a;text-align:center;margin:20px;}
+#instruction{font-size:20px;margin:10px;}
+#scoreText{margin:10px;}
+.box{position:absolute;padding:15px 20px;background:#ffb703;color:#2d2340;border-radius:12px;cursor:pointer;user-select:none;font-weight:bold;transition: transform 0.2s;}
+.box.correct{background:#b7efc5;}
+.box.wrong{background:#ffccd5;}
+.streamer{position:absolute;width:4px;height:40px;background:linear-gradient(to bottom, #ffd700,#ff4500);animation:fall 1s ease-out forwards;}
+@keyframes fall{0%{opacity:1;transform:translateY(0) rotate(0deg);}100%{opacity:0;transform:translateY(200px) rotate(720deg);}}
+button{padding:10px 16px;margin-top:20px;border-radius:12px;border:none;background:#ffb703;color:#2d2340;font-weight:bold;cursor:pointer;font-size:16px;}
 #endScreen{display:none;text-align:center;margin-top:20px;}
 </style>
 </head>
@@ -26,52 +29,60 @@ button.wrong{background:#ffccd5;}
 <h2>Loading Game...</h2>
 </div>
 
-<!-- Quiz Screen -->
-<div id="quizScreen">
-<h1>Present Tense Classifier</h1>
-<div id="scoreText">Question 1 of 10</div>
-<div id="questionBox">
-<div id="questionText"></div>
-<div id="optionsBox"></div>
-<div id="feedback"></div>
-</div>
+<!-- Game Screen -->
+<div id="gameScreen">
+<h1>Present Tense Box Pop Game</h1>
+<div id="instruction"></div>
+<div id="scoreText">Score: 0</div>
 </div>
 
 <!-- End Screen -->
 <div id="endScreen">
-<h1>Quiz Completed!</h1>
+<h1>Game Over!</h1>
 <p id="finalScore"></p>
-<button onclick="restartQuiz()">Play Again</button>
+<button onclick="restartGame()">Play Again</button>
 </div>
 
+<!-- Audio -->
 <audio id="correctSound" src="assets/correct.mp3"></audio>
 <audio id="wrongSound" src="assets/wrong.mp3"></audio>
 <audio id="clapSound" src="assets/clapping.mp3"></audio>
 
 <script>
-// Present Tense Sentences
-const mcqs=[
-{q:"I eat breakfast every day.",opts:["Present Simple","Present Continuous","Present Perfect","Present Perfect Continuous"],ans:"Present Simple"},
-{q:"She is reading a book now.",opts:["Present Simple","Present Continuous","Present Perfect","Present Perfect Continuous"],ans:"Present Continuous"},
-{q:"They have visited London.",opts:["Present Simple","Present Continuous","Present Perfect","Present Perfect Continuous"],ans:"Present Perfect"},
-{q:"He has been working here for two hours.",opts:["Present Simple","Present Continuous","Present Perfect","Present Perfect Continuous"],ans:"Present Perfect Continuous"},
-{q:"We play football on Sundays.",opts:["Present Simple","Present Continuous","Present Perfect","Present Perfect Continuous"],ans:"Present Simple"},
-{q:"I am cooking dinner.",opts:["Present Simple","Present Continuous","Present Perfect","Present Perfect Continuous"],ans:"Present Continuous"},
-{q:"She has finished her homework.",opts:["Present Simple","Present Continuous","Present Perfect","Present Perfect Continuous"],ans:"Present Perfect"},
-{q:"They have been studying for three hours.",opts:["Present Simple","Present Continuous","Present Perfect","Present Perfect Continuous"],ans:"Present Perfect Continuous"},
-{q:"He drinks coffee every morning.",opts:["Present Simple","Present Continuous","Present Perfect","Present Perfect Continuous"],ans:"Present Simple"},
-{q:"We are watching a movie.",opts:["Present Simple","Present Continuous","Present Perfect","Present Perfect Continuous"],ans:"Present Continuous"}
+// Define rounds with dynamic instructions and sentences
+const rounds=[
+  {instruction:"Click all Present Simple sentences.",sentences:[
+    {text:"I eat breakfast every day.",type:"Simple"},
+    {text:"I am eating breakfast now.",type:"Continuous"},
+    {text:"I have eaten breakfast.",type:"Perfect"},
+    {text:"She has been eating breakfast for 2 hours.",type:"PerfectContinuous"},
+  ]},
+  {instruction:"Click all Present Continuous sentences.",sentences:[
+    {text:"She is reading a book now.",type:"Continuous"},
+    {text:"They play football on Sundays.",type:"Simple"},
+    {text:"They have played football.",type:"Perfect"},
+    {text:"He has been playing football for 3 hours.",type:"PerfectContinuous"},
+  ]},
+  {instruction:"Click all Present Perfect sentences.",sentences:[
+    {text:"They have visited Delhi.",type:"Perfect"},
+    {text:"We are watching a movie.",type:"Continuous"},
+    {text:"He drinks coffee every morning.",type:"Simple"},
+    {text:"I have been working here for 2 hours.",type:"PerfectContinuous"},
+  ]},
+  {instruction:"Click all Present Perfect Continuous sentences.",sentences:[
+    {text:"He has been working here for 2 hours.",type:"PerfectContinuous"},
+    {text:"I am cooking dinner.",type:"Continuous"},
+    {text:"She has finished her homework.",type:"Perfect"},
+    {text:"We play football on Sundays.",type:"Simple"},
+  ]}
 ];
 
-let currentQ=0;
+let currentRound=0;
 let score=0;
 
-// DOM elements
 const logoScreen=document.getElementById('logoScreen');
-const quizScreen=document.getElementById('quizScreen');
-const questionText=document.getElementById('questionText');
-const optionsBox=document.getElementById('optionsBox');
-const feedback=document.getElementById('feedback');
+const gameScreen=document.getElementById('gameScreen');
+const instruction=document.getElementById('instruction');
 const scoreText=document.getElementById('scoreText');
 const endScreen=document.getElementById('endScreen');
 const finalScore=document.getElementById('finalScore');
@@ -79,66 +90,102 @@ const correctAudio=document.getElementById('correctSound');
 const wrongAudio=document.getElementById('wrongSound');
 const clapAudio=document.getElementById('clapSound');
 
-// Show logo 5 seconds
+// Show logo for 5 seconds
 logoScreen.style.display='flex';
 setTimeout(()=>{
   logoScreen.style.display='none';
-  quizScreen.style.display='flex';
-  showQuestion();
+  gameScreen.style.display='flex';
+  startRound();
 },5000);
 
-// Show current question
-function showQuestion(){
-  feedback.innerText="";
-  const q=mcqs[currentQ];
-  questionText.innerText=q.q;
-  optionsBox.innerHTML='';
-  q.opts.forEach(opt=>{
-    const btn=document.createElement('button');
-    btn.innerText=opt;
-    btn.onclick=()=>checkAnswer(opt,btn);
-    optionsBox.appendChild(btn);
+// Start a round
+function startRound(){
+  instruction.innerText = rounds[currentRound].instruction;
+  // Remove previous boxes
+  document.querySelectorAll('.box').forEach(b=>b.remove());
+  rounds[currentRound].sentences.forEach((s,i)=>{
+    const box = document.createElement('div');
+    box.className='box';
+    box.innerText = s.text;
+    box.dataset.type = s.type;
+    box.style.top = Math.random()*300+50+'px';
+    box.style.left = Math.random()*window.innerWidth*0.7+'px';
+    box.onclick = () => popBox(box);
+    gameScreen.appendChild(box);
+    floatBox(box);
   });
-  scoreText.innerText=`Question ${currentQ+1} of ${mcqs.length}`;
 }
 
-// Check answer
-function checkAnswer(selected,btn){
-  const q=mcqs[currentQ];
-  const buttons=document.querySelectorAll('#optionsBox button');
-  buttons.forEach(b=>b.disabled=true);
-  if(selected===q.ans){
-    btn.classList.add('correct');
-    feedback.innerText="Correct!";
-    correctAudio.currentTime=0; correctAudio.play();
+// Float animation for boxes
+function floatBox(box){
+  let dy = (Math.random()*2+0.5);
+  setInterval(()=>{
+    let top = parseFloat(box.style.top);
+    top += dy;
+    if(top>window.innerHeight-50) top=50;
+    box.style.top = top+'px';
+  },50);
+}
+
+// Handle box click
+function popBox(box){
+  let targetType = "";
+  const instr = rounds[currentRound].instruction;
+  if(instr.includes("Simple")) targetType="Simple";
+  else if(instr.includes("Continuous")) targetType="Continuous";
+  else if(instr.includes("Perfect Continuous")) targetType="PerfectContinuous";
+  else if(instr.includes("Perfect")) targetType="Perfect";
+
+  if(box.dataset.type===targetType){
+    box.remove();
+    createStreamer(box);
     score++;
+    correctAudio.currentTime=0; correctAudio.play();
+    scoreText.innerText=`Score: ${score}`;
+    const remaining=document.querySelectorAll(`.box[data-type='${targetType}']`).length;
+    if(remaining===0){
+      currentRound++;
+      if(currentRound>=rounds.length){
+        endGame();
+      } else {
+        setTimeout(startRound,1000);
+      }
+    }
   } else{
-    btn.classList.add('wrong');
-    feedback.innerText="Wrong! Correct: "+q.ans;
     wrongAudio.currentTime=0; wrongAudio.play();
-    buttons.forEach(b=>{if(b.innerText===q.ans) b.classList.add('correct');});
+    box.style.background="#ffccd5";
+    setTimeout(()=>{box.style.background="#ffb703"},300);
   }
-  setTimeout(nextQuestion,1200);
 }
 
-// Next question
-function nextQuestion(){
-  currentQ++;
-  if(currentQ>=mcqs.length){
-    quizScreen.style.display='none';
-    endScreen.style.display='flex';
-    finalScore.innerText=`You scored ${score} / ${mcqs.length}`;
-    clapAudio.play();
-  } else showQuestion();
+// Streamer animation
+function createStreamer(box){
+  for(let i=0;i<10;i++){
+    const s=document.createElement('div');
+    s.className='streamer';
+    s.style.left = box.offsetLeft + Math.random()*50 +'px';
+    s.style.top = box.offsetTop + Math.random()*50 +'px';
+    gameScreen.appendChild(s);
+    setTimeout(()=>{s.remove()},1000);
+  }
 }
 
-// Restart quiz
-function restartQuiz(){
-  currentQ=0;
+// End game
+function endGame(){
+  gameScreen.style.display='none';
+  endScreen.style.display='flex';
+  finalScore.innerText=`Your Score: ${score}`;
+  clapAudio.play();
+}
+
+// Restart game
+function restartGame(){
+  currentRound=0;
   score=0;
   endScreen.style.display='none';
-  quizScreen.style.display='flex';
-  showQuestion();
+  gameScreen.style.display='flex';
+  scoreText.innerText=`Score: 0`;
+  startRound();
 }
 </script>
 </body>
