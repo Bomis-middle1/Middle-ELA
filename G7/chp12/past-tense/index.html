@@ -10,10 +10,10 @@ body{margin:0;font-family:Arial,sans-serif;background:#1a1a2e;color:#fff;overflo
 #logoScreen img{width:200px;margin-top:50px;}
 h1{color:#ffd60a;text-align:center;margin:10px;}
 #scoreText{margin:10px;}
-#conveyor{position:relative;width:100%;height:300px;overflow:hidden;border-top:2px solid #fff;border-bottom:2px solid #fff;margin:10px 0;}
+#conveyor{position:relative;width:100%;height:500px;overflow:hidden;border-top:2px solid #fff;border-bottom:2px solid #fff;margin:10px 0;}
 .sentence{position:absolute;padding:10px 15px;background:#ff6f61;color:#fff;border-radius:12px;cursor:grab;white-space:nowrap;font-weight:bold;}
 .binContainer{display:flex;justify-content:space-around;width:100%;margin-top:20px;}
-.bin{width:22%;padding:40px;background:#ffb703;color:#2d2340;border-radius:12px;text-align:center;font-weight:bold;min-height:100px;}
+.bin{width:22%;padding:40px;background:#ffb703;color:#2d2340;border-radius:12px;text-align:center;font-weight:bold;min-height:120px;}
 .streamer{position:absolute;width:4px;height:40px;background:linear-gradient(to bottom,#ffd700,#ff4500);animation:fall 1s ease-out forwards;}
 @keyframes fall{0%{opacity:1;transform:translateY(0) rotate(0deg);}100%{opacity:0;transform:translateY(200px) rotate(720deg);}}
 button{padding:10px 16px;margin-top:20px;border-radius:12px;border:none;background:#ff6f61;color:#fff;font-weight:bold;cursor:pointer;font-size:16px;}
@@ -74,7 +74,7 @@ const correctAudio=document.getElementById('correctSound');
 const wrongAudio=document.getElementById('wrongSound');
 const clapAudio=document.getElementById('clapSound');
 
-// Show logo 5 sec
+// Show logo for 5 seconds
 logoScreen.style.display='flex';
 setTimeout(()=>{
   logoScreen.style.display='none';
@@ -95,7 +95,7 @@ function createSentenceBox(s,i){
   div.className='sentence';
   div.innerText=s.text;
   div.dataset.type=s.type;
-  div.style.top = 50 + i*50 + 'px';
+  div.style.top = 50 + i*45 + 'px'; // spread out vertically
   div.style.left = conveyor.offsetWidth +'px';
   div.draggable = true;
   div.ondragstart = e=>{e.dataTransfer.setData("text", s.type); e.dataTransfer.setData("id", i);}
@@ -106,13 +106,13 @@ function createSentenceBox(s,i){
 function moveSentence(div){
   let interval=setInterval(()=>{
     let left = parseFloat(div.style.left);
-    left -= 0.3; // slow speed
+    left -= 1; // faster but readable
     if(left < -div.offsetWidth){
       div.remove();
       clearInterval(interval);
       checkEnd();
     } else div.style.left = left+'px';
-  },20); // slower interval
+  },15); // slightly faster than before
 }
 
 // Bins
@@ -141,7 +141,6 @@ function moveSentence(div){
   }
 });
 
-// Streamer
 function createStreamer(div){
   for(let i=0;i<10;i++){
     const s=document.createElement('div');
@@ -153,7 +152,6 @@ function createStreamer(div){
   }
 }
 
-// End check
 function checkEnd(){
   if(document.querySelectorAll('.sentence').length===0){
     endGame();
