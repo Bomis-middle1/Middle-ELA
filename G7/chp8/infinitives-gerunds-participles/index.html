@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Infinitives, Gerunds, Participles Tap Game</title>
+<title>Infinitives, Gerunds & Participles Game</title>
 <style>
 body{margin:0;font-family:Arial,sans-serif;background:#140f3d;color:#fff;display:flex;align-items:center;justify-content:center;flex-direction:column;height:100vh;}
-#logoScreen, #gameScreen, #endScreen{display:none;align-items:center;justify-content:center;flex-direction:column;}
+#logoScreen, #gameScreen, #mcqBox, #endScreen{display:none;align-items:center;justify-content:center;flex-direction:column;}
 #logoScreen img{width:200px;}
 h1{color:#ffd60a;text-align:center;}
 #wordBox{margin:20px;padding:20px 30px;background:#fff4d6;color:#2d2340;font-size:28px;border-radius:12px;cursor:pointer;}
@@ -15,19 +15,28 @@ h1{color:#ffd60a;text-align:center;}
 .correct{background:#b7efc5;}
 .wrong{background:#ffccd5;}
 button{padding:10px 16px;margin-top:12px;border-radius:12px;border:none;background:#ffb703;color:#2d2340;font-weight:bold;cursor:pointer;}
+#optionsBox button{display:block;margin:8px;width:80%;font-size:16px;}
+.feedback{margin-top:10px;font-weight:bold;}
 </style>
 </head>
 <body>
 
 <div id="logoScreen">
-  <img src="assets/innovine-logo.png" alt="Innovine Logo">
+<img src="assets/innovine-logo.png" alt="Logo">
 </div>
 
 <div id="gameScreen">
 <h1>Infinitives, Gerunds & Participles</h1>
 <div id="instruction">Tap the <span id="targetType">Gerund</span></div>
 <div id="wordBox"></div>
-<div id="scoreText">Score: 0 / 10</div>
+<div id="scoreText">Correct taps: 0 | MCQs answered: 0/10</div>
+</div>
+
+<div id="mcqBox">
+<div id="questionText"></div>
+<div id="optionsBox"></div>
+<div class="feedback" id="feedback"></div>
+<button onclick="closeMCQ()">Continue</button>
 </div>
 
 <div id="endScreen">
@@ -36,13 +45,12 @@ button{padding:10px 16px;margin-top:12px;border-radius:12px;border:none;backgrou
 <button onclick="restartGame()">Play Again</button>
 </div>
 
-<!-- Audio assets -->
 <audio id="correctSound" src="assets/correct.mp3"></audio>
 <audio id="wrongSound" src="assets/wrong.mp3"></audio>
 <audio id="clapSound" src="assets/clapping.mp3"></audio>
 
 <script>
-// Word list
+// Word balloons
 const words=[
   {word:"to run",type:"Infinitive"},
   {word:"running",type:"Gerund"},
@@ -52,19 +60,33 @@ const words=[
   {word:"painted",type:"Participle"},
   {word:"to write",type:"Infinitive"},
   {word:"singing",type:"Gerund"},
-  {word:"fallen",type:"Participle"},
-  {word:"to play",type:"Infinitive"},
-  {word:"dancing",type:"Gerund"},
-  {word:"opened",type:"Participle"}
+  {word:"fallen",type:"Participle"}
 ];
 
 const targetTypes=["Infinitive","Gerund","Participle"];
 let currentTarget="Gerund";
+let correctTaps=0;
+let mcqIndex=0;
 let score=0;
-let rounds=0;
 
+// MCQs from your list
+const mcqs=[
+{q:"The infinitive in: 'Riya wants to learn coding.'",opts:["wants","learn","to learn","coding"],ans:"to learn"},
+{q:"Which word is a gerund? 'Swimming every morning makes Aryan energetic.'",opts:["morning","energetic","feel","Swimming"],ans:"Swimming"},
+{q:"Find the participle: 'The excited fans cheered.'",opts:["fans","goal","cheered","excited"],ans:"excited"},
+{q:"Which option contains an infinitive?",opts:["Dancing is fun","To dance is fun","Danced happily","Dancing happily"],ans:"To dance is fun"},
+{q:"The gerund in: 'Playing video games can improve skills.'",opts:["improve","skills","Playing","games"],ans:"Playing"},
+{q:"Choose the participle: 'The barking dog woke everyone.'",opts:["woke","barking","everyone","dog"],ans:"barking"},
+{q:"What is the underlined phrase? 'To watch the science show.'",opts:["Gerund","Participle","Infinitive Phrase","Noun Phrase"],ans:"Infinitive Phrase"},
+{q:"Identify the gerund: 'Maya enjoys painting superheroes.'",opts:["enjoys","superheroes","notebook","painting"],ans:"painting"},
+{q:"Find the participle: 'The broken skateboard lay beside the ramp.'",opts:["lay","beside","broken","ramp"],ans:"broken"},
+{q:"Which sentence contains a gerund?","opts":["I want to travel","Running helps me stay fit","The tired player rested","She plans to win"],ans:"Running helps me stay fit"}
+];
+
+// DOM elements
 const logoScreen=document.getElementById('logoScreen');
 const gameScreen=document.getElementById('gameScreen');
+const mcqBox=document.getElementById('mcqBox');
 const endScreen=document.getElementById('endScreen');
 const wordBox=document.getElementById('wordBox');
 const targetSpan=document.getElementById('targetType');
@@ -74,7 +96,7 @@ const correctAudio=document.getElementById('correctSound');
 const wrongAudio=document.getElementById('wrongSound');
 const clapAudio=document.getElementById('clapSound');
 
-// Show logo for 5 seconds
+// Show logo 5 sec
 logoScreen.style.display='flex';
 setTimeout(()=>{
   logoScreen.style.display='none';
@@ -84,10 +106,10 @@ setTimeout(()=>{
 
 // Next word
 function nextWord(){
-  if(rounds>=10){
+  if(correctTaps>=10){
     gameScreen.style.display='none';
     endScreen.style.display='flex';
-    finalScore.innerText=`Score: ${score} / 10`;
+    finalScore.innerText=`Correct taps: ${correctTaps} | MCQs answered: ${mcqIndex}`;
     clapAudio.play();
     return;
   }
@@ -99,33 +121,67 @@ function nextWord(){
   wordBox.style.background="#fff4d6";
 }
 
-// Word tap
+// Tap word
 wordBox.onclick=function(){
-  const type=this.dataset.type;
-  if(type===currentTarget){
+  if(this.dataset.type===currentTarget){
     this.style.background="#b7efc5";
+    correctAudio.currentTime=0; correctAudio.play();
+    correctTaps++;
     score++;
-    correctAudio.currentTime=0;
-    correctAudio.play();
   } else{
     this.style.background="#ffccd5";
-    wrongAudio.currentTime=0;
-    wrongAudio.play();
+    wrongAudio.currentTime=0; wrongAudio.play();
   }
-  rounds++;
-  scoreText.innerText=`Score: ${score} / 10`;
+  scoreText.innerText=`Correct taps: ${correctTaps} | MCQs answered: ${mcqIndex}`;
+  if(correctTaps>0 && correctTaps%3===0 && mcqIndex<mcqs.length) showMCQ();
   setTimeout(nextWord,600);
+}
+
+// MCQ functions
+function showMCQ(){
+  mcqBox.style.display='block';
+  const q=mcqs[mcqIndex];
+  document.getElementById('questionText').innerText=q.q;
+  const optionsBox=document.getElementById('optionsBox');
+  optionsBox.innerHTML='';
+  q.opts.forEach(opt=>{
+    const btn=document.createElement('button');
+    btn.innerText=opt;
+    btn.onclick=()=>checkMCQ(opt,btn);
+    optionsBox.appendChild(btn);
+  });
+  document.getElementById('feedback').innerText='';
+}
+
+function checkMCQ(selected,btn){
+  const q=mcqs[mcqIndex];
+  const buttons=document.querySelectorAll('#optionsBox button');
+  buttons.forEach(b=>b.disabled=true);
+  if(selected===q.ans){
+    btn.classList.add('correct');
+    document.getElementById('feedback').innerText='Correct!';
+    correctAudio.currentTime=0; correctAudio.play();
+  } else{
+    btn.classList.add('wrong');
+    document.getElementById('feedback').innerText='Wrong! Correct: '+q.ans;
+    wrongAudio.currentTime=0; wrongAudio.play();
+    buttons.forEach(b=>{if(b.innerText===q.ans) b.classList.add('correct');});
+  }
+  mcqIndex++;
+}
+
+function closeMCQ(){
+  mcqBox.style.display='none';
 }
 
 // Restart
 function restartGame(){
+  correctTaps=0;
+  mcqIndex=0;
   score=0;
-  rounds=0;
   endScreen.style.display='none';
   gameScreen.style.display='flex';
-  scoreText.innerText=`Score: 0 / 10`;
+  scoreText.innerText=`Correct taps: 0 | MCQs answered: 0/10`;
   nextWord();
 }
 </script>
-</body>
-</html>
