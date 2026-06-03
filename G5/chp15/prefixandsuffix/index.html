@@ -57,7 +57,6 @@
 </div>
 
 <div id="endScreen">
-  <div>🎉 Congratulations! You completed the factory! 🎉</div>
   <button onclick="location.reload()">Play Again</button>
 </div>
 
@@ -130,14 +129,9 @@ function checkAnswer(selected){
     if(currentQ < questions.length){
       showQuestion();
     } else {
-      finishGame();
+      endScreen.style.display = "flex";  // Only shows Play Again button
     }
   }, 1000);
-}
-
-function finishGame(){
-  applause.play();
-  endScreen.style.display = "flex";
 }
 
 setTimeout(()=>{
