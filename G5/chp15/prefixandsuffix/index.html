@@ -6,7 +6,7 @@
 <title>Grade 5 Prefix & Suffix Factory</title>
 <style>
   * {box-sizing:border-box; margin:0; padding:0; font-family: Arial, sans-serif;}
-  body, html {height:100%; width:100%; background: linear-gradient(to right, #f0f8ff, #ffe4e1);}
+  body, html {height:100%; width:100%; background: linear-gradient(to right, #f0f8ff, #ffe4e1); overflow-x:hidden;}
   
   /* Splash */
   #splash {
@@ -25,7 +25,7 @@
   .option {background:orange; border:none; padding:25px 35px; font-size:1.5rem; border-radius:15px; cursor:pointer; transition:0.2s;}
   .option:hover {transform: scale(1.05);}
   
-  /* Belt Container */
+  /* Conveyor Belt */
   #belt-container {
     position: relative; width:100%; height:150px; margin-top:50px; overflow:hidden; border-radius:20px;
     background: repeating-linear-gradient(to right,#ccc 0 50px,#bbb 50px 100px);
@@ -42,7 +42,7 @@
   }
   #character {width:100px; height:100px;}
   #callout {
-    margin-top:10px; padding:5px 10px; background:#fff; border-radius:10px; font-size:1.5rem; min-width:120px; text-align:center;
+    margin-top:10px; padding:5px 10px; background:#fff; border-radius:10px; font-size:1.5rem; min-width:140px; text-align:center;
     visibility:hidden;
   }
 
@@ -117,6 +117,7 @@ const questions = [
   {q:"Add a suffix to 'friend' to make it 'friendly'", options:["-ly","-ness","-er","-ful"], answer:"-ly"}
 ];
 
+// Show question
 function showQuestion(){
   const q = questions[currentQ];
   questionEl.textContent = q.q;
@@ -125,17 +126,18 @@ function showQuestion(){
     const btn = document.createElement('button');
     btn.textContent = opt;
     btn.className = 'option';
-    btn.onclick = ()=>checkAnswer(opt);
+    btn.onclick = () => checkAnswer(opt);
     optionsEl.appendChild(btn);
   });
 }
 
+// Check answer
 function checkAnswer(selected){
   const q = questions[currentQ];
   if(selected === q.answer){
     correctSound.play();
     score++;
-    scoreEl.textContent = "Score: "+score;
+    scoreEl.textContent = "Score: " + score;
     callout.textContent = "Right Answer!";
     callout.style.background = "#a0ffa0";
   } else {
@@ -144,24 +146,29 @@ function checkAnswer(selected){
     callout.style.background = "#ffa0a0";
   }
   callout.style.visibility = "visible";
-  setTimeout(()=>{callout.style.visibility="hidden";},1000);
-  currentQ++;
-  if(currentQ < questions.length) showQuestion();
-  else finishGame();
+  setTimeout(() => { callout.style.visibility = "hidden"; currentQ++; 
+    if(currentQ < questions.length){
+      showQuestion();
+    } else {
+      finishGame();
+    }
+  }, 1000);
 }
 
+// Finish game
 function finishGame(){
   applause.play();
-  endScreen.style.display="flex";
+  endScreen.style.display = "flex";
 }
 
+// Splash to Game
 setTimeout(()=>{
   splash.style.display='none';
   game.style.display='block';
   score = 0;
   currentQ = 0;
   showQuestion();
-},5000);
+}, 5000);
 
 </script>
 </body>
