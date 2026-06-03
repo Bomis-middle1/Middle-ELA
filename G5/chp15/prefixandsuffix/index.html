@@ -7,25 +7,25 @@
 <style>
   * {box-sizing:border-box; margin:0; padding:0; font-family: Arial, sans-serif;}
   body, html {height:100%; width:100%; background: linear-gradient(to right, #f0f8ff, #ffe4e1); overflow-x:hidden;}
-  
+
   /* Splash */
   #splash {
     position: fixed; top:0; left:0; width:100%; height:100%;
     background:#fff; display:flex; justify-content:center; align-items:center; z-index:100;
   }
-  #splash img {width: 300px; max-width:40%;}
+  #splash img {width:300px; max-width:40%;}
 
   /* Game */
   #game {display:none; width:100%; height:100%; padding:20px; position:relative;}
   #score {position:absolute; top:10px; left:10px; background:#fff; padding:5px 15px; border-radius:8px; font-size:1.5rem;}
-  
-  /* Question & Options */
+
+  /* Questions & Options */
   #question {text-align:center; font-size:2rem; font-weight:bold; margin-top:50px;}
   #options {display:flex; justify-content:center; gap:20px; flex-wrap: wrap; margin-top:30px;}
   .option {background:orange; border:none; padding:25px 35px; font-size:1.5rem; border-radius:15px; cursor:pointer; transition:0.2s;}
   .option:hover {transform: scale(1.05);}
-  
-  /* Conveyor Belt */
+
+  /* Belt */
   #belt-container {
     position: relative; width:100%; height:150px; margin-top:50px; overflow:hidden; border-radius:20px;
     background: repeating-linear-gradient(to right,#ccc 0 50px,#bbb 50px 100px);
@@ -36,7 +36,7 @@
     100% {background-position-x:100px;}
   }
 
-  /* Static Character */
+  /* Character */
   #character-container {
     position:absolute; bottom:10px; left:20px; display:flex; flex-direction:column; align-items:center; z-index:10;
   }
@@ -66,9 +66,7 @@
   <div id="score">Score: 0</div>
   <div id="question">Question</div>
   <div id="options"></div>
-
   <div id="belt-container"></div>
-
   <div id="character-container">
     <img id="character" src="assests/character.png" alt="Character">
     <div id="callout"></div>
@@ -117,7 +115,6 @@ const questions = [
   {q:"Add a suffix to 'friend' to make it 'friendly'", options:["-ly","-ness","-er","-ful"], answer:"-ly"}
 ];
 
-// Show question
 function showQuestion(){
   const q = questions[currentQ];
   questionEl.textContent = q.q;
@@ -131,7 +128,6 @@ function showQuestion(){
   });
 }
 
-// Check answer
 function checkAnswer(selected){
   const q = questions[currentQ];
   if(selected === q.answer){
@@ -146,7 +142,10 @@ function checkAnswer(selected){
     callout.style.background = "#ffa0a0";
   }
   callout.style.visibility = "visible";
-  setTimeout(() => { callout.style.visibility = "hidden"; currentQ++; 
+
+  setTimeout(() => {
+    callout.style.visibility = "hidden";
+    currentQ++;
     if(currentQ < questions.length){
       showQuestion();
     } else {
@@ -155,13 +154,11 @@ function checkAnswer(selected){
   }, 1000);
 }
 
-// Finish game
 function finishGame(){
   applause.play();
   endScreen.style.display = "flex";
 }
 
-// Splash to Game
 setTimeout(()=>{
   splash.style.display='none';
   game.style.display='block';
@@ -169,7 +166,6 @@ setTimeout(()=>{
   currentQ = 0;
   showQuestion();
 }, 5000);
-
 </script>
 </body>
 </html>
