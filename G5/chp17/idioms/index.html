@@ -1,1 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Idioms Pictionary</title>
+<style>
+  body {
+    background: #87ceeb; /* sky color */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    font-family: 'Courier New', monospace;
+    flex-direction: column;
+  }
 
+  /* Splash screen */
+  #splash {
+    position: fixed; top:0; left:0; width:100%; height:100%;
+    background:#fff; display:flex; justify-content:center; align-items:center; z-index:100;
+  }
+  #splash img {width:300px; max-width:40%;}
+
+  /* Game container */
+  #game {display:none; width:700px; max-width:90%; text-align:center;}
+  #score {font-size:1.5rem; margin-bottom:10px;}
+  #timer {font-size:1.3rem; margin-bottom:10px;}
+
+  /* Blackboard */
+  .blackboard {
+    width: 100%; height: 300px; background: #111; border: 10px solid #654321;
+    border-radius: 10px; padding: 20px; box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    display:flex; justify-content:center; align-items:center; flex-direction:column;
+  }
+
+  .chalk-text {
+    color: #fff;
+    font-size: 2rem;
+    text-shadow: 0 0 2px #fff, 0 0 5px #fff, 0 0 10px #fff;
+  }
+</style>
+</head>
+<body>
+
+<!-- Splash -->
+<div id="splash">
+  <img src="assets/logo.png" alt="Logo">
+</div>
+
+<!-- Game -->
+<div id="game">
+  <div id="score">Idioms Completed: 0 / 7</div>
+  <div id="timer">Time Left: 60s</div>
+  <div class="blackboard">
+    <div id="idiom" class="chalk-text"></div>
+  </div>
+</div>
+
+<!-- Audio -->
+<audio id="correctSound" src="assets/correct.mp3"></audio>
+<audio id="wrongSound" src="assets/wrong.mp3"></audio>
+<audio id="applause" src="assets/freesound_community-claps-44774.mp3"></audio>
+
+<script>
+const splash = document.getElementById('splash');
+const game = document.getElementById('game');
+const idiomEl = document.getElementById('idiom');
+const scoreEl = document.getElementById('score');
+const timerEl = document.getElementById('timer');
+
+const correctSound = document.getElementById('correctSound');
+const applause = document.getElementById('applause');
+
+const idioms = [
+  "Break the ice",
+  "Hit the hay",
+  "Spill the beans",
+  "Piece of cake",
+  "Let the cat out of the bag",
+  "Bite the bullet",
+  "Under the weather"
+];
+
+let current = 0;
+let timeLeft = 60; // seconds per idiom
+let timerInterval;
+
+function startTimer() {
+  timerLeft = 60;
+  timerEl.textContent = `Time Left: ${timerLeft}s`;
+  clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    timerLeft--;
+    timerEl.textContent = `Time Left: ${timerLeft}s`;
+    if(timerLeft <= 0){
+      nextIdiom();
+    }
+  }, 1000);
+}
+
+function nextIdiom(){
+  correctSound.play();
+  current++;
+  scoreEl.textContent = `Idioms Completed: ${current} / 7`;
+  if(current >= idioms.length){
+    clearInterval(timerInterval);
+    applause.play();
+    idiomEl.textContent = "Game Completed! Great job!";
+    timerEl.textContent = "";
+    return;
+  }
+  idiomEl.textContent = idioms[current];
+  startTimer();
+}
+
+// Start game after splash
+setTimeout(()=>{
+  splash.style.display='none';
+  game.style.display='block';
+  idiomEl.textContent = idioms[current];
+  startTimer();
+}, 5000);
+</script>
+
+</body>
+</html>
