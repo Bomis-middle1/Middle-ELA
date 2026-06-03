@@ -1,1 +1,148 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Conjunctions Quiz Adventure</title>
+<style>
+body{margin:0;font-family:Arial,sans-serif;background:#140f3d;color:#fff;display:flex;align-items:center;justify-content:center;flex-direction:column;height:100vh;}
+#logoScreen, #quizScreen, #endScreen{display:none;align-items:center;justify-content:center;flex-direction:column;}
+#logoScreen img{width:200px;margin-top:50px;}
+h1{color:#ffd60a;text-align:center;}
+#questionBox{background:#fff4d6;color:#2d2340;padding:20px;border-radius:12px;max-width:500px;margin-top:20px;text-align:left;}
+button{padding:10px 16px;margin:8px;border-radius:12px;border:none;background:#ffb703;color:#2d2340;font-weight:bold;cursor:pointer;width:90%;font-size:16px;}
+.correct{background:#b7efc5;}
+.wrong{background:#ffccd5;}
+#feedback{margin-top:10px;font-weight:bold;}
+#endScreen{display:none;text-align:center;margin-top:20px;}
+</style>
+</head>
+<body>
+
+<!-- Logo Screen -->
+<div id="logoScreen">
+<img src="assets/innovine-logo.png" alt="Logo">
+<h2>Loading Game...</h2>
+</div>
+
+<!-- Quiz Screen -->
+<div id="quizScreen">
+<h1>Conjunctions Quiz Adventure</h1>
+<div id="scoreText">Question 1 of 10</div>
+<div id="questionBox">
+<div id="questionText"></div>
+<div id="optionsBox"></div>
+<div id="feedback"></div>
+</div>
+</div>
+
+<!-- End Screen -->
+<div id="endScreen">
+<h1>Quiz Completed!</h1>
+<p id="finalScore"></p>
+<button onclick="restartQuiz()">Play Again</button>
+</div>
+
+<!-- Audio -->
+<audio id="correctSound" src="assets/correct.mp3"></audio>
+<audio id="wrongSound" src="assets/wrong.mp3"></audio>
+<audio id="clapSound" src="assets/clapping.mp3"></audio>
+
+<script>
+// Exact 10 Conjunction questions you provided
+const mcqs=[
+{q:'A detective finds this clue: "Although it was midnight, the thief escaped." What type of conjunction is although?',opts:["Coordinating","Relative","Concessive","Comparative"],ans:"Concessive"},
+{q:'Which sentence contains a Conditional Conjunction?',opts:["I stayed home because it rained.","If you find the key, open the chest.","The player was tired but won.","The bike is faster than the scooter."],ans:"If you find the key, open the chest."},
+{q:'A robot made a grammar mistake. Which sentence is WRONG?',opts:["The tiger is stronger than the fox.","She studied so that she could pass.","Although he was hungry, he ate lunch.","If it rains, we will stay inside."],ans:"Although he was hungry, he ate lunch."},
+{q:'The door opens only if you choose the sentence with a Purpose Conjunction.',opts:["The knight trained so that he could defeat the dragon.","The knight trained because he was bored.","The knight trained although he was tired.","The knight trained and became stronger."],ans:"The knight trained so that he could defeat the dragon."},
+{q:'What does the conjunction because do?',opts:["Shows comparison","Shows condition","Gives a reason","Gives extra information"],ans:"Gives a reason"},
+{q:'The alien says: "The spaceship that landed here is invisible." What type of conjunction is that?',opts:["Relative","Comparative","Coordinating","Conditional"],ans:"Relative"},
+{q:'Which sentence uses a Coordinating Conjunction?',opts:["The runner trained because she wanted to win.","The runner trained although she was tired.","The runner trained and improved her speed.","The runner trained so that she could compete."],ans:"The runner trained and improved her speed."},
+{q:'Which conjunction belongs to a DIFFERENT category?',opts:["Although","Even though","Though","Because"],ans:"Because"},
+{q:'Which pair belongs to the same conjunction type?',opts:["if, unless","and, although","because, than","that, but"],ans:"if, unless"},
+{q:'Read the sentence: "The wizard carried a map so that he could find the treasure, although the journey was dangerous." How many conjunction types are used?',opts:["One","Two","Three","Four"],ans:"Two"}
+];
+
+let currentQ=0;
+let score=0;
+
+// DOM elements
+const logoScreen=document.getElementById('logoScreen');
+const quizScreen=document.getElementById('quizScreen');
+const questionText=document.getElementById('questionText');
+const optionsBox=document.getElementById('optionsBox');
+const feedback=document.getElementById('feedback');
+const scoreText=document.getElementById('scoreText');
+const endScreen=document.getElementById('endScreen');
+const finalScore=document.getElementById('finalScore');
+const correctAudio=document.getElementById('correctSound');
+const wrongAudio=document.getElementById('wrongSound');
+const clapAudio=document.getElementById('clapSound');
+
+// Show logo for 5 sec
+logoScreen.style.display='flex';
+setTimeout(()=>{
+  logoScreen.style.display='none';
+  quizScreen.style.display='flex';
+  showQuestion();
+},5000);
+
+// Show current question
+function showQuestion(){
+  feedback.innerText="";
+  const q=mcqs[currentQ];
+  questionText.innerText=q.q;
+  optionsBox.innerHTML='';
+  q.opts.forEach(opt=>{
+    const btn=document.createElement('button');
+    btn.innerText=opt;
+    btn.onclick=()=>checkAnswer(opt,btn);
+    optionsBox.appendChild(btn);
+  });
+  scoreText.innerText=`Question ${currentQ+1} of ${mcqs.length}`;
+}
+
+// Check answer
+function checkAnswer(selected,btn){
+  const q=mcqs[currentQ];
+  const buttons=document.querySelectorAll('#optionsBox button');
+  buttons.forEach(b=>b.disabled=true);
+  if(selected===q.ans){
+    btn.classList.add('correct');
+    feedback.innerText="Correct!";
+    correctAudio.currentTime=0; correctAudio.play();
+    score++;
+  } else{
+    btn.classList.add('wrong');
+    feedback.innerText="Wrong! Correct: "+q.ans;
+    wrongAudio.currentTime=0; wrongAudio.play();
+    buttons.forEach(b=>{if(b.innerText===q.ans) b.classList.add('correct');});
+  }
+  setTimeout(nextQuestion,1200);
+}
+
+// Move to next question
+function nextQuestion(){
+  currentQ++;
+  if(currentQ>=mcqs.length){
+    quizScreen.style.display='none';
+    endScreen.style.display='flex';
+    finalScore.innerText=`You scored ${score} / ${mcqs.length}`;
+    clapAudio.play();
+  } else{
+    showQuestion();
+  }
+}
+
+// Restart
+function restartQuiz(){
+  currentQ=0;
+  score=0;
+  endScreen.style.display='none';
+  quizScreen.style.display='flex';
+  showQuestion();
+}
+</script>
+</body>
+</html>
