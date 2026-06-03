@@ -1,22 +1,21 @@
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Present Tense Box Pop Game</title>
+<title>Present Tense Game</title>
 <style>
-body{margin:0;font-family:Arial,sans-serif;background:#140f3d;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;overflow:hidden;}
+body{margin:0;font-family:Arial,sans-serif;background:#140f3d;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;height:100vh;}
 #logoScreen,#gameScreen,#endScreen{display:none;align-items:center;justify-content:center;flex-direction:column;width:100%;height:100vh;}
 #logoScreen img{width:200px;margin-top:50px;}
 h1{color:#ffd60a;text-align:center;margin:20px;}
-#instruction{font-size:20px;margin:10px;}
+#instruction{font-size:20px;margin:10px;text-align:center;}
 #scoreText{margin:10px;}
-.box{position:absolute;padding:15px 20px;background:#ffb703;color:#2d2340;border-radius:12px;cursor:pointer;user-select:none;font-weight:bold;transition: transform 0.2s;}
+.box{padding:15px 20px;background:#ffb703;color:#2d2340;border-radius:12px;margin:10px;cursor:pointer;font-weight:bold;width:70%;text-align:center;}
 .box.correct{background:#b7efc5;}
 .box.wrong{background:#ffccd5;}
-.streamer{position:absolute;width:4px;height:40px;background:linear-gradient(to bottom, #ffd700,#ff4500);animation:fall 1s ease-out forwards;}
-@keyframes fall{0%{opacity:1;transform:translateY(0) rotate(0deg);}100%{opacity:0;transform:translateY(200px) rotate(720deg);}}
 button{padding:10px 16px;margin-top:20px;border-radius:12px;border:none;background:#ffb703;color:#2d2340;font-weight:bold;cursor:pointer;font-size:16px;}
 #endScreen{display:none;text-align:center;margin-top:20px;}
 </style>
@@ -31,25 +30,24 @@ button{padding:10px 16px;margin-top:20px;border-radius:12px;border:none;backgrou
 
 <!-- Game Screen -->
 <div id="gameScreen">
-<h1>Present Tense Box Pop Game</h1>
+<h1>Present Tense Classification</h1>
 <div id="instruction"></div>
 <div id="scoreText">Score: 0</div>
+<div id="boxesContainer"></div>
 </div>
 
 <!-- End Screen -->
 <div id="endScreen">
-<h1>Game Over!</h1>
+<h1>Game Completed!</h1>
 <p id="finalScore"></p>
 <button onclick="restartGame()">Play Again</button>
 </div>
 
-<!-- Audio -->
 <audio id="correctSound" src="assets/correct.mp3"></audio>
 <audio id="wrongSound" src="assets/wrong.mp3"></audio>
-<audio id="clapSound" src="assets/clapping.mp3"></audio>
 
 <script>
-// Define rounds with dynamic instructions and sentences
+// Sample sentences for the game
 const rounds=[
   {instruction:"Click all Present Simple sentences.",sentences:[
     {text:"I eat breakfast every day.",type:"Simple"},
@@ -84,107 +82,76 @@ const logoScreen=document.getElementById('logoScreen');
 const gameScreen=document.getElementById('gameScreen');
 const instruction=document.getElementById('instruction');
 const scoreText=document.getElementById('scoreText');
+const boxesContainer=document.getElementById('boxesContainer');
 const endScreen=document.getElementById('endScreen');
 const finalScore=document.getElementById('finalScore');
 const correctAudio=document.getElementById('correctSound');
 const wrongAudio=document.getElementById('wrongSound');
-const clapAudio=document.getElementById('clapSound');
 
-// Show logo for 5 seconds
+// Show logo first
 logoScreen.style.display='flex';
 setTimeout(()=>{
   logoScreen.style.display='none';
   gameScreen.style.display='flex';
   startRound();
-},5000);
+},3000);
 
-// Start a round
 function startRound(){
   instruction.innerText = rounds[currentRound].instruction;
-  // Remove previous boxes
-  document.querySelectorAll('.box').forEach(b=>b.remove());
-  rounds[currentRound].sentences.forEach((s,i)=>{
-    const box = document.createElement('div');
-    box.className='box';
-    box.innerText = s.text;
-    box.dataset.type = s.type;
-    box.style.top = Math.random()*300+50+'px';
-    box.style.left = Math.random()*window.innerWidth*0.7+'px';
-    box.onclick = () => popBox(box);
-    gameScreen.appendChild(box);
-    floatBox(box);
+  boxesContainer.innerHTML = '';
+  // Shuffle sentences
+  const shuffled = rounds[currentRound].sentences.sort(()=>Math.random()-0.5);
+  shuffled.forEach(s=>{
+    const div=document.createElement('div');
+    div.className='box';
+    div.innerText=s.text;
+    div.dataset.type=s.type;
+    div.onclick=()=>checkBox(div);
+    boxesContainer.appendChild(div);
   });
 }
 
-// Float animation for boxes
-function floatBox(box){
-  let dy = (Math.random()*2+0.5);
-  setInterval(()=>{
-    let top = parseFloat(box.style.top);
-    top += dy;
-    if(top>window.innerHeight-50) top=50;
-    box.style.top = top+'px';
-  },50);
-}
-
-// Handle box click
-function popBox(box){
-  let targetType = "";
-  const instr = rounds[currentRound].instruction;
-  if(instr.includes("Simple")) targetType="Simple";
-  else if(instr.includes("Continuous")) targetType="Continuous";
-  else if(instr.includes("Perfect Continuous")) targetType="PerfectContinuous";
-  else if(instr.includes("Perfect")) targetType="Perfect";
-
+function checkBox(box){
+  const targetType = instruction.innerText.includes("Simple") ? "Simple":
+                     instruction.innerText.includes("Continuous") ? "Continuous":
+                     instruction.innerText.includes("Perfect Continuous") ? "PerfectContinuous":
+                     "Perfect";
   if(box.dataset.type===targetType){
-    box.remove();
-    createStreamer(box);
+    box.classList.add('correct');
+    correctAudio.currentTime=0;
+    correctAudio.play();
     score++;
-    correctAudio.currentTime=0; correctAudio.play();
-    scoreText.innerText=`Score: ${score}`;
+    scoreText.innerText = `Score: ${score}`;
+    box.style.pointerEvents="none";
+    // check if all correct boxes are clicked
     const remaining=document.querySelectorAll(`.box[data-type='${targetType}']`).length;
-    if(remaining===0){
+    const clicked=document.querySelectorAll(`.box.correct[data-type='${targetType}']`).length;
+    if(clicked===remaining){
       currentRound++;
       if(currentRound>=rounds.length){
         endGame();
-      } else {
-        setTimeout(startRound,1000);
-      }
+      } else setTimeout(startRound,1000);
     }
   } else{
-    wrongAudio.currentTime=0; wrongAudio.play();
-    box.style.background="#ffccd5";
-    setTimeout(()=>{box.style.background="#ffb703"},300);
+    box.classList.add('wrong');
+    wrongAudio.currentTime=0;
+    wrongAudio.play();
+    setTimeout(()=>{box.classList.remove('wrong')},300);
   }
 }
 
-// Streamer animation
-function createStreamer(box){
-  for(let i=0;i<10;i++){
-    const s=document.createElement('div');
-    s.className='streamer';
-    s.style.left = box.offsetLeft + Math.random()*50 +'px';
-    s.style.top = box.offsetTop + Math.random()*50 +'px';
-    gameScreen.appendChild(s);
-    setTimeout(()=>{s.remove()},1000);
-  }
-}
-
-// End game
 function endGame(){
   gameScreen.style.display='none';
   endScreen.style.display='flex';
   finalScore.innerText=`Your Score: ${score}`;
-  clapAudio.play();
 }
 
-// Restart game
 function restartGame(){
   currentRound=0;
   score=0;
   endScreen.style.display='none';
   gameScreen.style.display='flex';
-  scoreText.innerText=`Score: 0`;
+  scoreText.innerText = `Score: 0`;
   startRound();
 }
 </script>
