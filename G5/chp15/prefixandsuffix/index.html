@@ -9,10 +9,7 @@
   body, html {height:100%; width:100%; background: linear-gradient(to right, #f0f8ff, #ffe4e1); overflow-x:hidden;}
 
   /* Splash */
-  #splash {
-    position: fixed; top:0; left:0; width:100%; height:100%;
-    background:#fff; display:flex; justify-content:center; align-items:center; z-index:100;
-  }
+  #splash {position: fixed; top:0; left:0; width:100%; height:100%; background:#fff; display:flex; justify-content:center; align-items:center; z-index:100;}
   #splash img {width:300px; max-width:40%;}
 
   /* Game */
@@ -26,42 +23,28 @@
   .option:hover {transform: scale(1.05);}
 
   /* Belt */
-  #belt-container {
-    position: relative; width:100%; height:150px; margin-top:50px; overflow:hidden; border-radius:20px;
+  #belt-container {position: relative; width:100%; height:150px; margin-top:50px; overflow:hidden; border-radius:20px;
     background: repeating-linear-gradient(to right,#ccc 0 50px,#bbb 50px 100px);
-    animation: beltMove 5s linear infinite;
-  }
-  @keyframes beltMove {
-    0% {background-position-x:0;}
-    100% {background-position-x:100px;}
-  }
+    animation: beltMove 5s linear infinite;}
+  @keyframes beltMove {0% {background-position-x:0;} 100% {background-position-x:100px;}}
 
   /* Character */
-  #character-container {
-    position:absolute; bottom:10px; left:20px; display:flex; flex-direction:column; align-items:center; z-index:10;
-  }
+  #character-container {position:absolute; bottom:10px; left:20px; display:flex; flex-direction:column; align-items:center; z-index:10;}
   #character {width:100px; height:100px;}
-  #callout {
-    margin-top:10px; padding:5px 10px; background:#fff; border-radius:10px; font-size:1.5rem; min-width:140px; text-align:center;
-    visibility:hidden;
-  }
+  #callout {margin-top:10px; padding:5px 10px; background:#fff; border-radius:10px; font-size:1.5rem; min-width:140px; text-align:center; visibility:hidden;}
 
   /* End Screen */
-  #endScreen {
-    display:none; position:absolute; top:0; left:0; width:100%; height:100%;
-    background: rgba(0,0,0,0.7); justify-content:center; align-items:center; color:#fff; font-size:2rem; flex-direction:column; display:flex;
-  }
+  #endScreen {display:none; position:absolute; top:0; left:0; width:100%; height:100%;
+    background: rgba(0,0,0,0.7); justify-content:center; align-items:center; color:#fff; font-size:2rem; flex-direction:column; display:flex;}
   #endScreen button {margin-top:20px; padding:15px 25px; font-size:1.5rem; cursor:pointer; border-radius:10px;}
 </style>
 </head>
 <body>
 
-<!-- Splash -->
 <div id="splash">
   <img src="assests/logo.png" alt="Innovine Logo">
 </div>
 
-<!-- Game -->
 <div id="game">
   <div id="score">Score: 0</div>
   <div id="question">Question</div>
@@ -73,13 +56,11 @@
   </div>
 </div>
 
-<!-- End Screen -->
 <div id="endScreen">
   <div>🎉 Congratulations! You completed the factory! 🎉</div>
   <button onclick="location.reload()">Play Again</button>
 </div>
 
-<!-- Audio -->
 <audio id="correctSound" src="assests/correct.mp3"></audio>
 <audio id="wrongSound" src="assests/wrong.mp3"></audio>
 <audio id="applause" src="assests/freesound_community-claps-44774.mp3"></audio>
