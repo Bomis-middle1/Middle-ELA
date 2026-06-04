@@ -2,137 +2,115 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Figures of Speech Potion Lab</title>
 <style>
+  @import url('https://fonts.googleapis.com/css2?family=Arvo:wght@700&display=swap');
   body, html {
     margin: 0;
     padding: 0;
-    font-family: 'Arial', sans-serif;
-    height: 100%;
-    overflow: hidden;
-    background: linear-gradient(135deg, #fbb1b1, #c6baff);
+    font-family: 'Arvo', serif;
+    overflow-x: hidden;
   }
 
-  /* Logo Splash */
+  /* Splash screen */
   #splash {
     position: fixed;
-    top:0; left:0;
-    width: 100%; height: 100%;
+    width: 100%;
+    height: 100%;
     background: #fff;
-    display: flex; align-items:center; justify-content:center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     z-index: 999;
   }
-
   #splash img {
     width: 250px;
+    height: auto;
   }
 
-  /* Container */
-  #gameContainer {
-    display: none;
+  /* Background gradient and bubbles */
+  body {
+    background: linear-gradient(135deg, #d1c4e9, #f8bbd0);
     position: relative;
-    width: 80%;
-    max-width: 900px;
-    margin: 40px auto;
-    padding: 30px;
-    background: rgba(255,255,255,0.9);
-    border-radius: 20px;
-    text-align: center;
-    box-shadow: 0px 0px 20px rgba(0,0,0,0.2);
-    z-index: 1;
+    min-height: 100vh;
   }
-
-  #instruction {
-    font-weight: bold;
-    font-size: 20px;
-    margin-bottom: 20px;
-  }
-
-  #score, #timer {
-    font-weight: bold;
-    font-size: 18px;
-  }
-
-  #question {
-    font-weight: bold;
-    font-size: 28px;
-    margin: 30px 0;
-  }
-
-  .optionBtn {
-    display: inline-block;
-    padding: 15px 25px;
-    margin: 10px;
-    font-size: 20px;
-    font-weight: bold;
-    background-color: orange;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: transform 0.2s ease;
-  }
-
-  .optionBtn:hover {
-    transform: scale(1.1);
-  }
-
-  /* Potion */
-  #potionContainer {
-    position: relative;
-    width: 60px;
-    height: 200px;
-    border: 3px solid #6a0dad;
-    border-radius: 10px;
-    margin: 30px auto;
-    background: #fff;
-  }
-
-  #potionFill {
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    height: 0%;
-    background: #ff2e8a;
-    border-radius: 8px 8px 0 0;
-    transition: height 0.5s ease;
-  }
-
-  /* Confetti */
-  .confetti {
-    position: absolute;
-    width: 10px;
-    height: 10px;
-    background-color: #ff0;
-    opacity: 0.8;
-    animation: fall linear infinite;
-    z-index: 2;
-  }
-
-  @keyframes fall {
-    0% {transform: translateY(-10px) rotate(0deg);}
-    100% {transform: translateY(700px) rotate(360deg);}
-  }
-
-  /* Floating bubbles */
   .bubble {
     position: absolute;
     border-radius: 50%;
-    background: rgba(255,255,255,0.4);
-    animation: floatUp linear infinite;
+    opacity: 0.6;
+    animation: float 15s linear infinite;
+  }
+  @keyframes float {
+    0% { transform: translateY(100vh) scale(0.5); }
+    100% { transform: translateY(-100vh) scale(1); }
   }
 
-  @keyframes floatUp {
-    0% {transform: translateY(100vh);}
-    100% {transform: translateY(-50px);}
+  /* Container */
+  .container {
+    max-width: 900px;
+    margin: auto;
+    text-align: center;
+    padding: 30px 10px;
   }
 
-  /* End screen */
-  #endScreen {
-    display: none;
-    font-size: 28px;
+  h1 {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    color: #4a148c;
+  }
+
+  h2 {
+    font-size: 1.3rem;
+    margin-bottom: 20px;
+  }
+
+  h3 {
+    font-size: 1.8rem;
+    margin-bottom: 25px;
+    color: #1a237e;
+  }
+
+  .buttons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 40px;
+  }
+
+  .buttons button {
+    background: #ffb300;
+    color: #fff;
+    border: none;
+    padding: 15px 25px;
+    margin: 10px;
+    font-size: 1.2rem;
     font-weight: bold;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+  }
+  .buttons button:hover {
+    transform: scale(1.05);
   }
 
+  /* Potion container */
+  .potion-container {
+    position: relative;
+    width: 60px;
+    height: 250px;
+    margin: auto;
+    border: 3px solid #4a148c;
+    border-radius: 15px;
+    overflow: hidden;
+    background: #fff;
+  }
+  .potion-fill {
+    width: 100%;
+    background: #ff4081;
+    height: 0;
+    transition: height 0.5s ease;
+  }
 </style>
 </head>
 <body>
@@ -142,97 +120,113 @@
   <img src="assets/logo.png" alt="Innovine Logo">
 </div>
 
-<!-- Game Container -->
-<div id="gameContainer">
-  <div id="instruction">Click the correct figure of speech to fill the potion!</div>
-  <div id="score">Score: 0</div>
-  <div id="timer">Time Left: 60s</div>
-  <div id="question"></div>
-  <div id="options"></div>
-  <div id="potionContainer">
-    <div id="potionFill"></div>
+<!-- Bubbles -->
+<script>
+  for(let i=0;i<30;i++){
+    let bubble=document.createElement('div');
+    bubble.classList.add('bubble');
+    bubble.style.width = `${Math.random()*40+10}px`;
+    bubble.style.height = bubble.style.width;
+    bubble.style.left = `${Math.random()*100}vw`;
+    bubble.style.background = `rgba(255,255,255,${Math.random()})`;
+    bubble.style.animationDuration = `${Math.random()*20+10}s`;
+    document.body.appendChild(bubble);
+  }
+</script>
+
+<div class="container" id="game" style="display:none;">
+  <h1>Figures of Speech Potion Lab</h1>
+  <h2>Click the correct figure of speech to fill the potion!</h2>
+  <h3 id="sentence">Sentence goes here</h3>
+  <div class="buttons" id="choices"></div>
+  <div class="potion-container">
+    <div class="potion-fill" id="potion"></div>
   </div>
-  <div id="endScreen">Potion Completed! Game Over!</div>
 </div>
 
+<audio id="correctSound" src="assets/correct.mp3"></audio>
+<audio id="wrongSound" src="assets/wrong.mp3"></audio>
+<audio id="clapSound" src="assets/freesound_community-claps-44774.mp3"></audio>
+
 <script>
+const splash = document.getElementById('splash');
+const game = document.getElementById('game');
+const sentenceEl = document.getElementById('sentence');
+const choicesEl = document.getElementById('choices');
+const potionEl = document.getElementById('potion');
+const correctSound = document.getElementById('correctSound');
+const wrongSound = document.getElementById('wrongSound');
+const clapSound = document.getElementById('clapSound');
+
 const questions = [
-  {q: "I could eat a mountain of food!", options: ["Hyperbole","Simile","Metaphor","Personification"], ans: "Hyperbole"},
-  {q: "The stars danced in the sky.", options: ["Personification","Hyperbole","Simile","Alliteration"], ans: "Personification"},
-  {q: "He is as brave as a lion.", options: ["Simile","Hyperbole","Metaphor","Onomatopoeia"], ans: "Simile"},
-  {q: "Time is a thief.", options: ["Metaphor","Hyperbole","Simile","Personification"], ans: "Metaphor"},
-  {q: "Sally sells sea shells by the sea shore.", options: ["Alliteration","Onomatopoeia","Personification","Metaphor"], ans: "Alliteration"},
-  {q: "The bees buzzed angrily.", options: ["Onomatopoeia","Alliteration","Metaphor","Hyperbole"], ans: "Onomatopoeia"},
-  {q: "The classroom was a zoo.", options: ["Metaphor","Simile","Personification","Hyperbole"], ans: "Metaphor"},
-  {q: "He is stronger than ten men!", options: ["Hyperbole","Simile","Personification","Metaphor"], ans: "Hyperbole"},
-  {q: "The wind whispered through the trees.", options: ["Personification","Hyperbole","Onomatopoeia","Alliteration"], ans: "Personification"},
-  {q: "Her cheeks were as red as roses.", options: ["Simile","Metaphor","Alliteration","Hyperbole"], ans: "Simile"},
-  {q: "The thunder grumbled like an old man.", options: ["Simile","Onomatopoeia","Personification","Metaphor"], ans: "Simile"},
-  {q: "He runs faster than the wind.", options: ["Hyperbole","Simile","Metaphor","Personification"], ans: "Hyperbole"}
+  {sentence: "I could eat a mountain of food!", answer:"Hyperbole"},
+  {sentence: "The wind whispered through the trees.", answer:"Personification"},
+  {sentence: "Life is a rollercoaster.", answer:"Metaphor"},
+  {sentence: "He is as brave as a lion.", answer:"Simile"},
+  {sentence: "The stars danced in the sky.", answer:"Personification"},
+  {sentence: "I’m so hungry I could eat a horse!", answer:"Hyperbole"},
+  {sentence: "Time is a thief.", answer:"Metaphor"},
+  {sentence: "Her smile was like sunshine.", answer:"Simile"},
+  {sentence: "The leaves waved in the wind.", answer:"Personification"},
+  {sentence: "He ran faster than the wind.", answer:"Hyperbole"},
+  {sentence: "The classroom was a zoo.", answer:"Metaphor"},
+  {sentence: "She sang like an angel.", answer:"Simile"}
 ];
 
-let current = 0;
-let score = 0;
-let potion = 0;
-const totalPotion = 12;
+let currentQ = 0;
+let potionLevel = 0;
+let attempts = 0;
 
-const gameContainer = document.getElementById("gameContainer");
-const questionDiv = document.getElementById("question");
-const optionsDiv = document.getElementById("options");
-const potionFill = document.getElementById("potionFill");
-const endScreen = document.getElementById("endScreen");
+function startGame() {
+  splash.style.display='none';
+  game.style.display='block';
+  showQuestion();
+}
 
-function showQuestion() {
-  questionDiv.textContent = questions[current].q;
-  optionsDiv.innerHTML = "";
-  questions[current].options.forEach(opt=>{
-    const btn = document.createElement("button");
-    btn.className = "optionBtn";
-    btn.textContent = opt;
-    btn.onclick = ()=> checkAnswer(opt);
-    optionsDiv.appendChild(btn);
+function showQuestion(){
+  if(currentQ>=questions.length){
+    clapSound.play();
+    setTimeout(()=>{alert("Potion complete! Well done!");},200);
+    return;
+  }
+  attempts=0;
+  const q = questions[currentQ];
+  sentenceEl.textContent=q.sentence;
+
+  choicesEl.innerHTML="";
+  const options = ["Hyperbole","Simile","Metaphor","Personification"];
+  options.sort(()=>Math.random()-0.5); // shuffle
+
+  options.forEach(opt=>{
+    const btn=document.createElement('button');
+    btn.textContent=opt;
+    btn.onclick=()=>checkAnswer(opt);
+    choicesEl.appendChild(btn);
   });
 }
 
 function checkAnswer(selected){
-  const correct = questions[current].ans;
+  const correct = questions[currentQ].answer;
   if(selected===correct){
-    score++;
-    potion++;
-    potionFill.style.height = (potion/totalPotion*100) + "%";
-    current++;
-    if(current>=questions.length){
-      gameOver();
-      return;
-    }
-    showQuestion();
+    correctSound.play();
+    potionLevel += (100/questions.length);
+    potionEl.style.height=potionLevel+'%';
+    currentQ++;
+    setTimeout(showQuestion,400);
   } else {
-    alert("Try again!");
+    wrongSound.play();
+    attempts++;
+    if(attempts<2){
+      alert("Try again!");
+    } else {
+      currentQ++;
+      setTimeout(showQuestion,300);
+    }
   }
 }
 
-function gameOver(){
-  questionDiv.style.display="none";
-  optionsDiv.style.display="none";
-  endScreen.style.display="block";
-}
-
-setTimeout(()=>{
-  document.getElementById("splash").style.display="none";
-  gameContainer.style.display="block";
-  showQuestion();
-},3000);
-
-// Create floating bubbles
-for(let i=0;i<20;i++){
-  const bubble = document.createElement("div");
-  bubble.className="bubble";
-  bubble.style.width = (10+Math.random()*30)+"px";
-  bubble.style.height = bubble.style.width;
-  bubble.style.left = Math.random()*100+"%";
-  bubble.style.animationDuration = (5+Math.random()*10)+"s";
-  document.body.appendChild(bubble);
-}
+// Start game after 3s splash
+setTimeout(startGame,3000);
 </script>
 </body>
 </html>
