@@ -1,1 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Transformation Sculptor</title>
+<style>
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(to right, #fbb1b1, #d6a5f5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    flex-direction: column;
+  }
 
+  /* Splash */
+  #splash {
+    position: fixed; top:0; left:0; width:100%; height:100%;
+    background:#fff; display:flex; justify-content:center; align-items:center; z-index:100;
+  }
+  #splash img { width:300px; max-width:40%; }
+
+  /* Game */
+  #game {
+    display: none;
+    width: 90%;
+    max-width: 850px;
+    text-align: center;
+    background: rgba(255,255,255,0.95);
+    border-radius: 25px;
+    padding: 35px;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.4);
+    position: relative;
+  }
+
+  #score { font-size: 2rem; margin-bottom: 15px; font-weight: bold; color:#6a2c70;}
+  #timer { font-size: 1.6rem; margin-bottom: 15px; font-weight:bold; color:#6a2c70;}
+  #sentence { font-size: 2.5rem; margin: 25px 0; color:#4a1c53; font-weight:bold;}
+
+  #board {
+    width: 100%;
+    min-height: 150px;
+    border-radius: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 30px;
+    padding: 15px;
+    background: #111; /* chalkboard background */
+    box-shadow: inset 0 0 10px #000000;
+  }
+
+  .word {
+    padding: 20px 30px;
+    margin: 8px;
+    background: #f39c12;
+    color: #fff;
+    font-size: 1.6rem;
+    font-weight: bold;
+    border-radius: 15px;
+    cursor: pointer;
+    box-shadow: 0 5px 12px rgba(0,0,0,0.3);
+    user-select: none;
+    transition: 0.2s;
+  }
+  .word:hover { transform: scale(1.05); }
+
+  /* Confetti CSS */
+  .confetti {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background: gold;
+    animation: fall 1s linear forwards;
+  }
+  @keyframes fall {
+    0% { transform: translateY(0) rotate(0deg);}
+    100% { transform: translateY(400px) rotate(360deg); opacity:0;}
+  }
+
+</style>
+</head>
+<body>
+
+<!-- Splash -->
+<div id="splash">
+  <img src="assets/logo.png" alt="Innovine Logo">
+</div>
+
+<!-- Game -->
+<div id="game">
+  <div id="score">Score: 0</div>
+  <div id="timer">Time Left: 30s</div>
+  <div id="sentence">Sentence appears here</div>
+  <div id="board"></div>
+</div>
+
+<!-- Audio -->
+<audio id="correctSound" src="assets/correct.mp3"></audio>
+<audio id="wrongSound" src="assets/wrong.mp3"></audio>
+<audio id="applause" src="assets/freesound_community-claps-44774.mp3"></audio>
+
+<script>
+const splash = document.getElementById('splash');
+const game = document.getElementById('game');
+const sentenceEl = document.getElementById('sentence');
+const board = document.getElementById('board');
+const scoreEl = document.getElementById('score');
+const timerEl = document.getElementById('timer');
+
+const correctSound = document.getElementById('correctSound');
+const wrongSound = document.getElementById('wrongSound');
+const applause = document.getElementById('applause');
+
+let current = 0;
+let score = 0;
+let timer = 30;
+let timerInterval;
+
+// Complex sentences for transformation
+const sentences = [
+  {base:"The manager approved the report.", transform:["The report was approved by the manager."]},
+  {base:"She will attend the seminar tomorrow.", transform:["Will she attend the seminar tomorrow?"]},
+  {base:"I like to play chess.", transform:["I do not like to play chess."]},
+  {base:"They completed the assignment on time.", transform:["The assignment was completed by them on time."]},
+  {base:"He is preparing dinner.", transform:["Is he preparing dinner?"]},
+  {base:"We will organize the event next month.", transform:["We will not organize the event next month."]},
+  {base:"She submitted the essay yesterday.", transform:["The essay was submitted by her yesterday."]}
+];
+
+function startTimer() {
+  timer = 30;
+  timerEl.textContent = `Time Left: ${timer}s`;
+  clearInterval(timerInterval);
+  timerInterval = setInterval(()=>{
+    timer--;
+    timerEl.textContent = `Time Left: ${timer}s`;
+    if(timer<=0) nextSentence();
+  }, 1000);
+}
+
+function createBoard(words) {
+  board.innerHTML = "";
+  words.forEach(word => {
+    const div = document.createElement('div');
+    div.textContent = word;
+    div.className = "word";
+    div.onclick = ()=>checkWord(div);
+    board.appendChild(div);
+  });
+}
+
+let selectedWords = [];
+function checkWord(div) {
+  selectedWords.push(div.textContent);
+  div.style.background="#27ae60"; // green highlight
+  correctSound.play();
+  createConfetti();
+  if(selectedWords.join(" ") === sentences[current].transform[0]){
+    score++;
+    scoreEl.textContent = `Score: ${score}`;
+    nextSentence();
+  }
+}
+
+// Confetti function
+function createConfetti(){
+  for(let i=0;i<12;i++){
+    const conf = document.createElement('div');
+    conf.className="confetti";
+    conf.style.left=Math.random()*game.offsetWidth+"px";
+    conf.style.background=`hsl(${Math.random()*360}, 80%, 60%)`; // colorful confetti
+    board.appendChild(conf);
+    setTimeout(()=>conf.remove(),1000);
+  }
+}
+
+function nextSentence(){
+  clearInterval(timerInterval);
+  current++;
+  selectedWords=[];
+  if(current>=sentences.length){
+    applause.play();
+    sentenceEl.textContent="Game Completed! Score: "+score;
+    board.innerHTML="";
+    timerEl.textContent="";
+    return;
+  }
+  sentenceEl.textContent=sentences[current].base;
+  const words=sentences[current].transform[0].split(" ");
+  // shuffle words
+  for(let i=words.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [words[i],words[j]]=[words[j],words[i]];
+  }
+  createBoard(words);
+  startTimer();
+}
+
+function startGame(){
+  splash.style.display='none';
+  game.style.display='block';
+  current=0; score=0;
+  scoreEl.textContent=`Score: ${score}`;
+  sentenceEl.textContent=sentences[0].base;
+  const words=sentences[0].transform[0].split(" ");
+  for(let i=words.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [words[i],words[j]]=[words[j],words[i]];
+  }
+  createBoard(words);
+  startTimer();
+}
+
+// Splash 5 sec
+setTimeout(()=>startGame(),5000);
+
+</script>
+</body>
+</html>
