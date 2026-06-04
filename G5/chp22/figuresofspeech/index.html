@@ -1,1 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Figures of Speech Potion Lab</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Arvo:wght@700&display=swap');
 
+  body, html {
+    margin: 0;
+    padding: 0;
+    font-family: 'Arvo', serif;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  /* Splash Logo */
+  #splash {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  #splash img {
+    width: 200px;
+  }
+
+  /* Background with floating bubbles */
+  body {
+    background: linear-gradient(135deg, #ffb3ff, #b3d9ff);
+    overflow: hidden;
+  }
+
+  .bubble {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.6;
+    animation: rise 10s infinite;
+    background: rgba(255,255,255,0.7);
+  }
+
+  @keyframes rise {
+    0% {transform: translateY(100vh);}
+    100% {transform: translateY(-50px);}
+  }
+
+  /* Game Container */
+  #game {
+    display: none;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-evenly;
+    text-align: center;
+    padding: 20px;
+  }
+
+  h1 {
+    font-size: 2em;
+    color: #4b0082;
+    margin-bottom: 10px;
+  }
+
+  #sentence {
+    font-size: 1.8em;
+    font-weight: bold;
+    margin-bottom: 20px;
+  }
+
+  .options {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+  }
+
+  .option-btn {
+    padding: 15px 25px;
+    font-size: 1.5em;
+    background: orange;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    color: white;
+    font-weight: bold;
+    transition: transform 0.2s;
+  }
+
+  .option-btn:hover {
+    transform: scale(1.1);
+  }
+
+  /* Potion bottle */
+  #potion-container {
+    position: relative;
+    width: 80px;
+    height: 200px;
+    border: 5px solid #4b0082;
+    border-radius: 20px 20px 10px 10px;
+    overflow: hidden;
+    margin-top: 20px;
+  }
+
+  #potion {
+    width: 100%;
+    height: 0;
+    background: linear-gradient(to top, #ff69b4, #ff1493);
+    position: absolute;
+    bottom: 0;
+    transition: height 0.5s ease-in-out;
+  }
+
+  /* Confetti */
+  .confetti {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: yellow;
+    top: 50%;
+    left: 50%;
+    animation: explode 1s forwards;
+  }
+
+  @keyframes explode {
+    to {
+      transform: translate(var(--x), var(--y)) rotate(720deg);
+      opacity: 0;
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- Splash -->
+<div id="splash">
+  <img src="assets/logo.png" alt="Innovine Logo">
+</div>
+
+<!-- Game -->
+<div id="game">
+  <h1>Figures of Speech Potion Lab</h1>
+  <div id="instructions">
+    Click the correct figure of speech to fill the potion!
+  </div>
+  <div id="sentence"></div>
+  <div class="options"></div>
+
+  <div id="potion-container">
+    <div id="potion"></div>
+  </div>
+</div>
+
+<!-- Audio -->
+<audio id="correct-sound" src="assets/correct.mp3"></audio>
+<audio id="wrong-sound" src="assets/wrong.mp3"></audio>
+<audio id="clap-sound" src="assets/freesound_community-claps-44774.mp3"></audio>
+
+<script>
+const splash = document.getElementById('splash');
+const game = document.getElementById('game');
+const sentenceDiv = document.getElementById('sentence');
+const optionsDiv = document.querySelector('.options');
+const potion = document.getElementById('potion');
+const correctSound = document.getElementById('correct-sound');
+const wrongSound = document.getElementById('wrong-sound');
+const clapSound = document.getElementById('clap-sound');
+
+// Bubble background
+for(let i=0;i<30;i++){
+  const bubble = document.createElement('div');
+  bubble.classList.add('bubble');
+  bubble.style.width = bubble.style.height = Math.random()*30 + 10 + 'px';
+  bubble.style.left = Math.random()*100 + 'vw';
+  bubble.style.animationDuration = 5+Math.random()*10+'s';
+  document.body.appendChild(bubble);
+}
+
+// Example Sentences
+const questions = [
+  {text: "The wind whispered through the trees.", answer: "Personification", options: ["Simile","Personification","Metaphor","Hyperbole"]},
+  {text: "Her smile was as bright as the sun.", answer: "Simile", options: ["Personification","Hyperbole","Simile","Metaphor"]},
+  {text: "He’s a shining star.", answer: "Metaphor", options: ["Metaphor","Hyperbole","Personification","Simile"]},
+  {text: "I could eat a mountain of food!", answer: "Hyperbole", options: ["Hyperbole","Simile","Metaphor","Personification"]}
+];
+
+let current = 0;
+
+function showQuestion(){
+  if(current>=questions.length){
+    clapSound.play();
+    alert("Potion complete! Well done!");
+    return;
+  }
+  const q = questions[current];
+  sentenceDiv.textContent = q.text;
+  optionsDiv.innerHTML = '';
+  q.options.forEach(opt=>{
+    const btn = document.createElement('button');
+    btn.classList.add('option-btn');
+    btn.textContent = opt;
+    btn.onclick = ()=>checkAnswer(opt);
+    optionsDiv.appendChild(btn);
+  });
+}
+
+function checkAnswer(selected){
+  if(selected === questions[current].answer){
+    correctSound.play();
+    let fillPercent = ((current+1)/questions.length)*100;
+    potion.style.height = fillPercent + '%';
+  } else {
+    wrongSound.play();
+  }
+  current++;
+  setTimeout(showQuestion,500);
+}
+
+// Start after splash
+setTimeout(()=>{
+  splash.style.display = 'none';
+  game.style.display = 'flex';
+  showQuestion();
+}, 5000);
+</script>
+
+</body>
+</html>
