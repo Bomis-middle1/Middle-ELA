@@ -1,1 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Homophones & Homographs Game</title>
+<style>
+  body, html {
+    margin:0;
+    padding:0;
+    font-family: 'Arial', sans-serif;
+    height:100%;
+    overflow:hidden;
+  }
+  #splash {
+    position:fixed;
+    top:0; left:0;
+    width:100%; height:100%;
+    background:white;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    z-index:100;
+  }
+  #splash img {
+    width:300px;
+  }
+  #game {
+    display:none;
+    width:100%;
+    height:100%;
+    background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+    position:relative;
+    overflow:hidden;
+    padding-top:40px;
+    box-sizing:border-box;
+    text-align:center;
+  }
+  .bubble {
+    position:absolute;
+    width:20px; height:20px;
+    border-radius:50%;
+    background:rgba(255,255,0,0.6);
+    animation: float 10s linear infinite;
+  }
+  @keyframes float {
+    0% {transform: translateY(100vh);}
+    100% {transform: translateY(-50px);}
+  }
+  #question-container {
+    background:rgba(255,255,255,0.9);
+    display:inline-block;
+    padding:20px;
+    border-radius:15px;
+    text-align:center;
+    max-width:700px;
+  }
+  #question {
+    font-size:28px;
+    font-weight:bold;
+    margin-bottom:20px;
+  }
+  .answer-btn {
+    font-size:20px;
+    padding:15px 25px;
+    margin:10px;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+    font-weight:bold;
+    background:#FFA500;
+    color:white;
+  }
+  .answer-btn.correct {background:green;}
+  .answer-btn.wrong {background:red;}
+  #info {
+    font-size:20px;
+    margin-bottom:10px;
+  }
+</style>
+</head>
+<body>
 
+<!-- Splash screen -->
+<div id="splash">
+  <img src="assets/logo.png" alt="Innovine Logo">
+</div>
+
+<!-- Game container -->
+<div id="game">
+  <div id="question-container">
+    <div id="info">
+      Level: <span id="level">1</span> | Score: <span id="score">0</span> | Time Left: <span id="timer">20</span>s
+    </div>
+    <div id="instruction"></div>
+    <div id="question"></div>
+    <div id="answers"></div>
+  </div>
+</div>
+
+<audio id="correct-sound" src="assets/correct.mp3"></audio>
+<audio id="wrong-sound" src="assets/wrong.mp3"></audio>
+<audio id="applause-sound" src="assets/freesound_community-claps-44774.mp3"></audio>
+
+<script>
+const splash = document.getElementById('splash');
+const game = document.getElementById('game');
+const questionEl = document.getElementById('question');
+const answersEl = document.getElementById('answers');
+const levelEl = document.getElementById('level');
+const scoreEl = document.getElementById('score');
+const timerEl = document.getElementById('timer');
+const instructionEl = document.getElementById('instruction');
+
+const correctSound = document.getElementById('correct-sound');
+const wrongSound = document.getElementById('wrong-sound');
+const applauseSound = document.getElementById('applause-sound');
+
+let score = 0;
+let level = 0;
+let currentQuestion = 0;
+let attempt = 0;
+let timeLeft = 20;
+let timerInterval;
+
+// Questions for each level
+const levels = [
+  { name: "Homophones", questions: [
+    {q:"I want to buy a new ___ for my head.", choices:["cap","cat","cup","cab"], answer:"cap"},
+    {q:"He heard the ___ of the bell.", choices:["ring","wring","rang","rung"], answer:"ring"},
+    {q:"I need to ___ the rope.", choices:["tie","thy","tiee","tai"], answer:"tie"},
+    {q:"The wind will ___ the leaves.", choices:["blow","blue","blew","bloe"], answer:"blow"},
+    {q:"She will read the ___ before bed.", choices:["book","bouk","bake","buck"], answer:"book"},
+    {q:"The dog will ___ loudly.", choices:["bark","barque","berk","barkk"], answer:"bark"}
+  ]},
+  { name: "Homographs", questions: [
+    {q:"He will ___ the ball.", choices:["lead","lead","read","read"], answer:"lead"},
+    {q:"I can ___ a book.", choices:["read","read","tear","tear"], answer:"read"},
+    {q:"She will ___ the rope.", choices:["wind","wind","bass","bass"], answer:"wind"},
+    {q:"He has a ___ bass.", choices:["bass","bass","lead","lead"], answer:"bass"},
+    {q:"Can you ___ the paper?", choices:["tear","tear","read","read"], answer:"tear"},
+    {q:"They will ___ the bell.", choices:["ring","ring","bark","bark"], answer:"ring"}
+  ]},
+  { name: "Mixed", questions: [
+    {q:"I will ___ a letter.", choices:["write","right","lead","led"], answer:"write"},
+    {q:"The ___ was too heavy.", choices:["lead","led","bass","base"], answer:"lead"},
+    {q:"She can ___ very fast.", choices:["run","run","read","reed"], answer:"run"},
+    {q:"Please ___ the window.", choices:["close","clothes","closee","cloze"], answer:"close"},
+    {q:"The wind will ___ the paper.", choices:["blow","blue","blew","bloe"], answer:"blow"}
+  ]}
+];
+
+// Splash display
+setTimeout(() => {
+  splash.style.display = 'none';
+  game.style.display = 'block';
+  loadLevel();
+  startTimer();
+}, 3000);
+
+// Create floating bubbles
+for(let i=0;i<40;i++){
+  let bubble = document.createElement('div');
+  bubble.classList.add('bubble');
+  bubble.style.left = Math.random()*100 + 'vw';
+  bubble.style.animationDuration = (5+Math.random()*10) + 's';
+  game.appendChild(bubble);
+}
+
+// Load questions
+function loadLevel() {
+  levelEl.textContent = level+1;
+  currentQuestion = 0;
+  attempt = 0;
+  timeLeft = 20;
+  loadQuestion();
+}
+
+function loadQuestion() {
+  let q = levels[level].questions[currentQuestion];
+  questionEl.textContent = q.q;
+  instructionEl.textContent = `Convert sentence: (${levels[level].name})`;
+  answersEl.innerHTML = '';
+  q.choices.forEach(choice => {
+    let btn = document.createElement('button');
+    btn.textContent = choice;
+    btn.classList.add('answer-btn');
+    btn.onclick = ()=>checkAnswer(choice);
+    answersEl.appendChild(btn);
+  });
+}
+
+function checkAnswer(choice) {
+  let q = levels[level].questions[currentQuestion];
+  if(choice === q.answer) {
+    correctSound.play();
+    score += 1;
+    scoreEl.textContent = score;
+    nextQuestion();
+  } else {
+    wrongSound.play();
+    attempt +=1;
+    if(attempt >=2){
+      alert("You reached max attempts. Game over.");
+      location.reload();
+    }
+  }
+}
+
+function nextQuestion() {
+  currentQuestion +=1;
+  attempt =0;
+  if(currentQuestion < levels[level].questions.length) {
+    loadQuestion();
+  } else {
+    applauseSound.play();
+    alert(`Level ${level+1} Complete!`);
+    level +=1;
+    if(level < levels.length){
+      loadLevel();
+    } else {
+      alert("Congratulations! You finished all levels!");
+      location.reload();
+    }
+  }
+}
+
+// Timer
+function startTimer(){
+  clearInterval(timerInterval);
+  timerInterval = setInterval(()=>{
+    timeLeft -=1;
+    timerEl.textContent = timeLeft;
+    if(timeLeft <=0){
+      clearInterval(timerInterval);
+      alert("Time's up! Game over.");
+      location.reload();
+    }
+  },1000);
+}
+</script>
+</body>
+</html>
