@@ -6,32 +6,60 @@
 <title>Tense Time Machine</title>
 <style>
   body {
-    font-family: Arial, sans-serif;
-    background: linear-gradient(to right, #87ceeb, #f0f8ff);
+    margin:0;
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(to right, #a8e063, #56ab2f); /* lively green gradient */
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
   }
+
+  /* Splash */
   #splash {
     position: fixed; top:0; left:0; width:100%; height:100%;
-    background: #fff; display:flex; justify-content:center; align-items:center; z-index:100;
+    background:#fff; display:flex; justify-content:center; align-items:center; z-index:100;
   }
   #splash img { width:300px; max-width:40%; }
 
-  #game { display:none; width:90%; max-width:700px; text-align:center; }
-  #score, #timer { font-size: 1.5rem; margin: 10px 0; }
-  #sentence { font-size: 2rem; margin: 20px 0; }
+  /* Game container */
+  #game {
+    display:none;
+    width:700px; max-width:90%;
+    text-align:center;
+    background: rgba(255,255,255,0.95);
+    border-radius:20px;
+    padding:30px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+  }
 
-  #options { display:flex; flex-wrap: wrap; justify-content:center; gap:15px; }
+  #score, #timer { 
+    font-size: 1.6rem; 
+    margin: 10px 0;
+    font-weight:bold;
+    color: #2b5d34;
+  }
+
+  #sentence {
+    font-size: 2rem;
+    margin: 25px 0;
+    color: #1b3a20;
+  }
+
+  #options {
+    display:flex; flex-wrap: wrap; justify-content:center; gap:15px;
+  }
+
   .option {
-    padding: 15px 25px;
-    font-size: 1.5rem;
-    border-radius: 10px;
+    background: #f39c12;
+    color:#fff;
+    border:none;
+    padding:20px 35px;
+    font-size:1.5rem;
+    border-radius:15px;
     cursor:pointer;
-    background: orange;
-    border: none;
     transition: 0.2s;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
   }
   .option:hover { transform: scale(1.05); }
 
@@ -39,10 +67,12 @@
 </head>
 <body>
 
+<!-- Splash -->
 <div id="splash">
   <img src="assets/logo.png" alt="Innovine Logo">
 </div>
 
+<!-- Game -->
 <div id="game">
   <div id="score">Score: 0</div>
   <div id="timer">Time Left: 30s</div>
@@ -50,6 +80,7 @@
   <div id="options"></div>
 </div>
 
+<!-- Audio -->
 <audio id="correctSound" src="assets/correct.mp3"></audio>
 <audio id="wrongSound" src="assets/wrong.mp3"></audio>
 <audio id="applause" src="assets/freesound_community-claps-44774.mp3"></audio>
@@ -72,16 +103,16 @@ let timer = 30;
 let timerInterval;
 
 const sentences = [
-  {text: "She (walk) to school yesterday.", tense:"past", options:["walked","walk","will walk"], answer:"walked"},
-  {text: "I (eat) breakfast every morning.", tense:"present", options:["eat","ate","will eat"], answer:"eat"},
-  {text: "They (play) soccer tomorrow.", tense:"future", options:["play","played","will play"], answer:"will play"},
-  {text: "He (go) to the market last week.", tense:"past", options:["go","went","will go"], answer:"went"},
-  {text: "We (study) English now.", tense:"present", options:["study","studied","will study"], answer:"study"},
-  {text: "I (call) you later.", tense:"future", options:["call","called","will call"], answer:"will call"},
-  {text: "She (write) a letter yesterday.", tense:"past", options:["write","wrote","will write"], answer:"wrote"},
-  {text: "He (read) a book every day.", tense:"present", options:["reads","read","will read"], answer:"read"},
-  {text: "They (travel) next week.", tense:"future", options:["travel","traveled","will travel"], answer:"will travel"},
-  {text: "I (see) a movie last night.", tense:"past", options:["see","saw","will see"], answer:"saw"}
+  {text: "She (walk) to school yesterday.", options:["walked","walk","will walk"], answer:"walked"},
+  {text: "I (eat) breakfast every morning.", options:["eat","ate","will eat"], answer:"eat"},
+  {text: "They (play) soccer tomorrow.", options:["play","played","will play"], answer:"will play"},
+  {text: "He (go) to the market last week.", options:["go","went","will go"], answer:"went"},
+  {text: "We (study) English now.", options:["study","studied","will study"], answer:"study"},
+  {text: "I (call) you later.", options:["call","called","will call"], answer:"will call"},
+  {text: "She (write) a letter yesterday.", options:["write","wrote","will write"], answer:"wrote"},
+  {text: "He (read) a book every day.", options:["reads","read","will read"], answer:"read"},
+  {text: "They (travel) next week.", options:["travel","traveled","will travel"], answer:"will travel"},
+  {text: "I (see) a movie last night.", options:["see","saw","will see"], answer:"saw"}
 ];
 
 function startTimer() {
@@ -149,7 +180,6 @@ function startGame(){
 setTimeout(()=>{
   startGame();
 }, 5000);
-
 </script>
 
 </body>
