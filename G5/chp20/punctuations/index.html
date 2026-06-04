@@ -1,1 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Punctuation Escape Room</title>
+<style>
+body {
+    margin:0;
+    font-family: 'Segoe UI', sans-serif;
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background: linear-gradient(to right, #fbc2eb, #a18cd1);
+}
 
+/* Splash */
+#splash {
+    position:fixed; top:0; left:0; width:100%; height:100%;
+    display:flex; justify-content:center; align-items:center;
+    background:white; z-index:100;
+}
+#splash img { width:300px; max-width:40%; }
+
+/* Game Container */
+#game {
+    display:none;
+    width:90%; max-width:900px;
+    text-align:center;
+    background: rgba(255,255,255,0.95);
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    position: relative;
+}
+
+/* Texts */
+#instructions { font-size:1.6rem; font-weight:bold; margin-bottom:15px; color:#6a1b9a;}
+#sentence { font-size:2rem; font-weight:bold; margin:25px 0; color:#0d47a1;}
+#score { font-size:1.6rem; font-weight:bold; margin-bottom:10px; color:#1b5e20;}
+#timer { font-size:1.5rem; font-weight:bold; margin-bottom:15px; color:#e65100;}
+
+/* Input */
+#inputBox {
+    width:90%; max-width:800px;
+    padding:18px;
+    font-size:1.6rem;
+    font-weight:bold;
+    border-radius:12px;
+    border:2px solid #6a1b9a;
+    margin-bottom:25px;
+}
+
+/* Button */
+#submitBtn {
+    font-size:1.6rem;
+    padding:12px 25px;
+    border:none; border-radius:12px;
+    background:#fbc02d; font-weight:bold;
+    cursor:pointer; margin-bottom:25px;
+}
+#submitBtn:hover { background:#f9a825; }
+
+/* Confetti */
+.confetti {
+    position:absolute;
+    width:12px; height:12px;
+    animation: fall 1s linear forwards;
+}
+@keyframes fall {
+    0% { transform: translateY(0) rotate(0deg);}
+    100% { transform: translateY(400px) rotate(360deg); opacity:0;}
+}
+</style>
+</head>
+<body>
+
+<!-- Splash -->
+<div id="splash">
+  <img src="assets/logo.png" alt="Innovine Logo">
+</div>
+
+<!-- Game -->
+<div id="game">
+  <div id="instructions"></div>
+  <div id="score">Score: 0</div>
+  <div id="timer">Time Left: 60s</div>
+  <div id="sentence"></div>
+  <input type="text" id="inputBox" placeholder="Type punctuation here">
+  <br>
+  <button id="submitBtn">Submit</button>
+</div>
+
+<!-- Audio -->
+<audio id="correctSound" src="assets/correct.mp3"></audio>
+<audio id="wrongSound" src="assets/wrong.mp3"></audio>
+<audio id="applause" src="assets/freesound_community-claps-44774.mp3"></audio>
+
+<script>
+// Elements
+const splash = document.getElementById('splash');
+const game = document.getElementById('game');
+const instructionsEl = document.getElementById('instructions');
+const sentenceEl = document.getElementById('sentence');
+const inputBox = document.getElementById('inputBox');
+const submitBtn = document.getElementById('submitBtn');
+const scoreEl = document.getElementById('score');
+const timerEl = document.getElementById('timer');
+
+const correctSound = document.getElementById('correctSound');
+const wrongSound = document.getElementById('wrongSound');
+const applause = document.getElementById('applause');
+
+let current = 0;
+let score = 0;
+let timer = 60;
+let timerInterval;
+
+// Sentences (missing punctuation)
+const sentences = [
+  {text:'What a beautiful day', answer:'What a beautiful day!'},
+  {text:'She said I am coming', answer:'She said, "I am coming."'},
+  {text:'Do you like ice cream', answer:'Do you like ice cream?'},
+  {text:'Lets go to the park', answer:"Let's go to the park."},
+  {text:'Stop running immediately', answer:'Stop running immediately!'},
+  {text:'He asked where are you going', answer:'He asked, "Where are you going?"'},
+  {text:'Wow that is amazing', answer:'Wow! That is amazing!'}
+];
+
+// Timer function
+function startTimer() {
+  timer = 60;
+  timerEl.textContent = `Time Left: ${timer}s`;
+  clearInterval(timerInterval);
+  timerInterval = setInterval(()=>{
+    timer--;
+    timerEl.textContent = `Time Left: ${timer}s`;
+    if(timer <= 0){
+      nextSentence();
+    }
+  }, 1000);
+}
+
+// Confetti
+function createConfetti(){
+  for(let i=0;i<15;i++){
+    const conf = document.createElement('div');
+    conf.className="confetti";
+    conf.style.left=Math.random()*game.offsetWidth+"px";
+    conf.style.background=`hsl(${Math.random()*360}, 80%, 60%)`; 
+    game.appendChild(conf);
+    setTimeout(()=>conf.remove(),1000);
+  }
+}
+
+// Check Answer
+function checkAnswer(){
+  const userAnswer = inputBox.value.trim();
+  if(userAnswer === sentences[current].answer){
+    score++;
+    scoreEl.textContent = `Score: ${score}`;
+    correctSound.play();
+    createConfetti();
+  } else {
+    wrongSound.play();
+  }
+  nextSentence();
+}
+
+// Next sentence
+function nextSentence(){
+  clearInterval(timerInterval);
+  inputBox.value='';
+  current++;
+  if(current >= sentences.length){
+    applause.play();
+    sentenceEl.textContent = "Game Completed! Score: "+score;
+    instructionsEl.textContent = "";
+    inputBox.style.display='none';
+    submitBtn.style.display='none';
+    timerEl.style.display='none';
+    return;
+  }
+  sentenceEl.textContent = sentences[current].text;
+  instructionsEl.textContent = "Add the missing punctuation to the sentence!";
+  startTimer();
+}
+
+// Start Game
+function startGame(){
+  splash.style.display='none';
+  game.style.display='block';
+  current=0; score=0;
+  scoreEl.textContent=`Score: ${score}`;
+  sentenceEl.textContent=sentences[0].text;
+  inputBox.value='';
+  inputBox.style.display='inline-block';
+  submitBtn.style.display='inline-block';
+  timerEl.style.display='block';
+  instructionsEl.textContent = "Add the missing punctuation to the sentence!";
+  startTimer();
+}
+
+// Splash 5s
+setTimeout(()=>startGame(),5000);
+submitBtn.onclick = checkAnswer;
+</script>
+
+</body>
+</html>
