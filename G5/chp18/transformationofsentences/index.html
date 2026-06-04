@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Transformation Sculptor</title>
 <style>
-  body {
+body {
     margin: 0;
     font-family: 'Segoe UI', sans-serif;
     background: linear-gradient(to right, #fbb1b1, #d6a5f5);
@@ -14,17 +14,17 @@
     align-items: center;
     height: 100vh;
     flex-direction: column;
-  }
+}
 
-  /* Splash */
-  #splash {
+/* Splash */
+#splash {
     position: fixed; top:0; left:0; width:100%; height:100%;
     background:#fff; display:flex; justify-content:center; align-items:center; z-index:100;
-  }
-  #splash img { width:300px; max-width:40%; }
+}
+#splash img { width:300px; max-width:40%; }
 
-  /* Game */
-  #game {
+/* Game */
+#game {
     display: none;
     width: 90%;
     max-width: 850px;
@@ -34,13 +34,20 @@
     padding: 35px;
     box-shadow: 0 12px 30px rgba(0,0,0,0.4);
     position: relative;
-  }
+}
 
-  #score { font-size: 2rem; margin-bottom: 15px; font-weight: bold; color:#6a2c70;}
-  #timer { font-size: 1.6rem; margin-bottom: 15px; font-weight:bold; color:#6a2c70;}
-  #sentence { font-size: 2.5rem; margin: 25px 0; color:#4a1c53; font-weight:bold;}
+#instructions {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #6a2c70;
+    margin-bottom: 10px;
+}
 
-  #board {
+#score { font-size: 2rem; margin-bottom: 10px; font-weight: bold; color:#6a2c70;}
+#timer { font-size: 1.6rem; margin-bottom: 15px; font-weight:bold; color:#6a2c70;}
+#sentence { font-size: 2.5rem; margin: 25px 0; color:#4a1c53; font-weight:bold;}
+
+#board {
     width: 100%;
     min-height: 150px;
     border-radius: 20px;
@@ -52,9 +59,9 @@
     padding: 15px;
     background: #111; /* chalkboard background */
     box-shadow: inset 0 0 10px #000000;
-  }
+}
 
-  .word {
+.word {
     padding: 20px 30px;
     margin: 8px;
     background: #f39c12;
@@ -66,22 +73,20 @@
     box-shadow: 0 5px 12px rgba(0,0,0,0.3);
     user-select: none;
     transition: 0.2s;
-  }
-  .word:hover { transform: scale(1.05); }
+}
+.word:hover { transform: scale(1.05); }
 
-  /* Confetti CSS */
-  .confetti {
+/* Confetti CSS */
+.confetti {
     position: absolute;
     width: 12px;
     height: 12px;
-    background: gold;
     animation: fall 1s linear forwards;
-  }
-  @keyframes fall {
+}
+@keyframes fall {
     0% { transform: translateY(0) rotate(0deg);}
     100% { transform: translateY(400px) rotate(360deg); opacity:0;}
-  }
-
+}
 </style>
 </head>
 <body>
@@ -93,6 +98,7 @@
 
 <!-- Game -->
 <div id="game">
+  <div id="instructions">Instructions appear here</div>
   <div id="score">Score: 0</div>
   <div id="timer">Time Left: 30s</div>
   <div id="sentence">Sentence appears here</div>
@@ -107,6 +113,7 @@
 <script>
 const splash = document.getElementById('splash');
 const game = document.getElementById('game');
+const instructionsEl = document.getElementById('instructions');
 const sentenceEl = document.getElementById('sentence');
 const board = document.getElementById('board');
 const scoreEl = document.getElementById('score');
@@ -123,13 +130,13 @@ let timerInterval;
 
 // Complex sentences for transformation
 const sentences = [
-  {base:"The manager approved the report.", transform:["The report was approved by the manager."]},
-  {base:"She will attend the seminar tomorrow.", transform:["Will she attend the seminar tomorrow?"]},
-  {base:"I like to play chess.", transform:["I do not like to play chess."]},
-  {base:"They completed the assignment on time.", transform:["The assignment was completed by them on time."]},
-  {base:"He is preparing dinner.", transform:["Is he preparing dinner?"]},
-  {base:"We will organize the event next month.", transform:["We will not organize the event next month."]},
-  {base:"She submitted the essay yesterday.", transform:["The essay was submitted by her yesterday."]}
+  {base:"The manager approved the report.", transform:["The report was approved by the manager."], hint:"Transform to passive voice"},
+  {base:"She will attend the seminar tomorrow.", transform:["Will she attend the seminar tomorrow?"], hint:"Transform to a question"},
+  {base:"I like to play chess.", transform:["I do not like to play chess."], hint:"Transform to negative sentence"},
+  {base:"They completed the assignment on time.", transform:["The assignment was completed by them on time."], hint:"Transform to passive voice"},
+  {base:"He is preparing dinner.", transform:["Is he preparing dinner?"], hint:"Transform to a question"},
+  {base:"We will organize the event next month.", transform:["We will not organize the event next month."], hint:"Transform to negative sentence"},
+  {base:"She submitted the essay yesterday.", transform:["The essay was submitted by her yesterday."], hint:"Transform to passive voice"}
 ];
 
 function startTimer() {
@@ -173,7 +180,7 @@ function createConfetti(){
     const conf = document.createElement('div');
     conf.className="confetti";
     conf.style.left=Math.random()*game.offsetWidth+"px";
-    conf.style.background=`hsl(${Math.random()*360}, 80%, 60%)`; // colorful confetti
+    conf.style.background=`hsl(${Math.random()*360}, 80%, 60%)`; 
     board.appendChild(conf);
     setTimeout(()=>conf.remove(),1000);
   }
@@ -186,11 +193,13 @@ function nextSentence(){
   if(current>=sentences.length){
     applause.play();
     sentenceEl.textContent="Game Completed! Score: "+score;
+    instructionsEl.textContent = "Well done!";
     board.innerHTML="";
     timerEl.textContent="";
     return;
   }
   sentenceEl.textContent=sentences[current].base;
+  instructionsEl.textContent=sentences[current].hint;
   const words=sentences[current].transform[0].split(" ");
   // shuffle words
   for(let i=words.length-1;i>0;i--){
@@ -207,6 +216,7 @@ function startGame(){
   current=0; score=0;
   scoreEl.textContent=`Score: ${score}`;
   sentenceEl.textContent=sentences[0].base;
+  instructionsEl.textContent=sentences[0].hint;
   const words=sentences[0].transform[0].split(" ");
   for(let i=words.length-1;i>0;i--){
     const j=Math.floor(Math.random()*(i+1));
@@ -218,7 +228,6 @@ function startGame(){
 
 // Splash 5 sec
 setTimeout(()=>startGame(),5000);
-
 </script>
 </body>
 </html>
