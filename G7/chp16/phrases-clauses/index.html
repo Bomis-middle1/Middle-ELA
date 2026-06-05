@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -6,7 +7,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 
-<title>Grammar Sorting Factory Deluxe</title>
+<title>Conveyor Belt Chaos</title>
 
 <style>
 
@@ -18,9 +19,9 @@ font-family:Arial,sans-serif;
 }
 
 body{
-background:linear-gradient(to bottom,#d4fc79,#96e6a1);
-overflow:hidden;
+background:linear-gradient(to bottom,#b2f7ef,#effaf5);
 height:100vh;
+overflow:hidden;
 }
 
 /* SPLASH */
@@ -43,7 +44,7 @@ max-width:80%;
 
 #splash h2{
 margin-top:20px;
-color:#2e7d32;
+color:#1565c0;
 }
 
 /* INTRO */
@@ -52,7 +53,7 @@ color:#2e7d32;
 display:none;
 position:fixed;
 inset:0;
-background:linear-gradient(135deg,#43a047,#66bb6a);
+background:linear-gradient(135deg,#2196f3,#64b5f6);
 color:white;
 justify-content:center;
 align-items:center;
@@ -66,19 +67,19 @@ margin-bottom:20px;
 }
 
 #intro p{
-max-width:700px;
+max-width:800px;
 line-height:1.7;
 margin-bottom:25px;
 }
 
 #startBtn{
-padding:15px 25px;
+padding:15px 30px;
 font-size:18px;
-border:none;
-border-radius:10px;
-cursor:pointer;
-background:#ffeb3b;
 font-weight:bold;
+border:none;
+border-radius:12px;
+background:#ffeb3b;
+cursor:pointer;
 }
 
 /* GAME */
@@ -87,7 +88,6 @@ font-weight:bold;
 display:none;
 height:100vh;
 position:relative;
-overflow:hidden;
 }
 
 /* TOP BAR */
@@ -103,8 +103,8 @@ border-radius:15px;
 display:flex;
 gap:20px;
 flex-wrap:wrap;
-z-index:100;
 font-weight:bold;
+z-index:100;
 }
 
 .progress{
@@ -123,97 +123,96 @@ background:#4caf50;
 
 /* MACHINE */
 
-#factoryArea{
-position:absolute;
-top:80px;
-left:0;
-right:0;
-height:250px;
-display:flex;
-justify-content:center;
-align-items:flex-start;
-}
-
 #machine{
-font-size:120px;
-animation:machineIdle 2s infinite;
+position:absolute;
+top:90px;
+left:30px;
+font-size:100px;
 }
 
-@keyframes machineIdle{
+/* CONVEYOR */
 
-0%{transform:rotate(0deg);}
-25%{transform:rotate(2deg);}
-50%{transform:rotate(0deg);}
-75%{transform:rotate(-2deg);}
-100%{transform:rotate(0deg);}
-
-}
-
-.machineShake{
-
-animation:shake .3s linear 3;
-
-}
-
-@keyframes shake{
-
-0%{transform:translateX(-5px);}
-50%{transform:translateX(5px);}
-100%{transform:translateX(-5px);}
-
-}
-
-/* FALLING ITEM */
-
-#grammarPiece{
+#belt{
 
 position:absolute;
 
-top:180px;
+top:190px;
 
-left:50%;
+left:120px;
 
-transform:translateX(-50%);
+right:20px;
+
+height:70px;
+
+background:#666;
+
+border-radius:15px;
+
+overflow:hidden;
+
+}
+
+#belt::before{
+
+content:"";
+
+position:absolute;
+
+inset:0;
+
+background:repeating-linear-gradient(
+90deg,
+#777 0px,
+#777 20px,
+#999 20px,
+#999 40px
+);
+
+animation:beltMove 2s linear infinite;
+
+}
+
+@keyframes beltMove{
+
+from{
+transform:translateX(0);
+}
+
+to{
+transform:translateX(40px);
+}
+
+}
+
+/* MOVING PIECE */
+
+#piece{
+
+position:absolute;
+
+top:150px;
+
+left:150px;
 
 background:white;
 
-padding:15px 20px;
+padding:12px 18px;
 
 border-radius:12px;
 
-font-size:22px;
-
 font-weight:bold;
+
+font-size:20px;
 
 box-shadow:0 3px 8px rgba(0,0,0,.3);
 
 display:none;
 
-max-width:80%;
+max-width:280px;
 
 text-align:center;
 
-}
-
-.fall{
-
-animation:falling 6s linear forwards;
-
-}
-
-@keyframes falling{
-
-from{
-
-top:180px;
-
-}
-
-to{
-
-top:65vh;
-
-}
+z-index:50;
 
 }
 
@@ -223,7 +222,7 @@ top:65vh;
 
 position:absolute;
 
-bottom:10px;
+bottom:15px;
 
 left:0;
 
@@ -243,13 +242,13 @@ padding:10px;
 
 .bin{
 
-width:150px;
+width:160px;
 
 height:90px;
 
 background:white;
 
-border:4px solid #2e7d32;
+border:4px solid #1565c0;
 
 border-radius:12px;
 
@@ -275,13 +274,13 @@ transform:scale(1.05);
 
 }
 
-.correctBin{
+.correct{
 
 background:#81c784 !important;
 
 }
 
-.wrongBin{
+.wrong{
 
 background:#ef5350 !important;
 
@@ -311,7 +310,7 @@ z-index:500;
 
 }
 
-/* END SCREEN */
+/* END */
 
 #endScreen{
 
@@ -357,25 +356,25 @@ cursor:pointer;
 
 }
 
-@media(max-width:700px){
+@media(max-width:768px){
 
 #machine{
 
-font-size:90px;
+font-size:70px;
 
 }
 
-#grammarPiece{
+#piece{
 
 font-size:16px;
 
-max-width:90%;
+max-width:220px;
 
 }
 
 .bin{
 
-width:110px;
+width:120px;
 
 height:80px;
 
@@ -391,33 +390,35 @@ font-size:13px;
 
 <body>
 
-<!-- SPLASH -->
-
 <div id="splash">
 
 <img src="assets/innovine-logo.png">
 
-<h2>🏭 Grammar Sorting Factory Deluxe</h2>
+<h2>🏭 Conveyor Belt Chaos</h2>
 
 </div>
 
-<!-- INTRO -->
-
 <div id="intro">
 
-<h1>🏭 Grammar Sorting Factory</h1>
+<h1>🏭 Conveyor Belt Chaos</h1>
 
 <p>
 
-The factory machine is broken!
+The Grammar Factory conveyor belt is overloaded!
 
-Grammar pieces are being thrown out in complete chaos.
+Grammar pieces are travelling across the belt.
 
-Your job is to sort every piece into the correct bin.
+Sort each piece into the correct factory container before it reaches the end.
 
-Watch carefully as the machine ejects noun phrases, adjective phrases, adverb phrases, main clauses and subordinate clauses.
+Collect 10 gears to repair the Super Factory.
 
-Collect 10 gears to repair the Super Grammar Machine!
+Categories include:
+
+Noun Phrases,
+Adjective Phrases,
+Adverb Phrases,
+Main Clauses,
+and Subordinate Clauses.
 
 </p>
 
@@ -428,8 +429,6 @@ START FACTORY
 </button>
 
 </div>
-
-<!-- GAME -->
 
 <div id="game">
 
@@ -445,23 +444,7 @@ START FACTORY
 
 </div>
 
-<div>
-
-Volume
-
-<input
-type="range"
-id="volume"
-min="0"
-max="1"
-step="0.1"
-value="1">
-
 </div>
-
-</div>
-
-<div id="factoryArea">
 
 <div id="machine">
 
@@ -469,43 +452,41 @@ value="1">
 
 </div>
 
-</div>
+<div id="belt"></div>
 
-<div id="grammarPiece"></div>
+<div id="piece"></div>
 
 <div id="feedback"></div>
 
 <div id="bins">
 
 <div class="bin" data-answer="Noun Phrase">
-Noun Phrase
+📦 Noun Phrase
 </div>
 
 <div class="bin" data-answer="Adjective Phrase">
-Adjective Phrase
+📦 Adjective Phrase
 </div>
 
 <div class="bin" data-answer="Adverb Phrase">
-Adverb Phrase
+📦 Adverb Phrase
 </div>
 
 <div class="bin" data-answer="Main Clause">
-Main Clause
+📦 Main Clause
 </div>
 
 <div class="bin" data-answer="Subordinate Clause">
-Subordinate Clause
+📦 Subordinate Clause
 </div>
 
 </div>
 
 </div>
-
-<!-- END -->
 
 <div id="endScreen">
 
-<h1>🏭 SUPER FACTORY ONLINE!</h1>
+<h1>🏭 SUPER FACTORY REPAIRED!</h1>
 
 <h2 id="finalScore"></h2>
 
@@ -521,6 +502,10 @@ Subordinate Clause
 <audio id="wrongSound" src="assets/wrong.mp3"></audio>
 <audio id="clapSound" src="assets/clapping.mp3"></audio><script>
 
+/* =========================
+   GRAMMAR BANK (40 ITEMS)
+   ========================= */
+
 const grammarBank = [
 
 /* NOUN PHRASES */
@@ -531,17 +516,17 @@ answer:"Noun Phrase"
 },
 
 {
-text:"the old man near the fountain",
+text:"the athlete with the gold medal",
 answer:"Noun Phrase"
 },
 
 {
-text:"the girl wearing a blue cap",
+text:"the girl near the library entrance",
 answer:"Noun Phrase"
 },
 
 {
-text:"the noisy crowd at the stadium",
+text:"the puppy under the wooden table",
 answer:"Noun Phrase"
 },
 
@@ -551,7 +536,17 @@ answer:"Noun Phrase"
 },
 
 {
-text:"the puppy under the table",
+text:"the old man beside the fountain",
+answer:"Noun Phrase"
+},
+
+{
+text:"the captain of the football team",
+answer:"Noun Phrase"
+},
+
+{
+text:"the cyclist wearing a yellow helmet",
 answer:"Noun Phrase"
 },
 
@@ -559,6 +554,11 @@ answer:"Noun Phrase"
 
 {
 text:"full of excitement",
+answer:"Adjective Phrase"
+},
+
+{
+text:"ready for the competition",
 answer:"Adjective Phrase"
 },
 
@@ -573,17 +573,22 @@ answer:"Adjective Phrase"
 },
 
 {
+text:"proud of her achievement",
+answer:"Adjective Phrase"
+},
+
+{
 text:"eager to learn new things",
 answer:"Adjective Phrase"
 },
 
 {
-text:"ready for the competition",
+text:"afraid of the dark tunnel",
 answer:"Adjective Phrase"
 },
 
 {
-text:"proud of her achievement",
+text:"famous for its beautiful beaches",
 answer:"Adjective Phrase"
 },
 
@@ -595,17 +600,12 @@ answer:"Adverb Phrase"
 },
 
 {
-text:"during the lunch break",
-answer:"Adverb Phrase"
-},
-
-{
-text:"in complete silence",
-answer:"Adverb Phrase"
-},
-
-{
 text:"without any hesitation",
+answer:"Adverb Phrase"
+},
+
+{
+text:"during the lunch break",
 answer:"Adverb Phrase"
 },
 
@@ -619,20 +619,45 @@ text:"at the end of the match",
 answer:"Adverb Phrase"
 },
 
+{
+text:"in complete silence",
+answer:"Adverb Phrase"
+},
+
+{
+text:"before sunrise",
+answer:"Adverb Phrase"
+},
+
+{
+text:"with a cheerful smile",
+answer:"Adverb Phrase"
+},
+
 /* MAIN CLAUSES */
 
 {
-text:"The dog barked loudly.",
+text:"The train arrived on time.",
 answer:"Main Clause"
 },
 
 {
-text:"The children played outside.",
+text:"The crowd cheered loudly.",
 answer:"Main Clause"
 },
 
 {
-text:"The team celebrated their victory.",
+text:"The students completed the project.",
+answer:"Main Clause"
+},
+
+{
+text:"The dog barked at the stranger.",
+answer:"Main Clause"
+},
+
+{
+text:"The athlete crossed the finish line.",
 answer:"Main Clause"
 },
 
@@ -642,12 +667,12 @@ answer:"Main Clause"
 },
 
 {
-text:"The train arrived on time.",
+text:"The band performed beautifully.",
 answer:"Main Clause"
 },
 
 {
-text:"The athlete crossed the finish line.",
+text:"The children played outside.",
 answer:"Main Clause"
 },
 
@@ -669,11 +694,6 @@ answer:"Subordinate Clause"
 },
 
 {
-text:"after the match ended",
-answer:"Subordinate Clause"
-},
-
-{
 text:"while the students were working",
 answer:"Subordinate Clause"
 },
@@ -681,87 +701,128 @@ answer:"Subordinate Clause"
 {
 text:"since the road was closed",
 answer:"Subordinate Clause"
+},
+
+{
+text:"after the match ended",
+answer:"Subordinate Clause"
+},
+
+{
+text:"before the guests arrived",
+answer:"Subordinate Clause"
+},
+
+{
+text:"whenever the alarm sounded",
+answer:"Subordinate Clause"
 }
 
 ];
 
-/* GAME VARIABLES */
+/* =========================
+   GAME VARIABLES
+   ========================= */
 
-let gameQuestions = [];
-let currentQuestion = 0;
+let selectedPieces = [];
+let currentIndex = 0;
 let score = 0;
 let gears = 0;
 let currentAnswer = "";
+let beltTimer = null;
 
-/* RANDOMIZE QUESTIONS */
+/* =========================
+   SHUFFLE FUNCTION
+   ========================= */
 
-function prepareQuestions(){
+function shuffle(array){
 
-gameQuestions =
-[...grammarBank]
-.sort(()=>Math.random()-0.5)
-.slice(0,10);
+for(let i=array.length-1;i>0;i--){
+
+const j =
+Math.floor(Math.random()*(i+1));
+
+[array[i],array[j]] =
+[array[j],array[i]];
 
 }
 
-/* UPDATE GEAR DISPLAY */
+return array;
+
+}
+
+/* =========================
+   PREPARE GAME
+   RANDOM 10 EACH TIME
+   ========================= */
+
+function prepareGame(){
+
+selectedPieces =
+shuffle([...grammarBank]).slice(0,10);
+
+}
+
+/* =========================
+   PROGRESS UPDATE
+   ========================= */
 
 function updateProgress(){
-
-document.getElementById("gearCount").textContent =
-gears;
 
 document.getElementById("score").textContent =
 score;
 
+document.getElementById("gearCount").textContent =
+gears;
+
 document.getElementById("fill").style.width =
-((currentQuestion)/10)*100 + "%";
+(currentIndex/10)*100 + "%";
 
 }
 
-/* VOLUME */
+/* =========================
+   AUDIO VOLUME
+   ========================= */
 
 function updateVolume(){
 
-const v =
-document.getElementById("volume").value;
+const correct =
+document.getElementById("correctSound");
 
-document.getElementById("correctSound").volume = v;
-document.getElementById("wrongSound").volume = v;
-document.getElementById("clapSound").volume = v;
+const wrong =
+document.getElementById("wrongSound");
 
-}function showNextPiece(){
+const clap =
+document.getElementById("clapSound");
 
-if(currentQuestion >= gameQuestions.length){
+correct.volume = 1;
+wrong.volume = 1;
+clap.volume = 1;
+
+}
+
+/* =========================
+   SHOW NEXT PIECE
+   (Part 3 will animate it)
+   ========================= */
+
+function loadNextPiece(){
+
+if(currentIndex >= selectedPieces.length){
 
 finishGame();
 return;
 
 }
 
-const machine =
-document.getElementById("machine");
-
-machine.classList.add("machineShake");
-
-setTimeout(()=>{
-
-machine.classList.remove("machineShake");
-
-},900);
-
 const item =
-gameQuestions[currentQuestion];
+selectedPieces[currentIndex];
 
 currentAnswer =
 item.answer;
 
 const piece =
-document.getElementById("grammarPiece");
-
-piece.classList.remove("fall");
-
-void piece.offsetWidth;
+document.getElementById("piece");
 
 piece.innerHTML =
 item.text;
@@ -769,34 +830,125 @@ item.text;
 piece.style.display =
 "block";
 
-piece.style.top =
-"180px";
+}
+/* =========================
+   CONVEYOR MOVEMENT
+   ========================= */
 
-setTimeout(()=>{
+function animatePiece(){
 
-piece.classList.add("fall");
+const piece =
+document.getElementById("piece");
 
-},200);
+let position = 150;
+
+/*
+Slow movement:
+~9 seconds across screen
+*/
+
+clearInterval(beltTimer);
+
+beltTimer = setInterval(()=>{
+
+position += 3;
+
+piece.style.left =
+position + "px";
+
+/* Piece reached end */
+
+if(position > window.innerWidth - 150){
+
+clearInterval(beltTimer);
+
+wrongTimeout();
 
 }
 
-function correctAnswer(bin){
+},40);
+
+}
+
+/* =========================
+   AUTO MISS
+   ========================= */
+
+function wrongTimeout(){
+
+document.getElementById("wrongSound").currentTime = 0;
+document.getElementById("wrongSound").play();
+
+const feedback =
+document.getElementById("feedback");
+
+feedback.style.display = "block";
+feedback.style.color = "#d32f2f";
+feedback.innerHTML = "🗑️ LOST ON BELT!";
+
+setTimeout(()=>{
+
+feedback.style.display = "none";
+
+currentIndex++;
+
+updateProgress();
+
+loadNextPiece();
+animatePiece();
+
+},1200);
+
+}
+
+/* =========================
+   BIN CLICK
+   ========================= */
+
+document.querySelectorAll(".bin").forEach(bin=>{
+
+bin.addEventListener("click",()=>{
+
+if(currentIndex >= selectedPieces.length) return;
+
+const chosen =
+bin.dataset.answer;
+
+if(chosen === currentAnswer){
+
+handleCorrect(bin);
+
+}else{
+
+handleWrong(bin);
+
+}
+
+});
+
+});
+
+/* =========================
+   CORRECT
+   ========================= */
+
+function handleCorrect(bin){
+
+clearInterval(beltTimer);
 
 updateVolume();
 
 document.getElementById("correctSound").currentTime = 0;
 document.getElementById("correctSound").play();
 
-bin.classList.add("correctBin");
+bin.classList.add("correct");
 
-document.getElementById("feedback").style.display =
-"block";
+const feedback =
+document.getElementById("feedback");
 
-document.getElementById("feedback").style.color =
-"green";
-
-document.getElementById("feedback").innerHTML =
-"⚙️ GEAR COLLECTED!";
+feedback.style.display = "block";
+feedback.style.color = "#2e7d32";
+feedback.innerHTML = "⚙️ GEAR COLLECTED!";
 
 score += 10;
 
@@ -808,84 +960,99 @@ gears++;
 
 setTimeout(()=>{
 
-bin.classList.remove("correctBin");
+bin.classList.remove("correct");
 
-document.getElementById("feedback").style.display =
-"none";
+feedback.style.display = "none";
 
-nextQuestion();
+currentIndex++;
+
+updateProgress();
+
+loadNextPiece();
+animatePiece();
 
 },1200);
 
 }
 
-function wrongAnswer(bin){
+/* =========================
+   WRONG
+   ========================= */
+
+function handleWrong(bin){
+
+clearInterval(beltTimer);
 
 updateVolume();
 
 document.getElementById("wrongSound").currentTime = 0;
 document.getElementById("wrongSound").play();
 
-bin.classList.add("wrongBin");
+bin.classList.add("wrong");
 
-document.getElementById("feedback").style.display =
-"block";
+const feedback =
+document.getElementById("feedback");
 
-document.getElementById("feedback").style.color =
-"red";
-
-document.getElementById("feedback").innerHTML =
-"❌ WRONG BIN";
+feedback.style.display = "block";
+feedback.style.color = "#d32f2f";
+feedback.innerHTML = "❌ WRONG BIN";
 
 setTimeout(()=>{
 
-bin.classList.remove("wrongBin");
+bin.classList.remove("wrong");
 
-document.getElementById("feedback").style.display =
-"none";
+feedback.style.display = "none";
 
-nextQuestion();
+currentIndex++;
+
+updateProgress();
+
+loadNextPiece();
+animatePiece();
 
 },1200);
 
 }
 
-function nextQuestion(){
+/* =========================
+   LOAD PIECE
+   ========================= */
 
-document.getElementById("grammarPiece").style.display =
-"none";
+function loadNextPiece(){
 
-currentQuestion++;
+if(currentIndex >= selectedPieces.length){
 
-updateProgress();
-
-showNextPiece();
-
-}
-
-document.querySelectorAll(".bin").forEach(bin=>{
-
-bin.addEventListener("click",()=>{
-
-if(
-bin.dataset.answer === currentAnswer
-){
-
-correctAnswer(bin);
-
-}else{
-
-wrongAnswer(bin);
+finishGame();
+return;
 
 }
 
-});
+const item =
+selectedPieces[currentIndex];
 
-});
+currentAnswer =
+item.answer;
+
+const piece =
+document.getElementById("piece");
+
+piece.style.display = "block";
+
+piece.innerHTML =
+item.text;
+
+piece.style.left =
+"150px";
+
+}
+
+/* =========================
+   FINISH GAME
+   ========================= */
 
 function finishGame(){
 
-updateVolume();
+clearInterval(beltTimer);
 
 document.getElementById("game").style.display =
 "none";
@@ -934,11 +1101,15 @@ document.getElementById("finalScore").innerHTML =
 
 }
 
+/* =========================
+   START GAME
+   ========================= */
+
 function startGame(){
 
-prepareQuestions();
+prepareGame();
 
-currentQuestion = 0;
+currentIndex = 0;
 score = 0;
 gears = 0;
 
@@ -950,13 +1121,14 @@ document.getElementById("intro").style.display =
 document.getElementById("game").style.display =
 "block";
 
-showNextPiece();
+loadNextPiece();
+animatePiece();
 
 }
 
-document
-.getElementById("startBtn")
-.addEventListener("click",startGame);
+/* =========================
+   RESTART
+   ========================= */
 
 document
 .getElementById("restartBtn")
@@ -968,9 +1140,34 @@ document.getElementById("endScreen").style.display =
 document.getElementById("game").style.display =
 "block";
 
-startGame();
+/*
+Fresh shuffle every replay
+*/
+
+prepareGame();
+
+currentIndex = 0;
+score = 0;
+gears = 0;
+
+updateProgress();
+
+loadNextPiece();
+animatePiece();
 
 });
+
+/* =========================
+   START BUTTON
+   ========================= */
+
+document
+.getElementById("startBtn")
+.addEventListener("click",startGame);
+
+/* =========================
+   SPLASH SCREEN
+   ========================= */
 
 setTimeout(()=>{
 
@@ -981,6 +1178,10 @@ document.getElementById("intro").style.display =
 "flex";
 
 },5000);
+
+/* =========================
+   INITIALIZE
+   ========================= */
 
 updateProgress();
 
