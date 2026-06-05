@@ -1,1 +1,826 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
 
+<title>Grammar Factory Chaos</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
+body{
+background:linear-gradient(to bottom,#c8f7c5,#fff7cc);
+min-height:100vh;
+overflow-x:hidden;
+}
+
+#splash{
+position:fixed;
+inset:0;
+background:white;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+z-index:9999;
+}
+
+#splash img{
+width:220px;
+max-width:80%;
+}
+
+#splash h2{
+margin-top:20px;
+color:#2e7d32;
+}
+
+#intro{
+display:none;
+position:fixed;
+inset:0;
+background:linear-gradient(135deg,#4caf50,#66bb6a);
+color:white;
+padding:20px;
+text-align:center;
+justify-content:center;
+align-items:center;
+flex-direction:column;
+}
+
+#intro h1{
+margin-bottom:20px;
+}
+
+#intro p{
+max-width:700px;
+line-height:1.7;
+margin-bottom:25px;
+}
+
+#startBtn{
+padding:15px 25px;
+font-size:18px;
+border:none;
+border-radius:10px;
+cursor:pointer;
+background:#ffeb3b;
+font-weight:bold;
+}
+
+#game{
+display:none;
+padding:15px;
+max-width:900px;
+margin:auto;
+}
+
+.topBar{
+background:white;
+padding:12px;
+border-radius:12px;
+display:flex;
+flex-wrap:wrap;
+justify-content:center;
+gap:15px;
+font-weight:bold;
+box-shadow:0 2px 8px rgba(0,0,0,.2);
+}
+
+.progress{
+width:220px;
+height:18px;
+background:#ddd;
+border-radius:20px;
+overflow:hidden;
+}
+
+#fill{
+width:0%;
+height:100%;
+background:#4caf50;
+transition:.4s;
+}
+
+#parts{
+font-size:28px;
+text-align:center;
+margin:15px 0;
+}
+
+#machine{
+background:white;
+padding:25px;
+border-radius:15px;
+box-shadow:0 3px 10px rgba(0,0,0,.2);
+margin-top:15px;
+}
+
+#challengeType{
+color:#2e7d32;
+margin-bottom:15px;
+}
+
+#question{
+font-size:22px;
+margin-bottom:20px;
+line-height:1.5;
+}
+
+.option{
+width:100%;
+padding:14px;
+margin-bottom:10px;
+border:none;
+border-radius:10px;
+background:#e8f5e9;
+cursor:pointer;
+font-size:16px;
+text-align:left;
+}
+
+.option:hover{
+background:#c8e6c9;
+}
+
+#feedback{
+display:none;
+text-align:center;
+font-size:24px;
+font-weight:bold;
+margin-top:15px;
+}
+
+#endScreen{
+display:none;
+position:fixed;
+inset:0;
+background:rgba(0,0,0,.9);
+color:white;
+justify-content:center;
+align-items:center;
+flex-direction:column;
+text-align:center;
+padding:20px;
+}
+
+#restartBtn{
+margin-top:20px;
+padding:15px 25px;
+font-size:18px;
+border:none;
+border-radius:10px;
+background:#4caf50;
+color:white;
+cursor:pointer;
+}
+
+@media(max-width:600px){
+
+#question{
+font-size:18px;
+}
+
+.option{
+font-size:15px;
+}
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="splash">
+
+<img src="assets/innovine-logo.png">
+
+<h2>🏭 Grammar Factory Chaos</h2>
+
+</div>
+
+<div id="intro">
+
+<h1>🏭 Grammar Factory Chaos</h1>
+
+<p>
+
+The Grammar Factory has broken down!
+
+Sentence parts are arriving in complete chaos.
+
+Repair machines by solving different grammar challenges.
+
+Some questions ask you to identify phrases.
+
+Some ask you to identify clauses.
+
+Some ask you to repair machine mistakes.
+
+Some ask you to complete sentences.
+
+Collect 10 Factory Parts to activate the Super Grammar Machine!
+
+</p>
+
+<button id="startBtn">
+
+START REPAIRING
+
+</button>
+
+</div>
+
+<div id="game">
+
+<div class="topBar">
+
+<div>Score: <span id="score">0</span></div>
+
+<div>Parts: <span id="partCount">0</span>/10</div>
+
+<div class="progress">
+<div id="fill"></div>
+</div>
+
+<div>
+
+Volume
+
+<input
+type="range"
+id="volume"
+min="0"
+max="1"
+step="0.1"
+value="1">
+
+</div>
+
+</div>
+
+<div id="parts"></div>
+
+<div id="machine">
+
+<h2 id="challengeType"></h2>
+
+<div id="question"></div>
+
+<div id="options"></div>
+
+<div id="feedback"></div>
+
+</div>
+
+</div>
+
+<div id="endScreen">
+
+<h1>🏭 SUPER GRAMMAR MACHINE ACTIVATED!</h1>
+
+<h2 id="finalScore"></h2>
+
+<button id="restartBtn">
+
+🔄 Play Again
+
+</button>
+
+</div>
+
+<audio id="correctSound" src="assets/correct.mp3"></audio>
+<audio id="wrongSound" src="assets/wrong.mp3"></audio>
+<audio id="clapSound" src="assets/clapping.mp3"></audio><script>
+
+const questionBank = [
+
+{
+type:"Identify",
+question:"The boy with the red backpack",
+correct:"Noun Phrase",
+options:["Noun Phrase","Adjective Phrase","Adverb Phrase","Main Clause"]
+},
+
+{
+type:"Identify",
+question:"full of excitement",
+correct:"Adjective Phrase",
+options:["Main Clause","Adjective Phrase","Noun Phrase","Adverb Phrase"]
+},
+
+{
+type:"Identify",
+question:"with great speed",
+correct:"Adverb Phrase",
+options:["Adverb Phrase","Noun Phrase","Main Clause","Subordinate Clause"]
+},
+
+{
+type:"Identify",
+question:"The dog barked loudly.",
+correct:"Main Clause",
+options:["Main Clause","Subordinate Clause","Adverb Phrase","Noun Phrase"]
+},
+
+{
+type:"Identify",
+question:"because it was raining",
+correct:"Subordinate Clause",
+options:["Main Clause","Noun Phrase","Subordinate Clause","Adjective Phrase"]
+},
+
+{
+type:"Find",
+question:"The dog barked loudly because it was hungry.<br><br>Which part is the subordinate clause?",
+correct:"because it was hungry",
+options:[
+"because it was hungry",
+"The dog",
+"barked loudly",
+"loudly"
+]
+},
+
+{
+type:"Find",
+question:"When the bell rang, the students left quickly.<br><br>Which part is the main clause?",
+correct:"the students left quickly",
+options:[
+"the students left quickly",
+"When the bell rang",
+"quickly",
+"the students"
+]
+},
+
+{
+type:"Repair",
+question:"Machine Label: Main Clause<br><br>Sentence Part: Running through the park<br><br>Is the machine correct?",
+correct:"No",
+options:["Yes","No"]
+},
+
+{
+type:"Repair",
+question:"Machine Label: Adverb Phrase<br><br>Sentence Part: with great excitement<br><br>Is the machine correct?",
+correct:"Yes",
+options:["Yes","No"]
+},
+
+{
+type:"Repair",
+question:"Machine Label: Noun Phrase<br><br>Sentence Part: because she was tired<br><br>Is the machine correct?",
+correct:"No",
+options:["Yes","No"]
+},
+
+{
+type:"Complete",
+question:"______ because it was raining.",
+correct:"The match was cancelled",
+options:[
+"The match was cancelled",
+"because it was raining",
+"with heavy rain",
+"during the storm"
+]
+},
+
+{
+type:"Complete",
+question:"When the bell rang, ______.",
+correct:"the students left quickly",
+options:[
+"the students left quickly",
+"when the bell rang",
+"after school",
+"with excitement"
+]
+},
+
+{
+type:"Complete",
+question:"The puppy slept ______.",
+correct:"under the old table",
+options:[
+"under the old table",
+"because it was tired",
+"the old puppy",
+"which barked loudly"
+]
+},
+
+{
+type:"Upgrade",
+question:"The girl smiled.<br><br>Which option adds an adjective phrase?",
+correct:"full of confidence",
+options:[
+"full of confidence",
+"with great speed",
+"because she won",
+"the smiling girl"
+]
+},
+
+{
+type:"Upgrade",
+question:"The athlete ran.<br><br>Which option adds an adverb phrase?",
+correct:"with great determination",
+options:[
+"with great determination",
+"full of energy",
+"the athlete",
+"who won the race"
+]
+},
+
+{
+type:"Count",
+question:"When the bell rang, the students left quickly.<br><br>How many clauses are there?",
+correct:"2",
+options:["1","2","3","4"]
+},
+
+{
+type:"Count",
+question:"The teacher smiled because the class worked hard.<br><br>How many clauses are there?",
+correct:"2",
+options:["1","2","3","4"]
+},
+
+{
+type:"Count",
+question:"The dog barked loudly.<br><br>How many clauses are there?",
+correct:"1",
+options:["1","2","3","4"]
+},
+
+{
+type:"Build",
+question:"because she studied hard<br><br>What is needed to complete this sentence?",
+correct:"Main Clause",
+options:[
+"Main Clause",
+"Noun Phrase",
+"Adjective Phrase",
+"Adverb Phrase"
+]
+},
+
+{
+type:"Build",
+question:"under the old bridge<br><br>What type of phrase is this?",
+correct:"Adverb Phrase",
+options:[
+"Adverb Phrase",
+"Noun Phrase",
+"Main Clause",
+"Subordinate Clause"
+]
+},
+
+{
+type:"Build",
+question:"the girl with the blue backpack<br><br>What type of phrase is this?",
+correct:"Noun Phrase",
+options:[
+"Noun Phrase",
+"Adjective Phrase",
+"Main Clause",
+"Subordinate Clause"
+]
+},
+
+{
+type:"Challenge",
+question:"Which sentence contains a subordinate clause?",
+correct:"The game ended because it was late.",
+options:[
+"The game ended because it was late.",
+"The players celebrated loudly.",
+"The tired players.",
+"With great excitement."
+]
+},
+
+{
+type:"Challenge",
+question:"Which option is an adjective phrase?",
+correct:"full of happiness",
+options:[
+"full of happiness",
+"because she laughed",
+"the happy girl laughed",
+"with happiness"
+]
+},
+
+{
+type:"Challenge",
+question:"Which option is a main clause?",
+correct:"The children played outside.",
+options:[
+"The children played outside.",
+"because the weather was nice",
+"under the bright sun",
+"full of excitement"
+]
+},
+
+{
+type:"Challenge",
+question:"Which option is a subordinate clause?",
+correct:"although it was difficult",
+options:[
+"although it was difficult",
+"the difficult task",
+"with difficulty",
+"The task was difficult"
+]
+}
+
+];
+
+// RANDOMIZE
+
+let selectedQuestions = [];
+
+function prepareQuestions(){
+
+selectedQuestions =
+[...questionBank]
+.sort(()=>Math.random()-0.5)
+.slice(0,10);
+
+}
+
+function shuffleOptions(arr){
+
+return [...arr]
+.sort(()=>Math.random()-0.5);
+
+}
+
+let currentQuestion = 0;
+let score = 0;
+let parts = 0;function setVolume(){
+
+const v =
+document.getElementById("volume").value;
+
+document.getElementById("correctSound").volume = v;
+document.getElementById("wrongSound").volume = v;
+document.getElementById("clapSound").volume = v;
+
+}
+
+function updateParts(){
+
+let html = "";
+
+for(let i=0;i<10;i++){
+
+html += i < parts ? "⚙️" : "⬜";
+
+}
+
+document.getElementById("parts").innerHTML = html;
+
+}
+
+function loadQuestion(){
+
+if(currentQuestion >= selectedQuestions.length){
+
+finishGame();
+return;
+
+}
+
+const q =
+selectedQuestions[currentQuestion];
+
+document.getElementById("challengeType").innerHTML =
+"🏭 " + q.type + " Challenge";
+
+document.getElementById("question").innerHTML =
+q.question;
+
+const optionsDiv =
+document.getElementById("options");
+
+optionsDiv.innerHTML = "";
+
+const shuffled =
+shuffleOptions(q.options);
+
+shuffled.forEach(option=>{
+
+const btn =
+document.createElement("button");
+
+btn.className =
+"option";
+
+btn.innerHTML =
+option;
+
+btn.onclick = ()=>{
+
+checkAnswer(option === q.correct);
+
+};
+
+optionsDiv.appendChild(btn);
+
+});
+
+}
+
+function checkAnswer(correct){
+
+setVolume();
+
+const feedback =
+document.getElementById("feedback");
+
+feedback.style.display = "block";
+
+if(correct){
+
+document.getElementById("correctSound").currentTime = 0;
+document.getElementById("correctSound").play();
+
+score += 10;
+
+if(parts < 10){
+
+parts++;
+
+}
+
+feedback.innerHTML =
+"⚙️ FACTORY PART COLLECTED!";
+
+feedback.style.color =
+"#2e7d32";
+
+}else{
+
+document.getElementById("wrongSound").currentTime = 0;
+document.getElementById("wrongSound").play();
+
+feedback.innerHTML =
+"⚠️ MACHINE STILL BROKEN";
+
+feedback.style.color =
+"#d32f2f";
+
+}
+
+document.getElementById("score").textContent =
+score;
+
+document.getElementById("partCount").textContent =
+parts;
+
+updateParts();
+
+const progress =
+((currentQuestion + 1) / 10) * 100;
+
+document.getElementById("fill").style.width =
+progress + "%";
+
+currentQuestion++;
+
+setTimeout(()=>{
+
+feedback.style.display = "none";
+
+loadQuestion();
+
+},1500);
+
+}
+
+function finishGame(){
+
+setVolume();
+
+document.getElementById("game").style.display =
+"none";
+
+document.getElementById("endScreen").style.display =
+"flex";
+
+document.getElementById("clapSound").currentTime = 0;
+document.getElementById("clapSound").play();
+
+let rank = "";
+
+if(score >= 90){
+
+rank =
+"🏆 MASTER GRAMMAR ENGINEER";
+
+}else if(score >= 70){
+
+rank =
+"⭐ EXPERT MACHINE REPAIRER";
+
+}else if(score >= 50){
+
+rank =
+"👍 FACTORY TECHNICIAN";
+
+}else{
+
+rank =
+"🔧 APPRENTICE ENGINEER";
+
+}
+
+document.getElementById("finalScore").innerHTML =
+
+`
+<p>Score: ${score}/100</p>
+<p>Factory Parts Collected: ${parts}/10</p>
+<br>
+<p>${rank}</p>
+`;
+
+}
+
+function startGame(){
+
+prepareQuestions();
+
+currentQuestion = 0;
+score = 0;
+parts = 0;
+
+document.getElementById("score").textContent =
+"0";
+
+document.getElementById("partCount").textContent =
+"0";
+
+document.getElementById("fill").style.width =
+"0%";
+
+updateParts();
+
+document.getElementById("intro").style.display =
+"none";
+
+document.getElementById("game").style.display =
+"block";
+
+loadQuestion();
+
+}
+
+document
+.getElementById("startBtn")
+.addEventListener("click",startGame);
+
+document
+.getElementById("restartBtn")
+.addEventListener("click",()=>{
+
+document.getElementById("endScreen").style.display =
+"none";
+
+document.getElementById("game").style.display =
+"block";
+
+startGame();
+
+});
+
+setTimeout(()=>{
+
+document.getElementById("splash").style.display =
+"none";
+
+document.getElementById("intro").style.display =
+"flex";
+
+},5000);
+
+updateParts();
+
+</script>
+
+</body>
+</html>
