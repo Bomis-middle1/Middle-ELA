@@ -1,1 +1,849 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<title>Detective Interview Mystery</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial, sans-serif;
+}
+
+body{
+background:linear-gradient(to bottom,#b3e5fc,#fff8e1);
+min-height:100vh;
+overflow-x:hidden;
+}
+
+/* SPLASH */
+
+#splash{
+position:fixed;
+inset:0;
+background:white;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+z-index:9999;
+}
+
+#splash img{
+width:220px;
+max-width:80%;
+margin-bottom:20px;
+}
+
+#splash h2{
+color:#1565c0;
+}
+
+/* BRIEFING */
+
+#briefing{
+display:none;
+position:fixed;
+inset:0;
+background:linear-gradient(135deg,#0d47a1,#1976d2);
+color:white;
+justify-content:center;
+align-items:center;
+flex-direction:column;
+text-align:center;
+padding:20px;
+}
+
+#briefing h1{
+margin-bottom:20px;
+}
+
+#briefing p{
+max-width:600px;
+line-height:1.6;
+margin-bottom:25px;
+}
+
+#startBtn{
+padding:15px 25px;
+font-size:18px;
+border:none;
+border-radius:10px;
+cursor:pointer;
+background:#ffca28;
+font-weight:bold;
+}
+
+/* GAME */
+
+#game{
+display:none;
+padding:15px;
+max-width:900px;
+margin:auto;
+}
+
+h1{
+text-align:center;
+color:#0d47a1;
+margin-bottom:15px;
+}
+
+.topbar{
+display:flex;
+flex-wrap:wrap;
+justify-content:center;
+gap:15px;
+background:white;
+padding:12px;
+border-radius:12px;
+margin-bottom:15px;
+box-shadow:0 2px 6px rgba(0,0,0,.2);
+font-weight:bold;
+}
+
+.progressContainer{
+width:250px;
+height:18px;
+background:#ddd;
+border-radius:20px;
+overflow:hidden;
+}
+
+#progressFill{
+width:0%;
+height:100%;
+background:#4caf50;
+transition:.4s;
+}
+
+/* CLUES */
+
+#clueBoard{
+display:flex;
+justify-content:center;
+flex-wrap:wrap;
+gap:6px;
+margin-bottom:15px;
+font-size:28px;
+}
+
+/* WITNESS CARD */
+
+#witnessCard{
+background:white;
+padding:25px;
+border-radius:15px;
+box-shadow:0 3px 8px rgba(0,0,0,.2);
+}
+
+#witnessNumber{
+color:#1565c0;
+margin-bottom:10px;
+}
+
+#statement{
+font-size:22px;
+font-style:italic;
+margin-bottom:25px;
+color:#333;
+}
+
+#questionTitle{
+margin-bottom:15px;
+}
+
+/* OPTIONS */
+
+.optionBtn{
+width:100%;
+padding:14px;
+margin-bottom:10px;
+border:none;
+border-radius:10px;
+background:#e3f2fd;
+cursor:pointer;
+font-size:16px;
+text-align:left;
+transition:.2s;
+}
+
+.optionBtn:hover{
+background:#bbdefb;
+}
+
+/* FEEDBACK */
+
+#feedback{
+display:none;
+text-align:center;
+font-size:24px;
+font-weight:bold;
+margin-top:20px;
+}
+
+/* END SCREEN */
+
+#endScreen{
+display:none;
+position:fixed;
+inset:0;
+background:rgba(0,0,0,.9);
+color:white;
+justify-content:center;
+align-items:center;
+flex-direction:column;
+text-align:center;
+padding:20px;
+}
+
+#endScreen h1{
+font-size:42px;
+color:#ffd54f;
+}
+
+#finalScore{
+margin-top:20px;
+font-size:24px;
+}
+
+#restartBtn{
+margin-top:25px;
+padding:15px 25px;
+font-size:18px;
+border:none;
+border-radius:10px;
+cursor:pointer;
+background:#4caf50;
+color:white;
+}
+
+/* MOBILE */
+
+@media(max-width:600px){
+
+#statement{
+font-size:18px;
+}
+
+.optionBtn{
+font-size:15px;
+}
+
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- SPLASH -->
+
+<div id="splash">
+
+<img src="assets/innovine-logo.png">
+
+<h2>🕵️ Detective Interview Mystery</h2>
+
+</div>
+
+<!-- BRIEFING -->
+
+<div id="briefing">
+
+<h1>🚨 CASE FILE #007</h1>
+
+<p>
+
+A priceless diamond has been stolen from the City Museum.
+
+Interview witnesses.
+
+Collect clues.
+
+Recover the diamond.
+
+</p>
+
+<button id="startBtn">
+
+START INVESTIGATION
+
+</button>
+
+</div>
+
+<!-- GAME -->
+
+<div id="game">
+
+<h1>🕵️ Detective Interview Mystery</h1>
+
+<div class="topbar">
+
+<div>
+Score:
+<span id="score">0</span>
+</div>
+
+<div>
+Clues:
+<span id="clueCount">0</span>/10
+</div>
+
+<div class="progressContainer">
+<div id="progressFill"></div>
+</div>
+
+<div>
+
+Volume
+
+<input
+type="range"
+id="volume"
+min="0"
+max="1"
+step="0.1"
+value="1">
+
+</div>
+
+</div>
+
+<div id="clueBoard"></div>
+
+<div id="witnessCard">
+
+<h2 id="witnessNumber"></h2>
+
+<div id="statement"></div>
+
+<h3 id="questionTitle">
+
+How should the detective report this statement?
+
+</h3>
+
+<div id="options"></div>
+
+<div id="feedback"></div>
+
+</div>
+
+</div>
+
+<!-- END SCREEN -->
+
+<div id="endScreen">
+
+<h1>💎 DIAMOND RECOVERED!</h1>
+
+<h2>CASE SOLVED</h2>
+
+<div id="finalScore"></div>
+
+<button id="restartBtn">
+
+🔄 Solve Another Case
+
+</button>
+
+</div>
+
+<!-- AUDIO -->
+
+<audio id="correctSound" src="assets/correct.mp3"></audio>
+
+<audio id="wrongSound" src="assets/wrong.mp3"></audio>
+
+<audio id="clapSound" src="assets/clapping.mp3"></audio><script>
+
+// =========================
+// QUESTION BANK (15 QUESTIONS)
+// =========================
+
+const questionBank = [
+
+{
+statement:'"I saw a man wearing a red jacket."',
+witness:'👩 Witness',
+correct:'She said that she had seen a man wearing a red jacket.',
+options:[
+'She said that she had seen a man wearing a red jacket.',
+'She said she see a man wearing a red jacket.',
+'She says red jacket man.',
+'She had jacket man.'
+]
+},
+
+{
+statement:'"I am waiting for the bus."',
+witness:'👨 Witness',
+correct:'He said that he was waiting for the bus.',
+options:[
+'He said that he was waiting for the bus.',
+'He waits for the bus.',
+'He said he wait bus.',
+'Bus waiting he.'
+]
+},
+
+{
+statement:'"I will call the police."',
+witness:'👩 Witness',
+correct:'She said that she would call the police.',
+options:[
+'She said that she would call the police.',
+'She call police.',
+'Police call she.',
+'She says police.'
+]
+},
+
+{
+statement:'"I have never seen that person before."',
+witness:'👨 Witness',
+correct:'He said that he had never seen that person before.',
+options:[
+'He said that he had never seen that person before.',
+'He never person.',
+'He sees person before.',
+'That person seen.'
+]
+},
+
+{
+statement:'"The museum was very crowded."',
+witness:'👩 Witness',
+correct:'She said that the museum had been very crowded.',
+options:[
+'She said that the museum had been very crowded.',
+'Museum crowded.',
+'Museum is crowded.',
+'She crowd museum.'
+]
+},
+
+{
+statement:'"I was walking near the entrance."',
+witness:'👨 Witness',
+correct:'He said that he had been walking near the entrance.',
+options:[
+'He said that he had been walking near the entrance.',
+'Entrance walked.',
+'He walking entrance.',
+'He walks near.'
+]
+},
+
+{
+statement:'"I can identify the suspect."',
+witness:'👩 Witness',
+correct:'She said that she could identify the suspect.',
+options:[
+'She said that she could identify the suspect.',
+'She identify suspect.',
+'Suspect identify.',
+'She can suspect.'
+]
+},
+
+{
+statement:'"The alarm went off suddenly."',
+witness:'👨 Witness',
+correct:'He said that the alarm had gone off suddenly.',
+options:[
+'He said that the alarm had gone off suddenly.',
+'Alarm off suspect.',
+'Alarm suddenly.',
+'Alarm go off.'
+]
+},
+
+{
+statement:'"I left the museum at 3 p.m."',
+witness:'👩 Witness',
+correct:'She said that she had left the museum at 3 p.m.',
+options:[
+'She said that she had left the museum at 3 p.m.',
+'Museum left.',
+'She leave museum.',
+'3pm museum.'
+]
+},
+
+{
+statement:'"I know where the suspect went."',
+witness:'👨 Witness',
+correct:'He said that he knew where the suspect had gone.',
+options:[
+'He said that he knew where the suspect had gone.',
+'He know suspect.',
+'Suspect gone.',
+'Went suspect.'
+]
+},
+
+{
+statement:'"The suspect looked nervous."',
+witness:'👩 Witness',
+correct:'She said that the suspect had looked nervous.',
+options:[
+'She said that the suspect had looked nervous.',
+'Suspect nervous.',
+'Suspect look.',
+'Nervous suspect.'
+]
+},
+
+{
+statement:'"I heard someone shouting."',
+witness:'👨 Witness',
+correct:'He said that he had heard someone shouting.',
+options:[
+'He said that he had heard someone shouting.',
+'Someone shout.',
+'He hear shouting.',
+'Shouting heard.'
+]
+},
+
+{
+statement:'"I am sure it was the same person."',
+witness:'👩 Witness',
+correct:'She said that she was sure it had been the same person.',
+options:[
+'She said that she was sure it had been the same person.',
+'Same person.',
+'Sure person.',
+'Person same.'
+]
+},
+
+{
+statement:'"The security guard helped everyone."',
+witness:'👨 Witness',
+correct:'He said that the security guard had helped everyone.',
+options:[
+'He said that the security guard had helped everyone.',
+'Guard helped.',
+'Everyone guard.',
+'Security everyone.'
+]
+},
+
+{
+statement:'"I was standing near the gift shop."',
+witness:'👩 Witness',
+correct:'She said that she had been standing near the gift shop.',
+options:[
+'She said that she had been standing near the gift shop.',
+'Gift shop standing.',
+'Standing shop.',
+'She stand shop.'
+]
+}
+
+];
+
+// =========================
+// GAME VARIABLES
+// =========================
+
+let gameQuestions = [];
+let currentQuestion = 0;
+let score = 0;
+let clues = 0;
+
+// =========================
+// UTILITY FUNCTIONS
+// =========================
+
+function shuffle(array){
+
+return [...array].sort(()=>Math.random()-0.5);
+
+}
+
+function setVolume(){
+
+const volume =
+document.getElementById("volume").value;
+
+document.getElementById("correctSound").volume = volume;
+document.getElementById("wrongSound").volume = volume;
+document.getElementById("clapSound").volume = volume;
+
+}
+
+function buildClueBoard(){
+
+const board =
+document.getElementById("clueBoard");
+
+board.innerHTML = "";
+
+for(let i=0;i<10;i++){
+
+const span =
+document.createElement("span");
+
+span.textContent =
+i < clues ? "🔎" : "⬜";
+
+board.appendChild(span);
+
+}
+
+}
+
+// =========================
+// LOAD QUESTION
+// =========================
+
+function loadQuestion(){
+
+if(currentQuestion >= 10){
+
+finishGame();
+return;
+
+}
+
+const q =
+gameQuestions[currentQuestion];
+
+document.getElementById("witnessNumber").textContent =
+q.witness + " #" + (currentQuestion+1);
+
+document.getElementById("statement").textContent =
+q.statement;
+
+const optionsDiv =
+document.getElementById("options");
+
+optionsDiv.innerHTML = "";
+
+const shuffledOptions =
+shuffle(q.options);
+
+shuffledOptions.forEach(option=>{
+
+const btn =
+document.createElement("button");
+
+btn.className =
+"optionBtn";
+
+btn.textContent =
+option;
+
+btn.onclick = ()=>{
+
+checkAnswer(
+option === q.correct
+);
+
+};
+
+optionsDiv.appendChild(btn);
+
+});
+
+}
+// =========================
+// CHECK ANSWER
+// =========================
+
+function checkAnswer(isCorrect){
+
+setVolume();
+
+const feedback =
+document.getElementById("feedback");
+
+feedback.style.display = "block";
+
+if(isCorrect){
+
+document.getElementById("correctSound").play();
+
+score += 10;
+clues++;
+
+feedback.innerHTML =
+"🔎 CLUE FOUND! +10 Points";
+
+feedback.style.color = "green";
+
+}else{
+
+document.getElementById("wrongSound").play();
+
+feedback.innerHTML =
+"❌ No useful clue found.";
+
+feedback.style.color = "red";
+
+}
+
+document.getElementById("score").textContent =
+score;
+
+document.getElementById("clueCount").textContent =
+clues;
+
+buildClueBoard();
+
+const progress =
+((currentQuestion + 1) / 10) * 100;
+
+document.getElementById("progressFill").style.width =
+progress + "%";
+
+currentQuestion++;
+
+setTimeout(()=>{
+
+feedback.style.display = "none";
+
+loadQuestion();
+
+},1500);
+
+}
+
+// =========================
+// START GAME
+// =========================
+
+function startGame(){
+
+document.getElementById("briefing").style.display =
+"none";
+
+document.getElementById("game").style.display =
+"block";
+
+score = 0;
+clues = 0;
+currentQuestion = 0;
+
+document.getElementById("score").textContent = 0;
+document.getElementById("clueCount").textContent = 0;
+
+document.getElementById("progressFill").style.width =
+"0%";
+
+buildClueBoard();
+
+gameQuestions =
+shuffle(questionBank).slice(0,10);
+
+loadQuestion();
+
+}
+
+// =========================
+// FINISH GAME
+// =========================
+
+function finishGame(){
+
+document.getElementById("game").style.display =
+"none";
+
+document.getElementById("endScreen").style.display =
+"flex";
+
+document.getElementById("clapSound").play();
+
+let message = "";
+
+if(score >= 90){
+
+message =
+"🏆 Master Detective!";
+
+}else if(score >= 70){
+
+message =
+"⭐ Excellent Investigation!";
+
+}else if(score >= 50){
+
+message =
+"👍 Good Detective Work!";
+
+}else{
+
+message =
+"🔍 Keep Practicing Detective Skills!";
+
+}
+
+document.getElementById("finalScore").innerHTML =
+
+`
+<p><strong>Final Score:</strong> ${score}/100</p>
+<p><strong>Clues Found:</strong> ${clues}/10</p>
+<p>${message}</p>
+`;
+
+}
+
+// =========================
+// RESTART GAME
+// =========================
+
+document.getElementById("restartBtn")
+.addEventListener("click",()=>{
+
+document.getElementById("endScreen").style.display =
+"none";
+
+startGame();
+
+});
+
+// =========================
+// START BUTTON
+// =========================
+
+document.getElementById("startBtn")
+.addEventListener("click",()=>{
+
+startGame();
+
+});
+
+// =========================
+// SPLASH SCREEN
+// =========================
+
+setTimeout(()=>{
+
+document.getElementById("splash").style.display =
+"none";
+
+document.getElementById("briefing").style.display =
+"flex";
+
+},5000);
+
+// =========================
+// INITIALIZE
+// =========================
+
+buildClueBoard();
+
+</script>
+
+</body>
+</html>
