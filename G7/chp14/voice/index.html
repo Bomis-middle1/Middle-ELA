@@ -1,1 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Active & Passive Voice Memory Match</title>
 
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
+body{
+background:linear-gradient(to bottom,#87CEEB,#FFE082);
+min-height:100vh;
+overflow-x:hidden;
+}
+
+#splash{
+position:fixed;
+inset:0;
+background:white;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+z-index:9999;
+}
+
+#splash img{
+width:220px;
+max-width:80%;
+}
+
+#game{
+display:none;
+padding:15px;
+text-align:center;
+}
+
+h1{
+color:#0d47a1;
+margin-bottom:10px;
+}
+
+.topbar{
+display:flex;
+justify-content:center;
+gap:15px;
+flex-wrap:wrap;
+margin-bottom:15px;
+font-weight:bold;
+}
+
+#board{
+display:grid;
+grid-template-columns:repeat(4,1fr);
+gap:10px;
+max-width:500px;
+margin:auto;
+}
+
+.card{
+aspect-ratio:1;
+background:#1565c0;
+border-radius:12px;
+display:flex;
+justify-content:center;
+align-items:center;
+font-size:34px;
+cursor:pointer;
+color:white;
+user-select:none;
+transition:.3s;
+}
+
+.card.open{
+background:white;
+color:black;
+}
+
+.card.matched{
+background:#81c784;
+color:black;
+}
+
+#questionModal{
+position:fixed;
+inset:0;
+background:rgba(0,0,0,.7);
+display:none;
+justify-content:center;
+align-items:center;
+padding:20px;
+}
+
+.questionBox{
+background:white;
+padding:20px;
+border-radius:12px;
+max-width:600px;
+width:100%;
+}
+
+.option{
+display:block;
+width:100%;
+padding:12px;
+margin-top:10px;
+border:none;
+background:#e3f2fd;
+cursor:pointer;
+border-radius:8px;
+font-size:16px;
+}
+
+.option:hover{
+background:#bbdefb;
+}
+
+#endScreen{
+display:none;
+position:fixed;
+inset:0;
+background:rgba(0,0,0,.85);
+color:white;
+justify-content:center;
+align-items:center;
+flex-direction:column;
+text-align:center;
+}
+
+#restartBtn{
+padding:12px 20px;
+font-size:18px;
+border:none;
+border-radius:10px;
+cursor:pointer;
+margin-top:20px;
+}
+
+@media(max-width:600px){
+#board{
+grid-template-columns:repeat(3,1fr);
+}
+}
+</style>
+</head>
+<body>
+
+<div id="splash">
+<img src="assets/innovine-logo.png">
+<h2>Memory Match Adventure</h2>
+<p>Active & Passive Voice</p>
+</div>
+
+<div id="game">
+
+<h1>🏴‍☠️ Memory Match Adventure</h1>
+
+<div class="topbar">
+<div>Score: <span id="score">0</span></div>
+<div>Matches: <span id="matches">0</span>/6</div>
+
+<label>
+Volume
+<input type="range" id="volume" min="0" max="1" step="0.1" value="1">
+</label>
+</div>
+
+<div id="board"></div>
+
+</div>
+
+<div id="questionModal">
+<div class="questionBox">
+<h3 id="questionText"></h3>
+<div id="options"></div>
+</div>
+</div>
+
+<div id="endScreen">
+<h1>🏆 Treasure Found!</h1>
+<h2 id="finalScore"></h2>
+
+<button id="restartBtn" onclick="restartGame()">
+Play Again
+</button>
+</div>
+
+<audio id="correctSound" src="assets/correct.mp3"></audio>
+<audio id="wrongSound" src="assets/wrong.mp3"></audio>
+<audio id="clapSound" src="assets/clapping.mp3"></audio>
+
+<script>
+
+const icons=[
+"💎","💎",
+"🗝️","🗝️",
+"⚓","⚓",
+"🦜","🦜",
+"🗺️","🗺️",
+"💰","💰"
+];
+
+const questionBank=[
+
+{
+question:"Your friend says: 'I scored the winning goal!' This sentence is:",
+correct:"Active Voice",
+options:["Passive Voice","Active Voice","Question","Command"]
+},
+
+{
+question:"A newspaper headline says: 'The bridge was damaged during the storm.' Why use passive voice?",
+correct:"It focuses on the bridge",
+options:[
+"It focuses on the bridge",
+"It removes the verb",
+"It is shorter",
+"It is active voice"
+]
+},
+
+{
+question:"Which sounds stronger?",
+correct:"Maya won the trophy.",
+options:[
+"The trophy was won by Maya.",
+"Maya won the trophy.",
+"The trophy won Maya.",
+"Maya was won."
+]
+},
+
+{
+question:"Which sentence is Passive Voice?",
+correct:"The picture was painted by Sarah.",
+options:[
+"Sarah painted the picture.",
+"The picture was painted by Sarah.",
+"Sarah admired the picture.",
+"Sarah displayed the picture."
+]
+},
+
+{
+question:"Which sentence is Active Voice?",
+correct:"Our team won the match.",
+options:[
+"The match was won by our team.",
+"Our team won the match.",
+"The match has been won.",
+"The match was being won."
+]
+},
+
+{
+question:"The jewels were stolen. Why might this be used?",
+correct:"The thief is unknown",
+options:[
+"The thief is unknown",
+"It sounds active",
+"It removes action",
+"It is a question"
+]
+},
+
+{
+question:"Choose the Passive Voice sentence.",
+correct:"The lesson was explained by the teacher.",
+options:[
+"The teacher explained the lesson.",
+"The lesson was explained by the teacher.",
+"The lesson explains.",
+"The teacher explained."
+]
+},
+
+{
+question:"Which sentence focuses on the doer?",
+correct:"Rahul scored the goal!",
+options:[
+"The goal was scored by Rahul.",
+"Rahul scored the goal!",
+"The goal was celebrated.",
+"The goal scored Rahul."
+]
+}
+];
+
+let score=0;
+let matches=0;
+let firstCard=null;
+let lockBoard=false;
+let currentPair=[];
+
+function shuffle(arr){
+return [...arr].sort(()=>Math.random()-0.5);
+}
+
+let questions=shuffle(questionBank);
+
+const board=document.getElementById("board");
+
+function buildBoard(){
+
+board.innerHTML="";
+
+shuffle(icons).forEach(icon=>{
+
+const card=document.createElement("div");
+
+card.className="card";
+card.dataset.icon=icon;
+card.textContent="❓";
+
+card.addEventListener("click",()=>flipCard(card));
+
+board.appendChild(card);
+
+});
+}
+
+function flipCard(card){
+
+if(lockBoard) return;
+if(card.classList.contains("matched")) return;
+if(card===firstCard) return;
+
+card.classList.add("open");
+card.textContent=card.dataset.icon;
+
+if(!firstCard){
+firstCard=card;
+return;
+}
+
+if(firstCard.dataset.icon===card.dataset.icon){
+
+currentPair=[firstCard,card];
+
+lockBoard=true;
+
+showQuestion();
+
+}else{
+
+lockBoard=true;
+
+setTimeout(()=>{
+
+firstCard.classList.remove("open");
+card.classList.remove("open");
+
+firstCard.textContent="❓";
+card.textContent="❓";
+
+firstCard=null;
+lockBoard=false;
+
+},800);
+
+}
+
+}
+
+function showQuestion(){
+
+if(questions.length===0){
+questions=shuffle(questionBank);
+}
+
+const q=questions.pop();
+
+document.getElementById("questionText").textContent=q.question;
+
+const optionsDiv=document.getElementById("options");
+optionsDiv.innerHTML="";
+
+shuffle(q.options).forEach(opt=>{
+
+const btn=document.createElement("button");
+
+btn.className="option";
+btn.textContent=opt;
+
+btn.onclick=()=>checkAnswer(opt===q.correct);
+
+optionsDiv.appendChild(btn);
+
+});
+
+document.getElementById("questionModal").style.display="flex";
+
+}
+
+function setVolume(){
+
+const v=document.getElementById("volume").value;
+
+document.getElementById("correctSound").volume=v;
+document.getElementById("wrongSound").volume=v;
+document.getElementById("clapSound").volume=v;
+
+}
+
+function checkAnswer(correct){
+
+setVolume();
+
+document.getElementById("questionModal").style.display="none";
+
+if(correct){
+
+document.getElementById("correctSound").play();
+
+currentPair.forEach(c=>{
+c.classList.add("matched");
+});
+
+score+=10;
+matches++;
+
+}else{
+
+document.getElementById("wrongSound").play();
+
+currentPair.forEach(c=>{
+
+c.classList.remove("open");
+c.textContent="❓";
+
+});
+
+}
+
+document.getElementById("score").textContent=score;
+document.getElementById("matches").textContent=matches;
+
+firstCard=null;
+lockBoard=false;
+
+if(matches===6){
+
+document.getElementById("clapSound").play();
+
+document.getElementById("finalScore").textContent=
+"Final Score: "+score;
+
+document.getElementById("endScreen").style.display="flex";
+
+}
+
+}
+
+function restartGame(){
+
+score=0;
+matches=0;
+
+document.getElementById("score").textContent=0;
+document.getElementById("matches").textContent=0;
+
+questions=shuffle(questionBank);
+
+document.getElementById("endScreen").style.display="none";
+
+firstCard=null;
+lockBoard=false;
+
+buildBoard();
+
+}
+
+setTimeout(()=>{
+
+document.getElementById("splash").style.display="none";
+document.getElementById("game").style.display="block";
+
+buildBoard();
+
+},5000);
+
+</script>
+
+</body>
+</html>
