@@ -2,19 +2,17 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Idioms Pictionary</title>
+<title>Idioms Pictionary - Teacher Scoring</title>
 
 <style>
 body {
   margin: 0;
   font-family: 'Courier New', monospace;
+  height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
 
-  /* Glow background */
   background: radial-gradient(circle at top left, #ff9a9e, #fad0c4, #fbc2eb, #a18cd1);
   background-size: 400% 400%;
   animation: glowBG 10s ease infinite;
@@ -27,24 +25,21 @@ body {
   100% {background-position:0% 50%;}
 }
 
-/* Splash */
+/* SPLASH */
 #splash {
   position: fixed;
-  width: 100%;
-  height: 100%;
+  inset: 0;
   background: white;
   display: flex;
   justify-content: center;
   align-items: center;
-  flex-direction: column;
   z-index: 9999;
 }
 
-/* Instructions */
+/* INSTRUCTIONS */
 #instructions {
   position: fixed;
-  width: 100%;
-  height: 100%;
+  inset: 0;
   background: white;
   display: none;
   justify-content: center;
@@ -53,38 +48,63 @@ body {
   z-index: 9998;
 }
 
-/* Game */
+/* GAME */
 #game {
   display: none;
-  width: 700px;
-  max-width: 90%;
+  width: 750px;
   text-align: center;
 }
 
 .blackboard {
-  width: 100%;
   height: 300px;
   background: rgba(0,0,0,0.7);
   border-radius: 20px;
   display: flex;
   justify-content: center;
   align-items: center;
+  margin-bottom: 20px;
 }
 
-.chalk-text {
+#idiom {
   color: white;
-  font-size: 2.5rem;
-  text-shadow: 0 0 10px #fff;
+  font-size: 2.3rem;
+}
+
+/* TIMER + SCORE */
+#timer, #score {
+  color: white;
+  font-size: 1.2rem;
+  margin: 5px;
+}
+
+/* TEACHER PANEL */
+#teacherPanel {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: rgba(255,255,255,0.95);
+  padding: 15px;
+  text-align: center;
+  box-shadow: 0 -5px 15px rgba(0,0,0,0.2);
+}
+
+#teacherPanel input {
+  width: 80px;
+  padding: 8px;
+  font-size: 16px;
+  text-align: center;
 }
 
 button {
-  padding: 12px 20px;
+  padding: 10px 15px;
+  margin-left: 10px;
   border: none;
-  border-radius: 10px;
+  border-radius: 8px;
   cursor: pointer;
   background: #ff4081;
   color: white;
-  font-size: 16px;
 }
 </style>
 </head>
@@ -98,54 +118,60 @@ button {
 
 <!-- INSTRUCTIONS -->
 <div id="instructions">
-  <img src="assets/logo.png" width="160">
-  <h1>Idioms Pictionary</h1>
-  <p>Draw the idioms in your notebook!</p>
+  <img src="assets/logo.png" width="150">
+  <h2>Idioms Pictionary</h2>
+  <p>Draw the idiom and teacher will score it!</p>
   <button onclick="startGame()">Start Game</button>
 </div>
 
 <!-- GAME -->
 <div id="game">
-  <h2 id="score">Idioms Completed: 0 / 7</h2>
-  <h3 id="timer">Time Left: 60s</h3>
+  <div id="score">Idioms: 0 / 7</div>
+  <div id="timer">Time Left: 60s</div>
 
   <div class="blackboard">
-    <div id="idiom" class="chalk-text"></div>
+    <div id="idiom"></div>
   </div>
 </div>
 
+<!-- TEACHER PANEL -->
+<div id="teacherPanel">
+  Score ( /10 ):
+  <input type="number" id="scoreInput" min="0" max="10">
+  <button onclick="nextIdiom()">Next</button>
+</div>
+
 <!-- AUDIO -->
-<audio id="correctSound" src="assets/correct.mp3"></audio>
-<audio id="applause" src="assets/freesound_community-claps-44774.mp3"></audio>
+<audio id="clap" src="assets/freesound_community-claps-44774.mp3"></audio>
 
 <script>
 
 const idioms = [
-  "Break the ice",
-  "Hit the hay",
-  "Spill the beans",
-  "Piece of cake",
-  "Let the cat out of the bag",
-  "Bite the bullet",
-  "Under the weather"
+"Break the ice",
+"Hit the hay",
+"Spill the beans",
+"Piece of cake",
+"Let the cat out of the bag",
+"Bite the bullet",
+"Under the weather"
 ];
 
 let current = 0;
 let timer = 60;
 let interval;
 let gameStarted = false;
+let totalScores = [];
 
 const idiomEl = document.getElementById("idiom");
-const scoreEl = document.getElementById("score");
 const timerEl = document.getElementById("timer");
+const scoreEl = document.getElementById("score");
+const teacherPanel = document.getElementById("teacherPanel");
+const clap = document.getElementById("clap");
 
-const correctSound = document.getElementById("correctSound");
-const applause = document.getElementById("applause");
-
-/* SAFE START (ONLY ONE ENTRY POINT) */
+/* FIXED START (NO SPLASH REPEAT EVER) */
 function startGame(){
 
-  if(gameStarted) return;   // 🔒 prevents re-trigger bug
+  if(gameStarted) return;
   gameStarted = true;
 
   document.getElementById("splash").style.display = "none";
@@ -162,7 +188,7 @@ function showIdiom(){
   idiomEl.textContent = idioms[current];
 }
 
-/* TIMER */
+/* TIMER RESET EVERY ROUND */
 function startTimer(){
   clearInterval(interval);
   timer = 60;
@@ -172,29 +198,50 @@ function startTimer(){
     timerEl.textContent = `Time Left: ${timer}s`;
 
     if(timer <= 0){
-      nextIdiom();
+      openTeacherPanel();
     }
   },1000);
 }
 
-/* NEXT */
+/* TEACHER PANEL */
+function openTeacherPanel(){
+  clearInterval(interval);
+  document.getElementById("scoreInput").value = "";
+  teacherPanel.style.display = "block";
+}
+
+/* NEXT IDIOM AFTER TEACHER SCORE */
 function nextIdiom(){
-  correctSound.play();
+
+  let score = Number(document.getElementById("scoreInput").value || 0);
+  totalScores.push(score);
+
+  teacherPanel.style.display = "none";
+
   current++;
 
-  scoreEl.textContent = `Idioms Completed: ${current} / ${idioms.length}`;
+  scoreEl.textContent = `Idioms: ${current} / ${idioms.length}`;
 
   if(current >= idioms.length){
-    clearInterval(interval);
-    applause.play();
-    idiomEl.textContent = "Game Completed! Great Job!";
+    clap.play();
+    idiomEl.textContent = "Game Completed 🎉";
     timerEl.textContent = "";
+
+    console.log("Total Scores:", totalScores);
     return;
   }
 
   showIdiom();
   startTimer();
 }
+
+/* SPLASH FLOW (SAFE ONCE ONLY) */
+window.onload = () => {
+  setTimeout(() => {
+    document.getElementById("splash").style.display = "none";
+    document.getElementById("instructions").style.display = "flex";
+  }, 5000);
+};
 
 </script>
 
