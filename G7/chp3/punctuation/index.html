@@ -2,15 +2,12 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Punctuation Pop - Audio Fixed</title>
+<title>Punctuation Pop FIXED</title>
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Arial;}
 
-body{
-overflow:hidden;
-background:linear-gradient(#b3e5ff,#e6f7ff);
-}
+body{overflow:hidden;background:#dff6ff;}
 
 /* LOGO */
 #logoScreen{
@@ -62,7 +59,6 @@ width:100%;
 height:100vh;
 position:relative;
 overflow:hidden;
-background:linear-gradient(to top,#9be2ff,#ffffff);
 }
 
 #score{
@@ -72,16 +68,19 @@ left:15px;
 font-size:22px;
 font-weight:bold;
 color:#0d47a1;
+z-index:10;
 }
 
+/* IMPORTANT FIX */
 #question{
 position:absolute;
 top:90px;
 width:100%;
 text-align:center;
-font-size:30px;
+font-size:32px;
 font-weight:bold;
 color:#0d47a1;
+z-index:10;
 }
 
 /* BALLOON */
@@ -98,12 +97,13 @@ font-weight:bold;
 color:white;
 cursor:pointer;
 animation:floatUp 9s linear forwards;
+z-index:5;
 }
 
 @keyframes floatUp{
 0%{transform:translateY(100vh);}
-50%{transform:translateY(40vh) translateX(20px);}
-100%{transform:translateY(-120vh) translateX(-10px);}
+50%{transform:translateY(40vh);}
+100%{transform:translateY(-120vh);}
 }
 
 .red{background:#ff5252;}
@@ -139,12 +139,9 @@ animation:floatUp 9s linear forwards;
 <div id="question">Loading...</div>
 </div>
 
-<!-- 🎵 AUDIO FIXED -->
-<audio id="correctSound" src="G7/chp3/punctuation/assets/correct.mp3"></audio>
-<audio id="wrongSound" src="G7/chp3/punctuation/assets/wrong.mp3"></audio>
-<audio id="clapSound" src="G7/chp3/punctuation/assets/clapping.mp3"></audio>
-
 <script>
+
+document.addEventListener("DOMContentLoaded", () => {
 
 /* FLOW */
 setTimeout(()=>{
@@ -157,76 +154,80 @@ document.getElementById("titleScreen").style.display="none";
 document.getElementById("startScreen").style.display="flex";
 },8000);
 
-/* GAME STATE */
-let index=0;
-let score=0;
-let currentAnswer="";
-let gameStarted=false;
+/* SAFE ELEMENT REFERENCES */
+const game = document.getElementById("game");
+const questionBox = document.getElementById("question");
+const scoreBox = document.getElementById("score");
 
-/* QUESTIONS */
-const questions=[
-{q:"I can’t believe it ___",answer:"!"},
-{q:"Where are you going ___",answer:"?"},
-{q:"Wow that is amazing ___",answer:"!"},
-{q:"John is coming ___",answer:"."},
-{q:"Are you ready ___",answer:"?"},
-{q:"Please sit down ___ said teacher",answer:":"},
-{q:"I love ice cream ___",answer:"!"},
-{q:"She asked where is the book ___",answer:"?"},
-{q:"Stop right there ___",answer:"!"},
-{q:"The sun is bright ___",answer:"."}
+/* GAME STATE */
+let index = 0;
+let score = 0;
+let currentAnswer = "";
+let gameStarted = false;
+
+/* QUESTIONS (10 FIXED) */
+const questions = [
+{q:"I can’t believe it ___", answer:"!"},
+{q:"Where are you going ___", answer:"?"},
+{q:"Wow that is amazing ___", answer:"!"},
+{q:"John is coming ___", answer:"."},
+{q:"Are you ready ___", answer:"?"},
+{q:"Please sit down ___", answer:":"},
+{q:"I love ice cream ___", answer:"!"},
+{q:"She asked where is the book ___", answer:"?"},
+{q:"Stop right there ___", answer:"!"},
+{q:"The sun is bright ___", answer:"."}
 ];
 
 /* START */
-document.getElementById("startBtn").onclick=()=>{
+document.getElementById("startBtn").onclick = () => {
 document.getElementById("startScreen").style.display="none";
-document.getElementById("game").style.display="block";
+game.style.display="block";
 
-gameStarted=true;
-index=0;
-score=0;
+gameStarted = true;
+index = 0;
+score = 0;
 
 loadQuestion();
-spawnLoop();
+setInterval(spawnBalloon, 1800);
 };
 
-/* LOAD QUESTION */
+/* LOAD QUESTION (SAFE) */
 function loadQuestion(){
 
-if(index>=questions.length){
-document.getElementById("question").innerText="🎉 Game Over! Score: "+score;
-document.getElementById("clapSound").play();
+if(!questionBox) return;
+
+if(index >= questions.length){
+questionBox.innerText = "🎉 Game Over! Score: " + score;
 return;
 }
 
-currentAnswer=questions[index].answer;
-document.getElementById("question").innerText=questions[index].q;
+currentAnswer = questions[index].answer;
+questionBox.innerText = questions[index].q;
+scoreBox.innerText = "Score: " + score;
 }
 
-/* BALLOONS */
-const symbols=["!","?","."];
-const colors=["red","blue","green","yellow","purple"];
+/* BALLOON SYSTEM */
+const symbols = ["!","?","."];
+const colors = ["red","blue","green","yellow","purple"];
 
 function spawnBalloon(){
 
 if(!gameStarted) return;
 
-let symbol=symbols[Math.floor(Math.random()*symbols.length)];
+let symbol = symbols[Math.floor(Math.random()*symbols.length)];
 
-let b=document.createElement("div");
-b.className="balloon "+colors[Math.floor(Math.random()*colors.length)];
-b.innerText=symbol;
-b.style.left=Math.random()*90+"vw";
+let b = document.createElement("div");
+b.className = "balloon " + colors[Math.floor(Math.random()*colors.length)];
+b.innerText = symbol;
+b.style.left = Math.random()*90 + "vw";
 
-b.onclick=()=>{
+b.onclick = () => {
 
-if(symbol===currentAnswer){
-score+=10;
+if(symbol === currentAnswer){
+score += 10;
 index++;
 loadQuestion();
-document.getElementById("correctSound").play();
-}else{
-document.getElementById("wrongSound").play();
 }
 
 b.remove();
@@ -237,10 +238,7 @@ document.body.appendChild(b);
 setTimeout(()=>b.remove(),9000);
 }
 
-/* LOOP */
-function spawnLoop(){
-setInterval(spawnBalloon,1800);
-}
+}); // DOM READY END
 
 </script>
 
