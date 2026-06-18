@@ -8,11 +8,11 @@
 body {
   margin: 0;
   font-family: Arial, sans-serif;
-  background: linear-gradient(135deg, #e1bee7, #f8bbd0);
+  background: linear-gradient(135deg, #f3e5f5, #f8bbd0);
   overflow: hidden;
 }
 
-/* ================= SPLASH (PRODUCTION STANDARD) ================= */
+/* SPLASH */
 #splash {
   position: fixed;
   inset: 0;
@@ -22,25 +22,17 @@ body {
   align-items: center;
   flex-direction: column;
   z-index: 99999;
-  opacity: 1;
-  transition: opacity 0.8s ease;
-  pointer-events: all;
 }
 
 #splash img {
   width: 180px;
 }
 
-/* ================= GAME ================= */
+/* GAME */
 #game {
   display: none;
-  padding: 15px;
   text-align: center;
-}
-
-h2 {
-  margin: 10px;
-  color: #4a148c;
+  padding: 10px;
 }
 
 #score {
@@ -48,7 +40,7 @@ h2 {
   margin: 10px;
 }
 
-/* ITEMS */
+/* DRAG ITEMS */
 #items {
   display: flex;
   flex-wrap: wrap;
@@ -63,6 +55,7 @@ h2 {
   border-radius: 10px;
   cursor: grab;
   user-select: none;
+  max-width: 220px;
 }
 
 /* BUCKETS */
@@ -70,23 +63,23 @@ h2 {
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 15px;
 }
 
 .bucket {
   width: 200px;
   min-height: 150px;
   border: 3px dashed #444;
-  border-radius: 10px;
+  border-radius: 12px;
   padding: 10px;
-  background: rgba(255,255,255,0.4);
+  background: rgba(255,255,255,0.5);
 }
 
 .bucket h3 {
   margin: 5px;
 }
 
-/* END SCREEN */
+/* END */
 #endScreen {
   display: none;
   position: fixed;
@@ -103,12 +96,12 @@ h2 {
 
 <body>
 
-<!-- ================= SPLASH ================= -->
+<!-- SPLASH -->
 <div id="splash">
   <img src="assets/logo.png">
 </div>
 
-<!-- ================= GAME ================= -->
+<!-- GAME -->
 <div id="game">
 
   <h2>Figures of Speech Sorting Lab</h2>
@@ -126,20 +119,18 @@ h2 {
   </div>
 </div>
 
-<!-- ================= END ================= -->
+<!-- END -->
 <div id="endScreen">
   <h1>Great Job 🎉</h1>
   <h2 id="finalScore"></h2>
 </div>
 
-<!-- ================= AUDIO ================= -->
 <audio id="correctSound" src="assets/correct.mp3"></audio>
 <audio id="wrongSound" src="assets/wrong.mp3"></audio>
 <audio id="clapSound" src="assets/freesound_community-claps-44774.mp3"></audio>
 
 <script>
 
-/* ================= DATA ================= */
 const questions = [
 { text:"He is as brave as a lion", type:"Simile" },
 { text:"Her smile is like sunshine", type:"Simile" },
@@ -151,8 +142,8 @@ const questions = [
 { text:"He ran faster than the wind", type:"Hyperbole" }
 ];
 
-let currentItems = [];
 let score = 0;
+let remaining = [...questions];
 
 const itemsDiv = document.getElementById("items");
 const scoreDiv = document.getElementById("score");
@@ -161,34 +152,21 @@ const correctSound = document.getElementById("correctSound");
 const wrongSound = document.getElementById("wrongSound");
 const clapSound = document.getElementById("clapSound");
 
-/* ================= SPLASH (PRODUCTION LOGIC) ================= */
+/* SPLASH (5 sec lock) */
 window.onload = () => {
   setTimeout(() => {
-    const splash = document.getElementById("splash");
-
-    splash.style.opacity = "0";
-
-    setTimeout(() => {
-      splash.style.display = "none";
-      startGame();
-    }, 800);
-
-  }, 5000); // EXACT 5 SECONDS LOCK
+    document.getElementById("splash").style.display = "none";
+    document.getElementById("game").style.display = "block";
+    loadItems();
+    enableDrop();
+  }, 5000);
 };
 
-/* ================= START GAME ================= */
-function startGame() {
-  document.getElementById("game").style.display = "block";
-  loadItems();
-  enableDrop();
-}
-
-/* ================= LOAD ITEMS ================= */
+/* LOAD ITEMS */
 function loadItems() {
   itemsDiv.innerHTML = "";
-  currentItems = [...questions];
 
-  currentItems.forEach(q => {
+  remaining.forEach(q => {
     let div = document.createElement("div");
     div.className = "item";
     div.draggable = true;
@@ -196,49 +174,56 @@ function loadItems() {
     div.dataset.type = q.type;
 
     div.ondragstart = (e) => {
-      e.dataTransfer.setData("text", JSON.stringify(q));
+      e.dataTransfer.setData("text/plain", JSON.stringify(q));
     };
 
     itemsDiv.appendChild(div);
   });
 }
 
-/* ================= DROP LOGIC ================= */
+/* DROP SYSTEM (TRUE CALM CHOICE STYLE) */
 function enableDrop() {
+
   document.querySelectorAll(".bucket").forEach(bucket => {
 
-    bucket.ondragover = (e) => e.preventDefault();
+    bucket.ondragover = (e) => {
+      e.preventDefault();
+    };
 
     bucket.ondrop = (e) => {
       e.preventDefault();
 
-      let data = JSON.parse(e.dataTransfer.getData("text"));
+      let data = JSON.parse(e.dataTransfer.getData("text/plain"));
 
       if (data.type === bucket.dataset.type) {
         correctSound.play();
         score += 10;
         scoreDiv.innerText = "Score: " + score;
+
+        remaining = remaining.filter(i => i.text !== data.text);
+
       } else {
         wrongSound.play();
       }
 
-      currentItems = currentItems.filter(i => i.text !== data.text);
       loadItems();
 
-      if (currentItems.length === 0) endGame();
+      if (remaining.length === 0) {
+        endGame();
+      }
     };
 
   });
 }
 
-/* ================= END ================= */
+/* END GAME */
 function endGame() {
   document.getElementById("game").style.display = "none";
   document.getElementById("endScreen").style.display = "flex";
 
   clapSound.play();
   document.getElementById("finalScore").innerText =
-    "Score: " + score;
+    "Score: " + score + " / " + questions.length * 10;
 }
 
 </script>
