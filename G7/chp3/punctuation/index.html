@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Punctuation Balloon Pop</title>
+<title>Punctuation Pop - Fixed Version</title>
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Arial;}
@@ -25,12 +25,6 @@ z-index:9999;
 
 #logoScreen img{
 width:220px;
-animation:pulse 1.5s infinite alternate;
-}
-
-@keyframes pulse{
-from{transform:scale(1);}
-to{transform:scale(1.08);}
 }
 
 /* ================= TITLE ================= */
@@ -41,7 +35,7 @@ display:none;
 justify-content:center;
 align-items:center;
 flex-direction:column;
-background:linear-gradient(135deg,#4fc3f7,#e1f5fe);
+background:linear-gradient(#4fc3f7,#e1f5fe);
 z-index:9998;
 text-align:center;
 }
@@ -50,12 +44,6 @@ text-align:center;
 font-size:50px;
 color:#0d47a1;
 animation:bounce 1.2s infinite;
-}
-
-#titleScreen p{
-font-size:22px;
-margin-top:10px;
-color:#1565c0;
 }
 
 @keyframes bounce{
@@ -95,6 +83,7 @@ overflow:hidden;
 background:linear-gradient(to top,#9be2ff,#ffffff);
 }
 
+/* SCORE */
 #score{
 position:absolute;
 top:15px;
@@ -104,21 +93,31 @@ font-weight:bold;
 color:#0d47a1;
 }
 
+/* QUESTION */
+#question{
+position:absolute;
+top:80px;
+width:100%;
+text-align:center;
+font-size:30px;
+font-weight:bold;
+color:#0d47a1;
+}
+
 /* ================= BALLOONS ================= */
 .balloon{
 position:absolute;
-width:45px;
-height:60px;
+width:48px;
+height:62px;
 border-radius:50% 50% 45% 45%;
 display:flex;
 justify-content:center;
 align-items:center;
-font-size:22px;
-font-weight:bold;
+font-size:24px;
 color:white;
 cursor:pointer;
-animation:floatUp 10s linear forwards;
-box-shadow:inset -5px -8px rgba(0,0,0,0.1);
+animation:floatUp 9s linear forwards;
+box-shadow:inset -4px -6px rgba(0,0,0,0.1);
 }
 
 .balloon::after{
@@ -132,8 +131,8 @@ background:#555;
 
 @keyframes floatUp{
 0%{transform:translateY(100vh);}
-50%{transform:translateY(40vh) translateX(25px);}
-100%{transform:translateY(-120vh) translateX(-15px);}
+50%{transform:translateY(40vh) translateX(20px);}
+100%{transform:translateY(-120vh) translateX(-10px);}
 }
 
 .red{background:#ff5252;}
@@ -141,12 +140,13 @@ background:#555;
 .green{background:#66bb6a;}
 .yellow{background:#ffca28;}
 .purple{background:#ab47bc;}
+
 </style>
 </head>
 
 <body>
 
-<!-- ================= LOGO (FIXED PATH) ================= -->
+<!-- ================= LOGO ================= -->
 <div id="logoScreen">
 <img src="G7/chp3/punctuation/assets/innovine-logo.png">
 </div>
@@ -165,12 +165,8 @@ background:#555;
 <!-- ================= GAME ================= -->
 <div id="game">
 <div id="score">Score: 0</div>
+<div id="question">Loading...</div>
 </div>
-
-<!-- ================= AUDIO (FIXED PATHS) ================= -->
-<audio id="correctSound" src="G7/chp3/punctuation/assets/correct.mp3"></audio>
-<audio id="wrongSound" src="G7/chp3/punctuation/assets/wrong.mp3"></audio>
-<audio id="clapSound" src="G7/chp3/punctuation/assets/clapping.mp3"></audio>
 
 <script>
 
@@ -186,9 +182,19 @@ document.getElementById("titleScreen").style.display="none";
 document.getElementById("startScreen").style.display="flex";
 },8000);
 
-/* ================= GAME STATE ================= */
+/* ================= GAME DATA ================= */
 
+const questions = [
+{q:"I can’t believe it ___", answer:"!"},
+{q:"Where is the library ___", answer:"?"},
+{q:"Wow that was amazing ___", answer:"!"},
+{q:"John is coming ___", answer:"."},
+{q:"Are you ready ___", answer:"?"}
+];
+
+let index = 0;
 let score = 0;
+let currentAnswer = "";
 let gameStarted = false;
 
 /* ================= START GAME ================= */
@@ -197,63 +203,61 @@ document.getElementById("startBtn").onclick = () => {
 document.getElementById("startScreen").style.display="none";
 document.getElementById("game").style.display="block";
 gameStarted = true;
+loadQuestion();
 spawnLoop();
 };
 
-/* ================= AUDIO FIX (unlock on click) ================= */
-document.body.addEventListener("click",()=>{
-document.getElementById("correctSound").play().catch(()=>{});
-document.getElementById("correctSound").pause();
-},{once:true});
+/* ================= LOAD QUESTION ================= */
 
-/* ================= BALLOON DATA ================= */
+function loadQuestion(){
 
-const symbols = [
-{symbol:"!", type:"correct"},
-{symbol:"?", type:"wrong"},
-{symbol:".", type:"wrong"}
-];
+if(index >= questions.length){
+document.getElementById("question").innerText = "🎉 Game Over!";
+return;
+}
 
-const colors = ["red","blue","green","yellow","purple"];
+currentAnswer = questions[index].answer;
+document.getElementById("question").innerText = questions[index].q;
+}
 
-/* ================= SPAWN ================= */
+/* ================= BALLOON SPAWN ================= */
 
 function spawnBalloon(){
 
 if(!gameStarted) return;
 
-const data = symbols[Math.floor(Math.random()*symbols.length)];
+const symbols = ["!", "?", "."];
+const colors = ["red","blue","green","yellow","purple"];
 
-const b = document.createElement("div");
-b.className = "balloon " + colors[Math.floor(Math.random()*colors.length)];
-b.textContent = data.symbol;
+let symbol = symbols[Math.floor(Math.random()*symbols.length)];
 
-b.style.left = Math.random()*90 + "vw";
+let balloon = document.createElement("div");
+balloon.className = "balloon " + colors[Math.floor(Math.random()*colors.length)];
+balloon.innerText = symbol;
+balloon.style.left = Math.random()*90 + "vw";
 
-b.onclick = () => {
+balloon.onclick = () => {
 
-if(data.type === "correct"){
+if(symbol === currentAnswer){
 score += 10;
+index++;
+loadQuestion();
 document.getElementById("score").innerText = "Score: " + score;
-document.getElementById("correctSound").play();
-b.remove();
-}else{
-document.getElementById("wrongSound").play();
-b.style.transform = "scale(0.7)";
-setTimeout(()=>b.remove(),200);
 }
+
+balloon.remove();
 
 };
 
-document.getElementById("game").appendChild(b);
+document.getElementById("game").appendChild(balloon);
 
-setTimeout(()=>b.remove(),10000);
+setTimeout(()=>balloon.remove(),9000);
 }
 
 /* ================= LOOP ================= */
 
 function spawnLoop(){
-setInterval(spawnBalloon,2000);
+setInterval(spawnBalloon,1800);
 }
 
 </script>
