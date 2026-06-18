@@ -3,248 +3,242 @@
 <head>
 <meta charset="UTF-8">
 <title>Homophones & Homographs Adventure</title>
+
 <style>
-  body {
-    margin: 0;
-    font-family: 'Arial', sans-serif;
-    background: linear-gradient(to bottom, #1a237e, #3f51b5);
-    color: #fff;
-    overflow: hidden;
-    position: relative;
-  }
-  #logoSplash {
-    position: fixed;
-    width: 50%;
-    top: 25%;
-    left: 25%;
-    z-index: 100;
-    display: none;
-  }
-  .container {
-    max-width: 800px;
-    margin: auto;
-    text-align: center;
-    padding-top: 50px;
-  }
-  h1 {
-    font-size: 2em;
-    margin-bottom: 15px;
-  }
-  .question {
-    font-size: 1.8em;
-    margin-bottom: 20px;
-  }
-  .options {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 15px;
-    margin-bottom: 20px;
-  }
-  .btn {
-    padding: 15px 25px;
-    font-size: 1.2em;
-    background-color: orange;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: 0.3s;
-    color: white;
-  }
-  .btn:hover {
-    transform: scale(1.1);
-  }
-  #potionContainer {
-    width: 50px;
-    height: 200px;
-    border: 3px solid #fff;
-    border-radius: 10px;
-    margin: auto;
-    position: relative;
-    background: #0003;
-  }
-  #potionFill {
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    height: 0;
-    background: linear-gradient(to top, #ff4081, #f06292);
-    border-radius: 10px 10px 0 0;
-    transition: height 0.5s;
-  }
-  #scoreBoard {
-    font-size: 1.2em;
-    margin-bottom: 10px;
-  }
-  #timer {
-    font-size: 1.2em;
-    margin-bottom: 30px;
-  }
-  .bubble {
-    position: absolute;
-    border-radius: 50%;
-    background: rgba(255, 235, 59, 0.5);
-    animation: float 8s linear infinite;
-  }
-  @keyframes float {
-    0% { transform: translateY(100vh) translateX(0) }
-    100% { transform: translateY(-50px) translateX(50px) }
-  }
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(to bottom, #1a237e, #3f51b5);
+  color: white;
+  overflow: hidden;
+}
+
+/* SPLASH SCREEN */
+#splash {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  background: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+#splash img {
+  width: 40%;
+}
+
+/* GAME UI */
+.container {
+  max-width: 800px;
+  margin: auto;
+  text-align: center;
+  padding-top: 40px;
+}
+
+h1 { font-size: 2em; }
+
+.question { font-size: 1.6em; margin: 20px; }
+
+.options {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.btn {
+  padding: 12px 20px;
+  background: orange;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-size: 1.1em;
+}
+
+/* SCORE SCREEN */
+#endScreen {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.9);
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  text-align: center;
+}
+
+#endScreen h2 {
+  font-size: 2.2em;
+}
+
+#restartBtn {
+  margin-top: 20px;
+  padding: 12px 25px;
+  font-size: 1.2em;
+  border: none;
+  background: #ff9800;
+  color: white;
+  border-radius: 10px;
+}
 </style>
 </head>
+
 <body>
-<img id="logoSplash" src="assets/logo.png">
+
+<!-- SPLASH -->
+<div id="splash">
+  <img src="assets/logo.png">
+</div>
+
+<!-- GAME -->
 <div class="container">
   <h1 id="levelTitle">Level 1 - Homophones</h1>
   <div id="scoreBoard">Score: 0</div>
   <div id="timer">Time Left: 20s</div>
+
   <div class="question" id="question"></div>
   <div class="options" id="options"></div>
-  <div id="potionContainer">
-    <div id="potionFill"></div>
-  </div>
+</div>
+
+<!-- END SCREEN -->
+<div id="endScreen">
+  <h2 id="finalScore"></h2>
+  <button id="restartBtn" onclick="location.reload()">Play Again</button>
 </div>
 
 <audio id="correctSound" src="assets/correct.mp3"></audio>
 <audio id="wrongSound" src="assets/wrong.mp3"></audio>
-<audio id="applause" src="assets/freesound_community-claps-44774.mp3"></audio>
 
 <script>
+
 const levels = [
-  {
-    title: "Level 1 - Homophones",
-    questions: [
-      {q:"The cake is too ___ to eat.", options:["sweet","suite"], answer:"sweet"},
-      {q:"I need to ___ my new shoes.", options:["buy","by"], answer:"buy"},
-      {q:"He went to the ___ to meet his friend.", options:["sea","see"], answer:"see"},
-      {q:"The wind will ___ the leaves away.", options:["blow","below"], answer:"blow"},
-      {q:"She used a ___ to tie her hair.", options:["band","banned"], answer:"band"},
-      {q:"I can't ___ what he said.", options:["hear","here"], answer:"hear"}
-    ]
-  },
-  {
-    title: "Level 2 - Homographs",
-    questions: [
-      {q:"I will ___ the book on the table.", options:["lead","lead"], answer:"lead"},
-      {q:"He used a ___ to paint the walls.", options:["bow","bow"], answer:"bow"},
-      {q:"I cannot ___ the problem.", options:["read","read"], answer:"read"},
-      {q:"The soldier took a ___ to the enemy.", options:["tear","tear"], answer:"tear"},
-      {q:"She decided to ___ the letter.", options:["wind","wind"], answer:"wind"},
-      {q:"The dove will ___ peacefully.", options:["lead","lead"], answer:"lead"}
-    ]
-  },
-  {
-    title: "Level 3 - Mixed",
-    questions: [
-      {q:"I will ___ the window before leaving.", options:["close","close"], answer:"close"},
-      {q:"I need to ___ my homework.", options:["do","due"], answer:"do"},
-      {q:"The ___ is shining bright.", options:["sun","son"], answer:"sun"},
-      {q:"The show will ___ at 7 PM.", options:["start","start"], answer:"start"},
-      {q:"They used a ___ to lift the box.", options:["lead","lead"], answer:"lead"}
-    ]
-  }
+{
+title: "Level 1 - Homophones",
+questions: [
+{q:"The cake is too ___ to eat.", options:["sweet","suite"], answer:"sweet"},
+{q:"I need to ___ my new shoes.", options:["buy","by"], answer:"buy"},
+{q:"He went to the ___ to meet his friend.", options:["sea","see"], answer:"see"},
+{q:"The wind will ___ the leaves away.", options:["blow","below"], answer:"blow"},
+{q:"She used a ___ to tie her hair.", options:["band","banned"], answer:"band"},
+{q:"I can't ___ what he said.", options:["hear","here"], answer:"hear"}
+]
+},
+{
+title: "Level 2 - Homographs",
+questions: [
+{q:"I will ___ the book on the table.", options:["lead","lead"], answer:"lead"},
+{q:"He used a ___ to paint the walls.", options:["bow","bowe"], answer:"bowe"},
+{q:"I cannot ___ the problem.", options:["read","reed"], answer:"read"},
+{q:"The soldier took a ___ to the enemy.", options:["tear","tear"], answer:"tear"},
+{q:"She decided to ___ the letter.", options:["wind","winde"], answer:"wind"},
+{q:"The dove will ___ peacefully.", options:["lead","lead"], answer:"lead"}
+]
+},
+{
+title: "Level 3 - Mixed",
+questions: [
+{q:"I will ___ the window before leaving.", options:["close","close"], answer:"close"},
+{q:"I need to ___ my homework.", options:["do","due"], answer:"do"},
+{q:"The ___ is shining bright.", options:["sun","son"], answer:"sun"},
+{q:"The show will ___ at 7 PM.", options:["start","start"], answer:"start"},
+{q:"They used a ___ to lift the box.", options:["lead","lead"], answer:"lead"}
+]
+}
 ];
 
 let currentLevel = 0;
 let currentQuestion = 0;
 let score = 0;
-let attempts = 0;
-let maxAttempts = 2;
-let timerInterval;
-const questionEl = document.getElementById('question');
-const optionsEl = document.getElementById('options');
-const levelTitle = document.getElementById('levelTitle');
-const scoreBoard = document.getElementById('scoreBoard');
-const timerEl = document.getElementById('timer');
-const potionFill = document.getElementById('potionFill');
-const correctSound = document.getElementById('correctSound');
-const wrongSound = document.getElementById('wrongSound');
-const applause = document.getElementById('applause');
+let timeLeft = 20;
+let timer;
 
-function startLevel() {
-  attempts = 0;
-  currentQuestion = 0;
-  levelTitle.textContent = levels[currentLevel].title;
-  showQuestion();
-}
+const qEl = document.getElementById("question");
+const optEl = document.getElementById("options");
+const scoreBoard = document.getElementById("scoreBoard");
+const levelTitle = document.getElementById("levelTitle");
+const timerEl = document.getElementById("timer");
 
-function showQuestion() {
-  if(currentQuestion >= levels[currentLevel].questions.length){
-    currentLevel++;
-    if(currentLevel >= levels.length){
-      alert("Congratulations! You completed all levels!");
-      location.reload();
-      return;
-    }
-    startLevel();
-    return;
-  }
+const correctSound = document.getElementById("correctSound");
+const wrongSound = document.getElementById("wrongSound");
+
+function loadQuestion() {
   let q = levels[currentLevel].questions[currentQuestion];
-  questionEl.textContent = q.q;
-  optionsEl.innerHTML = "";
-  q.options.forEach(opt=>{
+
+  if (!q) return endGame();
+
+  levelTitle.innerText = levels[currentLevel].title;
+  qEl.innerText = q.q;
+  optEl.innerHTML = "";
+
+  q.options.forEach(opt => {
     let btn = document.createElement("button");
-    btn.textContent = opt;
     btn.className = "btn";
-    btn.onclick = ()=>checkAnswer(opt);
-    optionsEl.appendChild(btn);
+    btn.innerText = opt;
+    btn.onclick = () => checkAnswer(opt);
+    optEl.appendChild(btn);
   });
+
   resetTimer();
 }
 
-function checkAnswer(opt){
+function checkAnswer(opt) {
   let q = levels[currentLevel].questions[currentQuestion];
-  if(opt === q.answer){
+
+  if (opt === q.answer) {
     correctSound.play();
     score += 20;
-    scoreBoard.textContent = `Score: ${score}`;
-    let fillHeight = ((currentQuestion+1)/levels[currentLevel].questions.length)*100;
-    potionFill.style.height = fillHeight+"%";
+    scoreBoard.innerText = "Score: " + score;
     currentQuestion++;
-    showQuestion();
+    loadQuestion();
   } else {
-    attempts++;
-    if(attempts >= maxAttempts){
-      alert("Too many wrong attempts! Game over!");
-      location.reload();
-      return;
-    } else {
-      wrongSound.play();
-      alert("Wrong! Try again.");
-    }
+    wrongSound.play();
+    alert("Wrong! Try again.");
   }
 }
 
-let timeLeft = 20;
-function resetTimer(){
-  clearInterval(timerInterval);
+function nextLevel() {
+  currentLevel++;
+  currentQuestion = 0;
+  if (currentLevel >= levels.length) return endGame();
+  loadQuestion();
+}
+
+function resetTimer() {
+  clearInterval(timer);
   timeLeft = 20;
-  timerEl.textContent = `Time Left: ${timeLeft}s`;
-  timerInterval = setInterval(()=>{
+
+  timer = setInterval(() => {
     timeLeft--;
-    timerEl.textContent = `Time Left: ${timeLeft}s`;
-    if(timeLeft <= 0){
-      clearInterval(timerInterval);
-      alert("Time's up!");
-      location.reload();
+    timerEl.innerText = "Time Left: " + timeLeft + "s";
+
+    if (timeLeft <= 0) {
+      clearInterval(timer);
+      endGame();
     }
-  },1000);
+  }, 1000);
 }
 
-// Floating bubbles
-for(let i=0;i<15;i++){
-  let bubble = document.createElement("div");
-  bubble.className="bubble";
-  let size = Math.random()*20+10;
-  bubble.style.width = bubble.style.height = size+"px";
-  bubble.style.left = Math.random()*100+"%";
-  document.body.appendChild(bubble);
+function endGame() {
+  clearInterval(timer);
+
+  document.querySelector(".container").style.display = "none";
+  document.getElementById("endScreen").style.display = "flex";
+
+  document.getElementById("finalScore").innerText =
+    "You scored " + score + " / " + (levels.flatMap(l => l.questions).length * 20);
 }
 
-// Splash Innovine logo
-let logo = document.getElementById('logoSplash');
-logo.style.display = 'block';
-setTimeout(()=>{logo.style.display = 'none'; startLevel();}, 3000);
+// SPLASH SCREEN
+setTimeout(() => {
+  document.getElementById("splash").style.display = "none";
+  loadQuestion();
+}, 3000);
+
 </script>
+
 </body>
 </html>
