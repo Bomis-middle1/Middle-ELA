@@ -123,18 +123,18 @@ opacity:0;
 
 <body>
 
-<!-- 🔵 LOGO SCREEN -->
+<!-- 🔵 LOGO -->
 <div id="logoScreen" class="screen active">
 <img src="assets/innovine-logo.png">
 </div>
 
-<!-- 🟡 TITLE SCREEN -->
+<!-- 🟡 TITLE -->
 <div id="titleScreen" class="screen">
 <div class="title">🚌 The Class Trip Adventure</div>
 <button onclick="startGame()">Start Game</button>
 </div>
 
-<!-- 🟢 GAME SCREEN -->
+<!-- 🟢 GAME -->
 <div id="gameScreen" class="screen">
 <div class="card">
 
@@ -150,7 +150,7 @@ opacity:0;
 </div>
 </div>
 
-<!-- 🏁 END SCREEN -->
+<!-- 🏁 END -->
 <div id="endScreen" class="screen">
 <div class="card">
 <h2>🎉 Trip Completed!</h2>
@@ -169,7 +169,7 @@ opacity:0;
 
 <script>
 
-/* ================= STRICT ORIGINAL STORY (UNCHANGED) ================= */
+/* ================= STORY (UNCHANGED STRICT) ================= */
 const levels = [
 {
 story:"It is Monday morning. Everyone is excited for the class trip. Ms. Anita checks the time.",
@@ -233,6 +233,7 @@ ans:"in"
 }
 ];
 
+/* RANDOMISE QUESTIONS */
 levels.sort(()=>Math.random()-0.5);
 
 let i=0;
@@ -250,6 +251,11 @@ function startGame(){
 document.getElementById("titleScreen").classList.remove("active");
 document.getElementById("gameScreen").classList.add("active");
 loadQ();
+}
+
+/* ================= SHUFFLE FUNCTION ================= */
+function shuffle(arr){
+return arr.sort(()=>Math.random()-0.5);
 }
 
 /* ================= LOAD QUESTION ================= */
@@ -273,7 +279,10 @@ box.innerHTML="";
 
 document.getElementById("feedback").innerText="";
 
-L.opts.forEach(o=>{
+/* 🔥 FIXED: RANDOM OPTIONS EVERY TIME */
+let shuffledOptions = shuffle([...L.opts]);
+
+shuffledOptions.forEach(o=>{
 let d=document.createElement("div");
 d.className="option";
 d.innerText=o;
