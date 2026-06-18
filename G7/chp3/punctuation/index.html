@@ -8,13 +8,11 @@
     :root{
       --bg-dark:#0f172a;
       --bg-mid:#1e293b;
-      --bg-light:#334155;
-      --accent:#60a5fa;
-      --accent-2:#a78bfa;
       --text:#f8fafc;
       --card-bg:#ffffff;
       --success:#22c55e;
       --error:#ef4444;
+      --accent:#60a5fa;
     }
 
     * { box-sizing: border-box; }
@@ -46,6 +44,7 @@
       opacity: 0.08;
       filter: blur(10px);
       animation: float 18s ease-in-out infinite;
+      z-index: 0;
     }
     body::before { top: 12%; left: 14%; }
     body::after  { bottom: 10%; right: 12%; animation-delay: -9s; }
@@ -56,12 +55,12 @@
     }
 
     #logoScreen, #instructionScreen, #gameContainer {
+      position:absolute;
       width:100%;
       max-width:620px;
       text-align:center;
       padding:24px;
-      position:absolute;
-      top:0; left:0;
+      left:0; right:0; margin:0 auto;
     }
 
     #logoScreen {
@@ -82,16 +81,8 @@
       z-index:99;
       padding:28px 24px;
     }
-
-    #instructionScreen h2 {
-      margin: 0 0 12px 0;
-      font-size: 28px;
-      letter-spacing: 0.2px;
-    }
-    #instructionScreen p {
-      margin: 8px 0;
-      font-size: 16px;
-    }
+    #instructionScreen h2 { margin: 0 0 12px 0; font-size: 28px; }
+    #instructionScreen p { margin: 8px 0; font-size: 16px; }
 
     #gameContainer {
       display:none;
@@ -106,29 +97,26 @@
       overflow: hidden;
     }
 
-    /* Top bar inside game to show progress */
     #gameHeader {
       display:flex;
       justify-content:space-between;
       align-items:center;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
       font-size: 14px;
       color: #6b7280;
     }
-    #gameHeader .progress {
-      font-weight: bold;
-      color: #374151;
-    }
+    #gameHeader .progress { font-weight: bold; color: #374151; }
 
     #sentence {
       font-size: 20px;
       font-weight:bold;
-      margin: 6px 0 10px;
+      margin: 4px 0 8px;
       line-height: 1.35;
+      min-height: 28px;
     }
 
     #feedback {
-      margin-top:8px;
+      margin-top:6px;
       font-weight:bold;
       height:24px;
       font-size: 16px;
@@ -153,7 +141,6 @@
       position:absolute;
       width:64px; height:84px;
       border-radius:50% 50% 50% 50% / 60% 60% 40% 40%;
-      /* Better contrast color */
       background: radial-gradient(circle at 30% 30%, #fde047 0%, #f59e0b 70%);
       display:flex;
       justify-content:center;
@@ -168,7 +155,6 @@
     }
     .balloon:hover { transform: translateY(-2px) scale(1.03); }
 
-    /* Balloon Knot */
     .balloon::after {
       content:'';
       position:absolute;
@@ -177,7 +163,6 @@
       background:#fde047;
       border-radius:50%;
     }
-    /* Balloon String */
     .balloon::before {
       content:'';
       position:absolute;
@@ -208,9 +193,8 @@
       100% { transform: translateY(420px) translateX(10px); opacity:0; }
     }
 
-    /* Responsive text tweaks */
     @media (max-width: 420px) {
-      #sentence { font-size: 18px; }
+      #sentence { font-size: 18px; min-height: 24px; }
       .balloon { width: 58px; height: 78px; font-size: 20px; }
     }
   </style>
@@ -275,18 +259,22 @@
       // Remove old balloons
       document.querySelectorAll(".balloon").forEach(b=>b.remove());
 
-      // Create floating balloons (randomized order)
+      // Ready dimensions for safe positioning
+      const containerWidth = container.clientWidth;
+      const containerHeight = container.clientHeight;
+      const balloonWidth = 64;
+      const padding = 20;
+
+      // Compute safe horizontal positions so balloons fit fully inside
+      const available = containerWidth - padding*2 - balloonWidth;
+      const step = available / q.options.length;
+
       q.options.sort(()=>Math.random()-0.5).forEach((opt,i)=>{
         const balloon = document.createElement("div");
-        balloon.className="balloon";
-        balloon.textContent=opt;
+        balloon.className = "balloon";
+        balloon.textContent = opt;
 
-        // Responsive horizontal spacing inside the container
-        const containerWidth = container.clientWidth;
-        const padding = 24;
-        const available = containerWidth - padding*2;
-        const step = available / q.options.length;
-        const leftPos = padding + step*(i+0.5) - 32; // -32 to center 64px balloon
+        const leftPos = padding + step*i + (step/2) - (balloonWidth/2);
 
         balloon.style.left = leftPos + "px";
         balloon.style.bottom = "0px";
@@ -298,11 +286,11 @@
 
     function floatBalloon(balloon){
       let pos = 0;
-      const speed = 1.2; // slightly smoother
+      const speed = 1.2;
       const interval = setInterval(()=>{
         pos += speed;
         balloon.style.bottom = pos + "px";
-        if(pos > container.offsetHeight) {
+        if(pos > container.clientHeight) {
           clearInterval(interval);
           balloon.remove();
         }
@@ -345,7 +333,7 @@
         const c = document.createElement("div");
         c.className="confetti-piece";
         c.style.left = Math.random()*container.clientWidth + "px";
-        c.style.bottom = container.offsetHeight + "px";
+        c.style.bottom = container.clientHeight + "px";
         c.style.background = `hsl(${Math.random()*360},100%,55%)`;
         container.appendChild(c);
         setTimeout(()=>c.remove(),1500);
