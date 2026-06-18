@@ -7,143 +7,149 @@
 
 <style>
 *{box-sizing:border-box;margin:0;padding:0;font-family:Arial,sans-serif;}
-body{overflow:hidden;background:linear-gradient(135deg,#1f1c5c,#342070,#ffb347);}
+body{overflow:hidden;background:linear-gradient(135deg,#1f1c5c,#342070,#ffb347);color:#fff;}
 
-/* SCREENS */
 .screen{
-  display:none;
-  width:100vw;
-  height:100vh;
-  align-items:center;
-  justify-content:center;
-  flex-direction:column;
+display:none;
+width:100vw;height:100vh;
+align-items:center;justify-content:center;
+flex-direction:column;
+text-align:center;
+padding:20px;
+position:relative;
 }
 .active{display:flex;}
 
-/* SPLASH */
-.logo{width:220px;max-width:60%;}
+.logo{width:60%;max-width:280px;animation:pulse 1.5s infinite alternate;}
+@keyframes pulse{from{transform:scale(1)}to{transform:scale(1.06)}}
 
-/* CARD */
 .card{
-  width:95%;
-  max-width:950px;
-  background:#ffffffee;
-  padding:20px;
-  border-radius:20px;
+width:95%;max-width:950px;
+background:#ffffffee;
+color:#2d2340;
+border-radius:25px;
+padding:20px;
+box-shadow:0 10px 25px #00000055;
 }
 
-/* TOPBAR */
-.topbar{
-  display:flex;
-  justify-content:space-between;
-  margin-bottom:10px;
-}
-.badge{
-  background:#eef2ff;
-  padding:8px 12px;
-  border-radius:12px;
-  font-weight:bold;
-}
+h1{font-size:38px;color:#5a189a;}
+h2{font-size:24px;color:#3c096c;}
+p{font-size:18px;line-height:1.4;}
 
-/* GAME AREA */
+button{
+border:none;border-radius:18px;
+padding:14px 25px;
+font-size:18px;
+font-weight:bold;
+background:#ffb703;
+cursor:pointer;
+box-shadow:0 5px 0 #d88900;
+}
+button:active{transform:translateY(3px);}
+
+.topbar{display:flex;justify-content:space-between;gap:8px;margin-bottom:10px;}
+.badge{background:#edf6f9;color:#2d2340;padding:8px 12px;border-radius:15px;font-weight:bold;}
+
+.progressOuter{width:100%;height:16px;background:#ddd;border-radius:20px;overflow:hidden;}
+.progressInner{height:100%;width:0%;background:linear-gradient(90deg,#80ed99,#38b000);}
+
 .gameArea{
-  position:relative;
-  width:100%;
-  height:250px;
-  background:linear-gradient(#87ceeb,#e0f7ff);
-  border-radius:16px;
-  overflow:hidden;
+position:relative;
+width:100%;
+height:260px;
+background:linear-gradient(180deg,#8ecae6,#219ebc);
+border-radius:20px;
+overflow:hidden;
 }
 
-.ground{
-  position:absolute;
-  bottom:0;
-  width:100%;
-  height:50px;
-  background:#2e7d32;
-}
+.ground{position:absolute;bottom:0;width:100%;height:50px;background:#023047;}
 
-/* PLAYER (ONLY VISUAL FIX KEPT) */
+/* 🏃 REAL RUNNER STYLE */
 .player{
-  position:absolute;
-  bottom:50px;
-  left:90%;
-  font-size:50px;
-  transition:left 0.6s,bottom 0.4s;
-  transform:scaleX(-1);
+position:absolute;
+bottom:50px;
+left:10%;
+font-size:52px;
+transform:scaleX(1);
+transition:transform 0.2s;
 }
 
-/* OPTIONS */
+/* running animation */
+.player.run{
+animation:runAnim 0.4s infinite alternate;
+}
+
+@keyframes runAnim{
+0%{transform:translateY(0) scaleX(1) rotate(0deg);}
+100%{transform:translateY(-3px) scaleX(1) rotate(-3deg);}
+}
+
+.questionBox{
+background:#fff4d6;
+border:3px dashed #ffb703;
+border-radius:18px;
+padding:12px;
+margin-top:10px;
+}
+
+.question{font-size:20px;font-weight:bold;}
+
 .options{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:10px;
-  margin-top:10px;
+display:grid;
+grid-template-columns:repeat(2,1fr);
+gap:10px;
+margin-top:10px;
 }
 
 .option{
-  background:#d8f3dc;
-  padding:12px;
-  border-radius:10px;
-  font-weight:bold;
-  cursor:pointer;
+background:#d8f3dc;
+border:3px solid #52b788;
+border-radius:12px;
+padding:12px;
+font-weight:bold;
+cursor:pointer;
 }
 
 .correct{background:#b7efc5!important;}
 .wrong{background:#ffccd5!important;}
 
-.question{
-  font-size:18px;
-  font-weight:bold;
-  margin:10px 0;
-}
+.feedback{min-height:25px;font-size:18px;font-weight:bold;margin-top:8px;}
 
-/* NEXT BUTTON (RESTORED FIX) */
-#nextBtn{
-  margin-top:10px;
-  padding:12px 16px;
-  border:none;
-  border-radius:10px;
-  background:#ffb703;
-  font-weight:bold;
-  cursor:pointer;
-  display:none;
-}
-
-button{
-  padding:12px 16px;
-  border:none;
-  border-radius:10px;
-  background:#ffb703;
-  font-weight:bold;
-}
-
+.trophy{font-size:80px;}
 </style>
 </head>
 
 <body>
 
+<audio id="correctSound" src="assets/correct.mp3"></audio>
+<audio id="wrongSound" src="assets/wrong.mp3"></audio>
+<audio id="clapSound" src="assets/freesound_community-claps-44774.mp3"></audio>
+
 <!-- SPLASH -->
 <div id="splash" class="screen active">
-  <img class="logo" src="assets/innovine-logo.png">
+  <img src="assets/innovine-logo.png" class="logo">
 </div>
 
 <!-- START -->
 <div id="startScreen" class="screen">
   <div class="card">
     <h1>Adverb Parkour Runner</h1>
+    <p>Run forward, choose correct adverbs and beat the track!</p>
     <button onclick="startGame()">Start</button>
   </div>
 </div>
 
 <!-- GAME -->
 <div id="gameScreen" class="screen">
-
   <div class="card">
-
     <div class="topbar">
       <div class="badge" id="levelText">Level 1</div>
       <div class="badge" id="scoreText">Score: 0</div>
+      <div class="badge" id="attemptText">Chances: 2</div>
+    </div>
+
+    <div class="progressOuter">
+      <div class="progressInner" id="progressBar"></div>
     </div>
 
     <div class="gameArea">
@@ -151,125 +157,137 @@ button{
       <div class="player" id="player">🏃</div>
     </div>
 
-    <div class="question" id="questionText"></div>
+    <div class="questionBox">
+      <div class="question" id="questionText"></div>
+    </div>
 
     <div class="options" id="optionsBox"></div>
+    <div class="feedback" id="feedback"></div>
 
-    <!-- ✅ RESTORED NEXT BUTTON -->
-    <button id="nextBtn" onclick="nextQuestion()">Next</button>
-
+    <button id="nextBtn" onclick="nextQuestion()" style="display:none;">Next</button>
   </div>
-
 </div>
 
 <!-- END -->
 <div id="endScreen" class="screen">
   <div class="card">
-    <h1>🏆 Completed!</h1>
+    <div class="trophy">🏆</div>
+    <h1>Completed!</h1>
     <p id="finalScore"></p>
-    <button onclick="location.reload()">Play Again</button>
+    <button onclick="restartGame()">Play Again</button>
   </div>
 </div>
 
 <script>
-
-/* ORIGINAL QUESTIONS (UNCHANGED) */
 const questions=[
- {q:"swiftly",options:["athlete","ran","swiftly","the"],answer:"swiftly"},
- {q:"tomorrow",options:["train","arrive","tomorrow","will"],answer:"tomorrow"},
- {q:"upstairs",options:["cat","hiding","upstairs","is"],answer:"upstairs"},
- {q:"always",options:["she","arrives","always","early"],answer:"always"},
- {q:"never",options:["never","sometimes","always","often"],answer:"never"}
+{q:"The athlete ran swiftly.",a:"swiftly",o:["athlete","ran","swiftly","the"]},
+{q:"The train arrives tomorrow.",a:"tomorrow",o:["train","arrives","tomorrow","will"]},
+{q:"The cat is upstairs.",a:"upstairs",o:["cat","is","upstairs","hiding"]},
+{q:"She always comes early.",a:"always",o:["she","always","comes","late"]},
+{q:"It is extremely hot.",a:"extremely",o:["it","hot","extremely","today"]}
 ];
 
-let current=0;
-let score=0;
+let i=0,score=0,chances=2,locked=false;
 
-/* START */
+setTimeout(()=>{
+document.getElementById("splash").classList.remove("active");
+document.getElementById("startScreen").classList.add("active");
+},2000);
+
 function startGame(){
-  document.getElementById("startScreen").classList.remove("active");
-  document.getElementById("gameScreen").classList.add("active");
-  loadQuestion();
+document.getElementById("startScreen").classList.remove("active");
+document.getElementById("gameScreen").classList.add("active");
+loadQ();
 }
 
-/* LOAD */
-function loadQuestion(){
+function loadQ(){
+locked=false;
+chances=2;
 
-  let q=questions[current];
+let q=questions[i];
 
-  document.getElementById("questionText").innerText =
-    "Choose the correct adverb";
+document.getElementById("questionText").innerText=q.q;
+document.getElementById("levelText").innerText="Level "+(i+1);
+document.getElementById("scoreText").innerText="Score "+score;
+document.getElementById("attemptText").innerText="Chances "+chances;
+document.getElementById("progressBar").style.width=(i/questions.length)*100+"%";
 
-  document.getElementById("scoreText").innerText =
-    "Score: "+score;
+let box=document.getElementById("optionsBox");
+box.innerHTML="";
 
-  let box=document.getElementById("optionsBox");
-  box.innerHTML="";
-
-  q.options.forEach(opt=>{
-    let d=document.createElement("div");
-    d.className="option";
-    d.innerText=opt;
-    d.onclick=()=>check(opt,d);
-    box.appendChild(d);
-  });
-
-  document.getElementById("nextBtn").style.display="none";
+q.o.forEach(opt=>{
+let d=document.createElement("div");
+d.className="option";
+d.innerText=opt;
+d.onclick=()=>check(opt,d);
+box.appendChild(d);
+});
 }
 
-/* CHECK */
-function check(val,el){
+function check(opt,el){
+if(locked)return;
 
-  let q=questions[current];
+let q=questions[i];
 
-  if(val===q.answer){
-    el.classList.add("correct");
-    score++;
-    movePlayer();
-  }else{
-    el.classList.add("wrong");
-  }
+if(opt===q.a){
+locked=true;
+score++;
+document.getElementById("feedback").innerText="Correct! RUN!";
+el.classList.add("correct");
 
-  document.getElementById("scoreText").innerText="Score: "+score;
+document.getElementById("correctSound").play();
 
-  document.getElementById("nextBtn").style.display="block";
+runForward();
+document.getElementById("nextBtn").style.display="inline-block";
+}
+else{
+chances--;
+el.classList.add("wrong");
+document.getElementById("wrongSound").play();
+
+document.getElementById("attemptText").innerText="Chances "+chances;
+
+if(chances<=0){
+locked=true;
+document.getElementById("feedback").innerText="Answer: "+q.a;
+document.getElementById("nextBtn").style.display="inline-block";
+}
+}
 }
 
-/* MOVE (ONLY FIX KEPT) */
-function movePlayer(){
+function runForward(){
+let p=document.getElementById("player");
 
-  let p=document.getElementById("player");
+p.classList.add("run");
 
-  p.style.bottom="120px";
-  setTimeout(()=>p.style.bottom="50px",300);
+let percent=10+(i/(questions.length-1))*80;
 
-  let step=80/(questions.length-1);
-  let pos=90-(current*step);
+/* smooth real runner movement */
+p.style.left=percent+"%";
 
-  p.style.left=pos+"%";
+/* stop run animation after burst */
+setTimeout(()=>p.classList.remove("run"),600);
 }
 
-/* NEXT */
 function nextQuestion(){
-  current++;
-
-  if(current>=questions.length){
-    endGame();
-    return;
-  }
-
-  loadQuestion();
+i++;
+if(i<questions.length){
+loadQ();
+}else{
+end();
+}
 }
 
-/* END */
-function endGame(){
-  document.getElementById("gameScreen").classList.remove("active");
-  document.getElementById("endScreen").classList.add("active");
-
-  document.getElementById("finalScore").innerText=
-    "Score: "+score+" / "+questions.length;
+function end(){
+document.getElementById("gameScreen").classList.remove("active");
+document.getElementById("endScreen").classList.add("active");
+document.getElementById("finalScore").innerText=score+" / "+questions.length;
+document.getElementById("clapSound").play();
 }
 
+function restartGame(){
+location.reload();
+}
 </script>
 
 </body>
