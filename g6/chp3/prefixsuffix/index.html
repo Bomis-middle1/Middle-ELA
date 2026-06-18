@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -19,6 +17,9 @@ body{
     overflow:hidden;
     font-family:Arial,sans-serif;
     background:#7ed957;
+    touch-action:none;
+    -webkit-user-select:none;
+    user-select:none;
 }
 
 #gameArea{
@@ -27,6 +28,7 @@ body{
     height:100vh;
     overflow:hidden;
     background:linear-gradient(to bottom,#87CEEB,#7ed957);
+    touch-action:manipulation;
 }
 
 /* LOGO SCREEN */
@@ -99,27 +101,12 @@ body{
     border-top:8px solid #2e7d32;
 }
 
-.vine{
+#cave{
     position:absolute;
-    width:10px;
-    background:#2e7d32;
-    top:0;
-    border-radius:10px;
-}
-
-#vine1{
-    left:20%;
-    height:220px;
-}
-
-#vine2{
-    left:50%;
-    height:260px;
-}
-
-#vine3{
-    left:80%;
-    height:220px;
+    right:40px;
+    bottom:120px;
+    font-size:80px;
+    z-index:40;
 }
 
 /* PLAYER */
@@ -135,7 +122,7 @@ body{
     justify-content:center;
     align-items:center;
     z-index:50;
-    transition:transform 0.1s;
+    transition:transform 0.1s, left 0.5s ease;
 }
 
 /* GEMS */
@@ -315,10 +302,20 @@ body{
         width:55px;
         height:55px;
         font-size:42px;
+        left:55px;
     }
 
     #scoreBoard{
         font-size:16px;
+    }
+
+    #cave{
+        right:18px;
+        font-size:62px;
+    }
+
+    #volumeBox{
+        font-size:14px;
     }
 }
 
@@ -339,11 +336,11 @@ body{
 <!-- START -->
 
 <div id="startScreen" style="display:none;">
-<h1>🌴 Jungle Vine Swing 🌴</h1>
+<h1>🌴 Jungle Gem Adventure 🌴</h1>
 
 <p style="margin-top:20px;font-size:20px;">
-Swing through the jungle, collect gems,
-and solve Prefix & Suffix adventures!
+Jump to collect 3 gems, answer a Prefix & Suffix challenge,
+and move closer to home!
 </p>
 
 <p style="margin-top:20px;">
@@ -368,11 +365,9 @@ Play Again
 </button>
 </div>
 
-<!-- VINES -->
+<!-- CAVE / HOME -->
 
-<div class="vine" id="vine1"></div>
-<div class="vine" id="vine2"></div>
-<div class="vine" id="vine3"></div>
+<div id="cave">🏠</div>
 
 <!-- GROUND -->
 
@@ -385,7 +380,7 @@ Play Again
 <!-- SCORE -->
 
 <div id="scoreBoard">
-Gems: <span id="gemCount">0</span> |
+Gems: <span id="gemCount">0/3</span> |
 Questions: <span id="questionCount">0</span>/10
 </div>
 
@@ -459,6 +454,25 @@ volumeSlider.addEventListener("input",updateVolumes);
 
 updateVolumes();
 
+function unlockSounds(){
+
+correctSound.play().then(()=>{
+    correctSound.pause();
+    correctSound.currentTime = 0;
+}).catch(()=>{});
+
+wrongSound.play().then(()=>{
+    wrongSound.pause();
+    wrongSound.currentTime = 0;
+}).catch(()=>{});
+
+clapSound.play().then(()=>{
+    clapSound.pause();
+    clapSound.currentTime = 0;
+}).catch(()=>{});
+
+}
+
 /* GAME VARIABLES */
 
 let gameRunning = false;
@@ -470,6 +484,7 @@ let gravity = 0.8;
 let playerY = 120;
 
 let gems = 0;
+let totalGems = 0;
 let currentQuestion = 0;
 
 /* QUESTIONS */
@@ -638,6 +653,8 @@ questions.sort(()=>Math.random()-0.5);
 
 function startGame(){
 
+unlockSounds();
+
 document.getElementById("startScreen").style.display="none";
 
 gameRunning = true;
@@ -653,9 +670,9 @@ requestAnimationFrame(gameLoop);
 
 function jump(){
 
-if(!jumping){
+if(!jumping && gameRunning){
 
-velocity = -18;
+velocity = -20;
 jumping = true;
 
 }
@@ -672,11 +689,18 @@ jump();
 
 });
 
-document.addEventListener("touchstart",()=>{
+document.addEventListener("touchstart",(e)=>{
 
-jump();
+if(
+    e.target.tagName !== "BUTTON" &&
+    e.target.id !== "volumeSlider" &&
+    questionBox.style.display !== "block"
+){
+    e.preventDefault();
+    jump();
+}
 
-});
+},{passive:false});
 
 /* GAME LOOP */
 
@@ -714,14 +738,20 @@ gem.classList.add("gem");
 
 gem.innerHTML = "💎";
 
-gem.style.left = "100%";
-gem.style.top = (180 + Math.random()*180) + "px";
+gem.style.left = window.innerWidth + "px";
+gem.style.bottom = (180 + Math.random()*80) + "px";
 
 document.getElementById("gameArea").appendChild(gem);
 
 let move = setInterval(()=>{
 
-let left = parseInt(gem.style.left);
+if(!gameRunning){
+    clearInterval(move);
+    gem.remove();
+    return;
+}
+
+let left = Number(gem.style.left.replace("px",""));
 
 left -= 3;
 
@@ -738,15 +768,18 @@ g.bottom > p.top
 ){
 
 gems++;
+totalGems++;
 
-gemCount.innerText = gems;
+gemCount.innerText = gems + "/3";
 
 gem.remove();
 
 clearInterval(move);
 
-if(gems % 3 === 0 && currentQuestion < 10){
+if(gems >= 3 && currentQuestion < 10){
 
+gems = 0;
+gemCount.innerText = "0/3";
 showQuestion();
 
 }
@@ -778,13 +811,19 @@ obstacle.classList.add("obstacle");
 
 obstacle.innerHTML = "🪵";
 
-obstacle.style.left = "100%";
+obstacle.style.left = window.innerWidth + "px";
 
 document.getElementById("gameArea").appendChild(obstacle);
 
 let move = setInterval(()=>{
 
-let left = parseInt(obstacle.style.left);
+if(!gameRunning){
+    clearInterval(move);
+    obstacle.remove();
+    return;
+}
+
+let left = Number(obstacle.style.left.replace("px",""));
 
 left -= 4;
 
@@ -802,7 +841,7 @@ o.bottom > p.top
 
 gems = Math.max(0,gems-1);
 
-gemCount.innerText = gems;
+gemCount.innerText = gems + "/3";
 
 obstacle.remove();
 
@@ -870,6 +909,9 @@ clapSound.play();
 
 createConfetti();
 
+let currentLeft = parseInt(player.style.left || window.getComputedStyle(player).left);
+player.style.left = Math.min(currentLeft + 35, window.innerWidth - 160) + "px";
+
 }else{
 
 feedback.innerHTML = "❌ Wrong!";
@@ -896,6 +938,9 @@ endGame();
 gameRunning = true;
 
 requestAnimationFrame(gameLoop);
+
+spawnGem();
+spawnObstacle();
 
 }
 
@@ -944,8 +989,8 @@ gameRunning = false;
 document.getElementById("endScreen").style.display = "flex";
 
 document.getElementById("finalMessage").innerHTML =
-"You collected <b>" + gems +
-"</b> jungle gems and completed all 10 Prefix & Suffix adventures!";
+"You collected <b>" + totalGems +
+"</b> jungle gems and reached home after completing all 10 Prefix & Suffix adventures!";
 
 }
 
