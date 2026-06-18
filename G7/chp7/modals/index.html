@@ -18,6 +18,7 @@ flex-direction:column;
 height:100vh;
 }
 
+/* SCREEN CONTROL */
 .screen{
 display:none;
 width:100%;
@@ -30,14 +31,12 @@ text-align:center;
 
 .active{display:flex;}
 
-h1{color:#ffd60a;}
-
 .logo{
 width:260px;
 }
 
 .topic{
-font-size:40px;
+font-size:38px;
 color:#ffd60a;
 text-shadow:2px 2px 4px #000;
 }
@@ -46,7 +45,7 @@ text-shadow:2px 2px 4px #000;
 .card-container{
 display:grid;
 grid-template-columns:repeat(4,100px);
-grid-gap:15px;
+gap:15px;
 margin:20px;
 }
 
@@ -59,8 +58,8 @@ border-radius:12px;
 display:flex;
 align-items:center;
 justify-content:center;
-font-weight:bold;
 cursor:pointer;
+font-weight:bold;
 transition:0.4s;
 }
 
@@ -83,13 +82,14 @@ margin:5px;
 border:none;
 border-radius:12px;
 background:#ffb703;
-cursor:pointer;
 font-weight:bold;
+cursor:pointer;
 }
 
 .correct{background:#b7efc5;}
 .wrong{background:#ffccd5;}
 
+/* CONFETTI */
 .confetti{
 position:fixed;
 width:8px;
@@ -104,22 +104,23 @@ transform:translateY(100vh) rotate(360deg);
 opacity:0;
 }
 }
+
 </style>
 </head>
 
 <body>
 
-<!-- SPLASH 1 -->
+<!-- 🔵 LOGO SCREEN -->
 <div id="logoScreen" class="screen active">
   <img class="logo" src="Middle-ELA/G7/chp7/modals/assets/innovine-logo.png">
 </div>
 
-<!-- SPLASH 2 -->
+<!-- 🟡 TITLE SCREEN -->
 <div id="titleScreen" class="screen">
   <div class="topic">✨ Modals Master Challenge ✨</div>
 </div>
 
-<!-- GAME -->
+<!-- 🟢 GAME SCREEN -->
 <div id="gameScreen" class="screen">
 
 <h1>Modals Card Flip Game</h1>
@@ -138,13 +139,15 @@ opacity:0;
 </div>
 
 <!-- AUDIO -->
-<audio id="correctSound" src="Middle-ELA/G7/chp7/modals/assets/correct.mp3"></audio>
-<audio id="wrongSound" src="Middle-ELA/G7/chp7/modals/assets/wrong.mp3"></audio>
-<audio id="clapSound" src="Middle-ELA/G7/chp7/modals/assets/clapping.mp3"></audio>
+<audio id="correctSound" src="Middle-ELA/G7/ch7/modals/assets/correct.mp3"></audio>
+<audio id="wrongSound" src="Middle-ELA/G7/ch7/modals/assets/wrong.mp3"></audio>
+<audio id="clapSound" src="Middle-ELA/G7/ch7/modals/assets/clapping.mp3"></audio>
 
 <script>
 
-/* SPLASH FLOW */
+/* =========================
+   SPLASH FLOW (FIXED)
+========================= */
 window.onload = () => {
 
   setTimeout(() => {
@@ -159,20 +162,23 @@ window.onload = () => {
   }, 8000);
 };
 
-/* MCQs */
+/* =========================
+   QUESTIONS (MODALS)
+========================= */
 const mcqs = [
   {q:"You ___ complete homework.",opts:["must","might","may"],ans:"must"},
   {q:"She ___ help us.",opts:["can","could","shall"],ans:"could"},
   {q:"It ___ rain.",opts:["may","would","must"],ans:"may"},
-  {q:"You ___ not enter.",opts:["needn’t","must","could"],ans:"must"},
   {q:"We ___ finish on time.",opts:["shall","will","might"],ans:"will"},
   {q:"He ___ be late.",opts:["might","should","must"],ans:"might"},
   {q:"You ___ practice more.",opts:["should","can","would"],ans:"should"},
   {q:"She said I ___ go.",opts:["might","needn’t","ought to"],ans:"might"},
   {q:"We ___ leave now.",opts:["must","can","may"],ans:"must"},
-  {q:"They ___ come tomorrow.",opts:["might","will","must"],ans:"might"}
+  {q:"They ___ come.",opts:["might","will","must"],ans:"might"},
+  {q:"You ___ be careful.",opts:["must","can","may"],ans:"must"}
 ];
 
+/* RANDOMISE */
 function shuffle(arr){
   return arr.sort(()=>Math.random()-0.5);
 }
@@ -182,7 +188,9 @@ let current=0;
 let score=0;
 let flipped=[];
 
-/* INIT */
+/* =========================
+   INIT GAME
+========================= */
 function initGame(){
   const container=document.getElementById("cardContainer");
   container.innerHTML="";
@@ -192,22 +200,25 @@ function initGame(){
   order.forEach(i=>{
     let card=document.createElement("div");
     card.className="card";
-    card.innerHTML="Tap";
+    card.innerText="Tap";
     card.onclick=()=>flip(card,i);
     container.appendChild(card);
   });
 }
 
-/* FLIP */
-function flip(card,index){
+/* =========================
+   FLIP CARD
+========================= */
+function flip(card){
   if(card.classList.contains("flipped")) return;
-
   card.classList.add("flipped");
   flipped.push(card);
   showMCQ();
 }
 
-/* MCQ */
+/* =========================
+   SHOW MCQ
+========================= */
 function showMCQ(){
   let q=gameData[current];
 
@@ -225,8 +236,11 @@ function showMCQ(){
   });
 }
 
-/* CHECK */
+/* =========================
+   CHECK ANSWER
+========================= */
 function check(ans,btn){
+
   let q=gameData[current];
   let buttons=document.querySelectorAll("#optionsBox button");
 
@@ -244,7 +258,9 @@ function check(ans,btn){
   }
 }
 
-/* CONFETTI */
+/* =========================
+   CONFETTI
+========================= */
 function confetti(){
   for(let i=0;i<40;i++){
     let d=document.createElement("div");
@@ -256,7 +272,9 @@ function confetti(){
   }
 }
 
-/* CLOSE */
+/* =========================
+   CLOSE MCQ
+========================= */
 function closeMCQ(){
   document.getElementById("mcqBox").style.display="none";
   flipped=[];
@@ -267,22 +285,23 @@ function closeMCQ(){
   }
 }
 
-/* END */
+/* =========================
+   END SCREEN
+========================= */
 function endGame(){
   document.getElementById("gameScreen").innerHTML=`
     <div>
       <h1>🏆 Game Complete</h1>
       <h2>Score: ${score} / ${mcqs.length}</h2>
-      <button onclick="restart()">Play Again</button>
+      <button onclick="location.reload()">Play Again</button>
     </div>
   `;
+
   document.getElementById("clapSound").play().catch(()=>{});
 }
 
-/* RESTART */
-function restart(){
-  location.reload();
-}
+/* INIT */
+initGame();
 
 </script>
 
