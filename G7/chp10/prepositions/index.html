@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Prepositions Adventure Quest</title>
+<title>The Class Trip Adventure</title>
 
 <style>
 body{
 margin:0;
 font-family:Arial,sans-serif;
-background:linear-gradient(135deg,#ffecd2,#fcb69f,#a1c4fd);
+background:linear-gradient(135deg,#a1c4fd,#c2e9fb,#fbc2eb);
 display:flex;
 align-items:center;
 justify-content:center;
@@ -44,7 +44,7 @@ to{transform:scale(1);opacity:1;}
 
 /* TITLE */
 .title{
-font-size:30px;
+font-size:28px;
 font-weight:bold;
 color:#222;
 animation:flash 1s infinite alternate;
@@ -55,33 +55,19 @@ from{transform:scale(1);opacity:0.7;}
 to{transform:scale(1.1);opacity:1;}
 }
 
-/* BUTTON */
-button{
-padding:12px 18px;
-border:none;
-border-radius:12px;
-background:#ff9800;
-color:#fff;
-font-size:16px;
-font-weight:bold;
-cursor:pointer;
-margin-top:15px;
-}
-
-/* GAME BOX */
+/* CARD */
 .card{
 background:#ffffffee;
 padding:18px;
 border-radius:15px;
 width:95%;
-max-width:600px;
+max-width:650px;
 box-shadow:0 10px 20px rgba(0,0,0,0.2);
 }
 
 /* OPTIONS */
 .option{
-background:#4caf50;
-color:#fff;
+background:#ffb703;
 padding:12px;
 margin:8px;
 border-radius:10px;
@@ -98,8 +84,22 @@ font-size:18px;
 
 /* FEEDBACK */
 #feedback{
-min-height:25px;
+min-height:20px;
+margin-top:10px;
 font-weight:bold;
+}
+
+/* BUTTON */
+button{
+padding:12px;
+border:none;
+border-radius:12px;
+background:#ff9800;
+color:#fff;
+font-size:16px;
+font-weight:bold;
+cursor:pointer;
+width:100%;
 margin-top:10px;
 }
 
@@ -118,36 +118,30 @@ transform:translateY(100vh) rotate(360deg);
 opacity:0;
 }
 }
-
-/* END SCREEN */
-#remark{
-font-size:22px;
-font-weight:bold;
-margin:10px 0;
-}
 </style>
 </head>
 
 <body>
 
-<!-- 🔵 LOGO -->
+<!-- 🔵 LOGO SCREEN -->
 <div id="logoScreen" class="screen active">
 <img src="assets/innovine-logo.png">
 </div>
 
-<!-- 🟡 TITLE -->
+<!-- 🟡 TITLE SCREEN -->
 <div id="titleScreen" class="screen">
-<div class="title">✨ Prepositions Adventure Quest ✨</div>
+<div class="title">🚌 The Class Trip Adventure</div>
 <button onclick="startGame()">Start Game</button>
 </div>
 
-<!-- 🟢 GAME -->
+<!-- 🟢 GAME SCREEN -->
 <div id="gameScreen" class="screen">
 <div class="card">
 
 <div id="scoreBoard">Score: 0 / 10</div>
 
-<h3 id="questionText"></h3>
+<h3 id="storyText"></h3>
+<h2 id="questionText"></h2>
 
 <div id="optionsBox"></div>
 
@@ -156,10 +150,10 @@ margin:10px 0;
 </div>
 </div>
 
-<!-- 🏁 END -->
+<!-- 🏁 END SCREEN -->
 <div id="endScreen" class="screen">
 <div class="card">
-<h2>🎉 Game Completed!</h2>
+<h2>🎉 Trip Completed!</h2>
 
 <div id="finalScore"></div>
 <div id="remark"></div>
@@ -169,26 +163,77 @@ margin:10px 0;
 </div>
 
 <!-- AUDIO -->
-<audio id="correctSound" src="assets/correct.mp3" volume="1"></audio>
-<audio id="wrongSound" src="assets/wrong.mp3" volume="1"></audio>
+<audio id="correctSound" src="assets/correct.mp3"></audio>
+<audio id="wrongSound" src="assets/wrong.mp3"></audio>
+<audio id="clapSound" src="assets/clapping.mp3"></audio>
 
 <script>
 
-/* ================= QUESTIONS ================= */
-const mcqs=[
-{q:"The train arrives ___ 8:00 a.m.",opts:["at","on","in","under"],ans:"at"},
-{q:"The book is ___ the table.",opts:["on","in","at","under"],ans:"on"},
-{q:"She sat ___ me.",opts:["beside","on","under","in"],ans:"beside"},
-{q:"We met ___ Monday.",opts:["on","at","in","under"],ans:"on"},
-{q:"He is ___ school.",opts:["at","on","in","over"],ans:"at"},
-{q:"They walked ___ the bridge.",opts:["across","under","in","on"],ans:"across"},
-{q:"The cat is ___ the chair.",opts:["under","on","in","at"],ans:"under"},
-{q:"The plane flew ___ the ocean.",opts:["over","under","into","at"],ans:"over"},
-{q:"The bird flew ___ the river.",opts:["over","in","at","during"],ans:"over"},
-{q:"The key is ___ the box.",opts:["in","on","under","beside"],ans:"in"}
+/* ================= STRICT ORIGINAL STORY (UNCHANGED) ================= */
+const levels = [
+{
+story:"It is Monday morning. Everyone is excited for the class trip. Ms. Anita checks the time.",
+q:"The bus will leave ___ 7:30 a.m.",
+opts:["at","on","in"],
+ans:"at"
+},
+{
+story:"The teacher reminds everyone about the trip.",
+q:"Our trip is ___ Friday.",
+opts:["on","at","in"],
+ans:"on"
+},
+{
+story:"The bus finally arrives.",
+q:"The students are waiting ___ the bus stop.",
+opts:["at","on","under"],
+ans:"at"
+},
+{
+story:"Everyone finds a seat.",
+q:"Rina is sitting ___ her best friend.",
+opts:["beside","under","between"],
+ans:"beside"
+},
+{
+story:"The bus begins its journey.",
+q:"We are travelling ___ bus.",
+opts:["by","on","in"],
+ans:"by"
+},
+{
+story:"The students enter the museum.",
+q:"The dinosaur skeleton is ___ the entrance.",
+opts:["near","in","on"],
+ans:"near"
+},
+{
+story:"Students look for clues.",
+q:"The next clue is hidden ___ the old tree.",
+opts:["under","between","on"],
+ans:"under"
+},
+{
+story:"Everyone sits together.",
+q:"Our lunch break starts ___ noon.",
+opts:["at","on","in"],
+ans:"at"
+},
+{
+story:"The trip ends.",
+q:"The students got ___ the bus happily.",
+opts:["on","in","under"],
+ans:"on"
+},
+{
+story:"The teacher smiles.",
+q:"We arrived home ___ the evening.",
+opts:["in","at","on"],
+ans:"in"
+}
 ];
 
-mcqs.sort(()=>Math.random()-0.5);
+levels.sort(()=>Math.random()-0.5);
 
 let i=0;
 let score=0;
@@ -201,48 +246,50 @@ document.getElementById("titleScreen").classList.add("active");
 },5000);
 };
 
-/* START */
 function startGame(){
 document.getElementById("titleScreen").classList.remove("active");
 document.getElementById("gameScreen").classList.add("active");
 loadQ();
 }
 
-/* LOAD */
+/* ================= LOAD QUESTION ================= */
 function loadQ(){
 
-if(i>=mcqs.length){
+if(i>=levels.length){
 endGame();
 return;
 }
 
-let q=mcqs[i];
+let L = levels[i];
 
-document.getElementById("scoreBoard").innerText=
-`Score: ${score} / ${mcqs.length}`;
+document.getElementById("scoreBoard").innerText =
+`Score: ${score} / ${levels.length}`;
 
-document.getElementById("questionText").innerText=q.q;
+document.getElementById("storyText").innerText = L.story;
+document.getElementById("questionText").innerText = L.q;
 
 let box=document.getElementById("optionsBox");
 box.innerHTML="";
 
 document.getElementById("feedback").innerText="";
 
-q.opts.forEach(o=>{
+L.opts.forEach(o=>{
 let d=document.createElement("div");
 d.className="option";
 d.innerText=o;
+
 d.onclick=()=>check(o);
+
 box.appendChild(d);
 });
 }
 
-/* CHECK */
+/* ================= CHECK ================= */
 function check(opt){
 
-let q=mcqs[i];
+let L = levels[i];
 
-if(opt===q.ans){
+if(opt === L.ans){
 score++;
 document.getElementById("correctSound").play().catch(()=>{});
 confetti();
@@ -258,7 +305,35 @@ loadQ();
 },900);
 }
 
-/* CONFETTI */
+/* ================= END ================= */
+function endGame(){
+
+document.getElementById("gameScreen").classList.remove("active");
+document.getElementById("endScreen").classList.add("active");
+
+let percent = (score/levels.length)*100;
+
+let remark="";
+
+if(percent>=80) remark="🌟 Excellent!";
+else if(percent>=60) remark="👍 Good Job!";
+else if(percent>=45) remark="🙂 Well Tried!";
+else remark="📘 Let's Revise and Come Back!";
+
+document.getElementById("finalScore").innerText =
+`You answered ${score} out of ${levels.length} correct`;
+
+document.getElementById("remark").innerText = remark;
+
+document.getElementById("clapSound").play().catch(()=>{});
+}
+
+/* ================= RESTART ================= */
+function restartGame(){
+location.reload();
+}
+
+/* ================= CONFETTI ================= */
 function confetti(){
 for(let j=0;j<30;j++){
 let c=document.createElement("div");
@@ -268,32 +343,6 @@ c.style.background=["#ff0","#0ff","#f0f","#0f0","#f60"][Math.floor(Math.random()
 document.body.appendChild(c);
 setTimeout(()=>c.remove(),2000);
 }
-}
-
-/* END */
-function endGame(){
-
-document.getElementById("gameScreen").classList.remove("active");
-document.getElementById("endScreen").classList.add("active");
-
-let percent = (score/mcqs.length)*100;
-
-let remark="";
-
-if(percent>=80) remark="🌟 Excellent!";
-else if(percent>=60) remark="👍 Good Job!";
-else if(percent>=45) remark="🙂 Well Tried!";
-else remark="📘 Let's revise and come back!";
-
-document.getElementById("finalScore").innerText=
-`You answered ${score} out of ${mcqs.length} correct`;
-
-document.getElementById("remark").innerText=remark;
-}
-
-/* RESTART */
-function restartGame(){
-location.reload();
 }
 
 </script>
