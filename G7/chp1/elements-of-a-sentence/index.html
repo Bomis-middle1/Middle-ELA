@@ -1,152 +1,1030 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sentence Elements Adventure - Grade 7</title>
+
+<title>Elements of a Sentence</title>
+
 <style>
-body { margin:0; font-family:Arial; background:#e8f5e9; display:flex; justify-content:center; align-items:center; height:100vh; overflow:hidden; }
-#logoScreen,#instructionScreen,#gameContainer { width:100%; max-width:600px; text-align:center; padding:20px; position:absolute; top:0; left:0; }
-#logoScreen { height:100%; display:flex; justify-content:center; align-items:center; background:white; z-index:100;}
-#instructionScreen { display:none; background:#fff; border-radius:10px; box-shadow:0 0 10px #aaa; z-index:99;}
-#gameContainer { display:none; background:#fff; border-radius:10px; box-shadow:0 0 10px #aaa; z-index:98;}
-#sentence { font-size:18px; font-weight:bold; margin-bottom:15px; }
-.blank { display:inline-block; width:160px; border-bottom:2px solid #000; margin:0 5px; font-weight:bold; cursor:pointer; min-height:24px; }
-.options { display:flex; flex-wrap:wrap; justify-content:center; gap:10px; margin-top:15px; }
-.option { background:#ffeb3b; padding:8px 12px; border-radius:5px; cursor:pointer; user-select:none; min-width:80px; text-align:center; }
-.option.wiggle { animation: wiggle 0.5s; }
-@keyframes wiggle {0%{transform:rotate(0deg);}25%{transform:rotate(-10deg);}50%{transform:rotate(10deg);}75%{transform:rotate(-10deg);}100%{transform:rotate(0deg);}}
-#feedback { margin-top:10px; font-weight:bold; height:24px; }
-#tick { display:none; font-size:30px; color:green; margin-top:10px; }
-#restartBtn { display:none; margin-top:20px; padding:10px 20px; font-size:18px; cursor:pointer; background:#4caf50; color:white; border:none; border-radius:5px; }
-.confetti-piece { position:absolute; width:8px; height:8px; border-radius:50%; top:0; animation: fall 2s linear forwards;}
-@keyframes fall {0%{transform:translateY(0);}100%{transform:translateY(400px); opacity:0;}}
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,Helvetica,sans-serif;
+}
+
+body{
+
+background:linear-gradient(135deg,#7dd3fc,#fde68a,#bbf7d0);
+overflow:hidden;
+height:100vh;
+
+}
+
+/******** Floating Background ********/
+
+body::before{
+
+content:"";
+position:absolute;
+width:250px;
+height:250px;
+background:rgba(255,255,255,.3);
+border-radius:50%;
+left:-80px;
+top:-80px;
+animation=float1 9s infinite alternate;
+
+}
+
+body::after{
+
+content:"";
+position:absolute;
+width:220px;
+height:220px;
+background:rgba(255,255,255,.25);
+border-radius:50%;
+right:-80px;
+bottom:-80px;
+animation=float2 10s infinite alternate;
+
+}
+
+@keyframes float1{
+
+from{transform:translateY(0);}
+to{transform:translateY(45px);}
+
+}
+
+@keyframes float2{
+
+from{transform:translateY(0);}
+to{transform:translateY(-35px);}
+
+}
+
+.screen{
+
+position:absolute;
+width:100%;
+height:100%;
+display:flex;
+justify-content:center;
+align-items:center;
+flex-direction:column;
+padding:20px;
+
+}
+
+/******** Splash ********/
+
+#splash{
+
+background:white;
+z-index:10;
+
+}
+
+#logo{
+
+width:220px;
+animation:zoom 2s infinite alternate;
+
+}
+
+@keyframes zoom{
+
+from{transform:scale(1);}
+to{transform:scale(1.08);}
+
+}
+
+#splash h2{
+
+margin-top:20px;
+font-size:34px;
+color:#0ea5e9;
+
+}
+
+/******** Topic ********/
+
+#topic{
+
+display:none;
+background:linear-gradient(135deg,#06b6d4,#9333ea);
+color:white;
+text-align:center;
+
+}
+
+#topic h1{
+
+font-size:54px;
+animation:flash .8s infinite;
+text-shadow:3px 3px 10px black;
+
+}
+
+#topic h2{
+
+margin-top:15px;
+font-size:28px;
+
+}
+
+@keyframes flash{
+
+0%{transform:scale(1);}
+50%{transform:scale(1.08);}
+100%{transform:scale(1);}
+
+}
+
+/******** Start ********/
+
+#startScreen{
+
+display:none;
+
+}
+
+.card{
+
+background:white;
+padding:35px;
+border-radius:25px;
+box-shadow:0 10px 25px rgba(0,0,0,.25);
+max-width:800px;
+width:95%;
+text-align:center;
+
+}
+
+.card h1{
+
+color:#f97316;
+font-size:45px;
+margin-bottom:15px;
+
+}
+
+.card h2{
+
+color:#0ea5e9;
+margin-bottom:15px;
+
+}
+
+.card p{
+
+font-size:22px;
+margin:10px 0;
+
+}
+
+#startBtn{
+
+margin-top:25px;
+padding:18px 55px;
+font-size:28px;
+border:none;
+border-radius:50px;
+background:#22c55e;
+color:white;
+cursor:pointer;
+transition:.3s;
+
+}
+
+#startBtn:hover{
+
+transform:scale(1.05);
+
+}
+
+/******** Volume ********/
+
+.volume{
+
+margin-top:25px;
+display:flex;
+justify-content:center;
+align-items:center;
+gap:15px;
+font-size:22px;
+
+}
+
+input[type=range]{
+
+width:220px;
+
+}
+
+/******** Game ********/
+
+#gameScreen{
+
+display:none;
+
+}
+
+.gameCard{
+
+background:white;
+width:95%;
+max-width:900px;
+padding:30px;
+border-radius:25px;
+box-shadow:0 10px 25px rgba(0,0,0,.25);
+
+}
+
+#progress{
+
+font-size:22px;
+font-weight:bold;
+color:#0284c7;
+margin-bottom:15px;
+
+}
+
+#question{
+
+font-size:32px;
+font-weight:bold;
+margin-bottom:30px;
+line-height:1.4;
+
+}
+
+#answers{
+
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:15px;
+
+}
+
+.answerBtn{
+
+padding:18px;
+font-size:22px;
+border:none;
+border-radius:15px;
+background:#f1f5f9;
+cursor:pointer;
+transition:.3s;
+
+}
+
+.answerBtn:hover{
+
+background:#dbeafe;
+transform:scale(1.02);
+
+}
+
+.correct{
+
+background:#4ade80!important;
+color:white;
+
+}
+
+.wrong{
+
+background:#f87171!important;
+color:white;
+
+}
+
+#score{
+
+margin-top:20px;
+font-size:24px;
+font-weight:bold;
+color:#ea580c;
+
+}
+
+/******** Result ********/
+
+#resultScreen{
+
+display:none;
+
+}
+
+#restartBtn{
+
+margin-top:25px;
+padding:18px 50px;
+font-size:26px;
+background:#0ea5e9;
+color:white;
+border:none;
+border-radius:50px;
+cursor:pointer;
+
+}
+
+/******** Confetti ********/
+
+canvas{
+
+position:absolute;
+top:0;
+left:0;
+pointer-events:none;
+
+}
+
+/******** Mobile ********/
+
+@media(max-width:768px){
+
+#logo{
+
+width:170px;
+
+}
+
+#topic h1{
+
+font-size:38px;
+
+}
+
+.card h1{
+
+font-size:34px;
+
+}
+
+.card p{
+
+font-size:20px;
+
+}
+
+#question{
+
+font-size:24px;
+
+}
+
+#answers{
+
+grid-template-columns:1fr;
+
+}
+
+.answerBtn{
+
+font-size:18px;
+
+}
+
+}
+
 </style>
+
 </head>
+
 <body>
 
-<!-- Logo Screen -->
-<div id="logoScreen">
-<img src="assets/innovine-logo.png" alt="Innovine Logo" width="200">
-</div>
-
-<!-- Instruction Screen -->
-<div id="instructionScreen">
-<h2>Welcome to Sentence Elements Adventure!</h2>
-<p>In this game, you will identify parts of a sentence.</p>
-<p>Click on the correct word for the blank: <b>subject, predicate, object, or complement</b>.</p>
-<p>Correct answers show a green tick ✔, wrong answers wiggle ❌.</p>
-<p>Complete all sentences to finish the game!</p>
-</div>
-
-<!-- Game Container -->
-<div id="gameContainer">
-<div id="sentence"></div>
-<div class="options" id="optionsContainer"></div>
-<div id="feedback"></div>
-<div id="tick">✔</div>
-<button id="restartBtn">Play Again</button>
-</div>
+<canvas id="confetti"></canvas>
 
 <audio id="correctSound" src="assets/correct.mp3"></audio>
 <audio id="wrongSound" src="assets/wrong.mp3"></audio>
 <audio id="clapSound" src="assets/clapping.mp3"></audio>
 
-<script>
-// --- Sentences and interactive questions ---
-const sentences = [
-  {text:"The little girl ___ happily to school.", ask:"subject", options:["The little girl","skipped happily","to school","Ali","ran fast"]},
-  {text:"The dog barked ___ at the stranger.", ask:"predicate", options:["barked loudly","The dog","at the stranger","jumped high"]},
-  {text:"Ali finished ___ before dinner.", ask:"object", options:["his homework","Ali","finished","before dinner"]},
-  {text:"The sun shines ___ in the sky.", ask:"complement", options:["brightly","The sun","shines","in the sky"]},
-  {text:"The students cheered ___ for the winning team.", ask:"subject", options:["The students","cheered","for the winning team","They"]},
-  {text:"She painted ___ yesterday.", ask:"predicate", options:["painted a beautiful landscape","She","a beautiful landscape","yesterday"]},
-  {text:"My father bought ___ last week.", ask:"object", options:["a new car","My father","bought","last week"]},
-  {text:"The chef cooked ___ perfectly.", ask:"complement", options:["the meal","perfectly","The chef","cooked"]},
-  {text:"Tom and Jerry ran ___ across the garden.", ask:"subject", options:["Tom and Jerry","ran","across the garden","quickly"]},
-  {text:"The wind blew ___ all over the yard.", ask:"predicate", options:["blew the leaves","The wind","the leaves","all over the yard"]}
-];
+<!-- Splash -->
 
-let current=0;
-const sentenceEl = document.getElementById("sentence");
-const optionsContainer = document.getElementById("optionsContainer");
-const feedback = document.getElementById("feedback");
-const tick = document.getElementById("tick");
-const restartBtn = document.getElementById("restartBtn");
+<div id="splash" class="screen">
+
+<img src="assets/innovine-logo.png" id="logo">
+
+<h2>Innovine Learning Games</h2>
+
+</div>
+
+<!-- Topic -->
+
+<div id="topic" class="screen">
+
+<h1>✨ ELEMENTS OF A SENTENCE ✨</h1>
+
+<h2>Subject • Predicate • Object • Complement</h2>
+
+</div>
+
+<!-- Start -->
+
+<div id="startScreen" class="screen">
+
+<div class="card">
+
+<h1>🎯 Ready to Play?</h1>
+
+<h2>Grade 7 English</h2>
+
+<p>Identify the Subject, Predicate, Object, and Complement.</p>
+
+<p><strong>10 Questions</strong></p>
+
+<div class="volume">
+
+🔊 Volume
+
+<input type="range" id="volume" min="0" max="1" value="1" step=".1">
+
+</div>
+
+<button id="startBtn">
+
+START GAME
+
+</button>
+
+</div>
+
+</div>
+
+<!-- Game -->
+
+<div id="gameScreen" class="screen">
+
+<div class="gameCard">
+
+<div id="progress"></div>
+
+<div id="question"></div>
+
+<div id="answers"></div>
+
+<div id="score"></div>
+
+</div>
+
+</div>
+
+<!-- Result -->
+
+<div id="resultScreen" class="screen">
+
+<div class="card">
+
+<h1>🎉 Great Job!</h1>
+
+<h2 id="finalScore"></h2>
+
+<button id="restartBtn">
+
+Play Again
+
+</button>
+
+</div>
+
+</div>
+
+<script>
+
+const splash=document.getElementById("splash");
+const topic=document.getElementById("topic");
+const startScreen=document.getElementById("startScreen");
+const gameScreen=document.getElementById("gameScreen");
+const resultScreen=document.getElementById("resultScreen");
+
 const correctSound=document.getElementById("correctSound");
 const wrongSound=document.getElementById("wrongSound");
 const clapSound=document.getElementById("clapSound");
 
-// --- Show current sentence ---
-function showSentence(){
-  tick.style.display="none";
-  feedback.textContent="";
-  const s = sentences[current];
-  // Highlight blank
-  let displayed = s.text.replace("___","<span class='blank'>___</span>");
-  sentenceEl.innerHTML = displayed;
+const volume=document.getElementById("volume");
 
-  // Show options
-  optionsContainer.innerHTML="";
-  const opts = s.options.sort(()=>Math.random()-0.5);
-  opts.forEach(opt=>{
-    const btn = document.createElement("div");
-    btn.className="option";
-    btn.textContent=opt;
-    btn.onclick = ()=>checkAnswer(btn,opt,s);
-    optionsContainer.appendChild(btn);
-  });
-}
+volume.oninput=function(){
 
-// --- Check answer ---
-function checkAnswer(btn,opt,s){
-  let correctWord;
-  if(s.ask==="subject") correctWord = s.options[0];
-  else if(s.ask==="predicate") correctWord = s.options[1];
-  else if(s.ask==="object") correctWord = s.options[2];
-  else if(s.ask==="complement") correctWord = s.options[3];
+correctSound.volume=this.value;
+wrongSound.volume=this.value;
+clapSound.volume=this.value;
 
-  if(opt===correctWord){
-    feedback.textContent="Good Job! 🎉";
-    feedback.style.color="green";
-    tick.style.display="block";
-    correctSound.currentTime=0; correctSound.play();
-    setTimeout(nextSentence,800);
-  } else {
-    feedback.textContent="Try Again! ❌";
-    feedback.style.color="red";
-    btn.classList.add("wiggle");
-    wrongSound.currentTime=0; wrongSound.play();
-    setTimeout(()=>btn.classList.remove("wiggle"),500);
-  }
-}
+};
 
-// --- Next sentence ---
-function nextSentence(){
-  current++;
-  if(current>=sentences.length){
-    feedback.textContent="🎉 You completed all questions!";
-    clapSound.currentTime=0; clapSound.play();
-    restartBtn.style.display="block";
-  } else showSentence();
-}
-
-// --- Restart ---
-restartBtn.onclick=()=>location.reload();
-
-// --- Logo and instruction splash ---
 setTimeout(()=>{
-  document.getElementById("logoScreen").style.display="none";
-  document.getElementById("instructionScreen").style.display="block";
 
-  setTimeout(()=>{
-    document.getElementById("instructionScreen").style.display="none";
-    document.getElementById("gameContainer").style.display="block";
-    showSentence();
-  },5000);
+splash.style.display="none";
+topic.style.display="flex";
 
 },5000);
+
+setTimeout(()=>{
+
+topic.style.display="none";
+startScreen.style.display="flex";
+
+},8000);
+
+let questions=[];
+let currentQuestion=0;
+let score=0;
+/*************************************************
+                QUESTIONS
+*************************************************/
+
+questions=[
+
+{
+question:"Identify the subject in the sentence.<br><br><b>The students completed the science project on time.</b>",
+options:[
+"completed the science project",
+"the science project",
+"The students",
+"on time"
+],
+answer:2
+},
+
+{
+question:"Identify the predicate in the sentence.<br><br><b>The little puppy barked loudly all night.</b>",
+options:[
+"The little puppy",
+"loudly",
+"barked loudly all night",
+"all night"
+],
+answer:2
+},
+
+{
+question:"Which words form the direct object in the sentence?<br><br><b>Maria baked a delicious cake yesterday.</b>",
+options:[
+"Maria",
+"baked",
+"a delicious cake",
+"yesterday"
+],
+answer:2
+},
+
+{
+question:"Identify the complement in the sentence.<br><br><b>The sky became dark before the storm.</b>",
+options:[
+"The sky",
+"became",
+"dark",
+"before the storm"
+],
+answer:2
+},
+
+{
+question:"Which part of the sentence is the predicate?<br><br><b>My brother plays basketball every Saturday.</b>",
+options:[
+"My brother",
+"plays basketball every Saturday",
+"basketball",
+"every Saturday"
+],
+answer:1
+},
+
+{
+question:"Identify the subject in the sentence.<br><br><b>After school, the children visited the library.</b>",
+options:[
+"visited",
+"the library",
+"After school",
+"the children"
+],
+answer:3
+},
+
+{
+question:"Which words are the direct object in the sentence?<br><br><b>The teacher explained the lesson clearly.</b>",
+options:[
+"The teacher",
+"explained",
+"the lesson",
+"clearly"
+],
+answer:2
+},
+
+{
+question:"Identify the complement in the sentence.<br><br><b>Our classroom looks beautiful after the decorations.</b>",
+options:[
+"Our classroom",
+"looks",
+"beautiful",
+"after the decorations"
+],
+answer:2
+},
+
+{
+question:"Which part of the sentence is the subject?<br><br><b>Several colorful birds flew across the lake.</b>",
+options:[
+"Several colorful birds",
+"flew",
+"across the lake",
+"the lake"
+],
+answer:0
+},
+
+{
+question:"Identify the predicate in the sentence.<br><br><b>The firefighters rescued the family safely.</b>",
+options:[
+"The firefighters",
+"rescued the family safely",
+"the family",
+"safely"
+],
+answer:1
+}
+
+];
+
+/*************************************************
+            RANDOMIZE QUESTIONS
+*************************************************/
+
+questions.sort(()=>Math.random()-0.5);
+
+/*************************************************
+              START GAME
+*************************************************/
+
+document.getElementById("startBtn").onclick=function(){
+
+startScreen.style.display="none";
+gameScreen.style.display="flex";
+
+currentQuestion=0;
+score=0;
+
+showQuestion();
+
+};
+
+/*************************************************
+            SHOW QUESTION
+*************************************************/
+
+function showQuestion(){
+
+document.getElementById("progress").innerHTML=
+"Question "+(currentQuestion+1)+" of "+questions.length;
+
+document.getElementById("score").innerHTML=
+"Score : "+score;
+
+document.getElementById("question").innerHTML=
+questions[currentQuestion].question;
+
+const answers=document.getElementById("answers");
+
+answers.innerHTML="";
+
+questions[currentQuestion].options.forEach(function(option,index){
+
+const btn=document.createElement("button");
+
+btn.className="answerBtn";
+
+btn.innerHTML=option;
+
+btn.onclick=function(){
+
+checkAnswer(index,btn);
+
+};
+
+answers.appendChild(btn);
+
+});
+
+}
+
+/*************************************************
+            CHECK ANSWER
+*************************************************/
+
+function checkAnswer(choice,button){
+
+let correct=questions[currentQuestion].answer;
+
+let buttons=document.querySelectorAll(".answerBtn");
+
+buttons.forEach(btn=>btn.disabled=true);
+
+if(choice===correct){
+
+button.classList.add("correct");
+
+correctSound.currentTime=0;
+correctSound.play();
+
+score++;
+
+launchConfetti();
+
+}else{
+
+button.classList.add("wrong");
+
+buttons[correct].classList.add("correct");
+
+wrongSound.currentTime=0;
+wrongSound.play();
+
+}
+
+document.getElementById("score").innerHTML=
+"Score : "+score;
+
+setTimeout(function(){
+
+currentQuestion++;
+
+if(currentQuestion<questions.length){
+
+showQuestion();
+
+}else{
+
+showResults();
+
+}
+
+},1200);
+
+}
+/*************************************************
+            CONFETTI ANIMATION
+*************************************************/
+
+const canvas = document.getElementById("confetti");
+const ctx = canvas.getContext("2d");
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+window.addEventListener("resize",function(){
+
+canvas.width=window.innerWidth;
+canvas.height=window.innerHeight;
+
+});
+
+let confetti=[];
+
+function launchConfetti(){
+
+confetti=[];
+
+for(let i=0;i<180;i++){
+
+confetti.push({
+
+x:Math.random()*canvas.width,
+
+y:-20,
+
+r:Math.random()*8+4,
+
+d:Math.random()*180,
+
+speed:Math.random()*5+3,
+
+tilt:Math.random()*10-5,
+
+color:
+
+"hsl("+Math.random()*360+",100%,60%)"
+
+});
+
+}
+
+animateConfetti();
+
+}
+
+function animateConfetti(){
+
+let frame=0;
+
+function draw(){
+
+ctx.clearRect(0,0,canvas.width,canvas.height);
+
+confetti.forEach(function(c){
+
+ctx.beginPath();
+
+ctx.fillStyle=c.color;
+
+ctx.fillRect(c.x,c.y,c.r,c.r);
+
+c.y+=c.speed;
+
+c.x+=Math.sin(c.d);
+
+c.d+=0.1;
+
+});
+
+frame++;
+
+if(frame<90){
+
+requestAnimationFrame(draw);
+
+}else{
+
+ctx.clearRect(0,0,canvas.width,canvas.height);
+
+}
+
+}
+
+draw();
+
+}
+
+/*************************************************
+        BUTTON FEEDBACK ANIMATION
+*************************************************/
+
+const style=document.createElement("style");
+
+style.innerHTML=`
+
+.answerBtn{
+
+transition:.25s;
+
+}
+
+.answerBtn:hover{
+
+transform:scale(1.05);
+
+}
+
+.correct{
+
+animation:pop .5s;
+
+}
+
+.wrong{
+
+animation:shake .5s;
+
+}
+
+@keyframes pop{
+
+0%{transform:scale(1);}
+
+50%{transform:scale(1.18);}
+
+100%{transform:scale(1);}
+
+}
+
+@keyframes shake{
+
+0%{transform:translateX(0);}
+
+20%{transform:translateX(-10px);}
+
+40%{transform:translateX(10px);}
+
+60%{transform:translateX(-8px);}
+
+80%{transform:translateX(8px);}
+
+100%{transform:translateX(0);}
+
+}
+
+`;
+
+document.head.appendChild(style);
+
+/*************************************************
+      SHOW RESULT SCREEN
+*************************************************/
+
+function showResults(){
+
+gameScreen.style.display="none";
+
+resultScreen.style.display="flex";
+
+document.getElementById("finalScore").innerHTML=
+
+"You scored <br><br><span style='font-size:60px;color:#16a34a;'>"
+
++score+
+
+" / "
+
++questions.length+
+
+"</span>";
+
+clapSound.currentTime=0;
+
+clapSound.play();
+
+}
+/*************************************************
+            RESTART GAME
+*************************************************/
+
+document.getElementById("restartBtn").onclick=function(){
+
+// Hide result screen
+resultScreen.style.display="none";
+
+// Show game screen
+gameScreen.style.display="flex";
+
+// Reset values
+score=0;
+currentQuestion=0;
+
+// Shuffle questions again
+questions.sort(()=>Math.random()-0.5);
+
+// Show first question
+showQuestion();
+
+};
+
+/*************************************************
+      OPTIONAL: ENTER KEY SUPPORT
+*************************************************/
+
+document.addEventListener("keydown",function(e){
+
+if(e.key==="Enter"){
+
+const startVisible=
+startScreen.style.display==="flex";
+
+const resultVisible=
+resultScreen.style.display==="flex";
+
+if(startVisible){
+
+document.getElementById("startBtn").click();
+
+}
+
+if(resultVisible){
+
+document.getElementById("restartBtn").click();
+
+}
+
+}
+
+});
+
+/*************************************************
+      PRELOAD SOUNDS
+*************************************************/
+
+window.onload=function(){
+
+correctSound.load();
+wrongSound.load();
+clapSound.load();
+
+correctSound.volume=1;
+wrongSound.volume=1;
+clapSound.volume=1;
+
+};
+
+/*************************************************
+      END OF SCRIPT
+*************************************************/
+
 </script>
+
 </body>
 </html>
