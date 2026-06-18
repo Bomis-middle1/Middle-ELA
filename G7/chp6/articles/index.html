@@ -173,7 +173,24 @@ from{transform:translateY(0);}
 to{transform:translateY(-12px);}
 }
 
-/* SPLASH ONLY */
+/* CONFETTI */
+.confetti{
+position:fixed;
+width:10px;
+height:10px;
+top:-10px;
+z-index:9999;
+animation:fall 2s linear forwards;
+}
+
+@keyframes fall{
+to{
+transform:translateY(100vh) rotate(360deg);
+opacity:0;
+}
+}
+
+/* SPLASH */
 .logoScreen img{
 width:260px;
 animation:pop 1s ease;
@@ -193,6 +210,11 @@ text-shadow:2px 2px 4px #000;
 </head>
 
 <body>
+
+<!-- AUDIO -->
+<audio id="correctSound" src="Middle-ELA/G7/chp6/articles/assets/correct.mp3"></audio>
+<audio id="wrongSound" src="Middle-ELA/G7/chp6/articles/assets/wrong.mp3"></audio>
+<audio id="clapSound" src="Middle-ELA/G7/chp6/articles/assets/clapping.mp3"></audio>
 
 <!-- SPLASH 1 -->
 <div id="logoScreen" class="screen active">
@@ -214,7 +236,7 @@ text-shadow:2px 2px 4px #000;
   </div>
 </div>
 
-<!-- GAME (UNCHANGED) -->
+<!-- GAME -->
 <div id="gameScreen" class="screen">
   <div class="card">
 
@@ -230,12 +252,10 @@ text-shadow:2px 2px 4px #000;
     <button onclick="spinWheel()">Spin Wheel</button>
 
     <div class="questionBox">
-      <div class="question" id="sentenceText">Press spin to start!</div>
+      <div class="question" id="sentenceText"></div>
     </div>
 
     <div class="options" id="optionsBox"></div>
-
-    <div class="feedback" id="feedback"></div>
 
     <div>
       Score: <span id="scoreText">0</span> /
@@ -255,14 +275,9 @@ text-shadow:2px 2px 4px #000;
   </div>
 </div>
 
-<!-- AUDIO -->
-<audio id="correctSound" src="assets/correct.mp3"></audio>
-<audio id="wrongSound" src="assets/wrong.mp3"></audio>
-<audio id="clapSound" src="assets/freesound_community-claps-44774.mp3"></audio>
-
 <script>
 
-/* ONLY SPLASH FLOW ADDED */
+/* SPLASH FLOW */
 window.onload = () => {
 
   setTimeout(() => {
@@ -276,7 +291,7 @@ window.onload = () => {
   }, 8000);
 };
 
-/* YOUR ORIGINAL LOGIC (UNCHANGED) */
+/* QUESTIONS */
 const questions = [
   {sentence:"I saw ___ elephant at the zoo.",answer:"An"},
   {sentence:"She wants to buy ___ apple.",answer:"An"},
@@ -295,14 +310,16 @@ let score=0;
 
 document.getElementById("totalText").innerText = questions.length;
 
+/* START */
 function startGame(){
   document.getElementById("startScreen").classList.remove("active");
   document.getElementById("gameScreen").classList.add("active");
   loadQuestion();
 }
 
+/* LOAD */
 function loadQuestion(){
-  if(current >= questions.length){
+  if(current>=questions.length){
     endGame();
     return;
   }
@@ -322,36 +339,32 @@ function loadQuestion(){
   });
 }
 
-let spinning=false;
-
+/* SPIN */
 function spinWheel(){
-  if(spinning) return;
-  spinning = true;
-
   const spinner = document.getElementById("spinner");
   const spins = 3 + Math.floor(Math.random()*3);
-  const randSegment = Math.floor(Math.random()*3);
-  const totalDeg = spins*360 + randSegment*120 + 60;
-
-  spinner.style.transform = `rotate(${totalDeg}deg)`;
-
-  setTimeout(()=>{spinning=false;},3000);
+  const deg = spins*360 + Math.floor(Math.random()*360);
+  spinner.style.transform = `rotate(${deg}deg)`;
 }
 
+/* CHECK ANSWER */
 function checkAnswer(selected, btn){
-  const q = questions[current];
-  const optionButtons = document.querySelectorAll(".optionBtn");
 
-  optionButtons.forEach(b=>b.onclick=null);
+  const q = questions[current];
+  const buttons = document.querySelectorAll(".optionBtn");
+
+  buttons.forEach(b=>b.onclick=null);
 
   if(selected === q.answer){
     btn.classList.add("correct");
     score++;
     document.getElementById("correctSound").play().catch(()=>{});
-  } else {
+    launchConfetti();   // 🎉 ADDED
+  }
+  else{
     btn.classList.add("wrong");
     document.getElementById("wrongSound").play().catch(()=>{});
-    optionButtons.forEach(b=>{
+    buttons.forEach(b=>{
       if(b.innerText===q.answer) b.classList.add("correct");
     });
   }
@@ -361,6 +374,19 @@ function checkAnswer(selected, btn){
   setTimeout(loadQuestion,1000);
 }
 
+/* CONFETTI */
+function launchConfetti(){
+  for(let i=0;i<60;i++){
+    const c=document.createElement("div");
+    c.className="confetti";
+    c.style.left=Math.random()*100+"vw";
+    c.style.background=["#ff0","#0ff","#f0f","#0f0","#ff6600"][Math.floor(Math.random()*5)];
+    document.body.appendChild(c);
+    setTimeout(()=>c.remove(),2000);
+  }
+}
+
+/* END */
 function endGame(){
   document.getElementById("gameScreen").classList.remove("active");
   document.getElementById("endScreen").classList.add("active");
@@ -370,6 +396,7 @@ function endGame(){
   document.getElementById("clapSound").play().catch(()=>{});
 }
 
+/* RESTART */
 function restartGame(){
   location.reload();
 }
