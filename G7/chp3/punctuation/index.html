@@ -12,7 +12,7 @@ overflow:hidden;
 background:linear-gradient(#b3e5ff,#e6f7ff);
 }
 
-/* ================= LOGO SCREEN ================= */
+/* ================= LOGO ================= */
 #logoScreen{
 position:fixed;
 inset:0;
@@ -33,7 +33,7 @@ from{transform:scale(1);}
 to{transform:scale(1.08);}
 }
 
-/* ================= TITLE SCREEN ================= */
+/* ================= TITLE ================= */
 #titleScreen{
 position:fixed;
 inset:0;
@@ -64,7 +64,7 @@ color:#1565c0;
 100%{transform:translateY(0);}
 }
 
-/* ================= START SCREEN ================= */
+/* ================= START ================= */
 #startScreen{
 position:fixed;
 inset:0;
@@ -117,7 +117,7 @@ font-size:22px;
 font-weight:bold;
 color:white;
 cursor:pointer;
-animation:floatUp 9s linear forwards;
+animation:floatUp 10s linear forwards;
 box-shadow:inset -5px -8px rgba(0,0,0,0.1);
 }
 
@@ -141,15 +141,14 @@ background:#555;
 .green{background:#66bb6a;}
 .yellow{background:#ffca28;}
 .purple{background:#ab47bc;}
-
 </style>
 </head>
 
 <body>
 
-<!-- ================= LOGO ================= -->
+<!-- ================= LOGO (FIXED PATH) ================= -->
 <div id="logoScreen">
-<img src="assets/innovine-logo.png">
+<img src="G7/chp3/punctuation/assets/innovine-logo.png">
 </div>
 
 <!-- ================= TITLE ================= -->
@@ -168,9 +167,14 @@ background:#555;
 <div id="score">Score: 0</div>
 </div>
 
+<!-- ================= AUDIO (FIXED PATHS) ================= -->
+<audio id="correctSound" src="G7/chp3/punctuation/assets/correct.mp3"></audio>
+<audio id="wrongSound" src="G7/chp3/punctuation/assets/wrong.mp3"></audio>
+<audio id="clapSound" src="G7/chp3/punctuation/assets/clapping.mp3"></audio>
+
 <script>
 
-/* ================= FLOW CONTROL ================= */
+/* ================= FLOW ================= */
 
 setTimeout(()=>{
 document.getElementById("logoScreen").style.display="none";
@@ -182,7 +186,7 @@ document.getElementById("titleScreen").style.display="none";
 document.getElementById("startScreen").style.display="flex";
 },8000);
 
-/* ================= GAME VARIABLES ================= */
+/* ================= GAME STATE ================= */
 
 let score = 0;
 let gameStarted = false;
@@ -193,8 +197,14 @@ document.getElementById("startBtn").onclick = () => {
 document.getElementById("startScreen").style.display="none";
 document.getElementById("game").style.display="block";
 gameStarted = true;
-startSpawning();
+spawnLoop();
 };
+
+/* ================= AUDIO FIX (unlock on click) ================= */
+document.body.addEventListener("click",()=>{
+document.getElementById("correctSound").play().catch(()=>{});
+document.getElementById("correctSound").pause();
+},{once:true});
 
 /* ================= BALLOON DATA ================= */
 
@@ -206,7 +216,7 @@ const symbols = [
 
 const colors = ["red","blue","green","yellow","purple"];
 
-/* ================= SPAWN BALLOONS ================= */
+/* ================= SPAWN ================= */
 
 function spawnBalloon(){
 
@@ -217,6 +227,7 @@ const data = symbols[Math.floor(Math.random()*symbols.length)];
 const b = document.createElement("div");
 b.className = "balloon " + colors[Math.floor(Math.random()*colors.length)];
 b.textContent = data.symbol;
+
 b.style.left = Math.random()*90 + "vw";
 
 b.onclick = () => {
@@ -224,9 +235,11 @@ b.onclick = () => {
 if(data.type === "correct"){
 score += 10;
 document.getElementById("score").innerText = "Score: " + score;
+document.getElementById("correctSound").play();
 b.remove();
 }else{
-b.style.transform = "scale(0.8)";
+document.getElementById("wrongSound").play();
+b.style.transform = "scale(0.7)";
 setTimeout(()=>b.remove(),200);
 }
 
@@ -234,13 +247,13 @@ setTimeout(()=>b.remove(),200);
 
 document.getElementById("game").appendChild(b);
 
-setTimeout(()=>b.remove(),9000);
+setTimeout(()=>b.remove(),10000);
 }
 
-/* ================= SPAWN LOOP ================= */
+/* ================= LOOP ================= */
 
-function startSpawning(){
-setInterval(spawnBalloon, 2000);
+function spawnLoop(){
+setInterval(spawnBalloon,2000);
 }
 
 </script>
