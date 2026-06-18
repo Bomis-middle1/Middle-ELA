@@ -169,7 +169,7 @@ opacity:0;
 
 <script>
 
-/* ================= STORY (STRICT - NOT CHANGED) ================= */
+/* ================= STRICT STORY FLOW (DO NOT CHANGE ORDER) ================= */
 const levels = [
 { story:"It is Monday morning. Everyone is excited for the class trip. Ms. Anita checks the time.", q:"The bus will leave ___ 7:30 a.m.", opts:["at","on","in"], ans:"at" },
 { story:"The teacher reminds everyone about the trip.", q:"Our trip is ___ Friday.", opts:["on","at","in"], ans:"on" },
@@ -183,16 +183,15 @@ const levels = [
 { story:"The teacher smiles.", q:"We arrived home ___ the evening.", opts:["in","at","on"], ans:"in" }
 ];
 
-/* DO NOT CHANGE STORY ORDER */
 let i = 0;
 let score = 0;
 
-/* shuffle ONLY options */
+/* ================= SHUFFLE ONLY OPTIONS ================= */
 function shuffle(arr){
 return arr.sort(()=>Math.random()-0.5);
 }
 
-/* FLOW */
+/* ================= INTRO FLOW ================= */
 window.onload = () => {
 setTimeout(()=>{
 document.getElementById("logoScreen").classList.remove("active");
@@ -206,9 +205,10 @@ document.getElementById("gameScreen").classList.add("active");
 loadQ();
 }
 
+/* ================= LOAD QUESTION ================= */
 function loadQ(){
 
-if(i>=levels.length){
+if(i >= levels.length){
 endGame();
 return;
 }
@@ -221,25 +221,26 @@ document.getElementById("scoreBoard").innerText =
 document.getElementById("storyText").innerText = L.story;
 document.getElementById("questionText").innerText = L.q;
 
-document.getElementById("feedback").innerText="";
+let box = document.getElementById("optionsBox");
+box.innerHTML = "";
 
-let box=document.getElementById("optionsBox");
-box.innerHTML="";
+document.getElementById("feedback").innerText = "";
 
-/* ONLY OPTIONS RANDOMISED */
+/* 🔥 ONLY OPTIONS SHUFFLED (FLOW SAFE) */
 let options = shuffle([...L.opts]);
 
 options.forEach(o=>{
-let d=document.createElement("div");
-d.className="option";
-d.innerText=o;
+let d = document.createElement("div");
+d.className = "option";
+d.innerText = o;
 
-d.onclick=()=>check(o);
+d.onclick = () => check(o);
 
 box.appendChild(d);
 });
 }
 
+/* ================= CHECK ANSWER ================= */
 function check(opt){
 
 let L = levels[i];
@@ -248,10 +249,10 @@ if(opt === L.ans){
 score++;
 document.getElementById("correctSound").play().catch(()=>{});
 confetti();
-document.getElementById("feedback").innerText="✔ Correct!";
+document.getElementById("feedback").innerText = "✔ Correct!";
 }else{
 document.getElementById("wrongSound").play().catch(()=>{});
-document.getElementById("feedback").innerText="❌ Wrong!";
+document.getElementById("feedback").innerText = "❌ Wrong!";
 }
 
 setTimeout(()=>{
@@ -260,17 +261,18 @@ loadQ();
 },900);
 }
 
+/* ================= END GAME ================= */
 function endGame(){
 
 document.getElementById("gameScreen").classList.remove("active");
 document.getElementById("endScreen").classList.add("active");
 
-let percent = (score/levels.length)*100;
+let percent = (score / levels.length) * 100;
 
 let remark =
-percent>=80 ? "🌟 Excellent!"
-: percent>=60 ? "👍 Good Job!"
-: percent>=45 ? "🙂 Well Tried!"
+percent >= 80 ? "🌟 Excellent!"
+: percent >= 60 ? "👍 Good Job!"
+: percent >= 45 ? "🙂 Well Tried!"
 : "📘 Let's Revise and Come Back!";
 
 document.getElementById("finalScore").innerText =
@@ -281,16 +283,18 @@ document.getElementById("remark").innerText = remark;
 document.getElementById("clapSound").play().catch(()=>{});
 }
 
+/* ================= RESTART ================= */
 function restartGame(){
 location.reload();
 }
 
+/* ================= CONFETTI ================= */
 function confetti(){
-for(let j=0;j<30;j++){
-let c=document.createElement("div");
-c.className="confetti";
-c.style.left=Math.random()*100+"vw";
-c.style.background=["#ff0","#0ff","#f0f","#0f0","#f60"][Math.floor(Math.random()*5)];
+for(let j = 0; j < 30; j++){
+let c = document.createElement("div");
+c.className = "confetti";
+c.style.left = Math.random() * 100 + "vw";
+c.style.background = ["#ff0","#0ff","#f0f","#0f0","#f60"][Math.floor(Math.random()*5)];
 document.body.appendChild(c);
 setTimeout(()=>c.remove(),2000);
 }
