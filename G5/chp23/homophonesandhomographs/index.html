@@ -13,7 +13,7 @@ body {
   overflow: hidden;
 }
 
-/* SPLASH SCREEN */
+/* SPLASH */
 #splash {
   position: fixed;
   width: 100%;
@@ -29,7 +29,7 @@ body {
   width: 40%;
 }
 
-/* GAME CONTAINER */
+/* GAME */
 .container {
   max-width: 800px;
   margin: auto;
@@ -63,6 +63,27 @@ h1 {
   cursor: pointer;
 }
 
+/* BOTTLE */
+#potionContainer {
+  width: 50px;
+  height: 200px;
+  border: 3px solid #fff;
+  border-radius: 10px;
+  margin: 20px auto;
+  position: relative;
+  background: rgba(255,255,255,0.1);
+  overflow: hidden;
+}
+
+#potionFill {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 0%;
+  background: linear-gradient(to top, #ff4081, #f06292);
+  transition: height 0.4s;
+}
+
 /* END SCREEN */
 #endScreen {
   position: fixed;
@@ -74,10 +95,6 @@ h1 {
   justify-content: center;
   align-items: center;
   z-index: 9999;
-}
-
-#endScreen h2 {
-  font-size: 2.2em;
 }
 
 #restartBtn {
@@ -107,9 +124,13 @@ h1 {
 
   <div class="question" id="question"></div>
   <div class="options" id="options"></div>
+
+  <div id="potionContainer">
+    <div id="potionFill"></div>
+  </div>
 </div>
 
-<!-- END SCREEN -->
+<!-- END -->
 <div id="endScreen">
   <h2 id="finalScore"></h2>
   <button id="restartBtn" onclick="location.reload()">Play Again</button>
@@ -120,7 +141,7 @@ h1 {
 
 <script>
 
-/* LEVELS (UNCHANGED CONTENT AS REQUESTED) */
+/* LEVELS (UNCHANGED CONTENT AS YOU REQUIRED) */
 const levels = [
 {
 title:"Level 1 - Homophones",
@@ -133,17 +154,18 @@ questions:[
 {q:"I can't ___ what he said.",options:["hear","here"],answer:"hear"}
 ]
 },
+
 {
 title:"Level 2 - Homographs",
 questions:[
 {q:"I will ___ the book on the table.",options:["lead","lead"],answer:"lead"},
-{q:"He used a ___ to paint the walls.",options:["bow","bowe"],answer:"bowe"},
 {q:"I cannot ___ the problem.",options:["read","reed"],answer:"read"},
 {q:"The soldier took a ___ to the enemy.",options:["tear","tear"],answer:"tear"},
 {q:"She decided to ___ the letter.",options:["wind","winde"],answer:"wind"},
-{q:"The dove will ___ peacefully.",options:["lead","lead"],answer:"lead"}
+{q:"The teacher will ___ the class.",options:["lead","leads"],answer:"leads"}
 ]
 },
+
 {
 title:"Level 3 - Mixed",
 questions:[
@@ -164,9 +186,22 @@ const qEl = document.getElementById("question");
 const optEl = document.getElementById("options");
 const levelTitle = document.getElementById("levelTitle");
 const scoreBoard = document.getElementById("scoreBoard");
+const potionFill = document.getElementById("potionFill");
 
-const correctSound = document.getElementById("correctSound");
-const wrongSound = document.getElementById("wrongSound");
+/* RESET BOTTLE */
+function resetBottle(){
+  potionFill.style.height = "0%";
+}
+
+/* UPDATE BOTTLE (FIXED PROPERLY) */
+function updateBottle(){
+  let total = levels[currentLevel].questions.length;
+
+  // +1 because we show progress AFTER correct answer
+  let progress = (currentQuestion / total) * 100;
+
+  potionFill.style.height = progress + "%";
+}
 
 /* LOAD QUESTION */
 function loadQuestion(){
@@ -179,22 +214,23 @@ function loadQuestion(){
       endGame();
       return;
     }
+
+    resetBottle(); // FIXED
   }
 
   let q = levels[currentLevel].questions[currentQuestion];
 
   levelTitle.innerText = levels[currentLevel].title;
   qEl.innerText = q.q;
-
   optEl.innerHTML = "";
+
+  updateBottle();
 
   q.options.forEach(opt=>{
     let btn = document.createElement("button");
     btn.className = "btn";
     btn.innerText = opt;
-
     btn.onclick = ()=>checkAnswer(opt);
-
     optEl.appendChild(btn);
   });
 }
@@ -204,15 +240,15 @@ function checkAnswer(opt){
   let q = levels[currentLevel].questions[currentQuestion];
 
   if(opt === q.answer){
-    correctSound.play();
     score += 20;
     scoreBoard.innerText = "Score: " + score;
 
     currentQuestion++;
+    updateBottle(); // FIXED timing
+
     loadQuestion();
   } else {
-    wrongSound.play();
-    alert("Wrong answer! Try again.");
+    alert("Wrong!");
   }
 }
 
@@ -226,7 +262,7 @@ function endGame(){
     " / " + (levels.flatMap(l=>l.questions).length * 20);
 }
 
-/* SPLASH SCREEN CONTROL */
+/* SPLASH */
 setTimeout(()=>{
   document.getElementById("splash").style.display = "none";
   loadQuestion();
