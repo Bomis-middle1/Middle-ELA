@@ -2,290 +2,274 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Punctuation Balloon Pop Game</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Punctuation Pop</title>
 
 <style>
-body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    overflow: hidden;
-    background: linear-gradient(135deg, #6dd5fa, #ff758c);
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial;}
+
+body{
+overflow:hidden;
+background:#eaf6ff;
 }
 
-/* ---------- SCREENS ---------- */
-.screen {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    text-align: center;
+/* ================= LOGO SCREEN ================= */
+#logoScreen{
+position:fixed;
+inset:0;
+background:white;
+display:flex;
+justify-content:center;
+align-items:center;
+z-index:9999;
 }
 
-/* ---------- SPLASH ---------- */
-#splash img {
-    width: 180px;
-    animation: pulse 1.5s infinite;
+#logoScreen img{
+width:220px;
+animation:zoom 1.5s ease-in-out infinite alternate;
 }
 
-@keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.1); }
-    100% { transform: scale(1); }
+@keyframes zoom{
+from{transform:scale(1);}
+to{transform:scale(1.08);}
 }
 
-/* ---------- TITLE ---------- */
-#title {
-    font-size: 2rem;
-    color: white;
-    display: none;
-    font-weight: bold;
+/* ================= TITLE SCREEN ================= */
+#titleScreen{
+position:fixed;
+inset:0;
+display:none;
+justify-content:center;
+align-items:center;
+flex-direction:column;
+background:linear-gradient(135deg,#4fc3f7,#e1f5fe);
+z-index:9998;
+text-align:center;
 }
 
-/* ---------- START BUTTON ---------- */
-button {
-    padding: 12px 25px;
-    font-size: 18px;
-    border: none;
-    border-radius: 10px;
-    background: #ffdd57;
-    cursor: pointer;
-    margin-top: 20px;
+#titleScreen h1{
+font-size:48px;
+color:#0d47a1;
+animation:bounce 1.2s infinite;
 }
 
-/* ---------- GAME AREA ---------- */
-#game {
-    display: none;
-    flex-direction: column;
-    width: 100%;
-    height: 100%;
+#titleScreen p{
+font-size:20px;
+color:#1565c0;
+margin-top:10px;
 }
 
-#questionBox {
-    padding: 20px;
-    font-size: 20px;
-    color: white;
-    font-weight: bold;
+@keyframes bounce{
+0%{transform:translateY(0);}
+50%{transform:translateY(-15px);}
+100%{transform:translateY(0);}
 }
 
-/* ---------- BALLOONS ---------- */
-.balloon {
-    position: absolute;
-    width: 120px;
-    height: 140px;
-    background: radial-gradient(circle at 30% 30%, #fff, #ff4d6d);
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: white;
-    font-weight: bold;
-    cursor: pointer;
-    animation: float 6s linear infinite;
-    box-shadow: 0 10px 15px rgba(0,0,0,0.2);
+/* ================= START SCREEN ================= */
+#startScreen{
+position:fixed;
+inset:0;
+display:none;
+justify-content:center;
+align-items:center;
+flex-direction:column;
+background:#dff6ff;
+z-index:9997;
 }
 
-.balloon::after {
-    content: "";
-    position: absolute;
-    bottom: -20px;
-    width: 2px;
-    height: 25px;
-    background: #333;
+#startBtn{
+padding:15px 30px;
+font-size:20px;
+border:none;
+border-radius:12px;
+background:#ffca28;
+cursor:pointer;
+font-weight:bold;
 }
 
-@keyframes float {
-    0% { transform: translateY(100vh); }
-    100% { transform: translateY(-20vh); }
+/* ================= GAME ================= */
+#game{
+display:none;
+width:100%;
+height:100vh;
+position:relative;
+overflow:hidden;
+background:linear-gradient(to top,#a8e6ff,#ffffff);
 }
 
-/* ---------- CONFETTI ---------- */
-.confetti {
-    position: absolute;
-    width: 8px;
-    height: 8px;
-    background: yellow;
-    animation: fall 2s linear forwards;
+#question{
+position:absolute;
+top:90px;
+width:100%;
+text-align:center;
+font-size:30px;
+font-weight:bold;
+color:#0d47a1;
 }
 
-@keyframes fall {
-    to { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+#options{
+position:absolute;
+bottom:60px;
+width:100%;
+display:flex;
+flex-direction:column;
+align-items:center;
+gap:10px;
 }
 
-/* ---------- CONTROLS ---------- */
-#controls {
-    position: absolute;
-    bottom: 10px;
-    left: 10px;
-    color: white;
+.option{
+padding:12px 20px;
+width:80%;
+background:#e3f2fd;
+border:none;
+border-radius:10px;
+font-size:18px;
+cursor:pointer;
 }
 
-/* ---------- END SCREEN ---------- */
-#endScreen {
-    display: none;
-    color: white;
-    font-size: 24px;
+/* ================= BALLOONS FIXED ================= */
+.balloon{
+position:absolute;
+width:40px;
+height:55px;
+border-radius:50% 50% 45% 45%;
+background:red;
+display:flex;
+justify-content:center;
+align-items:center;
+color:white;
+font-weight:bold;
+animation:float 8s linear forwards;
+box-shadow:inset -6px -10px rgba(0,0,0,0.1);
 }
+
+.balloon::after{
+content:"";
+position:absolute;
+bottom:-10px;
+width:2px;
+height:12px;
+background:#555;
+}
+
+@keyframes float{
+0%{transform:translateY(100vh) translateX(0);}
+50%{transform:translateY(50vh) translateX(30px);}
+100%{transform:translateY(-120vh) translateX(-20px);}
+}
+
+.red{background:#ff5252;}
+.blue{background:#42a5f5;}
+.green{background:#66bb6a;}
+.yellow{background:#ffca28;}
+.purple{background:#ab47bc;}
 
 </style>
 </head>
 
 <body>
 
-<!-- SPLASH -->
-<div id="splash" class="screen">
-    <img src="assets/logo.png" alt="Innovine Logo">
+<!-- LOGO -->
+<div id="logoScreen">
+<img src="assets/innovine-logo.png">
 </div>
 
 <!-- TITLE -->
-<div id="title" class="screen">
-    <div>🎯 Punctuation Power Challenge!</div>
-    <button onclick="startGame()">Start</button>
+<div id="titleScreen">
+<h1>Punctuation Pop 🎈</h1>
+<p>Let’s Learn Grammar the Fun Way!</p>
+</div>
+
+<!-- START -->
+<div id="startScreen">
+<button id="startBtn">Start Game</button>
 </div>
 
 <!-- GAME -->
-<div id="game" class="screen">
-    <div id="questionBox"></div>
-</div>
-
-<!-- END -->
-<div id="endScreen" class="screen">
-    <div id="scoreText"></div>
-    <button onclick="restart()">Restart</button>
-</div>
-
-<!-- SOUND -->
-<audio id="correctSound" src="assets/correct.mp3"></audio>
-<audio id="wrongSound" src="assets/wrong.mp3"></audio>
-
-<!-- VOLUME -->
-<div id="controls">
-Volume: <input type="range" min="0" max="1" step="0.1" value="0.7" onchange="setVolume(this.value)">
+<div id="game">
+<div id="question">Loading...</div>
+<div id="options"></div>
 </div>
 
 <script>
 
-const questions = [
-{q:"I can’t believe we finally finished the project ___", a:[".", "!", "?", ","], c:"!"},
-{q:"Where are you going ___", a:[".", "!", "?", ","], c:"?"},
-{q:"She whispered, “Don’t tell anyone.”", a:["Correct","Wrong","None","Error"], c:"Correct"},
-{q:"The teacher said, “Submit your work.”", a:["A","B","C","D"], c:"A"},
-{q:"You need ___ notebook pen ruler and eraser", a:[".",":","!","?"], c:":"},
-{q:"I love reading books its my hobby", a:["A","B","C","D"], c:"A"},
-{q:"Let’s go to the park tomorrow ___", a:[".",",","!", "?"], c:"."},
-{q:"Wow this place is incredible ___", a:["!",".","?",","], c:"!"},
-{q:"My brother who lives in mumbai is visiting", a:["Mumbai capital","comma error","full stop","none"], c:"Mumbai capital"},
-{q:"Are you coming with us ___", a:["!",".","?",","], c:"?"},
-{q:"The weather is beautiful let’s go outside", a:["A","B","C","D"], c:"B"},
-{q:"He shouted, “Watch out!”", a:["Correct","Wrong","None","Error"], c:"Correct"},
-{q:"I visited delhi last year", a:["A","B","C","D"], c:"B"},
-{q:"Bring snacks water juice and chips", a:["A","B","C","D"], c:"A"},
-{q:"She asked, “Where are you going?”", a:["A","B","C","D"], c:"B"}
-];
-
-let current = 0;
-let score = 0;
-let shuffled = [];
-
-const splash = document.getElementById("splash");
-const title = document.getElementById("title");
-const game = document.getElementById("game");
+/* ================= FLOW CONTROL ================= */
 
 setTimeout(()=>{
-    splash.style.display="none";
-    title.style.display="flex";
+document.getElementById("logoScreen").style.display="none";
+document.getElementById("titleScreen").style.display="flex";
 },5000);
 
+setTimeout(()=>{
+document.getElementById("titleScreen").style.display="none";
+document.getElementById("startScreen").style.display="flex";
+},8000);
+
+/* ================= START GAME ================= */
+
+document.getElementById("startBtn").onclick=function(){
+document.getElementById("startScreen").style.display="none";
+document.getElementById("game").style.display="block";
+startGame();
+};
+
+/* ================= QUESTIONS ================= */
+
+const questions=[
+{q:"I can’t believe it ___",options:[".","!","?"],a:"!"},
+{q:"Where is the library ___",options:[".","?","!"],a:"?"},
+{q:"John is coming ___",options:[".","?","!"],a:"."},
+{q:"Wow that was amazing ___",options:[".","!","?"],a:"!"}
+];
+
+let i=0;
+let score=0;
+
 function startGame(){
-    title.style.display="none";
-    game.style.display="flex";
-    shuffled = questions.sort(()=>Math.random()-0.5);
-    current = 0;
-    score = 0;
-    loadQuestion();
+loadQ();
+spawnBalloon();
+setInterval(spawnBalloon,1800);
 }
 
-function loadQuestion(){
-    clearBalloons();
-    if(current >= shuffled.length){
-        endGame();
-        return;
-    }
-
-    let q = shuffled[current];
-    document.getElementById("questionBox").innerText = q.q;
-
-    q.a.forEach(opt=>{
-        createBalloon(opt, q.c);
-    });
+function loadQ(){
+if(i>=questions.length){
+document.getElementById("question").innerText="Game Over!";
+document.getElementById("options").innerHTML="";
+return;
 }
 
-function createBalloon(text, correct){
-    let b = document.createElement("div");
-    b.className = "balloon";
-    b.innerText = text;
-    b.style.left = Math.random()*80 + "vw";
-    b.style.animationDuration = (4 + Math.random()*3) + "s";
+let q=questions[i];
+document.getElementById("question").innerText=q.q;
 
-    b.onclick = ()=>{
-        if(text === correct){
-            score++;
-            playCorrect();
-            confetti();
-        } else {
-            playWrong();
-        }
-        current++;
-        setTimeout(loadQuestion, 1000);
-    };
+let opt=document.getElementById("options");
+opt.innerHTML="";
 
-    game.appendChild(b);
+q.options.forEach(o=>{
+let btn=document.createElement("button");
+btn.className="option";
+btn.innerText=o;
+btn.onclick=()=>{
+if(o===q.a) score++;
+i++;
+loadQ();
+};
+opt.appendChild(btn);
+});
 }
 
-function clearBalloons(){
-    document.querySelectorAll(".balloon").forEach(b=>b.remove());
-}
+/* ================= BALLOONS ================= */
 
-function playCorrect(){
-    let a = document.getElementById("correctSound");
-    a.volume = volume;
-    a.play();
-}
+function spawnBalloon(){
+let b=document.createElement("div");
+let colors=["red","blue","green","yellow","purple"];
 
-function playWrong(){
-    let a = document.getElementById("wrongSound");
-    a.volume = volume;
-    a.play();
-}
+b.className="balloon "+colors[Math.floor(Math.random()*colors.length)];
+b.innerText=["!","?","·"][Math.floor(Math.random()*3)];
 
-let volume = 0.7;
-function setVolume(v){
-    volume = v;
-}
+b.style.left=Math.random()*90+"vw";
 
-function confetti(){
-    for(let i=0;i<30;i++){
-        let c = document.createElement("div");
-        c.className = "confetti";
-        c.style.left = Math.random()*100 + "vw";
-        c.style.background = ["#ff0","#0ff","#f0f","#0f0"][Math.floor(Math.random()*4)];
-        document.body.appendChild(c);
-        setTimeout(()=>c.remove(),2000);
-    }
-}
+document.body.appendChild(b);
 
-function endGame(){
-    game.style.display="none";
-    document.getElementById("endScreen").style.display="flex";
-    document.getElementById("scoreText").innerText =
-        `🎉 You scored ${score} / ${shuffled.length}`;
-}
-
-function restart(){
-    location.reload();
+setTimeout(()=>b.remove(),8000);
 }
 
 </script>
