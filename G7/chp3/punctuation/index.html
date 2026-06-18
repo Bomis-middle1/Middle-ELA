@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Punctuation Balloon Game - FINAL</title>
+<title>Punctuation Masters - Grade 7</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
 body{
@@ -22,7 +23,15 @@ justify-content:center;
 align-items:center;
 z-index:9999;
 }
-#logoScreen img{width:220px;}
+#logoScreen img{
+width:220px;
+animation:pulse 1.5s infinite alternate;
+}
+
+@keyframes pulse{
+from{transform:scale(1);}
+to{transform:scale(1.08);}
+}
 
 /* ================= TITLE ================= */
 #titleScreen{
@@ -87,6 +96,7 @@ text-align:center;
 font-size:28px;
 font-weight:bold;
 color:#0d47a1;
+padding:10px;
 }
 
 #score{
@@ -95,22 +105,24 @@ top:10px;
 left:10px;
 font-size:20px;
 font-weight:bold;
+color:#0d47a1;
 }
 
-/* ================= BALLOONS ================= */
+/* ================= BALLOON ================= */
 .balloon{
 position:absolute;
-width:55px;
-height:70px;
+width:60px;
+height:75px;
 border-radius:50% 50% 45% 45%;
 display:flex;
 justify-content:center;
 align-items:center;
-font-size:24px;
+font-size:26px;
 font-weight:bold;
 color:white;
 cursor:pointer;
-animation:floatUp 9s linear forwards;
+animation:floatUp 8s linear forwards;
+box-shadow:inset -3px -5px rgba(0,0,0,0.2);
 }
 
 .balloon::after{
@@ -132,28 +144,29 @@ background:#444;
 .green{background:#66bb6a;}
 .yellow{background:#ffca28;}
 .purple{background:#ab47bc;}
+
 </style>
 </head>
 
 <body>
 
-<!-- LOGO -->
+<!-- ================= LOGO ================= -->
 <div id="logoScreen">
 <img src="G7/chp3/punctuation/assets/innovine-logo.png">
 </div>
 
-<!-- TITLE -->
+<!-- ================= TITLE ================= -->
 <div id="titleScreen">
-<h1>Punctuation Pop 🎈</h1>
-<p>Tap the correct punctuation balloon!</p>
+<h1>Punctuation Masters 🎯</h1>
+<p>Grade 7 Grammar Challenge</p>
 </div>
 
-<!-- START -->
+<!-- ================= START ================= -->
 <div id="startScreen">
 <button onclick="startGame()">Start Game</button>
 </div>
 
-<!-- GAME -->
+<!-- ================= GAME ================= -->
 <div id="game">
 <div id="score">Score: 0</div>
 <div id="question">Loading...</div>
@@ -172,25 +185,25 @@ document.getElementById("titleScreen").style.display="none";
 document.getElementById("startScreen").style.display="flex";
 },8000);
 
-/* ================= QUESTIONS (FIXED CLEAN SET) ================= */
+/* ================= QUESTIONS (GRADE 7 CLEAN SET) ================= */
 const questions=[
-{q:"I can’t believe it ___", a:[".","!","?"], c:"!"},
-{q:"Where are you going ___", a:[".","!","?"], c:"?"},
-{q:"Wow this is amazing ___", a:[".","!","?"], c:"!"},
-{q:"John is coming ___", a:[".","!","?"], c:"."},
-{q:"Are you ready ___", a:[".","!","?"], c:"?"},
-{q:"Please sit down ___", a:[".",":","!"], c:":"},
-{q:"I love ice cream ___", a:[".","!","?"], c:"!"},
+{q:"I can’t believe we finally finished the project ___", a:[".","!","?"], c:"!"},
+{q:"Where are you going after school ___", a:[".","!","?"], c:"?"},
+{q:"She whispered, ‘Don’t tell anyone’ ___", a:[".","!","?"], c:"."},
+{q:"You need to bring notebook pen and ruler ___", a:[".",":","!"], c:":"},
+{q:"What a beautiful performance ___", a:[".","!","?"], c:"!"},
+{q:"The teacher said ‘Submit your work’ ___", a:[".","!","?"], c:"."},
+{q:"Are you coming with us ___", a:[".","!","?"], c:"?"},
+{q:"The sun is shining brightly ___", a:[".","!","?"], c:"."},
 {q:"Stop right there ___", a:[".","!","?"], c:"!"},
-{q:"The sun is bright ___", a:[".","!","?"], c:"."},
-{q:"Let’s go to the park ___", a:[".",",","!"], c:"."}
+{q:"Let’s go to the park tomorrow ___", a:[".",",","!"], c:"."}
 ];
 
 let i=0;
 let score=0;
 let currentAnswer="";
 
-/* ================= START GAME ================= */
+/* ================= START ================= */
 function startGame(){
 document.getElementById("startScreen").style.display="none";
 document.getElementById("game").style.display="block";
@@ -207,7 +220,7 @@ function loadQuestion(){
 
 if(i>=questions.length){
 document.getElementById("question").innerText=
-"🎉 Game Over! Score: " + score;
+"🎉 Game Over! Final Score: " + score;
 return;
 }
 
@@ -216,25 +229,21 @@ document.getElementById("question").innerText = questions[i].q;
 document.getElementById("score").innerText = "Score: " + score;
 }
 
-/* ================= BALLOON SYSTEM (FIXED NO OVERLAP LOGIC) ================= */
-
+/* ================= BALLOONS ================= */
 const symbols=["!","?","."];
 const colors=["red","blue","green","yellow","purple"];
 
-/* LANE SYSTEM (FIX FOR OVERLAP) */
-const lanes=[10,25,40,55,70,85];
-
 function spawnBalloon(){
 
+let q = questions[i];
+if(!q) return;
+
+let symbol = q.a[Math.floor(Math.random()*q.a.length)];
+
 let b=document.createElement("div");
-
-let symbol=symbols[Math.floor(Math.random()*symbols.length)];
-
 b.className="balloon "+colors[Math.floor(Math.random()*colors.length)];
 b.innerText=symbol;
-
-/* FIXED POSITIONING (NO OVERLAP) */
-b.style.left=lanes[Math.floor(Math.random()*lanes.length)] + "vw";
+b.style.left=Math.random()*85+"vw";
 
 b.onclick=()=>{
 
@@ -249,13 +258,12 @@ b.remove();
 
 document.body.appendChild(b);
 
-/* SAFE CLEANUP */
-setTimeout(()=>b.remove(),9000);
+setTimeout(()=>b.remove(),7000);
 }
 
 /* ================= LOOP ================= */
 function spawnLoop(){
-setInterval(spawnBalloon,2000);
+setInterval(spawnBalloon,1500);
 }
 
 </script>
