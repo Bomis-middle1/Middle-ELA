@@ -7,11 +7,15 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Arial;}
 
-body{overflow:hidden;background:#dff6ff;}
+body{
+overflow:hidden;
+background:linear-gradient(#b3e5ff,#e6f7ff);
+}
 
-/* ================= LOGO ================= */
+/* ================= LOGO SCREEN ================= */
 #logoScreen{
-position:fixed;inset:0;
+position:fixed;
+inset:0;
 background:white;
 display:flex;
 justify-content:center;
@@ -21,23 +25,37 @@ z-index:9999;
 
 #logoScreen img{
 width:220px;
+animation:pulse 1.5s infinite alternate;
 }
 
-/* ================= TITLE ================= */
+@keyframes pulse{
+from{transform:scale(1);}
+to{transform:scale(1.08);}
+}
+
+/* ================= TITLE SCREEN ================= */
 #titleScreen{
-position:fixed;inset:0;
+position:fixed;
+inset:0;
 display:none;
-flex-direction:column;
 justify-content:center;
 align-items:center;
-background:linear-gradient(#4fc3f7,#e1f5fe);
+flex-direction:column;
+background:linear-gradient(135deg,#4fc3f7,#e1f5fe);
 z-index:9998;
+text-align:center;
 }
 
 #titleScreen h1{
-font-size:48px;
+font-size:50px;
 color:#0d47a1;
 animation:bounce 1.2s infinite;
+}
+
+#titleScreen p{
+font-size:22px;
+margin-top:10px;
+color:#1565c0;
 }
 
 @keyframes bounce{
@@ -46,9 +64,10 @@ animation:bounce 1.2s infinite;
 100%{transform:translateY(0);}
 }
 
-/* ================= START ================= */
+/* ================= START SCREEN ================= */
 #startScreen{
-position:fixed;inset:0;
+position:fixed;
+inset:0;
 display:none;
 justify-content:center;
 align-items:center;
@@ -73,7 +92,7 @@ width:100%;
 height:100vh;
 position:relative;
 overflow:hidden;
-background:linear-gradient(to top,#a8e6ff,#ffffff);
+background:linear-gradient(to top,#9be2ff,#ffffff);
 }
 
 #score{
@@ -95,10 +114,10 @@ display:flex;
 justify-content:center;
 align-items:center;
 font-size:22px;
-color:white;
 font-weight:bold;
+color:white;
 cursor:pointer;
-animation:floatUp 10s linear forwards;
+animation:floatUp 9s linear forwards;
 box-shadow:inset -5px -8px rgba(0,0,0,0.1);
 }
 
@@ -111,11 +130,10 @@ height:14px;
 background:#555;
 }
 
-/* slow kid-friendly movement */
 @keyframes floatUp{
 0%{transform:translateY(100vh);}
-50%{transform:translateY(40vh) translateX(20px);}
-100%{transform:translateY(-120vh) translateX(-10px);}
+50%{transform:translateY(40vh) translateX(25px);}
+100%{transform:translateY(-120vh) translateX(-15px);}
 }
 
 .red{background:#ff5252;}
@@ -123,35 +141,36 @@ background:#555;
 .green{background:#66bb6a;}
 .yellow{background:#ffca28;}
 .purple{background:#ab47bc;}
+
 </style>
 </head>
 
 <body>
 
-<!-- LOGO -->
+<!-- ================= LOGO ================= -->
 <div id="logoScreen">
 <img src="assets/innovine-logo.png">
 </div>
 
-<!-- TITLE -->
+<!-- ================= TITLE ================= -->
 <div id="titleScreen">
 <h1>Punctuation Pop 🎈</h1>
 <p>Tap the correct punctuation balloon!</p>
 </div>
 
-<!-- START -->
+<!-- ================= START ================= -->
 <div id="startScreen">
 <button id="startBtn">Start Game</button>
 </div>
 
-<!-- GAME -->
+<!-- ================= GAME ================= -->
 <div id="game">
 <div id="score">Score: 0</div>
 </div>
 
 <script>
 
-/* ================= FLOW ================= */
+/* ================= FLOW CONTROL ================= */
 
 setTimeout(()=>{
 document.getElementById("logoScreen").style.display="none";
@@ -163,56 +182,51 @@ document.getElementById("titleScreen").style.display="none";
 document.getElementById("startScreen").style.display="flex";
 },8000);
 
-/* ================= AUDIO FIX ================= */
-const audioUnlock = () => {
-document.body.addEventListener("click",()=>{
-console.log("Audio unlocked");
-},{once:true});
-};
-audioUnlock();
+/* ================= GAME VARIABLES ================= */
 
-/* ================= GAME START ================= */
+let score = 0;
+let gameStarted = false;
 
-let score=0;
-let gameStarted=false;
+/* ================= START GAME ================= */
 
-document.getElementById("startBtn").onclick=()=>{
+document.getElementById("startBtn").onclick = () => {
 document.getElementById("startScreen").style.display="none";
 document.getElementById("game").style.display="block";
-gameStarted=true;
-spawnLoop();
+gameStarted = true;
+startSpawning();
 };
 
-/* ================= BALLOONS ================= */
+/* ================= BALLOON DATA ================= */
 
 const symbols = [
-{symbol:"!",type:"correct"},
-{symbol:"?",type:"wrong"},
-{symbol:".",type:"wrong"}
+{symbol:"!", type:"correct"},
+{symbol:"?", type:"wrong"},
+{symbol:".", type:"wrong"}
 ];
+
+const colors = ["red","blue","green","yellow","purple"];
+
+/* ================= SPAWN BALLOONS ================= */
 
 function spawnBalloon(){
 
 if(!gameStarted) return;
 
-let b=document.createElement("div");
+const data = symbols[Math.floor(Math.random()*symbols.length)];
 
-let data=symbols[Math.floor(Math.random()*symbols.length)];
-let colors=["red","blue","green","yellow","purple"];
+const b = document.createElement("div");
+b.className = "balloon " + colors[Math.floor(Math.random()*colors.length)];
+b.textContent = data.symbol;
+b.style.left = Math.random()*90 + "vw";
 
-b.className="balloon "+colors[Math.floor(Math.random()*colors.length)];
-b.innerText=data.symbol;
+b.onclick = () => {
 
-b.style.left=Math.random()*90+"vw";
-
-b.onclick=()=>{
-
-if(data.type==="correct"){
-score+=10;
-document.getElementById("score").innerText="Score: "+score;
+if(data.type === "correct"){
+score += 10;
+document.getElementById("score").innerText = "Score: " + score;
 b.remove();
 }else{
-b.style.transform="scale(0.8)";
+b.style.transform = "scale(0.8)";
 setTimeout(()=>b.remove(),200);
 }
 
@@ -220,12 +234,13 @@ setTimeout(()=>b.remove(),200);
 
 document.getElementById("game").appendChild(b);
 
-setTimeout(()=>b.remove(),10000);
+setTimeout(()=>b.remove(),9000);
 }
 
-/* slower spawn */
-function spawnLoop(){
-setInterval(spawnBalloon,2000);
+/* ================= SPAWN LOOP ================= */
+
+function startSpawning(){
+setInterval(spawnBalloon, 2000);
 }
 
 </script>
