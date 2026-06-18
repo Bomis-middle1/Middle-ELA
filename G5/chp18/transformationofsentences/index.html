@@ -3,21 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Grammar Transformation Quest</title>
+<title>Grammar Transformation Quest - FIXED ENGINE</title>
 
 <style>
-/* ================= GLOBAL ================= */
-*{margin:0;padding:0;box-sizing:border-box;}
-
+/* ================= BASE ================= */
 body{
+  margin:0;
   font-family:Arial;
-  background: radial-gradient(circle at top,#0f172a,#020617);
+  background:#050b1a;
   color:white;
-  overflow:hidden;
 }
 
 /* ================= SPLASH ================= */
-.splash{
+#splash{
   position:fixed;
   inset:0;
   background:white;
@@ -26,307 +24,240 @@ body{
   align-items:center;
   z-index:9999;
 }
-.splash img{
-  width:420px;
-  animation:float 2s ease-in-out infinite;
-}
-@keyframes float{
-  0%,100%{transform:translateY(0)}
-  50%{transform:translateY(-20px)}
+#splash img{width:380px}
+
+/* ================= MAIN ================= */
+#game{
+  display:none;
+  padding:20px;
+  max-width:1100px;
+  margin:auto;
 }
 
-/* ================= DASHBOARD ================= */
-.container{
-  opacity:0;
-  transition:0.5s;
-  padding:15px;
-}
-.container.show{opacity:1;}
-
-/* HEADER (FIXED BIG TEXT) */
-.header{
+/* TITLE (FIXED BIGGER TEXT) */
+h1{
   text-align:center;
-  padding:12px;
-}
-.header h1{
-  font-size:30px;
-  font-weight:800;
+  font-size:34px;
   color:#facc15;
-}
-.header p{
-  font-size:18px;
-  color:#cbd5e1;
+  margin-bottom:10px;
 }
 
-/* ================= JOURNEY PATH (NEW FIX) ================= */
-.journey{
-  margin:10px auto;
-  width:95%;
+/* ================= JOURNEY (NOW ANIMATED) ================= */
+#journey{
   display:flex;
+  align-items:center;
   justify-content:space-between;
-  align-items:center;
+  margin:25px 0;
   position:relative;
-  padding:10px;
 }
 
-.node{
-  width:26px;
-  height:26px;
-  border-radius:50%;
-  background:#334155;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  font-size:12px;
-}
-
-.node.active{
-  background:#22c55e;
-  box-shadow:0 0 10px #22c55e;
-  transform:scale(1.2);
-}
-
-/* line */
 .line{
   position:absolute;
   top:50%;
   left:0;
   width:100%;
-  height:4px;
+  height:6px;
+  background:#1f2937;
+  z-index:0;
+  border-radius:10px;
+}
+
+/* NODE */
+.node{
+  width:34px;
+  height:34px;
+  border-radius:50%;
   background:#334155;
-  z-index:-1;
-}
-
-/* ================= DASHBOARD GRID ================= */
-.grid{
   display:flex;
-  gap:10px;
+  align-items:center;
+  justify-content:center;
+  font-size:13px;
+  z-index:1;
+  transition:0.4s;
 }
 
-/* LEFT */
-.left{
-  width:60%;
+/* ACTIVE NODE */
+.node.active{
+  background:#22c55e;
+  box-shadow:0 0 18px #22c55e;
+  transform:scale(1.25);
+}
+
+/* MOVING TOKEN (THIS WAS MISSING) */
+#token{
+  position:absolute;
+  top:50%;
+  transform:translate(-50%,-50%);
+  width:18px;
+  height:18px;
+  background:gold;
+  border-radius:50%;
+  z-index:2;
+  transition:0.5s ease;
+  box-shadow:0 0 15px gold;
+}
+
+/* ================= QUESTION BOX ================= */
+.box{
   background:#0b1220;
-  padding:15px;
+  padding:20px;
   border-radius:15px;
 }
 
-.question{
-  font-size:22px; /* FIXED BIG TEXT */
-  margin-bottom:10px;
+/* BIG TEXT FIX */
+.q{
+  font-size:26px;
   font-weight:bold;
+  margin-bottom:10px;
   color:#93c5fd;
 }
 
-.instruction{
+.inst{
   font-size:18px;
-  margin-bottom:15px;
+  margin-bottom:12px;
   color:#fbbf24;
 }
 
 .option{
-  background:#1e293b;
-  margin:8px 0;
+  background:#1f2937;
   padding:12px;
+  margin:8px 0;
   border-radius:10px;
   cursor:pointer;
   font-size:18px;
 }
 
 .option:hover{
-  background:#334155;
+  background:#374151;
 }
 
-/* RIGHT */
-.right{
-  width:40%;
-  display:flex;
-  flex-direction:column;
-  gap:10px;
-}
-
-/* KPI */
-.kpi{
-  background:#111827;
-  padding:12px;
-  border-radius:12px;
-  text-align:center;
-}
-
-/* FEEDBACK */
-.feedback{
-  background:#1f2937;
-  padding:12px;
-  border-radius:12px;
-  min-height:80px;
-  font-size:16px;
+/* SCORE */
+.score{
+  margin-top:15px;
+  font-size:18px;
 }
 </style>
 </head>
 
 <body>
 
-<!-- SPLASH -->
-<div class="splash" id="splash">
+<div id="splash">
   <img src="assets/logo.png">
 </div>
 
-<!-- MAIN -->
-<div class="container" id="container">
+<div id="game">
 
-  <!-- HEADER -->
-  <div class="header">
-    <h1>Grammar Transformation Quest</h1>
-    <p>Grade 5 English • Direct & Indirect Speech</p>
-  </div>
+<h1>Grammar Transformation Quest</h1>
 
-  <!-- JOURNEY (FIXED FULL ENGINE) -->
-  <div class="journey" id="journey">
-    <div class="line"></div>
-  </div>
+<div id="journey">
+  <div class="line"></div>
+  <div id="token"></div>
+</div>
 
-  <!-- GRID -->
-  <div class="grid">
+<div class="box">
+  <div class="q" id="q"></div>
+  <div class="inst" id="inst"></div>
+  <div id="options"></div>
+</div>
 
-    <!-- LEFT -->
-    <div class="left">
-      <div class="question" id="q"></div>
-      <div class="instruction" id="inst"></div>
-      <div id="options"></div>
-    </div>
+<div class="score">
+Score: <span id="score">0</span> | Level: <span id="level">1</span>
+</div>
 
-    <!-- RIGHT -->
-    <div class="right">
-      <div class="kpi" id="score">Score: 0</div>
-      <div class="kpi" id="level">Level: 1</div>
-      <div class="feedback" id="fb">Choose correct transformation</div>
-    </div>
-
-  </div>
 </div>
 
 <script>
 
-/* ================= DATA ================= */
-const data = [
-{
-q:'He said that he was reading a book.',
-type:'Indirect → Direct',
-inst:'Convert to Direct Speech',
-options:[
-'He said, "I am reading a book."',
-'He said I reading book.',
-'He say reading book.',
-'He said book reading.'
-],
-ans:0
-},
-{
-q:'She said, "I will come tomorrow."',
-type:'Direct → Indirect',
-inst:'Convert to Indirect Speech',
-options:[
-'She said that she would come the next day.',
-'She said she will come tomorrow.',
-'She say coming tomorrow.',
-'She said come tomorrow.'
-],
-ans:0
-},
-{
-q:'They said that they were going to school.',
-type:'Indirect → Direct',
-inst:'Convert to Direct Speech',
-options:[
-'They said, "We are going to school."',
-'They said going school.',
-'They say school.',
-'They going school.'
-],
-ans:0
-},
-{
-q:'He said, "I have finished my work."',
-type:'Direct → Indirect',
-inst:'Convert to Indirect Speech',
-options:[
-'He said that he had finished his work.',
-'He said finished work.',
-'He say work done.',
-'He said work finish.'
-],
-ans:0
-},
-{
-q:'She said that she could swim.',
-type:'Indirect → Direct',
-inst:'Convert to Direct Speech',
-options:[
-'She said, "I can swim."',
-'She said swim can.',
-'She say I swim.',
-'She swimming said.'
-],
-ans:0
-}
+/* ================= DATA (15 LEVELS FIXED) ================= */
+const data=[
+{q:'He said that he was reading a book.',inst:'Convert to Direct Speech',options:['He said, "I am reading a book."','He said book.','He reading said.','Book he said.'],ans:0},
+{q:'She said, "I will come tomorrow."',inst:'Convert to Indirect Speech',options:['She said that she would come tomorrow.','She said she come.','She will said come.','She tomorrow come.'],ans:0},
+{q:'They said that they were playing.',inst:'Convert to Direct Speech',options:['They said, "We are playing."','They said playing.','They play said.','Playing they said.'],ans:0},
+{q:'He said, "I have finished my work."',inst:'Convert to Indirect Speech',options:['He said that he had finished his work.','He said finish work.','Work he said finish.','He finish said.'],ans:0},
+{q:'She said that she could swim.',inst:'Convert to Direct Speech',options:['She said, "I can swim."','She swim said.','She can said swim.','Swim she said.'],ans:0},
+
+{q:'The teacher said, "The Earth moves."',inst:'Convert to Indirect Speech',options:['The teacher said that the Earth moves.','Teacher Earth said.','Earth moving said.','Moves Earth teacher.'],ans:0},
+{q:'He said that he was tired.',inst:'Convert to Direct Speech',options:['He said, "I am tired."','He tired said.','Tired he is said.','He said tired.'],ans:0},
+{q:'They said, "We are going home."',inst:'Convert to Indirect Speech',options:['They said that they were going home.','They go home said.','Home they said go.','They said home.'],ans:0},
+{q:'She said that she liked chocolate.',inst:'Convert to Direct Speech',options:['She said, "I like chocolate."','She chocolate said.','Chocolate she like said.','She likes said.'],ans:0},
+{q:'He said, "I am late."',inst:'Convert to Indirect Speech',options:['He said that he was late.','He late said.','Late he is said.','He said late.'],ans:0},
+
+{q:'They said that they had won.',inst:'Convert to Direct Speech',options:['They said, "We have won."','They win said.','Won they said.','They said win.'],ans:0},
+{q:'She said, "I can dance well."',inst:'Convert to Indirect Speech',options:['She said that she could dance well.','She dance said.','Dance she said well.','She well dance.'],ans:0},
+{q:'He said that he was hungry.',inst:'Convert to Direct Speech',options:['He said, "I am hungry."','He hungry said.','Hungry he is said.','He said hungry.'],ans:0},
+{q:'They said, "We are studying."',inst:'Convert to Indirect Speech',options:['They said that they were studying.','They study said.','Studying they said.','They said study.'],ans:0},
+{q:'She said that she would help.',inst:'Convert to Direct Speech',options:['She said, "I will help."','She help said.','Help she said will.','She said help.'],ans:0},
 ];
 
-/* ================= JOURNEY BUILD ================= */
+/* ================= SETUP ================= */
 const journey=document.getElementById("journey");
-for(let i=0;i<data.length;i++){
-  let n=document.createElement("div");
-  n.className="node";
-  n.innerText=i+1;
-  journey.appendChild(n);
-}
+const token=document.getElementById("token");
 
-/* ================= STATE ================= */
+data.forEach((_,i)=>{
+  let d=document.createElement("div");
+  d.className="node";
+  d.innerText=i+1;
+  journey.appendChild(d);
+});
+
+const nodes=document.querySelectorAll(".node");
+
 let i=0;
 let score=0;
 
-/* ================= ELEMENTS ================= */
 const q=document.getElementById("q");
 const inst=document.getElementById("inst");
 const opt=document.getElementById("options");
-const fb=document.getElementById("fb");
 const sc=document.getElementById("score");
 const lvl=document.getElementById("level");
-const nodes=document.querySelectorAll(".node");
+
+/* ================= MOVE TOKEN ================= */
+function moveToken(index){
+  let node=nodes[index];
+  let rect=node.getBoundingClientRect();
+  let parent=journey.getBoundingClientRect();
+
+  token.style.left=(rect.left - parent.left + 17)+"px";
+}
 
 /* ================= LOAD ================= */
 function load(){
+
   let d=data[i];
+
   q.innerText=d.q;
   inst.innerText=d.inst;
+
   opt.innerHTML="";
 
+  nodes.forEach(n=>n.classList.remove("active"));
   nodes[i].classList.add("active");
+
+  moveToken(i);
 
   d.options.forEach((o,idx)=>{
     let div=document.createElement("div");
     div.className="option";
     div.innerText=o;
+
     div.onclick=()=>{
-      if(idx===d.ans){
-        score++;
-        fb.innerText="Correct ✔";
-      }else{
-        fb.innerText="Wrong ✖";
-      }
+      if(idx===d.ans) score++;
       next();
     };
+
     opt.appendChild(div);
   });
 
-  sc.innerText="Score: "+score;
-  lvl.innerText="Level: "+(i+1);
+  sc.innerText=score;
+  lvl.innerText=i+1;
 }
 
 /* ================= NEXT ================= */
 function next(){
   i++;
   if(i>=data.length){
-    fb.innerText="Journey Completed 🎉";
+    alert("Journey Complete 🎉");
+    location.reload();
     return;
   }
   load();
@@ -335,7 +266,7 @@ function next(){
 /* ================= START ================= */
 setTimeout(()=>{
   document.getElementById("splash").style.display="none";
-  document.getElementById("container").classList.add("show");
+  document.getElementById("game").style.display="block";
   load();
 },3000);
 
