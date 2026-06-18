@@ -45,6 +45,7 @@
       filter: blur(10px);
       animation: float 18s ease-in-out infinite;
       z-index: 0;
+      pointer-events:none;
     }
     body::before { top: 12%; left: 14%; }
     body::after  { bottom: 10%; right: 12%; animation-delay: -9s; }
@@ -70,6 +71,7 @@
       align-items:center;
       background: transparent;
       z-index:100;
+      pointer-events:none;
     }
 
     #instructionScreen {
@@ -152,6 +154,7 @@
       color:#0b0f19;
       box-shadow: 0 8px 18px rgba(245,158,11,0.35), 0 0 0 1px rgba(0,0,0,0.08);
       transition: transform 0.08s ease;
+      z-index: 1;
     }
     .balloon:hover { transform: translateY(-2px) scale(1.03); }
 
@@ -187,6 +190,7 @@
       top:0;
       animation: fall 2s linear forwards;
       box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+      z-index: 2;
     }
     @keyframes fall {
       0% { transform: translateY(0) translateX(0); opacity:1; }
@@ -284,4 +288,67 @@
       const speed = 1.2;
       const interval = setInterval(()=>{
         pos += speed;
-        balloon.style.bottom = pos + 
+        balloon.style.bottom = pos + "px";
+        if(pos > container.clientHeight) {
+          clearInterval(interval);
+          balloon.remove();
+        }
+      }, 30);
+    }
+
+    function checkAnswer(selected, correct, balloon){
+      if(selected===correct){
+        feedback.textContent="Good Job! ✔";
+        feedback.style.color="var(--success)";
+        correctSound.currentTime=0;
+        correctSound.play();
+        balloon.remove();
+        createConfetti();
+        setTimeout(nextQuestion,800);
+      } else {
+        feedback.textContent="Try Again! ❌";
+        feedback.style.color="var(--error)";
+        balloon.classList.add("wiggle");
+        wrongSound.currentTime=0;
+        wrongSound.play();
+        setTimeout(()=>balloon.classList.remove("wiggle"),500);
+      }
+    }
+
+    function nextQuestion(){
+      current++;
+      if(current>=questions.length){
+        feedback.textContent="🎉 You completed all questions!";
+        clapSound.currentTime=0;
+        clapSound.play();
+        restartBtn.style.display="block";
+      } else showQuestion();
+    }
+
+    restartBtn.onclick = ()=>location.reload();
+
+    function createConfetti(){
+      for(let i=0;i<20;i++){
+        const c = document.createElement("div");
+        c.className="confetti-piece";
+        c.style.left = Math.random()*container.clientWidth + "px";
+        c.style.bottom = container.clientHeight + "px";
+        c.style.background = `hsl(${Math.random()*360},100%,55%)`;
+        container.appendChild(c);
+        setTimeout(()=>c.remove(),1500);
+      }
+    }
+
+    // --- Logo + Instructions (UNCHANGED timing & flow) ---
+    setTimeout(()=>{
+      document.getElementById("logoScreen").style.display="none";
+      document.getElementById("instructionScreen").style.display="block";
+      setTimeout(()=>{
+        document.getElementById("instructionScreen").style.display="none";
+        container.style.display="block";
+        showQuestion();
+      },5000);
+    },5000);
+  </script>
+</body>
+</html>
