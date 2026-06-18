@@ -169,78 +169,31 @@ opacity:0;
 
 <script>
 
-/* ================= STORY (UNCHANGED STRICT) ================= */
+/* ================= STORY (STRICT - NOT CHANGED) ================= */
 const levels = [
-{
-story:"It is Monday morning. Everyone is excited for the class trip. Ms. Anita checks the time.",
-q:"The bus will leave ___ 7:30 a.m.",
-opts:["at","on","in"],
-ans:"at"
-},
-{
-story:"The teacher reminds everyone about the trip.",
-q:"Our trip is ___ Friday.",
-opts:["on","at","in"],
-ans:"on"
-},
-{
-story:"The bus finally arrives.",
-q:"The students are waiting ___ the bus stop.",
-opts:["at","on","under"],
-ans:"at"
-},
-{
-story:"Everyone finds a seat.",
-q:"Rina is sitting ___ her best friend.",
-opts:["beside","under","between"],
-ans:"beside"
-},
-{
-story:"The bus begins its journey.",
-q:"We are travelling ___ bus.",
-opts:["by","on","in"],
-ans:"by"
-},
-{
-story:"The students enter the museum.",
-q:"The dinosaur skeleton is ___ the entrance.",
-opts:["near","in","on"],
-ans:"near"
-},
-{
-story:"Students look for clues.",
-q:"The next clue is hidden ___ the old tree.",
-opts:["under","between","on"],
-ans:"under"
-},
-{
-story:"Everyone sits together.",
-q:"Our lunch break starts ___ noon.",
-opts:["at","on","in"],
-ans:"at"
-},
-{
-story:"The trip ends.",
-q:"The students got ___ the bus happily.",
-opts:["on","in","under"],
-ans:"on"
-},
-{
-story:"The teacher smiles.",
-q:"We arrived home ___ the evening.",
-opts:["in","at","on"],
-ans:"in"
-}
+{ story:"It is Monday morning. Everyone is excited for the class trip. Ms. Anita checks the time.", q:"The bus will leave ___ 7:30 a.m.", opts:["at","on","in"], ans:"at" },
+{ story:"The teacher reminds everyone about the trip.", q:"Our trip is ___ Friday.", opts:["on","at","in"], ans:"on" },
+{ story:"The bus finally arrives.", q:"The students are waiting ___ the bus stop.", opts:["at","on","under"], ans:"at" },
+{ story:"Everyone finds a seat.", q:"Rina is sitting ___ her best friend.", opts:["beside","under","between"], ans:"beside" },
+{ story:"The bus begins its journey.", q:"We are travelling ___ bus.", opts:["by","on","in"], ans:"by" },
+{ story:"The students enter the museum.", q:"The dinosaur skeleton is ___ the entrance.", opts:["near","in","on"], ans:"near" },
+{ story:"Students look for clues.", q:"The next clue is hidden ___ the old tree.", opts:["under","between","on"], ans:"under" },
+{ story:"Everyone sits together.", q:"Our lunch break starts ___ noon.", opts:["at","on","in"], ans:"at" },
+{ story:"The trip ends.", q:"The students got ___ the bus happily.", opts:["on","in","under"], ans:"on" },
+{ story:"The teacher smiles.", q:"We arrived home ___ the evening.", opts:["in","at","on"], ans:"in" }
 ];
 
-/* RANDOMISE QUESTIONS */
-levels.sort(()=>Math.random()-0.5);
+/* DO NOT CHANGE STORY ORDER */
+let i = 0;
+let score = 0;
 
-let i=0;
-let score=0;
+/* shuffle ONLY options */
+function shuffle(arr){
+return arr.sort(()=>Math.random()-0.5);
+}
 
-/* ================= FLOW ================= */
-window.onload=()=>{
+/* FLOW */
+window.onload = () => {
 setTimeout(()=>{
 document.getElementById("logoScreen").classList.remove("active");
 document.getElementById("titleScreen").classList.add("active");
@@ -253,12 +206,6 @@ document.getElementById("gameScreen").classList.add("active");
 loadQ();
 }
 
-/* ================= SHUFFLE FUNCTION ================= */
-function shuffle(arr){
-return arr.sort(()=>Math.random()-0.5);
-}
-
-/* ================= LOAD QUESTION ================= */
 function loadQ(){
 
 if(i>=levels.length){
@@ -274,15 +221,15 @@ document.getElementById("scoreBoard").innerText =
 document.getElementById("storyText").innerText = L.story;
 document.getElementById("questionText").innerText = L.q;
 
+document.getElementById("feedback").innerText="";
+
 let box=document.getElementById("optionsBox");
 box.innerHTML="";
 
-document.getElementById("feedback").innerText="";
+/* ONLY OPTIONS RANDOMISED */
+let options = shuffle([...L.opts]);
 
-/* 🔥 FIXED: RANDOM OPTIONS EVERY TIME */
-let shuffledOptions = shuffle([...L.opts]);
-
-shuffledOptions.forEach(o=>{
+options.forEach(o=>{
 let d=document.createElement("div");
 d.className="option";
 d.innerText=o;
@@ -293,7 +240,6 @@ box.appendChild(d);
 });
 }
 
-/* ================= CHECK ================= */
 function check(opt){
 
 let L = levels[i];
@@ -314,7 +260,6 @@ loadQ();
 },900);
 }
 
-/* ================= END ================= */
 function endGame(){
 
 document.getElementById("gameScreen").classList.remove("active");
@@ -322,12 +267,11 @@ document.getElementById("endScreen").classList.add("active");
 
 let percent = (score/levels.length)*100;
 
-let remark="";
-
-if(percent>=80) remark="🌟 Excellent!";
-else if(percent>=60) remark="👍 Good Job!";
-else if(percent>=45) remark="🙂 Well Tried!";
-else remark="📘 Let's Revise and Come Back!";
+let remark =
+percent>=80 ? "🌟 Excellent!"
+: percent>=60 ? "👍 Good Job!"
+: percent>=45 ? "🙂 Well Tried!"
+: "📘 Let's Revise and Come Back!";
 
 document.getElementById("finalScore").innerText =
 `You answered ${score} out of ${levels.length} correct`;
@@ -337,12 +281,10 @@ document.getElementById("remark").innerText = remark;
 document.getElementById("clapSound").play().catch(()=>{});
 }
 
-/* ================= RESTART ================= */
 function restartGame(){
 location.reload();
 }
 
-/* ================= CONFETTI ================= */
 function confetti(){
 for(let j=0;j<30;j++){
 let c=document.createElement("div");
