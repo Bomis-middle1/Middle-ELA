@@ -34,6 +34,7 @@ button:active{transform:translateY(3px);box-shadow:0 2px 0 #d88900;}
 @keyframes spark{from{transform:scale(.5) translateY(0);opacity:1}to{transform:scale(2) translateY(-60px);opacity:0}}
 </style>
 </head>
+
 <body>
 
 <audio id="correctSound" src="assets/correct.mp3"></audio>
@@ -58,12 +59,16 @@ button:active{transform:translateY(3px);box-shadow:0 2px 0 #d88900;}
         <div class="segment segmentThe">The</div>
       </div>
     </div>
+
     <button onclick="spinWheel()">Spin Wheel</button>
-    <div class="questionBox" id="questionBox">
+
+    <div class="questionBox">
       <div class="question" id="sentenceText">Press spin to start!</div>
     </div>
+
     <div class="options" id="optionsBox"></div>
     <div class="feedback" id="feedback"></div>
+
     <div style="margin-top:10px;">
       <span id="scoreText">Score: 0</span> / <span id="totalText">0</span>
     </div>
@@ -81,6 +86,7 @@ button:active{transform:translateY(3px);box-shadow:0 2px 0 #d88900;}
 </div>
 
 <script>
+
 const questions = [
   {sentence:"I saw ___ elephant at the zoo.",answer:"An"},
   {sentence:"She wants to buy ___ apple.",answer:"An"},
@@ -96,6 +102,8 @@ const questions = [
 
 let current=0;
 let score=0;
+let currentBonus="";
+let bonus = {points:0, hint:false, timer:false};
 
 document.getElementById("totalText").innerText = questions.length;
 
@@ -106,90 +114,122 @@ function startGame(){
 }
 
 function loadQuestion(){
-  if(current >= questions.length){
+
+  if(current>=questions.length){
     endGame();
     return;
   }
+
+  bonus = {points:0, hint:false, timer:false};
+
   const q = questions[current];
   document.getElementById("sentenceText").innerText = q.sentence.replace("___","...");
   document.getElementById("feedback").innerText = "";
-  const optionsBox = document.getElementById("optionsBox");
-  optionsBox.innerHTML = "";
+
+  const box = document.getElementById("optionsBox");
+  box.innerHTML="";
+
   ["A","An","The"].forEach(opt=>{
-    const btn = document.createElement("div");
-    btn.className="optionBtn";
-    btn.innerText = opt;
-    btn.onclick = ()=>checkAnswer(opt, btn);
-    optionsBox.appendChild(btn);
+    const b=document.createElement("div");
+    b.className="optionBtn";
+    b.innerText=opt;
+    b.onclick=()=>checkAnswer(opt,b);
+    box.appendChild(b);
   });
 }
 
-let spinning = false;
+let spinning=false;
 
 function spinWheel(){
   if(spinning) return;
-  spinning = true;
-  const spinner = document.getElementById("spinner");
-  const spins = 3 + Math.floor(Math.random()*3);
-  const randSegment = Math.floor(Math.random()*3);
-  const totalDeg = spins*360 + randSegment*120 + 60; // center of segment
-  spinner.style.transition="transform 3s cubic-bezier(0.33, 1, 0.68, 1)";
-  spinner.style.transform = `rotate(${totalDeg}deg)`;
-  setTimeout(()=>{spinning=false; alert("Now select your answer!");},3100);
+  spinning=true;
+
+  const rewards=["⭐ +10 Points","💡 Hint","⏱ Timer Boost"];
+  currentBonus = rewards[Math.floor(Math.random()*3)];
+
+  bonus.points= currentBonus.includes("10")?10:0;
+  bonus.hint= currentBonus.includes("Hint");
+  bonus.timer= currentBonus.includes("Timer");
+
+  const spin=document.getElementById("spinner");
+  const deg= (3+Math.random()*2)*360 + Math.floor(Math.random()*3)*120 + 60;
+
+  spin.style.transform=`rotate(${deg}deg)`;
+
+  setTimeout(()=>{
+    spinning=false;
+    alert("Bonus: "+currentBonus);
+  },3100);
 }
 
-function checkAnswer(selected, btn){
-  const q = questions[current];
-  const optionButtons = document.querySelectorAll(".optionBtn");
-  optionButtons.forEach(b=>b.onclick=null); // disable all buttons
+function checkAnswer(selected,btn){
 
-  if(selected === q.answer){
+  const q=questions[current];
+  const buttons=document.querySelectorAll(".optionBtn");
+  buttons.forEach(b=>b.onclick=null);
+
+  let earned=0;
+
+  if(selected===q.answer){
     btn.classList.add("correct");
     playSound("correctSound");
-    sparkleEffect();
-    score++;
-  } else {
+
+    earned=1+bonus.points;
+    score+=earned;
+
+    document.getElementById("feedback").innerText="Correct! +"+earned+" ⭐";
+
+  }else{
     btn.classList.add("wrong");
     playSound("wrongSound");
-    optionButtons.forEach(b=>{
-      if(b.innerText===q.answer) b.classList.add("correct");
+
+    buttons.forEach(b=>{
+      if(b.innerText===q.answer)b.classList.add("correct");
     });
+
+    document.getElementById("feedback").innerText="Try next!";
   }
 
-  document.getElementById("scoreText").innerText = score;
+  if(bonus.hint){
+    setTimeout(()=>{
+      buttons.forEach(b=>{
+        if(b.innerText===q.answer){
+          b.style.boxShadow="0 0 15px #52b788";
+        }
+      });
+    },800);
+  }
+
+  document.getElementById("scoreText").innerText=score;
   current++;
-  setTimeout(loadQuestion,1000);
+
+  setTimeout(loadQuestion,1200);
 }
 
 function endGame(){
   document.getElementById("gameScreen").classList.remove("active");
   document.getElementById("endScreen").classList.add("active");
-  document.getElementById("finalScore").innerText = "Your Score: "+score+" / "+questions.length;
+  document.getElementById("finalScore").innerText=
+  "Your Score: "+score+" / "+questions.length;
+
   playSound("clapSound");
   launchConfetti();
 }
 
 function restartGame(){
-  current=0; score=0;
+  current=0;score=0;
   document.getElementById("endScreen").classList.remove("active");
   document.getElementById("gameScreen").classList.add("active");
   loadQuestion();
 }
 
-function sparkleEffect(){
-  for(let i=0;i<12;i++){
-    const s=document.createElement("div");
-    s.className="sparkle";
-    s.innerText="✨";
-    s.style.left=(30+Math.random()*40)+"vw";
-    s.style.top=(50+Math.random()*40)+"px";
-    document.body.appendChild(s);
-    setTimeout(()=>s.remove(),1000);
-  }
+function playSound(id){
+  const s=document.getElementById(id);
+  if(s){s.currentTime=0;s.play().catch(()=>{});}
 }
 
 function launchConfetti(){
-  for(let i=0;i<60;i++){
+  for(let i=0;i<50;i++){
     const c=document.createElement("div");
     c.className="sparkle";
     c.innerText="✨";
@@ -200,10 +240,7 @@ function launchConfetti(){
   }
 }
 
-function playSound(id){
-  const s=document.getElementById(id);
-  if(s){s.currentTime=0;s.play().catch(()=>{});}
-}
 </script>
+
 </body>
 </html>
