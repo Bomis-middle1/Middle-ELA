@@ -4,151 +4,287 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Modals Card Flip Game</title>
+
 <style>
-body{margin:0;font-family:Arial,sans-serif;background:#140f3d;color:#fff;display:flex;align-items:center;justify-content:center;flex-direction:column;height:100vh;}
+body{
+margin:0;
+font-family:Arial,sans-serif;
+background:#140f3d;
+color:#fff;
+display:flex;
+align-items:center;
+justify-content:center;
+flex-direction:column;
+height:100vh;
+}
+
+.screen{
+display:none;
+width:100%;
+height:100%;
+align-items:center;
+justify-content:center;
+flex-direction:column;
+text-align:center;
+}
+
+.active{display:flex;}
+
 h1{color:#ffd60a;}
-.card-container{display:grid;grid-template-columns:repeat(4,100px);grid-gap:15px;margin:20px;}
-.card{width:100px;height:140px;background:#fff4d6;color:#2d2340;border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:18px;cursor:pointer;user-select:none;position:relative;transform-style:preserve-3d;transition:transform 0.5s;}
+
+.logo{
+width:260px;
+}
+
+.topic{
+font-size:40px;
+color:#ffd60a;
+text-shadow:2px 2px 4px #000;
+}
+
+/* GAME */
+.card-container{
+display:grid;
+grid-template-columns:repeat(4,100px);
+grid-gap:15px;
+margin:20px;
+}
+
+.card{
+width:100px;
+height:140px;
+background:#fff4d6;
+color:#2d2340;
+border-radius:12px;
+display:flex;
+align-items:center;
+justify-content:center;
+font-weight:bold;
+cursor:pointer;
+transition:0.4s;
+}
+
 .card.flipped{transform:rotateY(180deg);}
-.card .front,.card .back{position:absolute;width:100%;height:100%;backface-visibility:hidden;display:flex;align-items:center;justify-content:center;border-radius:12px;}
-.card .front{background:#d8f3dc;}
-.card .back{background:#52b788;color:#fff;transform:rotateY(180deg);}
 .card.matched{visibility:hidden;}
-.card .optionText{padding:5px;text-align:center;}
-#mcqBox{background:#fff4d6;color:#2d2340;padding:15px;border-radius:15px;max-width:400px;text-align:center;display:none;margin-top:15px;}
-button{padding:8px 12px;margin:5px;border-radius:12px;border:none;background:#ffb703;color:#2d2340;font-weight:bold;cursor:pointer;}
+
+#mcqBox{
+background:#fff4d6;
+color:#2d2340;
+padding:15px;
+border-radius:15px;
+max-width:400px;
+display:none;
+margin-top:15px;
+}
+
+button{
+padding:8px 12px;
+margin:5px;
+border:none;
+border-radius:12px;
+background:#ffb703;
+cursor:pointer;
+font-weight:bold;
+}
+
 .correct{background:#b7efc5;}
 .wrong{background:#ffccd5;}
-.feedback{min-height:25px;margin-top:8px;font-weight:bold;}
-#endScreen{display:none;text-align:center;margin-top:20px;}
+
+.confetti{
+position:fixed;
+width:8px;
+height:8px;
+top:-10px;
+animation:fall 2s linear forwards;
+}
+
+@keyframes fall{
+to{
+transform:translateY(100vh) rotate(360deg);
+opacity:0;
+}
+}
 </style>
 </head>
+
 <body>
 
+<!-- SPLASH 1 -->
+<div id="logoScreen" class="screen active">
+  <img class="logo" src="Middle-ELA/G7/chp7/modals/assets/innovine-logo.png">
+</div>
+
+<!-- SPLASH 2 -->
+<div id="titleScreen" class="screen">
+  <div class="topic">✨ Modals Master Challenge ✨</div>
+</div>
+
+<!-- GAME -->
+<div id="gameScreen" class="screen">
+
 <h1>Modals Card Flip Game</h1>
+
 <div class="card-container" id="cardContainer"></div>
 
 <div id="mcqBox">
   <div id="questionText"></div>
   <div id="optionsBox"></div>
-  <div class="feedback" id="feedback"></div>
+  <div id="feedback"></div>
   <button onclick="closeMCQ()">Continue</button>
 </div>
 
-<div id="endScreen">
-  <h2>Well Done!</h2>
-  <p id="finalScore"></p>
-  <button onclick="restartGame()">Play Again</button>
+<div id="endScreen"></div>
+
 </div>
 
-<audio id="correctSound" src="assets/correct.mp3"></audio>
-<audio id="wrongSound" src="assets/wrong.mp3"></audio>
-<audio id="clapSound" src="assets/freesound_community-claps-44774.mp3"></audio>
+<!-- AUDIO -->
+<audio id="correctSound" src="Middle-ELA/G7/chp7/modals/assets/correct.mp3"></audio>
+<audio id="wrongSound" src="Middle-ELA/G7/chp7/modals/assets/wrong.mp3"></audio>
+<audio id="clapSound" src="Middle-ELA/G7/chp7/modals/assets/clapping.mp3"></audio>
 
 <script>
-// Modals MCQs
-const mcqs=[
-  {q:"You ___ complete your homework before dinner.",opts:["must","might","may"],ans:"must"},
-  {q:"She said she ___ help us with the project tomorrow.",opts:["can","could","shall"],ans:"could"},
-  {q:"It ___ rain later, so take an umbrella.",opts:["may","would","must"],ans:"may"},
-  {q:"You ___ not enter the lab without safety glasses.",opts:["needn’t","must","could"],ans:"must"},
-  {q:"I ___ like to join you for the movie.",opts:["would","can","shall"],ans:"would"},
-  {q:"We ___ finish the work on time if we start now.",opts:["shall","will","might"],ans:"will"},
-  {q:"He ___ be at the library; I’m not sure.",opts:["might","should","must"],ans:"might"},
-  {q:"You ___ practice more to improve your score.",opts:["should","can","would"],ans:"should"},
-  {q:"She said I ___ go if I wanted.",opts:["might","needn’t","ought to"],ans:"might"},
-  {q:"You ___ eat too much sugar; it’s not healthy.",opts:["must","needn’t","could"],ans:"needn’t"}
+
+/* SPLASH FLOW */
+window.onload = () => {
+
+  setTimeout(() => {
+    document.getElementById("logoScreen").classList.remove("active");
+    document.getElementById("titleScreen").classList.add("active");
+  }, 5000);
+
+  setTimeout(() => {
+    document.getElementById("titleScreen").classList.remove("active");
+    document.getElementById("gameScreen").classList.add("active");
+    initGame();
+  }, 8000);
+};
+
+/* MCQs */
+const mcqs = [
+  {q:"You ___ complete homework.",opts:["must","might","may"],ans:"must"},
+  {q:"She ___ help us.",opts:["can","could","shall"],ans:"could"},
+  {q:"It ___ rain.",opts:["may","would","must"],ans:"may"},
+  {q:"You ___ not enter.",opts:["needn’t","must","could"],ans:"must"},
+  {q:"We ___ finish on time.",opts:["shall","will","might"],ans:"will"},
+  {q:"He ___ be late.",opts:["might","should","must"],ans:"might"},
+  {q:"You ___ practice more.",opts:["should","can","would"],ans:"should"},
+  {q:"She said I ___ go.",opts:["might","needn’t","ought to"],ans:"might"},
+  {q:"We ___ leave now.",opts:["must","can","may"],ans:"must"},
+  {q:"They ___ come tomorrow.",opts:["might","will","must"],ans:"might"}
 ];
 
-let currentMCQ=0;
+function shuffle(arr){
+  return arr.sort(()=>Math.random()-0.5);
+}
+
+let gameData = shuffle([...mcqs]);
+let current=0;
 let score=0;
+let flipped=[];
 
-// Card flip game setup
-const cardContainer=document.getElementById('cardContainer');
-let flippedCards=[];
-let totalPairs=10; // one card per MCQ for simplicity
+/* INIT */
+function initGame(){
+  const container=document.getElementById("cardContainer");
+  container.innerHTML="";
 
-function initCards(){
-  cardContainer.innerHTML='';
-  for(let i=0;i<totalPairs;i++){
-    const card=document.createElement('div');
-    card.className='card';
-    card.innerHTML=`
-      <div class="front">Card ${i+1}</div>
-      <div class="back">Tap me</div>
-    `;
-    card.onclick=()=>flipCard(card,i);
-    cardContainer.appendChild(card);
-  }
-}
+  let order=[...Array(gameData.length).keys()].sort(()=>Math.random()-0.5);
 
-function flipCard(card,index){
-  if(card.classList.contains('flipped')||card.classList.contains('matched')) return;
-  card.classList.add('flipped');
-  flippedCards.push(card);
-  if(flippedCards.length===1){
-    // show MCQ
-    showMCQ();
-  }
-}
-
-function showMCQ(){
-  const box=document.getElementById('mcqBox');
-  box.style.display='block';
-  const q=mcqs[currentMCQ];
-  document.getElementById('questionText').innerText=q.q;
-  const optionsBox=document.getElementById('optionsBox');
-  optionsBox.innerHTML='';
-  q.opts.forEach(opt=>{
-    const btn=document.createElement('button');
-    btn.innerText=opt;
-    btn.onclick=()=>checkMCQ(opt,btn);
-    optionsBox.appendChild(btn);
+  order.forEach(i=>{
+    let card=document.createElement("div");
+    card.className="card";
+    card.innerHTML="Tap";
+    card.onclick=()=>flip(card,i);
+    container.appendChild(card);
   });
-  document.getElementById('feedback').innerText='';
 }
 
-function checkMCQ(selected,btn){
-  const q=mcqs[currentMCQ];
-  const buttons=document.querySelectorAll('#optionsBox button');
+/* FLIP */
+function flip(card,index){
+  if(card.classList.contains("flipped")) return;
+
+  card.classList.add("flipped");
+  flipped.push(card);
+  showMCQ();
+}
+
+/* MCQ */
+function showMCQ(){
+  let q=gameData[current];
+
+  document.getElementById("mcqBox").style.display="block";
+  document.getElementById("questionText").innerText=q.q;
+
+  let box=document.getElementById("optionsBox");
+  box.innerHTML="";
+
+  q.opts.forEach(o=>{
+    let btn=document.createElement("button");
+    btn.innerText=o;
+    btn.onclick=()=>check(o,btn);
+    box.appendChild(btn);
+  });
+}
+
+/* CHECK */
+function check(ans,btn){
+  let q=gameData[current];
+  let buttons=document.querySelectorAll("#optionsBox button");
+
   buttons.forEach(b=>b.disabled=true);
-  if(selected===q.ans){
-    btn.classList.add('correct');
-    document.getElementById('feedback').innerText='Correct!';
-    document.getElementById('correctSound').play();
+
+  if(ans===q.ans){
+    btn.classList.add("correct");
+    document.getElementById("correctSound").play().catch(()=>{});
     score++;
-    // mark the flipped card as matched
-    flippedCards.forEach(c=>c.classList.add('matched'));
-  } else{
-    btn.classList.add('wrong');
-    document.getElementById('feedback').innerText='Wrong! Correct: '+q.ans;
-    document.getElementById('wrongSound').play();
-    flippedCards.forEach(c=>c.classList.remove('flipped'));
+    confetti();
+    flipped.forEach(c=>c.classList.add("matched"));
+  } else {
+    btn.classList.add("wrong");
+    document.getElementById("wrongSound").play().catch(()=>{});
   }
 }
 
+/* CONFETTI */
+function confetti(){
+  for(let i=0;i<40;i++){
+    let d=document.createElement("div");
+    d.className="confetti";
+    d.style.left=Math.random()*100+"vw";
+    d.style.background=["#ff0","#0ff","#f0f","#0f0","#f60"][Math.floor(Math.random()*5)];
+    document.body.appendChild(d);
+    setTimeout(()=>d.remove(),2000);
+  }
+}
+
+/* CLOSE */
 function closeMCQ(){
-  document.getElementById('mcqBox').style.display='none';
-  flippedCards=[];
-  currentMCQ++;
-  if(currentMCQ>=mcqs.length){
-    document.getElementById('cardContainer').style.display='none';
-    document.getElementById('endScreen').style.display='block';
-    document.getElementById('finalScore').innerText=`Score: ${score} / ${mcqs.length}`;
-    document.getElementById('clapSound').play();
+  document.getElementById("mcqBox").style.display="none";
+  flipped=[];
+  current++;
+
+  if(current>=gameData.length){
+    endGame();
   }
 }
 
-function restartGame(){
-  currentMCQ=0;
-  score=0;
-  document.getElementById('cardContainer').style.display='grid';
-  document.getElementById('endScreen').style.display='none';
-  initCards();
+/* END */
+function endGame(){
+  document.getElementById("gameScreen").innerHTML=`
+    <div>
+      <h1>🏆 Game Complete</h1>
+      <h2>Score: ${score} / ${mcqs.length}</h2>
+      <button onclick="restart()">Play Again</button>
+    </div>
+  `;
+  document.getElementById("clapSound").play().catch(()=>{});
 }
 
-// initialize game
-initCards();
+/* RESTART */
+function restart(){
+  location.reload();
+}
+
 </script>
+
 </body>
 </html>
