@@ -131,15 +131,10 @@ margin-bottom:15px;
 
 <body>
 
-<!-- ✅ LOGO SCREEN (FIXED - NO PLACEHOLDER ISSUE) -->
+<!-- ✅ LOGO SCREEN (STATIC 5 SECONDS ONLY - NO ANIMATION) -->
 <div id="logoScreen" class="screen active">
   <div class="card">
-    
-    <!-- 🔥 IMPORTANT FIX:
-         You must replace THIS src with your REAL Innovine logo path -->
     <img src="innovine-logo.png" class="logo" alt="Innovine Logo">
-
-    <h1>Innovine Learning Games</h1>
   </div>
 </div>
 
@@ -152,7 +147,7 @@ margin-bottom:15px;
   </div>
 </div>
 
-<!-- GAME -->
+<!-- GAME SCREEN -->
 <div id="gameScreen" class="screen">
   <div class="card">
 
@@ -178,7 +173,7 @@ margin-bottom:15px;
   </div>
 </div>
 
-<!-- END -->
+<!-- END SCREEN -->
 <div id="endScreen" class="screen">
   <div class="card">
     <h1>🏆 Well Done!</h1>
@@ -213,7 +208,7 @@ let bonus={points:0,hint:false};
 
 document.getElementById("score").innerText=0;
 
-/* ✅ FIXED LOGO TIMING FLOW */
+/* ✅ ONLY LOGIC FIX: 5 SECOND STATIC LOGO */
 setTimeout(()=>{
 document.getElementById("logoScreen").classList.remove("active");
 document.getElementById("instructionScreen").classList.add("active");
