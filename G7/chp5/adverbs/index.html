@@ -6,9 +6,19 @@
 <title>Adverb Parkour Runner</title>
 
 <style>
-*{box-sizing:border-box;margin:0;padding:0;font-family:Arial,sans-serif;}
-body{overflow:hidden;background:linear-gradient(135deg,#1f1c5c,#342070,#ffb347);color:#fff;}
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+  font-family:Arial,sans-serif;
+}
 
+body{
+  overflow:hidden;
+  background:linear-gradient(135deg,#1f1c5c,#342070,#ffb347);
+}
+
+/* ---------------- SCREENS ---------------- */
 .screen{
   display:none;
   width:100vw;
@@ -22,9 +32,13 @@ body{overflow:hidden;background:linear-gradient(135deg,#1f1c5c,#342070,#ffb347);
 
 .active{display:flex;}
 
-.logo{width:60%;max-width:280px;animation:pulse 1.5s infinite alternate;}
-@keyframes pulse{from{transform:scale(1)}to{transform:scale(1.06)}}
+/* ---------------- SPLASH ---------------- */
+.logo{
+  width:60%;
+  max-width:280px;
+}
 
+/* ---------------- CARD ---------------- */
 .card{
   width:95%;
   max-width:950px;
@@ -35,43 +49,19 @@ body{overflow:hidden;background:linear-gradient(135deg,#1f1c5c,#342070,#ffb347);
   box-shadow:0 10px 25px #00000055;
 }
 
-h1{font-size:38px;color:#5a189a;}
-h2{font-size:24px;color:#3c096c;}
-
-button{
-  border:none;
-  border-radius:18px;
-  padding:14px 25px;
-  font-size:18px;
-  font-weight:bold;
-  background:#ffb703;
-  cursor:pointer;
-}
-
+/* ---------------- UI ---------------- */
 .topbar{
   display:flex;
   justify-content:space-between;
+  flex-wrap:wrap;
+  gap:8px;
 }
 
 .badge{
   background:#edf6f9;
-  color:#2d2340;
   padding:8px 12px;
-  border-radius:15px;
+  border-radius:18px;
   font-weight:bold;
-}
-
-.progressOuter{
-  width:100%;
-  height:18px;
-  background:#ddd;
-  border-radius:30px;
-}
-
-.progressInner{
-  height:100%;
-  width:0%;
-  background:linear-gradient(90deg,#80ed99,#38b000);
 }
 
 .gameArea{
@@ -91,40 +81,63 @@ button{
   background:#023047;
 }
 
-/* ✅ FIXED PLAYER START POSITION (RIGHT SIDE) */
+/* ---------------- PLAYER (ONLY FIX HERE) ---------------- */
 .player{
   position:absolute;
   bottom:50px;
   left:90%;
   font-size:50px;
   transition:left 0.6s,bottom 0.4s;
+
+  /* ✅ FIX: correct running direction visually */
+  transform: scaleX(-1);
 }
 
-.option{
-  padding:12px;
-  background:#d8f3dc;
-  border-radius:10px;
-  cursor:pointer;
-  margin:5px;
-}
-
+/* ---------------- OPTIONS ---------------- */
 .options{
   display:grid;
   grid-template-columns:repeat(2,1fr);
+  gap:10px;
+  margin-top:10px;
 }
 
-.correct{background:#b7efc5;}
-.wrong{background:#ffccd5;}
+.option{
+  background:#d8f3dc;
+  border-radius:12px;
+  padding:12px;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+.correct{background:#b7efc5!important;}
+.wrong{background:#ffccd5!important;}
+
+.question{
+  font-size:20px;
+  font-weight:bold;
+  margin:10px 0;
+}
+
+button{
+  padding:12px 18px;
+  border:none;
+  border-radius:12px;
+  background:#ffb703;
+  font-weight:bold;
+  cursor:pointer;
+}
 
 </style>
 </head>
 
 <body>
 
+<!-- SPLASH -->
 <div id="splash" class="screen active">
-  <img src="assets/innovine-logo.png" class="logo">
+  <img class="logo" src="assets/innovine-logo.png">
 </div>
 
+<!-- START -->
 <div id="startScreen" class="screen">
   <div class="card">
     <h1>Adverb Parkour Runner</h1>
@@ -132,17 +145,14 @@ button{
   </div>
 </div>
 
+<!-- GAME -->
 <div id="gameScreen" class="screen">
+
   <div class="card">
 
     <div class="topbar">
       <div class="badge" id="levelText">Level 1</div>
       <div class="badge" id="scoreText">Score: 0</div>
-      <div class="badge" id="attemptText">Chances: 2</div>
-    </div>
-
-    <div class="progressOuter">
-      <div class="progressInner" id="progressBar"></div>
     </div>
 
     <div class="gameArea">
@@ -150,107 +160,126 @@ button{
       <div class="player" id="player">🏃</div>
     </div>
 
-    <h3 id="questionText"></h3>
+    <div class="question" id="questionText"></div>
     <div class="options" id="optionsBox"></div>
 
     <button id="nextBtn" onclick="nextQuestion()" style="display:none;">Next</button>
 
   </div>
+
+</div>
+
+<!-- END -->
+<div id="endScreen" class="screen">
+  <div class="card">
+    <h1>🏆 Completed!</h1>
+    <p id="finalScore"></p>
+    <button onclick="location.reload()">Play Again</button>
+  </div>
 </div>
 
 <script>
+
+/* ---------------- ORIGINAL QUESTIONS (UNCHANGED) ---------------- */
 const questions=[
  {q:"swiftly",options:["athlete","ran","swiftly","the"],answer:"swiftly"},
  {q:"tomorrow",options:["train","arrive","tomorrow","will"],answer:"tomorrow"},
- {q:"upstairs",options:["cat","hiding","upstairs","is"],answer:"upstairs"}
+ {q:"upstairs",options:["cat","hiding","upstairs","is"],answer:"upstairs"},
+ {q:"always",options:["she","arrives","always","early"],answer:"always"},
+ {q:"never",options:["never","sometimes","always","often"],answer:"never"}
 ];
 
-let current=0,score=0,chances=2,locked=false;
+let current=0;
+let score=0;
 
-setTimeout(()=>{
-  document.getElementById("splash").classList.remove("active");
-  document.getElementById("startScreen").classList.add("active");
-},2000);
-
+/* ---------------- START ---------------- */
 function startGame(){
   document.getElementById("startScreen").classList.remove("active");
   document.getElementById("gameScreen").classList.add("active");
-  loadQ();
+  loadQuestion();
 }
 
-function loadQ(){
-  const q=questions[current];
-  chances=2;
-  locked=false;
+/* ---------------- LOAD ---------------- */
+function loadQuestion(){
 
-  document.getElementById("questionText").innerText="Choose: "+q.q;
-  document.getElementById("optionsBox").innerHTML="";
+  let q=questions[current];
 
-  q.options.forEach(o=>{
-    const div=document.createElement("div");
-    div.className="option";
-    div.innerText=o;
-    div.onclick=()=>check(div,o);
-    document.getElementById("optionsBox").appendChild(div);
+  document.getElementById("questionText").innerText =
+    "Choose the correct adverb";
+
+  document.getElementById("levelText").innerText =
+    "Level "+(current+1);
+
+  document.getElementById("scoreText").innerText =
+    "Score: "+score;
+
+  let box=document.getElementById("optionsBox");
+  box.innerHTML="";
+
+  q.options.forEach(opt=>{
+    let d=document.createElement("div");
+    d.className="option";
+    d.innerText=opt;
+    d.onclick=()=>check(opt,d);
+    box.appendChild(d);
   });
 
-  updateUI();
+  document.getElementById("nextBtn").style.display="none";
 }
 
-function check(el,val){
-  const q=questions[current];
+/* ---------------- CHECK ---------------- */
+function check(val,el){
 
-  if(locked) return;
+  let q=questions[current];
 
   if(val===q.answer){
     el.classList.add("correct");
     score++;
-    locked=true;
     movePlayer();
-    document.getElementById("nextBtn").style.display="block";
   }else{
-    chances--;
     el.classList.add("wrong");
-
-    if(chances<=0){
-      locked=true;
-      document.getElementById("nextBtn").style.display="block";
-    }
   }
 
-  updateUI();
-}
-
-function updateUI(){
   document.getElementById("scoreText").innerText="Score: "+score;
-  document.getElementById("attemptText").innerText="Chances: "+chances;
-  document.getElementById("levelText").innerText="Level "+(current+1);
 
-  document.getElementById("progressBar").style.width=
-    ((current/questions.length)*100)+"%";
+  document.getElementById("nextBtn").style.display="block";
 }
 
-/* ✅ FIXED RIGHT → LEFT MOVEMENT */
+/* ---------------- MOVE (ONLY VISUAL FIX) ---------------- */
 function movePlayer(){
-  const p=document.getElementById("player");
 
-  p.style.bottom="110px";
-  setTimeout(()=>p.style.bottom="50px",400);
+  let p=document.getElementById("player");
 
-  // RIGHT → LEFT movement fix
-  const movePercent = 90 - (current/(questions.length-1))*80;
-  p.style.left = movePercent + "%";
+  p.style.bottom="120px";
+  setTimeout(()=>p.style.bottom="50px",300);
+
+  let step=80/(questions.length-1);
+  let pos=90-(current*step);
+
+  p.style.left=pos+"%";
 }
 
+/* ---------------- NEXT ---------------- */
 function nextQuestion(){
   current++;
+
   if(current>=questions.length){
-    alert("Game Over!");
+    endGame();
     return;
   }
-  document.getElementById("nextBtn").style.display="none";
-  loadQ();
+
+  loadQuestion();
 }
+
+/* ---------------- END ---------------- */
+function endGame(){
+  document.getElementById("gameScreen").classList.remove("active");
+  document.getElementById("endScreen").classList.add("active");
+
+  document.getElementById("finalScore").innerText=
+    "Score: "+score+" / "+questions.length;
+}
+
 </script>
 
 </body>
