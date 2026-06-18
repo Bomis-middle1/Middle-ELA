@@ -4,68 +4,141 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Idioms Pictionary</title>
+
 <style>
-  body {
-    background: #87ceeb;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    font-family: 'Courier New', monospace;
-    flex-direction: column;
-  }
+body {
+  margin: 0;
+  font-family: 'Courier New', monospace;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
 
-  /* Splash / Instructions */
-  #splash, #instructions {
-    position: fixed; top:0; left:0; width:100%; height:100%;
-    background:#fff; display:flex; justify-content:center; align-items:center; z-index:100;
-    flex-direction: column; text-align: center; padding: 20px;
-  }
-  #splash img {width:300px; max-width:40%;}
-  #instructions img {width:200px; margin-bottom:20px;}
-  #instructions h1 {font-size: 2.5rem; margin-bottom: 20px;}
-  #instructions p {font-size: 1.5rem; margin-bottom: 20px;}
-  #instructions button {padding: 15px 25px; font-size: 1.2rem; cursor: pointer; border-radius:10px;}
+  /* 🌈 NEW GLOWING RADIANT BACKGROUND */
+  background: radial-gradient(circle at top left, #ff9a9e, #fad0c4, #fbc2eb, #a18cd1, #fbc2eb);
+  background-size: 400% 400%;
+  animation: glowBG 12s ease infinite;
+  overflow: hidden;
+}
 
-  /* Game container */
-  #game {display:none; width:700px; max-width:90%; text-align:center;}
-  #score {font-size:1.5rem; margin-bottom:10px;}
-  #timer {font-size:1.3rem; margin-bottom:10px;}
+/* animated glow movement */
+@keyframes glowBG {
+  0% {background-position:0% 50%;}
+  50% {background-position:100% 50%;}
+  100% {background-position:0% 50%;}
+}
 
-  /* Blackboard */
-  .blackboard {
-    width: 100%; height: 300px; background: #111; border: 10px solid #654321;
-    border-radius: 10px; padding: 20px; box-shadow: 0 0 20px rgba(0,0,0,0.5);
-    display:flex; justify-content:center; align-items:center; flex-direction:column;
-  }
+/* floating light particles */
+body::before {
+  content:"";
+  position:absolute;
+  width:100%;
+  height:100%;
+  background: radial-gradient(circle, rgba(255,255,255,0.3) 2px, transparent 6px);
+  background-size: 60px 60px;
+  animation: floatGlow 20s linear infinite;
+  pointer-events:none;
+}
 
-  .chalk-text {
-    color: #fff;
-    font-size: 3rem; 
-    font-weight: bold; 
-    text-shadow: 0 0 2px #fff, 0 0 5px #fff, 0 0 10px #fff;
-  }
+@keyframes floatGlow {
+  from {transform:translateY(0px);}
+  to {transform:translateY(-200px);}
+}
+
+/* Splash / Instructions */
+#splash, #instructions {
+  position: fixed;
+  top:0; left:0;
+  width:100%; height:100%;
+  background:#ffffff;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  z-index:100;
+  flex-direction: column;
+  text-align: center;
+  padding: 20px;
+}
+
+#splash img {width:300px; max-width:40%;}
+
+/* Game container */
+#game {
+  display:none;
+  width:700px;
+  max-width:90%;
+  text-align:center;
+  z-index:2;
+}
+
+#score {
+  font-size:1.5rem;
+  margin-bottom:10px;
+  color: #fff;
+  text-shadow: 0 0 10px #000;
+}
+
+#timer {
+  font-size:1.3rem;
+  margin-bottom:10px;
+  color:#fff;
+  text-shadow:0 0 10px #000;
+}
+
+/* Blackboard */
+.blackboard {
+  width: 100%;
+  height: 300px;
+  background: rgba(0,0,0,0.6);
+  border: 2px solid rgba(255,255,255,0.4);
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 0 25px rgba(255,255,255,0.2);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  flex-direction:column;
+  backdrop-filter: blur(8px);
+}
+
+.chalk-text {
+  color: #fff;
+  font-size: 2.5rem;
+  font-weight: bold;
+  text-shadow: 0 0 5px #fff, 0 0 10px #ff00ff, 0 0 20px #00ffff;
+}
+
+/* buttons */
+button {
+  padding: 12px 20px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+}
 </style>
 </head>
+
 <body>
 
 <!-- Splash -->
 <div id="splash">
-  <img src="assets/logo.png" alt="Logo">
+  <img src="assets/logo.png">
 </div>
 
 <!-- Instructions -->
 <div id="instructions">
-  <img src="assets/logo.png" alt="Innovine Logo">
+  <img src="assets/logo.png">
   <h1>Idioms Pictionary</h1>
-  <p>Draw the idioms in your notebook!!!</p>
-  <button onclick="startGame()">Start Drawing!</button>
+  <p>Draw the idioms in your notebook!</p>
+  <button onclick="startGame()">Start Game</button>
 </div>
 
 <!-- Game -->
 <div id="game">
   <div id="score">Idioms Completed: 0 / 7</div>
   <div id="timer">Time Left: 60s</div>
+
   <div class="blackboard">
     <div id="idiom" class="chalk-text"></div>
   </div>
@@ -76,15 +149,6 @@
 <audio id="applause" src="assets/freesound_community-claps-44774.mp3"></audio>
 
 <script>
-const splash = document.getElementById('splash');
-const instructions = document.getElementById('instructions');
-const game = document.getElementById('game');
-const idiomEl = document.getElementById('idiom');
-const scoreEl = document.getElementById('score');
-const timerEl = document.getElementById('timer');
-
-const correctSound = document.getElementById('correctSound');
-const applause = document.getElementById('applause');
 
 const idioms = [
   "Break the ice",
@@ -99,48 +163,74 @@ const idioms = [
 let current = 0;
 let timerLeft = 60;
 let timerInterval;
+let gameStarted = false;
 
-function startTimer() {
-  timerLeft = 60;
-  timerEl.textContent = `Time Left: ${timerLeft}s`;
-  clearInterval(timerInterval);
-  timerInterval = setInterval(() => {
-    timerLeft--;
-    timerEl.textContent = `Time Left: ${timerLeft}s`;
-    if(timerLeft <= 0){
-      nextIdiom();
-    }
-  }, 1000);
-}
+const idiomEl = document.getElementById('idiom');
+const scoreEl = document.getElementById('score');
+const timerEl = document.getElementById('timer');
+const correctSound = document.getElementById('correctSound');
+const applause = document.getElementById('applause');
 
-function nextIdiom(){
-  correctSound.play();
-  current++;
-  scoreEl.textContent = `Idioms Completed: ${current} / 7`;
-  if(current >= idioms.length){
-    clearInterval(timerInterval);
-    applause.play();
-    idiomEl.textContent = "Game Completed! Great job!";
-    timerEl.textContent = "";
-    return;
-  }
-  idiomEl.textContent = idioms[current];
-  startTimer();
-}
-
+/* START GAME (FIXED LOCK) */
 function startGame(){
+
+  if(gameStarted) return;   // 🛑 prevents re-trigger bug
+  gameStarted = true;
+
   splash.style.display = 'none';
   instructions.style.display = 'none';
   game.style.display = 'block';
-  idiomEl.textContent = idioms[current];
+
+  current = 0;
+  showIdiom();
   startTimer();
 }
 
-// Automatically hide splash after 5 seconds and show instructions
+/* TIMER */
+function startTimer(){
+  clearInterval(timerInterval);
+  timerLeft = 60;
+
+  timerInterval = setInterval(()=>{
+    timerLeft--;
+    timerEl.textContent = `Time Left: ${timerLeft}s`;
+
+    if(timerLeft <= 0){
+      nextIdiom();
+    }
+  },1000);
+}
+
+/* NEXT */
+function nextIdiom(){
+  correctSound.play();
+  current++;
+
+  scoreEl.textContent = `Idioms Completed: ${current} / ${idioms.length}`;
+
+  if(current >= idioms.length){
+    clearInterval(timerInterval);
+    applause.play();
+    idiomEl.textContent = "Game Completed! Great Job!";
+    timerEl.textContent = "";
+    return;
+  }
+
+  showIdiom();
+  startTimer();
+}
+
+/* SHOW */
+function showIdiom(){
+  idiomEl.textContent = idioms[current];
+}
+
+/* AUTO SPLASH FLOW */
 setTimeout(()=>{
   splash.style.display='none';
   instructions.style.display='flex';
-}, 5000);
+},5000);
+
 </script>
 
 </body>
