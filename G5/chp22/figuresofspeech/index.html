@@ -8,47 +8,38 @@
 body {
   margin: 0;
   font-family: Arial, sans-serif;
-  background: linear-gradient(135deg, #d1c4e9, #f8bbd0);
+  background: linear-gradient(135deg, #e1bee7, #f8bbd0);
   overflow: hidden;
-  color: #222;
 }
 
-/* SPLASH */
+/* ================= SPLASH (PRODUCTION STANDARD) ================= */
 #splash {
   position: fixed;
-  width: 100%;
-  height: 100%;
+  inset: 0;
   background: white;
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
-  z-index: 9999;
+  flex-direction: column;
+  z-index: 99999;
+  opacity: 1;
+  transition: opacity 0.8s ease;
+  pointer-events: all;
 }
 
 #splash img {
-  width: 200px;
+  width: 180px;
 }
 
-#startBtn {
-  margin-top: 20px;
-  padding: 12px 25px;
-  background: #ff4081;
-  color: white;
-  border: none;
-  border-radius: 10px;
-  font-size: 16px;
-  cursor: pointer;
-}
-
-/* GAME */
-.container {
+/* ================= GAME ================= */
+#game {
   display: none;
+  padding: 15px;
   text-align: center;
-  padding: 20px;
 }
 
-h1 {
+h2 {
+  margin: 10px;
   color: #4a148c;
 }
 
@@ -57,158 +48,197 @@ h1 {
   margin: 10px;
 }
 
-.sentence {
-  font-size: 22px;
-  margin: 25px;
-  font-weight: bold;
+/* ITEMS */
+#items {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin: 20px 0;
 }
 
-/* OPTIONS */
-.buttons button {
+.item {
   background: #ffb300;
-  border: none;
-  padding: 12px 18px;
-  margin: 10px;
+  padding: 10px 15px;
   border-radius: 10px;
-  font-size: 16px;
-  cursor: pointer;
+  cursor: grab;
+  user-select: none;
 }
 
-.buttons button:hover {
-  transform: scale(1.05);
+/* BUCKETS */
+#buckets {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.bucket {
+  width: 200px;
+  min-height: 150px;
+  border: 3px dashed #444;
+  border-radius: 10px;
+  padding: 10px;
+  background: rgba(255,255,255,0.4);
+}
+
+.bucket h3 {
+  margin: 5px;
 }
 
 /* END SCREEN */
 #endScreen {
   display: none;
   position: fixed;
-  width: 100%;
-  height: 100%;
+  inset: 0;
   background: rgba(0,0,0,0.85);
   color: white;
   justify-content: center;
   align-items: center;
   flex-direction: column;
-}
-
-#restartBtn {
-  margin-top: 20px;
-  padding: 12px 25px;
-  border: none;
-  background: #22c55e;
-  color: white;
-  border-radius: 10px;
-  font-size: 16px;
+  z-index: 9999;
 }
 </style>
 </head>
 
 <body>
 
-<!-- SPLASH -->
+<!-- ================= SPLASH ================= -->
 <div id="splash">
   <img src="assets/logo.png">
-  <button id="startBtn">Start Game</button>
 </div>
 
-<!-- GAME -->
-<div class="container" id="game">
-  <h1>Figures of Speech Sorting Lab</h1>
+<!-- ================= GAME ================= -->
+<div id="game">
+
+  <h2>Figures of Speech Sorting Lab</h2>
   <div id="score">Score: 0</div>
 
-  <div class="sentence" id="sentence"></div>
-  <div class="buttons" id="options"></div>
+  <div id="items"></div>
+
+  <div id="buckets">
+
+    <div class="bucket" data-type="Simile"><h3>Simile</h3></div>
+    <div class="bucket" data-type="Metaphor"><h3>Metaphor</h3></div>
+    <div class="bucket" data-type="Personification"><h3>Personification</h3></div>
+    <div class="bucket" data-type="Hyperbole"><h3>Hyperbole</h3></div>
+
+  </div>
 </div>
 
-<!-- END -->
+<!-- ================= END ================= -->
 <div id="endScreen">
-  <h1>Great Job! 🎉</h1>
+  <h1>Great Job 🎉</h1>
   <h2 id="finalScore"></h2>
-  <button id="restartBtn" onclick="location.reload()">Play Again</button>
 </div>
 
-<!-- AUDIO -->
+<!-- ================= AUDIO ================= -->
 <audio id="correctSound" src="assets/correct.mp3"></audio>
 <audio id="wrongSound" src="assets/wrong.mp3"></audio>
 <audio id="clapSound" src="assets/freesound_community-claps-44774.mp3"></audio>
 
 <script>
 
+/* ================= DATA ================= */
 const questions = [
-  {sentence:"I could eat a mountain of food!", answer:"Hyperbole"},
-  {sentence:"The wind whispered through the trees.", answer:"Personification"},
-  {sentence:"Life is a rollercoaster.", answer:"Metaphor"},
-  {sentence:"He is as brave as a lion.", answer:"Simile"},
-  {sentence:"The stars danced in the sky.", answer:"Personification"},
-  {sentence:"I’m so hungry I could eat a horse!", answer:"Hyperbole"},
-  {sentence:"Time is a thief.", answer:"Metaphor"},
-  {sentence:"Her smile was like sunshine.", answer:"Simile"},
-  {sentence:"The leaves waved in the wind.", answer:"Personification"},
-  {sentence:"He ran faster than the wind.", answer:"Hyperbole"}
+{ text:"He is as brave as a lion", type:"Simile" },
+{ text:"Her smile is like sunshine", type:"Simile" },
+{ text:"Time is a thief", type:"Metaphor" },
+{ text:"The classroom was a zoo", type:"Metaphor" },
+{ text:"The wind whispered through the trees", type:"Personification" },
+{ text:"The stars danced in the sky", type:"Personification" },
+{ text:"I’m so hungry I could eat a horse", type:"Hyperbole" },
+{ text:"He ran faster than the wind", type:"Hyperbole" }
 ];
 
-let current = 0;
+let currentItems = [];
 let score = 0;
 
-const splash = document.getElementById("splash");
-const game = document.getElementById("game");
-const sentenceEl = document.getElementById("sentence");
-const optionsEl = document.getElementById("options");
-const scoreEl = document.getElementById("score");
+const itemsDiv = document.getElementById("items");
+const scoreDiv = document.getElementById("score");
 
 const correctSound = document.getElementById("correctSound");
 const wrongSound = document.getElementById("wrongSound");
 const clapSound = document.getElementById("clapSound");
 
-document.getElementById("startBtn").onclick = () => {
-  splash.style.display = "none";
-  game.style.display = "block";
-  loadQ();
+/* ================= SPLASH (PRODUCTION LOGIC) ================= */
+window.onload = () => {
+  setTimeout(() => {
+    const splash = document.getElementById("splash");
+
+    splash.style.opacity = "0";
+
+    setTimeout(() => {
+      splash.style.display = "none";
+      startGame();
+    }, 800);
+
+  }, 5000); // EXACT 5 SECONDS LOCK
 };
 
-function loadQ() {
+/* ================= START GAME ================= */
+function startGame() {
+  document.getElementById("game").style.display = "block";
+  loadItems();
+  enableDrop();
+}
 
-  if(current >= questions.length){
-    endGame();
-    return;
-  }
+/* ================= LOAD ITEMS ================= */
+function loadItems() {
+  itemsDiv.innerHTML = "";
+  currentItems = [...questions];
 
-  let q = questions[current];
-  sentenceEl.textContent = q.sentence;
+  currentItems.forEach(q => {
+    let div = document.createElement("div");
+    div.className = "item";
+    div.draggable = true;
+    div.innerText = q.text;
+    div.dataset.type = q.type;
 
-  optionsEl.innerHTML = "";
+    div.ondragstart = (e) => {
+      e.dataTransfer.setData("text", JSON.stringify(q));
+    };
 
-  let opts = ["Hyperbole", "Simile", "Metaphor", "Personification"];
-  opts.sort(() => Math.random() - 0.5);
-
-  opts.forEach(opt => {
-    let btn = document.createElement("button");
-    btn.innerText = opt;
-    btn.onclick = () => check(opt);
-    optionsEl.appendChild(btn);
+    itemsDiv.appendChild(div);
   });
 }
 
-function check(opt){
-  let correct = questions[current].answer;
+/* ================= DROP LOGIC ================= */
+function enableDrop() {
+  document.querySelectorAll(".bucket").forEach(bucket => {
 
-  if(opt === correct){
-    correctSound.play();
-    score += 10;
-    scoreEl.textContent = "Score: " + score;
-    current++;
-    loadQ();
-  } else {
-    wrongSound.play();
-  }
+    bucket.ondragover = (e) => e.preventDefault();
+
+    bucket.ondrop = (e) => {
+      e.preventDefault();
+
+      let data = JSON.parse(e.dataTransfer.getData("text"));
+
+      if (data.type === bucket.dataset.type) {
+        correctSound.play();
+        score += 10;
+        scoreDiv.innerText = "Score: " + score;
+      } else {
+        wrongSound.play();
+      }
+
+      currentItems = currentItems.filter(i => i.text !== data.text);
+      loadItems();
+
+      if (currentItems.length === 0) endGame();
+    };
+
+  });
 }
 
-function endGame(){
-  clapSound.play();
-  game.style.display = "none";
+/* ================= END ================= */
+function endGame() {
+  document.getElementById("game").style.display = "none";
   document.getElementById("endScreen").style.display = "flex";
-  document.getElementById("finalScore").textContent =
-    "Your Score: " + score + " / " + questions.length * 10;
+
+  clapSound.play();
+  document.getElementById("finalScore").innerText =
+    "Score: " + score;
 }
 
 </script>
