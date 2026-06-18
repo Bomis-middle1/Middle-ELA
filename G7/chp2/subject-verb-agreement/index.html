@@ -1,133 +1,1346 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Subject-Verb Agreement Game - Grade 7</title>
+
+<title>Subject–Verb Agreement | Grade 7</title>
+
 <style>
-body { margin:0; font-family:Arial; background:#f0f8ff; display:flex; justify-content:center; align-items:center; height:100vh; overflow:hidden; }
-#logoScreen, #instructionScreen, #gameContainer { width:100%; max-width:600px; text-align:center; padding:20px; position:absolute; top:0; left:0; }
-#logoScreen { height:100%; display:flex; justify-content:center; align-items:center; background:white; z-index:100; }
-#instructionScreen { display:none; background:#fff; border-radius:10px; box-shadow:0 0 10px #aaa; z-index:99; }
-#gameContainer { display:none; background:#fff; border-radius:10px; box-shadow:0 0 10px #aaa; z-index:98; }
-#sentence { font-size:18px; font-weight:bold; margin-bottom:15px; }
-.option { background:#ffeb3b; padding:8px 12px; border-radius:5px; cursor:pointer; user-select:none; min-width:80px; text-align:center; margin:5px; display:inline-block; }
-.option.wiggle { animation: wiggle 0.5s; }
-@keyframes wiggle {0%{transform:rotate(0deg);}25%{transform:rotate(-10deg);}50%{transform:rotate(10deg);}75%{transform:rotate(-10deg);}100%{transform:rotate(0deg);}}
-#feedback { margin-top:10px; font-weight:bold; height:24px; }
-#tick { display:none; font-size:30px; color:green; margin-top:10px; }
-#restartBtn { display:none; margin-top:20px; padding:10px 20px; font-size:18px; cursor:pointer; background:#4caf50; color:white; border:none; border-radius:5px; }
-.confetti-piece { position:absolute; width:8px; height:8px; border-radius:50%; top:0; animation: fall 2s linear forwards;}
-@keyframes fall {0%{transform:translateY(0);}100%{transform:translateY(400px); opacity:0;}}
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,Helvetica,sans-serif;
+}
+
+body{
+
+overflow:hidden;
+height:100vh;
+
+background:linear-gradient(135deg,#74c0fc,#b2f2bb,#fff3bf);
+
+}
+
+/***********************
+FLOATING CIRCLES
+************************/
+
+body::before{
+
+content:"";
+
+position:absolute;
+
+width:260px;
+height:260px;
+
+background:rgba(255,255,255,.25);
+
+border-radius:50%;
+
+left:-90px;
+top:-90px;
+
+animation:floatLeft 9s infinite alternate;
+
+}
+
+body::after{
+
+content:"";
+
+position:absolute;
+
+width:220px;
+height:220px;
+
+background:rgba(255,255,255,.2);
+
+border-radius:50%;
+
+right:-70px;
+bottom:-70px;
+
+animation:floatRight 8s infinite alternate;
+
+}
+
+@keyframes floatLeft{
+
+from{
+
+transform:translateY(0);
+
+}
+
+to{
+
+transform:translateY(45px);
+
+}
+
+}
+
+@keyframes floatRight{
+
+from{
+
+transform:translateY(0);
+
+}
+
+to{
+
+transform:translateY(-45px);
+
+}
+
+}
+
+/************************/
+
+.screen{
+
+position:absolute;
+
+left:0;
+top:0;
+
+width:100%;
+height:100%;
+
+display:flex;
+
+justify-content:center;
+
+align-items:center;
+
+flex-direction:column;
+
+padding:20px;
+
+}
+
+/**********************
+LOGO
+**********************/
+
+#logoScreen{
+
+background:white;
+
+z-index:100;
+
+}
+
+#logo{
+
+width:220px;
+
+animation:zoom 2s infinite alternate;
+
+}
+
+@keyframes zoom{
+
+from{
+
+transform:scale(1);
+
+}
+
+to{
+
+transform:scale(1.08);
+
+}
+
+}
+
+#logoScreen h2{
+
+margin-top:20px;
+
+font-size:34px;
+
+color:#0284c7;
+
+}
+
+/**********************
+TOPIC
+**********************/
+
+#topicScreen{
+
+display:none;
+
+background:linear-gradient(135deg,#0ea5e9,#9333ea);
+
+color:white;
+
+text-align:center;
+
+z-index:90;
+
+}
+
+#topicScreen h1{
+
+font-size:52px;
+
+animation:flash .8s infinite;
+
+text-shadow:3px 3px 8px black;
+
+}
+
+#topicScreen h2{
+
+margin-top:15px;
+
+font-size:28px;
+
+}
+
+@keyframes flash{
+
+0%{transform:scale(1);}
+50%{transform:scale(1.08);}
+100%{transform:scale(1);}
+
+}
+
+/**********************
+START SCREEN
+**********************/
+
+#startScreen{
+
+display:none;
+
+}
+
+.card{
+
+background:white;
+
+padding:35px;
+
+border-radius:25px;
+
+width:95%;
+max-width:820px;
+
+box-shadow:0 10px 25px rgba(0,0,0,.25);
+
+text-align:center;
+
+}
+
+.card h1{
+
+font-size:46px;
+
+color:#f97316;
+
+margin-bottom:15px;
+
+}
+
+.card h2{
+
+color:#0284c7;
+
+margin-bottom:20px;
+
+}
+
+.card p{
+
+font-size:22px;
+
+margin:10px;
+
+line-height:1.5;
+
+}
+
+#startBtn{
+
+margin-top:30px;
+
+padding:18px 60px;
+
+font-size:28px;
+
+border:none;
+
+border-radius:50px;
+
+background:#22c55e;
+
+color:white;
+
+cursor:pointer;
+
+transition:.3s;
+
+}
+
+#startBtn:hover{
+
+transform:scale(1.05);
+
+}
+
+/***********************
+VOLUME
+************************/
+
+.volume{
+
+margin-top:25px;
+
+display:flex;
+
+justify-content:center;
+
+align-items:center;
+
+gap:15px;
+
+font-size:22px;
+
+}
+
+input[type=range]{
+
+width:220px;
+
+}
+
+/*************************
+GAME SCREEN
+*************************/
+
+#gameScreen{
+
+display:none;
+
+}
+
+.gameCard{
+
+background:white;
+
+width:95%;
+
+max-width:900px;
+
+padding:30px;
+
+border-radius:25px;
+
+box-shadow:0 10px 25px rgba(0,0,0,.25);
+
+}
+
+#progress{
+
+font-size:22px;
+
+font-weight:bold;
+
+color:#0284c7;
+
+margin-bottom:15px;
+
+}
+
+.progressBar{
+
+width:100%;
+
+height:18px;
+
+background:#dbeafe;
+
+border-radius:15px;
+
+margin-bottom:20px;
+
+overflow:hidden;
+
+}
+
+#progressFill{
+
+height:100%;
+
+width:0%;
+
+background:#22c55e;
+
+transition:.5s;
+
+}
+
+#score{
+
+font-size:22px;
+
+font-weight:bold;
+
+color:#ea580c;
+
+margin-bottom:20px;
+
+}
+
+#question{
+
+font-size:30px;
+
+font-weight:bold;
+
+line-height:1.5;
+
+margin-bottom:30px;
+
+}
+
+#answers{
+
+display:grid;
+
+grid-template-columns:1fr 1fr;
+
+gap:18px;
+
+}
+
+.answerBtn{
+
+padding:18px;
+
+font-size:22px;
+
+border:none;
+
+border-radius:15px;
+
+cursor:pointer;
+
+background:#f1f5f9;
+
+transition:.3s;
+
+}
+
+.answerBtn:hover{
+
+background:#dbeafe;
+
+transform:scale(1.03);
+
+}
+
+/***********************
+RESULT SCREEN
+************************/
+
+#resultScreen{
+
+display:none;
+
+}
+
+#restartBtn{
+
+margin-top:25px;
+
+padding:18px 55px;
+
+font-size:26px;
+
+border:none;
+
+border-radius:50px;
+
+background:#0ea5e9;
+
+color:white;
+
+cursor:pointer;
+
+}
+
+/**********************/
+
+canvas{
+
+position:absolute;
+
+left:0;
+top:0;
+
+pointer-events:none;
+
+}
+
+/**********************/
+
+@media(max-width:768px){
+
+#logo{
+
+width:170px;
+
+}
+
+#topicScreen h1{
+
+font-size:38px;
+
+}
+
+.card h1{
+
+font-size:34px;
+
+}
+
+.card p{
+
+font-size:19px;
+
+}
+
+#question{
+
+font-size:24px;
+
+}
+
+#answers{
+
+grid-template-columns:1fr;
+
+}
+
+.answerBtn{
+
+font-size:18px;
+
+}
+
+}
+
 </style>
+
 </head>
+
 <body>
 
-<!-- Logo -->
-<div id="logoScreen">
-<img src="assets/innovine-logo.png" alt="Innovine Logo" width="200">
-</div>
-
-<!-- Instruction Screen -->
-<div id="instructionScreen">
-<h2>Subject-Verb Agreement Game!</h2>
-<p>Click on the correct verb that agrees with the subject in the sentence.</p>
-<p>Correct answers show a green tick ✔, wrong answers wiggle ❌.</p>
-<p>Complete all sentences to win the game!</p>
-</div>
-
-<!-- Game Container -->
-<div id="gameContainer">
-<div id="sentence"></div>
-<div id="optionsContainer"></div>
-<div id="feedback"></div>
-<div id="tick">✔</div>
-<button id="restartBtn">Play Again</button>
-</div>
+<canvas id="confetti"></canvas>
 
 <audio id="correctSound" src="assets/correct.mp3"></audio>
 <audio id="wrongSound" src="assets/wrong.mp3"></audio>
 <audio id="clapSound" src="assets/clapping.mp3"></audio>
 
+<!-- Logo Screen -->
+
+<div id="logoScreen" class="screen">
+
+<img src="assets/innovine-logo.png" id="logo">
+
+<h2>Innovine Learning Games</h2>
+
+</div>
+
+<!-- Topic Screen -->
+
+<div id="topicScreen" class="screen">
+
+<h1>✨ SUBJECT–VERB AGREEMENT ✨</h1>
+
+<h2>Grade 7 English</h2>
+
+</div>
+
+<!-- Start Screen -->
+
+<div id="startScreen" class="screen">
+
+<div class="card">
+
+<h1>🎯 Ready to Play?</h1>
+
+<h2>Subject–Verb Agreement</h2>
+
+<p>Choose the correct verb that agrees with the subject.</p>
+
+<p>🏆 10 Questions</p>
+
+<div class="volume">
+
+🔊 Volume
+
+<input id="volume" type="range" min="0" max="1" value="1" step=".1">
+
+</div>
+
+<button id="startBtn">
+
+START GAME
+
+</button>
+
+</div>
+
+</div>
+
+<!-- Game Screen -->
+
+<div id="gameScreen" class="screen">
+
+<div class="gameCard">
+
+<div id="progress"></div>
+
+<div class="progressBar">
+
+<div id="progressFill"></div>
+
+</div>
+
+<div id="score"></div>
+
+<div id="question"></div>
+
+<div id="answers"></div>
+
+</div>
+
+</div>
+
+<!-- Result Screen -->
+
+<div id="resultScreen" class="screen">
+
+<div class="card">
+
+<h1>🏆 Congratulations!</h1>
+
+<h2 id="finalScore"></h2>
+
+<button id="restartBtn">
+
+Play Again
+
+</button>
+
+</div>
+
+</div>
+
 <script>
-const questions = [
-{q:"The cat ___ on the wall.", options:["is","are","were"], answer:"is"},
-{q:"My friends ___ going to the park.", options:["is","are","was"], answer:"are"},
-{q:"The teacher ___ very strict.", options:["is","are","were"], answer:"is"},
-{q:"The dogs ___ barking loudly.", options:["is","are","was"], answer:"are"},
-{q:"Neither of the boys ___ ready for the test.", options:["is","are","were"], answer:"is"},
-{q:"Each of the players ___ a medal.", options:["has","have","had"], answer:"has"},
-{q:"The flowers in the garden ___ beautiful.", options:["is","are","was"], answer:"are"},
-{q:"One of my sisters ___ coming tomorrow.", options:["is","are","were"], answer:"is"},
-{q:"The news ___ shocking yesterday.", options:["was","were","is"], answer:"was"},
-{q:"Ten dollars ___ enough to buy this book.", options:["is","are","was"], answer:"is"}
-];
 
-let current = 0;
-const sentenceEl = document.getElementById("sentence");
-const optionsContainer = document.getElementById("optionsContainer");
-const feedback = document.getElementById("feedback");
-const tick = document.getElementById("tick");
-const restartBtn = document.getElementById("restartBtn");
-const correctSound = document.getElementById("correctSound");
-const wrongSound = document.getElementById("wrongSound");
-const clapSound = document.getElementById("clapSound");
+/*************************
 
-function showQuestion(){
-  tick.style.display="none";
-  feedback.textContent="";
-  const q = questions[current];
-  sentenceEl.textContent = q.q;
-  optionsContainer.innerHTML="";
-  const shuffled = q.options.sort(()=>Math.random()-0.5);
-  shuffled.forEach(opt=>{
-    const btn = document.createElement("div");
-    btn.className="option";
-    btn.textContent=opt;
-    btn.onclick = ()=>checkAnswer(opt,q.answer,btn);
-    optionsContainer.appendChild(btn);
-  });
-}
+INITIAL VARIABLES
 
-function checkAnswer(selected, correct, btn){
-  if(selected === correct){
-    feedback.textContent="Good Job! 🎉";
-    feedback.style.color="green";
-    tick.style.display="block";
-    correctSound.currentTime=0; correctSound.play();
-    setTimeout(nextQuestion,800);
-  } else {
-    feedback.textContent="Try Again! ❌";
-    feedback.style.color="red";
-    btn.classList.add("wiggle");
-    wrongSound.currentTime=0; wrongSound.play();
-    setTimeout(()=>btn.classList.remove("wiggle"),500);
-  }
-}
+*************************/
 
-function nextQuestion(){
-  current++;
-  if(current>=questions.length){
-    feedback.textContent="🎉 You completed all questions!";
-    clapSound.currentTime=0; clapSound.play();
-    restartBtn.style.display="block";
-  } else showQuestion();
-}
+const logoScreen=document.getElementById("logoScreen");
+const topicScreen=document.getElementById("topicScreen");
+const startScreen=document.getElementById("startScreen");
+const gameScreen=document.getElementById("gameScreen");
+const resultScreen=document.getElementById("resultScreen");
 
-restartBtn.onclick = ()=>location.reload();
+const correctSound=document.getElementById("correctSound");
+const wrongSound=document.getElementById("wrongSound");
+const clapSound=document.getElementById("clapSound");
 
-// Logo and instruction flow
+const volume=document.getElementById("volume");
+
+volume.oninput=function(){
+
+correctSound.volume=this.value;
+wrongSound.volume=this.value;
+clapSound.volume=this.value;
+
+};
+
 setTimeout(()=>{
-  document.getElementById("logoScreen").style.display="none";
-  document.getElementById("instructionScreen").style.display="block";
 
-  setTimeout(()=>{
-    document.getElementById("instructionScreen").style.display="none";
-    document.getElementById("gameContainer").style.display="block";
-    showQuestion();
-  },5000);
+logoScreen.style.display="none";
+topicScreen.style.display="flex";
 
 },5000);
+
+setTimeout(()=>{
+
+topicScreen.style.display="none";
+startScreen.style.display="flex";
+
+},8000);
+
+let questions=[];
+
+let currentQuestion=0;
+
+let score=0;/*************************************************
+        GRADE 7 SUBJECT-VERB AGREEMENT
+*************************************************/
+
+questions=[
+
+{
+question:"The cat ____ on the wall every morning.",
+options:["is","are","were"],
+answer:"is"
+},
+
+{
+question:"My friends ____ going to the park after school.",
+options:["is","are","was"],
+answer:"are"
+},
+
+{
+question:"The teacher ____ very strict but kind.",
+options:["is","are","were"],
+answer:"is"
+},
+
+{
+question:"The dogs ____ barking loudly at the strangers.",
+options:["is","are","was"],
+answer:"are"
+},
+
+{
+question:"Neither of the boys ____ ready for the test.",
+options:["is","are","were"],
+answer:"is"
+},
+
+{
+question:"Each of the players ____ a medal after the match.",
+options:["has","have","had"],
+answer:"has"
+},
+
+{
+question:"The flowers in the garden ____ beautiful during spring.",
+options:["is","are","was"],
+answer:"are"
+},
+
+{
+question:"One of my sisters ____ coming tomorrow.",
+options:["is","are","were"],
+answer:"is"
+},
+
+{
+question:"The news ____ shocking yesterday.",
+options:["was","were","is"],
+answer:"was"
+},
+
+{
+question:"Ten dollars ____ enough to buy this book.",
+options:["is","are","was"],
+answer:"is"
+}
+
+];
+
+/*************************************************
+        FISHER-YATES SHUFFLE
+*************************************************/
+
+function shuffleArray(array){
+
+for(let i=array.length-1;i>0;i--){
+
+const j=Math.floor(Math.random()*(i+1));
+
+[array[i],array[j]]=[array[j],array[i]];
+
+}
+
+}
+
+/*************************************************
+        START GAME
+*************************************************/
+
+document.getElementById("startBtn").onclick=function(){
+
+shuffleArray(questions);
+
+currentQuestion=0;
+score=0;
+
+startScreen.style.display="none";
+gameScreen.style.display="flex";
+
+showQuestion();
+
+};
+
+/*************************************************
+        SHOW QUESTION
+*************************************************/
+
+function showQuestion(){
+
+const q=questions[currentQuestion];
+
+/************ Progress ************/
+
+document.getElementById("progress").innerHTML=
+
+"Question "+(currentQuestion+1)+" of "+questions.length;
+
+document.getElementById("progressFill").style.width=
+
+((currentQuestion)/questions.length)*100+"%";
+
+/************ Score ************/
+
+document.getElementById("score").innerHTML=
+
+"⭐ Score : "+score;
+
+/************ Question ************/
+
+document.getElementById("question").innerHTML=q.question;
+
+/************ Answers ************/
+
+const answers=document.getElementById("answers");
+
+answers.innerHTML="";
+
+/************ Shuffle Options ************/
+
+let options=[...q.options];
+
+shuffleArray(options);
+
+options.forEach(function(option){
+
+const btn=document.createElement("button");
+
+btn.className="answerBtn";
+
+btn.innerHTML=option;
+
+btn.onclick=function(){
+
+checkAnswer(btn,option,q.answer);
+
+};
+
+answers.appendChild(btn);
+
+});
+
+}
+
+/*************************************************
+        CHECK ANSWER
+*************************************************/
+
+function checkAnswer(button,selected,correct){
+
+const buttons=document.querySelectorAll(".answerBtn");
+
+buttons.forEach(btn=>btn.disabled=true);
+
+if(selected===correct){
+
+button.classList.add("correct");
+
+score++;
+
+correctSound.currentTime=0;
+
+correctSound.play();
+
+launchConfetti();
+
+}else{
+
+button.classList.add("wrong");
+
+buttons.forEach(function(btn){
+
+if(btn.innerHTML===correct){
+
+btn.classList.add("correct");
+
+}
+
+});
+
+wrongSound.currentTime=0;
+
+wrongSound.play();
+
+}
+
+/************ Update Score ************/
+
+document.getElementById("score").innerHTML=
+
+"⭐ Score : "+score;
+
+/************ Auto Next ************/
+
+setTimeout(function(){
+
+currentQuestion++;
+
+if(currentQuestion<questions.length){
+
+showQuestion();
+
+}else{
+
+showResults();
+
+}
+
+},1200);
+
+}
+/*************************************************
+        CONFETTI SYSTEM
+*************************************************/
+
+const canvas=document.getElementById("confetti");
+const ctx=canvas.getContext("2d");
+
+function resizeCanvas(){
+
+canvas.width=window.innerWidth;
+canvas.height=window.innerHeight;
+
+}
+
+resizeCanvas();
+
+window.addEventListener("resize",resizeCanvas);
+
+let particles=[];
+
+function launchConfetti(){
+
+particles=[];
+
+const colors=[
+"#ff595e",
+"#ffca3a",
+"#8ac926",
+"#1982c4",
+"#6a4c93",
+"#ff66c4",
+"#00c2ff"
+];
+
+for(let i=0;i<180;i++){
+
+particles.push({
+
+x:Math.random()*canvas.width,
+
+y:-20,
+
+size:Math.random()*8+5,
+
+speedY:Math.random()*5+3,
+
+speedX:(Math.random()-0.5)*6,
+
+rotation:Math.random()*360,
+
+rotationSpeed:(Math.random()-0.5)*10,
+
+color:colors[Math.floor(Math.random()*colors.length)]
+
+});
+
+}
+
+animateConfetti();
+
+}
+
+function animateConfetti(){
+
+let frame=0;
+
+function draw(){
+
+ctx.clearRect(0,0,canvas.width,canvas.height);
+
+particles.forEach(function(p){
+
+ctx.save();
+
+ctx.translate(p.x,p.y);
+
+ctx.rotate(p.rotation*Math.PI/180);
+
+ctx.fillStyle=p.color;
+
+ctx.fillRect(-p.size/2,-p.size/2,p.size,p.size);
+
+ctx.restore();
+
+p.x+=p.speedX;
+p.y+=p.speedY;
+p.rotation+=p.rotationSpeed;
+
+});
+
+frame++;
+
+if(frame<90){
+
+requestAnimationFrame(draw);
+
+}else{
+
+ctx.clearRect(0,0,canvas.width,canvas.height);
+
+}
+
+}
+
+draw();
+
+}
+
+/*************************************************
+        BUTTON ANIMATIONS
+*************************************************/
+
+const animationStyle=document.createElement("style");
+
+animationStyle.innerHTML=`
+
+.correct{
+
+background:#22c55e !important;
+color:white;
+animation:correctPop .5s;
+
+}
+
+.wrong{
+
+background:#ef4444 !important;
+color:white;
+animation:wrongShake .45s;
+
+}
+
+.answerBtn{
+
+transition:.25s;
+
+}
+
+.answerBtn:hover{
+
+transform:scale(1.05);
+
+}
+
+@keyframes correctPop{
+
+0%{transform:scale(1);}
+
+40%{transform:scale(1.18);}
+
+70%{transform:scale(.95);}
+
+100%{transform:scale(1);}
+
+}
+
+@keyframes wrongShake{
+
+0%{transform:translateX(0);}
+
+20%{transform:translateX(-10px);}
+
+40%{transform:translateX(10px);}
+
+60%{transform:translateX(-8px);}
+
+80%{transform:translateX(8px);}
+
+100%{transform:translateX(0);}
+
+}
+
+`;
+
+document.head.appendChild(animationStyle);
+
+/*************************************************
+        CORRECT / WRONG FEEDBACK
+*************************************************/
+
+const feedback=document.createElement("div");
+
+feedback.id="feedback";
+
+feedback.style.textAlign="center";
+feedback.style.fontSize="30px";
+feedback.style.fontWeight="bold";
+feedback.style.marginTop="20px";
+feedback.style.height="45px";
+
+document.querySelector(".gameCard").appendChild(feedback);
+
+function showFeedback(correct){
+
+if(correct){
+
+feedback.innerHTML="✅ Excellent!";
+
+feedback.style.color="#16a34a";
+
+}else{
+
+feedback.innerHTML="❌ Oops! Try to remember the rule.";
+
+feedback.style.color="#dc2626";
+
+}
+
+setTimeout(function(){
+
+feedback.innerHTML="";
+
+},900);
+
+}
+
+/*************************************************
+        IMPROVE checkAnswer()
+*************************************************/
+
+/*
+Inside your existing checkAnswer() function:
+
+AFTER
+
+score++;
+
+ADD
+
+showFeedback(true);
+
+-----------------------------------
+
+Inside the ELSE block
+
+AFTER
+
+wrongSound.play();
+
+ADD
+
+showFeedback(false);
+
+-----------------------------------
+
+This will display encouraging
+feedback without changing the
+rest of your code.
+*/
+
+/*************************************************
+        PRELOAD AUDIO
+*************************************************/
+
+correctSound.load();
+wrongSound.load();
+clapSound.load();
+
+correctSound.volume=1;
+wrongSound.volume=1;
+clapSound.volume=1;
+/*************************************************
+            SHOW RESULTS
+*************************************************/
+
+function showResults(){
+
+gameScreen.style.display="none";
+
+resultScreen.style.display="flex";
+
+/******** Progress Bar ********/
+
+document.getElementById("progressFill").style.width="100%";
+
+/******** Final Score ********/
+
+let percentage=Math.round((score/questions.length)*100);
+
+let stars="";
+
+if(percentage>=90){
+
+stars="⭐⭐⭐⭐⭐";
+
+}
+else if(percentage>=80){
+
+stars="⭐⭐⭐⭐☆";
+
+}
+else if(percentage>=70){
+
+stars="⭐⭐⭐☆☆";
+
+}
+else if(percentage>=60){
+
+stars="⭐⭐☆☆☆";
+
+}
+else{
+
+stars="⭐☆☆☆☆";
+
+}
+
+document.getElementById("finalScore").innerHTML=`
+
+<div style="font-size:80px;">🏆</div>
+
+<div style="font-size:42px;color:#16a34a;margin:15px;">
+
+${score} / ${questions.length}
+
+</div>
+
+<div style="font-size:30px;">
+
+${percentage}% Correct
+
+</div>
+
+<div style="font-size:40px;margin-top:20px;">
+
+${stars}
+
+</div>
+
+`;
+
+clapSound.currentTime=0;
+
+clapSound.play();
+
+launchConfetti();
+
+}
+
+/*************************************************
+            RESTART GAME
+*************************************************/
+
+document.getElementById("restartBtn").onclick=function(){
+
+/******** Reset ********/
+
+score=0;
+
+currentQuestion=0;
+
+/******** Shuffle Questions ********/
+
+shuffleArray(questions);
+
+/******** Hide Result ********/
+
+resultScreen.style.display="none";
+
+/******** Show Game ********/
+
+gameScreen.style.display="flex";
+
+/******** Reset Progress ********/
+
+document.getElementById("progressFill").style.width="0%";
+
+/******** First Question ********/
+
+showQuestion();
+
+};
+
+/*************************************************
+            ENTER KEY SUPPORT
+*************************************************/
+
+document.addEventListener("keydown",function(e){
+
+if(e.key==="Enter"){
+
+if(startScreen.style.display==="flex"){
+
+document.getElementById("startBtn").click();
+
+}
+
+if(resultScreen.style.display==="flex"){
+
+document.getElementById("restartBtn").click();
+
+}
+
+}
+
+});
+
+/*************************************************
+            WINDOW LOAD
+*************************************************/
+
+window.onload=function(){
+
+correctSound.volume=1;
+
+wrongSound.volume=1;
+
+clapSound.volume=1;
+
+};
+
+/*************************************************
+            END
+*************************************************/
+
 </script>
+
 </body>
 </html>
