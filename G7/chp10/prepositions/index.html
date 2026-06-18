@@ -3,147 +3,300 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Prepositions Drag & Drop</title>
+<title>Prepositions Adventure Quest</title>
+
 <style>
-body{margin:0;font-family:Arial,sans-serif;background:#140f3d;color:#fff;display:flex;align-items:center;justify-content:center;flex-direction:column;height:100vh;}
-#logoScreen,#quizScreen,#endScreen{display:none;align-items:center;justify-content:center;flex-direction:column;}
-#logoScreen img{width:200px;margin-top:50px;}
-h1{color:#ffd60a;text-align:center;}
-#questionBox{background:#fff4d6;color:#2d2340;padding:20px;border-radius:12px;max-width:600px;margin-top:20px;text-align:center;}
-#blank{display:inline-block;width:120px;border-bottom:2px solid #333;margin:0 5px;padding:2px;}
-#optionsBox{display:flex;flex-wrap:wrap;margin-top:20px;justify-content:center;}
-.option{background:#ffb703;color:#2d2340;padding:10px 15px;margin:5px;border-radius:12px;cursor:grab;user-select:none;}
-.option.correct{background:#b7efc5;}
-.option.wrong{background:#ffccd5;}
-#feedback{margin-top:10px;font-weight:bold;}
-button{padding:10px 16px;margin-top:12px;border-radius:12px;border:none;background:#ffb703;color:#2d2340;font-weight:bold;cursor:pointer;}
-#endScreen{display:none;text-align:center;margin-top:20px;}
+body{
+margin:0;
+font-family:Arial,sans-serif;
+background:linear-gradient(135deg,#ffecd2,#fcb69f,#a1c4fd);
+display:flex;
+align-items:center;
+justify-content:center;
+height:100vh;
+overflow:hidden;
+}
+
+.screen{
+display:none;
+width:100%;
+height:100%;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+text-align:center;
+padding:20px;
+box-sizing:border-box;
+}
+
+.active{display:flex;}
+
+/* LOGO */
+#logoScreen img{
+width:220px;
+animation:pop 1s ease;
+}
+
+@keyframes pop{
+from{transform:scale(0.5);opacity:0;}
+to{transform:scale(1);opacity:1;}
+}
+
+/* TITLE */
+.title{
+font-size:30px;
+font-weight:bold;
+color:#222;
+animation:flash 1s infinite alternate;
+}
+
+@keyframes flash{
+from{transform:scale(1);opacity:0.7;}
+to{transform:scale(1.1);opacity:1;}
+}
+
+/* BUTTON */
+button{
+padding:12px 18px;
+border:none;
+border-radius:12px;
+background:#ff9800;
+color:#fff;
+font-size:16px;
+font-weight:bold;
+cursor:pointer;
+margin-top:15px;
+}
+
+/* GAME BOX */
+.card{
+background:#ffffffee;
+padding:18px;
+border-radius:15px;
+width:95%;
+max-width:600px;
+box-shadow:0 10px 20px rgba(0,0,0,0.2);
+}
+
+/* OPTIONS */
+.option{
+background:#4caf50;
+color:#fff;
+padding:12px;
+margin:8px;
+border-radius:10px;
+cursor:pointer;
+font-weight:bold;
+}
+
+/* SCORE */
+#scoreBoard{
+font-weight:bold;
+margin-bottom:10px;
+font-size:18px;
+}
+
+/* FEEDBACK */
+#feedback{
+min-height:25px;
+font-weight:bold;
+margin-top:10px;
+}
+
+/* CONFETTI */
+.confetti{
+position:fixed;
+width:10px;
+height:10px;
+top:-10px;
+animation:fall 2s linear forwards;
+}
+
+@keyframes fall{
+to{
+transform:translateY(100vh) rotate(360deg);
+opacity:0;
+}
+}
+
+/* END SCREEN */
+#remark{
+font-size:22px;
+font-weight:bold;
+margin:10px 0;
+}
 </style>
 </head>
+
 <body>
 
-<div id="logoScreen">
-<img src="assets/innovine-logo.png" alt="Logo">
-<h2>Loading Game...</h2>
+<!-- 🔵 LOGO -->
+<div id="logoScreen" class="screen active">
+<img src="assets/innovine-logo.png">
 </div>
 
-<div id="quizScreen">
-<h1>Prepositions Drag & Drop</h1>
-<div id="scoreText">Question 1 of 10</div>
-<div id="questionBox">
-<span id="questionText"></span>
-<span id="blank" ondrop="drop(event)" ondragover="allowDrop(event)"></span>
+<!-- 🟡 TITLE -->
+<div id="titleScreen" class="screen">
+<div class="title">✨ Prepositions Adventure Quest ✨</div>
+<button onclick="startGame()">Start Game</button>
+</div>
+
+<!-- 🟢 GAME -->
+<div id="gameScreen" class="screen">
+<div class="card">
+
+<div id="scoreBoard">Score: 0 / 10</div>
+
+<h3 id="questionText"></h3>
+
 <div id="optionsBox"></div>
+
 <div id="feedback"></div>
+
 </div>
 </div>
 
-<div id="endScreen">
-<h1>Quiz Completed!</h1>
-<p id="finalScore"></p>
-<button onclick="restartQuiz()">Play Again</button>
+<!-- 🏁 END -->
+<div id="endScreen" class="screen">
+<div class="card">
+<h2>🎉 Game Completed!</h2>
+
+<div id="finalScore"></div>
+<div id="remark"></div>
+
+<button onclick="restartGame()">Restart</button>
+</div>
 </div>
 
-<audio id="correctSound" src="assets/correct.mp3"></audio>
-<audio id="wrongSound" src="assets/wrong.mp3"></audio>
-<audio id="clapSound" src="assets/clapping.mp3"></audio>
+<!-- AUDIO -->
+<audio id="correctSound" src="assets/correct.mp3" volume="1"></audio>
+<audio id="wrongSound" src="assets/wrong.mp3" volume="1"></audio>
 
 <script>
-// 10 Prepositions questions
+
+/* ================= QUESTIONS ================= */
 const mcqs=[
-{q:'Which preposition tells us WHEN something happens?\n"The train arrives ___ 8:00 a.m."',opts:["under the bridge","at","behind","through"],ans:"at"},
-{q:'Which sentence contains a place preposition?',"opts":["after","on","at","in"],ans:"on"},
-{q:'Which preposition shows movement or travel?\n"The hikers walked ___ the forest."',opts:["beside","through","at","under"],ans:"through"},
-{q:'The golden key is ___ the statue.',opts:["Time","Place","Travel","Reason"],ans:"Place"},
-{q:'The plane flew ___ the ocean.',opts:["Time","Place","Travel","Directionless"],ans:"Travel"},
-{q:'Which sentence contains a time preposition?',"opts":["behind","across","before","on"],ans:"before"},
-{q:'Three prepositions belong to the same group. One does not.',opts:["in","on","under","during"],ans:"during"},
-{q:'Sentence with BOTH a place and travel preposition.',opts:["in","over","before","during"],ans:"over"},
-{q:'Which category does the preposition during belong to?',opts:["Place","Travel","Time","Direction"],ans:"Time"},
-{q:'Read: "At sunrise, explorers walked ___ the jungle and ___ the river." How many types of prepositions appear?',opts:["One","Two","Three","Four"],ans:"Three"}
+{q:"The train arrives ___ 8:00 a.m.",opts:["at","on","in","under"],ans:"at"},
+{q:"The book is ___ the table.",opts:["on","in","at","under"],ans:"on"},
+{q:"She sat ___ me.",opts:["beside","on","under","in"],ans:"beside"},
+{q:"We met ___ Monday.",opts:["on","at","in","under"],ans:"on"},
+{q:"He is ___ school.",opts:["at","on","in","over"],ans:"at"},
+{q:"They walked ___ the bridge.",opts:["across","under","in","on"],ans:"across"},
+{q:"The cat is ___ the chair.",opts:["under","on","in","at"],ans:"under"},
+{q:"The plane flew ___ the ocean.",opts:["over","under","into","at"],ans:"over"},
+{q:"The bird flew ___ the river.",opts:["over","in","at","during"],ans:"over"},
+{q:"The key is ___ the box.",opts:["in","on","under","beside"],ans:"in"}
 ];
 
-let currentQ=0;
+mcqs.sort(()=>Math.random()-0.5);
+
+let i=0;
 let score=0;
 
-const logoScreen=document.getElementById('logoScreen');
-const quizScreen=document.getElementById('quizScreen');
-const questionText=document.getElementById('questionText');
-const optionsBox=document.getElementById('optionsBox');
-const blank=document.getElementById('blank');
-const feedback=document.getElementById('feedback');
-const scoreText=document.getElementById('scoreText');
-const endScreen=document.getElementById('endScreen');
-const finalScore=document.getElementById('finalScore');
-const correctAudio=document.getElementById('correctSound');
-const wrongAudio=document.getElementById('wrongSound');
-const clapAudio=document.getElementById('clapSound');
-
-// Show logo 5 sec
-logoScreen.style.display='flex';
+/* ================= FLOW ================= */
+window.onload=()=>{
 setTimeout(()=>{
-  logoScreen.style.display='none';
-  quizScreen.style.display='flex';
-  showQuestion();
+document.getElementById("logoScreen").classList.remove("active");
+document.getElementById("titleScreen").classList.add("active");
 },5000);
+};
 
-function allowDrop(ev){ev.preventDefault();}
-function drag(ev){ev.dataTransfer.setData("text", ev.target.innerText);}
-function drop(ev){
-  ev.preventDefault();
-  const data=ev.dataTransfer.getData("text");
-  if(data===mcqs[currentQ].ans){
-    blank.innerText=data;
-    blank.style.background="#b7efc5";
-    feedback.innerText="Correct!";
-    correctAudio.currentTime=0; correctAudio.play();
-    score++;
-    setTimeout(nextQuestion,1000);
-  } else{
-    feedback.innerText="Wrong! Try again.";
-    blank.style.background="#ffccd5";
-    wrongAudio.currentTime=0; wrongAudio.play();
-  }
+/* START */
+function startGame(){
+document.getElementById("titleScreen").classList.remove("active");
+document.getElementById("gameScreen").classList.add("active");
+loadQ();
 }
 
-// Show current question
-function showQuestion(){
-  feedback.innerText="";
-  const q=mcqs[currentQ];
-  questionText.innerText=q.q.replace("___", "_____");
-  blank.innerText="";
-  blank.style.background="#fff4d6";
-  optionsBox.innerHTML='';
-  q.opts.forEach(opt=>{
-    const div=document.createElement('div');
-    div.className='option';
-    div.innerText=opt;
-    div.draggable=true;
-    div.ondragstart=drag;
-    optionsBox.appendChild(div);
-  });
-  scoreText.innerText=`Question ${currentQ+1} of ${mcqs.length}`;
+/* LOAD */
+function loadQ(){
+
+if(i>=mcqs.length){
+endGame();
+return;
 }
 
-// Next question
-function nextQuestion(){
-  currentQ++;
-  if(currentQ>=mcqs.length){
-    quizScreen.style.display='none';
-    endScreen.style.display='flex';
-    finalScore.innerText=`You scored ${score} / ${mcqs.length}`;
-    clapAudio.play();
-  } else showQuestion();
+let q=mcqs[i];
+
+document.getElementById("scoreBoard").innerText=
+`Score: ${score} / ${mcqs.length}`;
+
+document.getElementById("questionText").innerText=q.q;
+
+let box=document.getElementById("optionsBox");
+box.innerHTML="";
+
+document.getElementById("feedback").innerText="";
+
+q.opts.forEach(o=>{
+let d=document.createElement("div");
+d.className="option";
+d.innerText=o;
+d.onclick=()=>check(o);
+box.appendChild(d);
+});
 }
 
-// Restart
-function restartQuiz(){
-  currentQ=0;
-  score=0;
-  endScreen.style.display='none';
-  quizScreen.style.display='flex';
-  showQuestion();
+/* CHECK */
+function check(opt){
+
+let q=mcqs[i];
+
+if(opt===q.ans){
+score++;
+document.getElementById("correctSound").play().catch(()=>{});
+confetti();
+document.getElementById("feedback").innerText="✔ Correct!";
+}else{
+document.getElementById("wrongSound").play().catch(()=>{});
+document.getElementById("feedback").innerText="❌ Wrong!";
 }
+
+setTimeout(()=>{
+i++;
+loadQ();
+},900);
+}
+
+/* CONFETTI */
+function confetti(){
+for(let j=0;j<30;j++){
+let c=document.createElement("div");
+c.className="confetti";
+c.style.left=Math.random()*100+"vw";
+c.style.background=["#ff0","#0ff","#f0f","#0f0","#f60"][Math.floor(Math.random()*5)];
+document.body.appendChild(c);
+setTimeout(()=>c.remove(),2000);
+}
+}
+
+/* END */
+function endGame(){
+
+document.getElementById("gameScreen").classList.remove("active");
+document.getElementById("endScreen").classList.add("active");
+
+let percent = (score/mcqs.length)*100;
+
+let remark="";
+
+if(percent>=80) remark="🌟 Excellent!";
+else if(percent>=60) remark="👍 Good Job!";
+else if(percent>=45) remark="🙂 Well Tried!";
+else remark="📘 Let's revise and come back!";
+
+document.getElementById("finalScore").innerText=
+`You answered ${score} out of ${mcqs.length} correct`;
+
+document.getElementById("remark").innerText=remark;
+}
+
+/* RESTART */
+function restartGame(){
+location.reload();
+}
+
 </script>
+
 </body>
 </html>
