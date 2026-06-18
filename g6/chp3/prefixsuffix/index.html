@@ -1,1 +1,1008 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jungle Vine Swing - Prefix & Suffix Adventure</title>
 
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    overflow:hidden;
+    font-family:Arial,sans-serif;
+    background:#7ed957;
+    touch-action:none;
+    -webkit-user-select:none;
+    user-select:none;
+}
+
+#gameArea{
+    position:relative;
+    width:100vw;
+    height:100vh;
+    overflow:hidden;
+    background:linear-gradient(to bottom,#87CEEB,#7ed957);
+    touch-action:manipulation;
+}
+
+/* LOGO SCREEN */
+
+#logoScreen{
+    position:absolute;
+    width:100%;
+    height:100%;
+    background:white;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    z-index:1000;
+}
+
+#logoScreen img{
+    width:260px;
+    max-width:80%;
+}
+
+#logoText{
+    margin-top:20px;
+    font-size:30px;
+    font-weight:bold;
+    color:#333;
+}
+
+/* START SCREEN */
+
+#startScreen,
+#endScreen{
+    position:absolute;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,0.7);
+    color:white;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    text-align:center;
+    z-index:500;
+    padding:20px;
+}
+
+.mainBtn{
+    padding:16px 32px;
+    border:none;
+    border-radius:20px;
+    background:#ff9800;
+    color:white;
+    font-size:22px;
+    margin-top:25px;
+    cursor:pointer;
+}
+
+.mainBtn:hover{
+    background:#fb8c00;
+}
+
+/* BACKGROUND */
+
+#ground{
+    position:absolute;
+    bottom:0;
+    width:100%;
+    height:120px;
+    background:#5d4037;
+    border-top:8px solid #2e7d32;
+}
+
+#cave{
+    position:absolute;
+    right:40px;
+    bottom:120px;
+    font-size:80px;
+    z-index:40;
+}
+
+/* PLAYER */
+
+#player{
+    position:absolute;
+    width:70px;
+    height:70px;
+    left:100px;
+    bottom:120px;
+    font-size:55px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    z-index:50;
+    transition:transform 0.1s, left 0.5s ease;
+}
+
+/* GEMS */
+
+.gem{
+    position:absolute;
+    width:45px;
+    height:45px;
+    border-radius:50%;
+    background:gold;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:24px;
+    box-shadow:0 0 15px yellow;
+}
+
+/* OBSTACLE */
+
+.obstacle{
+    position:absolute;
+    width:50px;
+    height:50px;
+    background:#795548;
+    border-radius:50%;
+    bottom:120px;
+    font-size:28px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+/* SCORE */
+
+#scoreBoard{
+    position:absolute;
+    top:10px;
+    left:10px;
+    background:white;
+    padding:12px 18px;
+    border-radius:15px;
+    font-size:20px;
+    font-weight:bold;
+    z-index:200;
+}
+
+/* VOLUME */
+
+#volumeBox{
+    position:absolute;
+    top:10px;
+    right:10px;
+    background:white;
+    padding:12px;
+    border-radius:15px;
+    z-index:200;
+}
+
+/* QUESTIONS */
+
+#questionBox{
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    width:92%;
+    max-width:600px;
+    background:#fffde7;
+    border-radius:25px;
+    padding:25px;
+    z-index:700;
+    display:none;
+    box-shadow:0 0 20px rgba(0,0,0,0.3);
+}
+
+#challengeTitle{
+    font-size:28px;
+    color:#2e7d32;
+    margin-bottom:15px;
+    text-align:center;
+}
+
+#questionText{
+    font-size:22px;
+    color:#333;
+    margin-bottom:20px;
+    line-height:1.5;
+}
+
+.optionBtn{
+    width:100%;
+    padding:15px;
+    margin:10px 0;
+    border:none;
+    border-radius:15px;
+    background:#4caf50;
+    color:white;
+    font-size:18px;
+    cursor:pointer;
+}
+
+.optionBtn:hover{
+    background:#388e3c;
+}
+
+#feedback{
+    text-align:center;
+    font-size:24px;
+    margin-top:15px;
+    font-weight:bold;
+}
+
+.correct{
+    color:green;
+    animation:pop 0.5s;
+}
+
+.wrong{
+    color:red;
+    animation:shake 0.5s;
+}
+
+/* CONFETTI */
+
+#confetti{
+    position:absolute;
+    width:100%;
+    height:100%;
+    pointer-events:none;
+    overflow:hidden;
+    z-index:900;
+}
+
+.confettiPiece{
+    position:absolute;
+    width:12px;
+    height:12px;
+    animation:fall 2s linear forwards;
+}
+
+@keyframes fall{
+    from{
+        transform:translateY(-100px) rotate(0deg);
+    }
+    to{
+        transform:translateY(100vh) rotate(720deg);
+    }
+}
+
+@keyframes pop{
+    0%{transform:scale(1);}
+    50%{transform:scale(1.3);}
+    100%{transform:scale(1);}
+}
+
+@keyframes shake{
+    0%{transform:translateX(0);}
+    25%{transform:translateX(-10px);}
+    50%{transform:translateX(10px);}
+    75%{transform:translateX(-10px);}
+    100%{transform:translateX(0);}
+}
+
+/* MOBILE */
+
+@media(max-width:768px){
+
+    #questionText{
+        font-size:18px;
+    }
+
+    .optionBtn{
+        font-size:16px;
+    }
+
+    #player{
+        width:55px;
+        height:55px;
+        font-size:42px;
+        left:55px;
+    }
+
+    #scoreBoard{
+        font-size:16px;
+    }
+
+    #cave{
+        right:18px;
+        font-size:62px;
+    }
+
+    #volumeBox{
+        font-size:14px;
+    }
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="gameArea">
+
+<!-- LOGO -->
+
+<div id="logoScreen">
+<img src="assets/innovine-logo.png">
+<div id="logoText">Innovine Learning Adventures</div>
+</div>
+
+<!-- START -->
+
+<div id="startScreen" style="display:none;">
+<h1>🌴 Jungle Gem Adventure 🌴</h1>
+
+<p style="margin-top:20px;font-size:20px;">
+Jump to collect 3 gems, answer a Prefix & Suffix challenge,
+and move closer to home!
+</p>
+
+<p style="margin-top:20px;">
+Desktop: SPACE / ↑ to jump<br>
+Mobile: Tap screen to jump
+</p>
+
+<button class="mainBtn" onclick="startGame()">
+Start Adventure
+</button>
+</div>
+
+<!-- END -->
+
+<div id="endScreen" style="display:none;">
+<h1>🏆 Jungle Adventure Complete! 🏆</h1>
+
+<h2 id="finalMessage" style="margin-top:20px;"></h2>
+
+<button class="mainBtn" onclick="restartGame()">
+Play Again
+</button>
+</div>
+
+<!-- CAVE / HOME -->
+
+<div id="cave">🏠</div>
+
+<!-- GROUND -->
+
+<div id="ground"></div>
+
+<!-- PLAYER -->
+
+<div id="player">🧑‍🌾</div>
+
+<!-- SCORE -->
+
+<div id="scoreBoard">
+Gems: <span id="gemCount">0/3</span> |
+Questions: <span id="questionCount">0</span>/10
+</div>
+
+<!-- VOLUME -->
+
+<div id="volumeBox">
+Volume
+<input type="range" id="volumeSlider" min="0" max="1" step="0.1" value="1">
+</div>
+
+<!-- QUESTIONS -->
+
+<div id="questionBox">
+
+<div id="challengeTitle">
+🌴 Jungle Challenge!
+</div>
+
+<div id="questionText"></div>
+
+<div id="options"></div>
+
+<div id="feedback"></div>
+
+</div>
+
+<div id="confetti"></div>
+
+</div>
+
+<script>
+
+/* LOGO SCREEN */
+
+setTimeout(()=>{
+
+document.getElementById("logoScreen").style.display="none";
+document.getElementById("startScreen").style.display="flex";
+
+},5000);
+
+/* ELEMENTS */
+
+const player = document.getElementById("player");
+
+const gemCount = document.getElementById("gemCount");
+const questionCount = document.getElementById("questionCount");
+
+const questionBox = document.getElementById("questionBox");
+const questionText = document.getElementById("questionText");
+const optionsDiv = document.getElementById("options");
+const feedback = document.getElementById("feedback");
+
+const volumeSlider = document.getElementById("volumeSlider");
+
+/* AUDIO */
+
+const correctSound = new Audio("assets/correct.mp3");
+const wrongSound = new Audio("assets/wrong.mp3");
+const clapSound = new Audio("assets/clapping.mp3");
+
+function updateVolumes(){
+
+correctSound.volume = volumeSlider.value;
+wrongSound.volume = volumeSlider.value;
+clapSound.volume = volumeSlider.value;
+
+}
+
+volumeSlider.addEventListener("input",updateVolumes);
+
+updateVolumes();
+
+function unlockSounds(){
+
+correctSound.play().then(()=>{
+    correctSound.pause();
+    correctSound.currentTime = 0;
+}).catch(()=>{});
+
+wrongSound.play().then(()=>{
+    wrongSound.pause();
+    wrongSound.currentTime = 0;
+}).catch(()=>{});
+
+clapSound.play().then(()=>{
+    clapSound.pause();
+    clapSound.currentTime = 0;
+}).catch(()=>{});
+
+}
+
+/* GAME VARIABLES */
+
+let gameRunning = false;
+
+let jumping = false;
+let velocity = 0;
+let gravity = 0.8;
+
+let playerY = 120;
+
+let gems = 0;
+let totalGems = 0;
+let currentQuestion = 0;
+
+/* QUESTIONS */
+
+const questions = [
+
+{
+q:`🐒 The Monkey Map Disaster<br><br>
+While crossing the jungle, Leo copied the treasure map incorrectly.
+He needs to write it AGAIN before sunset.<br><br>
+
+Which word should Leo use?`,
+o:["unlock","unfair","rewrite","careless"],
+a:2
+},
+
+{
+q:`🌋 The Sleeping Volcano<br><br>
+The guide warned the team:<br><br>
+
+"Do not worry. The volcano is inactive."<br><br>
+
+What does "inactive" MOST likely mean?`,
+o:[
+"exploding again",
+"full of smoke",
+"not active right now",
+"impossible to climb"
+],
+a:2
+},
+
+{
+q:`🍌 Banana Backpack Problem<br><br>
+Mia packed 47 bananas for a one-hour trip.
+The explorers laughed because she packed TOO MUCH.<br><br>
+
+Which word best describes Mia's backpack?`,
+o:[
+"fearless",
+"previewed",
+"overloaded",
+"rewritten"
+],
+a:2
+},
+
+{
+q:`🏛️ Temple Door Puzzle<br><br>
+A glowing temple door says:<br><br>
+
+"Enter the word meaning WITHOUT FEAR."<br><br>
+
+Which word opens the door?`,
+o:[
+"hopeful",
+"careless",
+"fearless",
+"inactive"
+],
+a:2
+},
+
+{
+q:`🦜 Talking Parrot Mistake<br><br>
+A parrot keeps shouting:<br><br>
+
+"This puzzle is unpossible!"<br><br>
+
+The explorers know the parrot used the WRONG prefix.<br><br>
+
+Which word fixes the mistake?`,
+o:[
+"replay",
+"impossible",
+"impossibleless",
+"misunderstanding"
+],
+a:1
+},
+
+{
+q:`🌴 Lost in the Jungle<br><br>
+Arjun read the directions incorrectly and the team ended up near a crocodile river.<br><br>
+
+Which word BEST explains what happened?`,
+o:[
+"hopeful",
+"replayed",
+"misunderstood",
+"colorful"
+],
+a:2
+},
+
+{
+q:`🐍 Snake Rope Challenge<br><br>
+To cross the giant snake pit, players must combine the correct prefix with:<br><br>
+
+"packed"<br><br>
+
+to create a word meaning:<br><br>
+
+"packed too much."`,
+o:[
+"re",
+"dis",
+"over",
+"un"
+],
+a:2
+},
+
+{
+q:`💎 Treasure Machine<br><br>
+A strange jungle machine adds "-less" to words.<br><br>
+
+What new word forms from:<br><br>
+
+"fear" ?`,
+o:[
+"fearful",
+"fearless",
+"refear",
+"fearment"
+],
+a:1
+},
+
+{
+q:`🌧️ Storm Camp Trouble<br><br>
+The explorers forgot rain covers.
+During the storm, their bags became:<br><br>
+
+"waterproofless"<br><br>
+
+What mistake appears in this word?`,
+o:[
+"wrong tense",
+"wrong punctuation",
+"unnecessary suffix added",
+"missing prefix"
+],
+a:2
+},
+
+{
+q:`🏆 Final Treasure Escape<br><br>
+The final treasure chest opens only if players correctly build a word meaning:<br><br>
+
+"not happy"`,
+o:[
+"re + happy",
+"happy + ful",
+"un + happy",
+"pre + happy"
+],
+a:2
+}
+
+];
+
+questions.sort(()=>Math.random()-0.5);
+
+/* START GAME */
+
+function startGame(){
+
+unlockSounds();
+
+document.getElementById("startScreen").style.display="none";
+
+gameRunning = true;
+
+spawnGem();
+spawnObstacle();
+
+requestAnimationFrame(gameLoop);
+
+}
+
+/* JUMP */
+
+function jump(){
+
+if(!jumping && gameRunning){
+
+velocity = -20;
+jumping = true;
+
+}
+
+}
+
+document.addEventListener("keydown",(e)=>{
+
+if(e.code==="Space" || e.code==="ArrowUp"){
+
+jump();
+
+}
+
+});
+
+document.addEventListener("touchstart",(e)=>{
+
+if(
+    e.target.tagName !== "BUTTON" &&
+    e.target.id !== "volumeSlider" &&
+    questionBox.style.display !== "block"
+){
+    e.preventDefault();
+    jump();
+}
+
+},{passive:false});
+
+/* GAME LOOP */
+
+function gameLoop(){
+
+if(!gameRunning) return;
+
+velocity += gravity;
+
+playerY -= velocity;
+
+if(playerY <= 120){
+
+playerY = 120;
+velocity = 0;
+jumping = false;
+
+}
+
+player.style.bottom = playerY + "px";
+
+requestAnimationFrame(gameLoop);
+
+}
+
+/* GEMS */
+
+function spawnGem(){
+
+if(!gameRunning) return;
+
+const gem = document.createElement("div");
+
+gem.classList.add("gem");
+
+gem.innerHTML = "💎";
+
+gem.style.left = window.innerWidth + "px";
+gem.style.bottom = (180 + Math.random()*80) + "px";
+
+document.getElementById("gameArea").appendChild(gem);
+
+let move = setInterval(()=>{
+
+if(!gameRunning){
+    clearInterval(move);
+    gem.remove();
+    return;
+}
+
+let left = Number(gem.style.left.replace("px",""));
+
+left -= 3;
+
+gem.style.left = left + "px";
+
+const g = gem.getBoundingClientRect();
+const p = player.getBoundingClientRect();
+
+if(
+g.left < p.right &&
+g.right > p.left &&
+g.top < p.bottom &&
+g.bottom > p.top
+){
+
+gems++;
+totalGems++;
+
+gemCount.innerText = gems + "/3";
+
+gem.remove();
+
+clearInterval(move);
+
+if(gems >= 3 && currentQuestion < 10){
+
+gems = 0;
+gemCount.innerText = "0/3";
+showQuestion();
+
+}
+
+}
+
+if(left < -50){
+
+gem.remove();
+clearInterval(move);
+
+}
+
+},20);
+
+setTimeout(spawnGem,2600);
+
+}
+
+/* OBSTACLES */
+
+function spawnObstacle(){
+
+if(!gameRunning) return;
+
+const obstacle = document.createElement("div");
+
+obstacle.classList.add("obstacle");
+
+obstacle.innerHTML = "🪵";
+
+obstacle.style.left = window.innerWidth + "px";
+
+document.getElementById("gameArea").appendChild(obstacle);
+
+let move = setInterval(()=>{
+
+if(!gameRunning){
+    clearInterval(move);
+    obstacle.remove();
+    return;
+}
+
+let left = Number(obstacle.style.left.replace("px",""));
+
+left -= 4;
+
+obstacle.style.left = left + "px";
+
+const o = obstacle.getBoundingClientRect();
+const p = player.getBoundingClientRect();
+
+if(
+o.left < p.right &&
+o.right > p.left &&
+o.top < p.bottom &&
+o.bottom > p.top
+){
+
+gems = Math.max(0,gems-1);
+
+gemCount.innerText = gems + "/3";
+
+obstacle.remove();
+
+clearInterval(move);
+
+}
+
+if(left < -50){
+
+obstacle.remove();
+
+clearInterval(move);
+
+}
+
+},20);
+
+setTimeout(spawnObstacle,3500);
+
+}
+
+/* QUESTIONS */
+
+function showQuestion(){
+
+gameRunning = false;
+
+questionBox.style.display = "block";
+
+const q = questions[currentQuestion];
+
+questionText.innerHTML = q.q;
+
+optionsDiv.innerHTML = "";
+
+feedback.innerHTML = "";
+
+q.o.forEach((option,index)=>{
+
+const btn = document.createElement("button");
+
+btn.classList.add("optionBtn");
+
+btn.innerText = option;
+
+btn.onclick = ()=>checkAnswer(index,q.a);
+
+optionsDiv.appendChild(btn);
+
+});
+
+}
+
+/* CHECK ANSWERS */
+
+function checkAnswer(selected,correct){
+
+if(selected === correct){
+
+feedback.innerHTML = "✅ Correct!";
+feedback.className = "correct";
+
+correctSound.play();
+clapSound.play();
+
+createConfetti();
+
+let currentLeft = parseInt(player.style.left || window.getComputedStyle(player).left);
+player.style.left = Math.min(currentLeft + 35, window.innerWidth - 160) + "px";
+
+}else{
+
+feedback.innerHTML = "❌ Wrong!";
+feedback.className = "wrong";
+
+wrongSound.play();
+
+}
+
+currentQuestion++;
+
+questionCount.innerText = currentQuestion;
+
+setTimeout(()=>{
+
+questionBox.style.display = "none";
+
+if(currentQuestion >= 10){
+
+endGame();
+
+}else{
+
+gameRunning = true;
+
+requestAnimationFrame(gameLoop);
+
+spawnGem();
+spawnObstacle();
+
+}
+
+},1800);
+
+}
+
+/* CONFETTI */
+
+function createConfetti(){
+
+const confetti = document.getElementById("confetti");
+
+for(let i=0;i<35;i++){
+
+const piece = document.createElement("div");
+
+piece.classList.add("confettiPiece");
+
+piece.style.left = Math.random()*100 + "%";
+
+piece.style.background =
+`hsl(${Math.random()*360},100%,50%)`;
+
+piece.style.animationDuration =
+(1 + Math.random()*2) + "s";
+
+confetti.appendChild(piece);
+
+setTimeout(()=>{
+
+piece.remove();
+
+},3000);
+
+}
+
+}
+
+/* END GAME */
+
+function endGame(){
+
+gameRunning = false;
+
+document.getElementById("endScreen").style.display = "flex";
+
+document.getElementById("finalMessage").innerHTML =
+"You collected <b>" + totalGems +
+"</b> jungle gems and reached home after completing all 10 Prefix & Suffix adventures!";
+
+}
+
+/* RESTART */
+
+function restartGame(){
+
+location.reload();
+
+}
+
+</script>
+
+</body>
+</html>
