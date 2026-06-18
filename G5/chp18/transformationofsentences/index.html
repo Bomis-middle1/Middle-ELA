@@ -3,231 +3,370 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Transformation Sculptor</title>
+<title>Grammar Transformation Quest</title>
+
 <style>
+/* ===== SAME ENGINE UI (UNCHANGED STRUCTURE) ===== */
+* { margin:0; padding:0; box-sizing:border-box; }
+
 body {
-    margin: 0;
-    font-family: 'Segoe UI', sans-serif;
-    background: linear-gradient(to right, #fbb1b1, #d6a5f5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    flex-direction: column;
+  font-family: Arial;
+  background: radial-gradient(circle at top, #243b55, #141e30, #000);
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  padding:10px;
+  color:#fff;
 }
 
 /* Splash */
-#splash {
-    position: fixed; top:0; left:0; width:100%; height:100%;
-    background:#fff; display:flex; justify-content:center; align-items:center; z-index:100;
+.splash-screen {
+  position:fixed;
+  inset:0;
+  background:#fff;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  z-index:9999;
+  transition:0.5s;
 }
-#splash img { width:300px; max-width:40%; }
+.splash-screen img {
+  width:420px;
+  animation: float 2s infinite ease-in-out;
+}
+@keyframes float {
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-15px)}
+}
+.splash-screen.hidden{opacity:0;pointer-events:none;}
+
+/* Container */
+.container{
+  max-width:1100px;
+  width:100%;
+  background:#020617;
+  border:3px solid gold;
+  border-radius:20px;
+  overflow:hidden;
+  opacity:0;
+  transition:0.5s;
+}
+.container.visible{opacity:1;}
+
+/* Header */
+.header{
+  text-align:center;
+  padding:12px;
+  background:linear-gradient(135deg,#ffd700,#ff9f1c);
+  color:#111;
+}
+.header h1{font-size:26px;}
+.subtitle{font-weight:bold;font-size:14px;}
+.stage{
+  margin-top:6px;
+  display:inline-block;
+  padding:6px 14px;
+  background:#111;
+  color:gold;
+  border-radius:20px;
+}
 
 /* Game */
-#game {
-    display: none;
-    width: 90%;
-    max-width: 850px;
-    text-align: center;
-    background: rgba(255,255,255,0.95);
-    border-radius: 25px;
-    padding: 35px;
-    box-shadow: 0 12px 30px rgba(0,0,0,0.4);
-    position: relative;
+.game-shell{padding:16px;}
+
+.screen{display:none;}
+.screen.active{display:block;}
+
+/* Score */
+.score-row{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+}
+.card{
+  background:#0f172a;
+  padding:10px;
+  border-radius:12px;
+  text-align:center;
+}
+.label{font-size:12px;color:#aaa;}
+.value{font-size:20px;font-weight:bold;}
+
+/* Question */
+.question-box{
+  margin-top:15px;
+  padding:18px;
+  border:2px solid #555;
+  border-radius:15px;
+  background:#0b1220;
+}
+.question-title{
+  color:gold;
+  font-size:18px;
+  margin-bottom:10px;
+}
+.question-text{
+  font-size:20px;
+  margin-bottom:12px;
 }
 
-#instructions {
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: #6a2c70;
-    margin-bottom: 10px;
+/* Options */
+.options button{
+  width:100%;
+  margin:6px 0;
+  padding:12px;
+  border-radius:10px;
+  border:1px solid #666;
+  background:#111827;
+  color:#fff;
+  cursor:pointer;
+}
+.options button:hover{
+  border-color:gold;
 }
 
-#score { font-size: 2rem; margin-bottom: 10px; font-weight: bold; color:#6a2c70;}
-#timer { font-size: 1.6rem; margin-bottom: 15px; font-weight:bold; color:#6a2c70;}
-#sentence { font-size: 2.5rem; margin: 25px 0; color:#4a1c53; font-weight:bold;}
-
-#board {
-    width: 100%;
-    min-height: 150px;
-    border-radius: 20px;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: 30px;
-    padding: 15px;
-    background: #111; /* chalkboard background */
-    box-shadow: inset 0 0 10px #000000;
+/* Journey */
+.journey{
+  padding:20px;
+  text-align:center;
 }
-
-.word {
-    padding: 20px 30px;
-    margin: 8px;
-    background: #f39c12;
-    color: #fff;
-    font-size: 1.6rem;
-    font-weight: bold;
-    border-radius: 15px;
-    cursor: pointer;
-    box-shadow: 0 5px 12px rgba(0,0,0,0.3);
-    user-select: none;
-    transition: 0.2s;
-}
-.word:hover { transform: scale(1.05); }
-
-/* Confetti CSS */
-.confetti {
-    position: absolute;
-    width: 12px;
-    height: 12px;
-    animation: fall 1s linear forwards;
-}
-@keyframes fall {
-    0% { transform: translateY(0) rotate(0deg);}
-    100% { transform: translateY(400px) rotate(360deg); opacity:0;}
+.btn{
+  margin-top:12px;
+  padding:10px 18px;
+  border-radius:20px;
+  background:gold;
+  border:none;
+  cursor:pointer;
+  font-weight:bold;
 }
 </style>
 </head>
+
 <body>
 
-<!-- Splash -->
-<div id="splash">
-  <img src="assets/logo.png" alt="Innovine Logo">
+<!-- SPLASH -->
+<div class="splash-screen" id="splash">
+  <img src="assets/logo.png">
 </div>
 
-<!-- Game -->
-<div id="game">
-  <div id="instructions">Instructions appear here</div>
-  <div id="score">Score: 0</div>
-  <div id="timer">Time Left: 30s</div>
-  <div id="sentence">Sentence appears here</div>
-  <div id="board"></div>
-</div>
+<!-- MAIN -->
+<div class="container" id="container">
 
-<!-- Audio -->
-<audio id="correctSound" src="assets/correct.mp3"></audio>
-<audio id="wrongSound" src="assets/wrong.mp3"></audio>
-<audio id="applause" src="assets/freesound_community-claps-44774.mp3"></audio>
+  <div class="header">
+    <h1>📘 Grammar Transformation Quest</h1>
+    <div class="subtitle">Grade 5–6 English Grammar</div>
+    <div class="stage" id="stage">Level 1 / 10</div>
+  </div>
+
+  <div class="game-shell">
+
+    <!-- SCORE -->
+    <div class="score-row">
+      <div class="card">
+        <div class="label">Correct</div>
+        <div class="value" id="correct">0</div>
+      </div>
+      <div class="card">
+        <div class="label">Level</div>
+        <div class="value" id="level">1/10</div>
+      </div>
+      <div class="card">
+        <div class="label">Score</div>
+        <div class="value" id="score">0%</div>
+      </div>
+    </div>
+
+    <!-- QUESTION -->
+    <div class="question-box">
+      <div class="question-title" id="task">Task</div>
+      <div class="question-text" id="q">Question</div>
+      <div class="options" id="options"></div>
+    </div>
+
+    <!-- JOURNEY -->
+    <div class="journey">
+      <div id="feedback"></div>
+      <button class="btn" id="next">Next Level</button>
+    </div>
+
+  </div>
+</div>
 
 <script>
-const splash = document.getElementById('splash');
-const game = document.getElementById('game');
-const instructionsEl = document.getElementById('instructions');
-const sentenceEl = document.getElementById('sentence');
-const board = document.getElementById('board');
-const scoreEl = document.getElementById('score');
-const timerEl = document.getElementById('timer');
 
-const correctSound = document.getElementById('correctSound');
-const wrongSound = document.getElementById('wrongSound');
-const applause = document.getElementById('applause');
+/* ===== GRAMMAR TRANSFORMATION ENGINE ===== */
 
-let current = 0;
-let score = 0;
-let timer = 30;
-let timerInterval;
+const TOTAL = 10;
 
-// Complex sentences for transformation
-const sentences = [
-  {base:"The manager approved the report.", transform:["The report was approved by the manager."], hint:"Transform to passive voice"},
-  {base:"She will attend the seminar tomorrow.", transform:["Will she attend the seminar tomorrow?"], hint:"Transform to a question"},
-  {base:"I like to play chess.", transform:["I do not like to play chess."], hint:"Transform to negative sentence"},
-  {base:"They completed the assignment on time.", transform:["The assignment was completed by them on time."], hint:"Transform to passive voice"},
-  {base:"He is preparing dinner.", transform:["Is he preparing dinner?"], hint:"Transform to a question"},
-  {base:"We will organize the event next month.", transform:["We will not organize the event next month."], hint:"Transform to negative sentence"},
-  {base:"She submitted the essay yesterday.", transform:["The essay was submitted by her yesterday."], hint:"Transform to passive voice"}
+const questions = [
+{
+task:"Direct → Indirect Speech",
+q:'He said, "I am reading a book."',
+options:[
+"He said that he is reading a book.",
+"He said that he was reading a book.",
+"He said he read book.",
+"He said reading book."
+],
+ans:1
+},
+{
+task:"Indirect → Direct Speech",
+q:"She said that she would come tomorrow.",
+options:[
+"She said, 'I will come tomorrow.'",
+"She said, 'I come tomorrow.'",
+"She said I will come.",
+"She says I will come."
+],
+ans:0
+},
+{
+task:"Active → Passive Voice",
+q:"The teacher teaches English.",
+options:[
+"English is taught by the teacher.",
+"English taught teacher.",
+"Teacher teaching English.",
+"English was teach teacher."
+],
+ans:0
+},
+{
+task:"Tense Change",
+q:"He is eating food.",
+options:[
+"He was eating food.",
+"He eats food yesterday.",
+"He ate food now.",
+"He is eat food."
+],
+ans:0
+},
+{
+task:"Direct → Indirect",
+q:'They said, "We are going to school."',
+options:[
+"They said that they are going to school.",
+"They said that they were going to school.",
+"They said we go school.",
+"They said going school."
+],
+ans:1
+},
+{
+task:"Passive → Active",
+q:"The cake was eaten by the boy.",
+options:[
+"The boy eats cake.",
+"The boy ate the cake.",
+"The boy eat cake.",
+"Cake boy eaten."
+],
+ans:1
+},
+{
+task:"Direct → Indirect",
+q:'He said, "I will help you."',
+options:[
+"He said that he would help me.",
+"He said I will help you.",
+"He says he help.",
+"He will help me said."
+],
+ans:0
+},
+{
+task:"Tense Change",
+q:"She plays football every day.",
+options:[
+"She played football every day.",
+"She is playing football yesterday.",
+"She play football.",
+"She is play football."
+],
+ans:0
+},
+{
+task:"Indirect → Direct",
+q:"They said that they had finished work.",
+options:[
+"They said, 'We finished work.'",
+"They said, 'We have finished work.'",
+"They said work finished.",
+"They said finishing work."
+],
+ans:1
+},
+{
+task:"Mixed Transformation",
+q:"The letters are being written by her.",
+options:[
+"She writes letters.",
+"She is writing letters.",
+"She wrote letters.",
+"Letters writing she."
+],
+ans:1
+}
 ];
 
-function startTimer() {
-  timer = 30;
-  timerEl.textContent = `Time Left: ${timer}s`;
-  clearInterval(timerInterval);
-  timerInterval = setInterval(()=>{
-    timer--;
-    timerEl.textContent = `Time Left: ${timer}s`;
-    if(timer<=0) nextSentence();
-  }, 1000);
-}
+let i=0, correct=0;
 
-function createBoard(words) {
-  board.innerHTML = "";
-  words.forEach(word => {
-    const div = document.createElement('div');
-    div.textContent = word;
-    div.className = "word";
-    div.onclick = ()=>checkWord(div);
-    board.appendChild(div);
+const q=document.getElementById("q");
+const task=document.getElementById("task");
+const options=document.getElementById("options");
+const correctBox=document.getElementById("correct");
+const levelBox=document.getElementById("level");
+const scoreBox=document.getElementById("score");
+const feedback=document.getElementById("feedback");
+const next=document.getElementById("next");
+
+function load(){
+  let data=questions[i];
+  task.innerText=data.task;
+  q.innerText=data.q;
+  options.innerHTML="";
+  feedback.innerText="";
+  
+  data.options.forEach((o,index)=>{
+    let btn=document.createElement("button");
+    btn.innerText=o;
+    btn.onclick=()=>{
+      if(index===data.ans){
+        correct++;
+        feedback.innerText="✅ Correct!";
+      }else{
+        feedback.innerText="❌ Wrong!";
+      }
+    }
+    options.appendChild(btn);
   });
+
+  correctBox.innerText=correct;
+  levelBox.innerText=(i+1)+"/"+TOTAL;
+  scoreBox.innerText=Math.round((correct/TOTAL)*100)+"%";
 }
 
-let selectedWords = [];
-function checkWord(div) {
-  selectedWords.push(div.textContent);
-  div.style.background="#27ae60"; // green highlight
-  correctSound.play();
-  createConfetti();
-  if(selectedWords.join(" ") === sentences[current].transform[0]){
-    score++;
-    scoreEl.textContent = `Score: ${score}`;
-    nextSentence();
-  }
-}
-
-// Confetti function
-function createConfetti(){
-  for(let i=0;i<12;i++){
-    const conf = document.createElement('div');
-    conf.className="confetti";
-    conf.style.left=Math.random()*game.offsetWidth+"px";
-    conf.style.background=`hsl(${Math.random()*360}, 80%, 60%)`; 
-    board.appendChild(conf);
-    setTimeout(()=>conf.remove(),1000);
-  }
-}
-
-function nextSentence(){
-  clearInterval(timerInterval);
-  current++;
-  selectedWords=[];
-  if(current>=sentences.length){
-    applause.play();
-    sentenceEl.textContent="Game Completed! Score: "+score;
-    instructionsEl.textContent = "Well done!";
-    board.innerHTML="";
-    timerEl.textContent="";
+next.onclick=()=>{
+  i++;
+  if(i>=TOTAL){
+    alert("Game Complete!");
+    location.reload();
     return;
   }
-  sentenceEl.textContent=sentences[current].base;
-  instructionsEl.textContent=sentences[current].hint;
-  const words=sentences[current].transform[0].split(" ");
-  // shuffle words
-  for(let i=words.length-1;i>0;i--){
-    const j=Math.floor(Math.random()*(i+1));
-    [words[i],words[j]]=[words[j],words[i]];
-  }
-  createBoard(words);
-  startTimer();
+  load();
 }
 
-function startGame(){
-  splash.style.display='none';
-  game.style.display='block';
-  current=0; score=0;
-  scoreEl.textContent=`Score: ${score}`;
-  sentenceEl.textContent=sentences[0].base;
-  instructionsEl.textContent=sentences[0].hint;
-  const words=sentences[0].transform[0].split(" ");
-  for(let i=words.length-1;i>0;i--){
-    const j=Math.floor(Math.random()*(i+1));
-    [words[i],words[j]]=[words[j],words[i]];
-  }
-  createBoard(words);
-  startTimer();
-}
+/* SPLASH FIX */
+setTimeout(()=>{
+  document.getElementById("splash").classList.add("hidden");
+  document.getElementById("container").classList.add("visible");
+  load();
+},3000);
 
-// Splash 5 sec
-setTimeout(()=>startGame(),5000);
 </script>
+
 </body>
 </html>
