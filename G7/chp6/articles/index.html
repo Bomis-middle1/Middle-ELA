@@ -4,153 +4,52 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Articles Spinner Game</title>
-
 <style>
-body{
-margin:0;
-font-family:Arial,sans-serif;
-background:linear-gradient(135deg,#140f3d,#342070,#ffb347);
-display:flex;
-align-items:center;
-justify-content:center;
-height:100vh;
-flex-direction:column;
-color:#fff;
-overflow:hidden;
-}
-
-.screen{
-display:none;
-width:100%;
-height:100%;
-align-items:center;
-justify-content:center;
-flex-direction:column;
-text-align:center;
-padding:20px;
-}
-
+body{margin:0;font-family:Arial,sans-serif;background:linear-gradient(135deg,#140f3d,#342070,#ffb347);display:flex;align-items:center;justify-content:center;height:100vh;flex-direction:column;color:#fff;}
+.screen{display:none;width:100%;height:100%;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:20px;}
 .active{display:flex;}
-
-.card{
-background:#ffffffee;
-color:#2d2340;
-border-radius:25px;
-padding:20px;
-box-shadow:0 10px 25px rgba(0,0,0,0.3);
-max-width:500px;
-width:95%;
-text-align:center;
-}
-
-h1{color:#ffd60a;text-shadow:1px 1px 2px #000;}
-
-button{
-border:none;
-border-radius:18px;
-padding:12px 20px;
-margin:10px;
-font-size:18px;
-font-weight:bold;
-background:#ffb703;
-color:#2d2340;
-cursor:pointer;
-}
-
-.spinnerContainer{position:relative;width:250px;height:250px;margin:auto;}
-.spinner{
-width:100%;
-height:100%;
-border-radius:50%;
-border:8px solid #fff;
-transition:transform 4s cubic-bezier(0.33,1,0.68,1);
-position:relative;
-}
-
-.segment{
-position:absolute;
-width:50%;
-height:50%;
-top:0;
-left:50%;
-transform-origin:0% 100%;
-font-weight:bold;
-color:#fff;
-font-size:20px;
-}
-
+h1{font-size:32px;margin-bottom:15px;color:#ffd60a;text-shadow:1px 1px 2px #000;}
+.card{background:#ffffffee;color:#2d2340;border-radius:25px;padding:20px;box-shadow:0 10px 25px #00000055;max-width:500px;width:95%;text-align:center;}
+button{border:none;border-radius:18px;padding:12px 20px;margin:10px;font-size:18px;font-weight:bold;background:#ffb703;color:#2d2340;cursor:pointer;box-shadow:0 5px 0 #d88900;}
+button:active{transform:translateY(3px);box-shadow:0 2px 0 #d88900;}
+.spinnerContainer{position:relative;width:250px;height:250px;margin:20px auto;}
+.spinner{width:100%;height:100%;border-radius:50%;border:8px solid #fff;position:relative;transition:transform 4s cubic-bezier(0.33, 1, 0.68, 1);}
+.segment{position:absolute;width:50%;height:50%;top:0;left:50%;transform-origin:0% 100%;text-align:center;font-weight:bold;color:#fff;font-size:20px;}
 .segmentA{transform:rotate(0deg);color:#ff595e;}
 .segmentAn{transform:rotate(120deg);color:#52b788;}
 .segmentThe{transform:rotate(240deg);color:#ffd60a;}
-
-.pointer{
-position:absolute;
-top:-20px;
-left:50%;
-transform:translateX(-50%);
-border-left:12px solid transparent;
-border-right:12px solid transparent;
-border-bottom:24px solid #fff;
-}
-
-.questionBox{
-background:#fff4d6;
-border:3px dashed #ffb703;
-border-radius:18px;
-padding:12px;
-margin:15px 0;
-}
-
+.pointer{position:absolute;top:-20px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:12px solid transparent;border-right:12px solid transparent;border-bottom:24px solid #fff;}
+.questionBox{background:#fff4d6;border:3px dashed #ffb703;border-radius:18px;padding:12px;margin:15px 0;}
 .question{font-size:20px;font-weight:bold;color:#2d2340;}
-
-.options{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:10px;}
-
-.optionBtn{
-background:#d8f3dc;
-border:3px solid #52b788;
-border-radius:12px;
-padding:10px 16px;
-font-size:16px;
-font-weight:bold;
-cursor:pointer;
-min-width:80px;
-}
-
-.correct{background:#b7efc5!important;}
-.wrong{background:#ffccd5!important;}
-
-.feedback{margin-top:10px;font-weight:bold;}
-
-.logo{
-width:180px;
-margin-bottom:15px;
-}
-
+.options{display:flex;justify-content:center;margin-top:12px;gap:12px;}
+.optionBtn{background:#d8f3dc;border:3px solid #52b788;border-radius:12px;padding:10px 16px;font-size:16px;font-weight:bold;cursor:pointer;transition:.2s;}
+.optionBtn:hover{transform:scale(1.05);}
+.correct{background:#b7efc5!important;border-color:#2d6a4f!important;}
+.wrong{background:#ffccd5!important;border-color:#d90429!important;animation:shake .3s;}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.feedback{min-height:25px;font-size:18px;font-weight:bold;margin-top:10px;}
+.trophy{font-size:80px;animation:trophyBounce 1s infinite alternate;margin-bottom:12px;}
+@keyframes trophyBounce{from{transform:translateY(0) rotate(-3deg)}to{transform:translateY(-12px) rotate(3deg)}}
+.sparkle{position:fixed;font-size:28px;animation:spark 1s ease-out forwards;}
+@keyframes spark{from{transform:scale(.5) translateY(0);opacity:1}to{transform:scale(2) translateY(-60px);opacity:0}}
 </style>
 </head>
-
 <body>
 
-<!-- ✅ LOGO SCREEN (STATIC 5 SECONDS ONLY - NO ANIMATION) -->
-<div id="logoScreen" class="screen active">
-  <div class="card">
-    <img src="innovine-logo.png" class="logo" alt="Innovine Logo">
-  </div>
-</div>
+<audio id="correctSound" src="assets/correct.mp3"></audio>
+<audio id="wrongSound" src="assets/wrong.mp3"></audio>
+<audio id="clapSound" src="assets/freesound_community-claps-44774.mp3"></audio>
 
-<!-- INSTRUCTION SCREEN -->
-<div id="instructionScreen" class="screen">
+<div id="startScreen" class="screen active">
   <div class="card">
     <h1>Articles Spinner Game</h1>
-    <p>Spin the wheel and choose A / An / The correctly</p>
+    <p>Spin the wheel and select the correct article for each sentence!</p>
     <button onclick="startGame()">Start Game</button>
   </div>
 </div>
 
-<!-- GAME SCREEN -->
 <div id="gameScreen" class="screen">
   <div class="card">
-
     <div class="spinnerContainer">
       <div class="pointer"></div>
       <div class="spinner" id="spinner">
@@ -159,148 +58,153 @@ margin-bottom:15px;
         <div class="segment segmentThe">The</div>
       </div>
     </div>
-
     <button onclick="spinWheel()">Spin Wheel</button>
-
-    <div class="questionBox">
-      <div class="question" id="qText"></div>
+    <div class="questionBox" id="questionBox">
+      <div class="question" id="sentenceText">Press spin to start!</div>
     </div>
-
-    <div class="options" id="options"></div>
+    <div class="options" id="optionsBox"></div>
     <div class="feedback" id="feedback"></div>
-
-    <div>Score: <span id="score">0</span></div>
+    <div style="margin-top:10px;">
+      <span id="scoreText">Score: 0</span> / <span id="totalText">0</span>
+    </div>
   </div>
 </div>
 
-<!-- END SCREEN -->
 <div id="endScreen" class="screen">
   <div class="card">
-    <h1>🏆 Well Done!</h1>
+    <div class="trophy">🏆</div>
+    <h1>Well Done!</h1>
+    <h2>You completed the Articles Game!</h2>
     <p id="finalScore"></p>
-    <button onclick="restart()">Play Again</button>
+    <button onclick="restartGame()">Play Again</button>
   </div>
 </div>
 
-<audio id="correctSound" src="assets/correct.mp3"></audio>
-<audio id="wrongSound" src="assets/wrong.mp3"></audio>
-<audio id="clapSound" src="assets/freesound_community-claps-44774.mp3"></audio>
-
 <script>
-
-const questions=[
-{sentence:"I saw ___ elephant at the zoo.",answer:"An"},
-{sentence:"She wants to buy ___ apple.",answer:"An"},
-{sentence:"He is ___ honest person.",answer:"An"},
-{sentence:"We went to ___ park yesterday.",answer:"The"},
-{sentence:"I need ___ pencil from my bag.",answer:"A"},
-{sentence:"___ sun rises in the east.",answer:"The"},
-{sentence:"They adopted ___ dog from the shelter.",answer:"A"},
-{sentence:"___ moon looks beautiful tonight.",answer:"The"},
-{sentence:"Can you give me ___ orange?",answer:"An"},
-{sentence:"She wore ___ dress to the party.",answer:"A"}
+const questions = [
+  {sentence:"I saw ___ elephant at the zoo.",answer:"An"},
+  {sentence:"She wants to buy ___ apple.",answer:"An"},
+  {sentence:"He is ___ honest person.",answer:"An"},
+  {sentence:"We went to ___ park yesterday.",answer:"The"},
+  {sentence:"I need ___ pencil from my bag.",answer:"A"},
+  {sentence:"___ sun rises in the east.",answer:"The"},
+  {sentence:"They adopted ___ dog from the shelter.",answer:"A"},
+  {sentence:"___ moon looks beautiful tonight.",answer:"The"},
+  {sentence:"Can you give me ___ orange?",answer:"An"},
+  {sentence:"She wore ___ dress to the party.",answer:"A"}
 ];
 
-let index=0;
+let current=0;
 let score=0;
-let spinning=false;
-let bonus={points:0,hint:false};
 
-document.getElementById("score").innerText=0;
-
-/* ✅ ONLY LOGIC FIX: 5 SECOND STATIC LOGO */
-setTimeout(()=>{
-document.getElementById("logoScreen").classList.remove("active");
-document.getElementById("instructionScreen").classList.add("active");
-},5000);
+document.getElementById("totalText").innerText = questions.length;
 
 function startGame(){
-document.getElementById("instructionScreen").classList.remove("active");
-document.getElementById("gameScreen").classList.add("active");
-load();
+  document.getElementById("startScreen").classList.remove("active");
+  document.getElementById("gameScreen").classList.add("active");
+  loadQuestion();
 }
 
-function load(){
-if(index>=questions.length){
-end();
-return;
+function loadQuestion(){
+  if(current >= questions.length){
+    endGame();
+    return;
+  }
+  const q = questions[current];
+  document.getElementById("sentenceText").innerText = q.sentence.replace("___","...");
+  document.getElementById("feedback").innerText = "";
+  const optionsBox = document.getElementById("optionsBox");
+  optionsBox.innerHTML = "";
+  ["A","An","The"].forEach(opt=>{
+    const btn = document.createElement("div");
+    btn.className="optionBtn";
+    btn.innerText = opt;
+    btn.onclick = ()=>checkAnswer(opt, btn);
+    optionsBox.appendChild(btn);
+  });
 }
 
-let q=questions[index];
-document.getElementById("qText").innerText=q.sentence;
-
-let box=document.getElementById("options");
-box.innerHTML="";
-
-["A","An","The"].forEach(o=>{
-let b=document.createElement("button");
-b.innerText=o;
-b.onclick=()=>check(o,b);
-box.appendChild(b);
-});
-
-document.getElementById("feedback").innerText="";
-bonus={points:0,hint:false};
-}
+let spinning = false;
 
 function spinWheel(){
-if(spinning)return;
-spinning=true;
-
-let rewards=["⭐ +10","💡 Hint","⏱ Boost"];
-let r=rewards[Math.floor(Math.random()*3)];
-
-bonus.points=r.includes("10")?10:0;
-bonus.hint=r.includes("Hint");
-
-let deg=1080+Math.random()*360;
-document.getElementById("spinner").style.transform=`rotate(${deg}deg)`;
-
-setTimeout(()=>{
-spinning=false;
-alert("Bonus: "+r);
-},3000);
+  if(spinning) return;
+  spinning = true;
+  const spinner = document.getElementById("spinner");
+  const spins = 3 + Math.floor(Math.random()*3);
+  const randSegment = Math.floor(Math.random()*3);
+  const totalDeg = spins*360 + randSegment*120 + 60; // center of segment
+  spinner.style.transition="transform 3s cubic-bezier(0.33, 1, 0.68, 1)";
+  spinner.style.transform = `rotate(${totalDeg}deg)`;
+  setTimeout(()=>{spinning=false; alert("Now select your answer!");},3100);
 }
 
-function check(ans,btn){
-let q=questions[index];
+function checkAnswer(selected, btn){
+  const q = questions[current];
+  const optionButtons = document.querySelectorAll(".optionBtn");
+  optionButtons.forEach(b=>b.onclick=null); // disable all buttons
 
-let buttons=document.querySelectorAll("button");
-buttons.forEach(b=>b.disabled=true);
+  if(selected === q.answer){
+    btn.classList.add("correct");
+    playSound("correctSound");
+    sparkleEffect();
+    score++;
+  } else {
+    btn.classList.add("wrong");
+    playSound("wrongSound");
+    optionButtons.forEach(b=>{
+      if(b.innerText===q.answer) b.classList.add("correct");
+    });
+  }
 
-if(ans===q.answer){
-btn.classList.add("correct");
-play("correctSound");
-
-score+=1+bonus.points;
-document.getElementById("score").innerText=score;
-document.getElementById("feedback").innerText="Correct!";
-}else{
-btn.classList.add("wrong");
-play("wrongSound");
+  document.getElementById("scoreText").innerText = score;
+  current++;
+  setTimeout(loadQuestion,1000);
 }
 
-index++;
-setTimeout(load,1000);
+function endGame(){
+  document.getElementById("gameScreen").classList.remove("active");
+  document.getElementById("endScreen").classList.add("active");
+  document.getElementById("finalScore").innerText = "Your Score: "+score+" / "+questions.length;
+  playSound("clapSound");
+  launchConfetti();
 }
 
-function end(){
-document.getElementById("gameScreen").classList.remove("active");
-document.getElementById("endScreen").classList.add("active");
-document.getElementById("finalScore").innerText="Score: "+score;
-play("clapSound");
+function restartGame(){
+  current=0; score=0;
+  document.getElementById("endScreen").classList.remove("active");
+  document.getElementById("gameScreen").classList.add("active");
+  loadQuestion();
 }
 
-function restart(){
-location.reload();
+function sparkleEffect(){
+  for(let i=0;i<12;i++){
+    const s=document.createElement("div");
+    s.className="sparkle";
+    s.innerText="✨";
+    s.style.left=(30+Math.random()*40)+"vw";
+    s.style.top=(50+Math.random()*40)+"px";
+    document.body.appendChild(s);
+    setTimeout(()=>s.remove(),1000);
+  }
 }
 
-function play(id){
-let a=document.getElementById(id);
-if(a){a.currentTime=0;a.play().catch(()=>{});}
+function launchConfetti(){
+  for(let i=0;i<60;i++){
+    const c=document.createElement("div");
+    c.className="sparkle";
+    c.innerText="✨";
+    c.style.left=Math.random()*100+"vw";
+    c.style.top="-10px";
+    document.body.appendChild(c);
+    setTimeout(()=>c.remove(),2000);
+  }
 }
 
+function playSound(id){
+  const s=document.getElementById(id);
+  if(s){s.currentTime=0;s.play().catch(()=>{});}
+}
 </script>
-
 </body>
 </html>
+
