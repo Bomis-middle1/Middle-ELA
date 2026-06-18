@@ -2,8 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Innovine Punctuation Balloon Game</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Punctuation Balloon Game - FINAL</title>
 
 <style>
 body{
@@ -23,16 +22,7 @@ justify-content:center;
 align-items:center;
 z-index:9999;
 }
-
-#logoScreen img{
-width:220px;
-animation:pulse 1.5s infinite alternate;
-}
-
-@keyframes pulse{
-from{transform:scale(1);}
-to{transform:scale(1.08);}
-}
+#logoScreen img{width:220px;}
 
 /* ================= TITLE ================= */
 #titleScreen{
@@ -97,7 +87,6 @@ text-align:center;
 font-size:28px;
 font-weight:bold;
 color:#0d47a1;
-padding:10px;
 }
 
 #score{
@@ -106,7 +95,6 @@ top:10px;
 left:10px;
 font-size:20px;
 font-weight:bold;
-color:#0d47a1;
 }
 
 /* ================= BALLOONS ================= */
@@ -122,8 +110,7 @@ font-size:24px;
 font-weight:bold;
 color:white;
 cursor:pointer;
-animation:floatUp 8s linear forwards;
-box-shadow:inset -3px -5px rgba(0,0,0,0.2);
+animation:floatUp 9s linear forwards;
 }
 
 .balloon::after{
@@ -137,7 +124,6 @@ background:#444;
 
 @keyframes floatUp{
 0%{transform:translateY(100vh);}
-50%{transform:translateY(40vh) translateX(20px);}
 100%{transform:translateY(-120vh);}
 }
 
@@ -151,23 +137,23 @@ background:#444;
 
 <body>
 
-<!-- ================= LOGO ================= -->
+<!-- LOGO -->
 <div id="logoScreen">
 <img src="G7/chp3/punctuation/assets/innovine-logo.png">
 </div>
 
-<!-- ================= TITLE ================= -->
+<!-- TITLE -->
 <div id="titleScreen">
-<h1>Punctuation Balloon Game 🎈</h1>
+<h1>Punctuation Pop 🎈</h1>
 <p>Tap the correct punctuation balloon!</p>
 </div>
 
-<!-- ================= START ================= -->
+<!-- START -->
 <div id="startScreen">
 <button onclick="startGame()">Start Game</button>
 </div>
 
-<!-- ================= GAME ================= -->
+<!-- GAME -->
 <div id="game">
 <div id="score">Score: 0</div>
 <div id="question">Loading...</div>
@@ -186,11 +172,11 @@ document.getElementById("titleScreen").style.display="none";
 document.getElementById("startScreen").style.display="flex";
 },8000);
 
-/* ================= QUESTIONS (CLEAN CLASSROOM SET) ================= */
+/* ================= QUESTIONS (FIXED CLEAN SET) ================= */
 const questions=[
 {q:"I can’t believe it ___", a:[".","!","?"], c:"!"},
 {q:"Where are you going ___", a:[".","!","?"], c:"?"},
-{q:"Wow that is amazing ___", a:[".","!","?"], c:"!"},
+{q:"Wow this is amazing ___", a:[".","!","?"], c:"!"},
 {q:"John is coming ___", a:[".","!","?"], c:"."},
 {q:"Are you ready ___", a:[".","!","?"], c:"?"},
 {q:"Please sit down ___", a:[".",":","!"], c:":"},
@@ -204,46 +190,58 @@ let i=0;
 let score=0;
 let currentAnswer="";
 
-/* ================= START ================= */
+/* ================= START GAME ================= */
 function startGame(){
 document.getElementById("startScreen").style.display="none";
 document.getElementById("game").style.display="block";
-loadQ();
+
+i=0;
+score=0;
+
+loadQuestion();
 spawnLoop();
 }
 
 /* ================= LOAD QUESTION ================= */
-function loadQ(){
+function loadQuestion(){
 
 if(i>=questions.length){
-document.getElementById("question").innerText="🎉 Game Over! Score: "+score;
+document.getElementById("question").innerText=
+"🎉 Game Over! Score: " + score;
 return;
 }
 
-currentAnswer=questions[i].c;
-document.getElementById("question").innerText=questions[i].q;
-document.getElementById("score").innerText="Score: "+score;
+currentAnswer = questions[i].c;
+document.getElementById("question").innerText = questions[i].q;
+document.getElementById("score").innerText = "Score: " + score;
 }
 
-/* ================= BALLOONS ================= */
+/* ================= BALLOON SYSTEM (FIXED NO OVERLAP LOGIC) ================= */
+
 const symbols=["!","?","."];
 const colors=["red","blue","green","yellow","purple"];
+
+/* LANE SYSTEM (FIX FOR OVERLAP) */
+const lanes=[10,25,40,55,70,85];
 
 function spawnBalloon(){
 
 let b=document.createElement("div");
+
 let symbol=symbols[Math.floor(Math.random()*symbols.length)];
 
 b.className="balloon "+colors[Math.floor(Math.random()*colors.length)];
 b.innerText=symbol;
-b.style.left=Math.random()*90+"vw";
+
+/* FIXED POSITIONING (NO OVERLAP) */
+b.style.left=lanes[Math.floor(Math.random()*lanes.length)] + "vw";
 
 b.onclick=()=>{
 
 if(symbol===currentAnswer){
 score+=10;
 i++;
-loadQ();
+loadQuestion();
 }
 
 b.remove();
@@ -251,12 +249,13 @@ b.remove();
 
 document.body.appendChild(b);
 
-setTimeout(()=>b.remove(),8000);
+/* SAFE CLEANUP */
+setTimeout(()=>b.remove(),9000);
 }
 
 /* ================= LOOP ================= */
 function spawnLoop(){
-setInterval(spawnBalloon,1700);
+setInterval(spawnBalloon,2000);
 }
 
 </script>
