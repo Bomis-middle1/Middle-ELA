@@ -2,307 +2,262 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Punctuation Balloon Game</title>
+<title>Innovine Punctuation Balloon Game</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-body {
-    margin: 0;
-    font-family: Arial;
-    overflow: hidden;
-    background: linear-gradient(135deg, #6dd5fa, #ff758c);
+body{
+margin:0;
+overflow:hidden;
+font-family:Arial;
+background:linear-gradient(#b3e5ff,#e6f7ff);
 }
 
-/* ---------- SCREENS ---------- */
-.screen {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
+/* ================= LOGO ================= */
+#logoScreen{
+position:fixed;
+inset:0;
+background:white;
+display:flex;
+justify-content:center;
+align-items:center;
+z-index:9999;
 }
 
-/* ---------- SPLASH ---------- */
-#splash img {
-    width: 180px;
+#logoScreen img{
+width:220px;
+animation:pulse 1.5s infinite alternate;
 }
 
-/* ---------- TITLE ---------- */
-#title {
-    display: none;
-    color: white;
-    font-size: 2rem;
-    font-weight: bold;
+@keyframes pulse{
+from{transform:scale(1);}
+to{transform:scale(1.08);}
 }
 
-/* ---------- GAME WRAPPER (IMPORTANT FIX) ---------- */
-#game {
-    display: none;
-    position: absolute;
-    width: 100%;
-    height: 100%;
+/* ================= TITLE ================= */
+#titleScreen{
+position:fixed;
+inset:0;
+display:none;
+justify-content:center;
+align-items:center;
+flex-direction:column;
+background:linear-gradient(#4fc3f7,#e1f5fe);
+z-index:9998;
+text-align:center;
 }
 
-/* ---------- TOP UI LAYER (QUESTION ALWAYS SAFE) ---------- */
-#uiLayer {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    z-index: 1000;
-    padding: 10px;
-    box-sizing: border-box;
+#titleScreen h1{
+font-size:48px;
+color:#0d47a1;
+animation:bounce 1.2s infinite;
 }
 
-/* QUESTION BOX FIXED */
-#questionBox {
-    background: rgba(0,0,0,0.5);
-    color: white;
-    font-size: 20px;
-    font-weight: bold;
-    padding: 12px;
-    border-radius: 10px;
-    text-align: center;
+@keyframes bounce{
+0%{transform:translateY(0);}
+50%{transform:translateY(-12px);}
+100%{transform:translateY(0);}
 }
 
-/* ---------- PLAY AREA (BALLOONS ONLY HERE) ---------- */
-#playArea {
-    position: absolute;
-    top: 80px;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    overflow: hidden;
+/* ================= START ================= */
+#startScreen{
+position:fixed;
+inset:0;
+display:none;
+justify-content:center;
+align-items:center;
+background:#e3f2fd;
+z-index:9997;
 }
 
-/* ---------- BALLOONS ---------- */
-.balloon {
-    position: absolute;
-    width: 110px;
-    height: 130px;
-    background: radial-gradient(circle at 30% 30%, #fff, #ff4d6d);
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: white;
-    font-weight: bold;
-    cursor: pointer;
-    animation: float 6s linear forwards;
-    z-index: 2;
+button{
+padding:15px 30px;
+font-size:18px;
+border:none;
+border-radius:10px;
+background:#ffca28;
+font-weight:bold;
+cursor:pointer;
 }
 
-.balloon::after {
-    content: "";
-    position: absolute;
-    bottom: -20px;
-    width: 2px;
-    height: 25px;
-    background: #333;
+/* ================= GAME ================= */
+#game{
+display:none;
+width:100%;
+height:100vh;
+position:relative;
+overflow:hidden;
 }
 
-@keyframes float {
-    0% { transform: translateY(100%); }
-    100% { transform: translateY(-120%); }
+#question{
+position:absolute;
+top:80px;
+width:100%;
+text-align:center;
+font-size:28px;
+font-weight:bold;
+color:#0d47a1;
+padding:10px;
 }
 
-/* ---------- CONFETTI ---------- */
-.confetti {
-    position: absolute;
-    width: 8px;
-    height: 8px;
-    background: yellow;
-    animation: fall 2s linear forwards;
-    z-index: 9999;
+#score{
+position:absolute;
+top:10px;
+left:10px;
+font-size:20px;
+font-weight:bold;
+color:#0d47a1;
 }
 
-@keyframes fall {
-    to { transform: translateY(100vh); opacity: 0; }
+/* ================= BALLOONS ================= */
+.balloon{
+position:absolute;
+width:55px;
+height:70px;
+border-radius:50% 50% 45% 45%;
+display:flex;
+justify-content:center;
+align-items:center;
+font-size:24px;
+font-weight:bold;
+color:white;
+cursor:pointer;
+animation:floatUp 8s linear forwards;
+box-shadow:inset -3px -5px rgba(0,0,0,0.2);
 }
 
-/* ---------- BUTTON ---------- */
-button {
-    padding: 12px 25px;
-    font-size: 18px;
-    border: none;
-    border-radius: 10px;
-    background: #ffdd57;
+.balloon::after{
+content:"";
+position:absolute;
+bottom:-12px;
+width:2px;
+height:14px;
+background:#444;
 }
 
-/* ---------- END SCREEN ---------- */
-#endScreen {
-    display: none;
-    color: white;
-    font-size: 24px;
+@keyframes floatUp{
+0%{transform:translateY(100vh);}
+50%{transform:translateY(40vh) translateX(20px);}
+100%{transform:translateY(-120vh);}
 }
 
-/* ---------- VOLUME ---------- */
-#controls {
-    position: absolute;
-    bottom: 10px;
-    left: 10px;
-    color: white;
-    z-index: 2000;
-}
+.red{background:#ff5252;}
+.blue{background:#42a5f5;}
+.green{background:#66bb6a;}
+.yellow{background:#ffca28;}
+.purple{background:#ab47bc;}
 </style>
 </head>
 
 <body>
 
-<!-- SPLASH -->
-<div id="splash" class="screen">
-    <img src="assets/logo.png">
+<!-- ================= LOGO ================= -->
+<div id="logoScreen">
+<img src="G7/chp3/punctuation/assets/innovine-logo.png">
 </div>
 
-<!-- TITLE -->
-<div id="title" class="screen">
-    <div>🎯 Punctuation Power Challenge</div>
-    <button onclick="startGame()">Start</button>
+<!-- ================= TITLE ================= -->
+<div id="titleScreen">
+<h1>Punctuation Balloon Game 🎈</h1>
+<p>Tap the correct punctuation balloon!</p>
 </div>
 
-<!-- GAME -->
+<!-- ================= START ================= -->
+<div id="startScreen">
+<button onclick="startGame()">Start Game</button>
+</div>
+
+<!-- ================= GAME ================= -->
 <div id="game">
-    <div id="uiLayer">
-        <div id="questionBox"></div>
-    </div>
-    <div id="playArea"></div>
-</div>
-
-<!-- END -->
-<div id="endScreen" class="screen">
-    <div id="scoreText"></div>
-    <button onclick="restart()">Restart</button>
-</div>
-
-<!-- SOUND -->
-<audio id="correctSound" src="assets/correct.mp3"></audio>
-<audio id="wrongSound" src="assets/wrong.mp3"></audio>
-
-<!-- VOLUME -->
-<div id="controls">
-Volume <input type="range" min="0" max="1" step="0.1" value="0.7" oninput="setVolume(this.value)">
+<div id="score">Score: 0</div>
+<div id="question">Loading...</div>
 </div>
 
 <script>
 
-/* ---------- INTRO ---------- */
+/* ================= FLOW ================= */
 setTimeout(()=>{
-    document.getElementById("splash").style.display="none";
-    document.getElementById("title").style.display="flex";
+document.getElementById("logoScreen").style.display="none";
+document.getElementById("titleScreen").style.display="flex";
 },5000);
 
-/* ---------- QUESTIONS ---------- */
-const questions = [
-{q:"I can’t believe we finally finished the project ___", a:[".", "!", "?", ","], c:"!"},
-{q:"Where are you going ___", a:[".", "!", "?", ","], c:"?"},
-{q:"She whispered, “Don’t tell anyone.”", a:["Correct","Wrong","None","Error"], c:"Correct"},
-{q:"The teacher said, “Submit your work.”", a:["A","B","C","D"], c:"A"},
-{q:"You need ___ notebook pen ruler and eraser", a:[".",":","!","?"], c:":"},
-{q:"Let’s go to the park tomorrow ___", a:[".",",","!", "?"], c:"."},
-{q:"Wow this place is incredible ___", a:["!",".","?",","], c:"!"},
-{q:"Are you coming with us ___", a:["!",".","?",","], c:"?"},
-{q:"I visited Delhi last year", a:["A","B","C","D"], c:"B"},
-{q:"She asked, “Where are you going?”", a:["A","B","C","D"], c:"B"}
+setTimeout(()=>{
+document.getElementById("titleScreen").style.display="none";
+document.getElementById("startScreen").style.display="flex";
+},8000);
+
+/* ================= QUESTIONS (CLEAN CLASSROOM SET) ================= */
+const questions=[
+{q:"I can’t believe it ___", a:[".","!","?"], c:"!"},
+{q:"Where are you going ___", a:[".","!","?"], c:"?"},
+{q:"Wow that is amazing ___", a:[".","!","?"], c:"!"},
+{q:"John is coming ___", a:[".","!","?"], c:"."},
+{q:"Are you ready ___", a:[".","!","?"], c:"?"},
+{q:"Please sit down ___", a:[".",":","!"], c:":"},
+{q:"I love ice cream ___", a:[".","!","?"], c:"!"},
+{q:"Stop right there ___", a:[".","!","?"], c:"!"},
+{q:"The sun is bright ___", a:[".","!","?"], c:"."},
+{q:"Let’s go to the park ___", a:[".",",","!"], c:"."}
 ];
 
-let shuffled=[], current=0, score=0, volume=0.7;
+let i=0;
+let score=0;
+let currentAnswer="";
 
-/* ---------- START ---------- */
+/* ================= START ================= */
 function startGame(){
-    document.getElementById("title").style.display="none";
-    document.getElementById("game").style.display="block";
-
-    shuffled = questions.sort(()=>Math.random()-0.5);
-    current=0; score=0;
-
-    loadQ();
+document.getElementById("startScreen").style.display="none";
+document.getElementById("game").style.display="block";
+loadQ();
+spawnLoop();
 }
 
-/* ---------- LOAD QUESTION ---------- */
+/* ================= LOAD QUESTION ================= */
 function loadQ(){
-    clearBalls();
 
-    if(current >= shuffled.length){
-        end();
-        return;
-    }
-
-    let q = shuffled[current];
-    document.getElementById("questionBox").innerText = q.q;
-
-    q.a.forEach(opt=>{
-        createBall(opt, q.c);
-    });
+if(i>=questions.length){
+document.getElementById("question").innerText="🎉 Game Over! Score: "+score;
+return;
 }
 
-/* ---------- BALLOON ---------- */
-function createBall(text, correct){
-    let b = document.createElement("div");
-    b.className="balloon";
-    b.innerText=text;
-
-    b.style.left=Math.random()*80+"vw";
-    b.style.top="100%";
-
-    b.onclick=()=>{
-        if(text===correct){
-            score++;
-            playCorrect();
-            confetti();
-        } else {
-            playWrong();
-        }
-        current++;
-        setTimeout(loadQ,800);
-    };
-
-    document.getElementById("playArea").appendChild(b);
+currentAnswer=questions[i].c;
+document.getElementById("question").innerText=questions[i].q;
+document.getElementById("score").innerText="Score: "+score;
 }
 
-/* ---------- CLEAN ---------- */
-function clearBalls(){
-    document.getElementById("playArea").innerHTML="";
+/* ================= BALLOONS ================= */
+const symbols=["!","?","."];
+const colors=["red","blue","green","yellow","purple"];
+
+function spawnBalloon(){
+
+let b=document.createElement("div");
+let symbol=symbols[Math.floor(Math.random()*symbols.length)];
+
+b.className="balloon "+colors[Math.floor(Math.random()*colors.length)];
+b.innerText=symbol;
+b.style.left=Math.random()*90+"vw";
+
+b.onclick=()=>{
+
+if(symbol===currentAnswer){
+score+=10;
+i++;
+loadQ();
 }
 
-/* ---------- SOUND ---------- */
-function playCorrect(){
-    let s=document.getElementById("correctSound");
-    s.volume=volume;
-    s.play();
+b.remove();
+};
+
+document.body.appendChild(b);
+
+setTimeout(()=>b.remove(),8000);
 }
 
-function playWrong(){
-    let s=document.getElementById("wrongSound");
-    s.volume=volume;
-    s.play();
+/* ================= LOOP ================= */
+function spawnLoop(){
+setInterval(spawnBalloon,1700);
 }
-
-function setVolume(v){ volume=v; }
-
-/* ---------- CONFETTI ---------- */
-function confetti(){
-    for(let i=0;i<25;i++){
-        let c=document.createElement("div");
-        c.className="confetti";
-        c.style.left=Math.random()*100+"vw";
-        c.style.background=["#ff0","#0ff","#f0f","#0f0"][Math.floor(Math.random()*4)];
-        document.body.appendChild(c);
-        setTimeout(()=>c.remove(),2000);
-    }
-}
-
-/* ---------- END ---------- */
-function end(){
-    document.getElementById("game").style.display="none";
-    document.getElementById("endScreen").style.display="flex";
-    document.getElementById("scoreText").innerText=
-        `🎉 Score: ${score}/${shuffled.length}`;
-}
-
-/* ---------- RESTART ---------- */
-function restart(){ location.reload(); }
 
 </script>
 
