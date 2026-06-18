@@ -11,11 +11,11 @@ body {
   font-family: Arial, sans-serif;
   background: radial-gradient(circle at top left, #ff9a9e, #fad0c4, #fbc2eb, #a18cd1);
   background-size: 400% 400%;
-  animation: glow 10s ease infinite;
+  animation: bg 10s ease infinite;
   overflow: hidden;
 }
 
-@keyframes glow {
+@keyframes bg {
   0% {background-position:0% 50%;}
   50% {background-position:100% 50%;}
   100% {background-position:0% 50%;}
@@ -32,40 +32,27 @@ body {
   z-index: 9999;
 }
 
-/* GAME LAYOUT */
+/* HEADER */
+.header {
+  text-align: center;
+  padding: 10px;
+  font-weight: bold;
+}
+
+/* DASHBOARD */
 #game {
   display: none;
   padding: 10px;
-  text-align: center;
 }
 
-.header {
-  font-size: 22px;
-  font-weight: bold;
-  margin: 5px;
-}
-
-.subheader {
-  font-size: 16px;
-  margin-bottom: 10px;
-}
-
-.progress {
-  font-size: 14px;
-  margin-bottom: 10px;
-}
-
-/* LAYOUT */
 .container {
   display: flex;
   gap: 10px;
-  justify-content: center;
 }
 
-/* LEFT SENTENCES */
-#sentences {
-  width: 45%;
-  min-height: 400px;
+/* LEFT */
+.left {
+  width: 55%;
   background: rgba(255,255,255,0.4);
   border-radius: 12px;
   padding: 10px;
@@ -73,31 +60,43 @@ body {
 
 .sentence {
   background: #ffb300;
-  margin: 8px;
   padding: 10px;
+  margin: 8px;
   border-radius: 10px;
   cursor: grab;
-  font-size: 14px;
 }
 
-/* RIGHT BUCKETS */
-#buckets {
+/* RIGHT */
+.right {
   width: 45%;
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
+/* KPI */
+.kpi {
+  background: white;
+  padding: 10px;
+  border-radius: 10px;
+  text-align: center;
+}
+
+/* BUCKETS */
 .bucket {
-  min-height: 80px;
+  min-height: 70px;
   background: rgba(255,255,255,0.5);
   border: 2px dashed #333;
   border-radius: 10px;
   padding: 10px;
 }
 
-.bucket h3 {
-  margin: 0;
+/* FEEDBACK */
+#feedback {
+  background: white;
+  padding: 10px;
+  border-radius: 10px;
+  text-align: center;
 }
 </style>
 </head>
@@ -112,104 +111,105 @@ body {
 <!-- GAME -->
 <div id="game">
 
-  <div class="header">Punctuation Power Dashboard</div>
-  <div class="subheader">Grade 5 Grammar – Punctuation Mastery</div>
-  <div class="progress" id="progress">Progress: 0 / 15 Sentences</div>
+  <div class="header">
+    Punctuation Power Dashboard <br>
+    <small>Grade 5 Grammar – Punctuation Mastery</small><br>
+    <b id="progress">Progress: 0 / 15</b>
+  </div>
 
   <div class="container">
 
-    <!-- SENTENCES -->
-    <div id="sentences"></div>
+    <!-- LEFT -->
+    <div class="left" id="sentences"></div>
 
-    <!-- BUCKETS -->
-    <div id="buckets">
+    <!-- RIGHT -->
+    <div class="right">
 
-      <div class="bucket" data-type="?">
-        <h3>Question Mark (?)</h3>
-      </div>
+      <div class="kpi" id="kpi">Accuracy: 0%</div>
 
-      <div class="bucket" data-type="!">
-        <h3>Exclamation Mark (!)</h3>
-      </div>
+      <div class="bucket" data-type="?">Question Mark (?)</div>
+      <div class="bucket" data-type="!">Exclamation (!)</div>
+      <div class="bucket" data-type=".">Full Stop (.)</div>
+      <div class="bucket" data-type=",">Comma (,)</div>
 
-      <div class="bucket" data-type=".">
-        <h3>Full Stop (.)</h3>
-      </div>
-
-      <div class="bucket" data-type=",">
-        <h3>Comma (,)</h3>
-      </div>
+      <div id="feedback">Drag sentences into correct punctuation buckets</div>
 
     </div>
-
   </div>
 </div>
 
 <script>
 
-const sentences = [
-{ text:"What time does the train arrive", type:"?" },
-{ text:"How beautiful the sunset is", type:"!" },
-{ text:"I went to the market with my mother", type:"." },
-{ text:"Although it was raining the match continued", type:"," },
+const data = [
+{t:"What is your name", type:"?"},
+{t:"How beautiful this place is", type:"!"},
+{t:"I went to school today", type:"."},
+{t:"Although he was tired he kept working", type:","},
 
-{ text:"Did you complete your homework", type:"?" },
-{ text:"Wow that performance was incredible", type:"!" },
-{ text:"She enjoys reading books in the evening", type:"." },
-{ text:"While walking to school I met my friend", type:"," },
+{t:"Where are you going", type:"?"},
+{t:"What a wonderful surprise", type:"!"},
+{t:"She is reading a book", type:"."},
+{t:"Because it was late he left early", type:","},
 
-{ text:"Where did you place the science notebook", type:"?" },
-{ text:"This is the best day ever", type:"!" },
-{ text:"The teacher explained the concept clearly", type:"." },
-{ text:"Because he was late he missed the bus", type:"," },
+{t:"Did you complete the task", type:"?"},
+{t:"That is unbelievable", type:"!"},
+{t:"We are learning grammar", type:"."},
+{t:"While walking home I saw him", type:","},
 
-{ text:"Why are you so quiet today", type:"?" },
-{ text:"What a fantastic achievement", type:"!" },
-{ text:"We are learning punctuation in grammar class", type:"." }
+{t:"Why are you crying", type:"?"},
+{t:"This is amazing", type:"!"},
+{t:"They are playing outside", type:"."}
 ];
 
-let progress = 0;
+let correct = 0;
 
-const sentenceBox = document.getElementById("sentences");
-const progressBox = document.getElementById("progress");
+const box = document.getElementById("sentences");
+const progress = document.getElementById("progress");
+const kpi = document.getElementById("kpi");
+const feedback = document.getElementById("feedback");
 
-/* LOAD SENTENCES */
+/* LOAD */
 function load(){
-  sentenceBox.innerHTML = "";
+  box.innerHTML = "";
 
-  sentences.forEach((s,i)=>{
-    const div = document.createElement("div");
+  data.forEach(d=>{
+    let div = document.createElement("div");
     div.className = "sentence";
     div.draggable = true;
-    div.textContent = s.text;
-    div.dataset.type = s.type;
+    div.innerText = d.t;
+    div.dataset.type = d.type;
 
     div.ondragstart = e=>{
-      e.dataTransfer.setData("text", JSON.stringify(s));
+      e.dataTransfer.setData("text", JSON.stringify(d));
     };
 
-    sentenceBox.appendChild(div);
+    box.appendChild(div);
   });
 }
 
-/* BUCKET LOGIC */
-document.querySelectorAll(".bucket").forEach(bucket=>{
-  bucket.ondragover = e=>e.preventDefault();
+/* BUCKETS */
+document.querySelectorAll(".bucket").forEach(b=>{
+  b.ondragover = e=>e.preventDefault();
 
-  bucket.ondrop = e=>{
-    e.preventDefault();
-    const data = JSON.parse(e.dataTransfer.getData("text"));
+  b.ondrop = e=>{
+    let d = JSON.parse(e.dataTransfer.getData("text"));
 
-    if(data.type === bucket.dataset.type){
-      progress++;
-      progressBox.textContent = `Progress: ${progress} / 15 Sentences`;
-      sentences.splice(sentences.findIndex(s=>s.text===data.text),1);
-      load();
+    if(d.type === b.dataset.type){
+      correct++;
+      feedback.innerText = "Correct ✔";
+    } else {
+      feedback.innerText = "Try again";
     }
+
+    progress.innerText = `Progress: ${correct} / 15`;
+    kpi.innerText = `Accuracy: ${Math.round((correct/15)*100)}%`;
+
+    data.splice(data.findIndex(x=>x.t===d.t),1);
+    load();
   };
 });
 
-/* SPLASH CONTROL (FIXED - NO REPEAT BUG) */
+/* SPLASH FIXED */
 window.onload = ()=>{
   setTimeout(()=>{
     document.getElementById("splash").style.display="none";
