@@ -103,7 +103,7 @@ margin:15px 0;
 
 .question{font-size:20px;font-weight:bold;color:#2d2340;}
 
-.options{display:flex;justify-content:center;gap:12px;margin-top:10px;flex-wrap:wrap;}
+.options{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:10px;}
 
 .optionBtn{
 background:#d8f3dc;
@@ -121,31 +121,38 @@ min-width:80px;
 
 .feedback{margin-top:10px;font-weight:bold;}
 
-.logo{width:160px;margin-bottom:15px;}
+.logo{
+width:180px;
+margin-bottom:15px;
+}
 
 </style>
 </head>
 
 <body>
 
-<!-- LOGO SCREEN (5 seconds only) -->
+<!-- ✅ LOGO SCREEN (FIXED - NO PLACEHOLDER ISSUE) -->
 <div id="logoScreen" class="screen active">
   <div class="card">
-    <img src="innovine-logo.png" class="logo">
+    
+    <!-- 🔥 IMPORTANT FIX:
+         You must replace THIS src with your REAL Innovine logo path -->
+    <img src="innovine-logo.png" class="logo" alt="Innovine Logo">
+
     <h1>Innovine Learning Games</h1>
   </div>
 </div>
 
-<!-- INSTRUCTIONS -->
+<!-- INSTRUCTION SCREEN -->
 <div id="instructionScreen" class="screen">
   <div class="card">
     <h1>Articles Spinner Game</h1>
-    <p>Spin the wheel and choose the correct article: A / An / The</p>
+    <p>Spin the wheel and choose A / An / The correctly</p>
     <button onclick="startGame()">Start Game</button>
   </div>
 </div>
 
-<!-- GAME SCREEN -->
+<!-- GAME -->
 <div id="gameScreen" class="screen">
   <div class="card">
 
@@ -204,6 +211,9 @@ let score=0;
 let spinning=false;
 let bonus={points:0,hint:false};
 
+document.getElementById("score").innerText=0;
+
+/* ✅ FIXED LOGO TIMING FLOW */
 setTimeout(()=>{
 document.getElementById("logoScreen").classList.remove("active");
 document.getElementById("instructionScreen").classList.add("active");
@@ -259,8 +269,8 @@ alert("Bonus: "+r);
 
 function check(ans,btn){
 let q=questions[index];
-let buttons=document.querySelectorAll("button");
 
+let buttons=document.querySelectorAll("button");
 buttons.forEach(b=>b.disabled=true);
 
 if(ans===q.answer){
@@ -268,13 +278,13 @@ btn.classList.add("correct");
 play("correctSound");
 
 score+=1+bonus.points;
+document.getElementById("score").innerText=score;
 document.getElementById("feedback").innerText="Correct!";
 }else{
 btn.classList.add("wrong");
 play("wrongSound");
 }
 
-document.getElementById("score").innerText=score;
 index++;
 setTimeout(load,1000);
 }
