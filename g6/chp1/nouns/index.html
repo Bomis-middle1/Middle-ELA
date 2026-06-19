@@ -37,7 +37,6 @@ display:none;
 padding:10px;
 }
 
-/* TOP BAR */
 .topbar{
 display:flex;
 justify-content:space-between;
@@ -46,19 +45,25 @@ font-size:16px;
 padding:10px;
 }
 
-/* SORT GAME */
-#sortGame{
-display:none;
-text-align:center;
+/* WORD BANK */
+#words{
+margin:10px 0;
+padding:10px;
+background:#fff7d6;
+border-radius:12px;
+min-height:60px;
+display:flex;
+flex-wrap:wrap;
+gap:8px;
 }
 
+/* BASKETS */
 .container{
 display:grid;
 grid-template-columns:repeat(2,1fr);
 gap:10px;
 }
 
-/* ✅ FIXED BASKETS (NOW LOOK LIKE BASKETS NOT BOXES) */
 .box{
 background:linear-gradient(145deg,#ffffff,#eaf6ff);
 padding:14px;
@@ -67,16 +72,9 @@ border-radius:22px;
 box-shadow:0 10px 20px rgba(0,0,0,0.15);
 border:3px dashed #4aa3df;
 position:relative;
-transition:0.3s;
 overflow:hidden;
 }
 
-/* basket hover effect */
-.box:hover{
-transform:scale(1.02);
-}
-
-/* basket label */
 .box::before{
 content:attr(data-label);
 position:absolute;
@@ -90,35 +88,18 @@ font-size:11px;
 font-weight:bold;
 }
 
-/* WORDS */
+/* WORD */
 .word{
 display:inline-block;
 padding:7px 10px;
-margin:5px;
 background:#ffd966;
 border-radius:10px;
 cursor:grab;
 font-weight:bold;
+user-select:none;
 }
 
-/* MCQ */
-#mcq{
-display:none;
-text-align:center;
-}
-
-.option{
-display:block;
-width:92%;
-margin:10px auto;
-padding:10px;
-border:none;
-border-radius:10px;
-background:#dff3ff;
-font-size:15px;
-}
-
-/* END SCREEN */
+/* END */
 #endScreen{
 display:none;
 text-align:center;
@@ -130,13 +111,12 @@ font-size:24px;
 font-weight:bold;
 }
 
-/* BUTTON */
 button{
 padding:10px 14px;
 border:none;
 border-radius:10px;
-margin-top:10px;
 cursor:pointer;
+margin-top:10px;
 }
 
 /* CONFETTI */
@@ -176,15 +156,13 @@ ONE & MANY – NOUNS ADVENTURE
 <div id="game">
 
 <div class="topbar">
-<div>Progress: <span id="progress">0/10</span></div>
-<div>⏱ <span id="timer">80</span>s</div>
 <div>Score: <span id="score">0</span></div>
 </div>
 
-<!-- SORT GAME -->
-<div id="sortGame">
-<h3>Sort the Nouns</h3>
+<!-- WORD BANK -->
+<div id="words"></div>
 
+<!-- BASKETS -->
 <div class="container">
 
 <div class="box" id="proper" data-label="📘 Proper Nouns"></div>
@@ -197,38 +175,14 @@ ONE & MANY – NOUNS ADVENTURE
 
 </div>
 
-<div id="words"></div>
-<button onclick="startMCQ()">Next</button>
-</div>
-
-<!-- MCQ -->
-<div id="mcq">
-<h3 id="qText"></h3>
-<div id="options"></div>
-</div>
-
-<!-- END -->
-<div id="endScreen">
-<div class="big" id="finalScore"></div>
-<p id="summary"></p>
-
-<button onclick="location.reload()">Restart</button>
 </div>
 
 <!-- AUDIO -->
 <audio id="correctSound" src="assets/correct.mp3"></audio>
-<audio id="wrongSound" src="assets/wrong.mp3"></audio>
-<audio id="clapSound" src="assets/clapping.mp3"></audio>
 
 <script>
 
 let score=0;
-let qIndex=0;
-let timer;
-let time=80;
-let attempts=0;
-let totalAttempts=0;
-let startTime;
 
 const nouns=[
 {w:"Mumbai",t:"proper"},
@@ -253,26 +207,11 @@ const nouns=[
 {w:"Salt",t:"uncountable"}
 ];
 
-const questions=[
-{q:"Plural of book?",a:"books",o:["books","bookes","bookies","bok"]},
-{q:"Plural of box?",a:"boxes",o:["boxs","boxes","boxies","box"]},
-{q:"Plural of baby?",a:"babies",o:["babys","babies","babes","baby"]},
-{q:"Plural of leaf?",a:"leaves",o:["leafs","leaves","leafes","leav"]},
-{q:"Plural of child?",a:"children",o:["childs","children","childes","childer"]},
-{q:"Plural of city?",a:"cities",o:["citys","cities","city","citty"]},
-{q:"Plural of fox?",a:"foxes",o:["foxs","foxes","fox","foxx"]},
-{q:"Plural of toy?",a:"toys",o:["toys","toies","toy","toyies"]},
-{q:"Plural of man?",a:"men",o:["mans","men","man","menn"]},
-{q:"Plural of bus?",a:"buses",o:["bus","buses","buss","busies"]},
-{q:"Plural of pen?",a:"pens",o:["pens","pen","penns","penes"]},
-{q:"Plural of dog?",a:"dogs",o:["dog","dogs","doges","dogz"]},
-{q:"Plural of car?",a:"cars",o:["car","cars","carrs","carses"]},
-{q:"Plural of apple?",a:"apples",o:["apple","apples","appl","appleses"]},
-{q:"Plural of table?",a:"tables",o:["tables","table","tabl","tablez"]}
-];
+function shuffle(a){
+return a.sort(()=>Math.random()-0.5);
+}
 
-function shuffle(a){return a.sort(()=>Math.random()-0.5)}
-
+/* SPLASH FLOW */
 setTimeout(()=>{
 document.getElementById("topic").style.display="block";
 },5000);
@@ -284,142 +223,56 @@ document.getElementById("startBtn").style.display="block";
 document.getElementById("startBtn").onclick=()=>{
 document.getElementById("splash").style.display="none";
 document.getElementById("game").style.display="block";
-document.getElementById("sortGame").style.display="block";
 loadWords();
-startTime=Date.now();
 };
 
-/* SORT */
+/* LOAD WORDS */
 function loadWords(){
 let box=document.getElementById("words");
 box.innerHTML="";
+
 shuffle(nouns).forEach(n=>{
 let d=document.createElement("div");
 d.className="word";
 d.textContent=n.w;
 d.dataset.type=n.t;
 d.draggable=true;
-d.ondragstart=e=>e.dataTransfer.setData("type",n.t);
+
+/* DRAG */
+d.ondragstart=e=>{
+e.dataTransfer.setData("type",n.t);
+e.dataTransfer.setData("text",n.w);
+setTimeout(()=>d.style.display="none",0);
+};
+
 box.appendChild(d);
 });
 
+/* DROP ZONES */
 document.querySelectorAll(".box").forEach(b=>{
 b.ondragover=e=>e.preventDefault();
+
 b.ondrop=e=>{
-let t=e.dataTransfer.getData("type");
-if(t===b.id){
+let type=e.dataTransfer.getData("type");
+let text=e.dataTransfer.getData("text");
+
+if(type===b.id){
 score+=2;
 document.getElementById("correctSound").play();
-}
+
+/* MOVE WORD INTO BASKET */
+let span=document.createElement("div");
+span.className="word";
+span.textContent=text;
+b.appendChild(span);
+
 document.getElementById("score").innerText=score;
-};
-});
-}
-
-/* MCQ */
-function startMCQ(){
-document.getElementById("sortGame").style.display="none";
-document.getElementById("mcq").style.display="block";
-
-loadQ();
-startTimer();
-}
-
-function startTimer(){
-clearInterval(timer);
-time=80;
-timer=setInterval(()=>{
-time--;
-document.getElementById("timer").innerText=time;
-if(time<=0) nextQ();
-},1000);
-}
-
-let used=[];
-
-function loadQ(){
-if(qIndex>=10) return endGame();
-
-document.getElementById("progress").innerText=(qIndex+1)+"/10";
-
-let q;
-do{
-q=questions[Math.floor(Math.random()*questions.length)];
-}while(used.includes(q.q));
-
-used.push(q.q);
-
-document.getElementById("qText").innerText=q.q;
-
-let opt=document.getElementById("options");
-opt.innerHTML="";
-
-attempts=0;
-
-shuffle(q.o).forEach(o=>{
-let b=document.createElement("button");
-b.className="option";
-b.innerText=o;
-
-b.onclick=()=>{
-attempts++;
-totalAttempts++;
-
-if(o===q.a){
-score+=5;
-document.getElementById("correctSound").play();
-confetti();
-nextQ();
 }else{
-document.getElementById("wrongSound").play();
-if(attempts>=2) nextQ();
+/* return word if wrong */
+loadWords();
 }
 };
-
-opt.appendChild(b);
 });
-}
-
-function nextQ(){
-qIndex++;
-loadQ();
-startTimer();
-}
-
-function confetti(){
-for(let i=0;i<15;i++){
-let c=document.createElement("div");
-c.className="confetti";
-c.style.left=Math.random()*100+"vw";
-c.style.background=["red","blue","green","yellow"][Math.floor(Math.random()*4)];
-document.body.appendChild(c);
-setTimeout(()=>c.remove(),3000);
-}
-}
-
-function endGame(){
-clearInterval(timer);
-
-document.getElementById("mcq").style.display="none";
-document.getElementById("endScreen").style.display="block";
-
-document.getElementById("clapSound").play();
-
-let percent=(score/50)*100;
-
-let remark=
-percent>=80?"Excellent 🎉":
-percent>=60?"Good Job 👍":
-percent>=45?"Well Tried 🙂":
-"Let's Revise 📘";
-
-let timeTaken=Math.floor((Date.now()-startTime)/1000);
-
-document.getElementById("finalScore").innerText=
-"Score: "+score+" | "+remark;
-
-document.getElementById("summary").innerText=
-"Time Taken: "+timeTaken+"s | Attempts: "+totalAttempts;
 }
 
 </script>
