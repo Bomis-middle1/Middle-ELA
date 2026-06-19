@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Nouns Sorting Game - FIXED ENGINE</title>
+<title>Nouns Sorting Game FIXED</title>
 
 <style>
 body{
@@ -38,7 +38,7 @@ user-select:none;
 touch-action:none;
 }
 
-/* GRID */
+/* BASKETS */
 .container{
 display:grid;
 grid-template-columns:repeat(2,1fr);
@@ -46,7 +46,6 @@ gap:8px;
 padding:8px;
 }
 
-/* BASKETS */
 .box{
 background:linear-gradient(145deg,#ffffff,#eaf6ff);
 min-height:90px;
@@ -149,7 +148,7 @@ const nouns=[
 
 let totalWords = nouns.length;
 let correctPlaced = 0;
-let score = 0;
+let placedSet = new Set();   // 🔥 prevents missing + duplicate bugs
 
 function shuffle(a){
 return a.sort(()=>Math.random()-0.5);
@@ -167,15 +166,13 @@ d.textContent=n.w;
 d.dataset.type=n.t;
 d.draggable=true;
 
-/* DRAG START */
+/* SAFE DRAG */
 d.ondragstart=e=>{
 e.dataTransfer.setData("type",n.t);
 e.dataTransfer.setData("text",n.w);
-
-/* remove from bank safely */
-setTimeout(()=>d.remove(),50);
 };
 
+/* mobile safety: only remove AFTER confirmed drop */
 box.appendChild(d);
 });
 
@@ -189,22 +186,33 @@ let text=e.dataTransfer.getData("text");
 
 if(!text) return;
 
+/* ONLY ACCEPT ONCE */
+if(placedSet.has(text)) return;
+
 if(type===b.id){
 
+placedSet.add(text);
+correctPlaced++;
+
+/* move word visually */
 const el=document.createElement("div");
 el.className="inside-word";
 el.textContent=text;
 b.appendChild(el);
 
-score++;
-correctPlaced++;
+/* remove from word bank safely */
+document.querySelectorAll(".word").forEach(w=>{
+if(w.textContent===text){
+w.remove();
+}
+});
 
-/* 🔥 FINAL FIX: END GAME CHECK */
+/* FINAL CHECK (NOW GUARANTEED) */
 if(correctPlaced === totalWords){
 endGame();
 }
-
 }
+
 };
 });
 }
@@ -215,8 +223,8 @@ function endGame(){
 document.getElementById("endScreen").style.display="block";
 
 document.getElementById("result").innerHTML=
-"Score: " + score + " / " + totalWords +
-"<br>Accuracy: " + Math.round((score/totalWords)*100) + "%";
+"Correct: " + correctPlaced + " / " + totalWords +
+"<br>🎯 All nouns sorted successfully!";
 }
 
 loadWords();
