@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Temple Treasure - Jungle Hunter Edition</title>
+<title>Temple Treasure Jungle Quiz</title>
 
 <style>
 body{
@@ -28,11 +28,10 @@ body{
     z-index:1;
     pointer-events:none;
 }
-
-.t1{ left:8%; font-size:90px; }
-.t2{ left:25%; font-size:120px; }
-.t3{ left:55%; font-size:95px; }
-.t4{ left:78%; font-size:130px; }
+.t1{left:8%;}
+.t2{left:25%;font-size:120px;}
+.t3{left:55%;}
+.t4{left:78%;font-size:130px;}
 
 /* GROUND */
 #ground{
@@ -48,37 +47,25 @@ body{
 /* PLAYER */
 #player{
     position:absolute;
-    width:70px;
-    height:70px;
     left:80px;
     bottom:120px;
     font-size:55px;
-    display:flex;
-    justify-content:center;
-    align-items:center;
     z-index:20;
-    transition: transform 0.1s linear;
+    transition:transform 0.1s linear;
 }
-
-#player.right{ transform:scaleX(1); }
-#player.left{ transform:scaleX(-1); }
-
-/* jump feel */
-.jump{
-    transform: translateY(-12px);
-}
+#player.right{transform:scaleX(1);}
+#player.left{transform:scaleX(-1);}
 
 /* COIN */
 .coin{
     position:absolute;
     width:40px;
     height:40px;
-    border-radius:50%;
     background:gold;
+    border-radius:50%;
     display:flex;
     justify-content:center;
     align-items:center;
-    z-index:10;
 }
 
 /* OBSTACLE */
@@ -88,8 +75,6 @@ body{
     height:50px;
     background:#6d4c41;
     bottom:120px;
-    border-radius:10px;
-    z-index:10;
 }
 
 /* SCORE */
@@ -98,12 +83,12 @@ body{
     top:10px;
     left:10px;
     background:white;
-    padding:10px 15px;
+    padding:10px;
     border-radius:10px;
     z-index:50;
 }
 
-/* QUESTION */
+/* QUESTION BOX */
 #questionBox{
     position:absolute;
     top:50%;
@@ -114,16 +99,13 @@ body{
     width:80%;
     display:none;
     z-index:100;
-    border-radius:15px;
 }
-
 .optionBtn{
     display:block;
     width:100%;
     margin:10px 0;
     padding:10px;
 }
-
 </style>
 </head>
 
@@ -142,7 +124,8 @@ body{
 <div id="player" class="right">🧑‍🌾</div>
 
 <div id="scoreBoard">
-Coins: <span id="coinCount">0</span>
+Coins: <span id="coinCount">0</span> |
+Questions: <span id="qCount">0</span>/10
 </div>
 
 <div id="questionBox">
@@ -155,8 +138,8 @@ Coins: <span id="coinCount">0</span>
 <script>
 
 let gameRunning = true;
-
 let coins = 0;
+let qIndex = 0;
 
 let playerY = 120;
 let velocity = 0;
@@ -167,26 +150,78 @@ let direction = 1;
 
 const player = document.getElementById("player");
 const coinCount = document.getElementById("coinCount");
-const gameArea = document.getElementById("gameArea");
+const qCount = document.getElementById("qCount");
 
-let lastTime = 0;
+const questionBox = document.getElementById("questionBox");
+const qText = document.getElementById("qText");
+const options = document.getElementById("options");
+
+/* QUESTIONS (RESTORED) */
+const questions = [
+{
+q:"Which word is correct prefix form of 'write'?",
+o:["rewrite","unwrite","miswrite","overwrite"],
+a:0
+},
+{
+q:"Meaning of 'inactive'?",
+o:["not active","very active","super active","half active"],
+a:0
+},
+{
+q:"Opposite of 'happy' using prefix?",
+o:["unhappy","rehappy","happyless","inhappy"],
+a:0
+},
+{
+q:"Correct word for 'too much packed'?",
+o:["overpacked","unpacked","repacked","mispacked"],
+a:0
+},
+{
+q:"Meaning of 'fearless'?",
+o:["without fear","full fear","some fear","after fear"],
+a:0
+},
+{
+q:"Correct prefix for 'possible' → not possible",
+o:["impossible","repossible","unpossible","dispossible"],
+a:0
+},
+{
+q:"Meaning of 'misunderstood'?",
+o:["understood correctly","understood wrongly","not understood at all","fully understood"],
+a:1
+},
+{
+q:"Suffix meaning 'full of care'?",
+o:["careful","careless","carement","recare"],
+a:0
+},
+{
+q:"Meaning of '-less' suffix?",
+o:["without","with more","before","after"],
+a:0
+},
+{
+q:"Build correct word: not happy",
+o:["unhappy","rehappy","happyless","inhappy"],
+a:0
+}
+];
 
 /* GAME LOOP */
-function gameLoop(time){
+function gameLoop(){
 
 if(!gameRunning) return;
 
-let delta = time - lastTime;
-lastTime = time;
-
-velocity += gravity * (delta/16);
-playerY -= velocity * (delta/16);
+velocity += gravity;
+playerY -= velocity;
 
 if(playerY <= 120){
-    playerY = 120;
-    velocity = 0;
-    jumping = false;
-    player.classList.remove("jump");
+playerY = 120;
+velocity = 0;
+jumping = false;
 }
 
 player.style.bottom = playerY + "px";
@@ -195,111 +230,98 @@ requestAnimationFrame(gameLoop);
 }
 
 /* JUMP */
-function jump(){
-if(!jumping){
-    velocity = -14;
-    jumping = true;
-    player.classList.add("jump");
-}
-}
-
-/* DIRECTION */
 document.addEventListener("keydown",(e)=>{
-
-if(e.code==="Space" || e.code==="ArrowUp"){
-    jump();
-}
+if(e.code==="Space" || e.code==="ArrowUp") jump();
 
 if(e.code==="ArrowLeft"){
-    direction = -1;
-    player.classList.remove("right");
-    player.classList.add("left");
+direction=-1;
+player.classList.add("left");
+player.classList.remove("right");
 }
 
 if(e.code==="ArrowRight"){
-    direction = 1;
-    player.classList.remove("left");
-    player.classList.add("right");
+direction=1;
+player.classList.add("right");
+player.classList.remove("left");
 }
-
 });
 
-/* TOUCH */
-document.addEventListener("touchstart",()=>{
-jump();
-});
+function jump(){
+if(!jumping && gameRunning){
+velocity = -14;
+jumping = true;
+}
+}
 
 /* COIN */
 function spawnCoin(){
 
 const coin = document.createElement("div");
-coin.className = "coin";
-coin.innerHTML = "💎";
+coin.className="coin";
+coin.innerHTML="💎";
 
-coin.style.left = window.innerWidth + "px";
-coin.style.bottom = (160 + Math.random()*100) + "px";
+coin.style.left=window.innerWidth+"px";
+coin.style.bottom=(160+Math.random()*100)+"px";
 
 gameArea.appendChild(coin);
 
-let move = setInterval(()=>{
+let move=setInterval(()=>{
 
-let left = parseFloat(coin.style.left);
-left -= 2.5;
+let left=parseFloat(coin.style.left);
+left-=2.5;
+coin.style.left=left+"px";
 
-coin.style.left = left + "px";
+const c=coin.getBoundingClientRect();
+const p=player.getBoundingClientRect();
 
-const c = coin.getBoundingClientRect();
-const p = player.getBoundingClientRect();
-
-if(c.left < p.right && c.right > p.left && c.top < p.bottom && c.bottom > p.top){
-
+if(c.left<p.right && c.right>p.left && c.top<p.bottom && c.bottom>p.top){
 coins++;
-coinCount.innerText = coins;
-
+coinCount.innerText=coins;
 coin.remove();
 clearInterval(move);
 
+if(coins%3===0){
+showQuestion();
+}
 }
 
-if(left < -50){
+if(left<-50){
 coin.remove();
 clearInterval(move);
 }
 
 },16);
 
-setTimeout(spawnCoin,2200);
+setTimeout(spawnCoin,2000);
 }
 
 /* OBSTACLE */
 function spawnObstacle(){
 
-const obs = document.createElement("div");
-obs.className = "obstacle";
-obs.innerHTML = "🪵";
+const obs=document.createElement("div");
+obs.className="obstacle";
+obs.innerHTML="🪵";
 
-obs.style.left = window.innerWidth + "px";
-
+obs.style.left=window.innerWidth+"px";
 gameArea.appendChild(obs);
 
-let move = setInterval(()=>{
+let move=setInterval(()=>{
 
-let left = parseFloat(obs.style.left);
-left -= 3;
+let left=parseFloat(obs.style.left);
+left-=3;
+obs.style.left=left+"px";
 
-obs.style.left = left + "px";
+const o=obs.getBoundingClientRect();
+const p=player.getBoundingClientRect();
 
-const o = obs.getBoundingClientRect();
-const p = player.getBoundingClientRect();
-
-if(o.left < p.right && o.right > p.left && o.top < p.bottom && o.bottom > p.top){
-coins = Math.max(0,coins-1);
-coinCount.innerText = coins;
+if(o.left<p.right && o.right>p.left && o.top<p.bottom && o.bottom>p.top){
+coins=Math.max(0,coins-1);
+coinCount.innerText=coins;
 obs.remove();
 clearInterval(move);
 }
 
-if(left < -50){
+if(left<-50){
 obs.remove();
 clearInterval(move);
 }
@@ -307,6 +329,47 @@ clearInterval(move);
 },16);
 
 setTimeout(spawnObstacle,2800);
+}
+
+/* QUESTION SYSTEM */
+function showQuestion(){
+
+gameRunning=false;
+
+questionBox.style.display="block";
+
+const q=questions[qIndex];
+
+qText.innerHTML=q.q;
+
+options.innerHTML="";
+
+q.o.forEach((opt,i)=>{
+
+const btn=document.createElement("button");
+btn.className="optionBtn";
+btn.innerText=opt;
+
+btn.onclick=()=>checkAnswer(i,q.a);
+
+options.appendChild(btn);
+
+});
+
+}
+
+function checkAnswer(sel,correct){
+
+qIndex++;
+qCount.innerText=qIndex;
+
+setTimeout(()=>{
+
+questionBox.style.display="none";
+gameRunning=true;
+requestAnimationFrame(gameLoop);
+
+},1200);
 }
 
 /* START */
