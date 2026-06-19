@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Nouns Sorting Game</title>
+<title>Nouns Sorting Game - FIXED ENGINE</title>
 
 <style>
 body{
@@ -22,11 +22,11 @@ background:#fff3d6;
 border-bottom:2px solid #ccc;
 position:sticky;
 top:0;
-z-index:1000;
+z-index:999;
 min-height:70px;
 }
 
-/* WORDS */
+/* WORD */
 .word{
 padding:6px 10px;
 background:#ffd966;
@@ -35,9 +35,10 @@ font-weight:bold;
 font-size:13px;
 cursor:grab;
 user-select:none;
+touch-action:none;
 }
 
-/* BASKETS */
+/* GRID */
 .container{
 display:grid;
 grid-template-columns:repeat(2,1fr);
@@ -45,15 +46,15 @@ gap:8px;
 padding:8px;
 }
 
-/* SMALL CLEAN BASKETS */
+/* BASKETS */
 .box{
 background:linear-gradient(145deg,#ffffff,#eaf6ff);
 min-height:90px;
 border-radius:14px;
 border:2px dashed #4aa3df;
-box-shadow:0 6px 12px rgba(0,0,0,0.12);
-padding:6px;
 position:relative;
+padding:6px;
+overflow:hidden;
 }
 
 .box::before{
@@ -96,22 +97,13 @@ font-weight:bold;
 cursor:pointer;
 margin-top:10px;
 }
-
-/* MOBILE SAFE */
-@media(max-width:600px){
-.container{
-grid-template-columns:1fr;
-}
-}
 </style>
 </head>
 
 <body>
 
-<!-- WORD BANK -->
 <div id="words"></div>
 
-<!-- BASKETS -->
 <div class="container">
 
 <div class="box" id="proper" data-label="Proper"></div>
@@ -124,10 +116,9 @@ grid-template-columns:1fr;
 
 </div>
 
-<!-- END -->
 <div id="endScreen">
-<h1>🎉 Game Completed!</h1>
-<h2 id="scoreText"></h2>
+<h1>🎉 Game Completed</h1>
+<h2 id="result"></h2>
 <button onclick="location.reload()">Play Again</button>
 </div>
 
@@ -156,14 +147,15 @@ const nouns=[
 {w:"Salt",t:"uncountable"}
 ];
 
+let totalWords = nouns.length;
+let correctPlaced = 0;
 let score = 0;
-let total = nouns.length;
-let placed = 0;
 
 function shuffle(a){
 return a.sort(()=>Math.random()-0.5);
 }
 
+/* LOAD WORDS */
 function loadWords(){
 const box=document.getElementById("words");
 box.innerHTML="";
@@ -175,15 +167,19 @@ d.textContent=n.w;
 d.dataset.type=n.t;
 d.draggable=true;
 
-d.ondragstart=(e)=>{
+/* DRAG START */
+d.ondragstart=e=>{
 e.dataTransfer.setData("type",n.t);
 e.dataTransfer.setData("text",n.w);
+
+/* remove from bank safely */
 setTimeout(()=>d.remove(),50);
 };
 
 box.appendChild(d);
 });
 
+/* DROP ZONES */
 document.querySelectorAll(".box").forEach(b=>{
 b.ondragover=e=>e.preventDefault();
 
@@ -191,29 +187,36 @@ b.ondrop=e=>{
 let type=e.dataTransfer.getData("type");
 let text=e.dataTransfer.getData("text");
 
+if(!text) return;
+
 if(type===b.id){
 
-score++;
-
-let el=document.createElement("div");
+const el=document.createElement("div");
 el.className="inside-word";
 el.textContent=text;
 b.appendChild(el);
 
-placed++;
+score++;
+correctPlaced++;
 
-checkEnd();
+/* 🔥 FINAL FIX: END GAME CHECK */
+if(correctPlaced === totalWords){
+endGame();
+}
+
 }
 };
 });
 }
 
-function checkEnd(){
-if(placed === total){
+/* END GAME */
+function endGame(){
+
 document.getElementById("endScreen").style.display="block";
-document.getElementById("scoreText").innerText=
-"Score: " + score + " / " + total;
-}
+
+document.getElementById("result").innerHTML=
+"Score: " + score + " / " + totalWords +
+"<br>Accuracy: " + Math.round((score/totalWords)*100) + "%";
 }
 
 loadWords();
