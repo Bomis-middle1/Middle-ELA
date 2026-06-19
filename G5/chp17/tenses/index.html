@@ -1,315 +1,156 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tense Time Quest</title>
+/* ================================
+   TENSE QUESTION BANK (GRADE 6 HOTS)
+================================ */
 
-<style>
-body{
-    font-family:'Comic Sans MS';
-    background:linear-gradient(135deg,#667eea,#764ba2);
-}
-
-.splash-screen{
-    position:fixed;
-    top:0;left:0;
-    width:100%;height:100%;
-    background:white;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    z-index:9999;
-}
-
-.splash-screen img{
-    width:300px;
-}
-
-.container{
-    opacity:0;
-    transition:0.5s;
-    max-width:850px;
-    margin:auto;
-    background:white;
-    border-radius:20px;
-    padding:20px;
-}
-
-.container.visible{
-    opacity:1;
-}
-
-.header{
-    background:linear-gradient(135deg,#f093fb,#f5576c);
-    padding:15px;
-    border-radius:15px;
-    color:white;
-    text-align:center;
-}
-
-.score-board{
-    display:flex;
-    justify-content:space-around;
-    margin-top:10px;
-}
-
-.score-item span{
-    font-size:22px;
-    font-weight:bold;
-}
-
-.game-container{
-    padding:15px;
-}
-
-.instructions{
-    background:#fff3cd;
-    padding:10px;
-    border-radius:10px;
-    margin-bottom:10px;
-}
-
-canvas{
-    width:100%;
-    height:420px;
-    border:3px solid #667eea;
-    border-radius:10px;
-    background:#f0f4ff;
-}
-
-.control-btn{
-    padding:10px;
-    margin:5px;
-}
-
-.question-modal{
-    display:none;
-    position:fixed;
-    top:0;left:0;
-    width:100%;height:100%;
-    background:rgba(0,0,0,0.8);
-    justify-content:center;
-    align-items:center;
-}
-
-.question-box{
-    background:white;
-    padding:20px;
-    border-radius:15px;
-    width:80%;
-}
-
-.option-btn{
-    display:block;
-    margin:10px 0;
-    padding:10px;
-    border:2px solid #667eea;
-    cursor:pointer;
-}
-</style>
-</head>
-
-<body>
-
-<div class="splash-screen" id="splash">
-    <img src="assets/logo.png">
-</div>
-
-<div class="container" id="gameUI">
-
-<div class="header">
-    <h2>⏳ Tense Time Quest</h2>
-
-    <div class="score-board">
-        <div>Stars<br><span id="stars">0</span></div>
-        <div>Questions<br><span id="qcount">0/10</span></div>
-        <div>Correct<br><span id="correct">0</span></div>
-    </div>
-</div>
-
-<div class="game-container">
-
-<div class="instructions">
-🎮 Move with arrows<br>
-⭐ Collect 3 stars → get Tense Challenge<br>
-🧠 Answer transformation questions
-</div>
-
-<canvas id="canvas"></canvas>
-
-<div style="text-align:center">
-<button onclick="move(0,-1)">↑</button>
-<button onclick="move(-1,0)">←</button>
-<button onclick="move(1,0)">→</button>
-<button onclick="move(0,1)">↓</button>
-</div>
-
-</div>
-</div>
-
-<div class="question-modal" id="modal">
-<div class="question-box">
-<h3 id="qtext"></h3>
-<div id="options"></div>
-</div>
-</div>
-
-<script>
-
-const canvas=document.getElementById("canvas");
-const ctx=canvas.getContext("2d");
-
-canvas.width=800;
-canvas.height=420;
-
-let player={x:1,y:1};
-let stars=[];
-let collected=0;
-let qIndex=0;
-let correct=0;
-
-/* ----------------- HOTS TENSE QUESTIONS ---------------- */
-
-const questions=[
+const questions = [
 {
-q:"Change to INDIRECT: 'She said, \"I am reading a book.\"'",
-options:[
-"She said that she was reading a book.",
-"She said she is reading book.",
-"She said reading book.",
-"She said she was read book."
+q: "Change to INDIRECT SPEECH: 'She said, \"I am preparing for exams.\"'",
+options: [
+"She said that she was preparing for exams.",
+"She said she is preparing exams.",
+"She said that she has prepared exams.",
+"She said she was prepare exams."
 ],
-a:0
+a: 0
 },
 {
-q:"Change to DIRECT: He said he had finished his homework.",
-options:[
-"He said, 'I finish my homework.'",
-"He said, 'I had finished my homework.'",
-"He said, 'I have finished my homework.'",
-"He said, 'I finished my homework.'"
+q: "Identify correct transformation: He said, 'I will finish the project.'",
+options: [
+"He said that he will finish the project.",
+"He said that he would finish the project.",
+"He said he finishes the project.",
+"He said that he finished the project."
 ],
-a:3
+a: 1
 },
 {
-q:"Identify correct FUTURE CONTINUOUS form:",
-options:[
-"I will be going to school tomorrow.",
-"I will going school.",
-"I go will school.",
-"I will be go school."
+q: "Which sentence is in PRESENT PERFECT tense?",
+options: [
+"I have completed my homework.",
+"I completed my homework yesterday.",
+"I will complete my homework.",
+"I am completing homework."
 ],
-a:0
+a: 0
 },
 {
-q:"Convert: 'They play football daily' into past tense",
-options:[
-"They played football daily.",
-"They are playing football daily.",
-"They will play football daily.",
-"They plays football daily."
+q: "Convert to PAST CONTINUOUS: 'They play football.'",
+options: [
+"They were playing football.",
+"They are playing football.",
+"They have played football.",
+"They will be playing football."
 ],
-a:0
+a: 0
 },
 {
-q:"Indirect speech of: 'I will help you'",
-options:[
-"He said he will help me.",
-"He said that he would help me.",
-"He said he helps me.",
-"He said he helping me."
+q: "HOTS: Identify correct correction → 'She don't like ice cream.'",
+options: [
+"She doesn't like ice cream.",
+"She don't likes ice cream.",
+"She didn't likes ice cream.",
+"She not like ice cream."
 ],
-a:1
+a: 0
+},
+{
+q: "Change into FUTURE CONTINUOUS: 'I study at night.'",
+options: [
+"I will be studying at night.",
+"I will studying at night.",
+"I study will at night.",
+"I will studied at night."
+],
+a: 0
+},
+{
+q: "Indirect speech: He said, 'I am busy now.'",
+options: [
+"He said that he was busy then.",
+"He said that he is busy now.",
+"He said he busy was.",
+"He said that I am busy."
+],
+a: 0
+},
+{
+q: "Which is SIMPLE PAST tense?",
+options: [
+"She went to school.",
+"She goes to school.",
+"She is going to school.",
+"She will go to school."
+],
+a: 0
+},
+{
+q: "HOTS: Find correct transformation → 'They are watching TV.' (past tense)",
+options: [
+"They were watching TV.",
+"They watched TV always.",
+"They will watched TV.",
+"They are watched TV."
+],
+a: 0
+},
+{
+q: "Advanced: Choose correct INDIRECT form → 'I can solve this problem.'",
+options: [
+"He said that he could solve that problem.",
+"He said he can solve problem.",
+"He said that he will solve problem.",
+"He said he solved problem."
+],
+a: 0
+},
+{
+q: "Convert into SIMPLE FUTURE: 'She writes a letter.'",
+options: [
+"She will write a letter.",
+"She wrote a letter.",
+"She is writing a letter.",
+"She has written a letter."
+],
+a: 0
+},
+{
+q: "Identify tense → 'I was reading a book.'",
+options: [
+"Past Continuous",
+"Present Continuous",
+"Future Continuous",
+"Simple Past"
+],
+a: 0
+},
+{
+q: "HOTS: Correct sentence form of → 'He has went home.'",
+options: [
+"He has gone home.",
+"He have went home.",
+"He gone home.",
+"He is went home."
+],
+a: 0
+},
+{
+q: "Indirect speech: 'We are happy.'",
+options: [
+"They said that they were happy.",
+"They said we are happy.",
+"They said that we are happy.",
+"They said happy were."
+],
+a: 0
+},
+{
+q: "Final challenge: Identify FUTURE PERFECT",
+options: [
+"I will have completed the task.",
+"I will completing task.",
+"I completed task will.",
+"I have will complete task."
+],
+a: 0
 }
 ];
-
-/* shuffle options */
-function shuffle(arr){
-return arr.map(v=>[Math.random(),v]).sort().map(v=>v[1]);
-}
-
-/* player movement */
-function move(dx,dy){
-player.x+=dx;
-player.y+=dy;
-check();
-draw();
-}
-
-/* stars */
-function spawnStars(){
-stars=[];
-for(let i=0;i<3;i++){
-stars.push({x:Math.random()*10,y:Math.random()*6});
-}
-}
-
-function check(){
-stars.forEach((s,i)=>{
-if(Math.abs(player.x-s.x)<1 && Math.abs(player.y-s.y)<1){
-stars.splice(i,1);
-collected++;
-document.getElementById("stars").innerText=collected;
-if(collected===3){
-showQ();
-collected=0;
-}
-}
-});
-}
-
-function showQ(){
-let q=questions[qIndex%questions.length];
-
-document.getElementById("modal").style.display="flex";
-document.getElementById("qtext").innerText=q.q;
-
-let html="";
-shuffle(q.options).forEach((opt,i)=>{
-html+=`<div class='option-btn' onclick='answer(${q.options.indexOf(opt)},${q.a})'>${opt}</div>`;
-});
-
-document.getElementById("options").innerHTML=html;
-}
-
-function answer(i,a){
-if(i===a){
-correct++;
-alert("Correct!");
-}else{
-alert("Wrong!");
-}
-
-qIndex++;
-document.getElementById("modal").style.display="none";
-document.getElementById("correct").innerText=correct;
-document.getElementById("qcount").innerText=qIndex+"/10";
-}
-
-/* draw */
-function draw(){
-ctx.clearRect(0,0,800,420);
-ctx.fillStyle="gold";
-stars.forEach(s=>{
-ctx.fillRect(s.x*50,s.y*50,10,10);
-});
-
-ctx.fillStyle="red";
-ctx.fillRect(player.x*50,player.y*50,20,20);
-}
-
-/* init */
-spawnStars();
-draw();
-
-/* splash */
-setTimeout(()=>{
-document.getElementById("splash").style.display="none";
-document.getElementById("gameUI").classList.add("visible");
-},3000);
-
-</script>
-
-</body>
-</html>
