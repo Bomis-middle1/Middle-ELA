@@ -3,295 +3,303 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Grammar Factory - Present Tenses</title>
+<title>Punctuation Balloon Challenge</title>
 
 <style>
 body{
 margin:0;
-font-family:Arial,sans-serif;
-background:linear-gradient(135deg,#1d2671,#c33764,#3a7bd5);
-color:#fff;
-overflow-x:hidden;
+font-family:Arial;
+background:linear-gradient(135deg,#6dd5fa,#ff758c,#4facfe);
+overflow:hidden;
 }
 
-/* SCREENS */
+/* ================= LOADING / LOGO ================= */
 .screen{
-display:none;
-height:100vh;
-width:100%;
+position:fixed;
+inset:0;
+display:flex;
 align-items:center;
 justify-content:center;
 flex-direction:column;
 text-align:center;
-padding:15px;
-box-sizing:border-box;
 }
-.active{display:flex;}
 
-/* LOGO */
+#logoScreen{
+background:white;
+z-index:9999;
+}
+
 #logoScreen img{
 width:220px;
-animation:pop 1s ease;
 }
 
-@keyframes pop{
-from{transform:scale(0.5);opacity:0;}
-to{transform:scale(1);opacity:1;}
+/* ================= TITLE ================= */
+#titleScreen{
+display:none;
+background:linear-gradient(#4fc3f7,#e1f5fe);
+z-index:9998;
+color:#0d47a1;
 }
 
-/* TITLE */
-.title{
-font-size:30px;
-font-weight:bold;
-animation:flash 1s infinite alternate;
+#titleScreen h1{
+font-size:42px;
+animation:pulse 1.2s infinite;
 }
 
-@keyframes flash{
-from{transform:scale(1);opacity:0.7;}
-to{transform:scale(1.1);opacity:1;}
+@keyframes pulse{
+0%{transform:scale(1);}
+50%{transform:scale(1.05);}
+100%{transform:scale(1);}
 }
 
-/* FACTORY */
-.factory{
-display:grid;
-grid-template-columns:repeat(2,1fr);
-gap:15px;
+/* ================= GAME ================= */
+#gameScreen{
+display:none;
+flex-direction:column;
+}
+
+#topBar{
+position:fixed;
+top:0;
 width:100%;
-max-width:600px;
-margin-top:20px;
+display:flex;
+justify-content:space-between;
+padding:10px;
+color:white;
+font-weight:bold;
+z-index:10;
 }
 
-.machine{
-padding:20px;
-border-radius:15px;
+#questionBox{
+margin-top:80px;
+padding:15px;
+font-size:22px;
+color:white;
+text-align:center;
+}
+
+#options{
+display:flex;
+flex-wrap:wrap;
+justify-content:center;
+gap:10px;
+padding:10px;
+}
+
+.option{
+background:white;
+padding:12px 16px;
+border-radius:10px;
 font-weight:bold;
 cursor:pointer;
-transition:0.3s;
-box-shadow:0 5px 15px rgba(0,0,0,0.3);
+min-width:120px;
+text-align:center;
 }
 
-.simple{background:#3498db;}
-.continuous{background:#2ecc71;}
-.perfect{background:#f1c40f;color:#000;}
-.perfectC{background:#9b59b6;}
-
-.machine.correct{
-background:#2ecc71 !important;
+.option:active{
+transform:scale(0.95);
 }
 
-.machine.wrong{
-animation:shake 0.4s;
-}
-
-@keyframes shake{
-0%,100%{transform:translateX(0);}
-25%{transform:translateX(-6px);}
-75%{transform:translateX(6px);}
-}
-
-/* CONVEYOR */
-.conveyor{
-background:rgba(0,0,0,0.4);
-padding:15px;
-border-radius:10px;
-margin-top:15px;
-width:90%;
-max-width:700px;
-}
-
-.sentence{
-font-size:20px;
-font-weight:bold;
-animation:slide 0.5s ease;
-}
-
-@keyframes slide{
-from{transform:translateX(-200px);opacity:0;}
-to{transform:translateX(0);opacity:1;}
-}
-
-/* SCORE */
-.score{
+/* ================= TIMER ================= */
+#timer{
 font-size:18px;
+}
+
+/* ================= HINT ================= */
+#hintBox{
+color:#fff;
+text-align:center;
 margin-top:10px;
 }
 
-/* CONFETTI */
+/* ================= RESULT ================= */
+#resultScreen{
+display:none;
+background:rgba(0,0,0,0.8);
+color:white;
+z-index:9999;
+}
+
+#restartBtn{
+padding:12px 20px;
+margin-top:20px;
+border:none;
+border-radius:10px;
+background:#ffca28;
+font-weight:bold;
+}
+
+/* ================= CONFETTI ================= */
 .confetti{
-position:fixed;
+position:absolute;
 width:8px;
 height:8px;
-top:-10px;
+background:yellow;
 animation:fall 2s linear forwards;
 }
 
 @keyframes fall{
-to{
-transform:translateY(100vh) rotate(360deg);
-opacity:0;
-}
-}
-
-button{
-padding:12px 18px;
-border:none;
-border-radius:10px;
-background:#ff9800;
-color:#fff;
-font-weight:bold;
-margin-top:10px;
+to{transform:translateY(100vh);opacity:0;}
 }
 </style>
 </head>
 
 <body>
 
-<!-- 🔵 LOGO (FIXED PATH) -->
-<div id="logoScreen" class="screen active">
+<!-- ================= LOGO ================= -->
+<div id="logoScreen" class="screen">
 <img src="assets/innovine-logo.png">
 </div>
 
-<!-- 🟡 TITLE -->
+<!-- ================= TITLE ================= -->
 <div id="titleScreen" class="screen">
-<div class="title">🏭 Grammar Factory – Present Tenses</div>
-<button onclick="startGame()">Start Machine</button>
+<h1>🎈 Punctuation Balloon Challenge</h1>
+<button onclick="startGame()">Start</button>
 </div>
 
-<!-- 🟢 GAME -->
+<!-- ================= GAME ================= -->
 <div id="gameScreen" class="screen">
 
-<div class="score">Score: <span id="score">0</span></div>
-
-<div class="conveyor">
-<div id="sentence" class="sentence"></div>
+<div id="topBar">
+<div id="score">Score: 0</div>
+<div id="timer">Time: 45</div>
 </div>
 
-<div class="factory">
-
-<div class="machine simple" onclick="check('Present Simple',this)">Present Simple</div>
-<div class="machine continuous" onclick="check('Present Continuous',this)">Present Continuous</div>
-<div class="machine perfect" onclick="check('Present Perfect',this)">Present Perfect</div>
-<div class="machine perfectC" onclick="check('Present Perfect Continuous',this)">Present Perfect Continuous</div>
+<div id="questionBox"></div>
+<div id="options"></div>
+<div id="hintBox"></div>
 
 </div>
 
+<!-- ================= RESULT ================= -->
+<div id="resultScreen" class="screen">
+<h1 id="finalText"></h1>
+<button id="restartBtn" onclick="location.reload()">Restart</button>
 </div>
 
-<!-- 🏁 END -->
-<div id="endScreen" class="screen">
-<h2>🎉 Factory Complete!</h2>
-<div id="finalScore"></div>
-<button onclick="location.reload()">Restart</button>
-</div>
-
-<!-- AUDIO (FIXED SAFE PLAY) -->
+<!-- ================= AUDIO ================= -->
 <audio id="correctSound" src="assets/correct.mp3"></audio>
 <audio id="wrongSound" src="assets/wrong.mp3"></audio>
 <audio id="clapSound" src="assets/clapping.mp3"></audio>
 
 <script>
 
+/* ================= FLOW ================= */
+setTimeout(()=>{
+document.getElementById("logoScreen").style.display="none";
+document.getElementById("titleScreen").style.display="flex";
+},5000);
+
 /* ================= QUESTIONS ================= */
-const allQ=[
-{q:"She goes to school by bus every day.",ans:"Present Simple"},
-{q:"They are playing football in the playground now.",ans:"Present Continuous"},
-{q:"I have finished my homework.",ans:"Present Perfect"},
-{q:"He has been studying for three hours.",ans:"Present Perfect Continuous"},
-{q:"My father works in a bank.",ans:"Present Simple"},
-{q:"Look! The baby is sleeping.",ans:"Present Continuous"},
-{q:"We have visited Jaipur twice.",ans:"Present Perfect"},
-{q:"It has been raining since morning.",ans:"Present Perfect Continuous"},
-{q:"The Earth moves around the Sun.",ans:"Present Simple"},
-{q:"She is preparing for her English test this week.",ans:"Present Continuous"},
-{q:"My sister has written three letters today.",ans:"Present Perfect"},
-{q:"They have been practising for the competition since Monday.",ans:"Present Perfect Continuous"}
+const allQuestions = [
+{q:"I can’t believe we finally finished the project ___",a:[".","!","?"],c:"!"},
+{q:"Where are you going after school ___",a:[".","!","?"],c:"?"},
+{q:"Wow this is amazing ___",a:[".","!","?"],c:"!"},
+{q:"Are you coming with us ___",a:[".","!","?"],c:"?"},
+{q:"The sun is shining brightly ___",a:[".","!","?"],c:"."},
+{q:"Please sit down ___",a:[".",":","!"],c:":"},
+{q:"Stop right there ___",a:[".","!","?"],c:"!"},
+{q:"Let’s go to the park ___",a:[".",",","!"],c:"."},
+{q:"She has been working all day ___",a:[".","!","?"],c:"."},
+{q:"What a beautiful day ___",a:[".","!","?"],c:"!"}
 ];
 
-function shuffle(a){return a.sort(()=>Math.random()-0.5);}
-let qBank = shuffle(allQ).slice(0,10);
+let qBank = shuffle(allQuestions).slice(0,10);
 
-let i=0;
+let index=0;
 let score=0;
 let attempts=2;
+let timer=45;
+let interval;
 
-/* ================= SAFE AUDIO ================= */
-function playAudio(a){
-a.currentTime=0;
-a.play().catch(()=>{});
-}
-
-/* ================= INTRO FLOW ================= */
-window.onload=()=>{
-setTimeout(()=>{
-document.getElementById("logoScreen").classList.remove("active");
-document.getElementById("titleScreen").classList.add("active");
-},5000);
-};
-
+/* ================= START ================= */
 function startGame(){
-document.getElementById("titleScreen").classList.remove("active");
-document.getElementById("gameScreen").classList.add("active");
-load();
+document.getElementById("titleScreen").style.display="none";
+document.getElementById("gameScreen").style.display="flex";
+
+loadQ();
+startTimer();
 }
 
-/* ================= LOAD ================= */
-function load(){
+/* ================= LOAD QUESTION ================= */
+function loadQ(){
 
-if(i>=qBank.length){
-end();
+if(index>=qBank.length){
+endGame();
 return;
 }
 
 attempts=2;
-document.getElementById("sentence").innerText=qBank[i].q;
+document.getElementById("hintBox").innerText="";
+document.getElementById("questionBox").innerText=qBank[index].q;
+
+let optDiv=document.getElementById("options");
+optDiv.innerHTML="";
+
+qBank[index].a.forEach(opt=>{
+let btn=document.createElement("div");
+btn.className="option";
+btn.innerText=opt;
+
+btn.onclick=()=>check(opt,btn);
+
+optDiv.appendChild(btn);
+});
 }
 
 /* ================= CHECK ================= */
 function check(ans,el){
 
-let correct=qBank[i].ans;
-
-reset();
+let correct=qBank[index].c;
 
 if(ans===correct){
-
 score++;
-document.getElementById("score").innerText=score;
-
-el.classList.add("correct");
-playAudio(document.getElementById("correctSound"));
-playAudio(document.getElementById("clapSound"));
-
+document.getElementById("score").innerText="Score: "+score;
+play("correct");
 confetti();
-
-setTimeout(()=>{i++;load();},900);
-
+nextQ();
 }else{
 
-el.classList.add("wrong");
-playAudio(document.getElementById("wrongSound"));
-
+play("wrong");
 attempts--;
 
+if(attempts===1){
+document.getElementById("hintBox").innerText="💡 Hint: Think about sentence tone or punctuation.";
+}
+
 if(attempts<=0){
-highlight(correct);
-setTimeout(()=>{i++;load();},1500);
+document.getElementById("hintBox").innerText="✔ Correct Answer: "+correct;
+nextQ();
 }
 }
 }
 
-function reset(){
-document.querySelectorAll(".machine").forEach(m=>{
-m.classList.remove("correct","wrong");
-});
+/* ================= NEXT ================= */
+function nextQ(){
+setTimeout(()=>{
+index++;
+loadQ();
+},900);
 }
 
-function highlight(correct){
-document.querySelectorAll(".machine").forEach(m=>{
-if(m.innerText.includes(correct.split(" ")[1])){
-m.classList.add("correct");
+/* ================= TIMER ================= */
+function startTimer(){
+interval=setInterval(()=>{
+timer--;
+document.getElementById("timer").innerText="Time: "+timer;
+
+if(timer<=0){
+clearInterval(interval);
+endGame();
 }
-});
+},1000);
+}
+
+/* ================= AUDIO ================= */
+function play(id){
+let a=document.getElementById(id+"Sound");
+a.volume=1;
+a.play().catch(()=>{});
 }
 
 /* ================= CONFETTI ================= */
@@ -307,17 +315,31 @@ setTimeout(()=>c.remove(),2000);
 }
 
 /* ================= END ================= */
-function end(){
+function endGame(){
 
-document.getElementById("gameScreen").classList.remove("active");
-document.getElementById("endScreen").classList.add("active");
+clearInterval(interval);
+
+document.getElementById("gameScreen").style.display="none";
+document.getElementById("resultScreen").style.display="flex";
 
 let percent=(score/qBank.length)*100;
 
-document.getElementById("finalScore").innerText=
-`You scored ${score} / ${qBank.length * 10}`;
+let remark="";
 
-playAudio(document.getElementById("clapSound"));
+if(percent>=80) remark="Excellent 🎉";
+else if(percent>=60) remark="Good Job 👍";
+else if(percent>=45) remark="Well Tried 🙂";
+else remark="Let’s Revise 📘";
+
+document.getElementById("finalText").innerText=
+`Score: ${score}/${qBank.length} \n${remark}`;
+
+play("clap");
+}
+
+/* ================= SHUFFLE ================= */
+function shuffle(arr){
+return arr.sort(()=>Math.random()-0.5);
 }
 
 </script>
