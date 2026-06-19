@@ -19,6 +19,7 @@ min-height:100vh;
 overflow-x:hidden;
 }
 
+/* Splash */
 #splash{
 position:fixed;
 inset:0;
@@ -31,10 +32,11 @@ z-index:9999;
 }
 
 #splash img{
-width:220px;
-max-width:80%;
+width:180px;
+max-width:60vw;
 }
 
+/* Game */
 #game{
 display:none;
 padding:15px;
@@ -55,11 +57,12 @@ margin-bottom:15px;
 font-weight:bold;
 }
 
+/* Board */
 #board{
 display:grid;
 grid-template-columns:repeat(4,1fr);
 gap:10px;
-max-width:500px;
+max-width:95vw;
 margin:auto;
 }
 
@@ -75,6 +78,7 @@ cursor:pointer;
 color:white;
 user-select:none;
 transition:.3s;
+touch-action: manipulation;
 }
 
 .card.open{
@@ -87,6 +91,7 @@ background:#81c784;
 color:black;
 }
 
+/* Modal */
 #questionModal{
 position:fixed;
 inset:0;
@@ -101,10 +106,12 @@ padding:20px;
 background:white;
 padding:20px;
 border-radius:12px;
-max-width:600px;
-width:100%;
+max-width:90vw;
+max-height:80vh;
+overflow-y:auto;
 }
 
+/* Options */
 .option{
 display:block;
 width:100%;
@@ -121,6 +128,7 @@ font-size:16px;
 background:#bbdefb;
 }
 
+/* End Screen */
 #endScreen{
 display:none;
 position:fixed;
@@ -142,21 +150,28 @@ cursor:pointer;
 margin-top:20px;
 }
 
+/* Mobile improvement */
 @media(max-width:600px){
 #board{
 grid-template-columns:repeat(3,1fr);
 }
+.card{
+font-size:28px;
+}
 }
 </style>
 </head>
+
 <body>
 
+<!-- SPLASH -->
 <div id="splash">
 <img src="assets/innovine-logo.png">
 <h2>Memory Match Adventure</h2>
 <p>Active & Passive Voice</p>
 </div>
 
+<!-- GAME -->
 <div id="game">
 
 <h1>🏴‍☠️ Memory Match Adventure</h1>
@@ -175,6 +190,7 @@ Volume
 
 </div>
 
+<!-- QUESTION -->
 <div id="questionModal">
 <div class="questionBox">
 <h3 id="questionText"></h3>
@@ -182,15 +198,15 @@ Volume
 </div>
 </div>
 
+<!-- END -->
 <div id="endScreen">
 <h1>🏆 Treasure Found!</h1>
 <h2 id="finalScore"></h2>
 
-<button id="restartBtn" onclick="restartGame()">
-Play Again
-</button>
+<button id="restartBtn" onclick="restartGame()">Play Again</button>
 </div>
 
+<!-- AUDIO -->
 <audio id="correctSound" src="assets/correct.mp3"></audio>
 <audio id="wrongSound" src="assets/wrong.mp3"></audio>
 <audio id="clapSound" src="assets/clapping.mp3"></audio>
@@ -211,12 +227,7 @@ const questionBank=[
 {
 question:'Q1 – The commentator says: "Aryan scored the winning goal!" Which voice is used?',
 correct:"Active Voice",
-options:[
-"Passive Voice",
-"Active Voice",
-"Future Tense",
-"Command"
-]
+options:["Passive Voice","Active Voice","Future Tense","Command"]
 },
 
 {
@@ -331,30 +342,21 @@ return [...arr].sort(()=>Math.random()-0.5);
 }
 
 let questions=shuffle(questionBank);
-
 const board=document.getElementById("board");
 
 function buildBoard(){
-
 board.innerHTML="";
-
 shuffle(icons).forEach(icon=>{
-
 const card=document.createElement("div");
-
 card.className="card";
 card.dataset.icon=icon;
 card.textContent="❓";
-
 card.addEventListener("click",()=>flipCard(card));
-
 board.appendChild(card);
-
 });
 }
 
 function flipCard(card){
-
 if(lockBoard) return;
 if(card.classList.contains("matched")) return;
 if(card===firstCard) return;
@@ -368,102 +370,65 @@ return;
 }
 
 if(firstCard.dataset.icon===card.dataset.icon){
-
 currentPair=[firstCard,card];
-
 lockBoard=true;
-
 showQuestion();
-
 }else{
-
 lockBoard=true;
-
 setTimeout(()=>{
-
 firstCard.classList.remove("open");
 card.classList.remove("open");
-
 firstCard.textContent="❓";
 card.textContent="❓";
-
 firstCard=null;
 lockBoard=false;
-
 },800);
-
 }
-
 }
 
 function showQuestion(){
-
 if(questions.length===0){
 questions=shuffle(questionBank);
 }
-
 const q=questions.pop();
-
 document.getElementById("questionText").textContent=q.question;
 
 const optionsDiv=document.getElementById("options");
 optionsDiv.innerHTML="";
 
 shuffle(q.options).forEach(opt=>{
-
 const btn=document.createElement("button");
-
 btn.className="option";
 btn.textContent=opt;
-
 btn.onclick=()=>checkAnswer(opt===q.correct);
-
 optionsDiv.appendChild(btn);
-
 });
 
 document.getElementById("questionModal").style.display="flex";
-
 }
 
 function setVolume(){
-
 const v=document.getElementById("volume").value;
-
 document.getElementById("correctSound").volume=v;
 document.getElementById("wrongSound").volume=v;
 document.getElementById("clapSound").volume=v;
-
 }
 
 function checkAnswer(correct){
-
 setVolume();
-
 document.getElementById("questionModal").style.display="none";
 
 if(correct){
-
 document.getElementById("correctSound").play();
-
-currentPair.forEach(c=>{
-c.classList.add("matched");
-});
-
+currentPair.forEach(c=>c.classList.add("matched"));
 score+=10;
 matches++;
-
 }else{
-
 document.getElementById("wrongSound").play();
-
 currentPair.forEach(c=>{
-
 c.classList.remove("open");
 c.textContent="❓";
-
 });
-
 }
 
 document.getElementById("score").textContent=score;
@@ -473,44 +438,28 @@ firstCard=null;
 lockBoard=false;
 
 if(matches===6){
-
 document.getElementById("clapSound").play();
-
-document.getElementById("finalScore").textContent=
-"Final Score: "+score;
-
+document.getElementById("finalScore").textContent="Final Score: "+score;
 document.getElementById("endScreen").style.display="flex";
-
 }
-
 }
 
 function restartGame(){
-
 score=0;
 matches=0;
-
 document.getElementById("score").textContent=0;
 document.getElementById("matches").textContent=0;
-
 questions=shuffle(questionBank);
-
 document.getElementById("endScreen").style.display="none";
-
 firstCard=null;
 lockBoard=false;
-
 buildBoard();
-
 }
 
 setTimeout(()=>{
-
 document.getElementById("splash").style.display="none";
 document.getElementById("game").style.display="block";
-
 buildBoard();
-
 },5000);
 
 </script>
