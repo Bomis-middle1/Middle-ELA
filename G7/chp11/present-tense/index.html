@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Grammar Factory - FIXED</title>
+<title>Grammar Factory - Present Tense</title>
 
 <style>
 body{
@@ -14,21 +14,22 @@ overflow:hidden;
 color:white;
 }
 
-/* SCREEN SYSTEM (FIXED) */
+/* SCREENS */
 .screen{
 position:fixed;
 inset:0;
-display:none;
+display:flex;
 align-items:center;
 justify-content:center;
 flex-direction:column;
 text-align:center;
 }
 
+.hidden{display:none;}
+
 /* LOGO */
 #logoScreen{
 background:white;
-display:flex;
 }
 #logoScreen img{
 width:220px;
@@ -41,41 +42,23 @@ to{transform:scale(1);opacity:1;}
 }
 
 /* TITLE */
-#titleScreen{
-background:linear-gradient(#4fc3f7,#e1f5fe);
-color:#0d47a1;
+#titleScreen h1{
+font-size:40px;
+animation:pulse 1s infinite;
+}
+
+@keyframes pulse{
+0%{transform:scale(1);}
+50%{transform:scale(1.05);}
+100%{transform:scale(1);}
 }
 
 /* GAME */
 #gameScreen{
 flex-direction:column;
+padding-top:60px;
 }
 
-/* TEXT */
-#instruction{
-font-size:18px;
-margin-bottom:10px;
-}
-
-#sentence{
-font-size:22px;
-font-weight:bold;
-margin:10px;
-}
-
-/* OPTIONS */
-.option{
-background:white;
-color:black;
-padding:12px;
-margin:8px;
-border-radius:10px;
-cursor:pointer;
-width:260px;
-font-weight:bold;
-}
-
-/* SCORE */
 #score{
 position:fixed;
 top:10px;
@@ -84,13 +67,51 @@ font-size:18px;
 font-weight:bold;
 }
 
+#instruction{
+font-size:18px;
+margin-bottom:10px;
+opacity:0.9;
+}
+
+#sentence{
+font-size:22px;
+font-weight:bold;
+margin:10px;
+padding:10px;
+}
+
+/* OPTIONS */
+#options{
+display:flex;
+flex-wrap:wrap;
+justify-content:center;
+gap:10px;
+margin-top:20px;
+}
+
+.option{
+background:white;
+color:black;
+padding:12px;
+border-radius:10px;
+cursor:pointer;
+min-width:220px;
+font-weight:bold;
+transition:0.2s;
+}
+
+.option:active{transform:scale(0.95);}
+
+.correct{background:#2ecc71 !important;color:white;}
+.wrong{background:#e74c3c !important;color:white;}
+
 /* POPUP */
 #popup{
 position:fixed;
 top:50%;
 left:50%;
 transform:translate(-50%,-50%);
-padding:18px 25px;
+padding:20px;
 border-radius:10px;
 font-size:22px;
 display:none;
@@ -100,13 +121,12 @@ color:white;
 
 /* BUTTON */
 button{
-padding:12px 18px;
+padding:12px 20px;
 border:none;
 border-radius:10px;
 background:#ffca28;
 font-weight:bold;
 cursor:pointer;
-color:black;
 }
 </style>
 </head>
@@ -119,7 +139,7 @@ color:black;
 </div>
 
 <!-- TITLE -->
-<div id="titleScreen" class="screen">
+<div id="titleScreen" class="screen hidden">
 <div>
 <h1>🏭 Grammar Factory</h1>
 <p>Present Tense Challenge</p>
@@ -128,13 +148,11 @@ color:black;
 </div>
 
 <!-- GAME -->
-<div id="gameScreen" class="screen">
+<div id="gameScreen" class="screen hidden">
 
 <div id="score">Score: 0</div>
 
-<div id="instruction">
-👉 Identify the tense used in the sentence
-</div>
+<div id="instruction">👉 Identify the tense used in the sentence</div>
 
 <div id="sentence"></div>
 
@@ -147,95 +165,106 @@ color:black;
 
 <script>
 
-/* ================= CLEAN SCREEN CONTROL ================= */
-const screens = {
-logo: document.getElementById("logoScreen"),
-title: document.getElementById("titleScreen"),
-game: document.getElementById("gameScreen")
-};
-
-/* FLOW */
+/* ================= CLEAN FLOW ================= */
 setTimeout(()=>{
-screens.logo.style.display="none";
-screens.title.style.display="flex";
+document.getElementById("logoScreen").classList.add("hidden");
+document.getElementById("titleScreen").classList.remove("hidden");
 },5000);
 
-/* ================= QUESTIONS ================= */
-const questions=[
-{q:"She goes to school by bus every day.",a:"Present Simple",hint:"Habit / routine",exp:"Used for regular actions"},
-{q:"He has been studying for three hours.",a:"Present Perfect Continuous",hint:"Ongoing duration",exp:"Action continuing over time"},
+/* ================= QUESTION BANK ================= */
+const questions = [
+{q:"She goes to school by bus every day.",a:"Present Simple",hint:"Habit or routine",exp:"Used for regular actions"},
+{q:"He has been studying for three hours.",a:"Present Perfect Continuous",hint:"Ongoing action",exp:"Action continuing over time"},
 {q:"They are playing football now.",a:"Present Continuous",hint:"happening now",exp:"Action in progress"},
 {q:"We have visited Jaipur twice.",a:"Present Perfect",hint:"past experience",exp:"Past action with present relevance"},
 {q:"The Earth moves around the Sun.",a:"Present Simple",hint:"universal truth",exp:"Scientific fact"}
 ];
 
+let qBank = questions.sort(()=>Math.random()-0.5);
 let i=0;
 let score=0;
 let attempts=2;
 
-/* START */
+/* ================= START ================= */
 function startGame(){
-screens.title.style.display="none";
-screens.game.style.display="flex";
-load();
+document.getElementById("titleScreen").classList.add("hidden");
+document.getElementById("gameScreen").classList.remove("hidden");
+loadQ();
 }
 
-/* LOAD */
-function load(){
+/* ================= LOAD QUESTION (SAFE - NO BUGS) ================= */
+function loadQ(){
 
-if(i>=questions.length){
-end();
+if(i>=qBank.length){
+endGame();
 return;
 }
 
 attempts=2;
 
 document.getElementById("score").innerText="Score: "+score;
-document.getElementById("sentence").innerText=questions[i].q;
+document.getElementById("sentence").innerText=qBank[i].q;
 
-let box=document.getElementById("options");
+const box=document.getElementById("options");
 box.innerHTML="";
 
-["Present Simple","Present Continuous","Present Perfect","Present Perfect Continuous"]
-.forEach(opt=>{
+const opts=[
+"Present Simple",
+"Present Continuous",
+"Present Perfect",
+"Present Perfect Continuous"
+];
 
-let div=document.createElement("div");
+opts.forEach(opt=>{
+const div=document.createElement("div");
 div.className="option";
 div.innerText=opt;
 
-div.onclick=()=>check(opt);
+div.onclick=()=>check(opt,div);
 
 box.appendChild(div);
 });
 }
 
-/* CHECK */
-function check(ans){
+/* ================= CHECK LOGIC ================= */
+function check(ans,el){
 
-let correct=questions[i].a;
+let correct=qBank[i].a;
 
 if(ans===correct){
+
 score++;
-show("Correct 🎉","green");
+showPopup("Correct 🎉","green");
+el.classList.add("correct");
+
+setTimeout(()=>{
 i++;
-setTimeout(load,900);
-}
-else{
+loadQ();
+},900);
+
+}else{
+
 attempts--;
 
 if(attempts===1){
-show("Hint: "+questions[i].hint,"orange");
+showPopup("Hint: "+qBank[i].hint,"orange");
 }
 else{
-show("Answer: "+correct+" | "+questions[i].exp,"red");
+showPopup("Answer: "+correct+" | "+qBank[i].exp,"red");
+
+setTimeout(()=>{
 i++;
-setTimeout(load,1500);
+loadQ();
+},1500);
 }
+
+el.classList.add("wrong");
 }
 }
 
-/* POPUP */
-function show(text,color){
+/* ================= POPUP ================= */
+function showPopup(text,color){
+
 let p=document.getElementById("popup");
 p.innerText=text;
 p.style.background=color;
@@ -244,12 +273,15 @@ p.style.display="block";
 setTimeout(()=>p.style.display="none",1200);
 }
 
-/* END */
-function end(){
-document.getElementById("gameScreen").innerHTML=
-`<h2>🎉 Game Completed</h2>
-<h3>Score: ${score}/${questions.length}</h3>
-<button onclick="location.reload()">Restart</button>`;
+/* ================= END ================= */
+function endGame(){
+
+document.getElementById("gameScreen").innerHTML=`
+<h2>🎉 Game Completed</h2>
+<h3>Score: ${score} / ${qBank.length}</h3>
+<button onclick="location.reload()">Restart</button>
+`;
+
 }
 
 </script>
