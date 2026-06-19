@@ -2,336 +2,366 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<title>Nouns Adventure Game</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Innovine Nouns Game</title>
 
 <style>
-body{
-margin:0;
-font-family:Arial;
-background:linear-gradient(to bottom,#dff6ff,#fff7c2);
+body {
+    margin: 0;
+    font-family: Arial;
+    background: linear-gradient(135deg,#fff3cd,#d0f0ff,#ffd6e7);
+    overflow-x: hidden;
 }
 
-/* SPLASH */
-#splash{
-position:fixed;
-inset:0;
-background:white;
-display:flex;
-flex-direction:column;
-justify-content:center;
-align-items:center;
-z-index:9999;
+.screen {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    z-index: 999;
+    background: white;
 }
 
-#splash img{
-width:180px;
+#logoScreen img {
+    width: 250px;
 }
 
-#topic{
-display:none;
-font-size:22px;
-font-weight:bold;
-color:#0b5394;
-margin-top:10px;
+#topicScreen {
+    font-size: 32px;
+    font-weight: bold;
+    color: #ff4d6d;
+    display: none;
+    text-align: center;
+    padding: 20px;
 }
 
-#startBtn{
-display:none;
-margin-top:15px;
-padding:10px 16px;
-border:none;
-background:#4CAF50;
-color:white;
-border-radius:10px;
+#gameContainer {
+    display: none;
+    padding: 10px;
 }
 
-/* TOPBAR */
-.topbar{
-display:flex;
-justify-content:space-between;
-padding:10px;
-font-weight:bold;
-flex-wrap:wrap;
+.header {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    font-weight: bold;
 }
 
-/* WORD BANK */
-#words{
-display:flex;
-flex-wrap:wrap;
-gap:6px;
-padding:10px;
-background:#fff3d6;
-border-bottom:2px solid #ccc;
-min-height:70px;
+#questionBox {
+    background: white;
+    padding: 20px;
+    margin: 10px;
+    border-radius: 15px;
+    font-size: 20px;
 }
 
-/* WORD */
-.word{
-padding:6px 10px;
-background:#ffd966;
-border-radius:10px;
-font-size:13px;
-font-weight:bold;
-cursor:grab;
+.option {
+    background: #fff;
+    margin: 10px;
+    padding: 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    border: 2px solid #ccc;
 }
 
-/* GRID */
-.container{
-display:grid;
-grid-template-columns:repeat(2,1fr);
-gap:8px;
-padding:8px;
+.option:hover {
+    background: #f0f8ff;
 }
 
-/* BASKETS */
-.box{
-min-height:90px;
-border:2px dashed #4aa3df;
-border-radius:14px;
-background:linear-gradient(#fff,#eaf6ff);
-padding:6px;
-position:relative;
+#finalScreen {
+    display: none;
+    text-align: center;
+    padding: 20px;
 }
 
-.box::before{
-content:attr(data-label);
-position:absolute;
-top:-10px;
-left:6px;
-background:#2196F3;
-color:white;
-padding:2px 6px;
-border-radius:10px;
-font-size:10px;
+.card {
+    background: white;
+    padding: 20px;
+    margin: 10px;
+    border-radius: 15px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
 
-/* INSIDE WORD */
-.inside{
-display:inline-block;
-margin:3px;
-padding:4px 6px;
-background:#c8f7c5;
-border-radius:6px;
-font-size:12px;
+button {
+    padding: 10px 20px;
+    margin: 10px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 16px;
 }
 
-/* END */
-#end{
-display:none;
-text-align:center;
-padding:30px;
+.restartBtn { background: #007bff; color: white; }
+.endBtn { background: #dc3545; color: white; }
+
+.flash { animation: flash 0.3s infinite alternate; }
+
+@keyframes flash {
+    from { opacity: 1; }
+    to { opacity: 0.4; }
 }
 
-button{
-padding:10px 14px;
-border:none;
-border-radius:10px;
-cursor:pointer;
+.confetti {
+    position: fixed;
+    width: 10px;
+    height: 10px;
+    background: red;
+    top: 0;
+    animation: fall 2s linear forwards;
 }
 
-/* CONFETTI */
-.confetti{
-position:fixed;
-width:8px;
-height:8px;
-top:-10px;
-animation:fall 3s linear;
+@keyframes fall {
+    to { transform: translateY(100vh) rotate(360deg); opacity: 0; }
 }
 
-@keyframes fall{
-to{transform:translateY(100vh) rotate(360deg);}
-}
-
-@media(max-width:600px){
-.container{grid-template-columns:1fr;}
+@media(max-width:768px){
+    #questionBox { font-size: 18px; }
 }
 </style>
 </head>
 
 <body>
 
-<!-- SPLASH -->
-<div id="splash">
-<img src="assets/innovine-logo.png">
-<div id="topic">NOUNS SORTING ADVENTURE</div>
-<button id="startBtn">START</button>
+<!-- LOGO -->
+<div id="logoScreen" class="screen">
+    <img src="assets/innovine-logo.png">
+</div>
+
+<!-- TOPIC -->
+<div id="topicScreen" class="screen">
+    🌟 Nouns Master Challenge 🌟
 </div>
 
 <!-- GAME -->
-<div class="topbar">
-<div>Score: <span id="score">0</span></div>
-<div>
-Volume <input type="range" id="vol" min="0" max="1" step="0.1" value="1">
-</div>
-</div>
+<div id="gameContainer">
 
-<div id="words"></div>
+    <div class="header">
+        <div id="qCount">1/10</div>
+        <div id="timer">80</div>
+    </div>
 
-<div class="container">
+    <div style="padding:10px;">
+        Volume:
+        <input type="range" id="volume" min="0" max="1" step="0.1" value="1">
+    </div>
 
-<div class="box" id="proper" data-label="Proper"></div>
-<div class="box" id="common" data-label="Common"></div>
-<div class="box" id="collective" data-label="Collective"></div>
-<div class="box" id="material" data-label="Material"></div>
-<div class="box" id="abstract" data-label="Abstract"></div>
-<div class="box" id="countable" data-label="Countable"></div>
-<div class="box" id="uncountable" data-label="Uncountable"></div>
-
+    <div id="questionBox"></div>
+    <div id="options"></div>
 </div>
 
-<!-- END -->
-<div id="end">
-<h1>🎉 Game Completed!</h1>
-<h2 id="result"></h2>
-<button onclick="location.reload()">Play Again</button>
+<!-- FINAL -->
+<div id="finalScreen">
+    <div class="card">
+        <h2 id="scoreText"></h2>
+        <p id="remark"></p>
+        <p id="timeTaken"></p>
+        <p id="attempts"></p>
+
+        <button class="restartBtn" onclick="restartGame()">Restart</button>
+        <button class="endBtn" onclick="location.reload()">End</button>
+    </div>
 </div>
 
-<!-- AUDIO -->
-<audio id="correct" src="assets/correct.mp3"></audio>
-<audio id="wrong" src="assets/wrong.mp3"></audio>
-<audio id="clap" src="assets/clapping.mp3"></audio>
+<audio id="correctSound" src="assets/correct.mp3"></audio>
+<audio id="wrongSound" src="assets/wrong.mp3"></audio>
+<audio id="clapSound" src="assets/clapping.mp3"></audio>
 
 <script>
 
-const nouns=[
-{w:"Mumbai",t:"proper"},
-{w:"Riya",t:"proper"},
-{w:"Peacock",t:"common"},
-{w:"Doctor",t:"common"},
-{w:"Forest",t:"common"},
-{w:"Bunch",t:"collective"},
-{w:"Army",t:"collective"},
-{w:"Class",t:"collective"},
-{w:"Silver",t:"material"},
-{w:"Iron",t:"material"},
-{w:"Courage",t:"abstract"},
-{w:"Honesty",t:"abstract"},
-{w:"Happiness",t:"abstract"},
-{w:"Pencil",t:"countable"},
-{w:"Apple",t:"countable"},
-{w:"Oxygen",t:"uncountable"},
-{w:"Sugar",t:"uncountable"},
-{w:"Bread",t:"uncountable"},
-{w:"Tea",t:"uncountable"},
-{w:"Salt",t:"uncountable"}
+/* ---------------- YOUR QUESTIONS ---------------- */
+let questions = [
+{
+q:"The committee decided to organize a science fair. Identify the noun type.",
+options:["Common Noun","Proper Noun","Collective Noun","Abstract Noun"],
+answer:2
+},
+{
+q:"Copper is used to make electrical wires. Identify noun type of Copper.",
+options:["Common Noun","Material Noun","Countable Noun","Collective Noun"],
+answer:1
+},
+{
+q:"Friendship becomes stronger when people trust each other.",
+options:["Common Noun","Proper Noun","Material Noun","Abstract Noun"],
+answer:3
+},
+{
+q:"The children counted the ancient coins in the museum.",
+options:["Uncountable Noun","Collective Noun","Countable Noun","Material Noun"],
+answer:2
+},
+{
+q:"We need more sand to complete the desert model.",
+options:["Material Noun","Countable Noun","Uncountable Noun","Collective Noun"],
+answer:2
+},
+{
+q:"Ms. Sharma encouraged students to debate.",
+options:["Common Noun","Collective Noun","Proper Noun","Abstract Noun"],
+answer:2
+},
+{
+q:"The garden behind our school is beautiful.",
+options:["Common Noun","Proper Noun","Material Noun","Collective Noun"],
+answer:0
+},
+{
+q:"A fleet of ships arrived at the harbour.",
+options:["Common Noun","Countable Noun","Material Noun","Collective Noun"],
+answer:3
+},
+{
+q:"Knowledge helps people make wise decisions.",
+options:["Common Noun","Material Noun","Abstract Noun","Proper Noun"],
+answer:2
+},
+{
+q:"The temple floor was built using marble.",
+options:["Countable Noun","Common Noun","Material Noun","Collective Noun"],
+answer:2
+}
 ];
 
-let score=0;
-let total=nouns.length;
-let placed=0;
+let current = 0;
+let score = 0;
+let time = 80;
+let timer;
+let totalTime = 0;
+let attempts = 0;
 
-/* SPLASH FLOW */
+/* ---------------- SPLASH FLOW ---------------- */
 setTimeout(()=>{
-document.getElementById("topic").style.display="block";
+    document.getElementById("logoScreen").style.display="none";
+    document.getElementById("topicScreen").style.display="flex";
+
+    setTimeout(()=>{
+        document.getElementById("topicScreen").style.display="none";
+        document.getElementById("gameContainer").style.display="block";
+        loadQuestion();
+        startTimer();
+    },3000);
+
 },5000);
 
-setTimeout(()=>{
-document.getElementById("startBtn").style.display="block";
-},8000);
+/* ---------------- LOAD QUESTION ---------------- */
+function loadQuestion(){
 
-/* START GAME */
-document.getElementById("startBtn").onclick=()=>{
-document.getElementById("splash").style.display="none";
-load();
-};
+    clearInterval(timer);
+    time = 80;
 
-/* LOAD WORDS */
-function load(){
+    if(current >= questions.length){
+        endGame();
+        return;
+    }
 
-let box=document.getElementById("words");
-box.innerHTML="";
+    document.getElementById("qCount").innerText = (current+1)+"/10";
+    document.getElementById("questionBox").innerText = questions[current].q;
 
-nouns.sort(()=>Math.random()-0.5).forEach(n=>{
-let d=document.createElement("div");
-d.className="word";
-d.textContent=n.w;
-d.dataset.type=n.t;
-d.draggable=true;
+    let box = document.getElementById("options");
+    box.innerHTML = "";
 
-/* DRAG */
-d.ondragstart=e=>{
-e.dataTransfer.setData("type",n.t);
-e.dataTransfer.setData("text",n.w);
-};
+    questions[current].options.forEach((opt,i)=>{
+        let div = document.createElement("div");
+        div.className="option";
+        div.innerText = opt;
+        div.onclick = ()=>check(i);
+        box.appendChild(div);
+    });
 
-box.appendChild(d);
-});
-
-/* DROP */
-document.querySelectorAll(".box").forEach(b=>{
-b.ondragover=e=>e.preventDefault();
-
-b.ondrop=e=>{
-let type=e.dataTransfer.getData("type");
-let text=e.dataTransfer.getData("text");
-
-if(!text) return;
-
-let vol=document.getElementById("vol").value;
-document.getElementById("correct").volume=vol;
-document.getElementById("wrong").volume=vol;
-
-if(type===b.id){
-
-score++;
-placed++;
-
-document.getElementById("correct").play();
-
-/* move word */
-let el=document.createElement("div");
-el.className="inside";
-el.textContent=text;
-b.appendChild(el);
-
-/* remove from bank */
-document.querySelectorAll(".word").forEach(w=>{
-if(w.textContent===text) w.remove();
-});
-
-confetti();
-
-/* END */
-if(placed===total) endGame();
-
-}else{
-document.getElementById("wrong").play();
-}
-};
-});
+    startTimer();
 }
 
-/* CONFETTI */
+/* ---------------- TIMER ---------------- */
+function startTimer(){
+    document.getElementById("timer").innerText = time;
+
+    timer = setInterval(()=>{
+        time--;
+        totalTime++;
+
+        document.getElementById("timer").innerText = time;
+
+        if(time<=10){
+            document.getElementById("timer").classList.add("flash");
+        }
+
+        if(time<=0){
+            current++;
+            loadQuestion();
+        }
+    },1000);
+}
+
+/* ---------------- CHECK ANSWER ---------------- */
+function check(i){
+    let vol = document.getElementById("volume").value;
+
+    correctSound.volume = vol;
+    wrongSound.volume = vol;
+    clapSound.volume = vol;
+
+    if(i === questions[current].answer){
+        score++;
+        correctSound.play();
+        confetti();
+    } else {
+        attempts++;
+        wrongSound.play();
+    }
+
+    setTimeout(()=>{
+        current++;
+        loadQuestion();
+    },700);
+}
+
+/* ---------------- CONFETTI ---------------- */
 function confetti(){
-for(let i=0;i<20;i++){
-let c=document.createElement("div");
-c.className="confetti";
-c.style.left=Math.random()*100+"vw";
-c.style.background=["red","blue","green","yellow"][Math.floor(Math.random()*4)];
-document.body.appendChild(c);
-setTimeout(()=>c.remove(),3000);
-}
+    for(let i=0;i<25;i++){
+        let c=document.createElement("div");
+        c.className="confetti";
+        c.style.left=Math.random()*100+"vw";
+        c.style.background=["#ff4d6d","#ffd166","#06d6a0","#4d96ff"][Math.floor(Math.random()*4)];
+        document.body.appendChild(c);
+        setTimeout(()=>c.remove(),2000);
+    }
 }
 
-/* END SCREEN */
+/* ---------------- END ---------------- */
 function endGame(){
 
-document.getElementById("end").style.display="block";
+    document.getElementById("gameContainer").style.display="none";
+    document.getElementById("finalScreen").style.display="block";
 
-let percent=Math.round((score/total)*100);
+    let percent = (score/questions.length)*100;
 
-let remark=
-percent>=80?"Excellent 🎉":
-percent>=60?"Good Job 👍":
-percent>=45?"Well Tried 🙂":
-"Revise Again 📘";
+    let remark =
+        percent>=80?"Excellent 🌟":
+        percent>=60?"Good Job 👍":
+        percent>=45?"Well Tried 🙂":
+        "Let's revise and come back 📘";
 
-document.getElementById("result").innerHTML=
-"Score: "+score+"/"+total+
-"<br>"+remark;
+    document.getElementById("scoreText").innerText =
+        `Score: ${score}/${questions.length}`;
+
+    document.getElementById("remark").innerText = remark;
+    document.getElementById("timeTaken").innerText = "Time Taken: " + totalTime + " sec";
+    document.getElementById("attempts").innerText = "Wrong Attempts: " + attempts;
 }
 
+/* ---------------- RESTART ---------------- */
+function restartGame(){
+    current=0;
+    score=0;
+    time=80;
+    totalTime=0;
+    attempts=0;
+    document.getElementById("finalScreen").style.display="none";
+    document.getElementById("gameContainer").style.display="block";
+    loadQuestion();
+}
 </script>
 
 </body>
