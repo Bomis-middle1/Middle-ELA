@@ -3,18 +3,18 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Grammar Factory - Production Ready</title>
+<title>Grammar Factory - Learning Engine</title>
 
 <style>
 body{
 margin:0;
 font-family:Arial;
 background:linear-gradient(135deg,#1d2671,#c33764,#3a7bd5);
-overflow:hidden;
 color:white;
+overflow:hidden;
 }
 
-/* ================= SCREENS ================= */
+/* SCREENS */
 .screen{
 position:fixed;
 inset:0;
@@ -24,85 +24,28 @@ justify-content:center;
 flex-direction:column;
 text-align:center;
 }
-
 .hidden{display:none;}
 
-/* ================= LOGO ================= */
-#logoScreen{
-background:white;
-z-index:9999;
-}
-#logoScreen img{
-width:220px;
-animation:zoom 1.5s ease;
-}
-@keyframes zoom{
-from{transform:scale(0.5);opacity:0;}
-to{transform:scale(1);opacity:1;}
-}
+/* LOGO */
+#logoScreen img{width:220px;}
 
-/* ================= TITLE ================= */
-#titleScreen{
-background:linear-gradient(#4fc3f7,#e1f5fe);
-z-index:9998;
-color:#0d47a1;
-}
-
+/* TITLE */
 #titleScreen h1{
-font-size:42px;
-animation:bounce 1.2s infinite;
+font-size:40px;
+animation:pulse 1.2s infinite;
 }
-@keyframes bounce{
-0%{transform:translateY(0);}
-50%{transform:translateY(-10px);}
-100%{transform:translateY(0);}
+@keyframes pulse{
+0%{transform:scale(1);}
+50%{transform:scale(1.05);}
+100%{transform:scale(1);}
 }
 
-/* ================= GAME ================= */
+/* GAME */
 #gameScreen{
-display:none;
 flex-direction:column;
-padding-top:80px;
+padding-top:70px;
 }
 
-#instruction{
-font-size:18px;
-margin-bottom:10px;
-opacity:0.9;
-}
-
-#sentence{
-font-size:22px;
-font-weight:bold;
-margin:10px;
-padding:0 20px;
-}
-
-#options{
-display:flex;
-flex-wrap:wrap;
-justify-content:center;
-gap:10px;
-margin-top:20px;
-}
-
-.option{
-background:white;
-color:black;
-padding:12px;
-border-radius:10px;
-cursor:pointer;
-min-width:220px;
-font-weight:bold;
-transition:0.2s;
-}
-
-.option:active{transform:scale(0.95);}
-
-.correct{background:#2ecc71 !important;color:white;}
-.wrong{background:#e74c3c !important;color:white;}
-
-/* ================= SCORE ================= */
 #score{
 position:fixed;
 top:10px;
@@ -111,68 +54,88 @@ font-size:18px;
 font-weight:bold;
 }
 
-/* ================= POPUP ================= */
+#instruction{
+margin:10px;
+font-size:18px;
+opacity:0.9;
+}
+
+#sentence{
+font-size:22px;
+font-weight:bold;
+margin:10px;
+}
+
+.option{
+background:white;
+color:black;
+padding:12px;
+margin:8px;
+border-radius:10px;
+cursor:pointer;
+width:250px;
+font-weight:bold;
+}
+
+.correct{background:#2ecc71 !important;color:white;}
+.wrong{background:#e74c3c !important;color:white;}
+
+/* POPUP */
 #popup{
 position:fixed;
 top:50%;
 left:50%;
 transform:translate(-50%,-50%);
-padding:20px 30px;
+padding:20px;
 border-radius:12px;
-font-size:24px;
+font-size:22px;
 display:none;
 z-index:9999;
-color:white;
 }
 
-.good{background:#2ecc71;}
-.bad{background:#e74c3c;}
-
-/* ================= BUTTON ================= */
-button{
-padding:12px 20px;
-border:none;
-border-radius:10px;
-background:#ffca28;
-font-weight:bold;
-cursor:pointer;
-}
-
-/* ================= CONFETTI ================= */
+/* CONFETTI */
 .confetti{
 position:fixed;
 width:8px;
 height:8px;
 animation:fall 2s linear forwards;
 }
-
 @keyframes fall{
-to{transform:translateY(100vh) rotate(360deg);opacity:0;}
+to{transform:translateY(100vh);opacity:0;}
+}
+
+button{
+padding:12px 18px;
+border:none;
+border-radius:10px;
+background:#ffca28;
+font-weight:bold;
+cursor:pointer;
 }
 </style>
 </head>
 
 <body>
 
-<!-- ================= LOGO ================= -->
+<!-- LOGO -->
 <div id="logoScreen" class="screen">
 <img src="assets/innovine-logo.png">
 </div>
 
-<!-- ================= TITLE ================= -->
+<!-- TITLE -->
 <div id="titleScreen" class="screen hidden">
 <h1>🏭 Grammar Factory</h1>
-<p>Present Tense Challenge (Grade 7)</p>
+<p>Present Tense Learning Engine</p>
 <button onclick="startGame()">Start</button>
 </div>
 
-<!-- ================= GAME ================= -->
-<div id="gameScreen">
+<!-- GAME -->
+<div id="gameScreen" class="screen hidden">
 
 <div id="score">Score: 0</div>
 
 <div id="instruction">
-👉 Identify the tense used in the following sentence
+👉 Identify the tense used in the sentence
 </div>
 
 <div id="sentence"></div>
@@ -181,58 +144,50 @@ to{transform:translateY(100vh) rotate(360deg);opacity:0;}
 
 </div>
 
-<!-- ================= POPUP ================= -->
+<!-- POPUP -->
 <div id="popup"></div>
 
 <script>
 
-/* ================= FLOW CONTROL ================= */
-setTimeout(()=>{
-document.getElementById("logoScreen").style.display="none";
-document.getElementById("titleScreen").classList.remove("hidden");
-},5000);
-
 /* ================= QUESTIONS ================= */
 const questions=[
-{q:"She goes to school by bus every day.",a:"Present Simple"},
-{q:"He has been studying for three hours.",a:"Present Perfect Continuous"},
-{q:"They are playing football now.",a:"Present Continuous"},
-{q:"We have visited Jaipur twice.",a:"Present Perfect"},
-{q:"Look! The baby is sleeping.",a:"Present Continuous"},
-{q:"The Earth moves around the Sun.",a:"Present Simple"},
-{q:"My sister has written three letters today.",a:"Present Perfect"},
-{q:"It has been raining since morning.",a:"Present Perfect Continuous"},
-{q:"My father works in a bank.",a:"Present Simple"},
-{q:"I have finished my homework.",a:"Present Perfect"}
+{q:"She goes to school by bus every day.",a:"Present Simple",hint:"Habit / routine action",exp:"Used for regular habits"},
+{q:"He has been studying for three hours.",a:"Present Perfect Continuous",hint:"Action continuing over time",exp:"Ongoing action with duration"},
+{q:"They are playing football now.",a:"Present Continuous",hint:"Happening right now",exp:"Action in progress"},
+{q:"We have visited Jaipur twice.",a:"Present Perfect",hint:"Past experience",exp:"Past action with present relevance"},
+{q:"The Earth moves around the Sun.",a:"Present Simple",hint:"Universal truth",exp:"Scientific fact"}
 ];
 
-let qBank = questions.sort(()=>Math.random()-0.5).slice(0,10);
-
-let index=0;
+let i=0;
 let score=0;
+let attempts=2;
 
-/* ================= START GAME ================= */
+/* ================= START ================= */
 function startGame(){
-document.getElementById("titleScreen").style.display="none";
-document.getElementById("gameScreen").style.display="flex";
+document.getElementById("logoScreen").classList.add("hidden");
+document.getElementById("titleScreen").classList.add("hidden");
+document.getElementById("gameScreen").classList.remove("hidden");
+
 loadQ();
 }
 
 /* ================= LOAD QUESTION ================= */
 function loadQ(){
 
-if(index>=qBank.length){
+if(i>=questions.length){
 endGame();
 return;
 }
 
-document.getElementById("sentence").innerText=qBank[index].q;
+attempts=2;
+
+document.getElementById("sentence").innerText=questions[i].q;
 document.getElementById("score").innerText="Score: "+score;
 
 let box=document.getElementById("options");
 box.innerHTML="";
 
-const opts=[
+let opts=[
 "Present Simple",
 "Present Continuous",
 "Present Perfect",
@@ -250,59 +205,74 @@ box.appendChild(div);
 });
 }
 
-/* ================= CHECK ================= */
+/* ================= CHECK LOGIC (2 ATTEMPTS SYSTEM) ================= */
 function check(ans,el){
 
-let correct=qBank[index].a;
+let correct=questions[i].a;
 
 if(ans===correct){
-score++;
-showPopup("Correct 🎉","good");
-el.classList.add("correct");
-confetti();
-}else{
-showPopup("Wrong ❌","bad");
-el.classList.add("wrong");
-}
 
-/* next */
+score++;
+showPopup("Correct 🎉","green");
+el.classList.add("correct");
+
+confetti();
+
+setTimeout(()=>{i++;loadQ();},1200);
+
+}else{
+
+attempts--;
+
+el.classList.add("wrong");
+
+if(attempts===1){
+
+// 🔹 FIRST WRONG → HINT
+showPopup("Hint: "+questions[i].hint,"orange");
+
+}else if(attempts<=0){
+
+// 🔴 SECOND WRONG → SHOW ANSWER + EXPLANATION
+showPopup("Correct: "+correct+" | "+questions[i].exp,"red");
+
 setTimeout(()=>{
-index++;
+i++;
 loadQ();
-},1200);
+},1800);
+}
+}
 }
 
 /* ================= POPUP ================= */
-function showPopup(text,type){
+function showPopup(text,color){
+
 let p=document.getElementById("popup");
 p.innerText=text;
-p.className=type;
+p.style.background=color;
 p.style.display="block";
 
-setTimeout(()=>{
-p.style.display="none";
-},1000);
+setTimeout(()=>p.style.display="none",1200);
 }
 
 /* ================= CONFETTI ================= */
 function confetti(){
-for(let i=0;i<25;i++){
+for(let i=0;i<20;i++){
 let c=document.createElement("div");
 c.className="confetti";
 c.style.left=Math.random()*100+"vw";
-c.style.top="0px";
 c.style.background=["#ff0","#0ff","#f0f","#0f0","#f60"][Math.floor(Math.random()*5)];
 document.body.appendChild(c);
 setTimeout(()=>c.remove(),2000);
 }
 }
 
-/* ================= END GAME ================= */
+/* ================= END SCREEN ================= */
 function endGame(){
 
 document.getElementById("gameScreen").innerHTML=`
 <h2>🎉 Game Completed</h2>
-<h3>Score: ${score} / ${qBank.length}</h3>
+<h3>Score: ${score}/${questions.length}</h3>
 <button onclick="location.reload()">Restart</button>
 `;
 
