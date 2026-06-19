@@ -1,1 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Innovine Nouns Game</title>
 
+<style>
+body{
+margin:0;
+font-family:Arial;
+background:linear-gradient(to bottom,#dff6ff,#fff7c2);
+}
+
+/* SPLASH */
+#splash{
+position:fixed;
+inset:0;
+background:white;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+z-index:9999;
+}
+
+#splash img{
+width:180px;
+}
+
+#topicScreen{
+display:none;
+font-size:24px;
+font-weight:bold;
+color:#0b5394;
+margin-top:10px;
+}
+
+#startBtn{
+display:none;
+margin-top:20px;
+padding:10px 18px;
+border:none;
+background:#4CAF50;
+color:white;
+border-radius:10px;
+}
+
+/* GAME */
+#game{
+display:none;
+padding:10px;
+}
+
+/* TOPBAR */
+.topbar{
+display:flex;
+justify-content:space-between;
+align-items:center;
+font-weight:bold;
+padding:10px;
+flex-wrap:wrap;
+gap:10px;
+}
+
+/* WORD BANK */
+#words{
+display:flex;
+flex-wrap:wrap;
+gap:6px;
+padding:10px;
+background:#fff3d6;
+border-bottom:2px solid #ccc;
+position:sticky;
+top:0;
+z-index:1000;
+min-height:70px;
+}
+
+/* WORD */
+.word{
+padding:6px 10px;
+background:#ffd966;
+border-radius:10px;
+font-weight:bold;
+font-size:13px;
+cursor:grab;
+user-select:none;
+}
+
+/* BASKETS */
+.container{
+display:grid;
+grid-template-columns:repeat(2,1fr);
+gap:8px;
+padding:8px;
+}
+
+.box{
+background:linear-gradient(145deg,#ffffff,#eaf6ff);
+min-height:90px;
+border-radius:14px;
+border:2px dashed #4aa3df;
+padding:6px;
+position:relative;
+}
+
+.box::before{
+content:attr(data-label);
+position:absolute;
+top:-10px;
+left:6px;
+background:#2196F3;
+color:white;
+padding:2px 6px;
+border-radius:10px;
+font-size:10px;
+}
+
+/* INSIDE WORD */
+.inside-word{
+display:inline-block;
+margin:3px;
+padding:4px 6px;
+background:#c8f7c5;
+border-radius:6px;
+font-size:12px;
+font-weight:bold;
+}
+
+/* END SCREEN */
+#endScreen{
+display:none;
+text-align:center;
+padding:20px;
+}
+
+.big{
+font-size:24px;
+font-weight:bold;
+}
+
+button{
+padding:10px 14px;
+border:none;
+border-radius:10px;
+cursor:pointer;
+}
+
+/* CONFETTI */
+.confetti{
+position:fixed;
+width:8px;
+height:8px;
+top:-10px;
+animation:fall 3s linear;
+}
+
+@keyframes fall{
+to{transform:translateY(100vh) rotate(360deg);}
+}
+
+@media(max-width:600px){
+.container{
+grid-template-columns:1fr;
+}
+}
+</style>
+</head>
+
+<body>
+
+<!-- SPLASH -->
+<div id="splash">
+<img src="assets/innovine-logo.png">
+<div id="topicScreen">NOUNS SORTING ADVENTURE</div>
+<button id="startBtn">START</button>
+</div>
+
+<!-- GAME -->
+<div id="game">
+
+<div class="topbar">
+<div>Score: <span id="score">0</span></div>
+
+<div>
+Volume
+<input type="range" id="vol" min="0" max="1" step="0.1" value="1">
+</div>
+</div>
+
+<!-- WORDS -->
+<div id="words"></div>
+
+<!-- BASKETS -->
+<div class="container">
+
+<div class="box" id="proper" data-label="Proper"></div>
+<div class="box" id="common" data-label="Common"></div>
+<div class="box" id="collective" data-label="Collective"></div>
+<div class="box" id="material" data-label="Material"></div>
+<div class="box" id="abstract" data-label="Abstract"></div>
+<div class="box" id="countable" data-label="Countable"></div>
+<div class="box" id="uncountable" data-label="Uncountable"></div>
+
+</div>
+
+</div>
+
+<!-- END -->
+<div id="endScreen">
+<div class="big" id="finalText"></div>
+<button onclick="location.reload()">RESTART</button>
+</div>
+
+<!-- AUDIO -->
+<audio id="correctSound" src="assets/correct.mp3"></audio>
+<audio id="wrongSound" src="assets/wrong.mp3"></audio>
+<audio id="clapSound" src="assets/clapping.mp3"></audio>
+
+<script>
+
+const nouns=[
+{w:"Mumbai",t:"proper"},
+{w:"Riya",t:"proper"},
+{w:"Peacock",t:"common"},
+{w:"Doctor",t:"common"},
+{w:"Forest",t:"common"},
+{w:"Bunch",t:"collective"},
+{w:"Cricket Team",t:"collective"},
+{w:"Class",t:"collective"},
+{w:"Army",t:"collective"},
+{w:"Silver",t:"material"},
+{w:"Iron",t:"material"},
+{w:"Courage",t:"abstract"},
+{w:"Honesty",t:"abstract"},
+{w:"Happiness",t:"abstract"},
+{w:"Pencil",t:"countable"},
+{w:"Oxygen",t:"uncountable"},
+{w:"Sugar",t:"uncountable"},
+{w:"Bread",t:"uncountable"},
+{w:"Tea",t:"uncountable"},
+{w:"Salt",t:"uncountable"}
+];
+
+let score=0;
+let total=nouns.length;
+let placed=0;
+
+function shuffle(a){
+return a.sort(()=>Math.random()-0.5);
+}
+
+/* SPLASH FLOW */
+setTimeout(()=>{
+document.getElementById("topicScreen").style.display="block";
+},5000);
+
+setTimeout(()=>{
+document.getElementById("startBtn").style.display="block";
+},8000);
+
+document.getElementById("startBtn").onclick=()=>{
+document.getElementById("splash").style.display="none";
+document.getElementById("game").style.display="block";
+loadWords();
+};
+
+/* LOAD WORDS */
+function loadWords(){
+let box=document.getElementById("words");
+box.innerHTML="";
+
+shuffle(nouns).forEach(n=>{
+let d=document.createElement("div");
+d.className="word";
+d.textContent=n.w;
+d.dataset.type=n.t;
+d.draggable=true;
+
+/* DRAG */
+d.ondragstart=e=>{
+e.dataTransfer.setData("type",n.t);
+e.dataTransfer.setData("text",n.w);
+};
+
+/* remove only after drop success */
+box.appendChild(d);
+});
+
+/* DROP */
+document.querySelectorAll(".box").forEach(b=>{
+b.ondragover=e=>e.preventDefault();
+
+b.ondrop=e=>{
+let type=e.dataTransfer.getData("type");
+let text=e.dataTransfer.getData("text");
+
+if(!text) return;
+
+let vol=document.getElementById("vol").value;
+document.getElementById("correctSound").volume=vol;
+document.getElementById("wrongSound").volume=vol;
+
+if(type===b.id){
+
+score++;
+placed++;
+
+document.getElementById("correctSound").play();
+
+/* move word */
+let el=document.createElement("div");
+el.className="inside-word";
+el.textContent=text;
+b.appendChild(el);
+
+/* remove from top */
+document.querySelectorAll(".word").forEach(w=>{
+if(w.textContent===text) w.remove();
+});
+
+confetti();
+
+/* check end */
+if(placed===total){
+endGame();
+}
+
+}else{
+document.getElementById("wrongSound").play();
+}
+};
+});
+}
+
+/* CONFETTI */
+function confetti(){
+for(let i=0;i<20;i++){
+let c=document.createElement("div");
+c.className="confetti";
+c.style.left=Math.random()*100+"vw";
+c.style.background=["red","blue","green","yellow"][Math.floor(Math.random()*4)];
+document.body.appendChild(c);
+setTimeout(()=>c.remove(),3000);
+}
+}
+
+/* END SCREEN */
+function endGame(){
+
+document.getElementById("game").style.display="none";
+document.getElementById("endScreen").style.display="block";
+
+let percent=Math.round((score/total)*100);
+
+let remark=
+percent>=80?"Excellent 🎉":
+percent>=60?"Good Job 👍":
+percent>=45?"Well Tried 🙂":
+"Let’s Revise 📘";
+
+document.getElementById("finalText").innerHTML=
+"Score: "+score+"/"+total+
+"<br>"+remark;
+}
+
+</script>
+
+</body>
+</html>
