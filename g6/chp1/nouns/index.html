@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Nouns Adventure Game</title>
+<title>Noun Explorer Game</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
@@ -10,7 +10,6 @@ body {
     margin: 0;
     font-family: Arial;
     background: linear-gradient(135deg,#fff3cd,#d0f0ff,#ffd6e7);
-    overflow-x: hidden;
 }
 
 .screen {
@@ -20,8 +19,10 @@ body {
     justify-content: center;
     align-items: center;
     flex-direction: column;
-    z-index: 999;
     background: white;
+    z-index: 999;
+    text-align: center;
+    padding: 20px;
 }
 
 #logoScreen img {
@@ -29,12 +30,16 @@ body {
 }
 
 #topicScreen {
-    font-size: 32px;
+    font-size: 30px;
     font-weight: bold;
     color: #ff4d6d;
     display: none;
-    text-align: center;
-    padding: 20px;
+}
+
+#instructionScreen {
+    display: none;
+    font-size: 18px;
+    line-height: 1.6;
 }
 
 #gameContainer {
@@ -55,15 +60,16 @@ body {
     margin: 10px;
     border-radius: 15px;
     font-size: 20px;
+    min-height: 100px;
 }
 
 .option {
-    background: #fff;
+    background: white;
     margin: 10px;
     padding: 12px;
     border-radius: 10px;
-    cursor: pointer;
     border: 2px solid #ccc;
+    cursor: pointer;
 }
 
 .option:hover {
@@ -79,9 +85,7 @@ body {
 .card {
     background: white;
     padding: 20px;
-    margin: 10px;
     border-radius: 15px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
 
 button {
@@ -89,19 +93,11 @@ button {
     margin: 10px;
     border: none;
     border-radius: 10px;
-    cursor: pointer;
-    font-size: 16px;
 }
 
+.startBtn { background: #28a745; color: white; }
 .restartBtn { background: #007bff; color: white; }
 .endBtn { background: #dc3545; color: white; }
-
-.flash { animation: flash 0.3s infinite alternate; }
-
-@keyframes flash {
-    from { opacity: 1; }
-    to { opacity: 0.4; }
-}
 
 .confetti {
     position: fixed;
@@ -113,11 +109,7 @@ button {
 }
 
 @keyframes fall {
-    to { transform: translateY(100vh) rotate(360deg); opacity: 0; }
-}
-
-@media(max-width:768px){
-    #questionBox { font-size: 18px; }
+    to { transform: translateY(100vh); opacity: 0; }
 }
 </style>
 </head>
@@ -131,7 +123,19 @@ button {
 
 <!-- TOPIC -->
 <div id="topicScreen" class="screen">
-    🌟 Nouns Master Challenge 🌟
+    🌟 Noun Explorer Challenge 🌟
+</div>
+
+<!-- INSTRUCTION -->
+<div id="instructionScreen" class="screen">
+    <h2>🎯 How to Play</h2>
+    <p>
+        Read each sentence carefully.<br><br>
+        The <b>highlighted word</b> is the noun to focus on.<br><br>
+        Tap the correct type of noun.<br>
+        Earn points and reach the winning level 🏆
+    </p>
+    <button class="startBtn" onclick="startGame()">Start Game</button>
 </div>
 
 <!-- GAME -->
@@ -140,11 +144,6 @@ button {
     <div class="header">
         <div id="qCount">1/10</div>
         <div id="timer">80</div>
-    </div>
-
-    <div style="padding:10px;">
-        Volume:
-        <input type="range" id="volume" min="0" max="1" step="0.1" value="1">
     </div>
 
     <div id="questionBox"></div>
@@ -166,70 +165,65 @@ button {
 
 <audio id="correctSound" src="assets/correct.mp3"></audio>
 <audio id="wrongSound" src="assets/wrong.mp3"></audio>
-<audio id="clapSound" src="assets/clapping.mp3"></audio>
 
 <script>
 
-/* ---------------- YOUR QUESTIONS ---------------- */
+/* ---------------- QUESTIONS WITH BOLD WORDS ---------------- */
 let questions = [
 {
-q:"The committee decided to organize a science fair. Identify the noun type.",
+q:"The <b>committee</b> decided to organize a science fair.",
 options:["Common Noun","Proper Noun","Collective Noun","Abstract Noun"],
 answer:2
 },
 {
-q:"Copper is used to make electrical wires. Identify noun type of Copper.",
+q:"<b>Copper</b> is used to make electrical wires.",
 options:["Common Noun","Material Noun","Countable Noun","Collective Noun"],
 answer:1
 },
 {
-q:"Friendship becomes stronger when people trust each other.",
+q:"<b>Friendship</b> becomes stronger when people trust each other.",
 options:["Common Noun","Proper Noun","Material Noun","Abstract Noun"],
 answer:3
 },
 {
-q:"The children counted the ancient coins in the museum.",
+q:"The <b>children</b> visited the museum.",
 options:["Uncountable Noun","Collective Noun","Countable Noun","Material Noun"],
 answer:2
 },
 {
-q:"We need more sand to complete the desert model.",
+q:"We need more <b>sand</b> to complete the model.",
 options:["Material Noun","Countable Noun","Uncountable Noun","Collective Noun"],
 answer:2
 },
 {
-q:"Ms. Sharma encouraged students to debate.",
+q:"<b>Ms. Sharma</b> encouraged students.",
 options:["Common Noun","Collective Noun","Proper Noun","Abstract Noun"],
 answer:2
 },
 {
-q:"The garden behind our school is beautiful.",
+q:"The <b>garden</b> is filled with flowers.",
 options:["Common Noun","Proper Noun","Material Noun","Collective Noun"],
 answer:0
 },
 {
-q:"A fleet of ships arrived at the harbour.",
+q:"A <b>fleet</b> of ships arrived.",
 options:["Common Noun","Countable Noun","Material Noun","Collective Noun"],
 answer:3
 },
 {
-q:"Knowledge helps people make wise decisions.",
+q:"<b>Knowledge</b> helps people make wise decisions.",
 options:["Common Noun","Material Noun","Abstract Noun","Proper Noun"],
 answer:2
 },
 {
-q:"The temple floor was built using marble.",
+q:"The temple floor was built using <b>marble</b>.",
 options:["Countable Noun","Common Noun","Material Noun","Collective Noun"],
 answer:2
 }
 ];
 
-let current = 0;
-let score = 0;
-let time = 80;
-let timer;
-let totalTime = 0;
-let attempts = 0;
+let current=0, score=0, time=80, timer;
+let totalTime=0, attempts=0;
 
 /* ---------------- SPLASH FLOW ---------------- */
 setTimeout(()=>{
@@ -238,36 +232,40 @@ setTimeout(()=>{
 
     setTimeout(()=>{
         document.getElementById("topicScreen").style.display="none";
-        document.getElementById("gameContainer").style.display="block";
-        loadQuestion();
-        startTimer();
+        document.getElementById("instructionScreen").style.display="flex";
     },3000);
 
 },5000);
 
-/* ---------------- LOAD QUESTION ---------------- */
+/* ---------------- START GAME ---------------- */
+function startGame(){
+    document.getElementById("instructionScreen").style.display="none";
+    document.getElementById("gameContainer").style.display="block";
+    loadQuestion();
+}
+
+/* ---------------- LOAD ---------------- */
 function loadQuestion(){
-
     clearInterval(timer);
-    time = 80;
+    time=80;
 
-    if(current >= questions.length){
+    if(current>=questions.length){
         endGame();
         return;
     }
 
-    document.getElementById("qCount").innerText = (current+1)+"/10";
-    document.getElementById("questionBox").innerText = questions[current].q;
+    document.getElementById("qCount") .innerText=(current+1)+"/10";
+    document.getElementById("questionBox").innerHTML=questions[current].q;
 
-    let box = document.getElementById("options");
-    box.innerHTML = "";
+    let box=document.getElementById("options");
+    box.innerHTML="";
 
     questions[current].options.forEach((opt,i)=>{
-        let div = document.createElement("div");
-        div.className="option";
-        div.innerText = opt;
-        div.onclick = ()=>check(i);
-        box.appendChild(div);
+        let d=document.createElement("div");
+        d.className="option";
+        d.innerText=opt;
+        d.onclick=()=>check(i);
+        box.appendChild(d);
     });
 
     startTimer();
@@ -275,17 +273,11 @@ function loadQuestion(){
 
 /* ---------------- TIMER ---------------- */
 function startTimer(){
-    document.getElementById("timer").innerText = time;
+    document.getElementById("timer").innerText=time;
 
-    timer = setInterval(()=>{
-        time--;
-        totalTime++;
-
-        document.getElementById("timer").innerText = time;
-
-        if(time<=10){
-            document.getElementById("timer").classList.add("flash");
-        }
+    timer=setInterval(()=>{
+        time--; totalTime++;
+        document.getElementById("timer").innerText=time;
 
         if(time<=0){
             current++;
@@ -294,39 +286,36 @@ function startTimer(){
     },1000);
 }
 
-/* ---------------- CHECK ANSWER ---------------- */
+/* ---------------- CHECK ---------------- */
 function check(i){
-    let vol = document.getElementById("volume").value;
-
-    correctSound.volume = vol;
-    wrongSound.volume = vol;
-    clapSound.volume = vol;
-
-    if(i === questions[current].answer){
+    if(i===questions[current].answer){
         score++;
-        correctSound.play();
-        confetti();
+        correct();
     } else {
         attempts++;
-        wrongSound.play();
+        wrong();
     }
 
     setTimeout(()=>{
         current++;
         loadQuestion();
-    },700);
+    },600);
 }
 
-/* ---------------- CONFETTI ---------------- */
-function confetti(){
-    for(let i=0;i<25;i++){
+function correct(){
+    document.getElementById("correctSound").play();
+    for(let i=0;i<20;i++){
         let c=document.createElement("div");
         c.className="confetti";
         c.style.left=Math.random()*100+"vw";
-        c.style.background=["#ff4d6d","#ffd166","#06d6a0","#4d96ff"][Math.floor(Math.random()*4)];
+        c.style.background=["#ff4d6d","#ffd166","#06d6a0","#4d96ff"][Math.random()*4|0];
         document.body.appendChild(c);
         setTimeout(()=>c.remove(),2000);
     }
+}
+
+function wrong(){
+    document.getElementById("wrongSound").play();
 }
 
 /* ---------------- END ---------------- */
@@ -335,34 +324,31 @@ function endGame(){
     document.getElementById("gameContainer").style.display="none";
     document.getElementById("finalScreen").style.display="block";
 
-    let percent = (score/questions.length)*100;
+    let percent=(score/questions.length)*100;
 
-    let remark =
+    let remark=
         percent>=80?"Excellent 🌟":
         percent>=60?"Good Job 👍":
         percent>=45?"Well Tried 🙂":
-        "Let's revise and come back 📘";
+        "Let's revise 📘";
 
-    document.getElementById("scoreText").innerText =
-        `Score: ${score}/${questions.length}`;
+    document.getElementById("scoreText").innerText=
+        `Score: ${score}/10`;
 
-    document.getElementById("remark").innerText = remark;
-    document.getElementById("timeTaken").innerText = "Time Taken: " + totalTime + " sec";
-    document.getElementById("attempts").innerText = "Wrong Attempts: " + attempts;
+    document.getElementById("remark").innerText=remark;
+    document.getElementById("timeTaken").innerText="Time: "+totalTime+" sec";
+    document.getElementById("attempts").innerText="Wrong Attempts: "+attempts;
 }
 
 /* ---------------- RESTART ---------------- */
 function restartGame(){
-    current=0;
-    score=0;
-    time=80;
-    totalTime=0;
-    attempts=0;
+    current=0; score=0; time=80;
+    totalTime=0; attempts=0;
     document.getElementById("finalScreen").style.display="none";
     document.getElementById("gameContainer").style.display="block";
     loadQuestion();
 }
-</script>
 
+</script>
 </body>
 </html>
