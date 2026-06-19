@@ -1,36 +1,35 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Grammar Factory - Present Tense</title>
+<title>Grammar Factory - Present Tenses</title>
 
 <style>
 body{
 margin:0;
-font-family:Arial;
+font-family:Arial,sans-serif;
 background:linear-gradient(135deg,#1d2671,#c33764,#3a7bd5);
-overflow:hidden;
-color:white;
+color:#fff;
+overflow-x:hidden;
 }
 
 /* SCREENS */
 .screen{
-position:fixed;
-inset:0;
-display:flex;
+display:none;
+height:100vh;
+width:100%;
 align-items:center;
 justify-content:center;
 flex-direction:column;
 text-align:center;
+padding:15px;
+box-sizing:border-box;
 }
-
-.hidden{display:none;}
+.active{display:flex;}
 
 /* LOGO */
-#logoScreen{
-background:white;
-}
 #logoScreen img{
 width:220px;
 animation:pop 1s ease;
@@ -42,246 +41,284 @@ to{transform:scale(1);opacity:1;}
 }
 
 /* TITLE */
-#titleScreen h1{
-font-size:40px;
-animation:pulse 1s infinite;
-}
-
-@keyframes pulse{
-0%{transform:scale(1);}
-50%{transform:scale(1.05);}
-100%{transform:scale(1);}
-}
-
-/* GAME */
-#gameScreen{
-flex-direction:column;
-padding-top:60px;
-}
-
-#score{
-position:fixed;
-top:10px;
-left:10px;
-font-size:18px;
+.title{
+font-size:30px;
 font-weight:bold;
+animation:flash 1s infinite alternate;
 }
 
-#instruction{
-font-size:18px;
-margin-bottom:10px;
-opacity:0.9;
+@keyframes flash{
+from{transform:scale(1);opacity:0.7;}
+to{transform:scale(1.1);opacity:1;}
 }
 
-#sentence{
-font-size:22px;
-font-weight:bold;
-margin:10px;
-padding:10px;
-}
-
-/* OPTIONS */
-#options{
-display:flex;
-flex-wrap:wrap;
-justify-content:center;
-gap:10px;
+/* FACTORY */
+.factory{
+display:grid;
+grid-template-columns:repeat(2,1fr);
+gap:15px;
+width:100%;
+max-width:600px;
 margin-top:20px;
 }
 
-.option{
-background:white;
-color:black;
-padding:12px;
-border-radius:10px;
-cursor:pointer;
-min-width:220px;
-font-weight:bold;
-transition:0.2s;
-}
-
-.option:active{transform:scale(0.95);}
-
-.correct{background:#2ecc71 !important;color:white;}
-.wrong{background:#e74c3c !important;color:white;}
-
-/* POPUP */
-#popup{
-position:fixed;
-top:50%;
-left:50%;
-transform:translate(-50%,-50%);
+.machine{
 padding:20px;
-border-radius:10px;
-font-size:22px;
-display:none;
-z-index:9999;
-color:white;
+border-radius:15px;
+font-weight:bold;
+cursor:pointer;
+transition:0.3s;
+box-shadow:0 5px 15px rgba(0,0,0,0.3);
 }
 
-/* BUTTON */
+.simple{background:#3498db;}
+.continuous{background:#2ecc71;}
+.perfect{background:#f1c40f;color:#000;}
+.perfectC{background:#9b59b6;}
+
+.machine.correct{
+background:#2ecc71 !important;
+}
+
+.machine.wrong{
+animation:shake 0.4s;
+}
+
+@keyframes shake{
+0%,100%{transform:translateX(0);}
+25%{transform:translateX(-6px);}
+75%{transform:translateX(6px);}
+}
+
+/* CONVEYOR */
+.conveyor{
+background:rgba(0,0,0,0.4);
+padding:15px;
+border-radius:10px;
+margin-top:15px;
+width:90%;
+max-width:700px;
+}
+
+.sentence{
+font-size:20px;
+font-weight:bold;
+animation:slide 0.5s ease;
+}
+
+@keyframes slide{
+from{transform:translateX(-200px);opacity:0;}
+to{transform:translateX(0);opacity:1;}
+}
+
+/* SCORE */
+.score{
+font-size:18px;
+margin-top:10px;
+}
+
+/* CONFETTI */
+.confetti{
+position:fixed;
+width:8px;
+height:8px;
+top:-10px;
+animation:fall 2s linear forwards;
+}
+
+@keyframes fall{
+to{
+transform:translateY(100vh) rotate(360deg);
+opacity:0;
+}
+}
+
 button{
-padding:12px 20px;
+padding:12px 18px;
 border:none;
 border-radius:10px;
-background:#ffca28;
+background:#ff9800;
+color:#fff;
 font-weight:bold;
-cursor:pointer;
+margin-top:10px;
 }
 </style>
 </head>
 
 <body>
 
-<!-- LOGO -->
-<div id="logoScreen" class="screen">
+<!-- 🔵 LOGO (FIXED PATH) -->
+<div id="logoScreen" class="screen active">
 <img src="assets/innovine-logo.png">
 </div>
 
-<!-- TITLE -->
-<div id="titleScreen" class="screen hidden">
-<div>
-<h1>🏭 Grammar Factory</h1>
-<p>Present Tense Challenge</p>
-<button onclick="startGame()">Start</button>
-</div>
+<!-- 🟡 TITLE -->
+<div id="titleScreen" class="screen">
+<div class="title">🏭 Grammar Factory – Present Tenses</div>
+<button onclick="startGame()">Start Machine</button>
 </div>
 
-<!-- GAME -->
-<div id="gameScreen" class="screen hidden">
+<!-- 🟢 GAME -->
+<div id="gameScreen" class="screen">
 
-<div id="score">Score: 0</div>
+<div class="score">Score: <span id="score">0</span></div>
 
-<div id="instruction">👉 Identify the tense used in the sentence</div>
+<div class="conveyor">
+<div id="sentence" class="sentence"></div>
+</div>
 
-<div id="sentence"></div>
+<div class="factory">
 
-<div id="options"></div>
+<div class="machine simple" onclick="check('Present Simple',this)">Present Simple</div>
+<div class="machine continuous" onclick="check('Present Continuous',this)">Present Continuous</div>
+<div class="machine perfect" onclick="check('Present Perfect',this)">Present Perfect</div>
+<div class="machine perfectC" onclick="check('Present Perfect Continuous',this)">Present Perfect Continuous</div>
 
 </div>
 
-<!-- POPUP -->
-<div id="popup"></div>
+</div>
+
+<!-- 🏁 END -->
+<div id="endScreen" class="screen">
+<h2>🎉 Factory Complete!</h2>
+<div id="finalScore"></div>
+<button onclick="location.reload()">Restart</button>
+</div>
+
+<!-- AUDIO (FIXED SAFE PLAY) -->
+<audio id="correctSound" src="assets/correct.mp3"></audio>
+<audio id="wrongSound" src="assets/wrong.mp3"></audio>
+<audio id="clapSound" src="assets/clapping.mp3"></audio>
 
 <script>
 
-/* ================= CLEAN FLOW ================= */
-setTimeout(()=>{
-document.getElementById("logoScreen").classList.add("hidden");
-document.getElementById("titleScreen").classList.remove("hidden");
-},5000);
-
-/* ================= QUESTION BANK ================= */
-const questions = [
-{q:"She goes to school by bus every day.",a:"Present Simple",hint:"Habit or routine",exp:"Used for regular actions"},
-{q:"He has been studying for three hours.",a:"Present Perfect Continuous",hint:"Ongoing action",exp:"Action continuing over time"},
-{q:"They are playing football now.",a:"Present Continuous",hint:"happening now",exp:"Action in progress"},
-{q:"We have visited Jaipur twice.",a:"Present Perfect",hint:"past experience",exp:"Past action with present relevance"},
-{q:"The Earth moves around the Sun.",a:"Present Simple",hint:"universal truth",exp:"Scientific fact"}
+/* ================= QUESTIONS ================= */
+const allQ=[
+{q:"She goes to school by bus every day.",ans:"Present Simple"},
+{q:"They are playing football in the playground now.",ans:"Present Continuous"},
+{q:"I have finished my homework.",ans:"Present Perfect"},
+{q:"He has been studying for three hours.",ans:"Present Perfect Continuous"},
+{q:"My father works in a bank.",ans:"Present Simple"},
+{q:"Look! The baby is sleeping.",ans:"Present Continuous"},
+{q:"We have visited Jaipur twice.",ans:"Present Perfect"},
+{q:"It has been raining since morning.",ans:"Present Perfect Continuous"},
+{q:"The Earth moves around the Sun.",ans:"Present Simple"},
+{q:"She is preparing for her English test this week.",ans:"Present Continuous"},
+{q:"My sister has written three letters today.",ans:"Present Perfect"},
+{q:"They have been practising for the competition since Monday.",ans:"Present Perfect Continuous"}
 ];
 
-let qBank = questions.sort(()=>Math.random()-0.5);
+function shuffle(a){return a.sort(()=>Math.random()-0.5);}
+let qBank = shuffle(allQ).slice(0,10);
+
 let i=0;
 let score=0;
 let attempts=2;
 
-/* ================= START ================= */
-function startGame(){
-document.getElementById("titleScreen").classList.add("hidden");
-document.getElementById("gameScreen").classList.remove("hidden");
-loadQ();
+/* ================= SAFE AUDIO ================= */
+function playAudio(a){
+a.currentTime=0;
+a.play().catch(()=>{});
 }
 
-/* ================= LOAD QUESTION (SAFE - NO BUGS) ================= */
-function loadQ(){
+/* ================= INTRO FLOW ================= */
+window.onload=()=>{
+setTimeout(()=>{
+document.getElementById("logoScreen").classList.remove("active");
+document.getElementById("titleScreen").classList.add("active");
+},5000);
+};
+
+function startGame(){
+document.getElementById("titleScreen").classList.remove("active");
+document.getElementById("gameScreen").classList.add("active");
+load();
+}
+
+/* ================= LOAD ================= */
+function load(){
 
 if(i>=qBank.length){
-endGame();
+end();
 return;
 }
 
 attempts=2;
-
-document.getElementById("score").innerText="Score: "+score;
 document.getElementById("sentence").innerText=qBank[i].q;
-
-const box=document.getElementById("options");
-box.innerHTML="";
-
-const opts=[
-"Present Simple",
-"Present Continuous",
-"Present Perfect",
-"Present Perfect Continuous"
-];
-
-opts.forEach(opt=>{
-const div=document.createElement("div");
-div.className="option";
-div.innerText=opt;
-
-div.onclick=()=>check(opt,div);
-
-box.appendChild(div);
-});
 }
 
-/* ================= CHECK LOGIC ================= */
+/* ================= CHECK ================= */
 function check(ans,el){
 
-let correct=qBank[i].a;
+let correct=qBank[i].ans;
+
+reset();
 
 if(ans===correct){
 
 score++;
-showPopup("Correct 🎉","green");
-el.classList.add("correct");
+document.getElementById("score").innerText=score;
 
-setTimeout(()=>{
-i++;
-loadQ();
-},900);
+el.classList.add("correct");
+playAudio(document.getElementById("correctSound"));
+playAudio(document.getElementById("clapSound"));
+
+confetti();
+
+setTimeout(()=>{i++;load();},900);
 
 }else{
 
+el.classList.add("wrong");
+playAudio(document.getElementById("wrongSound"));
+
 attempts--;
 
-if(attempts===1){
-showPopup("Hint: "+qBank[i].hint,"orange");
+if(attempts<=0){
+highlight(correct);
+setTimeout(()=>{i++;load();},1500);
 }
-else{
-showPopup("Answer: "+correct+" | "+qBank[i].exp,"red");
-
-setTimeout(()=>{
-i++;
-loadQ();
-},1500);
-}
-
-el.classList.add("wrong");
 }
 }
 
-/* ================= POPUP ================= */
-function showPopup(text,color){
+function reset(){
+document.querySelectorAll(".machine").forEach(m=>{
+m.classList.remove("correct","wrong");
+});
+}
 
-let p=document.getElementById("popup");
-p.innerText=text;
-p.style.background=color;
-p.style.display="block";
+function highlight(correct){
+document.querySelectorAll(".machine").forEach(m=>{
+if(m.innerText.includes(correct.split(" ")[1])){
+m.classList.add("correct");
+}
+});
+}
 
-setTimeout(()=>p.style.display="none",1200);
+/* ================= CONFETTI ================= */
+function confetti(){
+for(let i=0;i<25;i++){
+let c=document.createElement("div");
+c.className="confetti";
+c.style.left=Math.random()*100+"vw";
+c.style.background=["#ff0","#0ff","#f0f","#0f0","#f60"][Math.floor(Math.random()*5)];
+document.body.appendChild(c);
+setTimeout(()=>c.remove(),2000);
+}
 }
 
 /* ================= END ================= */
-function endGame(){
+function end(){
 
-document.getElementById("gameScreen").innerHTML=`
-<h2>🎉 Game Completed</h2>
-<h3>Score: ${score} / ${qBank.length}</h3>
-<button onclick="location.reload()">Restart</button>
-`;
+document.getElementById("gameScreen").classList.remove("active");
+document.getElementById("endScreen").classList.add("active");
 
+let percent=(score/qBank.length)*100;
+
+document.getElementById("finalScore").innerText=
+`You scored ${score} / ${qBank.length * 10}`;
+
+playAudio(document.getElementById("clapSound"));
 }
 
 </script>
