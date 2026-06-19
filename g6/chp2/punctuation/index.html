@@ -3,42 +3,43 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Punctuation Power Dashboard - Grade 6</title>
+<title>Punctuation Power Game FIXED</title>
 
 <style>
 body {
   margin: 0;
-  font-family: Arial, sans-serif;
-  background: radial-gradient(circle at top left, #a1c4fd, #c2e9fb, #fbc2eb, #fad0c4);
-  animation: bg 12s ease infinite;
+  font-family: Arial;
+  background: linear-gradient(135deg,#ffecd2,#fcb69f,#a1c4fd,#c2e9fb);
   overflow: hidden;
 }
 
-@keyframes bg {
-  0% {background-position:0% 50%;}
-  50% {background-position:100% 50%;}
-  100% {background-position:0% 50%;}
-}
-
-#splash {
+/* SPLASH */
+#splash, #topicScreen, #startScreen {
   position: fixed;
   inset: 0;
-  background: white;
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-direction: column;
+  background: white;
   z-index: 9999;
-}
-
-.header {
   text-align: center;
-  padding: 10px;
-  font-weight: bold;
 }
 
+#topicScreen { display: none; font-size: 28px; font-weight: bold; }
+#startScreen { display: none; }
+
+/* GAME */
 #game {
   display: none;
   padding: 10px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  font-weight: bold;
 }
 
 .container {
@@ -48,7 +49,7 @@ body {
 
 .left {
   width: 55%;
-  background: rgba(255,255,255,0.5);
+  background: rgba(255,255,255,0.6);
   border-radius: 12px;
   padding: 10px;
 }
@@ -59,158 +60,229 @@ body {
   margin: 8px;
   border-radius: 10px;
   cursor: grab;
-  font-size: 15px;
 }
 
 .right {
   width: 45%;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.kpi {
-  background: white;
-  padding: 10px;
-  border-radius: 10px;
-  text-align: center;
 }
 
 .bucket {
-  min-height: 70px;
   background: rgba(255,255,255,0.6);
   border: 2px dashed #333;
   border-radius: 10px;
   padding: 10px;
-  font-weight: bold;
+  margin-bottom: 10px;
+  min-height: 60px;
 }
 
-#feedback {
+/* END */
+#endScreen {
+  display: none;
+  position: fixed;
+  inset: 0;
   background: white;
-  padding: 10px;
-  border-radius: 10px;
+  z-index: 9999;
   text-align: center;
+  padding: 20px;
+}
+
+button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 10px;
+  margin: 10px;
+  cursor: pointer;
+}
+
+/* CONFETTI */
+.confetti {
+  position: fixed;
+  width: 8px;
+  height: 8px;
+  top: 0;
+  animation: fall 2s linear forwards;
+}
+
+@keyframes fall {
+  to { transform: translateY(100vh); opacity: 0; }
 }
 </style>
 </head>
 
 <body>
 
-<!-- SPLASH -->
+<!-- SPLASH (FIXED LOGO PATH) -->
 <div id="splash">
-  <img src="assets/logo.png" width="200">
+  <img src="71824359-f243-48be-bf6f-db272e2d66a2.png" width="200">
+</div>
+
+<!-- TOPIC -->
+<div id="topicScreen">
+  🎉 PUNCTUATION POWER CHALLENGE 🎉
+</div>
+
+<!-- START -->
+<div id="startScreen">
+  <h2>Ready to Play?</h2>
+  <button onclick="startGame()">START GAME</button>
 </div>
 
 <!-- GAME -->
 <div id="game">
 
-  <div class="header">
-    Punctuation & Capitalisation Mastery <br>
-    <small>Grade 6 Grammar Challenge</small><br>
-    <b id="progress">Progress: 0 / 15</b>
-  </div>
-
-  <div class="container">
-
-    <div class="left" id="sentences"></div>
-
-    <div class="right">
-
-      <div class="kpi" id="kpi">Accuracy: 0%</div>
-
-      <div class="bucket" data-type="?">Question Mark (?)</div>
-      <div class="bucket" data-type="!">Exclamation (!)</div>
-      <div class="bucket" data-type=".">Full Stop (.)</div>
-      <div class="bucket" data-type=",">Comma (,)</div>
-
-      <div id="feedback">Drag sentences into correct punctuation buckets</div>
-
-    </div>
+<div class="header">
+  <div id="progress">0 / 15</div>
+  <div>
+    🔊 <input type="range" id="vol" min="0" max="1" step="0.1" value="1">
   </div>
 </div>
 
+<div class="container">
+
+  <div class="left" id="list"></div>
+
+  <div class="right">
+    <div class="bucket" data="?" >?</div>
+    <div class="bucket" data="!">!</div>
+    <div class="bucket" data=".">.</div>
+    <div class="bucket" data=",">,</div>
+  </div>
+
+</div>
+</div>
+
+<!-- END SCREEN -->
+<div id="endScreen">
+  <h1>🏆 Trophy Unlocked!</h1>
+  <h2 id="scoreText"></h2>
+  <p id="remark"></p>
+  <button onclick="location.reload()">RESTART</button>
+</div>
+
+<!-- AUDIO (FIXED PATHS) -->
+<audio id="correct" src="assets/correct.mp3"></audio>
+<audio id="wrong" src="assets/wrong.mp3"></audio>
+<audio id="clap" src="assets/clapping.mp3"></audio>
+
 <script>
 
-/* ===================== GRADE 6 QUESTIONS ===================== */
-/* Includes punctuation + CAPITALISATION logic */
-
+/* FIXED GRADE 6 SET */
 const data = [
-{t:"what time does the train arrive in delhi", type:"?"},
-{t:"how incredibly talented that young musician is", type:"!"},
-{t:"the principal announced the results during assembly", type:"."},
-{t:"if you finish your homework early you can watch tv", type:","},
+{t:"Where are you going",type:"?"},
+{t:"What a beautiful day it is",type:"!"},
+{t:"The students completed the assignment on time",type:"."},
+{t:"After finishing homework he went out to play",type:","},
 
-{t:"where did anita and rohan go after school", type:"?"},
-{t:"what a breathtaking view of the mountains", type:"!"},
-{t:"the students submitted their projects on time", type:"."},
-{t:"although it was raining heavily the match continued", type:","},
+{t:"Why is the teacher absent today",type:"?"},
+{t:"How amazing this performance was",type:"!"},
+{t:"She is reading a novel in the library",type:"."},
+{t:"Although it was late they continued studying",type:","},
 
-{t:"why is mr sharma absent today", type:"?"},
-{t:"that was the most exciting performance ever", type:"!"},
-{t:"the teacher explained the lesson clearly to everyone", type:"."},
-{t:"since we were late we missed the beginning of the movie", type:","},
+{t:"Can you solve this puzzle",type:"?"},
+{t:"What an incredible achievement",type:"!"},
+{t:"The sun rises in the east",type:"."},
+{t:"If you work hard you will succeed",type:","},
 
-{t:"can you believe how fast time flies", type:"?"},
-{t:"what an amazing achievement by the school team", type:"!"},
-{t:"the scientists discovered a new species in the amazon forest", type:"."}
+{t:"Did you complete your project",type:"?"},
+{t:"That is absolutely fantastic",type:"!"},
+{t:"He went to school early this morning",type:"."}
 ];
 
-let correct = 0;
+let correct=0;
 
-const box = document.getElementById("sentences");
-const progress = document.getElementById("progress");
-const kpi = document.getElementById("kpi");
-const feedback = document.getElementById("feedback");
-
-/* LOAD */
-function load(){
-  box.innerHTML = "";
+function shuffle(){
+  let box=document.getElementById("list");
+  box.innerHTML="";
 
   data.forEach(d=>{
-    let div = document.createElement("div");
-    div.className = "sentence";
-    div.draggable = true;
-    div.innerText = d.t;
-    div.dataset.type = d.type;
+    let div=document.createElement("div");
+    div.className="sentence";
+    div.draggable=true;
+    div.innerText=d.t;
 
-    div.ondragstart = e=>{
-      e.dataTransfer.setData("text", JSON.stringify(d));
+    div.ondragstart=(e)=>{
+      e.dataTransfer.setData("text",JSON.stringify(d));
     };
 
     box.appendChild(div);
   });
 }
 
-/* BUCKETS */
 document.querySelectorAll(".bucket").forEach(b=>{
-  b.ondragover = e=>e.preventDefault();
+  b.ondragover=e=>e.preventDefault();
 
-  b.ondrop = e=>{
-    let d = JSON.parse(e.dataTransfer.getData("text"));
+  b.ondrop=e=>{
+    let d=JSON.parse(e.dataTransfer.getData("text"));
 
-    if(d.type === b.dataset.type){
+    let vol=document.getElementById("vol").value;
+
+    correctSound.volume=vol;
+    wrongSound.volume=vol;
+    clapSound.volume=vol;
+
+    if(d.type==b.dataset){
       correct++;
-      feedback.innerText = "Correct ✔ Excellent punctuation + grammar!";
+      correctSound.play();
+      confetti();
     } else {
-      feedback.innerText = "Try again ✖ Think about sentence meaning & structure";
+      wrongSound.play();
     }
 
-    progress.innerText = `Progress: ${correct} / 15`;
-    kpi.innerText = `Accuracy: ${Math.round((correct/15)*100)}%`;
+    document.getElementById("progress").innerText=correct+"/15";
 
     data.splice(data.findIndex(x=>x.t===d.t),1);
-    load();
+    shuffle();
+
+    if(correct===15){
+      endGame();
+    }
   };
 });
 
-/* SPLASH */
-window.onload = ()=>{
+/* SPLASH FLOW FIXED */
+setTimeout(()=>{
+  document.getElementById("splash").style.display="none";
+  document.getElementById("topicScreen").style.display="flex";
+
   setTimeout(()=>{
-    document.getElementById("splash").style.display="none";
-    document.getElementById("game").style.display="block";
-    load();
+    document.getElementById("topicScreen").style.display="none";
+    document.getElementById("startScreen").style.display="flex";
   },3000);
-};
+
+},5000);
+
+/* START GAME */
+function startGame(){
+  document.getElementById("startScreen").style.display="none";
+  document.getElementById("game").style.display="block";
+  shuffle();
+}
+
+/* CONFETTI FIXED */
+function confetti(){
+  for(let i=0;i<25;i++){
+    let c=document.createElement("div");
+    c.className="confetti";
+    c.style.left=Math.random()*100+"vw";
+    c.style.background=["red","blue","yellow","green"][Math.random()*4|0];
+    document.body.appendChild(c);
+    setTimeout(()=>c.remove(),2000);
+  }
+}
+
+/* END SCREEN WITH TROPHY */
+function endGame(){
+  document.getElementById("game").style.display="none";
+  document.getElementById("endScreen").style.display="block";
+
+  let percent=100;
+
+  document.getElementById("scoreText").innerText=
+    "Score: "+correct+"/15";
+
+  document.getElementById("remark").innerText=
+    "Excellent Performance 🎉 You reached the Trophy Zone!";
+}
 
 </script>
 
