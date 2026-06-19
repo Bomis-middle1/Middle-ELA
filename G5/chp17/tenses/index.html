@@ -9,56 +9,63 @@ body{
   margin:0;
   font-family:Arial;
   background:#070b1a;
-  color:white;
   overflow:hidden;
+  color:white;
 }
 
 /* SPLASH */
 #splash{
   position:fixed;
   inset:0;
-  background:white;
+  background:#fff;
   display:flex;
   justify-content:center;
   align-items:center;
-  z-index:9999;
+  z-index:999;
 }
-#splash img{width:320px}
+#splash img{width:300px}
 
 /* HEADER */
-#topBar{
+#header{
   text-align:center;
   padding:10px;
 }
 
 h1{
-  color:#facc15;
   margin:5px;
+  color:#facc15;
 }
 
-/* JOURNEY */
+/* JOURNEY BAR (FIXED STYLE) */
 #journey{
   display:flex;
   justify-content:center;
-  gap:8px;
-  margin:10px;
+  gap:10px;
+  margin:10px auto;
   flex-wrap:wrap;
 }
 
 .node{
-  width:22px;
-  height:22px;
+  width:24px;
+  height:24px;
   border-radius:50%;
   background:#334155;
   display:flex;
-  justify-content:center;
   align-items:center;
-  font-size:10px;
+  justify-content:center;
+  font-size:11px;
+  transition:0.3s;
 }
 
-.active{
+.node.active{
   background:#22c55e;
   box-shadow:0 0 10px #22c55e;
+}
+
+/* SCORE BAR */
+#info{
+  text-align:center;
+  font-size:14px;
 }
 
 /* GAME AREA */
@@ -66,23 +73,23 @@ h1{
   display:flex;
   justify-content:center;
   align-items:center;
-  height:65vh;
+  height:70vh;
 }
 
-/* MAZE */
 #maze{
   width:90%;
-  height:420px;
+  height:450px;
   border:2px solid #334155;
   position:relative;
   overflow:hidden;
 }
 
+/* PLAYER */
 #player{
   width:18px;
   height:18px;
-  border-radius:50%;
   background:gold;
+  border-radius:50%;
   position:absolute;
   top:50%;
   left:50%;
@@ -100,20 +107,21 @@ h1{
 /* QUESTION BOX */
 #qbox{
   position:fixed;
-  top:20%;
+  top:18%;
   left:50%;
   transform:translateX(-50%);
+  width:80%;
   background:#111827;
   padding:15px;
   border-radius:10px;
-  width:80%;
   display:none;
+  z-index:10;
 }
 
 .option{
   background:#1f2937;
-  padding:10px;
   margin:6px 0;
+  padding:10px;
   border-radius:6px;
   cursor:pointer;
 }
@@ -127,11 +135,14 @@ h1{
   <img src="assets/logo.png">
 </div>
 
-<div id="topBar">
+<div id="header">
   <h1>⏳ Tense Time Maze Adventure</h1>
-  <div>Score: <span id="score">0</span> | Zone: <span id="zone">Present</span></div>
+  <div id="info">
+    Score: <span id="score">0</span> | Zone: <span id="zone">Present</span>
+  </div>
 </div>
 
+<!-- JOURNEY -->
 <div id="journey"></div>
 
 <div id="gameArea">
@@ -140,6 +151,7 @@ h1{
   </div>
 </div>
 
+<!-- QUESTION -->
 <div id="qbox">
   <div id="q"></div>
   <div id="opts"></div>
@@ -150,124 +162,120 @@ h1{
 
 <script>
 
-/* ================= JOURNEY ================= */
+/* ---------------- JOURNEY ---------------- */
 const journey=document.getElementById("journey");
+
 for(let i=1;i<=15;i++){
-  let d=document.createElement("div");
-  d.className="node";
-  d.innerText=i;
-  journey.appendChild(d);
+  let n=document.createElement("div");
+  n.className="node";
+  n.innerText=i;
+  journey.appendChild(n);
 }
 
-let currentNode=0;
+/* ---------------- STATE ---------------- */
+let player=document.getElementById("player");
+let maze=document.getElementById("maze");
+let qbox=document.getElementById("qbox");
+let q=document.getElementById("q");
+let opts=document.getElementById("opts");
 
-/* ================= STATE ================= */
 let score=0;
-let starCount=0;
-let qIndex=0;
+let stars=0;
+let index=0;
 
-const zones=["Present","Past","Future"];
-
-/* ================= HOTS TENSE QUESTIONS ================= */
+/* ---------------- QUESTIONS (HOTS TENSES) ---------------- */
 const questions=[
 {
-q:"If she ___ harder, she would have passed the exam.",
+q:"If she ___ harder, she would have passed.",
 opts:["studies","had studied","studied","has studied"],
 ans:1
 },
 {
-q:"By next year, they ___ the project.",
-opts:["complete","will complete","will have completed","completed"],
+q:"By tomorrow, I ___ the work.",
+opts:["finish","will finish","will have finished","finished"],
 ans:2
 },
 {
-q:"He said that he ___ waiting for hours.",
+q:"He said that he ___ tired.",
 opts:["is","was","has been","will be"],
 ans:1
 },
 {
-q:"If I were you, I ___ that decision.",
-opts:["won't make","wouldn't make","didn't make","don't make"],
+q:"If I were rich, I ___ a school.",
+opts:["build","would build","built","will build"],
 ans:1
 },
 {
-q:"The train ___ before we reached the station.",
+q:"They ___ football when it started raining.",
+opts:["play","were playing","played","are playing"],
+ans:1
+},
+{
+q:"She ___ English every day.",
+opts:["study","studies","studied","is studying"],
+ans:1
+},
+{
+q:"The train ___ before we arrived.",
 opts:["left","had left","leaves","will leave"],
 ans:1
 },
 {
-q:"She ___ her homework every day.",
-opts:["do","does","done","did"],
-ans:1
+q:"If it rains, we ___ stay home.",
+opts:["will","would","did","do"],
+ans:0
 },
 {
-q:"They ___ dinner when I called them.",
-opts:["are having","were having","have","had"],
-ans:1
-},
-{
-q:"If it rains, we ___ the match.",
-opts:["cancel","will cancel","cancelled","cancels"],
-ans:1
-},
-{
-q:"He said he ___ come early.",
+q:"He said he ___ come later.",
 opts:["will","would","shall","can"],
 ans:1
 },
 {
-q:"By 2050, humans ___ Mars.",
-opts:["colonise","will colonise","will have colonised","colonised"],
+q:"By 2030, scientists ___ Mars.",
+opts:["reach","will reach","will have reached","reached"],
 ans:2
 },
 {
 q:"She ___ since morning.",
-opts:["works","has been working","worked","is working"],
+opts:["works","has been working","worked","is work"],
 ans:1
 },
 {
-q:"If they had left earlier, they ___ the bus.",
+q:"If they had left early, they ___ the bus.",
 opts:["catch","would catch","would have caught","caught"],
 ans:2
 },
 {
-q:"He ___ when I entered the room.",
+q:"He ___ when I entered.",
 opts:["sleeps","was sleeping","slept","has slept"],
 ans:1
 },
 {
-q:"They ___ football every evening.",
+q:"They ___ games every evening.",
 opts:["play","plays","playing","played"],
 ans:0
 },
 {
-q:"The movie ___ by the time we arrived.",
+q:"The movie ___ by the time we reached.",
 opts:["starts","had started","start","will start"],
 ans:1
 }
 ];
 
-/* ================= ELEMENTS ================= */
-const player=document.getElementById("player");
-const maze=document.getElementById("maze");
-const qbox=document.getElementById("qbox");
-const q=document.getElementById("q");
-const opts=document.getElementById("opts");
-
-/* ================= MOVE ================= */
+/* ---------------- MOVE ---------------- */
 document.addEventListener("keydown",(e)=>{
   let x=player.offsetLeft;
   let y=player.offsetTop;
 
-  if(e.key==="ArrowRight") player.style.left=(x+12)+"px";
-  if(e.key==="ArrowLeft") player.style.left=(x-12)+"px";
-  if(e.key==="ArrowUp") player.style.top=(y-12)+"px";
-  if(e.key==="ArrowDown") player.style.top=(y+12)+"px";
+  if(e.key==="ArrowRight")player.style.left=(x+10)+"px";
+  if(e.key==="ArrowLeft")player.style.left=(x-10)+"px";
+  if(e.key==="ArrowUp")player.style.top=(y-10)+"px";
+  if(e.key==="ArrowDown")player.style.top=(y-10)+"px";
 
-  checkStar();
+  checkCollision();
 });
 
-/* ================= STARS ================= */
+/* ---------------- STARS ---------------- */
 function spawnStar(){
   let s=document.createElement("div");
   s.className="star";
@@ -275,35 +283,37 @@ function spawnStar(){
   s.style.top=Math.random()*90+"%";
   maze.appendChild(s);
 }
-for(let i=0;i<5;i++) spawnStar();
+for(let i=0;i<6;i++)spawnStar();
 
-/* ================= COLLISION ================= */
-function checkStar(){
-  document.querySelectorAll(".star").forEach(s=>{
+/* ---------------- COLLISION ---------------- */
+function checkCollision(){
+  document.querySelectorAll(".star").forEach(st=>{
     let r1=player.getBoundingClientRect();
-    let r2=s.getBoundingClientRect();
+    let r2=st.getBoundingClientRect();
 
     if(!(r1.right<r2.left||r1.left>r2.right||r1.bottom<r2.top||r1.top>r2.bottom)){
-      s.remove();
-      starCount++;
+      st.remove();
+      stars++;
 
-      if(starCount>=3){
-        showQ();
+      if(stars>=3){
+        showQuestion();
       }
     }
   });
 }
 
-/* ================= QUESTION ================= */
-function showQ(){
+/* ---------------- QUESTION ---------------- */
+function showQuestion(){
   qbox.style.display="block";
 
-  let data=questions[qIndex];
+  let data=questions[index];
 
   q.innerText=data.q;
   opts.innerHTML="";
 
-  let shuffled=[...data.opts.map((o,i)=>({o,i}))].sort(()=>Math.random()-0.5);
+  let shuffled=data.opts
+    .map((o,i)=>({o,i}))
+    .sort(()=>Math.random()-0.5);
 
   shuffled.forEach(item=>{
     let div=document.createElement("div");
@@ -314,10 +324,10 @@ function showQ(){
       if(item.i===data.ans){
         score++;
         document.getElementById("correct").play();
-        currentNode++;
-        document.querySelectorAll(".node")[currentNode-1].classList.add("active");
+
+        document.querySelectorAll(".node")[index].classList.add("active");
         document.getElementById("score").innerText=score;
-      } else {
+      }else{
         document.getElementById("wrong").play();
       }
 
@@ -328,27 +338,23 @@ function showQ(){
   });
 }
 
-/* ================= NEXT ================= */
+/* ---------------- NEXT ---------------- */
 function next(){
   qbox.style.display="none";
-  starCount=0;
-  qIndex++;
+  stars=0;
+  index++;
 
-  if(qIndex>=questions.length){
-    alert("🎉 Tense Master Completed!");
+  if(index>=questions.length){
+    alert("🎉 Tense Master Complete!");
     location.reload();
     return;
   }
 
   spawnStar();
   spawnStar();
-  spawnStar();
-
-  document.getElementById("zone").innerText=
-    zones[qIndex%3];
 }
 
-/* ================= START ================= */
+/* ---------------- SPLASH ---------------- */
 setTimeout(()=>{
   document.getElementById("splash").style.display="none";
 },3000);
