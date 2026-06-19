@@ -2,184 +2,275 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tense Time Machine</title>
+<title>Tense Time Maze Adventure</title>
+
 <style>
-  body {
-    margin:0;
-    font-family: 'Segoe UI', sans-serif;
-    background: linear-gradient(to right, #a8e063, #56ab2f); /* lively green gradient */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-  }
+body{
+  margin:0;
+  font-family:Arial;
+  background:#0b1020;
+  color:white;
+  overflow:hidden;
+}
 
-  /* Splash */
-  #splash {
-    position: fixed; top:0; left:0; width:100%; height:100%;
-    background:#fff; display:flex; justify-content:center; align-items:center; z-index:100;
-  }
-  #splash img { width:300px; max-width:40%; }
+/* SPLASH */
+#splash{
+  position:fixed;
+  inset:0;
+  background:white;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  z-index:9999;
+}
+#splash img{width:350px}
 
-  /* Game container */
-  #game {
-    display:none;
-    width:700px; max-width:90%;
-    text-align:center;
-    background: rgba(255,255,255,0.95);
-    border-radius:20px;
-    padding:30px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.4);
-  }
+/* GAME AREA */
+#game{
+  display:none;
+  padding:10px;
+}
 
-  #score, #timer { 
-    font-size: 1.6rem; 
-    margin: 10px 0;
-    font-weight:bold;
-    color: #2b5d34;
-  }
+/* HEADER */
+h1{
+  text-align:center;
+  color:#facc15;
+  margin:10px;
+}
 
-  #sentence {
-    font-size: 2rem;
-    margin: 25px 0;
-    color: #1b3a20;
-  }
+/* STATS */
+#stats{
+  display:flex;
+  justify-content:space-around;
+  margin-bottom:10px;
+}
 
-  #options {
-    display:flex; flex-wrap: wrap; justify-content:center; gap:15px;
-  }
+/* MAZE */
+#maze{
+  position:relative;
+  width:100%;
+  height:450px;
+  background:#111827;
+  border:2px solid #334155;
+  overflow:hidden;
+}
 
-  .option {
-    background: #f39c12;
-    color:#fff;
-    border:none;
-    padding:20px 35px;
-    font-size:1.5rem;
-    border-radius:15px;
-    cursor:pointer;
-    transition: 0.2s;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-  }
-  .option:hover { transform: scale(1.05); }
+/* PLAYER */
+#player{
+  width:20px;
+  height:20px;
+  border-radius:50%;
+  background:gold;
+  position:absolute;
+  top:50%;
+  left:50%;
+}
 
+/* STAR */
+.star{
+  width:12px;
+  height:12px;
+  background:#22c55e;
+  border-radius:50%;
+  position:absolute;
+}
+
+/* QUESTION BOX */
+#qbox{
+  position:fixed;
+  top:20%;
+  left:50%;
+  transform:translateX(-50%);
+  background:#1f2937;
+  padding:15px;
+  border-radius:10px;
+  display:none;
+  width:80%;
+}
+
+.option{
+  background:#374151;
+  padding:10px;
+  margin:5px 0;
+  cursor:pointer;
+  border-radius:5px;
+}
+.option:hover{background:#4b5563}
 </style>
 </head>
+
 <body>
 
-<!-- Splash -->
 <div id="splash">
-  <img src="assets/logo.png" alt="Innovine Logo">
+  <img src="assets/logo.png">
 </div>
 
-<!-- Game -->
 <div id="game">
-  <div id="score">Score: 0</div>
-  <div id="timer">Time Left: 30s</div>
-  <div id="sentence">Sentence will appear here</div>
-  <div id="options"></div>
+
+<h1>⏳ Tense Time Maze Adventure</h1>
+
+<div id="stats">
+  <div>Score: <span id="score">0</span></div>
+  <div>Stars: <span id="stars">0</span>/3</div>
+  <div>Zone: <span id="zone">Present</span></div>
 </div>
 
-<!-- Audio -->
-<audio id="correctSound" src="assets/correct.mp3"></audio>
-<audio id="wrongSound" src="assets/wrong.mp3"></audio>
-<audio id="applause" src="assets/freesound_community-claps-44774.mp3"></audio>
+<div id="maze">
+  <div id="player"></div>
+</div>
+
+<div id="qbox">
+  <div id="q"></div>
+  <div id="opts"></div>
+</div>
+
+</div>
 
 <script>
-const splash = document.getElementById('splash');
-const game = document.getElementById('game');
-const sentenceEl = document.getElementById('sentence');
-const optionsEl = document.getElementById('options');
-const scoreEl = document.getElementById('score');
-const timerEl = document.getElementById('timer');
 
-const correctSound = document.getElementById('correctSound');
-const wrongSound = document.getElementById('wrongSound');
-const applause = document.getElementById('applause');
+/* ================= GAME STATE ================= */
+let score=0;
+let stars=0;
+let zoneIndex=0;
 
-let current = 0;
-let score = 0;
-let timer = 30;
-let timerInterval;
+const zones=["Present","Past","Future"];
 
-const sentences = [
-  {text: "She (walk) to school yesterday.", options:["walked","walk","will walk"], answer:"walked"},
-  {text: "I (eat) breakfast every morning.", options:["eat","ate","will eat"], answer:"eat"},
-  {text: "They (play) soccer tomorrow.", options:["play","played","will play"], answer:"will play"},
-  {text: "He (go) to the market last week.", options:["go","went","will go"], answer:"went"},
-  {text: "We (study) English now.", options:["study","studied","will study"], answer:"study"},
-  {text: "I (call) you later.", options:["call","called","will call"], answer:"will call"},
-  {text: "She (write) a letter yesterday.", options:["write","wrote","will write"], answer:"wrote"},
-  {text: "He (read) a book every day.", options:["reads","read","will read"], answer:"read"},
-  {text: "They (travel) next week.", options:["travel","traveled","will travel"], answer:"will travel"},
-  {text: "I (see) a movie last night.", options:["see","saw","will see"], answer:"saw"}
+/* ================= QUESTIONS ================= */
+const questions=[
+{
+q:"She ___ to school every day.",
+opts:["go","goes","going","gone"],
+ans:1
+},
+{
+q:"He ___ football yesterday.",
+opts:["play","played","plays","playing"],
+ans:1
+},
+{
+q:"They ___ visit tomorrow.",
+opts:["will","go","went","going"],
+ans:0
+},
+{
+q:"She is ___ now.",
+opts:["eat","eating","ate","eats"],
+ans:1
+},
+{
+q:"He ___ when I called him.",
+opts:["sleep","was sleeping","slept","sleeps"],
+ans:1
+}
 ];
 
-function startTimer() {
-  timer = 30;
-  timerEl.textContent = `Time Left: ${timer}s`;
-  clearInterval(timerInterval);
-  timerInterval = setInterval(() => {
-    timer--;
-    timerEl.textContent = `Time Left: ${timer}s`;
-    if(timer <= 0){
-      nextSentence();
-    }
-  }, 1000);
+let qIndex=0;
+
+/* ================= ELEMENTS ================= */
+const player=document.getElementById("player");
+const maze=document.getElementById("maze");
+const qbox=document.getElementById("qbox");
+const q=document.getElementById("q");
+const opts=document.getElementById("opts");
+
+/* ================= MOVE PLAYER ================= */
+document.addEventListener("keydown",(e)=>{
+  let x=player.offsetLeft;
+  let y=player.offsetTop;
+
+  if(e.key==="ArrowRight") player.style.left=(x+10)+"px";
+  if(e.key==="ArrowLeft") player.style.left=(x-10)+"px";
+  if(e.key==="ArrowUp") player.style.top=(y-10)+"px";
+  if(e.key==="ArrowDown") player.style.top=(y+10)+"px";
+
+  checkStar();
+});
+
+/* ================= STARS ================= */
+function spawnStar(){
+  let s=document.createElement("div");
+  s.className="star";
+  s.style.left=Math.random()*90+"%";
+  s.style.top=Math.random()*90+"%";
+  maze.appendChild(s);
 }
 
-function showSentence() {
-  if(current >= sentences.length) {
-    clearInterval(timerInterval);
-    sentenceEl.textContent = "Game Completed!";
-    optionsEl.innerHTML = "";
-    applause.play();
+for(let i=0;i<5;i++) spawnStar();
+
+/* ================= CHECK STAR ================= */
+function checkStar(){
+  let starsEl=document.querySelectorAll(".star");
+
+  starsEl.forEach(s=>{
+    let rect1=player.getBoundingClientRect();
+    let rect2=s.getBoundingClientRect();
+
+    if(!(rect1.right<rect2.left ||
+         rect1.left>rect2.right ||
+         rect1.bottom<rect2.top ||
+         rect1.top>rect2.bottom)){
+      s.remove();
+      stars++;
+      document.getElementById("stars").innerText=stars;
+
+      if(stars>=3){
+        showQuestion();
+      }
+    }
+  });
+}
+
+/* ================= QUESTION ================= */
+function showQuestion(){
+  qbox.style.display="block";
+
+  let qdata=questions[qIndex];
+
+  q.innerText=qdata.q;
+  opts.innerHTML="";
+
+  qdata.opts.forEach((o,i)=>{
+    let div=document.createElement("div");
+    div.className="option";
+    div.innerText=o;
+
+    div.onclick=()=>{
+      if(i===qdata.ans){
+        score++;
+      }
+
+      nextLevel();
+    };
+
+    opts.appendChild(div);
+  });
+}
+
+/* ================= NEXT LEVEL ================= */
+function nextLevel(){
+  qbox.style.display="none";
+  stars=0;
+  document.getElementById("stars").innerText=0;
+
+  qIndex++;
+  if(qIndex>=questions.length){
+    alert("Game Complete!");
+    location.reload();
     return;
   }
-  const s = sentences[current];
-  sentenceEl.textContent = s.text;
-  optionsEl.innerHTML = "";
-  s.options.forEach(opt => {
-    const btn = document.createElement('button');
-    btn.textContent = opt;
-    btn.className = 'option';
-    btn.onclick = () => checkAnswer(opt);
-    optionsEl.appendChild(btn);
-  });
-  startTimer();
+
+  zoneIndex=(zoneIndex+1)%zones.length;
+  document.getElementById("zone").innerText=zones[zoneIndex];
+
+  for(let i=0;i<3;i++) spawnStar();
 }
 
-function checkAnswer(selected) {
-  const s = sentences[current];
-  if(selected === s.answer){
-    correctSound.play();
-    score++;
-    scoreEl.textContent = `Score: ${score}`;
-  } else {
-    wrongSound.play();
-  }
-  nextSentence();
-}
-
-function nextSentence() {
-  clearInterval(timerInterval);
-  current++;
-  showSentence();
-}
-
-function startGame(){
-  splash.style.display='none';
-  game.style.display='block';
-  current=0;
-  score=0;
-  scoreEl.textContent = `Score: ${score}`;
-  showSentence();
-}
-
-// Splash for 5 seconds
+/* ================= START ================= */
 setTimeout(()=>{
-  startGame();
-}, 5000);
+  document.getElementById("splash").style.display="none";
+  document.getElementById("game").style.display="block";
+},3000);
+
 </script>
 
 </body>
