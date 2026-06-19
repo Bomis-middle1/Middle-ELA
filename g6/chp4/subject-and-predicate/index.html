@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Temple Treasure - Smooth Edition</title>
+<title>Temple Treasure - Hunter Edition</title>
 
 <style>
 body{
@@ -31,7 +31,21 @@ body{
     display:flex;
     justify-content:center;
     align-items:center;
-    transition:transform 0.08s linear;
+    transition: transform 0.1s linear;
+}
+
+/* facing */
+#player.right{
+    transform: scaleX(1);
+}
+
+#player.left{
+    transform: scaleX(-1);
+}
+
+/* jump animation feel */
+.jump{
+    transform: translateY(-10px);
 }
 
 /* COIN */
@@ -90,7 +104,8 @@ body{
 <body>
 
 <div id="gameArea">
-<div id="player">🏃</div>
+
+<div id="player" class="right">🧑‍🌾</div>
 
 <div id="scoreBoard">
 Coins: <span id="coinCount">0</span>
@@ -100,11 +115,10 @@ Coins: <span id="coinCount">0</span>
 <div id="qText"></div>
 <div id="options"></div>
 </div>
+
 </div>
 
 <script>
-
-/* ===== CORE SETUP ===== */
 
 let gameRunning = true;
 let coins = 0;
@@ -114,14 +128,15 @@ let velocity = 0;
 let gravity = 0.6;
 let jumping = false;
 
-let speed = 2.5;
+let direction = 1; // 1 right, -1 left
+
+const player = document.getElementById("player");
+const coinCount = document.getElementById("coinCount");
+const questionBox = document.getElementById("questionBox");
+
 let lastTime = 0;
 
-/* PLAYER */
-const player = document.getElementById("player");
-
-/* ===== SMOOTH GAME LOOP ===== */
-
+/* GAME LOOP */
 function gameLoop(time){
 
 if(!gameRunning) return;
@@ -129,7 +144,6 @@ if(!gameRunning) return;
 let delta = time - lastTime;
 lastTime = time;
 
-/* smooth gravity */
 velocity += gravity * (delta/16);
 playerY -= velocity * (delta/16);
 
@@ -137,35 +151,51 @@ if(playerY <= 120){
     playerY = 120;
     velocity = 0;
     jumping = false;
+
+    player.classList.remove("jump");
 }
 
 player.style.bottom = playerY + "px";
 
-/* jump animation feel */
-player.style.transform = jumping ? "translateY(-8px)" : "translateY(0)";
-
 requestAnimationFrame(gameLoop);
 }
 
-/* ===== JUMP ===== */
-
+/* JUMP */
 function jump(){
 if(!jumping && gameRunning){
     velocity = -14;
     jumping = true;
+    player.classList.add("jump");
 }
 }
 
+/* DIRECTION CONTROL */
 document.addEventListener("keydown",(e)=>{
-if(e.code==="Space") jump();
+
+if(e.code==="Space" || e.code==="ArrowUp"){
+    jump();
+}
+
+if(e.code==="ArrowLeft"){
+    direction = -1;
+    player.classList.remove("right");
+    player.classList.add("left");
+}
+
+if(e.code==="ArrowRight"){
+    direction = 1;
+    player.classList.remove("left");
+    player.classList.add("right");
+}
+
 });
 
+/* TOUCH */
 document.addEventListener("touchstart",()=>{
 jump();
 });
 
-/* ===== SPAWN COIN ===== */
-
+/* COIN */
 function spawnCoin(){
 
 if(!gameRunning) return;
@@ -175,20 +205,14 @@ coin.className = "coin";
 coin.innerHTML = "💰";
 
 coin.style.left = window.innerWidth + "px";
-coin.style.bottom = (160 + Math.random()*120) + "px";
+coin.style.bottom = (160 + Math.random()*100) + "px";
 
 document.getElementById("gameArea").appendChild(coin);
 
 let move = setInterval(()=>{
 
-if(!gameRunning){
-    clearInterval(move);
-    coin.remove();
-    return;
-}
-
 let left = parseFloat(coin.style.left);
-left -= speed;
+left -= 2.5;
 
 coin.style.left = left + "px";
 
@@ -197,7 +221,7 @@ const p = player.getBoundingClientRect();
 
 if(c.left < p.right && c.right > p.left && c.top < p.bottom && c.bottom > p.top){
     coins++;
-    document.getElementById("coinCount").innerText = coins;
+    coinCount.innerText = coins;
     coin.remove();
     clearInterval(move);
 }
@@ -212,8 +236,7 @@ if(left < -50){
 setTimeout(spawnCoin,2000);
 }
 
-/* ===== SPAWN OBSTACLE ===== */
-
+/* OBSTACLE */
 function spawnObstacle(){
 
 if(!gameRunning) return;
@@ -228,14 +251,8 @@ document.getElementById("gameArea").appendChild(obs);
 
 let move = setInterval(()=>{
 
-if(!gameRunning){
-    clearInterval(move);
-    obs.remove();
-    return;
-}
-
 let left = parseFloat(obs.style.left);
-left -= speed + 0.5;
+left -= 3;
 
 obs.style.left = left + "px";
 
@@ -243,8 +260,8 @@ const o = obs.getBoundingClientRect();
 const p = player.getBoundingClientRect();
 
 if(o.left < p.right && o.right > p.left && o.top < p.bottom && o.bottom > p.top){
-    coins = Math.max(0, coins - 1);
-    document.getElementById("coinCount").innerText = coins;
+    coins = Math.max(0, coins-1);
+    coinCount.innerText = coins;
     obs.remove();
     clearInterval(move);
 }
@@ -259,8 +276,7 @@ if(left < -50){
 setTimeout(spawnObstacle,2800);
 }
 
-/* ===== START GAME ===== */
-
+/* START */
 spawnCoin();
 spawnObstacle();
 requestAnimationFrame(gameLoop);
