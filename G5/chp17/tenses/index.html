@@ -1,156 +1,415 @@
-/* ================================
-   TENSE QUESTION BANK (GRADE 6 HOTS)
-================================ */
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Tense Time Maze Adventure</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body{
+    margin:0;
+    font-family:Arial;
+    background:linear-gradient(135deg,#1e3c72,#2a5298);
+    color:white;
+}
+
+/* SPLASH */
+#splash{
+    position:fixed;
+    width:100%;
+    height:100%;
+    background:white;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    z-index:999;
+}
+#splash img{
+    width:250px;
+}
+
+/* HEADER */
+.header{
+    text-align:center;
+    padding:10px;
+    background:linear-gradient(90deg,#ff6a88,#ff99ac);
+    font-weight:bold;
+}
+
+.scorebar{
+    display:flex;
+    justify-content:space-around;
+    padding:10px;
+}
+
+/* GAME AREA */
+#gameArea{
+    display:none;
+    text-align:center;
+}
+
+#maze{
+    width:90%;
+    height:420px;
+    margin:auto;
+    border:2px solid white;
+    position:relative;
+    overflow:hidden;
+    background:#0f172a;
+}
+
+.player{
+    width:20px;
+    height:20px;
+    background:yellow;
+    position:absolute;
+    border-radius:50%;
+}
+
+.star{
+    width:12px;
+    height:12px;
+    background:#38bdf8;
+    position:absolute;
+    border-radius:50%;
+}
+
+/* CONTROLS */
+.controls button{
+    padding:10px;
+    margin:5px;
+    font-size:18px;
+}
+
+/* MODAL */
+#modal{
+    display:none;
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,0.8);
+    justify-content:center;
+    align-items:center;
+}
+
+.box{
+    background:white;
+    color:black;
+    padding:20px;
+    width:80%;
+}
+
+.option{
+    display:block;
+    margin:10px 0;
+    padding:10px;
+    border:1px solid #333;
+    cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div id="splash">
+    <img src="assets/logo.png">
+</div>
+
+<div id="gameArea">
+
+<div class="header">
+⏳ TENSE TIME MAZE ADVENTURE
+</div>
+
+<div class="scorebar">
+<div>Stars: <span id="stars">0</span></div>
+<div>Q: <span id="qno">0/15</span></div>
+<div>Score: <span id="score">0</span></div>
+</div>
+
+<div id="maze">
+<div id="player" class="player"></div>
+</div>
+
+<div class="controls">
+<button onclick="move(0,-1)">↑</button>
+<button onclick="move(-1,0)">←</button>
+<button onclick="move(1,0)">→</button>
+<button onclick="move(0,1)">↓</button>
+</div>
+
+</div>
+
+<!-- MODAL -->
+<div id="modal">
+<div class="box">
+<h3 id="question"></h3>
+<div id="options"></div>
+</div>
+</div>
+
+<script>
+
+/* ================= GAME STATE ================= */
+
+let player = {x:50,y:50};
+let stars = [];
+let collected = 0;
+let qIndex = 0;
+let score = 0;
+
+/* ================= 15 HOTS QUESTIONS ================= */
 
 const questions = [
 {
-q: "Change to INDIRECT SPEECH: 'She said, \"I am preparing for exams.\"'",
-options: [
-"She said that she was preparing for exams.",
-"She said she is preparing exams.",
-"She said that she has prepared exams.",
-"She said she was prepare exams."
+q:"Change to INDIRECT: 'She said, I am happy.'",
+options:[
+"She said that she was happy.",
+"She said she is happy.",
+"She said she happy.",
+"She said happy was."
 ],
-a: 0
+a:0
 },
 {
-q: "Identify correct transformation: He said, 'I will finish the project.'",
-options: [
-"He said that he will finish the project.",
-"He said that he would finish the project.",
-"He said he finishes the project.",
-"He said that he finished the project."
+q:"Identify tense: I had finished my work.",
+options:[
+"Past Perfect",
+"Present Perfect",
+"Future Perfect",
+"Past Continuous"
 ],
-a: 1
+a:0
 },
 {
-q: "Which sentence is in PRESENT PERFECT tense?",
-options: [
-"I have completed my homework.",
-"I completed my homework yesterday.",
-"I will complete my homework.",
-"I am completing homework."
+q:"Convert to DIRECT: He said he was tired.",
+options:[
+"He said, 'I am tired.'",
+"He said, 'I was tired.'",
+"He said, 'I will tired.'",
+"He said, 'I tired.'"
 ],
-a: 0
+a:1
 },
 {
-q: "Convert to PAST CONTINUOUS: 'They play football.'",
-options: [
-"They were playing football.",
-"They are playing football.",
-"They have played football.",
-"They will be playing football."
+q:"Choose correct FUTURE CONTINUOUS:",
+options:[
+"I will be studying.",
+"I will studied.",
+"I studying will.",
+"I will studying."
 ],
-a: 0
+a:0
 },
 {
-q: "HOTS: Identify correct correction → 'She don't like ice cream.'",
-options: [
-"She doesn't like ice cream.",
-"She don't likes ice cream.",
-"She didn't likes ice cream.",
-"She not like ice cream."
+q:"Correct sentence:",
+options:[
+"She doesn't like apples.",
+"She don't likes apples.",
+"She not like apples.",
+"She didn't likes apples."
 ],
-a: 0
+a:0
 },
 {
-q: "Change into FUTURE CONTINUOUS: 'I study at night.'",
-options: [
-"I will be studying at night.",
-"I will studying at night.",
-"I study will at night.",
-"I will studied at night."
+q:"Change: They play football daily → past",
+options:[
+"They played football daily.",
+"They playing football daily.",
+"They plays football daily.",
+"They will play football."
 ],
-a: 0
+a:0
 },
 {
-q: "Indirect speech: He said, 'I am busy now.'",
-options: [
-"He said that he was busy then.",
-"He said that he is busy now.",
-"He said he busy was.",
-"He said that I am busy."
+q:"Indirect speech: He said 'I can swim'",
+options:[
+"He said that he could swim.",
+"He said he can swim.",
+"He said he will swim.",
+"He said he swims."
 ],
-a: 0
+a:0
 },
 {
-q: "Which is SIMPLE PAST tense?",
-options: [
-"She went to school.",
-"She goes to school.",
-"She is going to school.",
-"She will go to school."
-],
-a: 0
-},
-{
-q: "HOTS: Find correct transformation → 'They are watching TV.' (past tense)",
-options: [
-"They were watching TV.",
-"They watched TV always.",
-"They will watched TV.",
-"They are watched TV."
-],
-a: 0
-},
-{
-q: "Advanced: Choose correct INDIRECT form → 'I can solve this problem.'",
-options: [
-"He said that he could solve that problem.",
-"He said he can solve problem.",
-"He said that he will solve problem.",
-"He said he solved problem."
-],
-a: 0
-},
-{
-q: "Convert into SIMPLE FUTURE: 'She writes a letter.'",
-options: [
-"She will write a letter.",
-"She wrote a letter.",
-"She is writing a letter.",
-"She has written a letter."
-],
-a: 0
-},
-{
-q: "Identify tense → 'I was reading a book.'",
-options: [
+q:"Identify tense: She was reading a book",
+options:[
 "Past Continuous",
 "Present Continuous",
 "Future Continuous",
 "Simple Past"
 ],
-a: 0
+a:0
 },
 {
-q: "HOTS: Correct sentence form of → 'He has went home.'",
-options: [
+q:"Convert: I write a letter → future",
+options:[
+"I will write a letter.",
+"I wrote a letter.",
+"I writing a letter.",
+"I will wrote a letter."
+],
+a:0
+},
+{
+q:"HOTS: Find error",
+options:[
 "He has gone home.",
 "He have went home.",
 "He gone home.",
-"He is went home."
+"He is go home."
 ],
-a: 0
+a:0
 },
 {
-q: "Indirect speech: 'We are happy.'",
-options: [
-"They said that they were happy.",
-"They said we are happy.",
-"They said that we are happy.",
-"They said happy were."
+q:"Indirect: They said 'We are busy'",
+options:[
+"They said that they were busy.",
+"They said they are busy.",
+"They said we are busy.",
+"They said busy were."
 ],
-a: 0
+a:0
 },
 {
-q: "Final challenge: Identify FUTURE PERFECT",
-options: [
-"I will have completed the task.",
-"I will completing task.",
-"I completed task will.",
-"I have will complete task."
+q:"Future perfect:",
+options:[
+"I will have finished work.",
+"I will finished work.",
+"I have finish work.",
+"I will finishing work."
 ],
-a: 0
+a:0
+},
+{
+q:"Past continuous:",
+options:[
+"They were playing.",
+"They are playing.",
+"They will play.",
+"They play."
+],
+a:0
+},
+{
+q:"Change: She sings well → past",
+options:[
+"She sang well.",
+"She sings welled.",
+"She singing well.",
+"She will sang."
+],
+a:0
+},
+{
+q:"Indirect: I am late",
+options:[
+"He said he was late.",
+"He said I am late.",
+"He said he late.",
+"He said late was."
+],
+a:0
 }
 ];
+
+/* ================= STAR SPAWN ================= */
+
+function spawnStars(){
+for(let i=0;i<3;i++){
+let s=document.createElement("div");
+s.className="star";
+s.style.left=Math.random()*700+"px";
+s.style.top=Math.random()*350+"px";
+document.getElementById("maze").appendChild(s);
+stars.push(s);
+}
+}
+
+/* ================= MOVE ================= */
+
+function move(dx,dy){
+player.x+=dx*20;
+player.y+=dy*20;
+update();
+checkStar();
+}
+
+/* ================= UPDATE ================= */
+
+function update(){
+let p=document.getElementById("player");
+p.style.left=player.x+"px";
+p.style.top=player.y+"px";
+}
+
+/* ================= STAR CHECK ================= */
+
+function checkStar(){
+stars.forEach((s,i)=>{
+let sx=s.offsetLeft;
+let sy=s.offsetTop;
+
+if(Math.abs(player.x-sx)<20 && Math.abs(player.y-sy)<20){
+s.remove();
+stars.splice(i,1);
+collected++;
+
+document.getElementById("stars").innerText=collected;
+
+if(collected===3){
+showQuestion();
+collected=0;
+}
+}
+});
+}
+
+/* ================= QUESTION ================= */
+
+function showQuestion(){
+let q=questions[qIndex];
+
+document.getElementById("modal").style.display="flex";
+document.getElementById("question").innerText=q.q;
+
+let html="";
+q.options.forEach((o,i)=>{
+html+=`<div class="option" onclick="answer(${i})">${o}</div>`;
+});
+
+document.getElementById("options").innerHTML=html;
+}
+
+/* ================= ANSWER ================= */
+
+function answer(i){
+if(i===questions[qIndex].a){
+score++;
+}
+
+qIndex++;
+
+document.getElementById("score").innerText=score;
+document.getElementById("qno").innerText=qIndex+"/15";
+
+document.getElementById("modal").style.display="none";
+
+spawnStars();
+}
+
+/* ================= INIT ================= */
+
+setTimeout(()=>{
+document.getElementById("splash").style.display="none";
+document.getElementById("gameArea").style.display="block";
+update();
+spawnStars();
+},3000);
+
+</script>
+
+</body>
+</html>
