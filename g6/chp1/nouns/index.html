@@ -3,161 +3,95 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>One & Many - Nouns Adventure</title>
+<title>Nouns Sorting Game</title>
 
 <style>
 body{
 margin:0;
 font-family:Arial;
 background:linear-gradient(to bottom,#c2f0ff,#fff3b0);
-overflow-x:hidden;
-}
-
-/* SPLASH */
-#splash{
-position:fixed;
-inset:0;
-background:white;
-display:flex;
-flex-direction:column;
-justify-content:center;
-align-items:center;
-z-index:9999;
-text-align:center;
-}
-
-#splash img{
-width:200px;
-max-width:60vw;
-}
-
-/* GAME */
-#game{
-display:none;
-padding:10px;
-}
-
-.topbar{
-display:flex;
-justify-content:space-between;
-font-weight:bold;
-font-size:16px;
-padding:10px;
 }
 
 /* WORD BANK */
 #words{
-margin:10px 0;
-padding:10px;
-background:#fff7d6;
-border-radius:12px;
-min-height:60px;
 display:flex;
 flex-wrap:wrap;
-gap:8px;
+gap:6px;
+padding:10px;
+background:#fff7d6;
+border-bottom:2px solid #ccc;
+position:sticky;
+top:0;
+z-index:1000;
+min-height:60px;
 }
 
-/* BASKETS */
+/* WORDS */
+.word{
+padding:6px 8px;
+background:#ffd966;
+border-radius:8px;
+font-weight:bold;
+cursor:grab;
+user-select:none;
+font-size:13px;
+}
+
+/* BASKET GRID */
 .container{
 display:grid;
 grid-template-columns:repeat(2,1fr);
-gap:10px;
+gap:8px;
+padding:8px;
 }
 
+/* SMALL BASKETS (FIXED) */
 .box{
 background:linear-gradient(145deg,#ffffff,#eaf6ff);
-padding:14px;
-min-height:140px;
-border-radius:22px;
-box-shadow:0 10px 20px rgba(0,0,0,0.15);
-border:3px dashed #4aa3df;
+min-height:85px;   /* SMALL SIZE */
+border-radius:14px;
+border:2px dashed #4aa3df;
+box-shadow:0 6px 12px rgba(0,0,0,0.12);
 position:relative;
+padding:6px;
+font-size:12px;
 overflow:hidden;
 }
 
+/* LABEL */
 .box::before{
 content:attr(data-label);
 position:absolute;
-top:-12px;
-left:12px;
+top:-10px;
+left:6px;
 background:#2196F3;
 color:white;
-padding:4px 10px;
-border-radius:20px;
-font-size:11px;
-font-weight:bold;
+padding:2px 6px;
+border-radius:12px;
+font-size:9px;
 }
 
-/* WORD */
-.word{
+/* WORD INSIDE BASKET */
+.inside-word{
 display:inline-block;
-padding:7px 10px;
-background:#ffd966;
-border-radius:10px;
-cursor:grab;
-font-weight:bold;
-user-select:none;
-}
-
-/* END */
-#endScreen{
-display:none;
-text-align:center;
-padding:20px;
-}
-
-.big{
-font-size:24px;
+margin:3px;
+padding:4px 6px;
+background:#c8f7c5;
+border-radius:6px;
+font-size:12px;
 font-weight:bold;
 }
 
-button{
-padding:10px 14px;
-border:none;
-border-radius:10px;
-cursor:pointer;
-margin-top:10px;
-}
-
-/* CONFETTI */
-.confetti{
-position:fixed;
-width:8px;
-height:8px;
-top:-10px;
-animation:fall 3s linear;
-}
-
-@keyframes fall{
-to{transform:translateY(100vh) rotate(360deg);}
-}
-
+/* MOBILE */
 @media(max-width:600px){
-.container{grid-template-columns:1fr;}
+.container{
+grid-template-columns:1fr;
+}
 }
 </style>
 </head>
 
 <body>
-
-<!-- SPLASH -->
-<div id="splash">
-<img src="assets/innovine-logo.png">
-<h2>Innovine Learning Game</h2>
-
-<div id="topic" style="display:none;font-size:22px;font-weight:bold;color:#0b5394;">
-ONE & MANY – NOUNS ADVENTURE
-</div>
-
-<button id="startBtn" style="display:none">Start Game</button>
-</div>
-
-<!-- GAME -->
-<div id="game">
-
-<div class="topbar">
-<div>Score: <span id="score">0</span></div>
-</div>
 
 <!-- WORD BANK -->
 <div id="words"></div>
@@ -165,24 +99,17 @@ ONE & MANY – NOUNS ADVENTURE
 <!-- BASKETS -->
 <div class="container">
 
-<div class="box" id="proper" data-label="📘 Proper Nouns"></div>
-<div class="box" id="common" data-label="📗 Common Nouns"></div>
-<div class="box" id="collective" data-label="👥 Collective Nouns"></div>
-<div class="box" id="material" data-label="🪨 Material Nouns"></div>
-<div class="box" id="abstract" data-label="💡 Abstract Nouns"></div>
-<div class="box" id="countable" data-label="🔢 Countable Nouns"></div>
-<div class="box" id="uncountable" data-label="💧 Uncountable Nouns"></div>
+<div class="box" id="proper" data-label="Proper"></div>
+<div class="box" id="common" data-label="Common"></div>
+<div class="box" id="collective" data-label="Collective"></div>
+<div class="box" id="material" data-label="Material"></div>
+<div class="box" id="abstract" data-label="Abstract"></div>
+<div class="box" id="countable" data-label="Countable"></div>
+<div class="box" id="uncountable" data-label="Uncountable"></div>
 
 </div>
-
-</div>
-
-<!-- AUDIO -->
-<audio id="correctSound" src="assets/correct.mp3"></audio>
 
 <script>
-
-let score=0;
 
 const nouns=[
 {w:"Mumbai",t:"proper"},
@@ -211,21 +138,6 @@ function shuffle(a){
 return a.sort(()=>Math.random()-0.5);
 }
 
-/* SPLASH FLOW */
-setTimeout(()=>{
-document.getElementById("topic").style.display="block";
-},5000);
-
-setTimeout(()=>{
-document.getElementById("startBtn").style.display="block";
-},8000);
-
-document.getElementById("startBtn").onclick=()=>{
-document.getElementById("splash").style.display="none";
-document.getElementById("game").style.display="block";
-loadWords();
-};
-
 /* LOAD WORDS */
 function loadWords(){
 let box=document.getElementById("words");
@@ -238,11 +150,13 @@ d.textContent=n.w;
 d.dataset.type=n.t;
 d.draggable=true;
 
-/* DRAG */
+/* DRAG START */
 d.ondragstart=e=>{
 e.dataTransfer.setData("type",n.t);
 e.dataTransfer.setData("text",n.w);
-setTimeout(()=>d.style.display="none",0);
+
+/* REMOVE FROM TOP BANK */
+setTimeout(()=>d.remove(),50);
 };
 
 box.appendChild(d);
@@ -257,23 +171,16 @@ let type=e.dataTransfer.getData("type");
 let text=e.dataTransfer.getData("text");
 
 if(type===b.id){
-score+=2;
-document.getElementById("correctSound").play();
-
-/* MOVE WORD INTO BASKET */
-let span=document.createElement("div");
-span.className="word";
-span.textContent=text;
-b.appendChild(span);
-
-document.getElementById("score").innerText=score;
-}else{
-/* return word if wrong */
-loadWords();
+let el=document.createElement("div");
+el.className="inside-word";
+el.textContent=text;
+b.appendChild(el);
 }
 };
 });
 }
+
+loadWords();
 
 </script>
 
