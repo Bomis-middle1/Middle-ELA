@@ -2,257 +2,378 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>✨ Tense Time Maze Adventure</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tense Time Maze Adventure</title>
 
 <style>
 body{
-    margin:0;
-    font-family:Arial;
-    background: linear-gradient(135deg,#1b2a4a,#0b1020);
-    color:white;
+margin:0;
+font-family:Arial;
+background:linear-gradient(135deg,#1b2a4a,#0b1020);
+color:white;
 }
 
 /* HEADER */
 .header{
-    background: linear-gradient(90deg,#ff4d6d,#ff8fa3);
-    padding:15px;
-    text-align:center;
-    font-weight:bold;
-    font-size:22px;
+background:linear-gradient(90deg,#ff5f6d,#ffc371);
+padding:15px;
+text-align:center;
+font-size:22px;
+font-weight:bold;
 }
 
 /* STATS */
 .stats{
-    display:flex;
-    justify-content:space-around;
-    padding:10px;
-    font-size:18px;
+display:flex;
+justify-content:space-around;
+padding:10px;
+font-size:16px;
 }
 
-/* INFO */
+/* HOW TO PLAY */
 .info{
-    background:#fff3cd;
-    color:#333;
-    margin:10px auto;
-    width:90%;
-    padding:10px;
-    border-radius:10px;
-    font-size:14px;
-}
-
-/* JOURNEY BAR */
-.journey{
-    display:flex;
-    justify-content:center;
-    flex-wrap:wrap;
-    gap:6px;
-    margin:10px;
-}
-.node{
-    width:22px;
-    height:22px;
-    border-radius:50%;
-    background:#334155;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    font-size:10px;
-    color:white;
-}
-.active{
-    background:#22c55e;
-    box-shadow:0 0 10px #22c55e;
+background:#fff3cd;
+color:#000;
+margin:10px auto;
+width:90%;
+padding:12px;
+border-radius:12px;
+font-size:14px;
 }
 
 /* MAZE */
 #maze{
-    width:90%;
-    height:420px;
-    margin:auto;
-    border:2px solid #fff;
-    position:relative;
-    background:#0f172a;
-    overflow:hidden;
+width:90%;
+height:450px;
+margin:auto;
+border:3px solid white;
+position:relative;
+background:#0f172a;
+overflow:hidden;
+border-radius:10px;
 }
 
-/* PLAYER */
 #player{
-    width:18px;
-    height:18px;
-    background:yellow;
-    border-radius:50%;
-    position:absolute;
+width:20px;
+height:20px;
+background:#ffcc00;
+border-radius:50%;
+position:absolute;
+left:30px;
+top:30px;
 }
 
 /* STAR */
 .star{
-    width:12px;
-    height:12px;
-    background:#38bdf8;
-    border-radius:50%;
-    position:absolute;
+width:14px;
+height:14px;
+background:#38bdf8;
+border-radius:50%;
+position:absolute;
 }
 
 /* CONTROLS */
 .controls{
-    text-align:center;
-    margin:10px;
+text-align:center;
+margin:10px;
 }
 .controls button{
-    padding:10px;
-    margin:5px;
+padding:10px;
+margin:5px;
+font-size:18px;
+}
+
+/* QUESTION BOX */
+#qbox{
+display:none;
+position:fixed;
+top:20%;
+left:10%;
+width:80%;
+background:white;
+color:black;
+padding:20px;
+border-radius:15px;
+z-index:10;
+}
+#qbox button{
+display:block;
+width:100%;
+margin:10px 0;
+padding:10px;
+font-size:16px;
 }
 </style>
 </head>
+
 <body>
 
 <div class="header">⏳ TENSE TIME MAZE ADVENTURE</div>
 
 <div class="stats">
 <div>Stars: <span id="stars">0</span></div>
-<div>Progress: <span id="progress">0/15</span></div>
+<div>Questions: <span id="qcount">0/15</span></div>
 <div>Score: <span id="score">0</span></div>
 </div>
 
 <div class="info">
-Move with arrows → collect 3 stars → answer tense challenge → progress forward
+Move → Collect 3 stars → Unlock tense challenge → Progress forward
 </div>
 
-<!-- JOURNEY -->
-<div class="journey" id="journey"></div>
-
-<!-- MAZE -->
 <div id="maze">
 <div id="player"></div>
 </div>
 
-<!-- CONTROLS -->
 <div class="controls">
-<button onclick="move(0,-10)">↑</button>
-<button onclick="move(-10,0)">←</button>
-<button onclick="move(10,0)">→</button>
-<button onclick="move(0,10)">↓</button>
+<button onclick="move(0,-15)">↑</button>
+<button onclick="move(-15,0)">←</button>
+<button onclick="move(15,0)">→</button>
+<button onclick="move(0,15)">↓</button>
 </div>
 
-<!-- MODAL -->
-<div id="modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);justify-content:center;align-items:center;">
-<div style="background:white;color:black;padding:20px;width:80%;">
-<h3 id="question"></h3>
-<div id="options"></div>
+<!-- QUESTION BOX -->
+<div id="qbox">
+<h3 id="qtext"></h3>
+<div id="opts"></div>
 </div>
-</div>
-
-<!-- AUDIO -->
-<audio id="correctSound" src="assets/correct.mp3"></audio>
-<audio id="wrongSound" src="assets/wrong.mp3"></audio>
-<audio id="applause" src="assets/freesound_community-claps-44774.mp3"></audio>
 
 <script>
-let player={x:50,y:50};
+
+let player={x:30,y:30};
 let stars=[];
 let collected=0;
-let level=0;
+let qIndex=0;
 let score=0;
 
-/* JOURNEY NODES */
-const journey=document.getElementById("journey");
-for(let i=1;i<=15;i++){
-    let d=document.createElement("div");
-    d.className="node";
-    d.innerText=i;
-    d.id="n"+i;
-    journey.appendChild(d);
+/* ===== TENSE QUESTIONS (HOTS MIXED) ===== */
+const questions = [
+{
+q:"Convert to INDIRECT: She said, 'I am busy'",
+options:[
+"She said that she was busy",
+"She said that she is busy",
+"She said she busy",
+"She said busy"
+],
+a:0
+},
+{
+q:"Identify tense: I had finished my homework",
+options:[
+"Past Perfect",
+"Present Perfect",
+"Past Continuous",
+"Simple Past"
+],
+a:0
+},
+{
+q:"Convert to DIRECT: He said he was tired",
+options:[
+"He said 'I am tired'",
+"He said 'I was tired'",
+"He said 'I tired'",
+"He tired said"
+],
+a:1
+},
+{
+q:"Choose correct tense: She ___ to school daily",
+options:[
+"go",
+"goes",
+"going",
+"gone"
+],
+a:1
+},
+{
+q:"Find error: They goes to market",
+options:[
+"They go to market",
+"They going market",
+"They gone market",
+"They goes market"
+],
+a:0
+},
+{
+q:"Convert to INDIRECT: I can dance",
+options:[
+"I could dance",
+"I can danced",
+"I will dance",
+"I dancing"
+],
+a:0
+},
+{
+q:"Identify tense: She was reading a book",
+options:[
+"Past Continuous",
+"Present Perfect",
+"Simple Past",
+"Future Continuous"
+],
+a:0
+},
+{
+q:"Choose correct future tense",
+options:[
+"I will go",
+"I going",
+"I went",
+"I goes"
+],
+a:0
+},
+{
+q:"Convert to DIRECT: They said they were happy",
+options:[
+"They said 'We are happy'",
+"They said 'We were happy'",
+"They said happy",
+"They happy said"
+],
+a:1
+},
+{
+q:"Pick correct form: He ___ a letter now",
+options:[
+"writes",
+"write",
+"writing",
+"wrote"
+],
+a:0
+},
+{
+q:"Convert to INDIRECT: She said 'I will win'",
+options:[
+"She said that she would win",
+"She said she will win",
+"She said she wins",
+"She said winning"
+],
+a:0
+},
+{
+q:"Identify tense: They will have finished",
+options:[
+"Future Perfect",
+"Past Perfect",
+"Present Perfect",
+"Future Continuous"
+],
+a:0
+},
+{
+q:"Choose correct sentence",
+options:[
+"He is playing",
+"He playing is",
+"He play is",
+"He played is"
+],
+a:0
+},
+{
+q:"Convert to INDIRECT: He said 'I am late'",
+options:[
+"He said that he was late",
+"He said he is late",
+"He said I late",
+"He said late"
+],
+a:0
+},
+{
+q:"Identify tense: She sings beautifully",
+options:[
+"Simple Present",
+"Past Continuous",
+"Future Perfect",
+"Present Continuous"
+],
+a:0
 }
-
-/* 15 HOTS TENSE QUESTIONS */
-const questions=[
-{q:"Change to INDIRECT: She said, 'I am happy.'",options:["She said that she was happy.","She said she is happy.","She said she happy.","She said happy was."],a:0},
-{q:"Identify tense: I had written the letter.",options:["Past Perfect","Present Perfect","Future Perfect","Past Continuous"],a:0},
-{q:"Convert to DIRECT: He said he was tired.",options:["He said, 'I am tired.'","He said, 'I was tired.'","He said, 'I will tired.'","He said, 'I tired.'"],a:1},
-{q:"Choose correct: She ___ going to school (is/are)",options:["is","are","be","am"],a:0},
-{q:"Find error: They goes to market daily.",options:["They go to market daily.","They goes to market daily.","They going market.","They will go market."],a:0},
-{q:"Convert: He plays football → past",options:["He played football.","He playing football.","He plays football.","He will play football."],a:0},
-{q:"Indirect speech: He said 'I can swim'",options:["He said that he could swim.","He said he can swim.","He said he will swim.","He said he swims."],a:0},
-{q:"Identify tense: She was reading a book",options:["Past Continuous","Present Continuous","Future Continuous","Simple Past"],a:0},
-{q:"Convert: I write a letter → future",options:["I will write a letter.","I wrote a letter.","I writing a letter.","I will wrote a letter."],a:0},
-{q:"HOTS: Find error",options:["He has gone home.","He have went home.","He gone home.","He is go home."],a:0},
-{q:"Indirect: They said 'We are busy'",options:["They said that they were busy.","They said they are busy.","They said we are busy.","They said busy were."],a:0},
-{q:"Future perfect:","options":["I will have finished work.","I will finished work.","I have finish work.","I will finishing work."],a:0},
-{q:"Past continuous:",options:["They were playing.","They are playing.","They will play.","They play."],a:0},
-{q:"Change: She sings well → past",options:["She sang well.","She sings welled.","She singing well.","She will sang."],a:0},
-{q:"Indirect: I am late",options:["He said he was late.","He said I am late.","He said he late.","He said late was."],a:0}
 ];
 
-/* SPAWN STARS */
+/* ===== STAR SPAWN ===== */
 function spawnStars(){
-stars.forEach(s=>s.remove());
+document.querySelectorAll(".star").forEach(s=>s.remove());
 stars=[];
 for(let i=0;i<3;i++){
-    let s=document.createElement("div");
-    s.className="star";
-    s.style.left=Math.random()*700+"px";
-    s.style.top=Math.random()*350+"px";
-    document.getElementById("maze").appendChild(s);
-    stars.push(s);
+let s=document.createElement("div");
+s.className="star";
+s.style.left=Math.random()*700+"px";
+s.style.top=Math.random()*400+"px";
+document.getElementById("maze").appendChild(s);
+stars.push(s);
 }
 }
 
-/* MOVE PLAYER */
+/* ===== MOVE PLAYER ===== */
 function move(dx,dy){
-player.x+=dx; player.y+=dy;
+player.x+=dx;
+player.y+=dy;
+
 document.getElementById("player").style.left=player.x+"px";
 document.getElementById("player").style.top=player.y+"px";
+
 checkCollision();
 }
 
-/* CHECK STAR COLLISION */
+/* ===== COLLISION ===== */
 function checkCollision(){
 stars.forEach((s,i)=>{
-    let sx=s.offsetLeft,sy=s.offsetTop;
-    if(Math.abs(player.x-sx)<20 && Math.abs(player.y-sy)<20){
-        s.remove(); stars.splice(i,1); collected++;
-        document.getElementById("stars").innerText=collected;
-        if(collected===3){showQuestion();collected=0;}
-    }
+let r=s.getBoundingClientRect();
+let p=document.getElementById("player").getBoundingClientRect();
+
+if(!(p.right<r.left||p.left>r.right||p.bottom<r.top||p.top>r.bottom)){
+s.remove();
+stars.splice(i,1);
+collected++;
+document.getElementById("stars").innerText=collected;
+
+if(collected===3){
+openQuestion();
+collected=0;
+}
+}
 });
 }
 
-/* SHOW QUESTION MODAL */
-function showQuestion(){
-let q=questions[level];
-document.getElementById("modal").style.display="flex";
-document.getElementById("question").innerText=q.q;
+/* ===== QUESTION ===== */
+function openQuestion(){
+let q=questions[qIndex];
+document.getElementById("qbox").style.display="block";
+document.getElementById("qtext").innerText=q.q;
+
 let html="";
-q.options.forEach((o,i)=>html+=`<div class="option" onclick="answer(${i})">${o}</div>`);
-document.getElementById("options").innerHTML=html;
+q.options.forEach((opt,i)=>{
+html+=`<button onclick="answer(${i})">${opt}</button>`;
+});
+document.getElementById("opts").innerHTML=html;
 }
 
-/* ANSWER CHECK */
 function answer(i){
-if(i===questions[level].a) score++;
-level++;
+document.getElementById("qbox").style.display="none";
+
+if(i===questions[qIndex].a){
+score++;
+}
+
+qIndex++;
+
 document.getElementById("score").innerText=score;
-document.getElementById("progress").innerText=level+"/15";
-let node=document.getElementById("n"+level);
-if(node) node.classList.add("active");
-document.getElementById("modal").style.display="none";
+document.getElementById("qcount").innerText=qIndex+"/15";
+
 spawnStars();
 }
 
 /* INIT */
-setTimeout(()=>{
-document.getElementById("splash").style.display="none";
-document.getElementById("gameArea").style.display="block";
-updatePlayer();
 spawnStars();
-},3000);
 
-function updatePlayer(){
-document.getElementById("player").style.left=player.x+"px";
-document.getElementById("player").style.top=player.y+"px";
-}
 </script>
-
 </body>
 </html>
