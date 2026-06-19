@@ -9,7 +9,7 @@
 body{
 margin:0;
 font-family:Arial;
-background:linear-gradient(to bottom,#c2f0ff,#fff3b0);
+background:linear-gradient(to bottom,#dff6ff,#fff7c2);
 }
 
 /* WORD BANK */
@@ -18,26 +18,26 @@ display:flex;
 flex-wrap:wrap;
 gap:6px;
 padding:10px;
-background:#fff7d6;
+background:#fff3d6;
 border-bottom:2px solid #ccc;
 position:sticky;
 top:0;
 z-index:1000;
-min-height:60px;
+min-height:70px;
 }
 
 /* WORDS */
 .word{
-padding:6px 8px;
+padding:6px 10px;
 background:#ffd966;
-border-radius:8px;
+border-radius:10px;
 font-weight:bold;
+font-size:13px;
 cursor:grab;
 user-select:none;
-font-size:13px;
 }
 
-/* BASKET GRID */
+/* BASKETS */
 .container{
 display:grid;
 grid-template-columns:repeat(2,1fr);
@@ -45,20 +45,17 @@ gap:8px;
 padding:8px;
 }
 
-/* SMALL BASKETS (FIXED) */
+/* SMALL CLEAN BASKETS */
 .box{
 background:linear-gradient(145deg,#ffffff,#eaf6ff);
-min-height:85px;   /* SMALL SIZE */
+min-height:90px;
 border-radius:14px;
 border:2px dashed #4aa3df;
 box-shadow:0 6px 12px rgba(0,0,0,0.12);
-position:relative;
 padding:6px;
-font-size:12px;
-overflow:hidden;
+position:relative;
 }
 
-/* LABEL */
 .box::before{
 content:attr(data-label);
 position:absolute;
@@ -67,11 +64,11 @@ left:6px;
 background:#2196F3;
 color:white;
 padding:2px 6px;
-border-radius:12px;
-font-size:9px;
+border-radius:10px;
+font-size:10px;
 }
 
-/* WORD INSIDE BASKET */
+/* INSIDE WORD */
 .inside-word{
 display:inline-block;
 margin:3px;
@@ -82,7 +79,25 @@ font-size:12px;
 font-weight:bold;
 }
 
-/* MOBILE */
+/* END SCREEN */
+#endScreen{
+display:none;
+text-align:center;
+padding:30px;
+}
+
+button{
+padding:10px 14px;
+border:none;
+border-radius:10px;
+background:#4CAF50;
+color:white;
+font-weight:bold;
+cursor:pointer;
+margin-top:10px;
+}
+
+/* MOBILE SAFE */
 @media(max-width:600px){
 .container{
 grid-template-columns:1fr;
@@ -107,6 +122,13 @@ grid-template-columns:1fr;
 <div class="box" id="countable" data-label="Countable"></div>
 <div class="box" id="uncountable" data-label="Uncountable"></div>
 
+</div>
+
+<!-- END -->
+<div id="endScreen">
+<h1>🎉 Game Completed!</h1>
+<h2 id="scoreText"></h2>
+<button onclick="location.reload()">Play Again</button>
 </div>
 
 <script>
@@ -134,35 +156,34 @@ const nouns=[
 {w:"Salt",t:"uncountable"}
 ];
 
+let score = 0;
+let total = nouns.length;
+let placed = 0;
+
 function shuffle(a){
 return a.sort(()=>Math.random()-0.5);
 }
 
-/* LOAD WORDS */
 function loadWords(){
-let box=document.getElementById("words");
+const box=document.getElementById("words");
 box.innerHTML="";
 
 shuffle(nouns).forEach(n=>{
-let d=document.createElement("div");
+const d=document.createElement("div");
 d.className="word";
 d.textContent=n.w;
 d.dataset.type=n.t;
 d.draggable=true;
 
-/* DRAG START */
-d.ondragstart=e=>{
+d.ondragstart=(e)=>{
 e.dataTransfer.setData("type",n.t);
 e.dataTransfer.setData("text",n.w);
-
-/* REMOVE FROM TOP BANK */
 setTimeout(()=>d.remove(),50);
 };
 
 box.appendChild(d);
 });
 
-/* DROP ZONES */
 document.querySelectorAll(".box").forEach(b=>{
 b.ondragover=e=>e.preventDefault();
 
@@ -171,13 +192,28 @@ let type=e.dataTransfer.getData("type");
 let text=e.dataTransfer.getData("text");
 
 if(type===b.id){
+
+score++;
+
 let el=document.createElement("div");
 el.className="inside-word";
 el.textContent=text;
 b.appendChild(el);
+
+placed++;
+
+checkEnd();
 }
 };
 });
+}
+
+function checkEnd(){
+if(placed === total){
+document.getElementById("endScreen").style.display="block";
+document.getElementById("scoreText").innerText=
+"Score: " + score + " / " + total;
+}
 }
 
 loadWords();
