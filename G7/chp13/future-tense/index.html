@@ -3,116 +3,44 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Future Tense Space Race FIXED</title>
-
+<title>Future Tense Space Race - Full Questions</title>
 <style>
-body{
-margin:0;
-font-family:Arial;
-background:#0b1d51;
-color:#fff;
-overflow:hidden;
-}
-
-#logoScreen,#gameScreen,#endScreen{
-display:none;
-width:100%;
-height:100vh;
-align-items:center;
-justify-content:center;
-flex-direction:column;
-}
-
-#logoScreen img{
-width:200px;
-}
-
-/* GAME UI */
+body{margin:0;font-family:Arial,sans-serif;background:#0b1d51;color:#fff;overflow:hidden;}
+#logoScreen,#gameScreen,#endScreen{display:none;width:100%;height:100vh;align-items:center;justify-content:center;flex-direction:column;}
+#logoScreen img{width:200px;margin-top:40px;}
 h1{text-align:center;color:#ffd60a;margin:10px;}
-
 #scoreText{margin:10px;font-size:20px;}
-#questionText{text-align:center;margin:10px;}
-
-#options{
-display:flex;
-flex-direction:column;
-align-items:center;
-gap:10px;
-margin-top:10px;
-}
-
-.option{
-background:#ff6f61;
-padding:10px 20px;
-border-radius:12px;
-cursor:pointer;
-font-weight:bold;
-width:80%;
-text-align:center;
-}
-
+#questionText{text-align:center;margin:10px;font-size:18px;}
+#options{display:flex;flex-direction:column;align-items:center;gap:10px;margin-top:15px;}
+.option{background:#ff6f61;padding:10px 20px;border-radius:12px;cursor:pointer;font-weight:bold;width:80%;text-align:center;}
 .option.correct{background:#4caf50;}
 .option.wrong{background:#e53935;}
-
-/* TRACK */
-#track{
-position:relative;
-width:90%;
-height:150px;
-background:#222;
-border:2px solid #fff;
-margin-top:20px;
-overflow:hidden;
-}
-
-/* FIXED SPACESHIP */
-#spaceship{
-position:absolute;
-bottom:10px;
-left:0px;
-width:60px;
-transition:left 0.6s ease;
-}
-
-/* END */
+#track{position:relative;width:90%;height:120px;background:#222;border:2px solid #fff;margin-top:20px;overflow:hidden;} /* reduced height */
+#spaceship{position:absolute;bottom:5px;left:0px;width:60px;transition:left 0.6s ease;} /* reduced bottom */
+button{padding:10px 16px;margin-top:20px;border-radius:12px;border:none;background:#ff6f61;color:#fff;font-weight:bold;cursor:pointer;}
 #endScreen{text-align:center;}
-
-button{
-padding:10px 16px;
-margin-top:20px;
-border-radius:10px;
-border:none;
-background:#ff6f61;
-color:#fff;
-font-weight:bold;
-cursor:pointer;
-}
 </style>
 </head>
-
 <body>
 
-<!-- LOGO -->
+<!-- Logo -->
 <div id="logoScreen">
 <img src="assets/innovine-logo.png">
 <h2>Launching Mission...</h2>
 </div>
 
-<!-- GAME -->
+<!-- Game -->
 <div id="gameScreen">
 <h1>Future Tense Space Race</h1>
-
 <div id="scoreText">Score: 0</div>
 <div id="questionText"></div>
 <div id="options"></div>
-
 <div id="track">
-<img id="spaceship" src="assets/spaceship.png"
-onerror="this.src='https://img.icons8.com/color/96/rocket.png'">
+<img id="spaceship" src="assets/spaceship.png" onerror="this.src='https://img.icons8.com/color/96/rocket.png'">
 </div>
 </div>
 
-<!-- END -->
+<!-- End Screen -->
 <div id="endScreen">
 <h1>Mission Complete!</h1>
 <p id="finalScore"></p>
@@ -124,129 +52,102 @@ onerror="this.src='https://img.icons8.com/color/96/rocket.png'">
 <audio id="clapSound" src="assets/clapping.mp3"></audio>
 
 <script>
-
-/* ================= DATA ================= */
+// Full 12 questions
 const sentences=[
-{q:"Which sentence is Simple Future?",a:"I will visit Paris next summer.",
-options:["I will visit Paris next summer.","She will be reading when I arrive.","They will have finished homework by 8 PM."]},
-
-{q:"Which sentence is Future Continuous?",a:"She will be reading when I arrive.",
-options:["She will be reading when I arrive.","I will visit Paris next summer.","We will have completed project by Friday."]},
-
-{q:"Which sentence is Future Perfect?",a:"They will have finished their homework by 8 PM.",
-options:["They will have finished their homework by 8 PM.","He will travel tomorrow.","I will be studying at 10 AM."]},
-
-{q:"Which sentence is Simple Future?",a:"He will travel to London tomorrow.",
-options:["He will travel to London tomorrow.","I will have sent the email before lunch.","They will be playing football at 5 PM."]}
+{q:"Which sentence is Simple Future?",a:"I will visit Paris next summer.",options:["I will visit Paris next summer.","She will be reading when I arrive.","They will have finished homework by 8 PM."]},
+{q:"Which sentence is Future Continuous?",a:"She will be reading when I arrive.",options:["She will be reading when I arrive.","I will visit Paris next summer.","We will have completed project by Friday."]},
+{q:"Which sentence is Future Perfect?",a:"They will have finished homework by 8 PM.",options:["They will have finished homework by 8 PM.","He will travel tomorrow.","I will be studying at 10 AM."]},
+{q:"Which sentence is Simple Future?",a:"He will travel to London tomorrow.",options:["He will travel to London tomorrow.","I will have sent the email before lunch.","They will be playing football at 5 PM."]},
+{q:"Which sentence is Future Continuous?",a:"I will be studying at 10 AM.",options:["I will be studying at 10 AM.","She will attend meeting next week.","He will call after dinner."]},
+{q:"Which sentence is Future Perfect?",a:"We will have completed the project by Friday.",options:["We will have completed the project by Friday.","I will visit Paris next summer.","She will be reading when I arrive."]},
+{q:"Which sentence is Simple Future?",a:"She will attend the meeting next week.",options:["She will attend the meeting next week.","They will be playing football at 5 PM.","I will have sent the email before lunch."]},
+{q:"Which sentence is Future Continuous?",a:"They will be playing football at 5 PM.",options:["They will be playing football at 5 PM.","I will call you after dinner.","We will have completed project by Friday."]},
+{q:"Which sentence is Future Perfect?",a:"I will have sent the email before lunch.",options:["I will have sent the email before lunch.","She will attend meeting next week.","He will travel to London tomorrow."]},
+{q:"Which sentence is Simple Future?",a:"He will call you after dinner.",options:["He will call you after dinner.","I will be studying at 10 AM.","They will have finished homework by 8 PM."]},
+{q:"Which sentence is Future Continuous?",a:"She will be attending the class tomorrow.",options:["She will be attending the class tomorrow.","I will visit Paris next summer.","We will have completed project by Friday."]},
+{q:"Which sentence is Future Perfect?",a:"They will have submitted the report by 5 PM.",options:["They will have submitted the report by 5 PM.","He will travel tomorrow.","I will be studying at 10 AM."]}
 ];
 
 let current=0;
 let score=0;
+let shipPosition=0;
 
-/* IMPORTANT FIX */
-let shipPosition = 0;
+// DOM
+const gameScreen=document.getElementById('gameScreen');
+const logoScreen=document.getElementById('logoScreen');
+const endScreen=document.getElementById('endScreen');
+const questionText=document.getElementById('questionText');
+const optionsDiv=document.getElementById('options');
+const scoreText=document.getElementById('scoreText');
+const spaceship=document.getElementById('spaceship');
+const finalScore=document.getElementById('finalScore');
+const correctAudio=document.getElementById('correctSound');
+const wrongAudio=document.getElementById('wrongSound');
+const clapAudio=document.getElementById('clapSound');
 
-/* DOM */
-const ship=document.getElementById("spaceship");
-const track=document.getElementById("track");
-
-/* ================= START ================= */
+// Logo 5 sec
+logoScreen.style.display='flex';
 setTimeout(()=>{
-document.getElementById("logoScreen").style.display="none";
-document.getElementById("gameScreen").style.display="flex";
-loadQ();
+  logoScreen.style.display='none';
+  gameScreen.style.display='flex';
+  showQuestion();
 },5000);
 
-/* ================= LOAD QUESTION ================= */
-function loadQ(){
-
-if(current>=sentences.length){
-endGame();
-return;
+function showQuestion(){
+  optionsDiv.innerHTML='';
+  if(current>=sentences.length){ endGame(); return; }
+  let s=sentences[current];
+  questionText.innerText=s.q;
+  let shuffled=s.options.sort(()=>Math.random()-0.5);
+  shuffled.forEach(opt=>{
+    const btn=document.createElement('div');
+    btn.className='option';
+    btn.innerText=opt;
+    btn.onclick=()=>checkAnswer(btn,opt,s.a);
+    optionsDiv.appendChild(btn);
+  });
 }
 
-let q=sentences[current];
-
-document.getElementById("questionText").innerText=q.q;
-document.getElementById("scoreText").innerText="Score: "+score;
-
-let box=document.getElementById("options");
-box.innerHTML="";
-
-q.options.forEach(opt=>{
-let div=document.createElement("div");
-div.className="option";
-div.innerText=opt;
-
-div.onclick=()=>check(opt,div,q.a);
-
-box.appendChild(div);
-});
+function checkAnswer(btn,selected,correct){
+  if(selected===correct){
+    btn.classList.add('correct');
+    correctAudio.currentTime=0; correctAudio.play();
+    moveSpaceship();
+  }else{
+    btn.classList.add('wrong');
+    wrongAudio.currentTime=0; wrongAudio.play();
+    setTimeout(()=>btn.classList.remove('wrong'),300);
+  }
+  setTimeout(()=>{
+    current++;
+    showQuestion();
+  },600);
 }
 
-/* ================= CHECK ================= */
-function check(selected,btn,correct){
-
-if(selected===correct){
-score++;
-btn.classList.add("correct");
-document.getElementById("correctSound").play();
-moveShip();
-}else{
-btn.classList.add("wrong");
-document.getElementById("wrongSound").play();
+function moveSpaceship(){
+  score++;
+  scoreText.innerText=`Score: ${score}`;
+  let track=document.getElementById('track');
+  let step=track.offsetWidth/sentences.length;
+  shipPosition += step;
+  if(shipPosition>track.offsetWidth-60) shipPosition=track.offsetWidth-60;
+  spaceship.style.left=shipPosition+'px';
 }
 
-setTimeout(()=>{
-current++;
-loadQ();
-},700);
-}
-
-/* ================= FIXED SHIP MOVEMENT ================= */
-function moveShip(){
-
-let max=track.offsetWidth - 70;
-
-/* STEP PER QUESTION */
-let step = max / sentences.length;
-
-shipPosition += step;
-
-if(shipPosition > max){
-shipPosition = max;
-}
-
-ship.style.left = shipPosition + "px";
-}
-
-/* ================= END ================= */
 function endGame(){
-
-document.getElementById("gameScreen").style.display="none";
-document.getElementById("endScreen").style.display="flex";
-
-document.getElementById("clapSound").play();
-
-document.getElementById("finalScore").innerText=
-`Score: ${score} / ${sentences.length}`;
+  gameScreen.style.display='none';
+  endScreen.style.display='flex';
+  finalScore.innerText=`Your Score: ${score} / ${sentences.length}`;
+  clapAudio.play();
 }
 
-/* ================= RESTART ================= */
 function restartGame(){
-current=0;
-score=0;
-shipPosition=0;
-
-ship.style.left="0px";
-
-document.getElementById("endScreen").style.display="none";
-document.getElementById("gameScreen").style.display="flex";
-
-loadQ();
+  current=0;
+  score=0;
+  shipPosition=0;
+  spaceship.style.left='0px';
+  endScreen.style.display='none';
+  gameScreen.style.display='flex';
+  scoreText.innerText='Score: 0';
+  showQuestion();
 }
-
-</script>
-
-</body>
-</html>
