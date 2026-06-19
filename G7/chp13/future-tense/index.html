@@ -3,33 +3,31 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Future Tense Space Race - Full Questions</title>
+<title>Future Tense Space Race</title>
 <style>
-body{margin:0;font-family:Arial,sans-serif;background:#0b1d51;color:#fff;overflow:hidden;}
+body{margin:0;font-family:Arial;background:#0b1d51;color:#fff;overflow:hidden;}
 #logoScreen,#gameScreen,#endScreen{display:none;width:100%;height:100vh;align-items:center;justify-content:center;flex-direction:column;}
 #logoScreen img{width:200px;margin-top:40px;}
 h1{text-align:center;color:#ffd60a;margin:10px;}
-#scoreText{margin:10px;font-size:20px;}
+#scoreText{font-size:20px;margin:10px;}
 #questionText{text-align:center;margin:10px;font-size:18px;}
 #options{display:flex;flex-direction:column;align-items:center;gap:10px;margin-top:15px;}
 .option{background:#ff6f61;padding:10px 20px;border-radius:12px;cursor:pointer;font-weight:bold;width:80%;text-align:center;}
 .option.correct{background:#4caf50;}
 .option.wrong{background:#e53935;}
-#track{position:relative;width:90%;height:120px;background:#222;border:2px solid #fff;margin-top:20px;overflow:hidden;} /* reduced height */
-#spaceship{position:absolute;bottom:5px;left:0px;width:60px;transition:left 0.6s ease;} /* reduced bottom */
-button{padding:10px 16px;margin-top:20px;border-radius:12px;border:none;background:#ff6f61;color:#fff;font-weight:bold;cursor:pointer;}
+#track{position:relative;width:90%;height:100px;background:#222;border:2px solid #fff;margin-top:20px;overflow:hidden;}
+#spaceship{position:absolute;bottom:5px;left:0px;width:60px;transition:left 0.6s ease;}
+button{padding:10px 16px;margin-top:20px;border-radius:10px;border:none;background:#ff6f61;color:#fff;font-weight:bold;cursor:pointer;}
 #endScreen{text-align:center;}
 </style>
 </head>
 <body>
 
-<!-- Logo -->
 <div id="logoScreen">
 <img src="assets/innovine-logo.png">
 <h2>Launching Mission...</h2>
 </div>
 
-<!-- Game -->
 <div id="gameScreen">
 <h1>Future Tense Space Race</h1>
 <div id="scoreText">Score: 0</div>
@@ -40,7 +38,6 @@ button{padding:10px 16px;margin-top:20px;border-radius:12px;border:none;backgrou
 </div>
 </div>
 
-<!-- End Screen -->
 <div id="endScreen">
 <h1>Mission Complete!</h1>
 <p id="finalScore"></p>
@@ -52,7 +49,7 @@ button{padding:10px 16px;margin-top:20px;border-radius:12px;border:none;backgrou
 <audio id="clapSound" src="assets/clapping.mp3"></audio>
 
 <script>
-// Full 12 questions
+// Questions
 const sentences=[
 {q:"Which sentence is Simple Future?",a:"I will visit Paris next summer.",options:["I will visit Paris next summer.","She will be reading when I arrive.","They will have finished homework by 8 PM."]},
 {q:"Which sentence is Future Continuous?",a:"She will be reading when I arrive.",options:["She will be reading when I arrive.","I will visit Paris next summer.","We will have completed project by Friday."]},
@@ -85,7 +82,7 @@ const correctAudio=document.getElementById('correctSound');
 const wrongAudio=document.getElementById('wrongSound');
 const clapAudio=document.getElementById('clapSound');
 
-// Logo 5 sec
+// Show logo 5s
 logoScreen.style.display='flex';
 setTimeout(()=>{
   logoScreen.style.display='none';
@@ -93,9 +90,10 @@ setTimeout(()=>{
   showQuestion();
 },5000);
 
+// Show current question
 function showQuestion(){
   optionsDiv.innerHTML='';
-  if(current>=sentences.length){ endGame(); return; }
+  if(current>=sentences.length){ endGame(); return;}
   let s=sentences[current];
   questionText.innerText=s.q;
   let shuffled=s.options.sort(()=>Math.random()-0.5);
@@ -108,6 +106,7 @@ function showQuestion(){
   });
 }
 
+// Check answer and move ship
 function checkAnswer(btn,selected,correct){
   if(selected===correct){
     btn.classList.add('correct');
@@ -121,26 +120,29 @@ function checkAnswer(btn,selected,correct){
   setTimeout(()=>{
     current++;
     showQuestion();
-  },600);
+  },700);
 }
 
+// Move spaceship step-by-step
 function moveSpaceship(){
   score++;
   scoreText.innerText=`Score: ${score}`;
-  let track=document.getElementById('track');
-  let step=track.offsetWidth/sentences.length;
-  shipPosition += step;
-  if(shipPosition>track.offsetWidth-60) shipPosition=track.offsetWidth-60;
+  let maxWidth=document.getElementById('track').offsetWidth - 60;
+  let step=maxWidth/sentences.length;
+  shipPosition+=step;
+  if(shipPosition>maxWidth) shipPosition=maxWidth;
   spaceship.style.left=shipPosition+'px';
 }
 
+// End game
 function endGame(){
   gameScreen.style.display='none';
   endScreen.style.display='flex';
-  finalScore.innerText=`Your Score: ${score} / ${sentences.length}`;
+  finalScore.innerText=`Score: ${score} / ${sentences.length}`;
   clapAudio.play();
 }
 
+// Restart
 function restartGame(){
   current=0;
   score=0;
@@ -151,3 +153,7 @@ function restartGame(){
   scoreText.innerText='Score: 0';
   showQuestion();
 }
+</script>
+
+</body>
+</html>
