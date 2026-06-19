@@ -8,7 +8,7 @@
 body{
   margin:0;
   font-family:Arial;
-  background:#0b1020;
+  background:#070b1a;
   color:white;
   overflow:hidden;
 }
@@ -23,42 +23,64 @@ body{
   align-items:center;
   z-index:9999;
 }
-#splash img{width:350px}
+#splash img{width:320px}
 
-/* GAME AREA */
-#game{
-  display:none;
+/* HEADER */
+#topBar{
+  text-align:center;
   padding:10px;
 }
 
-/* HEADER */
 h1{
-  text-align:center;
   color:#facc15;
-  margin:10px;
+  margin:5px;
 }
 
-/* STATS */
-#stats{
+/* JOURNEY */
+#journey{
   display:flex;
-  justify-content:space-around;
-  margin-bottom:10px;
+  justify-content:center;
+  gap:8px;
+  margin:10px;
+  flex-wrap:wrap;
+}
+
+.node{
+  width:22px;
+  height:22px;
+  border-radius:50%;
+  background:#334155;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  font-size:10px;
+}
+
+.active{
+  background:#22c55e;
+  box-shadow:0 0 10px #22c55e;
+}
+
+/* GAME AREA */
+#gameArea{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:65vh;
 }
 
 /* MAZE */
 #maze{
-  position:relative;
-  width:100%;
-  height:450px;
-  background:#111827;
+  width:90%;
+  height:420px;
   border:2px solid #334155;
+  position:relative;
   overflow:hidden;
 }
 
-/* PLAYER */
 #player{
-  width:20px;
-  height:20px;
+  width:18px;
+  height:18px;
   border-radius:50%;
   background:gold;
   position:absolute;
@@ -70,7 +92,7 @@ h1{
 .star{
   width:12px;
   height:12px;
-  background:#22c55e;
+  background:#38bdf8;
   border-radius:50%;
   position:absolute;
 }
@@ -81,21 +103,21 @@ h1{
   top:20%;
   left:50%;
   transform:translateX(-50%);
-  background:#1f2937;
+  background:#111827;
   padding:15px;
   border-radius:10px;
-  display:none;
   width:80%;
+  display:none;
 }
 
 .option{
-  background:#374151;
+  background:#1f2937;
   padding:10px;
-  margin:5px 0;
+  margin:6px 0;
+  border-radius:6px;
   cursor:pointer;
-  border-radius:5px;
 }
-.option:hover{background:#4b5563}
+.option:hover{background:#374151}
 </style>
 </head>
 
@@ -105,18 +127,17 @@ h1{
   <img src="assets/logo.png">
 </div>
 
-<div id="game">
-
-<h1>⏳ Tense Time Maze Adventure</h1>
-
-<div id="stats">
-  <div>Score: <span id="score">0</span></div>
-  <div>Stars: <span id="stars">0</span>/3</div>
-  <div>Zone: <span id="zone">Present</span></div>
+<div id="topBar">
+  <h1>⏳ Tense Time Maze Adventure</h1>
+  <div>Score: <span id="score">0</span> | Zone: <span id="zone">Present</span></div>
 </div>
 
-<div id="maze">
-  <div id="player"></div>
+<div id="journey"></div>
+
+<div id="gameArea">
+  <div id="maze">
+    <div id="player"></div>
+  </div>
 </div>
 
 <div id="qbox">
@@ -124,47 +145,107 @@ h1{
   <div id="opts"></div>
 </div>
 
-</div>
+<audio id="correct" src="assets/correct.mp3"></audio>
+<audio id="wrong" src="assets/wrong.mp3"></audio>
 
 <script>
 
-/* ================= GAME STATE ================= */
+/* ================= JOURNEY ================= */
+const journey=document.getElementById("journey");
+for(let i=1;i<=15;i++){
+  let d=document.createElement("div");
+  d.className="node";
+  d.innerText=i;
+  journey.appendChild(d);
+}
+
+let currentNode=0;
+
+/* ================= STATE ================= */
 let score=0;
-let stars=0;
-let zoneIndex=0;
+let starCount=0;
+let qIndex=0;
 
 const zones=["Present","Past","Future"];
 
-/* ================= QUESTIONS ================= */
+/* ================= HOTS TENSE QUESTIONS ================= */
 const questions=[
 {
-q:"She ___ to school every day.",
-opts:["go","goes","going","gone"],
+q:"If she ___ harder, she would have passed the exam.",
+opts:["studies","had studied","studied","has studied"],
 ans:1
 },
 {
-q:"He ___ football yesterday.",
-opts:["play","played","plays","playing"],
+q:"By next year, they ___ the project.",
+opts:["complete","will complete","will have completed","completed"],
+ans:2
+},
+{
+q:"He said that he ___ waiting for hours.",
+opts:["is","was","has been","will be"],
 ans:1
 },
 {
-q:"They ___ visit tomorrow.",
-opts:["will","go","went","going"],
+q:"If I were you, I ___ that decision.",
+opts:["won't make","wouldn't make","didn't make","don't make"],
+ans:1
+},
+{
+q:"The train ___ before we reached the station.",
+opts:["left","had left","leaves","will leave"],
+ans:1
+},
+{
+q:"She ___ her homework every day.",
+opts:["do","does","done","did"],
+ans:1
+},
+{
+q:"They ___ dinner when I called them.",
+opts:["are having","were having","have","had"],
+ans:1
+},
+{
+q:"If it rains, we ___ the match.",
+opts:["cancel","will cancel","cancelled","cancels"],
+ans:1
+},
+{
+q:"He said he ___ come early.",
+opts:["will","would","shall","can"],
+ans:1
+},
+{
+q:"By 2050, humans ___ Mars.",
+opts:["colonise","will colonise","will have colonised","colonised"],
+ans:2
+},
+{
+q:"She ___ since morning.",
+opts:["works","has been working","worked","is working"],
+ans:1
+},
+{
+q:"If they had left earlier, they ___ the bus.",
+opts:["catch","would catch","would have caught","caught"],
+ans:2
+},
+{
+q:"He ___ when I entered the room.",
+opts:["sleeps","was sleeping","slept","has slept"],
+ans:1
+},
+{
+q:"They ___ football every evening.",
+opts:["play","plays","playing","played"],
 ans:0
 },
 {
-q:"She is ___ now.",
-opts:["eat","eating","ate","eats"],
-ans:1
-},
-{
-q:"He ___ when I called him.",
-opts:["sleep","was sleeping","slept","sleeps"],
+q:"The movie ___ by the time we arrived.",
+opts:["starts","had started","start","will start"],
 ans:1
 }
 ];
-
-let qIndex=0;
 
 /* ================= ELEMENTS ================= */
 const player=document.getElementById("player");
@@ -173,15 +254,15 @@ const qbox=document.getElementById("qbox");
 const q=document.getElementById("q");
 const opts=document.getElementById("opts");
 
-/* ================= MOVE PLAYER ================= */
+/* ================= MOVE ================= */
 document.addEventListener("keydown",(e)=>{
   let x=player.offsetLeft;
   let y=player.offsetTop;
 
-  if(e.key==="ArrowRight") player.style.left=(x+10)+"px";
-  if(e.key==="ArrowLeft") player.style.left=(x-10)+"px";
-  if(e.key==="ArrowUp") player.style.top=(y-10)+"px";
-  if(e.key==="ArrowDown") player.style.top=(y+10)+"px";
+  if(e.key==="ArrowRight") player.style.left=(x+12)+"px";
+  if(e.key==="ArrowLeft") player.style.left=(x-12)+"px";
+  if(e.key==="ArrowUp") player.style.top=(y-12)+"px";
+  if(e.key==="ArrowDown") player.style.top=(y+12)+"px";
 
   checkStar();
 });
@@ -194,81 +275,82 @@ function spawnStar(){
   s.style.top=Math.random()*90+"%";
   maze.appendChild(s);
 }
-
 for(let i=0;i<5;i++) spawnStar();
 
-/* ================= CHECK STAR ================= */
+/* ================= COLLISION ================= */
 function checkStar(){
-  let starsEl=document.querySelectorAll(".star");
+  document.querySelectorAll(".star").forEach(s=>{
+    let r1=player.getBoundingClientRect();
+    let r2=s.getBoundingClientRect();
 
-  starsEl.forEach(s=>{
-    let rect1=player.getBoundingClientRect();
-    let rect2=s.getBoundingClientRect();
-
-    if(!(rect1.right<rect2.left ||
-         rect1.left>rect2.right ||
-         rect1.bottom<rect2.top ||
-         rect1.top>rect2.bottom)){
+    if(!(r1.right<r2.left||r1.left>r2.right||r1.bottom<r2.top||r1.top>r2.bottom)){
       s.remove();
-      stars++;
-      document.getElementById("stars").innerText=stars;
+      starCount++;
 
-      if(stars>=3){
-        showQuestion();
+      if(starCount>=3){
+        showQ();
       }
     }
   });
 }
 
 /* ================= QUESTION ================= */
-function showQuestion(){
+function showQ(){
   qbox.style.display="block";
 
-  let qdata=questions[qIndex];
+  let data=questions[qIndex];
 
-  q.innerText=qdata.q;
+  q.innerText=data.q;
   opts.innerHTML="";
 
-  qdata.opts.forEach((o,i)=>{
+  let shuffled=[...data.opts.map((o,i)=>({o,i}))].sort(()=>Math.random()-0.5);
+
+  shuffled.forEach(item=>{
     let div=document.createElement("div");
     div.className="option";
-    div.innerText=o;
+    div.innerText=item.o;
 
     div.onclick=()=>{
-      if(i===qdata.ans){
+      if(item.i===data.ans){
         score++;
+        document.getElementById("correct").play();
+        currentNode++;
+        document.querySelectorAll(".node")[currentNode-1].classList.add("active");
+        document.getElementById("score").innerText=score;
+      } else {
+        document.getElementById("wrong").play();
       }
 
-      nextLevel();
+      next();
     };
 
     opts.appendChild(div);
   });
 }
 
-/* ================= NEXT LEVEL ================= */
-function nextLevel(){
+/* ================= NEXT ================= */
+function next(){
   qbox.style.display="none";
-  stars=0;
-  document.getElementById("stars").innerText=0;
-
+  starCount=0;
   qIndex++;
+
   if(qIndex>=questions.length){
-    alert("Game Complete!");
+    alert("🎉 Tense Master Completed!");
     location.reload();
     return;
   }
 
-  zoneIndex=(zoneIndex+1)%zones.length;
-  document.getElementById("zone").innerText=zones[zoneIndex];
+  spawnStar();
+  spawnStar();
+  spawnStar();
 
-  for(let i=0;i<3;i++) spawnStar();
+  document.getElementById("zone").innerText=
+    zones[qIndex%3];
 }
 
 /* ================= START ================= */
 setTimeout(()=>{
   document.getElementById("splash").style.display="none";
-  document.getElementById("game").style.display="block";
 },3000);
 
 </script>
