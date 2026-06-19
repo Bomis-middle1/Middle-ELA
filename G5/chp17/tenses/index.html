@@ -8,99 +8,70 @@
 body{
 margin:0;
 font-family:Arial;
-background:linear-gradient(135deg,#1b2a4a,#0b1020);
+background:#0b1020;
 color:white;
 }
 
-/* HEADER */
 .header{
-background:linear-gradient(90deg,#ff5f6d,#ffc371);
-padding:15px;
 text-align:center;
-font-size:22px;
+padding:12px;
+font-size:20px;
 font-weight:bold;
+background:linear-gradient(90deg,#ff6b6b,#ffa94d);
 }
 
-/* STATS */
 .stats{
 display:flex;
 justify-content:space-around;
-padding:10px;
-font-size:16px;
-}
-
-/* HOW TO PLAY */
-.info{
-background:#fff3cd;
-color:#000;
-margin:10px auto;
-width:90%;
-padding:12px;
-border-radius:12px;
+padding:8px;
 font-size:14px;
 }
 
-/* MAZE */
+.info{
+background:#fff3cd;
+color:#000;
+margin:10px;
+padding:10px;
+border-radius:10px;
+font-size:13px;
+}
+
 #maze{
-width:90%;
+width:92%;
 height:450px;
 margin:auto;
-border:3px solid white;
+border:2px solid white;
 position:relative;
-background:#0f172a;
+background:#111827;
 overflow:hidden;
-border-radius:10px;
 }
 
 #player{
-width:20px;
-height:20px;
-background:#ffcc00;
+width:18px;
+height:18px;
+background:yellow;
 border-radius:50%;
 position:absolute;
 left:30px;
 top:30px;
 }
 
-/* STAR */
 .star{
-width:14px;
-height:14px;
+width:12px;
+height:12px;
 background:#38bdf8;
 border-radius:50%;
 position:absolute;
 }
 
-/* CONTROLS */
 .controls{
 text-align:center;
 margin:10px;
 }
-.controls button{
-padding:10px;
-margin:5px;
-font-size:18px;
-}
 
-/* QUESTION BOX */
-#qbox{
-display:none;
-position:fixed;
-top:20%;
-left:10%;
-width:80%;
-background:white;
-color:black;
-padding:20px;
-border-radius:15px;
-z-index:10;
-}
-#qbox button{
-display:block;
-width:100%;
-margin:10px 0;
-padding:10px;
-font-size:16px;
+button{
+padding:8px;
+margin:3px;
 }
 </style>
 </head>
@@ -130,12 +101,6 @@ Move → Collect 3 stars → Unlock tense challenge → Progress forward
 <button onclick="move(0,15)">↓</button>
 </div>
 
-<!-- QUESTION BOX -->
-<div id="qbox">
-<h3 id="qtext"></h3>
-<div id="opts"></div>
-</div>
-
 <script>
 
 let player={x:30,y:30};
@@ -144,178 +109,36 @@ let collected=0;
 let qIndex=0;
 let score=0;
 
-/* ===== TENSE QUESTIONS (HOTS MIXED) ===== */
-const questions = [
-{
-q:"Convert to INDIRECT: She said, 'I am busy'",
-options:[
-"She said that she was busy",
-"She said that she is busy",
-"She said she busy",
-"She said busy"
-],
-a:0
-},
-{
-q:"Identify tense: I had finished my homework",
-options:[
-"Past Perfect",
-"Present Perfect",
-"Past Continuous",
-"Simple Past"
-],
-a:0
-},
-{
-q:"Convert to DIRECT: He said he was tired",
-options:[
-"He said 'I am tired'",
-"He said 'I was tired'",
-"He said 'I tired'",
-"He tired said"
-],
-a:1
-},
-{
-q:"Choose correct tense: She ___ to school daily",
-options:[
-"go",
-"goes",
-"going",
-"gone"
-],
-a:1
-},
-{
-q:"Find error: They goes to market",
-options:[
-"They go to market",
-"They going market",
-"They gone market",
-"They goes market"
-],
-a:0
-},
-{
-q:"Convert to INDIRECT: I can dance",
-options:[
-"I could dance",
-"I can danced",
-"I will dance",
-"I dancing"
-],
-a:0
-},
-{
-q:"Identify tense: She was reading a book",
-options:[
-"Past Continuous",
-"Present Perfect",
-"Simple Past",
-"Future Continuous"
-],
-a:0
-},
-{
-q:"Choose correct future tense",
-options:[
-"I will go",
-"I going",
-"I went",
-"I goes"
-],
-a:0
-},
-{
-q:"Convert to DIRECT: They said they were happy",
-options:[
-"They said 'We are happy'",
-"They said 'We were happy'",
-"They said happy",
-"They happy said"
-],
-a:1
-},
-{
-q:"Pick correct form: He ___ a letter now",
-options:[
-"writes",
-"write",
-"writing",
-"wrote"
-],
-a:0
-},
-{
-q:"Convert to INDIRECT: She said 'I will win'",
-options:[
-"She said that she would win",
-"She said she will win",
-"She said she wins",
-"She said winning"
-],
-a:0
-},
-{
-q:"Identify tense: They will have finished",
-options:[
-"Future Perfect",
-"Past Perfect",
-"Present Perfect",
-"Future Continuous"
-],
-a:0
-},
-{
-q:"Choose correct sentence",
-options:[
-"He is playing",
-"He playing is",
-"He play is",
-"He played is"
-],
-a:0
-},
-{
-q:"Convert to INDIRECT: He said 'I am late'",
-options:[
-"He said that he was late",
-"He said he is late",
-"He said I late",
-"He said late"
-],
-a:0
-},
-{
-q:"Identify tense: She sings beautifully",
-options:[
-"Simple Present",
-"Past Continuous",
-"Future Perfect",
-"Present Continuous"
-],
-a:0
-}
-];
-
-/* ===== STAR SPAWN ===== */
+/* FIXED STAR SYSTEM (CONSISTENT SPAWN INSIDE GRID) */
 function spawnStars(){
 document.querySelectorAll(".star").forEach(s=>s.remove());
 stars=[];
+
 for(let i=0;i<3;i++){
 let s=document.createElement("div");
 s.className="star";
-s.style.left=Math.random()*700+"px";
-s.style.top=Math.random()*400+"px";
-document.getElementById("maze").appendChild(s);
+
+/* IMPORTANT FIX: proper bounded area */
+let mx=document.getElementById("maze");
+
+s.style.left=Math.random()*(mx.clientWidth-30)+"px";
+s.style.top=Math.random()*(mx.clientHeight-30)+"px";
+
+mx.appendChild(s);
 stars.push(s);
 }
 }
 
-/* ===== MOVE PLAYER ===== */
+/* MOVE PLAYER */
 function move(dx,dy){
 player.x+=dx;
 player.y+=dy;
+
+let maze=document.getElementById("maze");
+
+/* boundary fix */
+player.x=Math.max(0,Math.min(maze.clientWidth-20,player.x));
+player.y=Math.max(0,Math.min(maze.clientHeight-20,player.y));
 
 document.getElementById("player").style.left=player.x+"px";
 document.getElementById("player").style.top=player.y+"px";
@@ -323,57 +146,39 @@ document.getElementById("player").style.top=player.y+"px";
 checkCollision();
 }
 
-/* ===== COLLISION ===== */
+/* COLLISION FIX */
 function checkCollision(){
-stars.forEach((s,i)=>{
-let r=s.getBoundingClientRect();
 let p=document.getElementById("player").getBoundingClientRect();
 
-if(!(p.right<r.left||p.left>r.right||p.bottom<r.top||p.top>r.bottom)){
+stars.forEach((s,i)=>{
+let r=s.getBoundingClientRect();
+
+if(
+p.left < r.right &&
+p.right > r.left &&
+p.top < r.bottom &&
+p.bottom > r.top
+){
 s.remove();
 stars.splice(i,1);
+
 collected++;
 document.getElementById("stars").innerText=collected;
 
 if(collected===3){
-openQuestion();
-collected=0;
-}
-}
-});
-}
-
-/* ===== QUESTION ===== */
-function openQuestion(){
-let q=questions[qIndex];
-document.getElementById("qbox").style.display="block";
-document.getElementById("qtext").innerText=q.q;
-
-let html="";
-q.options.forEach((opt,i)=>{
-html+=`<button onclick="answer(${i})">${opt}</button>`;
-});
-document.getElementById("opts").innerHTML=html;
-}
-
-function answer(i){
-document.getElementById("qbox").style.display="none";
-
-if(i===questions[qIndex].a){
-score++;
-}
-
 qIndex++;
-
-document.getElementById("score").innerText=score;
 document.getElementById("qcount").innerText=qIndex+"/15";
-
+collected=0;
 spawnStars();
+}
+}
+});
 }
 
 /* INIT */
 spawnStars();
 
 </script>
+
 </body>
 </html>
