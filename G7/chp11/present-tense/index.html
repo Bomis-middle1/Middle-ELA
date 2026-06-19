@@ -14,7 +14,7 @@ color:white;
 overflow:hidden;
 }
 
-/* SCREENS */
+/* SCREEN */
 .screen{
 display:none;
 height:100vh;
@@ -27,31 +27,26 @@ text-align:center;
 .active{display:flex;}
 
 /* LOGO */
-#logoScreen img{
-width:220px;
-}
+#logoScreen img{width:220px;}
 
 /* TITLE */
 .title{
 font-size:28px;
 font-weight:bold;
-animation:pulse 1s infinite alternate;
+animation:pulse 1s infinite;
 }
-
 @keyframes pulse{
-from{transform:scale(1);}
-to{transform:scale(1.05);}
+0%{transform:scale(1);}
+50%{transform:scale(1.05);}
+100%{transform:scale(1);}
 }
 
-/* GAME BOX */
-#gameScreen{
-flex-direction:column;
-}
-
+/* GAME */
 #instruction{
 font-size:18px;
 margin-bottom:10px;
-opacity:0.9;
+padding:10px;
+opacity:0.95;
 }
 
 #sentence{
@@ -60,7 +55,6 @@ font-weight:bold;
 margin:15px;
 }
 
-/* OPTIONS */
 .option{
 background:white;
 color:black;
@@ -68,7 +62,7 @@ padding:12px;
 margin:8px;
 border-radius:10px;
 cursor:pointer;
-width:220px;
+width:250px;
 font-weight:bold;
 }
 
@@ -78,8 +72,25 @@ font-weight:bold;
 /* SCORE */
 #score{
 margin-top:10px;
-font-size:18px;
 }
+
+/* POPUP */
+#popup{
+position:fixed;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+padding:25px 40px;
+border-radius:15px;
+font-size:26px;
+font-weight:bold;
+display:none;
+z-index:9999;
+color:white;
+}
+
+#popup.correct{background:#2ecc71;}
+#popup.wrong{background:#e74c3c;}
 
 /* BUTTON */
 button{
@@ -90,11 +101,6 @@ background:#ff9800;
 color:white;
 font-weight:bold;
 cursor:pointer;
-}
-
-/* END */
-#endScreen{
-text-align:center;
 }
 </style>
 </head>
@@ -109,13 +115,14 @@ text-align:center;
 <!-- TITLE -->
 <div id="titleScreen" class="screen">
 <div class="title">🏭 Grammar Factory – Present Tenses</div>
+<p>Identify the tense used in the following sentence.</p>
 <button onclick="startGame()">Start Machine</button>
 </div>
 
 <!-- GAME -->
 <div id="gameScreen" class="screen">
 
-<div id="instruction">👉 Identify the correct Present Tense used in the sentence</div>
+<div id="instruction">👉 Identify the tense used in the following sentence.</div>
 
 <div id="sentence"></div>
 
@@ -125,38 +132,29 @@ text-align:center;
 
 </div>
 
-<!-- END -->
-<div id="endScreen" class="screen">
-<h2>🎉 Game Over</h2>
-<div id="finalScore"></div>
-<button onclick="location.reload()">Restart</button>
-</div>
+<!-- POPUP -->
+<div id="popup"></div>
 
 <script>
 
-/* ================= LOGIC ================= */
-
-const questions = [
+/* QUESTIONS */
+const questions=[
 {q:"She goes to school by bus every day.",a:"Present Simple"},
 {q:"He has been studying for three hours.",a:"Present Perfect Continuous"},
-{q:"They are playing football in the playground now.",a:"Present Continuous"},
+{q:"They are playing football now.",a:"Present Continuous"},
 {q:"We have visited Jaipur twice.",a:"Present Perfect"},
 {q:"Look! The baby is sleeping.",a:"Present Continuous"},
 {q:"The Earth moves around the Sun.",a:"Present Simple"},
 {q:"My sister has written three letters today.",a:"Present Perfect"},
 {q:"It has been raining since morning.",a:"Present Perfect Continuous"},
 {q:"My father works in a bank.",a:"Present Simple"},
-{q:"I have finished my homework.",a:"Present Perfect"},
-{q:"She is preparing for her English test this week.",a:"Present Continuous"},
-{q:"They have been practising for the competition since Monday.",a:"Present Perfect Continuous"}
+{q:"I have finished my homework.",a:"Present Perfect"}
 ];
 
-let qBank = questions.sort(()=>Math.random()-0.5).slice(0,10);
-
+let qBank = questions.sort(()=>Math.random()-0.5);
 let i=0;
 let score=0;
 
-/* OPTIONS */
 const options=[
 "Present Simple",
 "Present Continuous",
@@ -171,7 +169,7 @@ document.getElementById("gameScreen").classList.add("active");
 loadQ();
 }
 
-/* LOAD QUESTION */
+/* LOAD */
 function loadQ(){
 
 if(i>=qBank.length){
@@ -202,26 +200,38 @@ let correct=qBank[i].a;
 
 if(ans===correct){
 score++;
-document.getElementById("score").innerText="Score: "+score;
+showPopup("Correct 🎉","correct");
 el.classList.add("correct");
 }else{
+showPopup("Wrong ❌","wrong");
 el.classList.add("wrong");
 }
 
-/* move next */
+/* next */
 setTimeout(()=>{
 i++;
 loadQ();
-},800);
+},1200);
+}
+
+/* POPUP */
+function showPopup(text,type){
+
+let p=document.getElementById("popup");
+p.innerText=text;
+p.className=type;
+p.style.display="block";
+
+setTimeout(()=>{
+p.style.display="none";
+},1000);
 }
 
 /* END */
 function end(){
-document.getElementById("gameScreen").classList.remove("active");
-document.getElementById("endScreen").classList.add("active");
-
-document.getElementById("finalScore").innerText=
-`You scored ${score} / ${qBank.length}`;
+document.getElementById("gameScreen").innerHTML=
+`<h2>🎉 Game Over</h2><h3>Score: ${score}/${qBank.length}</h3>
+<button onclick="location.reload()">Restart</button>`;
 }
 
 </script>
