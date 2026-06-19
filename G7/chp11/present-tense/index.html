@@ -3,141 +3,196 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Grammar Factory - Present Tenses</title>
+<title>Grammar Factory - Production Ready</title>
 
 <style>
 body{
 margin:0;
 font-family:Arial;
 background:linear-gradient(135deg,#1d2671,#c33764,#3a7bd5);
-color:white;
 overflow:hidden;
+color:white;
 }
 
-/* SCREEN */
+/* ================= SCREENS ================= */
 .screen{
-display:none;
-height:100vh;
-width:100%;
+position:fixed;
+inset:0;
+display:flex;
 align-items:center;
 justify-content:center;
 flex-direction:column;
 text-align:center;
 }
-.active{display:flex;}
 
-/* LOGO */
-#logoScreen img{width:220px;}
+.hidden{display:none;}
 
-/* TITLE */
-.title{
-font-size:28px;
-font-weight:bold;
-animation:pulse 1s infinite;
+/* ================= LOGO ================= */
+#logoScreen{
+background:white;
+z-index:9999;
 }
-@keyframes pulse{
-0%{transform:scale(1);}
-50%{transform:scale(1.05);}
-100%{transform:scale(1);}
+#logoScreen img{
+width:220px;
+animation:zoom 1.5s ease;
+}
+@keyframes zoom{
+from{transform:scale(0.5);opacity:0;}
+to{transform:scale(1);opacity:1;}
 }
 
-/* GAME */
+/* ================= TITLE ================= */
+#titleScreen{
+background:linear-gradient(#4fc3f7,#e1f5fe);
+z-index:9998;
+color:#0d47a1;
+}
+
+#titleScreen h1{
+font-size:42px;
+animation:bounce 1.2s infinite;
+}
+@keyframes bounce{
+0%{transform:translateY(0);}
+50%{transform:translateY(-10px);}
+100%{transform:translateY(0);}
+}
+
+/* ================= GAME ================= */
+#gameScreen{
+display:none;
+flex-direction:column;
+padding-top:80px;
+}
+
 #instruction{
 font-size:18px;
 margin-bottom:10px;
-padding:10px;
-opacity:0.95;
+opacity:0.9;
 }
 
 #sentence{
 font-size:22px;
 font-weight:bold;
-margin:15px;
+margin:10px;
+padding:0 20px;
+}
+
+#options{
+display:flex;
+flex-wrap:wrap;
+justify-content:center;
+gap:10px;
+margin-top:20px;
 }
 
 .option{
 background:white;
 color:black;
 padding:12px;
-margin:8px;
 border-radius:10px;
 cursor:pointer;
-width:250px;
+min-width:220px;
+font-weight:bold;
+transition:0.2s;
+}
+
+.option:active{transform:scale(0.95);}
+
+.correct{background:#2ecc71 !important;color:white;}
+.wrong{background:#e74c3c !important;color:white;}
+
+/* ================= SCORE ================= */
+#score{
+position:fixed;
+top:10px;
+left:10px;
+font-size:18px;
 font-weight:bold;
 }
 
-.option.correct{background:#2ecc71;color:white;}
-.option.wrong{background:#e74c3c;color:white;}
-
-/* SCORE */
-#score{
-margin-top:10px;
-}
-
-/* POPUP */
+/* ================= POPUP ================= */
 #popup{
 position:fixed;
 top:50%;
 left:50%;
 transform:translate(-50%,-50%);
-padding:25px 40px;
-border-radius:15px;
-font-size:26px;
-font-weight:bold;
+padding:20px 30px;
+border-radius:12px;
+font-size:24px;
 display:none;
 z-index:9999;
 color:white;
 }
 
-#popup.correct{background:#2ecc71;}
-#popup.wrong{background:#e74c3c;}
+.good{background:#2ecc71;}
+.bad{background:#e74c3c;}
 
-/* BUTTON */
+/* ================= BUTTON ================= */
 button{
-padding:12px 18px;
+padding:12px 20px;
 border:none;
 border-radius:10px;
-background:#ff9800;
-color:white;
+background:#ffca28;
 font-weight:bold;
 cursor:pointer;
+}
+
+/* ================= CONFETTI ================= */
+.confetti{
+position:fixed;
+width:8px;
+height:8px;
+animation:fall 2s linear forwards;
+}
+
+@keyframes fall{
+to{transform:translateY(100vh) rotate(360deg);opacity:0;}
 }
 </style>
 </head>
 
 <body>
 
-<!-- LOGO -->
-<div id="logoScreen" class="screen active">
+<!-- ================= LOGO ================= -->
+<div id="logoScreen" class="screen">
 <img src="assets/innovine-logo.png">
 </div>
 
-<!-- TITLE -->
-<div id="titleScreen" class="screen">
-<div class="title">🏭 Grammar Factory – Present Tenses</div>
-<p>Identify the tense used in the following sentence.</p>
-<button onclick="startGame()">Start Machine</button>
+<!-- ================= TITLE ================= -->
+<div id="titleScreen" class="screen hidden">
+<h1>🏭 Grammar Factory</h1>
+<p>Present Tense Challenge (Grade 7)</p>
+<button onclick="startGame()">Start</button>
 </div>
 
-<!-- GAME -->
-<div id="gameScreen" class="screen">
+<!-- ================= GAME ================= -->
+<div id="gameScreen">
 
-<div id="instruction">👉 Identify the tense used in the following sentence.</div>
+<div id="score">Score: 0</div>
+
+<div id="instruction">
+👉 Identify the tense used in the following sentence
+</div>
 
 <div id="sentence"></div>
 
 <div id="options"></div>
 
-<div id="score">Score: 0</div>
-
 </div>
 
-<!-- POPUP -->
+<!-- ================= POPUP ================= -->
 <div id="popup"></div>
 
 <script>
 
-/* QUESTIONS */
+/* ================= FLOW CONTROL ================= */
+setTimeout(()=>{
+document.getElementById("logoScreen").style.display="none";
+document.getElementById("titleScreen").classList.remove("hidden");
+},5000);
+
+/* ================= QUESTIONS ================= */
 const questions=[
 {q:"She goes to school by bus every day.",a:"Present Simple"},
 {q:"He has been studying for three hours.",a:"Present Perfect Continuous"},
@@ -151,72 +206,74 @@ const questions=[
 {q:"I have finished my homework.",a:"Present Perfect"}
 ];
 
-let qBank = questions.sort(()=>Math.random()-0.5);
-let i=0;
+let qBank = questions.sort(()=>Math.random()-0.5).slice(0,10);
+
+let index=0;
 let score=0;
 
-const options=[
+/* ================= START GAME ================= */
+function startGame(){
+document.getElementById("titleScreen").style.display="none";
+document.getElementById("gameScreen").style.display="flex";
+loadQ();
+}
+
+/* ================= LOAD QUESTION ================= */
+function loadQ(){
+
+if(index>=qBank.length){
+endGame();
+return;
+}
+
+document.getElementById("sentence").innerText=qBank[index].q;
+document.getElementById("score").innerText="Score: "+score;
+
+let box=document.getElementById("options");
+box.innerHTML="";
+
+const opts=[
 "Present Simple",
 "Present Continuous",
 "Present Perfect",
 "Present Perfect Continuous"
 ];
 
-/* START */
-function startGame(){
-document.getElementById("titleScreen").classList.remove("active");
-document.getElementById("gameScreen").classList.add("active");
-loadQ();
-}
-
-/* LOAD */
-function loadQ(){
-
-if(i>=qBank.length){
-end();
-return;
-}
-
-document.getElementById("sentence").innerText=qBank[i].q;
-
-let box=document.getElementById("options");
-box.innerHTML="";
-
-options.forEach(opt=>{
+opts.forEach(o=>{
 let div=document.createElement("div");
 div.className="option";
-div.innerText=opt;
+div.innerText=o;
 
-div.onclick=()=>check(opt,div);
+div.onclick=()=>check(o,div);
 
 box.appendChild(div);
 });
 }
 
-/* CHECK */
+/* ================= CHECK ================= */
 function check(ans,el){
 
-let correct=qBank[i].a;
+let correct=qBank[index].a;
 
 if(ans===correct){
 score++;
-showPopup("Correct 🎉","correct");
+showPopup("Correct 🎉","good");
 el.classList.add("correct");
+confetti();
 }else{
-showPopup("Wrong ❌","wrong");
+showPopup("Wrong ❌","bad");
 el.classList.add("wrong");
 }
 
 /* next */
 setTimeout(()=>{
-i++;
+index++;
 loadQ();
 },1200);
 }
 
-/* POPUP */
+/* ================= POPUP ================= */
 function showPopup(text,type){
-
 let p=document.getElementById("popup");
 p.innerText=text;
 p.className=type;
@@ -227,11 +284,28 @@ p.style.display="none";
 },1000);
 }
 
-/* END */
-function end(){
-document.getElementById("gameScreen").innerHTML=
-`<h2>🎉 Game Over</h2><h3>Score: ${score}/${qBank.length}</h3>
-<button onclick="location.reload()">Restart</button>`;
+/* ================= CONFETTI ================= */
+function confetti(){
+for(let i=0;i<25;i++){
+let c=document.createElement("div");
+c.className="confetti";
+c.style.left=Math.random()*100+"vw";
+c.style.top="0px";
+c.style.background=["#ff0","#0ff","#f0f","#0f0","#f60"][Math.floor(Math.random()*5)];
+document.body.appendChild(c);
+setTimeout(()=>c.remove(),2000);
+}
+}
+
+/* ================= END GAME ================= */
+function endGame(){
+
+document.getElementById("gameScreen").innerHTML=`
+<h2>🎉 Game Completed</h2>
+<h3>Score: ${score} / ${qBank.length}</h3>
+<button onclick="location.reload()">Restart</button>
+`;
+
 }
 
 </script>
