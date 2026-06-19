@@ -2,14 +2,14 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Temple Treasure - Hunter Edition</title>
+<title>Temple Treasure - Jungle Hunter Edition</title>
 
 <style>
 body{
     margin:0;
     overflow:hidden;
     font-family:Arial;
-    background:#cfefff;
+    background:linear-gradient(to bottom,#b3e5fc,#81c784);
 }
 
 #gameArea{
@@ -17,7 +17,32 @@ body{
     width:100vw;
     height:100vh;
     overflow:hidden;
-    background:linear-gradient(to bottom,#87CEEB,#dfffb0);
+}
+
+/* TREES */
+.tree{
+    position:absolute;
+    bottom:120px;
+    font-size:100px;
+    opacity:0.7;
+    z-index:1;
+    pointer-events:none;
+}
+
+.t1{ left:8%; font-size:90px; }
+.t2{ left:25%; font-size:120px; }
+.t3{ left:55%; font-size:95px; }
+.t4{ left:78%; font-size:130px; }
+
+/* GROUND */
+#ground{
+    position:absolute;
+    bottom:0;
+    width:100%;
+    height:120px;
+    background:linear-gradient(to top,#5d4037,#8d6e63);
+    border-top:6px solid #2e7d32;
+    z-index:5;
 }
 
 /* PLAYER */
@@ -31,21 +56,16 @@ body{
     display:flex;
     justify-content:center;
     align-items:center;
+    z-index:20;
     transition: transform 0.1s linear;
 }
 
-/* facing */
-#player.right{
-    transform: scaleX(1);
-}
+#player.right{ transform:scaleX(1); }
+#player.left{ transform:scaleX(-1); }
 
-#player.left{
-    transform: scaleX(-1);
-}
-
-/* jump animation feel */
+/* jump feel */
 .jump{
-    transform: translateY(-10px);
+    transform: translateY(-12px);
 }
 
 /* COIN */
@@ -58,6 +78,7 @@ body{
     display:flex;
     justify-content:center;
     align-items:center;
+    z-index:10;
 }
 
 /* OBSTACLE */
@@ -68,19 +89,21 @@ body{
     background:#6d4c41;
     bottom:120px;
     border-radius:10px;
+    z-index:10;
 }
 
-/* UI */
+/* SCORE */
 #scoreBoard{
     position:absolute;
     top:10px;
     left:10px;
     background:white;
-    padding:10px;
+    padding:10px 15px;
     border-radius:10px;
-    z-index:10;
+    z-index:50;
 }
 
+/* QUESTION */
 #questionBox{
     position:absolute;
     top:50%;
@@ -91,19 +114,30 @@ body{
     width:80%;
     display:none;
     z-index:100;
+    border-radius:15px;
 }
+
 .optionBtn{
     display:block;
     width:100%;
     margin:10px 0;
     padding:10px;
 }
+
 </style>
 </head>
 
 <body>
 
 <div id="gameArea">
+
+<!-- TREES -->
+<div class="tree t1">🌳</div>
+<div class="tree t2">🌴</div>
+<div class="tree t3">🌳</div>
+<div class="tree t4">🌴</div>
+
+<div id="ground"></div>
 
 <div id="player" class="right">🧑‍🌾</div>
 
@@ -121,6 +155,7 @@ Coins: <span id="coinCount">0</span>
 <script>
 
 let gameRunning = true;
+
 let coins = 0;
 
 let playerY = 120;
@@ -128,11 +163,11 @@ let velocity = 0;
 let gravity = 0.6;
 let jumping = false;
 
-let direction = 1; // 1 right, -1 left
+let direction = 1;
 
 const player = document.getElementById("player");
 const coinCount = document.getElementById("coinCount");
-const questionBox = document.getElementById("questionBox");
+const gameArea = document.getElementById("gameArea");
 
 let lastTime = 0;
 
@@ -151,7 +186,6 @@ if(playerY <= 120){
     playerY = 120;
     velocity = 0;
     jumping = false;
-
     player.classList.remove("jump");
 }
 
@@ -162,14 +196,14 @@ requestAnimationFrame(gameLoop);
 
 /* JUMP */
 function jump(){
-if(!jumping && gameRunning){
+if(!jumping){
     velocity = -14;
     jumping = true;
     player.classList.add("jump");
 }
 }
 
-/* DIRECTION CONTROL */
+/* DIRECTION */
 document.addEventListener("keydown",(e)=>{
 
 if(e.code==="Space" || e.code==="ArrowUp"){
@@ -198,16 +232,14 @@ jump();
 /* COIN */
 function spawnCoin(){
 
-if(!gameRunning) return;
-
 const coin = document.createElement("div");
 coin.className = "coin";
-coin.innerHTML = "💰";
+coin.innerHTML = "💎";
 
 coin.style.left = window.innerWidth + "px";
 coin.style.bottom = (160 + Math.random()*100) + "px";
 
-document.getElementById("gameArea").appendChild(coin);
+gameArea.appendChild(coin);
 
 let move = setInterval(()=>{
 
@@ -220,26 +252,27 @@ const c = coin.getBoundingClientRect();
 const p = player.getBoundingClientRect();
 
 if(c.left < p.right && c.right > p.left && c.top < p.bottom && c.bottom > p.top){
-    coins++;
-    coinCount.innerText = coins;
-    coin.remove();
-    clearInterval(move);
+
+coins++;
+coinCount.innerText = coins;
+
+coin.remove();
+clearInterval(move);
+
 }
 
 if(left < -50){
-    coin.remove();
-    clearInterval(move);
+coin.remove();
+clearInterval(move);
 }
 
 },16);
 
-setTimeout(spawnCoin,2000);
+setTimeout(spawnCoin,2200);
 }
 
 /* OBSTACLE */
 function spawnObstacle(){
-
-if(!gameRunning) return;
 
 const obs = document.createElement("div");
 obs.className = "obstacle";
@@ -247,7 +280,7 @@ obs.innerHTML = "🪵";
 
 obs.style.left = window.innerWidth + "px";
 
-document.getElementById("gameArea").appendChild(obs);
+gameArea.appendChild(obs);
 
 let move = setInterval(()=>{
 
@@ -260,15 +293,15 @@ const o = obs.getBoundingClientRect();
 const p = player.getBoundingClientRect();
 
 if(o.left < p.right && o.right > p.left && o.top < p.bottom && o.bottom > p.top){
-    coins = Math.max(0, coins-1);
-    coinCount.innerText = coins;
-    obs.remove();
-    clearInterval(move);
+coins = Math.max(0,coins-1);
+coinCount.innerText = coins;
+obs.remove();
+clearInterval(move);
 }
 
 if(left < -50){
-    obs.remove();
-    clearInterval(move);
+obs.remove();
+clearInterval(move);
 }
 
 },16);
