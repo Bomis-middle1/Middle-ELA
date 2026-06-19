@@ -2,253 +2,215 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Punctuation Pop NEW</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Punctuation Power Dashboard - Grade 6</title>
 
 <style>
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:Arial;
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: radial-gradient(circle at top left, #a1c4fd, #c2e9fb, #fbc2eb, #fad0c4);
+  animation: bg 12s ease infinite;
+  overflow: hidden;
 }
 
-body{
-overflow:hidden;
-background:linear-gradient(#b3e5ff,#e6f7ff);
+@keyframes bg {
+  0% {background-position:0% 50%;}
+  50% {background-position:100% 50%;}
+  100% {background-position:0% 50%;}
 }
 
-/* ================= LOGO ================= */
-#logoScreen{
-position:fixed;
-inset:0;
-background:white;
-display:flex;
-justify-content:center;
-align-items:center;
-z-index:9999;
-}
-#logoScreen img{
-width:220px;
+#splash {
+  position: fixed;
+  inset: 0;
+  background: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
 }
 
-/* ================= TITLE ================= */
-#titleScreen{
-position:fixed;
-inset:0;
-display:none;
-justify-content:center;
-align-items:center;
-flex-direction:column;
-background:linear-gradient(#4fc3f7,#e1f5fe);
-z-index:9998;
-text-align:center;
+.header {
+  text-align: center;
+  padding: 10px;
+  font-weight: bold;
 }
 
-#titleScreen h1{
-font-size:50px;
-color:#0d47a1;
-animation:bounce 1.2s infinite;
+#game {
+  display: none;
+  padding: 10px;
 }
 
-@keyframes bounce{
-0%{transform:translateY(0);}
-50%{transform:translateY(-10px);}
-100%{transform:translateY(0);}
+.container {
+  display: flex;
+  gap: 10px;
 }
 
-/* ================= START ================= */
-#startScreen{
-position:fixed;
-inset:0;
-display:none;
-justify-content:center;
-align-items:center;
-background:#e3f2fd;
-z-index:9997;
+.left {
+  width: 55%;
+  background: rgba(255,255,255,0.5);
+  border-radius: 12px;
+  padding: 10px;
 }
 
-button{
-padding:15px 30px;
-font-size:18px;
-border:none;
-border-radius:10px;
-background:#ffca28;
-font-weight:bold;
-cursor:pointer;
+.sentence {
+  background: #ffd166;
+  padding: 10px;
+  margin: 8px;
+  border-radius: 10px;
+  cursor: grab;
+  font-size: 15px;
 }
 
-/* ================= GAME ================= */
-#game{
-display:none;
-width:100%;
-height:100vh;
-position:relative;
-overflow:hidden;
+.right {
+  width: 45%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
-#question{
-position:absolute;
-top:80px;
-width:100%;
-text-align:center;
-font-size:28px;
-font-weight:bold;
-color:#0d47a1;
-padding:10px;
+.kpi {
+  background: white;
+  padding: 10px;
+  border-radius: 10px;
+  text-align: center;
 }
 
-#score{
-position:absolute;
-top:10px;
-left:10px;
-font-size:20px;
-font-weight:bold;
-color:#0d47a1;
+.bucket {
+  min-height: 70px;
+  background: rgba(255,255,255,0.6);
+  border: 2px dashed #333;
+  border-radius: 10px;
+  padding: 10px;
+  font-weight: bold;
 }
 
-/* ================= BALLOON ================= */
-.balloon{
-position:absolute;
-width:60px;
-height:75px;
-border-radius:50% 50% 45% 45%;
-display:flex;
-justify-content:center;
-align-items:center;
-font-size:24px;
-font-weight:bold;
-color:white;
-cursor:pointer;
-animation:floatUp 7s linear forwards;
+#feedback {
+  background: white;
+  padding: 10px;
+  border-radius: 10px;
+  text-align: center;
 }
-
-@keyframes floatUp{
-0%{transform:translateY(100vh);}
-100%{transform:translateY(-120vh);}
-}
-
-.red{background:#ff5252;}
-.blue{background:#42a5f5;}
-.green{background:#66bb6a;}
-
 </style>
 </head>
 
 <body>
 
-<!-- ================= LOGO ================= -->
-<div id="logoScreen">
-<img src="G7/chp3/punctuation/assets/innovine-logo.png">
+<!-- SPLASH -->
+<div id="splash">
+  <img src="assets/logo.png" width="200">
 </div>
 
-<!-- ================= TITLE ================= -->
-<div id="titleScreen">
-<h1>Punctuation Pop 🎈</h1>
-<p>Tap the correct punctuation!</p>
-</div>
-
-<!-- ================= START ================= -->
-<div id="startScreen">
-<button onclick="startGame()">Start Game</button>
-</div>
-
-<!-- ================= GAME ================= -->
+<!-- GAME -->
 <div id="game">
-<div id="score">Score: 0</div>
-<div id="question">Loading...</div>
+
+  <div class="header">
+    Punctuation & Capitalisation Mastery <br>
+    <small>Grade 6 Grammar Challenge</small><br>
+    <b id="progress">Progress: 0 / 15</b>
+  </div>
+
+  <div class="container">
+
+    <div class="left" id="sentences"></div>
+
+    <div class="right">
+
+      <div class="kpi" id="kpi">Accuracy: 0%</div>
+
+      <div class="bucket" data-type="?">Question Mark (?)</div>
+      <div class="bucket" data-type="!">Exclamation (!)</div>
+      <div class="bucket" data-type=".">Full Stop (.)</div>
+      <div class="bucket" data-type=",">Comma (,)</div>
+
+      <div id="feedback">Drag sentences into correct punctuation buckets</div>
+
+    </div>
+  </div>
 </div>
 
 <script>
 
-/* ================= FLOW ================= */
-setTimeout(()=>{
-document.getElementById("logoScreen").style.display="none";
-document.getElementById("titleScreen").style.display="flex";
-},5000);
+/* ===================== GRADE 6 QUESTIONS ===================== */
+/* Includes punctuation + CAPITALISATION logic */
 
-setTimeout(()=>{
-document.getElementById("titleScreen").style.display="none";
-document.getElementById("startScreen").style.display="flex";
-},8000);
+const data = [
+{t:"what time does the train arrive in delhi", type:"?"},
+{t:"how incredibly talented that young musician is", type:"!"},
+{t:"the principal announced the results during assembly", type:"."},
+{t:"if you finish your homework early you can watch tv", type:","},
 
-/* ================= QUESTIONS ================= */
-const questions=[
-{q:"I can’t believe it ___", a:["!","?","."], c:"!"},
-{q:"Where are you going ___", a:[".","!","?"], c:"?"},
-{q:"Wow this is amazing ___", a:[".","!","?"], c:"!"},
-{q:"Are you coming ___", a:[".","!","?"], c:"?"},
-{q:"The sun is bright ___", a:[".","!","?"], c:"."},
-{q:"Please sit down ___", a:[".",":","!"], c:":"},
-{q:"Stop right there ___", a:[".","!","?"], c:"!"},
-{q:"Let’s go to the park ___", a:[".",",","!"], c:"."}
+{t:"where did anita and rohan go after school", type:"?"},
+{t:"what a breathtaking view of the mountains", type:"!"},
+{t:"the students submitted their projects on time", type:"."},
+{t:"although it was raining heavily the match continued", type:","},
+
+{t:"why is mr sharma absent today", type:"?"},
+{t:"that was the most exciting performance ever", type:"!"},
+{t:"the teacher explained the lesson clearly to everyone", type:"."},
+{t:"since we were late we missed the beginning of the movie", type:","},
+
+{t:"can you believe how fast time flies", type:"?"},
+{t:"what an amazing achievement by the school team", type:"!"},
+{t:"the scientists discovered a new species in the amazon forest", type:"."}
 ];
 
-let i=0;
-let score=0;
-let currentAnswer="";
+let correct = 0;
 
-/* ================= START ================= */
-function startGame(){
-document.getElementById("startScreen").style.display="none";
-document.getElementById("game").style.display="block";
+const box = document.getElementById("sentences");
+const progress = document.getElementById("progress");
+const kpi = document.getElementById("kpi");
+const feedback = document.getElementById("feedback");
 
-i=0;
-score=0;
+/* LOAD */
+function load(){
+  box.innerHTML = "";
 
-loadQuestion();
-spawnLoop();
+  data.forEach(d=>{
+    let div = document.createElement("div");
+    div.className = "sentence";
+    div.draggable = true;
+    div.innerText = d.t;
+    div.dataset.type = d.type;
+
+    div.ondragstart = e=>{
+      e.dataTransfer.setData("text", JSON.stringify(d));
+    };
+
+    box.appendChild(div);
+  });
 }
 
-/* ================= LOAD QUESTION ================= */
-function loadQuestion(){
+/* BUCKETS */
+document.querySelectorAll(".bucket").forEach(b=>{
+  b.ondragover = e=>e.preventDefault();
 
-if(i>=questions.length){
-document.getElementById("question").innerText=
-"🎉 Game Over! Score: " + score;
-return;
-}
+  b.ondrop = e=>{
+    let d = JSON.parse(e.dataTransfer.getData("text"));
 
-currentAnswer=questions[i].c;
-document.getElementById("question").innerText=questions[i].q;
-document.getElementById("score").innerText="Score: "+score;
-}
+    if(d.type === b.dataset.type){
+      correct++;
+      feedback.innerText = "Correct ✔ Excellent punctuation + grammar!";
+    } else {
+      feedback.innerText = "Try again ✖ Think about sentence meaning & structure";
+    }
 
-/* ================= BALLOONS ================= */
-const colors=["red","blue","green"];
+    progress.innerText = `Progress: ${correct} / 15`;
+    kpi.innerText = `Accuracy: ${Math.round((correct/15)*100)}%`;
 
-function spawnBalloon(){
+    data.splice(data.findIndex(x=>x.t===d.t),1);
+    load();
+  };
+});
 
-let q = questions[i];
-if(!q) return;
-
-let option = q.a[Math.floor(Math.random()*q.a.length)];
-
-let b=document.createElement("div");
-b.className="balloon "+colors[Math.floor(Math.random()*colors.length)];
-b.innerText=option;
-
-b.style.left=Math.random()*85+"vw";
-
-b.onclick=()=>{
-
-if(option===currentAnswer){
-score+=10;
-i++;
-loadQuestion();
-}
-
-b.remove();
+/* SPLASH */
+window.onload = ()=>{
+  setTimeout(()=>{
+    document.getElementById("splash").style.display="none";
+    document.getElementById("game").style.display="block";
+    load();
+  },3000);
 };
-
-document.body.appendChild(b);
-
-setTimeout(()=>b.remove(),6000);
-}
-
-/* ================= LOOP ================= */
-function spawnLoop(){
-setInterval(spawnBalloon,1400);
-}
 
 </script>
 
