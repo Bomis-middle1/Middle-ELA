@@ -3,343 +3,225 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Punctuation Balloon Challenge</title>
+<title>Grammar Factory - Present Tenses</title>
 
 <style>
 body{
 margin:0;
 font-family:Arial;
-background:linear-gradient(135deg,#6dd5fa,#ff758c,#4facfe);
+background:linear-gradient(135deg,#1d2671,#c33764,#3a7bd5);
+color:white;
 overflow:hidden;
 }
 
-/* ================= LOADING / LOGO ================= */
+/* SCREENS */
 .screen{
-position:fixed;
-inset:0;
-display:flex;
+display:none;
+height:100vh;
+width:100%;
 align-items:center;
 justify-content:center;
 flex-direction:column;
 text-align:center;
 }
+.active{display:flex;}
 
-#logoScreen{
-background:white;
-z-index:9999;
-}
-
+/* LOGO */
 #logoScreen img{
 width:220px;
 }
 
-/* ================= TITLE ================= */
-#titleScreen{
-display:none;
-background:linear-gradient(#4fc3f7,#e1f5fe);
-z-index:9998;
-color:#0d47a1;
-}
-
-#titleScreen h1{
-font-size:42px;
-animation:pulse 1.2s infinite;
+/* TITLE */
+.title{
+font-size:28px;
+font-weight:bold;
+animation:pulse 1s infinite alternate;
 }
 
 @keyframes pulse{
-0%{transform:scale(1);}
-50%{transform:scale(1.05);}
-100%{transform:scale(1);}
+from{transform:scale(1);}
+to{transform:scale(1.05);}
 }
 
-/* ================= GAME ================= */
+/* GAME BOX */
 #gameScreen{
-display:none;
 flex-direction:column;
 }
 
-#topBar{
-position:fixed;
-top:0;
-width:100%;
-display:flex;
-justify-content:space-between;
-padding:10px;
-color:white;
-font-weight:bold;
-z-index:10;
+#instruction{
+font-size:18px;
+margin-bottom:10px;
+opacity:0.9;
 }
 
-#questionBox{
-margin-top:80px;
-padding:15px;
+#sentence{
 font-size:22px;
-color:white;
-text-align:center;
+font-weight:bold;
+margin:15px;
 }
 
-#options{
-display:flex;
-flex-wrap:wrap;
-justify-content:center;
-gap:10px;
-padding:10px;
-}
-
+/* OPTIONS */
 .option{
 background:white;
-padding:12px 16px;
+color:black;
+padding:12px;
+margin:8px;
 border-radius:10px;
-font-weight:bold;
 cursor:pointer;
-min-width:120px;
-text-align:center;
+width:220px;
+font-weight:bold;
 }
 
-.option:active{
-transform:scale(0.95);
-}
+.option.correct{background:#2ecc71;color:white;}
+.option.wrong{background:#e74c3c;color:white;}
 
-/* ================= TIMER ================= */
-#timer{
+/* SCORE */
+#score{
+margin-top:10px;
 font-size:18px;
 }
 
-/* ================= HINT ================= */
-#hintBox{
-color:#fff;
-text-align:center;
-margin-top:10px;
-}
-
-/* ================= RESULT ================= */
-#resultScreen{
-display:none;
-background:rgba(0,0,0,0.8);
-color:white;
-z-index:9999;
-}
-
-#restartBtn{
-padding:12px 20px;
-margin-top:20px;
+/* BUTTON */
+button{
+padding:12px 18px;
 border:none;
 border-radius:10px;
-background:#ffca28;
+background:#ff9800;
+color:white;
 font-weight:bold;
+cursor:pointer;
 }
 
-/* ================= CONFETTI ================= */
-.confetti{
-position:absolute;
-width:8px;
-height:8px;
-background:yellow;
-animation:fall 2s linear forwards;
-}
-
-@keyframes fall{
-to{transform:translateY(100vh);opacity:0;}
+/* END */
+#endScreen{
+text-align:center;
 }
 </style>
 </head>
 
 <body>
 
-<!-- ================= LOGO ================= -->
-<div id="logoScreen" class="screen">
+<!-- LOGO -->
+<div id="logoScreen" class="screen active">
 <img src="assets/innovine-logo.png">
 </div>
 
-<!-- ================= TITLE ================= -->
+<!-- TITLE -->
 <div id="titleScreen" class="screen">
-<h1>🎈 Punctuation Balloon Challenge</h1>
-<button onclick="startGame()">Start</button>
+<div class="title">🏭 Grammar Factory – Present Tenses</div>
+<button onclick="startGame()">Start Machine</button>
 </div>
 
-<!-- ================= GAME ================= -->
+<!-- GAME -->
 <div id="gameScreen" class="screen">
 
-<div id="topBar">
-<div id="score">Score: 0</div>
-<div id="timer">Time: 45</div>
-</div>
+<div id="instruction">👉 Identify the correct Present Tense used in the sentence</div>
 
-<div id="questionBox"></div>
+<div id="sentence"></div>
+
 <div id="options"></div>
-<div id="hintBox"></div>
+
+<div id="score">Score: 0</div>
 
 </div>
 
-<!-- ================= RESULT ================= -->
-<div id="resultScreen" class="screen">
-<h1 id="finalText"></h1>
-<button id="restartBtn" onclick="location.reload()">Restart</button>
+<!-- END -->
+<div id="endScreen" class="screen">
+<h2>🎉 Game Over</h2>
+<div id="finalScore"></div>
+<button onclick="location.reload()">Restart</button>
 </div>
-
-<!-- ================= AUDIO ================= -->
-<audio id="correctSound" src="assets/correct.mp3"></audio>
-<audio id="wrongSound" src="assets/wrong.mp3"></audio>
-<audio id="clapSound" src="assets/clapping.mp3"></audio>
 
 <script>
 
-/* ================= FLOW ================= */
-setTimeout(()=>{
-document.getElementById("logoScreen").style.display="none";
-document.getElementById("titleScreen").style.display="flex";
-},5000);
+/* ================= LOGIC ================= */
 
-/* ================= QUESTIONS ================= */
-const allQuestions = [
-{q:"I can’t believe we finally finished the project ___",a:[".","!","?"],c:"!"},
-{q:"Where are you going after school ___",a:[".","!","?"],c:"?"},
-{q:"Wow this is amazing ___",a:[".","!","?"],c:"!"},
-{q:"Are you coming with us ___",a:[".","!","?"],c:"?"},
-{q:"The sun is shining brightly ___",a:[".","!","?"],c:"."},
-{q:"Please sit down ___",a:[".",":","!"],c:":"},
-{q:"Stop right there ___",a:[".","!","?"],c:"!"},
-{q:"Let’s go to the park ___",a:[".",",","!"],c:"."},
-{q:"She has been working all day ___",a:[".","!","?"],c:"."},
-{q:"What a beautiful day ___",a:[".","!","?"],c:"!"}
+const questions = [
+{q:"She goes to school by bus every day.",a:"Present Simple"},
+{q:"He has been studying for three hours.",a:"Present Perfect Continuous"},
+{q:"They are playing football in the playground now.",a:"Present Continuous"},
+{q:"We have visited Jaipur twice.",a:"Present Perfect"},
+{q:"Look! The baby is sleeping.",a:"Present Continuous"},
+{q:"The Earth moves around the Sun.",a:"Present Simple"},
+{q:"My sister has written three letters today.",a:"Present Perfect"},
+{q:"It has been raining since morning.",a:"Present Perfect Continuous"},
+{q:"My father works in a bank.",a:"Present Simple"},
+{q:"I have finished my homework.",a:"Present Perfect"},
+{q:"She is preparing for her English test this week.",a:"Present Continuous"},
+{q:"They have been practising for the competition since Monday.",a:"Present Perfect Continuous"}
 ];
 
-let qBank = shuffle(allQuestions).slice(0,10);
+let qBank = questions.sort(()=>Math.random()-0.5).slice(0,10);
 
-let index=0;
+let i=0;
 let score=0;
-let attempts=2;
-let timer=45;
-let interval;
 
-/* ================= START ================= */
+/* OPTIONS */
+const options=[
+"Present Simple",
+"Present Continuous",
+"Present Perfect",
+"Present Perfect Continuous"
+];
+
+/* START */
 function startGame(){
-document.getElementById("titleScreen").style.display="none";
-document.getElementById("gameScreen").style.display="flex";
-
+document.getElementById("titleScreen").classList.remove("active");
+document.getElementById("gameScreen").classList.add("active");
 loadQ();
-startTimer();
 }
 
-/* ================= LOAD QUESTION ================= */
+/* LOAD QUESTION */
 function loadQ(){
 
-if(index>=qBank.length){
-endGame();
+if(i>=qBank.length){
+end();
 return;
 }
 
-attempts=2;
-document.getElementById("hintBox").innerText="";
-document.getElementById("questionBox").innerText=qBank[index].q;
+document.getElementById("sentence").innerText=qBank[i].q;
 
-let optDiv=document.getElementById("options");
-optDiv.innerHTML="";
+let box=document.getElementById("options");
+box.innerHTML="";
 
-qBank[index].a.forEach(opt=>{
-let btn=document.createElement("div");
-btn.className="option";
-btn.innerText=opt;
+options.forEach(opt=>{
+let div=document.createElement("div");
+div.className="option";
+div.innerText=opt;
 
-btn.onclick=()=>check(opt,btn);
+div.onclick=()=>check(opt,div);
 
-optDiv.appendChild(btn);
+box.appendChild(div);
 });
 }
 
-/* ================= CHECK ================= */
+/* CHECK */
 function check(ans,el){
 
-let correct=qBank[index].c;
+let correct=qBank[i].a;
 
 if(ans===correct){
 score++;
 document.getElementById("score").innerText="Score: "+score;
-play("correct");
-confetti();
-nextQ();
+el.classList.add("correct");
 }else{
-
-play("wrong");
-attempts--;
-
-if(attempts===1){
-document.getElementById("hintBox").innerText="💡 Hint: Think about sentence tone or punctuation.";
+el.classList.add("wrong");
 }
 
-if(attempts<=0){
-document.getElementById("hintBox").innerText="✔ Correct Answer: "+correct;
-nextQ();
-}
-}
-}
-
-/* ================= NEXT ================= */
-function nextQ(){
+/* move next */
 setTimeout(()=>{
-index++;
+i++;
 loadQ();
-},900);
+},800);
 }
 
-/* ================= TIMER ================= */
-function startTimer(){
-interval=setInterval(()=>{
-timer--;
-document.getElementById("timer").innerText="Time: "+timer;
+/* END */
+function end(){
+document.getElementById("gameScreen").classList.remove("active");
+document.getElementById("endScreen").classList.add("active");
 
-if(timer<=0){
-clearInterval(interval);
-endGame();
-}
-},1000);
-}
-
-/* ================= AUDIO ================= */
-function play(id){
-let a=document.getElementById(id+"Sound");
-a.volume=1;
-a.play().catch(()=>{});
-}
-
-/* ================= CONFETTI ================= */
-function confetti(){
-for(let i=0;i<25;i++){
-let c=document.createElement("div");
-c.className="confetti";
-c.style.left=Math.random()*100+"vw";
-c.style.background=["#ff0","#0ff","#f0f","#0f0","#f60"][Math.floor(Math.random()*5)];
-document.body.appendChild(c);
-setTimeout(()=>c.remove(),2000);
-}
-}
-
-/* ================= END ================= */
-function endGame(){
-
-clearInterval(interval);
-
-document.getElementById("gameScreen").style.display="none";
-document.getElementById("resultScreen").style.display="flex";
-
-let percent=(score/qBank.length)*100;
-
-let remark="";
-
-if(percent>=80) remark="Excellent 🎉";
-else if(percent>=60) remark="Good Job 👍";
-else if(percent>=45) remark="Well Tried 🙂";
-else remark="Let’s Revise 📘";
-
-document.getElementById("finalText").innerText=
-`Score: ${score}/${qBank.length} \n${remark}`;
-
-play("clap");
-}
-
-/* ================= SHUFFLE ================= */
-function shuffle(arr){
-return arr.sort(()=>Math.random()-0.5);
+document.getElementById("finalScore").innerText=
+`You scored ${score} / ${qBank.length}`;
 }
 
 </script>
