@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Future Tense Space Race</title>
+<title>Future Tense Space Race FIXED</title>
 
 <style>
 body{
 margin:0;
-font-family:Arial,sans-serif;
+font-family:Arial;
 background:#0b1d51;
 color:#fff;
 overflow:hidden;
@@ -25,20 +25,20 @@ flex-direction:column;
 
 #logoScreen img{
 width:200px;
-margin-top:40px;
 }
 
 /* GAME UI */
 h1{text-align:center;color:#ffd60a;margin:10px;}
-#scoreText{font-size:20px;margin:10px;}
-#questionText{margin:10px;font-size:18px;text-align:center;}
+
+#scoreText{margin:10px;font-size:20px;}
+#questionText{text-align:center;margin:10px;}
 
 #options{
 display:flex;
 flex-direction:column;
 align-items:center;
 gap:10px;
-margin-top:15px;
+margin-top:10px;
 }
 
 .option{
@@ -65,7 +65,7 @@ margin-top:20px;
 overflow:hidden;
 }
 
-/* SPACESHIP FIXED */
+/* FIXED SPACESHIP */
 #spaceship{
 position:absolute;
 bottom:10px;
@@ -74,7 +74,9 @@ width:60px;
 transition:left 0.6s ease;
 }
 
-/* BUTTON */
+/* END */
+#endScreen{text-align:center;}
+
 button{
 padding:10px 16px;
 margin-top:20px;
@@ -85,9 +87,6 @@ color:#fff;
 font-weight:bold;
 cursor:pointer;
 }
-
-/* END */
-#endScreen{text-align:center;}
 </style>
 </head>
 
@@ -102,12 +101,14 @@ cursor:pointer;
 <!-- GAME -->
 <div id="gameScreen">
 <h1>Future Tense Space Race</h1>
+
 <div id="scoreText">Score: 0</div>
 <div id="questionText"></div>
 <div id="options"></div>
 
 <div id="track">
-<img id="spaceship" src="assets/spaceship.png">
+<img id="spaceship" src="assets/spaceship.png"
+onerror="this.src='https://img.icons8.com/color/96/rocket.png'">
 </div>
 </div>
 
@@ -124,22 +125,19 @@ cursor:pointer;
 
 <script>
 
-/* ================= QUESTIONS ================= */
-const sentences = [
-{q:"Which sentence is Simple Future?", a:"I will visit Paris next summer.",
+/* ================= DATA ================= */
+const sentences=[
+{q:"Which sentence is Simple Future?",a:"I will visit Paris next summer.",
 options:["I will visit Paris next summer.","She will be reading when I arrive.","They will have finished homework by 8 PM."]},
 
-{q:"Which sentence is Future Continuous?", a:"She will be reading when I arrive.",
+{q:"Which sentence is Future Continuous?",a:"She will be reading when I arrive.",
 options:["She will be reading when I arrive.","I will visit Paris next summer.","We will have completed project by Friday."]},
 
-{q:"Which sentence is Future Perfect?", a:"They will have finished their homework by 8 PM.",
+{q:"Which sentence is Future Perfect?",a:"They will have finished their homework by 8 PM.",
 options:["They will have finished their homework by 8 PM.","He will travel tomorrow.","I will be studying at 10 AM."]},
 
-{q:"Which sentence is Simple Future?", a:"He will travel to London tomorrow.",
-options:["He will travel to London tomorrow.","I will have sent the email before lunch.","They will be playing football at 5 PM."]},
-
-{q:"Which sentence is Future Continuous?", a:"I will be studying at 10 AM.",
-options:["I will be studying at 10 AM.","She will attend meeting next week.","He will call after dinner."]}
+{q:"Which sentence is Simple Future?",a:"He will travel to London tomorrow.",
+options:["He will travel to London tomorrow.","I will have sent the email before lunch.","They will be playing football at 5 PM."]}
 ];
 
 let current=0;
@@ -149,25 +147,18 @@ let score=0;
 let shipPosition = 0;
 
 /* DOM */
-const gameScreen=document.getElementById('gameScreen');
-const logoScreen=document.getElementById('logoScreen');
-const endScreen=document.getElementById('endScreen');
-const questionText=document.getElementById('questionText');
-const optionsDiv=document.getElementById('options');
-const scoreText=document.getElementById('scoreText');
-const spaceship=document.getElementById('spaceship');
+const ship=document.getElementById("spaceship");
+const track=document.getElementById("track");
 
-/* ================= START FLOW ================= */
-logoScreen.style.display='flex';
-
+/* ================= START ================= */
 setTimeout(()=>{
-logoScreen.style.display='none';
-gameScreen.style.display='flex';
-loadQuestion();
+document.getElementById("logoScreen").style.display="none";
+document.getElementById("gameScreen").style.display="flex";
+loadQ();
 },5000);
 
 /* ================= LOAD QUESTION ================= */
-function loadQuestion(){
+function loadQ(){
 
 if(current>=sentences.length){
 endGame();
@@ -175,77 +166,70 @@ return;
 }
 
 let q=sentences[current];
-questionText.innerText=q.q;
-optionsDiv.innerHTML="";
+
+document.getElementById("questionText").innerText=q.q;
+document.getElementById("scoreText").innerText="Score: "+score;
+
+let box=document.getElementById("options");
+box.innerHTML="";
 
 q.options.forEach(opt=>{
-let div=document.createElement('div');
-div.className='option';
+let div=document.createElement("div");
+div.className="option";
 div.innerText=opt;
 
-div.onclick=()=>checkAnswer(div,opt,q.a);
+div.onclick=()=>check(opt,div,q.a);
 
-optionsDiv.appendChild(div);
+box.appendChild(div);
 });
 }
 
-/* ================= ANSWER CHECK ================= */
-function checkAnswer(btn,selected,correct){
+/* ================= CHECK ================= */
+function check(selected,btn,correct){
 
 if(selected===correct){
-
 score++;
-scoreText.innerText="Score: "+score;
-
 btn.classList.add("correct");
-correctSound.play();
-
-/* 🚀 MOVE SHIP STEP BY STEP */
+document.getElementById("correctSound").play();
 moveShip();
+}else{
+btn.classList.add("wrong");
+document.getElementById("wrongSound").play();
+}
 
 setTimeout(()=>{
 current++;
-loadQuestion();
-},800);
-
-}else{
-
-btn.classList.add("wrong");
-wrongSound.play();
-}
+loadQ();
+},700);
 }
 
-/* ================= SHIP MOVEMENT (FIXED SYSTEM) ================= */
+/* ================= FIXED SHIP MOVEMENT ================= */
 function moveShip(){
 
-let track=document.getElementById('track');
-let maxWidth=track.offsetWidth - 70;
+let max=track.offsetWidth - 70;
 
-/* STEP SIZE BASED ON TOTAL QUESTIONS */
-let step = maxWidth / sentences.length;
+/* STEP PER QUESTION */
+let step = max / sentences.length;
 
-/* INCREMENT POSITION */
 shipPosition += step;
 
-/* LIMIT */
-if(shipPosition > maxWidth){
-shipPosition = maxWidth;
+if(shipPosition > max){
+shipPosition = max;
 }
 
-/* APPLY */
-spaceship.style.left = shipPosition + "px";
+ship.style.left = shipPosition + "px";
 }
 
 /* ================= END ================= */
 function endGame(){
 
-gameScreen.style.display='none';
-endScreen.style.display='flex';
+document.getElementById("gameScreen").style.display="none";
+document.getElementById("endScreen").style.display="flex";
 
-clapSound.play();
+document.getElementById("clapSound").play();
 
-finalScore.innerText=
-`Your Score: ${score} / ${sentences.length}`;
+document.getElementById("finalScore").innerText=
+`Score: ${score} / ${sentences.length}`;
 }
 
 /* ================= RESTART ================= */
@@ -254,14 +238,12 @@ current=0;
 score=0;
 shipPosition=0;
 
-spaceship.style.left="0px";
+ship.style.left="0px";
 
-endScreen.style.display='none';
-gameScreen.style.display='flex';
+document.getElementById("endScreen").style.display="none";
+document.getElementById("gameScreen").style.display="flex";
 
-scoreText.innerText="Score: 0";
-
-loadQuestion();
+loadQ();
 }
 
 </script>
