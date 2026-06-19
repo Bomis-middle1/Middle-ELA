@@ -1,48 +1,50 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Temple Treasure Grammar Adventure</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Temple Treasure Adventure</title>
 
 <style>
-
 *{margin:0;padding:0;box-sizing:border-box;}
 
 body{
-    overflow:hidden;
     font-family:Arial,sans-serif;
+    overflow:hidden;
+    background:#87ceeb;
 }
 
+/* GAME AREA */
 #gameArea{
     position:relative;
     width:100vw;
     height:100vh;
-    background:linear-gradient(to bottom,#87ceeb,#dfffb0);
     overflow:hidden;
+    background:linear-gradient(to bottom,#87ceeb,#dfffb0);
 }
 
-/* 🌳 BACKGROUND TREES */
+/* 🌳 BACKGROUND */
 .tree{
     position:absolute;
     bottom:120px;
     font-size:80px;
     opacity:0.9;
+    z-index:1;
 }
-.tree1{left:10%;}
-.tree2{left:75%;}
+.tree1{left:8%;}
+.tree2{left:78%;}
 
+/* GROUND */
 #ground{
     position:absolute;
     bottom:0;
     width:100%;
     height:120px;
     background:#8B5A2B;
-    border-top:8px solid #4caf50;
+    border-top:6px solid #3cb371;
 }
 
-/* 🏹 HUNTER */
+/* PLAYER */
 #player{
     position:absolute;
     left:80px;
@@ -51,15 +53,14 @@ body{
     z-index:10;
 }
 
-/* 💰 COIN */
+/* COIN */
 .coin{
     position:absolute;
-    width:40px;
-    height:40px;
-    font-size:26px;
+    font-size:30px;
+    z-index:5;
 }
 
-/* SCORE */
+/* SCOREBOARD */
 #scoreBoard{
     position:absolute;
     top:10px;
@@ -68,58 +69,81 @@ body{
     padding:10px 14px;
     border-radius:12px;
     font-weight:bold;
-}
-
-#volumeBox{
-    position:absolute;
-    top:10px;
-    right:10px;
-    background:white;
-    padding:10px;
-    border-radius:12px;
+    z-index:50;
 }
 
 /* SCREENS */
-#startScreen,#endScreen{
+#logoScreen{
     position:absolute;
-    width:100%;
-    height:100%;
-    background:rgba(0,0,0,0.7);
-    color:white;
+    inset:0;
+    background:white;
     display:flex;
+    justify-content:center;
+    align-items:center;
+    flex-direction:column;
+    z-index:1000;
+}
+
+#logoScreen img{
+    width:240px;
+    max-width:80%;
+}
+
+#instructionScreen,
+#startScreen,
+#endScreen{
+    position:absolute;
+    inset:0;
+    background:rgba(0,0,0,0.75);
+    color:white;
+    display:none;
     flex-direction:column;
     justify-content:center;
     align-items:center;
     text-align:center;
+    padding:20px;
+    z-index:900;
 }
 
-.mainBtn{
+.btn{
     margin-top:20px;
     padding:14px 26px;
+    font-size:18px;
     border:none;
-    border-radius:15px;
+    border-radius:14px;
     background:#ff9800;
     color:white;
-    font-size:20px;
 }
 
-/* LOGO */
-#logoScreen{
+/* QUESTION BOX */
+#questionBox{
     position:absolute;
-    width:100%;
-    height:100%;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    width:90%;
+    max-width:520px;
     background:white;
-    display:flex;
-    justify-content:center;
-    align-items:center;
+    border-radius:18px;
+    padding:20px;
+    display:none;
     z-index:999;
-    flex-direction:column;
+    text-align:center;
 }
 
-#logoScreen img{
-    width:250px;
+.optionBtn{
+    width:100%;
+    margin-top:10px;
+    padding:12px;
+    border:none;
+    border-radius:10px;
+    background:#2196f3;
+    color:white;
+    font-size:16px;
 }
 
+/* SMALL TEXT */
+small{opacity:0.9;}
 </style>
 </head>
 
@@ -131,148 +155,290 @@ body{
 <div class="tree tree1">🌳</div>
 <div class="tree tree2">🌳</div>
 
-<!-- LOGO -->
-<div id="logoScreen">
-<img src="assets/innovine-logo.png">
-</div>
-
 <div id="ground"></div>
 
-<!-- 🏹 PLAYER -->
-<div id="player">🏹</div>
+<!-- PLAYER -->
+<div id="player">👨‍🌾</div>
 
+<!-- SCORE -->
 <div id="scoreBoard">
-Coins: <span id="coinCount">0</span>
+Coins: <span id="coinCount">0</span> |
+Score: <span id="score">0</span>
 </div>
 
-<div id="volumeBox">
-Volume <input type="range" id="volumeSlider" min="0" max="1" step="0.1" value="1">
+<!-- LOGO -->
+<div id="logoScreen">
+    <img src="assets/innovine-logo.png" />
 </div>
 
-<div id="startScreen" style="display:none;">
-<h1>Temple Treasure Adventure</h1>
-<button class="mainBtn" onclick="startGame()">Start</button>
+<!-- INSTRUCTIONS -->
+<div id="instructionScreen">
+    <h2>Temple Treasure Adventure</h2>
+    <p style="margin-top:10px;">
+        Jump and collect gold coins.<br>
+        Every 3 coins → answer a grammar question!
+    </p>
+    <button class="btn" onclick="startGame()">Start Game</button>
 </div>
 
-<div id="endScreen" style="display:none;">
-<h1>Game Over</h1>
+<!-- QUESTION -->
+<div id="questionBox">
+    <h3 id="qText"></h3>
+    <div id="options"></div>
+    <p id="hint" style="margin-top:10px;color:#333;"></p>
+</div>
+
+<!-- END -->
+<div id="endScreen">
+    <h1>🎉 Game Complete 🎉</h1>
+    <h2 id="finalText"></h2>
+    <button class="btn" onclick="restartGame()">Play Again</button>
 </div>
 
 </div>
 
 <script>
 
-const player=document.getElementById("player");
-const coinCount=document.getElementById("coinCount");
-const volumeSlider=document.getElementById("volumeSlider");
+/* ---------------- AUDIO ---------------- */
+const correctSound = new Audio("assets/correct.mp3");
+const wrongSound = new Audio("assets/wrong.mp3");
+const clapSound = new Audio("assets/clapping.mp3");
 
-const bgSound = new Audio("assets/bg.mp3");
-bgSound.loop = true;
-
-let coins=0;
-let gameRunning=false;
-
-let jumping=false;
-let velocity=0;
-let gravity=0.8;
-let playerY=120;
-
-/* VOLUME */
-function updateVolume(){
-    bgSound.volume = volumeSlider.value;
+function safePlay(audio){
+    try{ audio.currentTime=0; audio.play(); }catch(e){}
 }
-volumeSlider.oninput=updateVolume;
-updateVolume();
 
-/* START */
+/* ---------------- STATE ---------------- */
+let coins = 0;
+let score = 0;
+
+let playerY = 120;
+let velocity = 0;
+let gravity = 0.8;
+let jumping = false;
+
+let gameRunning = false;
+
+let questionsPool = [
+{
+q:"The cat sat on the mat. What is the subject?",
+o:["cat","sat","mat","on"],
+a:0
+},
+{
+q:"The boy is running fast. What is the predicate?",
+o:["boy","is running fast","fast","run"],
+a:1
+},
+{
+q:"Riya wrote a letter. Identify subject.",
+o:["wrote","letter","Riya","a"],
+a:2
+},
+{
+q:"The birds are flying. Predicate?",
+o:["birds","are flying","flying","the"],
+a:1
+}
+];
+
+let questions = shuffle([...questionsPool]);
+let qIndex = 0;
+let attempts = 2;
+
+/* ---------------- ELEMENTS ---------------- */
+const player = document.getElementById("player");
+const coinCount = document.getElementById("coinCount");
+const scoreBoard = document.getElementById("score");
+const qBox = document.getElementById("questionBox");
+const qText = document.getElementById("qText");
+const optionsDiv = document.getElementById("options");
+const hint = document.getElementById("hint");
+
+/* ---------------- INIT FLOW ---------------- */
+setTimeout(()=>{
+    document.getElementById("logoScreen").style.display="none";
+    document.getElementById("instructionScreen").style.display="flex";
+},5000);
+
+/* ---------------- START ---------------- */
 function startGame(){
-    document.getElementById("startScreen").style.display="none";
+    document.getElementById("instructionScreen").style.display="none";
     gameRunning=true;
-    bgSound.play();
-    spawnCoin();
     loop();
+    spawnCoin();
 }
 
-/* JUMP */
-function jump(){
-    if(!jumping){
-        velocity=-18;
-        jumping=true;
-    }
-}
-
+/* ---------------- JUMP ---------------- */
 document.addEventListener("keydown",(e)=>{
     if(e.code==="Space") jump();
 });
 
 document.addEventListener("touchstart",jump);
 
-/* LOOP */
+function jump(){
+    if(!jumping){
+        velocity = -16;
+        jumping = true;
+    }
+}
+
+/* ---------------- LOOP ---------------- */
 function loop(){
     if(!gameRunning) return;
 
-    velocity+=gravity;
-    playerY-=velocity;
+    velocity += gravity;
+    playerY -= velocity;
 
-    if(playerY<=120){
-        playerY=120;
-        velocity=0;
-        jumping=false;
+    if(playerY <= 120){
+        playerY = 120;
+        velocity = 0;
+        jumping = false;
     }
 
-    player.style.bottom=playerY+"px";
+    player.style.bottom = playerY + "px";
 
     requestAnimationFrame(loop);
 }
 
-/* COIN */
+/* ---------------- COIN ---------------- */
 function spawnCoin(){
 
-    const coin=document.createElement("div");
+    if(!gameRunning) return;
+
+    const coin = document.createElement("div");
     coin.className="coin";
     coin.innerHTML="💰";
     coin.style.left="100%";
-    coin.style.top=(180+Math.random()*200)+"px";
-
+    coin.style.top=(180 + Math.random()*200)+"px";
     document.getElementById("gameArea").appendChild(coin);
 
-    let move=setInterval(()=>{
+    let move = setInterval(()=>{
 
-        let left=parseInt(coin.style.left||100);
-        left-=3;
-        coin.style.left=left+"px";
+        let left = parseInt(coin.style.left || 100);
+        left -= 3;
+        coin.style.left = left + "px";
 
-        const c=coin.getBoundingClientRect();
-        const p=player.getBoundingClientRect();
+        const c = coin.getBoundingClientRect();
+        const p = player.getBoundingClientRect();
 
         if(
             jumping &&
-            c.left<p.right &&
-            c.right>p.left &&
-            c.top<p.bottom &&
-            c.bottom>p.top
+            c.left < p.right &&
+            c.right > p.left &&
+            c.top < p.bottom &&
+            c.bottom > p.top
         ){
             coins++;
-            coinCount.innerText=coins;
+            coinCount.innerText = coins;
             coin.remove();
             clearInterval(move);
+
+            if(coins % 3 === 0){
+                showQuestion();
+            }
         }
 
-        if(left<-50){
+        if(left < -50){
             coin.remove();
             clearInterval(move);
         }
 
     },20);
 
-    setTimeout(spawnCoin,2500);
+    setTimeout(spawnCoin,2200);
 }
 
-/* LOGO SCREEN */
-setTimeout(()=>{
-    document.getElementById("logoScreen").style.display="none";
-    document.getElementById("startScreen").style.display="flex";
-},5000);
+/* ---------------- QUESTION SYSTEM ---------------- */
+function showQuestion(){
+
+    gameRunning = false;
+    attempts = 2;
+
+    if(qIndex >= questions.length){
+        endGame();
+        return;
+    }
+
+    const q = questions[qIndex];
+
+    qText.innerText = q.q;
+    optionsDiv.innerHTML = "";
+    hint.innerText = "";
+
+    q.o.forEach((opt,i)=>{
+        const btn = document.createElement("button");
+        btn.className="optionBtn";
+        btn.innerText=opt;
+        btn.onclick=()=>checkAnswer(i);
+        optionsDiv.appendChild(btn);
+    });
+
+    qBox.style.display="block";
+}
+
+/* ---------------- ANSWER ---------------- */
+function checkAnswer(selected){
+
+    const q = questions[qIndex];
+
+    if(selected === q.a){
+
+        safePlay(correctSound);
+        safePlay(clapSound);
+
+        score += 10;
+        scoreBoard.innerText = score;
+
+        nextQuestion();
+
+    } else {
+
+        attempts--;
+
+        safePlay(wrongSound);
+
+        if(attempts <= 0){
+            hint.innerText = "Correct Answer: " + q.o[q.a];
+            setTimeout(nextQuestion,1200);
+        } else {
+            hint.innerText = "Try Again! Attempts left: " + attempts;
+        }
+    }
+}
+
+/* ---------------- NEXT ---------------- */
+function nextQuestion(){
+    qIndex++;
+    qBox.style.display="none";
+    gameRunning=true;
+    loop();
+}
+
+/* ---------------- END GAME ---------------- */
+function endGame(){
+
+    gameRunning=false;
+
+    document.getElementById("endScreen").style.display="flex";
+
+    document.getElementById("finalText").innerText =
+    "Coins Collected: " + coins + " | Score: " + score;
+}
+
+/* ---------------- RESTART ---------------- */
+function restartGame(){
+    location.reload();
+}
+
+/* ---------------- SHUFFLE ---------------- */
+function shuffle(arr){
+    for(let i=arr.length-1;i>0;i--){
+        const j=Math.floor(Math.random()*i);
+        [arr[i],arr[j]]=[arr[j],arr[i]];
+    }
+    return arr;
+}
 
 </script>
 
