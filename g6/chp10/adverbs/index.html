@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
+<meta charset="UTF-8">
 <title>Quest for Adverb Crystals</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
 body{
 margin:0;
-font-family:Arial, sans-serif;
-background:linear-gradient(to bottom,#162a4d,#2c5364);
+font-family:Arial;
+background:linear-gradient(to bottom,#142850,#27496d);
 color:white;
 overflow:hidden;
 }
@@ -23,6 +23,11 @@ display:flex;
 align-items:center;
 justify-content:center;
 z-index:9999;
+}
+
+#splash img{
+width:240px;
+max-width:80%;
 }
 
 /* TITLE */
@@ -43,8 +48,6 @@ display:none;
 padding:20px;
 font-size:15px;
 line-height:1.6;
-max-height:100vh;
-overflow:auto;
 }
 
 button{
@@ -73,20 +76,23 @@ margin-bottom:10px;
 .box{
 background:white;
 color:black;
-padding:15px;
+padding:18px;
 border-radius:10px;
-min-height:140px;
+min-height:160px;
+overflow:auto;
 }
 
 .option{
-background:#eee;
+background:#f0f0f0;
 margin:8px 0;
 padding:10px;
 border-radius:8px;
 cursor:pointer;
 }
 
-.option:active{transform:scale(0.98);}
+.option:hover{
+background:#ddd;
+}
 
 /* END */
 #endScreen{
@@ -120,9 +126,6 @@ animation:fall 3s linear forwards;
 to{transform:translateY(100vh) rotate(360deg);}
 }
 
-@media(max-width:768px){
-.box{font-size:14px}
-}
 </style>
 </head>
 
@@ -130,8 +133,7 @@ to{transform:translateY(100vh) rotate(360deg);}
 
 <!-- SPLASH (ONLY LOGO) -->
 <div id="splash">
-<img src="/mnt/data/ae80f07f-381f-4db7-bebe-7a48b91cdd96.png"
-style="width:240px;max-width:80%;">
+<img src="/mnt/data/ae80f07f-381f-4db7-bebe-7a48b91cdd96.png">
 </div>
 
 <!-- TITLE -->
@@ -143,15 +145,9 @@ style="width:240px;max-width:80%;">
 <div id="instructionScreen">
 <h2>🏰 Welcome to the Quest for the Seven Adverb Crystals!</h2>
 
-<p>The magical kingdom is in danger! Seven Adverb Crystals are hidden across the land.</p>
-
-<h3>📜 How to Play</h3>
-<ul>
-<li>🗡️ Read each question carefully</li>
-<li>🎯 Choose the correct answer</li>
-<li>✨ Earn points for each correct answer</li>
-<li>🏆 Unlock the final treasure</li>
-</ul>
+<p>
+The magical kingdom is in danger! Answer correctly to collect crystals.
+</p>
 
 <button onclick="startGame()">Start Game</button>
 </div>
@@ -193,28 +189,33 @@ style="width:240px;max-width:80%;">
 
 <script>
 
-/* QUESTIONS (UNCHANGED EXACTLY) */
+/* QUESTIONS */
 let questions = [
-{q:`1.A sleeping lion blocks your path. How do you walk past it?`, options:[`quietly`,`tomorrow`,`here`,`always`], answer:`quietly`},
-{q:`2. The castle gate is closing fast! When should you run through it?`, options:[`immediately`,`softly`,`everywhere`,`never`], answer:`immediately`},
-{q:`3. The castle guard checks the gates every single day. Which adverb matches this?`, options:[`always`,`tomorrow`,`carefully`,`there`], answer:`always`},
-{q:`4. The wizard suddenly vanished. Which question asks about the place?`, options:[`Where did the wizard vanish?`,`Why did the wizard vanish?`,`When did the wizard vanish?`,`How did the wizard vanish?`], answer:`Where did the wizard vanish?`},
-{q:`5.The cave is ______ dark that everyone lights a torch.`, options:[`very`,`yesterday`,`there`,`often`], answer:`very`},
-{q:`6. Heavy rain begins.Why do the explorers rush into a cave?`, options:[`because they want to stay dry`,`carefully`,`tomorrow`,`here`], answer:`because they want to stay dry`},
-{q:`7. Your treasure map says the key is hidden beside you.Which word tells the place?`, options:[`here`,`loudly`,`yesterday`,`always`], answer:`here`},
-{q:`8.You must hit the glowing target with one shot.How do you shoot the arrow?`, options:[`accurately`,`tomorrow`,`there`,`often`], answer:`accurately`},
-{q:`9. The dragon visits the village only a few times each year.Which adverb fits best?`, options:[`rarely`,`quickly`,`here`,`yesterday`], answer:`rarely`},
-{q:`10. The puzzle became ______ easy after the fairy gave you a clue.`, options:[`quite`,`tomorrow`,`everywhere`,`carefully`], answer:`quite`},
-{q:`11. The bridge catches fire.Why do the villagers take another road?`, options:[`because the bridge is unsafe`,`loudly`,`yesterday`,`there`], answer:`because the bridge is unsafe`},
-{q:`12.The magical bird flew in every direction.Which adverb tells where?`, options:[`everywhere`,`quietly`,`tomorrow`,`always`], answer:`everywhere`},
-{q:`13. The wizard says the secret door will open the next day.Which adverb tells when?`, options:[`tomorrow`,`carefully`,`here`,`very`], answer:`tomorrow`},
-{q:`14. The dragon escaped.Which question asks why it escaped?`, options:[`Why did the dragon escape?`,`Where did the dragon escape?`,`When did the dragon escape?`,`How did the dragon escape?`], answer:`Why did the dragon escape?`},
-{q:`15.You have reached the final treasure.Choose the sentence with the adverb used correctly.`, options:[`The knight carefully crossed the shaky bridge.`,`The knight crossed tomorrow.`,`The knight crossed sword.`,`The knight crossed castle.`], answer:`The knight carefully crossed the shaky bridge.`}
+{q:"A sleeping lion blocks your path. How do you walk past it?", options:["quietly","tomorrow","here","always"], answer:"quietly"},
+{q:"The castle gate is closing fast! When should you run through it?", options:["immediately","softly","everywhere","never"], answer:"immediately"},
+{q:"The castle guard checks the gates every single day.", options:["always","tomorrow","carefully","there"], answer:"always"},
+{q:"Where did the wizard vanish?", options:["Where did the wizard vanish?","Why did the wizard vanish?","When did the wizard vanish?","How did the wizard vanish?"], answer:"Where did the wizard vanish?"},
+{q:"The cave is very dark that everyone lights a torch.", options:["very","yesterday","there","often"], answer:"very"},
+{q:"Why do explorers rush into a cave?", options:["because they want to stay dry","carefully","tomorrow","here"], answer:"because they want to stay dry"},
+{q:"Which word tells the place?", options:["here","loudly","yesterday","always"], answer:"here"},
+{q:"How do you shoot the arrow?", options:["accurately","tomorrow","there","often"], answer:"accurately"},
+{q:"The dragon visits rarely.", options:["rarely","quickly","here","yesterday"], answer:"rarely"},
+{q:"The puzzle became quite easy.", options:["quite","tomorrow","everywhere","carefully"], answer:"quite"},
+{q:"Why did villagers take another road?", options:["because the bridge is unsafe","loudly","yesterday","there"], answer:"because the bridge is unsafe"},
+{q:"Which adverb tells where?", options:["everywhere","quietly","tomorrow","always"], answer:"everywhere"},
+{q:"Which adverb tells when?", options:["tomorrow","carefully","here","very"], answer:"tomorrow"},
+{q:"Why did dragon escape?", options:["Why did the dragon escape?","Where did the dragon escape?","When did the dragon escape?","How did the dragon escape?"], answer:"Why did the dragon escape?"},
+{q:"Choose correct sentence.", options:["The knight carefully crossed the bridge.","The knight crossed tomorrow.","The knight crossed sword.","The knight crossed castle."], answer:"The knight carefully crossed the bridge."}
 ];
 
-let index=0, score=0, time=0, timer=80, wrong=0, interval;
+let index=0;
+let score=0;
+let wrong=0;
+let time=0;
+let timer=80;
+let interval;
 
-/* SHUFFLE FUNCTION */
+/* SHUFFLE */
 function shuffle(arr){
 for(let i=arr.length-1;i>0;i--){
 let j=Math.floor(Math.random()*(i+1));
@@ -223,7 +224,7 @@ let j=Math.floor(Math.random()*(i+1));
 return arr;
 }
 
-/* SPLASH FLOW */
+/* FLOW */
 setTimeout(()=>{
 document.getElementById("splash").style.display="none";
 document.getElementById("titleScreen").style.display="flex";
@@ -241,44 +242,43 @@ document.getElementById("instructionScreen").style.display="none";
 document.getElementById("game").style.display="block";
 
 questions = shuffle(questions);
-loadQ();
+loadQuestion();
 startTimer();
 }
 
-/* LOAD QUESTION */
-function loadQ(){
+/* LOAD QUESTION (FIXED) */
+function loadQuestion(){
 
 if(index>=questions.length){
 endGame();
 return;
 }
 
-document.getElementById("qCount").innerText=(index+1)+"/15";
+let q = questions[index];
 
-let q=questions[index];
-document.getElementById("question").innerText=q.q;
+document.getElementById("qCount").innerText = (index+1)+"/15";
+document.getElementById("question").innerText = q.q;
 
-/* shuffle options */
 let opts = shuffle([...q.options]);
 
-let box=document.getElementById("options");
+let box = document.getElementById("options");
 box.innerHTML="";
 
 opts.forEach(opt=>{
-let d=document.createElement("div");
-d.className="option";
-d.innerText=opt;
-d.onclick=()=>check(opt);
-box.appendChild(d);
+let div=document.createElement("div");
+div.className="option";
+div.innerText=opt;
+div.onclick=()=>checkAnswer(opt);
+box.appendChild(div);
 });
 }
 
-/* CHECK ANSWER */
-function check(ans){
+/* CHECK */
+function checkAnswer(opt){
 
-let correct = ans===questions[index].answer;
+let correct = opt === questions[index].answer;
 
-let sound=document.getElementById(correct?"correctSound":"wrongSound");
+let sound = document.getElementById(correct?"correctSound":"wrongSound");
 sound.volume=document.getElementById("vol").value;
 sound.play();
 
@@ -287,15 +287,18 @@ score++;
 document.getElementById("clapSound").play();
 confetti();
 }
+else{
+wrong++;
+}
 
-next();
+nextQuestion();
 }
 
 /* NEXT */
-function next(){
+function nextQuestion(){
 index++;
 timer=80;
-loadQ();
+loadQuestion();
 }
 
 /* TIMER */
@@ -306,7 +309,7 @@ time++;
 document.getElementById("timer").innerText=timer;
 
 if(timer<=0){
-next();
+nextQuestion();
 }
 },1000);
 }
@@ -323,7 +326,7 @@ setTimeout(()=>c.remove(),3000);
 }
 }
 
-/* END SCREEN */
+/* END */
 function endGame(){
 clearInterval(interval);
 document.getElementById("game").style.display="none";
@@ -340,7 +343,7 @@ else if(percent>=45) remark="Well Tried 🙂";
 else remark="Let's Revise 📘";
 
 document.getElementById("remark").innerText=remark;
-document.getElementById("timeTaken").innerText="Time Taken: "+time+" sec";
+document.getElementById("timeTaken").innerText="Time: "+time+" sec";
 document.getElementById("wrongCount").innerText="Wrong Attempts: "+wrong;
 }
 
