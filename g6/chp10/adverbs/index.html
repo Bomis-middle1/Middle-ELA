@@ -8,8 +8,8 @@
 <style>
 body{
 margin:0;
-font-family:Arial, sans-serif;
-background:linear-gradient(to bottom,#1e3c72,#2a5298);
+font-family:Arial;
+background:linear-gradient(to bottom,#1b2a49,#2c5364);
 color:white;
 overflow:hidden;
 }
@@ -17,13 +17,12 @@ overflow:hidden;
 /* SPLASH */
 #splash{
 position:fixed;
-top:0;left:0;
-width:100%;height:100%;
+inset:0;
 background:white;
 display:flex;
 align-items:center;
 justify-content:center;
-z-index:10;
+z-index:999;
 }
 #splash img{
 width:220px;
@@ -32,33 +31,31 @@ width:220px;
 /* TITLE */
 #titleScreen{
 display:none;
-position:absolute;
-width:100%;height:100%;
+height:100vh;
 align-items:center;
 justify-content:center;
-flex-direction:column;
+text-align:center;
 font-size:28px;
 font-weight:bold;
-text-align:center;
+padding:20px;
 }
 
 /* INSTRUCTIONS */
 #instructionScreen{
 display:none;
 padding:20px;
-text-align:left;
-font-size:16px;
-line-height:1.5;
+font-size:15px;
+line-height:1.6;
 }
 
 button{
 padding:12px 18px;
-font-size:16px;
 border:none;
 border-radius:10px;
-background:#ffcc00;
+background:#ffd54f;
+font-weight:bold;
 cursor:pointer;
-margin-top:15px;
+margin-top:10px;
 }
 
 /* GAME */
@@ -74,25 +71,25 @@ font-size:16px;
 margin-bottom:10px;
 }
 
-.questionBox{
+.box{
 background:white;
 color:black;
 padding:15px;
 border-radius:10px;
-min-height:120px;
+min-height:140px;
 }
 
 .option{
-background:#f0f0f0;
+background:#eee;
 margin:8px 0;
 padding:10px;
 border-radius:8px;
 cursor:pointer;
 }
 
-.option:hover{background:#ddd;}
+.option:hover{background:#ddd}
 
-/* END SCREEN */
+/* END */
 #endScreen{
 display:none;
 text-align:center;
@@ -114,8 +111,8 @@ animation:flash 0.8s infinite;
 /* CONFETTI */
 .confetti{
 position:fixed;
-width:10px;height:10px;
-background:red;
+width:8px;
+height:8px;
 top:0;
 animation:fall 3s linear;
 }
@@ -124,7 +121,7 @@ to{transform:translateY(100vh) rotate(360deg);}
 }
 
 @media(max-width:768px){
-.questionBox{font-size:14px;}
+.box{font-size:14px}
 }
 </style>
 </head>
@@ -145,14 +142,14 @@ to{transform:translateY(100vh) rotate(360deg);}
 <div id="instructionScreen">
 <h2>🏰 Welcome to the Quest for the Seven Adverb Crystals!</h2>
 
-<p>The magical kingdom is in danger! Seven Adverb Crystals are hidden. Answer questions to collect them.</p>
+<p>The magical kingdom is in danger! Seven powerful Adverb Crystals have been hidden across the land. Your mission is to collect them by answering adventure questions correctly.</p>
 
 <h3>📜 How to Play</h3>
 <ul>
-<li>🗡️ Read each adventure carefully</li>
-<li>🎯 Choose correct answer</li>
-<li>✨ Earn points & crystals</li>
-<li>🏆 Unlock final treasure</li>
+<li>🗡️ Read each adventure carefully.</li>
+<li>🎯 Choose the best answer.</li>
+<li>✨ Earn points and crystals.</li>
+<li>🏆 Unlock final treasure.</li>
 </ul>
 
 <button onclick="startGame()">Start Game</button>
@@ -166,13 +163,13 @@ to{transform:translateY(100vh) rotate(360deg);}
 <div>⏳ <span id="timer">80</span>s</div>
 </div>
 
-<div class="questionBox">
+<div class="box">
 <h3 id="question"></h3>
 <div id="options"></div>
 </div>
 
 <div style="margin-top:10px;">
-Volume 🔊 <input type="range" id="vol" min="0" max="1" step="0.1" value="1">
+🔊 Volume <input type="range" id="vol" min="0" max="1" step="0.1" value="1">
 </div>
 
 </div>
@@ -180,10 +177,11 @@ Volume 🔊 <input type="range" id="vol" min="0" max="1" step="0.1" value="1">
 <!-- END -->
 <div id="endScreen">
 <div class="flash">🏆 TREASURE UNLOCKED!</div>
-<p id="scoreText"></p>
+
+<h3 id="scoreText"></h3>
 <p id="remark"></p>
 <p id="timeTaken"></p>
-<p id="reattempts"></p>
+<p id="wrongCount"></p>
 
 <button onclick="restart()">Restart</button>
 <button onclick="endGame()">End</button>
@@ -191,131 +189,97 @@ Volume 🔊 <input type="range" id="vol" min="0" max="1" step="0.1" value="1">
 
 <audio id="correctSound" src="assets/correct.mp3"></audio>
 <audio id="wrongSound" src="assets/wrong.mp3"></audio>
+<audio id="clapSound" src="assets/clapping.mp3"></audio>
 
 <script>
 
+/* EXACT QUESTIONS (NO CHANGES) */
 let questions = [
-{q:"🦁 A sleeping lion blocks your path. How do you walk past it?", options:["quietly","tomorrow","here","always"], answer:"quietly"},
-{q:"⏳ When should you run through a closing gate?", options:["immediately","softly","everywhere","never"], answer:"immediately"},
-{q:"The guard checks gates every day. Which adverb?", options:["always","tomorrow","carefully","there"], answer:"always"},
-{q:"🧙 Where did the wizard vanish?", options:["Where did the wizard vanish?","Why","When","How"], answer:"Where did the wizard vanish?"},
-{q:"🌑 The cave is ___ dark.", options:["very","yesterday","there","often"], answer:"very"},
-{q:"Why do explorers rush into cave?", options:["because they want to stay dry","carefully","tomorrow","here"], answer:"because they want to stay dry"},
-{q:"Map says key is beside you. Which word?", options:["here","loudly","yesterday","always"], answer:"here"},
-{q:"🏹 How do you shoot arrow?", options:["accurately","tomorrow","there","often"], answer:"accurately"},
-{q:"🐉 Dragon visits few times each year.", options:["rarely","quickly","here","yesterday"], answer:"rarely"},
-{q:"Puzzle became ___ easy.", options:["quite","tomorrow","everywhere","carefully"], answer:"quite"},
-{q:"Why bridge is avoided?", options:["because the bridge is unsafe","loudly","yesterday","there"], answer:"because the bridge is unsafe"},
-{q:"🦜 Which adverb tells where?", options:["everywhere","quietly","tomorrow","always"], answer:"everywhere"},
-{q:"Wizard opens door next day.", options:["tomorrow","carefully","here","very"], answer:"tomorrow"},
-{q:"Why did dragon escape?", options:["Why did the dragon escape?","Where","When","How"], answer:"Why did the dragon escape?"},
-{q:"Final treasure sentence?", options:["The knight carefully crossed the shaky bridge.","Tomorrow knight crossed","Sword crossed","Castle crossed"], answer:"The knight carefully crossed the shaky bridge."}
+{
+q:`1.A sleeping lion blocks your path. How do you walk past it?`,
+options:[`quietly`,`tomorrow`,`here`,`always`],
+answer:`quietly`
+},
+{
+q:`2. The castle gate is closing fast! When should you run through it?`,
+options:[`immediately`,`softly`,`everywhere`,`never`],
+answer:`immediately`
+},
+{
+q:`3. The castle guard checks the gates every single day. Which adverb matches this?`,
+options:[`always`,`tomorrow`,`carefully`,`there`],
+answer:`always`
+},
+{
+q:`4. The wizard suddenly vanished. Which question asks about the place?`,
+options:[`Where did the wizard vanish?`,`Why did the wizard vanish?`,`When did the wizard vanish?`,`How did the wizard vanish?`],
+answer:`Where did the wizard vanish?`
+},
+{
+q:`5.The cave is ______ dark that everyone lights a torch.`,
+options:[`very`,`yesterday`,`there`,`often`],
+answer:`very`
+},
+{
+q:`6. Heavy rain begins.Why do the explorers rush into a cave?`,
+options:[`because they want to stay dry`,`carefully`,`tomorrow`,`here`],
+answer:`because they want to stay dry`
+},
+{
+q:`7. Your treasure map says the key is hidden beside you.Which word tells the place?`,
+options:[`here`,`loudly`,`yesterday`,`always`],
+answer:`here`
+},
+{
+q:`8.You must hit the glowing target with one shot.How do you shoot the arrow?`,
+options:[`accurately`,`tomorrow`,`there`,`often`],
+answer:`accurately`
+},
+{
+q:`9. The dragon visits the village only a few times each year.Which adverb fits best?`,
+options:[`rarely`,`quickly`,`here`,`yesterday`],
+answer:`rarely`
+},
+{
+q:`10. The puzzle became ______ easy after the fairy gave you a clue.`,
+options:[`quite`,`tomorrow`,`everywhere`,`carefully`],
+answer:`quite`
+},
+{
+q:`11. The bridge catches fire.Why do the villagers take another road?`,
+options:[`because the bridge is unsafe`,`loudly`,`yesterday`,`there`],
+answer:`because the bridge is unsafe`
+},
+{
+q:`12.The magical bird flew in every direction.Which adverb tells where?`,
+options:[`everywhere`,`quietly`,`tomorrow`,`always`],
+answer:`everywhere`
+},
+{
+q:`13. The wizard says the secret door will open the next day.Which adverb tells when?`,
+options:[`tomorrow`,`carefully`,`here`,`very`],
+answer:`tomorrow`
+},
+{
+q:`14. The dragon escaped.Which question asks why it escaped?`,
+options:[`Why did the dragon escape?`,`Where did the dragon escape?`,`When did the dragon escape?`,`How did the dragon escape?`],
+answer:`Why did the dragon escape?`
+},
+{
+q:`15.You have reached the final treasure.Choose the sentence with the adverb used correctly.`,
+options:[`The knight carefully crossed the shaky bridge.`,`The knight crossed tomorrow.`,`The knight crossed sword.`,`The knight crossed castle.`],
+answer:`The knight carefully crossed the shaky bridge.`
+}
 ];
 
-let index=0, score=0, time=0, timer=80, interval;
-let wrongAttempts=0;
+let index=0, score=0, timer=80, interval;
+let wrongAttempts=0, timeTaken=0, attemptsPerQ=0;
 
 function shuffle(arr){
 return arr.sort(()=>Math.random()-0.5);
 }
 
-function startGame(){
-document.getElementById("instructionScreen").style.display="none";
-document.getElementById("game").style.display="block";
-questions = shuffle(questions);
-loadQ();
-startTimer();
-}
-
-function loadQ(){
-if(index>=questions.length){end();return;}
-
-document.getElementById("qCount").innerText=(index+1)+"/15";
-document.getElementById("question").innerText=questions[index].q;
-
-let optDiv=document.getElementById("options");
-optDiv.innerHTML="";
-
-questions[index].options.forEach(opt=>{
-let div=document.createElement("div");
-div.className="option";
-div.innerText=opt;
-div.onclick=()=>check(opt);
-optDiv.appendChild(div);
-});
-}
-
-function check(ans){
-let sound=document.getElementById(ans===questions[index].answer?"correctSound":"wrongSound");
-sound.volume=document.getElementById("vol").value;
-sound.play();
-
-if(ans===questions[index].answer){
-score++;
-celebrate();
-}
-else wrongAttempts++;
-
-nextQ();
-}
-
-function nextQ(){
-index++;
-timer=80;
-loadQ();
-}
-
-function startTimer(){
-interval=setInterval(()=>{
-timer--;
-document.getElementById("timer").innerText=timer;
-if(timer<=0){
-nextQ();
-}
-time++;
-},1000);
-}
-
-function celebrate(){
-for(let i=0;i<20;i++){
-let c=document.createElement("div");
-c.className="confetti";
-c.style.left=Math.random()*100+"vw";
-c.style.backgroundColor=["red","yellow","blue","green"][i%4];
-document.body.appendChild(c);
-setTimeout(()=>c.remove(),3000);
-}
-}
-
-function end(){
-clearInterval(interval);
-document.getElementById("game").style.display="none";
-document.getElementById("endScreen").style.display="block";
-
-let percent=(score/questions.length)*100;
-
-document.getElementById("scoreText").innerText=
-"You answered "+score+" / "+questions.length;
-
-let remark="";
-if(percent>=80) remark="Excellent ⭐";
-else if(percent>=60) remark="Good Job 👍";
-else if(percent>=45) remark="Well Tried 🙂";
-else remark="Let's Revise 📘";
-
-document.getElementById("remark").innerText=remark;
-document.getElementById("timeTaken").innerText="Time Taken: "+time+" sec";
-document.getElementById("reattempts").innerText="Wrong Attempts: "+wrongAttempts;
-}
-
-function restart(){
-location.reload();
-}
-
-function endGame(){
-alert("Thanks for playing!");
-}
-
+/* FLOW CONTROL */
 setTimeout(()=>{
 document.getElementById("splash").style.display="none";
 document.getElementById("titleScreen").style.display="flex";
@@ -326,6 +290,129 @@ document.getElementById("instructionScreen").style.display="block";
 },3000);
 
 },5000);
+
+/* START */
+function startGame(){
+document.getElementById("instructionScreen").style.display="none";
+document.getElementById("game").style.display="block";
+
+questions = shuffle(questions);
+loadQ();
+startTimer();
+}
+
+/* LOAD */
+function loadQ(){
+if(index>=questions.length){
+endGameScreen();
+return;
+}
+
+attemptsPerQ=0;
+
+document.getElementById("qCount").innerText=(index+1)+"/15";
+document.getElementById("question").innerText=questions[index].q;
+
+let box=document.getElementById("options");
+box.innerHTML="";
+
+questions[index].options.forEach(opt=>{
+let div=document.createElement("div");
+div.className="option";
+div.innerText=opt;
+div.onclick=()=>check(opt);
+box.appendChild(div);
+});
+}
+
+/* CHECK */
+function check(ans){
+attemptsPerQ++;
+
+let correct = ans===questions[index].answer;
+
+let sound=document.getElementById(correct?"correctSound":"wrongSound");
+sound.volume=document.getElementById("vol").value;
+sound.play();
+
+if(correct){
+score++;
+document.getElementById("clapSound").play();
+confetti();
+next();
+}
+else{
+wrongAttempts++;
+
+if(attemptsPerQ>=2){
+next();
+}
+}
+}
+
+/* NEXT */
+function next(){
+index++;
+timer=80;
+loadQ();
+}
+
+/* TIMER */
+function startTimer(){
+interval=setInterval(()=>{
+timer--;
+timeTaken++;
+document.getElementById("timer").innerText=timer;
+
+if(timer<=0){
+next();
+}
+},1000);
+}
+
+/* CONFETTI */
+function confetti(){
+for(let i=0;i<25;i++){
+let c=document.createElement("div");
+c.className="confetti";
+c.style.left=Math.random()*100+"vw";
+c.style.background=["red","yellow","blue","green"][i%4];
+document.body.appendChild(c);
+setTimeout(()=>c.remove(),3000);
+}
+}
+
+/* END SCREEN */
+function endGameScreen(){
+clearInterval(interval);
+document.getElementById("game").style.display="none";
+document.getElementById("endScreen").style.display="block";
+
+let percent=(score/15)*100;
+
+document.getElementById("scoreText").innerText=
+"You answered "+score+" / 15";
+
+let remark="";
+if(percent>=80) remark="Excellent ⭐";
+else if(percent>=60) remark="Good Job 👍";
+else if(percent>=45) remark="Well Tried 🙂";
+else remark="Let's Revise 📘";
+
+document.getElementById("remark").innerText=remark;
+document.getElementById("timeTaken").innerText="Time Taken: "+timeTaken+" sec";
+document.getElementById("wrongCount").innerText="Wrong Attempts: "+wrongAttempts;
+}
+
+/* RESTART */
+function restart(){
+location.reload();
+}
+
+/* END */
+function endGame(){
+alert("Thanks for playing!");
+}
 
 </script>
 
