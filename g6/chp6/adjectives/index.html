@@ -26,6 +26,7 @@ overflow:hidden;
 background:linear-gradient(to bottom,#ffdde1,#ee9ca7,#ffd3b6);
 }
 
+/* LIGHT EFFECTS */
 .light{
 position:absolute;
 width:300px;
@@ -35,7 +36,6 @@ border-radius:50%;
 filter:blur(50px);
 animation:moveLight 10s infinite alternate;
 }
-
 .light2{animation-duration:16s;}
 
 @keyframes moveLight{
@@ -43,6 +43,7 @@ from{transform:translate(-100px,-50px);}
 to{transform:translate(220px,120px);}
 }
 
+/* LOGO */
 #logoScreen{
 position:absolute;
 width:100%;
@@ -51,12 +52,15 @@ background:white;
 display:flex;
 justify-content:center;
 align-items:center;
-flex-direction:column;
 z-index:9999;
 }
 
-#logoScreen img{width:260px;max-width:80%;}
+#logoScreen img{
+width:260px;
+max-width:80%;
+}
 
+/* START & END */
 #startScreen,#endScreen{
 position:absolute;
 width:100%;
@@ -67,8 +71,8 @@ justify-content:center;
 align-items:center;
 flex-direction:column;
 color:white;
-z-index:5000;
 text-align:center;
+z-index:5000;
 padding:20px;
 }
 
@@ -83,6 +87,7 @@ margin-top:20px;
 cursor:pointer;
 }
 
+/* TITLE */
 #stageTitle{
 position:absolute;
 top:20px;
@@ -100,6 +105,7 @@ text-align:center;
 z-index:50;
 }
 
+/* CHARACTER */
 #character{
 position:absolute;
 bottom:110px;
@@ -108,6 +114,12 @@ transform:translateX(-50%);
 font-size:120px;
 }
 
+/* GIRL CHARACTER ADDED */
+#character{
+content:"👩‍🎤";
+}
+
+/* ITEMS */
 #itemsArea{
 position:absolute;
 bottom:20px;
@@ -134,8 +146,7 @@ box-shadow:0 0 10px rgba(0,0,0,0.2);
 transition:0.2s;
 }
 
-.item:hover{transform:scale(1.1);background:#fff176;}
-
+/* SCORE */
 #scoreBoard{
 position:absolute;
 top:10px;
@@ -147,6 +158,7 @@ font-weight:bold;
 z-index:200;
 }
 
+/* CHALLENGE */
 #challengeBox{
 position:absolute;
 top:120px;
@@ -160,6 +172,7 @@ color:#e65100;
 z-index:150;
 }
 
+/* QUESTION */
 #questionBox{
 position:absolute;
 top:50%;
@@ -186,6 +199,7 @@ font-size:16px;
 cursor:pointer;
 }
 
+/* FEEDBACK */
 .correct{color:green;font-size:24px;text-align:center;}
 .wrong{color:red;font-size:24px;text-align:center;}
 
@@ -220,7 +234,7 @@ Q: <span id="questionCount">0</span>/10
 
 <div id="challengeBox">Choose 3 items!</div>
 
-<div id="character">🧍</div>
+<div id="character">👩‍🎤</div>
 
 <div id="itemsArea"></div>
 
@@ -240,11 +254,6 @@ document.getElementById("logoScreen").style.display="none";
 document.getElementById("startScreen").style.display="flex";
 },5000);
 
-/* SOUND */
-const correctSound=new Audio("assets/correct.mp3");
-const wrongSound=new Audio("assets/wrong.mp3");
-const clapSound=new Audio("assets/clapping.mp3");
-
 /* THEMES */
 const fashionThemes=[
 {emoji:"👑 Royal",items:["👑","💍","👜","👗","🕶️","👒"]},
@@ -263,7 +272,7 @@ let selectedCount=0;
 let attempt=0;
 
 /* QUESTIONS (UNCHANGED) */
-const questions=[ /* SAME AS YOUR ORIGINAL - KEEP AS IS */
+const questions=[
 {
 q:`👗 Mia bought a beautiful dress for the school concert.<br><br>Which word is the adjective of quality?`,
 o:["Mia","beautiful","dress","concert"],
@@ -324,12 +333,12 @@ document.getElementById("startScreen").style.display="none";
 loadItems();
 }
 
-/* THEME SWITCH */
+/* THEME */
 function setTheme(){
-let theme=fashionThemes[themeIndex];
-document.getElementById("stageTitle").innerText=theme.emoji+" Fashion Challenge";
+let t=fashionThemes[themeIndex];
 themeIndex=(themeIndex+1)%fashionThemes.length;
-return theme;
+document.getElementById("stageTitle").innerText=t.emoji+" Fashion Challenge";
+return t;
 }
 
 /* LOAD ITEMS */
@@ -339,6 +348,7 @@ selectedCount=0;
 attempt=0;
 
 let theme=setTheme();
+
 let shuffled=[...theme.items].sort(()=>Math.random()-0.5).slice(0,5);
 
 shuffled.forEach(i=>{
@@ -354,7 +364,6 @@ itemsArea.appendChild(div);
 function selectItem(div){
 div.style.background="#81c784";
 selectedCount++;
-
 if(selectedCount>=3){
 showQuestion();
 }
@@ -380,51 +389,42 @@ options.appendChild(btn);
 });
 }
 
-/* ANSWER (2 ATTEMPTS FIXED) */
+/* ANSWER */
 function checkAnswer(sel,correct){
 let fb=document.getElementById("feedback");
 
 if(sel===correct){
 fb.innerHTML="Correct!";
 fb.className="correct";
-correctSound.play();
-clapSound.play();
-
-nextQuestion();
-}
-else{
-attempt++;
-wrongSound.play();
-
-if(attempt<2){
-fb.innerHTML="Try Again!";
-fb.className="wrong";
-return;
-}
-
-fb.innerHTML="Answer Revealed!";
-fb.className="wrong";
-
-setTimeout(nextQuestion,1000);
-}
-}
-
-/* NEXT */
-function nextQuestion(){
-document.getElementById("questionBox").style.display="none";
-
-currentQuestion++;
-document.getElementById("questionCount").innerText=currentQuestion;
-
-if(currentQuestion>=10){
-endGame();
-return;
-}
 
 stylesCompleted++;
-document.getElementById("styleCount").innerText=stylesCompleted;
+currentQuestion++;
 
+document.getElementById("styleCount").innerText=stylesCompleted;
+document.getElementById("questionCount").innerText=currentQuestion;
+
+setTimeout(()=>{
+document.getElementById("questionBox").style.display="none";
+if(currentQuestion>=10){
+endGame();
+}else{
 loadItems();
+}
+},1000);
+
+}else{
+attempt++;
+fb.innerHTML = attempt<2 ? "Try Again!" : "Answer Revealed!";
+fb.className="wrong";
+
+if(attempt>=2){
+setTimeout(()=>{
+document.getElementById("questionBox").style.display="none";
+currentQuestion++;
+loadItems();
+},1200);
+}
+}
 }
 
 /* END */
@@ -440,5 +440,6 @@ location.reload();
 }
 
 </script>
+
 </body>
 </html>
