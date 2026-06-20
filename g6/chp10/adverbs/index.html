@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Adverbs Balloon Adventure</title>
+<title>Adverbs Balloon Adventure Level 3</title>
 
 <style>
 body{
@@ -36,36 +36,72 @@ overflow:hidden;
 /* TITLE */
 h2{
 text-align:center;
-margin:10px;
+margin:8px;
 color:#1d3557;
 }
 
-/* PLAYER */
+/* SCORE */
+#scoreBoard{
+position:absolute;
+top:10px;
+right:10px;
+background:white;
+padding:8px 14px;
+border-radius:10px;
+z-index:50;
+}
+
+/* PROGRESS */
+#progress{
+position:absolute;
+top:10px;
+left:10px;
+background:#fff;
+padding:8px 12px;
+border-radius:10px;
+z-index:50;
+}
+
+/* MONKEY */
 #player{
 position:absolute;
 bottom:20px;
-left:40px;
+left:30px;
 width:90px;
-z-index:10;
+z-index:20;
 }
 
-/* BALLOON */
+/* BALLOON LAYER (IMPORTANT FIX) */
+#balloonArea{
+position:absolute;
+inset:0;
+z-index:5;
+overflow:hidden;
+}
+
+/* BALLOONS */
 .balloon{
 position:absolute;
 width:70px;
 height:90px;
 cursor:pointer;
-z-index:5;
 transition:transform 0.2s;
 filter: drop-shadow(0 8px 10px rgba(0,0,0,0.25));
 }
 
+/* fallback if image fails */
+.balloon.fallback{
+background:radial-gradient(circle at 30% 30%, #ff4d6d, #c9184a);
+border-radius:50% 50% 45% 45%;
+}
+
+/* POP */
 .balloon.pop{
 transform:scale(0);
 opacity:0;
 }
 
-/* QUESTION */
+/* QUESTION BOX */
 #questionBox{
 display:none;
 position:absolute;
@@ -73,19 +109,19 @@ top:50%;
 left:50%;
 transform:translate(-50%,-50%);
 background:white;
-padding:25px;
+padding:22px;
 border-radius:15px;
 width:90%;
 max-width:450px;
 text-align:center;
-z-index:50;
+z-index:100;
 box-shadow:0 10px 30px rgba(0,0,0,0.2);
 }
 
 #questionText{
 font-size:20px;
 font-weight:bold;
-margin-bottom:15px;
+margin-bottom:10px;
 }
 
 #optionsContainer{
@@ -98,9 +134,9 @@ button{
 padding:12px;
 border:none;
 border-radius:10px;
-font-size:16px;
 background:#f1f1f1;
 cursor:pointer;
+font-size:15px;
 }
 
 button:hover{
@@ -109,19 +145,8 @@ background:#dbeafe;
 
 /* FEEDBACK */
 #feedback{
-margin-top:10px;
+margin-top:8px;
 font-weight:bold;
-}
-
-/* SCORE */
-#scoreBoard{
-position:absolute;
-top:10px;
-right:10px;
-background:white;
-padding:8px 15px;
-border-radius:10px;
-z-index:20;
 }
 
 /* TREASURE */
@@ -146,6 +171,7 @@ border:none;
 border-radius:10px;
 background:#1d3557;
 color:white;
+z-index:100;
 }
 </style>
 </head>
@@ -160,9 +186,10 @@ color:white;
 <!-- GAME -->
 <div id="gameContainer">
 
-<h2>🎈 Adverbs Balloon Treasure Adventure 🎈</h2>
+<h2>🎈 Level 3 Balloon Adverbs Adventure 🎈</h2>
 
 <div id="scoreBoard">Score: 0</div>
+<div id="progress">Progress: 0/5</div>
 
 <img id="player" src="assets/player.png">
 
@@ -186,23 +213,24 @@ color:white;
 <script>
 
 const questions=[
-{q:"You run from monkeys. How do you run?",options:["quickly","slowly","yesterday","there"],answer:"quickly"},
-{q:"You shout in mountain. How?",options:["loudly","softly","often","very"],answer:"loudly"},
-{q:"You sneak past dragon. How?",options:["quietly","yesterday","there","now"],answer:"quietly"},
-{q:"You celebrate victory. How?",options:["joyfully","slowly","there","very"],answer:"joyfully"},
-{q:"You solve puzzle. How?",options:["cleverly","loudly","yesterday","there"],answer:"cleverly"}
+{q:"You run from monkeys. How?",options:["quickly","slowly","yesterday","there"],answer:"quickly"},
+{q:"You shout in mountain. How?",options:["loudly","softly","very","there"],answer:"loudly"},
+{q:"You sneak past dragon. How?",options:["quietly","yesterday","now","there"],answer:"quietly"},
+{q:"You solve puzzle. How?",options:["cleverly","slowly","there","very"],answer:"cleverly"},
+{q:"You celebrate victory. How?",options:["joyfully","sadly","there","yesterday"],answer:"joyfully"}
 ];
 
 let currentQ=0;
 let score=0;
+let balloons=[];
 
-const gameContainer=document.getElementById("gameContainer");
 const balloonArea=document.getElementById("balloonArea");
 const questionBox=document.getElementById("questionBox");
 const questionText=document.getElementById("questionText");
 const optionsContainer=document.getElementById("optionsContainer");
 const feedback=document.getElementById("feedback");
 const scoreBoard=document.getElementById("scoreBoard");
+const progress=document.getElementById("progress");
 
 const correctSound=document.getElementById("correctSound");
 const wrongSound=document.getElementById("wrongSound");
@@ -210,28 +238,26 @@ const clapSound=document.getElementById("clapSound");
 
 setTimeout(()=>{
 document.getElementById("logoScreen").style.display="none";
-gameContainer.style.display="block";
-spawnBalloon();
+document.getElementById("gameContainer").style.display="block";
+spawnMultipleBalloons();
 },5000);
 
-function spawnBalloon(){
-if(currentQ>=questions.length){
-endGame();
-return;
-}
-
-balloonArea.innerHTML="";
+function createBalloon(){
 
 const b=document.createElement("img");
 b.src="assets/balloon.png";
 b.className="balloon";
 
-b.style.left=Math.random()*80+"%";
-b.style.bottom="0px";
+b.style.left=Math.random()*85+"%";
+b.style.bottom="-100px";
+
+b.onerror=()=>{
+b.classList.add("fallback");
+};
 
 balloonArea.appendChild(b);
 
-let pos=0;
+let pos=-100;
 
 const move=setInterval(()=>{
 pos+=2;
@@ -239,13 +265,22 @@ b.style.bottom=pos+"px";
 
 if(pos>window.innerHeight){
 clearInterval(move);
-spawnBalloon();
+b.remove();
+spawnMultipleBalloons();
 }
 },20);
 
-b.onclick=()=>{
-showQ(b,move);
-};
+b.onclick=()=>showQ(b,move);
+
+balloons.push(b);
+}
+
+function spawnMultipleBalloons(){
+balloonArea.innerHTML="";
+balloons=[];
+for(let i=0;i<4;i++){
+setTimeout(createBalloon,i*400);
+}
 }
 
 function showQ(balloon,move){
@@ -268,12 +303,14 @@ questionBox.style.display="block";
 }
 
 function check(ans,balloon){
+
 const q=questions[currentQ];
 
 if(ans===q.answer){
 
 score++;
 scoreBoard.innerText="Score: "+score;
+progress.innerText="Progress: "+(currentQ+1)+"/"+questions.length;
 
 feedback.innerText="Correct 🎉";
 feedback.style.color="green";
@@ -286,7 +323,12 @@ setTimeout(()=>{
 balloon.remove();
 questionBox.style.display="none";
 currentQ++;
-spawnBalloon();
+
+if(currentQ>=questions.length){
+endGame();
+}else{
+spawnMultipleBalloons();
+}
 },300);
 
 }else{
