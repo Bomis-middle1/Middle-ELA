@@ -2,352 +2,330 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<title>Quest for Adverb Crystals</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Adverbs Balloon Adventure Level 3</title>
 
 <style>
 body{
 margin:0;
-font-family:Arial;
+font-family:Arial, sans-serif;
+background:linear-gradient(to bottom,#1e3c72,#2a5298);
+color:white;
 overflow:hidden;
-background:linear-gradient(#cfefff,#e9f7ff);
 }
 
-/* LOGO */
-#logoScreen{
+/* SPLASH */
+#splash{
 position:fixed;
-inset:0;
+top:0;left:0;
+width:100%;height:100%;
 background:white;
 display:flex;
-justify-content:center;
 align-items:center;
-z-index:999;
+justify-content:center;
+z-index:10;
 }
-
-/* GAME */
-#gameContainer{
-display:none;
-width:100%;
-height:100vh;
-position:relative;
-overflow:hidden;
+#splash img{
+width:220px;
 }
 
 /* TITLE */
-h2{
-text-align:center;
-margin:8px;
-color:#1d3557;
-}
-
-/* SCORE */
-#scoreBoard{
-position:absolute;
-top:10px;
-right:10px;
-background:white;
-padding:8px 14px;
-border-radius:10px;
-z-index:50;
-}
-
-/* PROGRESS */
-#progress{
-position:absolute;
-top:10px;
-left:10px;
-background:#fff;
-padding:8px 12px;
-border-radius:10px;
-z-index:50;
-}
-
-/* MONKEY */
-#player{
-position:absolute;
-bottom:20px;
-left:30px;
-width:90px;
-z-index:20;
-}
-
-/* BALLOON LAYER (IMPORTANT FIX) */
-#balloonArea{
-position:absolute;
-inset:0;
-z-index:5;
-overflow:hidden;
-}
-
-/* BALLOONS */
-.balloon{
-position:absolute;
-width:70px;
-height:90px;
-cursor:pointer;
-transition:transform 0.2s;
-filter: drop-shadow(0 8px 10px rgba(0,0,0,0.25));
-}
-
-/* fallback if image fails */
-.balloon.fallback{
-background:radial-gradient(circle at 30% 30%, #ff4d6d, #c9184a);
-border-radius:50% 50% 45% 45%;
-}
-
-/* POP */
-.balloon.pop{
-transform:scale(0);
-opacity:0;
-}
-
-/* QUESTION BOX */
-#questionBox{
+#titleScreen{
 display:none;
 position:absolute;
-top:50%;
-left:50%;
-transform:translate(-50%,-50%);
-background:white;
-padding:22px;
-border-radius:15px;
-width:90%;
-max-width:450px;
-text-align:center;
-z-index:100;
-box-shadow:0 10px 30px rgba(0,0,0,0.2);
-}
-
-#questionText{
-font-size:20px;
+width:100%;height:100%;
+align-items:center;
+justify-content:center;
+flex-direction:column;
+font-size:28px;
 font-weight:bold;
-margin-bottom:10px;
+text-align:center;
 }
 
-#optionsContainer{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:10px;
+/* INSTRUCTIONS */
+#instructionScreen{
+display:none;
+padding:20px;
+text-align:left;
+font-size:16px;
+line-height:1.5;
 }
 
 button{
-padding:12px;
+padding:12px 18px;
+font-size:16px;
 border:none;
 border-radius:10px;
-background:#f1f1f1;
+background:#ffcc00;
 cursor:pointer;
-font-size:15px;
+margin-top:15px;
 }
 
-button:hover{
-background:#dbeafe;
-}
-
-/* FEEDBACK */
-#feedback{
-margin-top:8px;
-font-weight:bold;
-}
-
-/* TREASURE */
-#treasure{
-position:absolute;
-bottom:20px;
-left:50%;
-width:120px;
-transform:translateX(-50%);
+/* GAME */
+#game{
 display:none;
+padding:10px;
 }
 
-/* RESTART */
-#restartBtn{
-display:none;
-position:absolute;
-left:50%;
-transform:translateX(-50%);
-top:70%;
-padding:12px 25px;
-border:none;
+.topBar{
+display:flex;
+justify-content:space-between;
+font-size:16px;
+margin-bottom:10px;
+}
+
+.questionBox{
+background:white;
+color:black;
+padding:15px;
 border-radius:10px;
-background:#1d3557;
-color:white;
-z-index:100;
+min-height:120px;
+}
+
+.option{
+background:#f0f0f0;
+margin:8px 0;
+padding:10px;
+border-radius:8px;
+cursor:pointer;
+}
+
+.option:hover{background:#ddd;}
+
+/* END SCREEN */
+#endScreen{
+display:none;
+text-align:center;
+padding:20px;
+}
+
+.flash{
+font-size:26px;
+font-weight:bold;
+animation:flash 0.8s infinite;
+}
+
+@keyframes flash{
+0%{opacity:1;}
+50%{opacity:0.3;}
+100%{opacity:1;}
+}
+
+/* CONFETTI */
+.confetti{
+position:fixed;
+width:10px;height:10px;
+background:red;
+top:0;
+animation:fall 3s linear;
+}
+@keyframes fall{
+to{transform:translateY(100vh) rotate(360deg);}
+}
+
+@media(max-width:768px){
+.questionBox{font-size:14px;}
 }
 </style>
 </head>
 
 <body>
 
-<!-- LOGO -->
-<div id="logoScreen">
-<img src="assets/innovine-logo.png" width="220">
+<!-- SPLASH -->
+<div id="splash">
+<img src="/mnt/data/ae80f07f-381f-4db7-bebe-7a48b91cdd96.png">
+</div>
+
+<!-- TITLE -->
+<div id="titleScreen">
+🏰 Quest for the Seven Adverb Crystals 🏰
+</div>
+
+<!-- INSTRUCTIONS -->
+<div id="instructionScreen">
+<h2>🏰 Welcome to the Quest for the Seven Adverb Crystals!</h2>
+
+<p>The magical kingdom is in danger! Seven Adverb Crystals are hidden. Answer questions to collect them.</p>
+
+<h3>📜 How to Play</h3>
+<ul>
+<li>🗡️ Read each adventure carefully</li>
+<li>🎯 Choose correct answer</li>
+<li>✨ Earn points & crystals</li>
+<li>🏆 Unlock final treasure</li>
+</ul>
+
+<button onclick="startGame()">Start Game</button>
 </div>
 
 <!-- GAME -->
-<div id="gameContainer">
+<div id="game">
 
-<h2>🎈 Level 3 Balloon Adverbs Adventure 🎈</h2>
-
-<div id="scoreBoard">Score: 0</div>
-<div id="progress">Progress: 0/5</div>
-
-<img id="player" src="assets/player.png">
-
-<div id="balloonArea"></div>
-
-<div id="questionBox">
-<div id="questionText"></div>
-<div id="optionsContainer"></div>
-<div id="feedback"></div>
+<div class="topBar">
+<div id="qCount">1/15</div>
+<div>⏳ <span id="timer">80</span>s</div>
 </div>
 
-<img id="treasure" src="assets/treasure.png">
-<button id="restartBtn">Restart</button>
+<div class="questionBox">
+<h3 id="question"></h3>
+<div id="options"></div>
+</div>
 
+<div style="margin-top:10px;">
+Volume 🔊 <input type="range" id="vol" min="0" max="1" step="0.1" value="1">
+</div>
+
+</div>
+
+<!-- END -->
+<div id="endScreen">
+<div class="flash">🏆 TREASURE UNLOCKED!</div>
+<p id="scoreText"></p>
+<p id="remark"></p>
+<p id="timeTaken"></p>
+<p id="reattempts"></p>
+
+<button onclick="restart()">Restart</button>
+<button onclick="endGame()">End</button>
 </div>
 
 <audio id="correctSound" src="assets/correct.mp3"></audio>
 <audio id="wrongSound" src="assets/wrong.mp3"></audio>
-<audio id="clapSound" src="assets/clapping.mp3"></audio>
 
 <script>
 
-const questions=[
-{q:"You run from monkeys. How?",options:["quickly","slowly","yesterday","there"],answer:"quickly"},
-{q:"You shout in mountain. How?",options:["loudly","softly","very","there"],answer:"loudly"},
-{q:"You sneak past dragon. How?",options:["quietly","yesterday","now","there"],answer:"quietly"},
-{q:"You solve puzzle. How?",options:["cleverly","slowly","there","very"],answer:"cleverly"},
-{q:"You celebrate victory. How?",options:["joyfully","sadly","there","yesterday"],answer:"joyfully"}
+let questions = [
+{q:"🦁 A sleeping lion blocks your path. How do you walk past it?", options:["quietly","tomorrow","here","always"], answer:"quietly"},
+{q:"⏳ When should you run through a closing gate?", options:["immediately","softly","everywhere","never"], answer:"immediately"},
+{q:"The guard checks gates every day. Which adverb?", options:["always","tomorrow","carefully","there"], answer:"always"},
+{q:"🧙 Where did the wizard vanish?", options:["Where did the wizard vanish?","Why","When","How"], answer:"Where did the wizard vanish?"},
+{q:"🌑 The cave is ___ dark.", options:["very","yesterday","there","often"], answer:"very"},
+{q:"Why do explorers rush into cave?", options:["because they want to stay dry","carefully","tomorrow","here"], answer:"because they want to stay dry"},
+{q:"Map says key is beside you. Which word?", options:["here","loudly","yesterday","always"], answer:"here"},
+{q:"🏹 How do you shoot arrow?", options:["accurately","tomorrow","there","often"], answer:"accurately"},
+{q:"🐉 Dragon visits few times each year.", options:["rarely","quickly","here","yesterday"], answer:"rarely"},
+{q:"Puzzle became ___ easy.", options:["quite","tomorrow","everywhere","carefully"], answer:"quite"},
+{q:"Why bridge is avoided?", options:["because the bridge is unsafe","loudly","yesterday","there"], answer:"because the bridge is unsafe"},
+{q:"🦜 Which adverb tells where?", options:["everywhere","quietly","tomorrow","always"], answer:"everywhere"},
+{q:"Wizard opens door next day.", options:["tomorrow","carefully","here","very"], answer:"tomorrow"},
+{q:"Why did dragon escape?", options:["Why did the dragon escape?","Where","When","How"], answer:"Why did the dragon escape?"},
+{q:"Final treasure sentence?", options:["The knight carefully crossed the shaky bridge.","Tomorrow knight crossed","Sword crossed","Castle crossed"], answer:"The knight carefully crossed the shaky bridge."}
 ];
 
-let currentQ=0;
-let score=0;
-let balloons=[];
+let index=0, score=0, time=0, timer=80, interval;
+let wrongAttempts=0;
 
-const balloonArea=document.getElementById("balloonArea");
-const questionBox=document.getElementById("questionBox");
-const questionText=document.getElementById("questionText");
-const optionsContainer=document.getElementById("optionsContainer");
-const feedback=document.getElementById("feedback");
-const scoreBoard=document.getElementById("scoreBoard");
-const progress=document.getElementById("progress");
-
-const correctSound=document.getElementById("correctSound");
-const wrongSound=document.getElementById("wrongSound");
-const clapSound=document.getElementById("clapSound");
-
-setTimeout(()=>{
-document.getElementById("logoScreen").style.display="none";
-document.getElementById("gameContainer").style.display="block";
-spawnMultipleBalloons();
-},5000);
-
-function createBalloon(){
-
-const b=document.createElement("img");
-b.src="assets/balloon.png";
-b.className="balloon";
-
-b.style.left=Math.random()*85+"%";
-b.style.bottom="-100px";
-
-b.onerror=()=>{
-b.classList.add("fallback");
-};
-
-balloonArea.appendChild(b);
-
-let pos=-100;
-
-const move=setInterval(()=>{
-pos+=2;
-b.style.bottom=pos+"px";
-
-if(pos>window.innerHeight){
-clearInterval(move);
-b.remove();
-spawnMultipleBalloons();
-}
-},20);
-
-b.onclick=()=>showQ(b,move);
-
-balloons.push(b);
+function shuffle(arr){
+return arr.sort(()=>Math.random()-0.5);
 }
 
-function spawnMultipleBalloons(){
-balloonArea.innerHTML="";
-balloons=[];
-for(let i=0;i<4;i++){
-setTimeout(createBalloon,i*400);
+function startGame(){
+document.getElementById("instructionScreen").style.display="none";
+document.getElementById("game").style.display="block";
+questions = shuffle(questions);
+loadQ();
+startTimer();
 }
-}
 
-function showQ(balloon,move){
-clearInterval(move);
+function loadQ(){
+if(index>=questions.length){end();return;}
 
-const q=questions[currentQ];
+document.getElementById("qCount").innerText=(index+1)+"/15";
+document.getElementById("question").innerText=questions[index].q;
 
-questionText.innerText=q.q;
-optionsContainer.innerHTML="";
-feedback.innerText="";
+let optDiv=document.getElementById("options");
+optDiv.innerHTML="";
 
-q.options.forEach(o=>{
-const btn=document.createElement("button");
-btn.innerText=o;
-btn.onclick=()=>check(o,balloon);
-optionsContainer.appendChild(btn);
+questions[index].options.forEach(opt=>{
+let div=document.createElement("div");
+div.className="option";
+div.innerText=opt;
+div.onclick=()=>check(opt);
+optDiv.appendChild(div);
 });
-
-questionBox.style.display="block";
 }
 
-function check(ans,balloon){
+function check(ans){
+let sound=document.getElementById(ans===questions[index].answer?"correctSound":"wrongSound");
+sound.volume=document.getElementById("vol").value;
+sound.play();
 
-const q=questions[currentQ];
-
-if(ans===q.answer){
-
+if(ans===questions[index].answer){
 score++;
-scoreBoard.innerText="Score: "+score;
-progress.innerText="Progress: "+(currentQ+1)+"/"+questions.length;
-
-feedback.innerText="Correct 🎉";
-feedback.style.color="green";
-
-correctSound.play();
-
-balloon.classList.add("pop");
-
-setTimeout(()=>{
-balloon.remove();
-questionBox.style.display="none";
-currentQ++;
-
-if(currentQ>=questions.length){
-endGame();
-}else{
-spawnMultipleBalloons();
+celebrate();
 }
-},300);
+else wrongAttempts++;
 
-}else{
-feedback.innerText="Try again!";
-feedback.style.color="red";
-wrongSound.play();
+nextQ();
 }
+
+function nextQ(){
+index++;
+timer=80;
+loadQ();
+}
+
+function startTimer(){
+interval=setInterval(()=>{
+timer--;
+document.getElementById("timer").innerText=timer;
+if(timer<=0){
+nextQ();
+}
+time++;
+},1000);
+}
+
+function celebrate(){
+for(let i=0;i<20;i++){
+let c=document.createElement("div");
+c.className="confetti";
+c.style.left=Math.random()*100+"vw";
+c.style.backgroundColor=["red","yellow","blue","green"][i%4];
+document.body.appendChild(c);
+setTimeout(()=>c.remove(),3000);
+}
+}
+
+function end(){
+clearInterval(interval);
+document.getElementById("game").style.display="none";
+document.getElementById("endScreen").style.display="block";
+
+let percent=(score/questions.length)*100;
+
+document.getElementById("scoreText").innerText=
+"You answered "+score+" / "+questions.length;
+
+let remark="";
+if(percent>=80) remark="Excellent ⭐";
+else if(percent>=60) remark="Good Job 👍";
+else if(percent>=45) remark="Well Tried 🙂";
+else remark="Let's Revise 📘";
+
+document.getElementById("remark").innerText=remark;
+document.getElementById("timeTaken").innerText="Time Taken: "+time+" sec";
+document.getElementById("reattempts").innerText="Wrong Attempts: "+wrongAttempts;
+}
+
+function restart(){
+location.reload();
 }
 
 function endGame(){
-questionBox.style.display="none";
-document.getElementById("treasure").style.display="block";
-document.getElementById("restartBtn").style.display="block";
-clapSound.play();
+alert("Thanks for playing!");
 }
 
-document.getElementById("restartBtn").onclick=()=>{
-location.reload();
-};
+setTimeout(()=>{
+document.getElementById("splash").style.display="none";
+document.getElementById("titleScreen").style.display="flex";
+
+setTimeout(()=>{
+document.getElementById("titleScreen").style.display="none";
+document.getElementById("instructionScreen").style.display="block";
+},3000);
+
+},5000);
 
 </script>
 
