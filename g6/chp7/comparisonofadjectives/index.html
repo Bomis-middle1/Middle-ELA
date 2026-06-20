@@ -3,309 +3,297 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🏁 Robot Race + Adjective Learning Game</title>
+<title>🏁 Robot Racing Championship</title>
 
 <style>
-body{
+*{
 margin:0;
-font-family:Arial;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
+body{overflow:hidden;background:black;}
+
+#gameArea{
+position:relative;
+width:100vw;
+height:100vh;
 overflow:hidden;
 background:linear-gradient(to bottom,#0f2027,#203a43,#2c5364);
 }
 
-/* SCREENS */
-.screen{
-position:fixed;
-inset:0;
-display:flex;
-justify-content:center;
-align-items:center;
-flex-direction:column;
-background:white;
-z-index:9999;
-}
-
-/* GAME */
-#game{
-display:none;
-width:100vw;
-height:100vh;
-position:relative;
-}
-
-/* SCORE */
-#scoreBoard{
+/* LIGHTS */
+.light{
 position:absolute;
-top:10px;
-left:10px;
-background:white;
-padding:10px 14px;
-border-radius:10px;
-font-weight:bold;
+width:350px;
+height:350px;
+background:rgba(255,255,255,0.05);
+border-radius:50%;
+filter:blur(60px);
+animation:moveLight 12s infinite alternate;
+}
+.light2{animation-duration:18s;}
+
+@keyframes moveLight{
+from{transform:translate(-120px,-60px);}
+to{transform:translate(250px,150px);}
+}
+
+/* LOGO */
+#logoScreen{
+position:absolute;width:100%;height:100%;
+background:white;display:flex;
+justify-content:center;align-items:center;
+flex-direction:column;z-index:9999;
+}
+#logoScreen img{width:260px;max-width:80%;}
+
+/* START */
+#startScreen{
+position:absolute;width:100%;height:100%;
+background:rgba(0,0,0,0.85);
+display:none;justify-content:center;align-items:center;
+flex-direction:column;color:white;z-index:5000;
+}
+
+.mainBtn{
+padding:16px 34px;font-size:22px;
+border:none;border-radius:18px;
+background:#ff9800;color:white;
+cursor:pointer;
 }
 
 /* TITLE */
-#title{
-position:absolute;
-top:10px;
-left:50%;
+#arenaTitle{
+position:absolute;top:15px;left:50%;
 transform:translateX(-50%);
-background:white;
-padding:10px 14px;
-border-radius:10px;
-font-weight:bold;
-width:80%;
+width:88%;
+background:white;border:8px solid #00e5ff;
+border-radius:20px;
 text-align:center;
+font-size:28px;font-weight:bold;
+padding:15px;
+z-index:50;
 }
 
-/* INTRO RACE */
+/* CHALLENGE */
+#challengeBox{
+position:absolute;top:135px;left:50%;
+transform:translateX(-50%);
+background:#fff9c4;
+padding:18px 30px;
+border-radius:18px;
+font-size:26px;
+font-weight:bold;
+z-index:200;
+}
+
+/* TRACK */
 #track{
 position:absolute;
-top:35%;
-left:50%;
-transform:translate(-50%,-50%);
-width:90%;
-height:220px;
-background:#222;
-border-radius:20px;
-overflow:hidden;
-}
-
-.lane{
-position:absolute;
-width:100%;
-height:33%;
-border-bottom:2px dashed white;
+top:290px;left:50%;
+transform:translateX(-50%);
+width:90%;height:300px;
+background:#424242;
+border-radius:25px;
+border:8px solid #212121;
 }
 
 .robot{
 position:absolute;
-font-size:60px;
-left:0;
+font-size:70px;
+left:20px;
+transition:left 0.15s linear;
 }
 
-#r1{top:20px;}
-#r2{top:80px;}
-#r3{top:140px;}
+#robot1{top:20px;}
+#robot2{top:110px;}
+#robot3{top:205px;}
 
-/* BUTTONS */
-.robotBtns{
+/* CHOICES */
+#robotChoices{
 position:absolute;
-bottom:20px;
+bottom:45px;
 left:50%;
 transform:translateX(-50%);
 display:flex;
-gap:20px;
+gap:25px;
 }
 
-.btn{
-padding:15px;
-font-size:40px;
-border:none;
-border-radius:12px;
-cursor:pointer;
-background:white;
+.choiceBtn{
+width:110px;height:110px;
+border:none;border-radius:22px;
+font-size:60px;
 }
 
 /* QUESTION */
 #questionBox{
-display:none;
 position:absolute;
-inset:0;
-background:rgba(0,0,0,0.92);
-color:white;
-justify-content:center;
-align-items:center;
-flex-direction:column;
-text-align:center;
-padding:20px;
+top:50%;left:50%;
+transform:translate(-50%,-50%);
+width:92%;
+background:#fff8e1;
+padding:28px;
+border-radius:25px;
+display:none;
+z-index:4500;
 }
 
-.option{
-width:80%;
-padding:12px;
-margin:8px;
+.optionBtnQuestion{
+width:100%;
+padding:16px;
+margin:10px 0;
 border:none;
-border-radius:10px;
+border-radius:15px;
 background:#4caf50;
 color:white;
+font-size:18px;
 }
 
-/* END */
-#end{
-display:none;
-position:fixed;
-inset:0;
-background:white;
-justify-content:center;
-align-items:center;
-flex-direction:column;
+#feedback{
+text-align:center;
+font-size:28px;
+font-weight:bold;
+margin-top:10px;
 }
 
+.correct{color:green;}
+.wrong{color:red;}
 </style>
 </head>
 
 <body>
 
-<!-- INTRO SCREEN -->
-<div id="intro" class="screen">
-<h1>🏁 Choose the Fastest Robot!</h1>
+<div id="gameArea">
+
+<div id="logoScreen">
+<img src="assets/innovine-logo.png">
+</div>
+
+<div id="startScreen">
+<h1>🏁 Robot Racing Championship</h1>
+<button class="mainBtn" onclick="startGame()">Start</button>
+</div>
+
+<div id="arenaTitle">🤖 Choose the Best Robot!</div>
+<div id="challengeBox">Choose the FASTEST robot!</div>
 
 <div id="track">
-<div class="lane"></div>
-<div class="lane" style="top:33%"></div>
-<div class="lane" style="top:66%"></div>
-
-<div class="robot" id="r1">🤖</div>
-<div class="robot" id="r2">🦾</div>
-<div class="robot" id="r3">⚙️</div>
+<div class="robot" id="robot1">🤖</div>
+<div class="robot" id="robot2">🦾</div>
+<div class="robot" id="robot3">⚙️</div>
 </div>
 
-<div class="robotBtns">
-<button class="btn" onclick="pick(1)">🤖</button>
-<button class="btn" onclick="pick(2)">🦾</button>
-<button class="btn" onclick="pick(3)">⚙️</button>
+<div id="robotChoices">
+<button class="choiceBtn" onclick="startRace(1)">🤖</button>
+<button class="choiceBtn" onclick="startRace(2)">🦾</button>
+<button class="choiceBtn" onclick="startRace(3)">⚙️</button>
 </div>
-
-<h3 id="introMsg"></h3>
-<button id="startBtn" style="display:none;padding:10px;margin-top:10px;" onclick="startGame()">Start Game</button>
-</div>
-
-<!-- GAME -->
-<div id="game">
-
-<div id="scoreBoard">
-Score: <span id="score">0</span> | Q: <span id="qno">0</span>/10
-</div>
-
-<div id="title">📚 Adjective Learning Game</div>
 
 <div id="questionBox">
-<h2 id="qText"></h2>
-<div id="opts"></div>
-<div id="fb"></div>
+<div id="questionText"></div>
+<div id="options"></div>
+<div id="feedback"></div>
 </div>
 
-</div>
-
-<!-- END -->
-<div id="end">
-<h1>🎉 Completed</h1>
-<h2 id="final"></h2>
-<button onclick="location.reload()">Restart</button>
 </div>
 
 <script>
 
-/* INTRO RACE ENGINE */
-let chosen=-1;
-let correct=2;
+/* STATE */
+let raceDone = false;
+let qIndex = 0;
 
-let pos=[0,0,0];
-let speeds=[2,2,2];
+/* LOGO */
+setTimeout(()=>{
+document.getElementById("logoScreen").style.display="none";
+document.getElementById("startScreen").style.display="flex";
+},5000);
 
-function animate(){
-pos[0]+=speeds[0];
-pos[1]+=speeds[1];
-pos[2]+=speeds[2];
-
-document.getElementById("r1").style.left=pos[0]+"px";
-document.getElementById("r2").style.left=pos[1]+"px";
-document.getElementById("r3").style.left=pos[2]+"px";
-
-let boost=correct-1;
-speeds[boost]=4;
-
-if(pos[boost]>600){
-return;
-}
-
-requestAnimationFrame(animate);
-}
-
-animate();
-
-/* PICK ROBOT */
-function pick(id){
-chosen=id;
-
-if(id===correct){
-document.getElementById("introMsg").innerText="🎉 Correct Robot Wins!";
-}else{
-document.getElementById("introMsg").innerText="❌ Good Try!";
-}
-
-document.getElementById("startBtn").style.display="block";
-}
-
-/* START GAME */
 function startGame(){
-document.getElementById("intro").style.display="none";
-document.getElementById("game").style.display="block";
-loadQ();
+document.getElementById("startScreen").style.display="none";
 }
 
 /* QUESTIONS */
-let qIndex=0;
-let score=0;
-let attempt=0;
-
-let qs=[
-{q:"Which is adjective of quality?",o:["beautiful","run","apple"],a:0},
-{q:"Which is adjective of number?",o:["many","run","blue"],a:0},
-{q:"Which is demonstrative?",o:["this","eat","jump"],a:0}
+const questions=[
+{q:"Fastest robot?",o:["A","B","C","D"],a:2},
+{q:"Second question?",o:["A","B","C","D"],a:1},
+{q:"Third question?",o:["A","B","C","D"],a:0}
 ];
 
-qs.sort(()=>Math.random()-0.5);
+/* RACE (ONLY ONCE) */
+function startRace(choice){
 
-function loadQ(){
-if(qIndex>=qs.length){
-end();
+if(raceDone){
+showQuestion();
 return;
 }
 
-let q=qs[qIndex];
-document.getElementById("questionBox").style.display="flex";
-document.getElementById("qText").innerText=q.q;
+let robots=[robot1,robot2,robot3];
+robots.forEach(r=>r.style.left="20px");
 
-let box=document.getElementById("opts");
-box.innerHTML="";
-document.getElementById("fb").innerText="";
+let pos=[20,20,20];
+let speed=[2,2,2];
+speed[choice-1]+=2;
 
-q.o.forEach((x,i)=>{
+let race=setInterval(()=>{
+
+for(let i=0;i<3;i++){
+pos[i]+=speed[i];
+robots[i].style.left=pos[i]+"px";
+
+if(pos[i]>window.innerWidth*0.7){
+clearInterval(race);
+raceDone=true;
+showQuestion();
+return;
+}
+}
+},40);
+}
+
+/* QUESTIONS ONLY FLOW */
+function showQuestion(){
+document.getElementById("questionBox").style.display="block";
+let q=questions[qIndex];
+document.getElementById("questionText").innerHTML=q.q;
+
+let optDiv=document.getElementById("options");
+optDiv.innerHTML="";
+
+q.o.forEach((op,i)=>{
 let b=document.createElement("button");
-b.className="option";
-b.innerText=x;
+b.className="optionBtnQuestion";
+b.innerHTML=op;
 b.onclick=()=>check(i,q.a);
-box.appendChild(b);
+optDiv.appendChild(b);
 });
 }
 
 function check(sel,ans){
-let fb=document.getElementById("fb");
+
+let fb=document.getElementById("feedback");
 
 if(sel===ans){
-score++;
-document.getElementById("score").innerText=score;
-fb.innerText="Correct!";
-qIndex++;
-attempt=0;
-setTimeout(loadQ,1000);
+fb.innerHTML="Correct!";
+fb.className="correct";
 }else{
-attempt++;
-fb.innerText=attempt<2?"Try again":"Answer revealed";
-if(attempt>=2){
-qIndex++;
-attempt=0;
-setTimeout(loadQ,1000);
-}
-}
+fb.innerHTML="Wrong!";
+fb.className="wrong";
 }
 
-function end(){
-document.getElementById("game").style.display="none";
-document.getElementById("end").style.display="flex";
-document.getElementById("final").innerText="Score: "+score;
+qIndex++;
+
+setTimeout(()=>{
+document.getElementById("questionBox").style.display="none";
+
+if(qIndex<questions.length){
+showQuestion();
+}else{
+alert("Game Over!");
+}
+},1200);
 }
 
 </script>
