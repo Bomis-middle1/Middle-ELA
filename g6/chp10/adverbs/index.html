@@ -6,17 +6,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-
-/* ✅ GLOBAL FIX FOR MOBILE VISIBILITY */
 body{
 margin:0;
 font-family:Arial;
 background:linear-gradient(to bottom,#142850,#27496d);
 color:white;
-
-/* IMPORTANT FIX */
 overflow:auto;
-min-height:100vh;
 }
 
 /* SPLASH */
@@ -66,17 +61,14 @@ cursor:pointer;
 margin-top:10px;
 }
 
-/* GAME AREA FIX */
+/* GAME */
 #game{
 display:none;
 padding:10px;
-
-/* IMPORTANT FIX */
 max-height:100vh;
 overflow:auto;
 }
 
-/* TOP BAR */
 .topBar{
 display:flex;
 justify-content:space-between;
@@ -84,24 +76,18 @@ font-size:16px;
 margin-bottom:10px;
 }
 
-/* QUESTION BOX FIXED */
 .box{
 background:white;
 color:black;
 padding:18px;
 border-radius:10px;
 min-height:180px;
-
-/* IMPORTANT FIXES */
-overflow-wrap:break-word;
-word-break:break-word;
-white-space:normal;
-
+white-space:pre-line;
+word-wrap:break-word;
 font-size:18px;
 line-height:1.5;
 }
 
-/* OPTIONS */
 .option{
 background:#f0f0f0;
 margin:8px 0;
@@ -114,7 +100,7 @@ cursor:pointer;
 background:#ddd;
 }
 
-/* END SCREEN */
+/* END */
 #endScreen{
 display:none;
 text-align:center;
@@ -133,7 +119,6 @@ animation:flash 0.8s infinite;
 100%{opacity:1}
 }
 
-/* CONFETTI */
 .confetti{
 position:fixed;
 width:8px;
@@ -165,30 +150,22 @@ to{transform:translateY(100vh) rotate(360deg);}
 <div id="instructionScreen">
 <h2>🏰 Welcome to the Quest for the Seven Adverb Crystals!</h2>
 
-<p>
-The magical kingdom is in danger! Answer correctly and collect all crystals.
-</p>
+<p>The magical kingdom is in danger! Answer correctly to collect crystals.</p>
 
 <button onclick="startGame()">Start Game</button>
 </div>
 
 <!-- GAME -->
 <div id="game">
-
 <div class="topBar">
 <div id="qCount">1/15</div>
 <div>⏳ <span id="timer">80</span>s</div>
 </div>
 
 <div class="box">
-<h3 id="question"></h3>
+<div id="question"></div>
 <div id="options"></div>
 </div>
-
-<div style="margin-top:10px;">
-🔊 <input type="range" min="0" max="1" step="0.1" value="1">
-</div>
-
 </div>
 
 <!-- END -->
@@ -203,30 +180,89 @@ The magical kingdom is in danger! Answer correctly and collect all crystals.
 <button onclick="restart()">Restart</button>
 </div>
 
-<!-- AUDIO -->
 <audio id="correctSound" src="assets/correct.mp3"></audio>
 <audio id="wrongSound" src="assets/wrong.mp3"></audio>
 <audio id="clapSound" src="assets/clapping.mp3"></audio>
 
 <script>
 
-/* ✅ EXACT QUESTIONS (UNCHANGED) */
+/* ✅ EXACT QUESTIONS — NO CUTTING / NO SHORTENING */
 let questions = [
-{q:`1.A sleeping lion blocks your path. How do you walk past it?`,options:[`quietly`,`tomorrow`,`here`,`always`],answer:`quietly`},
-{q:`2. The castle gate is closing fast! When should you run through it?`,options:[`immediately`,`softly`,`everywhere`,`never`],answer:`immediately`},
-{q:`3. The castle guard checks the gates every single day. Which adverb matches this?`,options:[`always`,`tomorrow`,`carefully`,`there`],answer:`always`},
-{q:`4. The wizard suddenly vanished. Which question asks about the place?`,options:[`Where did the wizard vanish?`,`Why did the wizard vanish?`,`When did the wizard vanish?`,`How did the wizard vanish?`],answer:`Where did the wizard vanish?`},
-{q:`5.The cave is ______ dark that everyone lights a torch.`,options:[`very`,`yesterday`,`there`,`often`],answer:`very`},
-{q:`6. Heavy rain begins.Why do the explorers rush into a cave?`,options:[`because they want to stay dry`,`carefully`,`tomorrow`,`here`],answer:`because they want to stay dry`},
-{q:`7. Your treasure map says the key is hidden beside you.Which word tells the place?`,options:[`here`,`loudly`,`yesterday`,`always`],answer:`here`},
-{q:`8.You must hit the glowing target with one shot.How do you shoot the arrow?`,options:[`accurately`,`tomorrow`,`there`,`often`],answer:`accurately`},
-{q:`9. The dragon visits the village only a few times each year.Which adverb fits best?`,options:[`rarely`,`quickly`,`here`,`yesterday`],answer:`rarely`},
-{q:`10. The puzzle became ______ easy after the fairy gave you a clue.`,options:[`quite`,`tomorrow`,`everywhere`,`carefully`],answer:`quite`},
-{q:`11. The bridge catches fire.Why do the villagers take another road?`,options:[`because the bridge is unsafe`,`loudly`,`yesterday`,`there`],answer:`because the bridge is unsafe`},
-{q:`12.The magical bird flew in every direction.Which adverb tells where?`,options:[`everywhere`,`quietly`,`tomorrow`,`always`],answer:`everywhere`},
-{q:`13. The wizard says the secret door will open the next day.Which adverb tells when?`,options:[`tomorrow`,`carefully`,`here`,`very`],answer:`tomorrow`},
-{q:`14. The dragon escaped.Which question asks why it escaped?`,options:[`Why did the dragon escape?`,`Where did the dragon escape?`,`When did the dragon escape?`,`How did the dragon escape?`],answer:`Why did the dragon escape?`},
-{q:`15.You have reached the final treasure.Choose the sentence with the adverb used correctly.`,options:[`The knight carefully crossed the shaky bridge.`,`The knight crossed tomorrow.`,`The knight crossed sword.`,`The knight crossed castle.`],answer:`The knight carefully crossed the shaky bridge.`}
+{
+q:`1.A sleeping lion blocks your path. How do you walk past it?`,
+options:[`quietly`,`tomorrow`,`here`,`always`],
+answer:`quietly`
+},
+{
+q:`2. The castle gate is closing fast! When should you run through it?`,
+options:[`immediately`,`softly`,`everywhere`,`never`],
+answer:`immediately`
+},
+{
+q:`3. The castle guard checks the gates every single day. Which adverb matches this?`,
+options:[`always`,`tomorrow`,`carefully`,`there`],
+answer:`always`
+},
+{
+q:`4. The wizard suddenly vanished. Which question asks about the place?`,
+options:[`Where did the wizard vanish?`,`Why did the wizard vanish?`,`When did the wizard vanish?`,`How did the wizard vanish?`],
+answer:`Where did the wizard vanish?`
+},
+{
+q:`5.The cave is ______ dark that everyone lights a torch.`,
+options:[`very`,`yesterday`,`there`,`often`],
+answer:`very`
+},
+{
+q:`6. Heavy rain begins.Why do the explorers rush into a cave?`,
+options:[`because they want to stay dry`,`carefully`,`tomorrow`,`here`],
+answer:`because they want to stay dry`
+},
+{
+q:`7. Your treasure map says the key is hidden beside you.Which word tells the place?`,
+options:[`here`,`loudly`,`yesterday`,`always`],
+answer:`here`
+},
+{
+q:`8.You must hit the glowing target with one shot.How do you shoot the arrow?`,
+options:[`accurately`,`tomorrow`,`there`,`often`],
+answer:`accurately`
+},
+{
+q:`9. The dragon visits the village only a few times each year.Which adverb fits best?`,
+options:[`rarely`,`quickly`,`here`,`yesterday`],
+answer:`rarely`
+},
+{
+q:`10. The puzzle became ______ easy after the fairy gave you a clue.`,
+options:[`quite`,`tomorrow`,`everywhere`,`carefully`],
+answer:`quite`
+},
+{
+q:`11. The bridge catches fire.Why do the villagers take another road?`,
+options:[`because the bridge is unsafe`,`loudly`,`yesterday`,`there`],
+answer:`because the bridge is unsafe`
+},
+{
+q:`12.The magical bird flew in every direction.Which adverb tells where?`,
+options:[`everywhere`,`quietly`,`tomorrow`,`always`],
+answer:`everywhere`
+},
+{
+q:`13. The wizard says the secret door will open the next day.Which adverb tells when?`,
+options:[`tomorrow`,`carefully`,`here`,`very`],
+answer:`tomorrow`
+},
+{
+q:`14. The dragon escaped.Which question asks why it escaped?`,
+options:[`Why did the dragon escape?`,`Where did the dragon escape?`,`When did the dragon escape?`,`How did the dragon escape?`],
+answer:`Why did the dragon escape?`
+},
+{
+q:`15.You have reached the final treasure.Choose the sentence with the adverb used correctly.`,
+options:[`The knight carefully crossed the shaky bridge.`,`The knight crossed tomorrow.`,`The knight crossed sword.`,`The knight crossed castle.`],
+answer:`The knight carefully crossed the shaky bridge.`
+}
 ];
 
 let index=0,score=0,wrong=0,time=0,timer=80,interval;
@@ -251,33 +287,34 @@ document.getElementById("instructionScreen").style.display="block";
 },3000);
 },5000);
 
-/* START GAME */
+/* START */
 function startGame(){
 document.getElementById("instructionScreen").style.display="none";
 document.getElementById("game").style.display="block";
 
 questions = shuffle(questions);
-loadQuestion();
+loadQ();
 startTimer();
 }
 
 /* LOAD QUESTION */
-function loadQuestion(){
+function loadQ(){
 
 if(index>=questions.length){
 endGame();
 return;
 }
 
+document.getElementById("qCount").innerText=(index+1)+"/15";
+
 let q = questions[index];
 
-document.getElementById("qCount").innerText=(index+1)+"/15";
-document.getElementById("question").innerText=q.q;
+document.getElementById("question").innerText = q.q;
 
 let opts = shuffle([...q.options]);
 
-let box=document.getElementById("options");
-box.innerHTML="";
+let box = document.getElementById("options");
+box.innerHTML = "";
 
 opts.forEach(o=>{
 let div=document.createElement("div");
@@ -305,11 +342,10 @@ else wrong++;
 next();
 }
 
-/* NEXT */
 function next(){
 index++;
 timer=80;
-loadQuestion();
+loadQ();
 }
 
 /* TIMER */
@@ -318,6 +354,7 @@ interval=setInterval(()=>{
 timer--;
 time++;
 document.getElementById("timer").innerText=timer;
+
 if(timer<=0) next();
 },1000);
 }
