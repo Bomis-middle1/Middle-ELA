@@ -27,13 +27,14 @@ z-index:9000;padding:30px;
 #instructionScreen p{
 max-width:700px;font-size:18px;line-height:1.6;
 }
+
 button{
 padding:14px 26px;font-size:18px;border:none;
 border-radius:12px;background:#ff9800;color:white;
 cursor:pointer;margin-top:20px;
 }
 
-/* START */
+/* START / END */
 #startScreen,#endScreen{
 position:absolute;inset:0;background:rgba(0,0,0,0.85);
 display:none;justify-content:center;align-items:center;
@@ -62,8 +63,8 @@ width:95%;background:#fff8e1;padding:15px;border-radius:18px;
 background:#4caf50;color:white;padding:12px;
 margin:8px;border-radius:10px;cursor:pointer;
 }
-
 .option:hover{background:#388e3c}
+
 </style>
 </head>
 
@@ -80,11 +81,11 @@ margin:8px;border-radius:10px;cursor:pointer;
 <h1>📘 Instructions</h1>
 <p>
 • Read the question carefully<br>
-• Choose the correct answer from options<br>
-• Tap your answer<br>
-• Get instant feedback<br>
-• Move automatically to next question<br>
-• Try to score high ⭐
+• Choose the correct answer from the options<br>
+• Tap on your answer<br>
+• Get instant feedback (correct or wrong)<br>
+• Move to the next question automatically<br>
+• Try to score as high as possible ⭐
 </p>
 <button onclick="showStart()">Start Game</button>
 </div>
@@ -111,7 +112,6 @@ Wrong: <span id="w">0</span><br>
 Q: <span id="qno">0</span>/15
 </div>
 
-<!-- QUESTION -->
 <div id="questionBox">
 <div id="question"></div>
 <div id="options"></div>
@@ -119,7 +119,7 @@ Q: <span id="qno">0</span>/15
 
 <script>
 
-/* FLOW: LOGO → INSTRUCTIONS */
+/* FLOW */
 setTimeout(()=>{
 document.getElementById("logoScreen").style.display="none";
 document.getElementById("instructionScreen").style.display="flex";
@@ -130,52 +130,160 @@ document.getElementById("instructionScreen").style.display="none";
 document.getElementById("startScreen").style.display="flex";
 }
 
-/* QUESTIONS */
-const questions = [
-{q:"Ambulance reached signal. Best sequence?",
-o:["Ambulance first","Cars moved first then ambulance","Signal first","Random"],a:1},
+/* QUESTIONS (STRICT - NO CHANGES) */
+const questions=[
 
-{q:"Best sentence",
-o:["The car carefully turned the corner","Car turned carefully","Carefully car turned","Corner turned car"],a:0},
+{
+q:`Q1.An ambulance reached a busy traffic signal.Which sequence sounds BEST?<br>
+Options:<br>
+• First the ambulance crossed safely, then the cars moved aside. <br>
+• First the cars moved aside, then the ambulance crossed safely. ✅ <br>
+• Finally the ambulance reached the signal, then the cars moved aside. <br>
+• The ambulance crossed first because finally the signal changed.`,
+a:1
+},
 
-{q:"Correct sequence",
-o:["Bus arrived → doors opened → passengers entered","Passengers first","Doors first","Random"],a:0},
+{
+q:`Q2. Choose the BEST sentence.<br>
+Options:<br>
+• The car carefully turned the corner. ✅ <br>
+• The car turned carefully the corner. <br>
+• Carefully the corner turned the car. <br>
+• The carefully car turned the corner.`,
+a:0
+},
 
-{q:"Worst placement",
-o:["Suddenly lights turned red","Lights suddenly red","Traffic suddenly lights turned red","Lights red suddenly"],a:2},
+{
+q:`Q3. The bus reached the stop.Which sentence uses the sequence words correctly?<br>
+Options:<br>
+• First the bus arrived. Next, the doors opened. Finally, the passengers entered. ✅ <br>
+• Finally the bus arrived. Next the passengers entered. First the doors opened. <br>
+• Next the passengers entered. First the bus arrived. Finally the doors opened. <br>
+• The passengers entered first because finally the bus arrived.`,
+a:0
+},
 
-{q:"Fill blank: First he came. ___ he left",
-o:["Loudly","Next","Fast","Slow"],a:1},
+{
+q:`Q4. Which sentence has the WORST adverb placement?<br>
+Options:<br>
+• The traffic lights suddenly turned red. <br>
+• Suddenly, the traffic lights turned red. <br>
+• The traffic suddenly lights turned red. ✅ <br>
+• The traffic lights turned red suddenly.`,
+a:2
+},
 
-{q:"Best sentence",
-o:["Biker quickly avoided pothole","Biker avoided quickly","Quickly biker pothole","Pothole biker"],a:0},
+{
+q:`Q5. Fill in the blank: "First the driver picked up the tourists. ______, he loaded their bags."<br>
+Options:<br>
+• Loudly <br>
+• Next ✅ <br>
+• Yesterday <br>
+• Carefully`,
+a:1
+},
 
-{q:"Correct order",
-o:["Signs → repair → traffic","Traffic → signs → repair","Repair → traffic → signs","Random"],a:0},
+{
+q:`Q6. Which sentence sounds MOST natural?<br>
+Options:<br>
+• The biker quickly avoided the pothole. ✅ <br>
+• The biker avoided quickly the pothole. <br>
+• Quickly the pothole avoided the biker. <br>
+• The quickly biker avoided the pothole.`,
+a:0
+},
 
-{q:"Best adverb",
-o:["Officer calmly guided traffic","Officer guided calmly traffic","Calmly officer","Officer calmly traffic"],a:0},
+{
+q:`Q7.  Which sentence shows the events in the correct order?<br>
+Options:<br>
+• First workers placed warning signs. Next, they repaired the road. Finally, traffic started moving again. ✅ <br>
+• Finally workers placed warning signs. Next they repaired the road. First traffic started moving again. <br>
+• Next traffic started moving again. First workers repaired the road. Finally they placed warning signs. <br>
+• First traffic started moving again. Finally workers repaired the road.`,
+a:0
+},
 
-{q:"Correct sequence",
-o:["Traffic stopped → bridge opened → cars crossed","Bridge first","Cars first","Random"],a:0},
+{
+q:`Q8. Which sentence uses the adverb BEST?<br>
+Options:<br>
+• The police officer calmly guided traffic. ✅ <br>
+• The police officer guided calmly traffic. <br>
+• Calmly traffic guided the officer. <br>
+• The calmly officer guided traffic.`,
+a:0
+},
 
-{q:"Ambulance sentence",
-o:["First ambulance carefully crossed","Carefully first crossed","Ambulance first road","Road crossed ambulance"],a:0},
+{
+q:`Q9. Which sentence uses the sequence words correctly?<br>
+Options:<br>
+• First the traffic stopped. Next, the bridge opened. Finally, the vehicles crossed. ✅ <br>
+• Finally the traffic stopped. First the bridge opened. Next the vehicles crossed. <br>
+• Next the vehicles crossed. Finally the traffic stopped. First the bridge opened. <br>
+• First the bridge crossed the vehicles. Finally the traffic stopped.`,
+a:0
+},
 
-{q:"Best sentence",
-o:["Driver always checks mirrors","Driver checks always","Always driver","Mirrors checks driver"],a:0},
+{
+q:`Q10. Choose the sentence with the correct sequence word and adverb placement.<br>
+Options:<br>
+• First the ambulance carefully crossed the busy road. ✅ <br>
+• Carefully first crossed the ambulance the road. <br>
+• The ambulance crossed carefully first the road. <br>
+• First carefully the busy road crossed the ambulance.`,
+a:0
+},
 
-{q:"Correct option",
-o:["Suddenly lights blinked","Lights suddenly blinked","Both correct","Blinking lights"],a:2},
+{
+q:`Q11. Choose the BEST sentence.<br>
+Options:<br>
+• The driver always checks the mirrors before driving. ✅ <br>
+• The driver checks always the mirrors before driving. <br>
+• Always the mirrors checks the driver. <br>
+• The always driver checks the mirrors.`,
+a:0
+},
 
-{q:"Fill blank",
-o:["Carefully","Yesterday","Next","Loudly"],a:2},
+{
+q:`Q12. Which sentence is correctly written?<br>
+Options:<br>
+• The traffic lights blinked suddenly. <br>
+• Suddenly, the traffic lights blinked. <br>
+• Both A and B are correct. ✅ <br>
+• Suddenly the traffic lights blinked redly.`,
+a:2
+},
 
-{q:"Best sentence",
-o:["Officer politely spoke","Officer spoke politely","Both correct","Politely officer"],a:2},
+{
+q:`Q13.Fill in the blank:<br>
+"The school bus arrived. ______, the students got off safely."<br>
+Options:<br>
+• Carefully <br>
+• Yesterday <br>
+• Next ✅ <br>
+• Loudly`,
+a:2
+},
 
-{q:"Final question",
-o:["Police stopped traffic → fire engine passed","Fire engine first","Traffic after","Random"],a:0}
+{
+q:`Q14. Choose the BEST sentence.<br>
+Options:<br>
+• The traffic officer politely spoke to the drivers. <br>
+• The traffic officer spoke politely to the drivers. <br>
+• Both A and B are correct. ✅ <br>
+• The politely traffic officer spoke to the drivers.`,
+a:2
+},
+
+{
+q:`Q15 – A police officer stopped traffic to let a fire engine pass.Which sentence is written correctly?<br>
+Options:<br>
+• First the police officer quickly stopped traffic. Then the fire engine safely passed. ✅ <br>
+• Quickly first stopped the police officer traffic. <br>
+• First traffic stopped quickly the police officer. <br>
+• Then the fire engine first safely passed quickly.`,
+a:0
+}
+
 ];
 
 let i=0,c=0,w=0;
@@ -186,6 +294,7 @@ load();
 }
 
 function load(){
+
 if(i>=15){
 document.getElementById("endScreen").style.display="flex";
 document.getElementById("final").innerText=`Score: ${c}/15`;
@@ -196,7 +305,31 @@ document.getElementById("qno").innerText=i+1;
 document.getElementById("question").innerHTML=questions[i].q;
 
 let html="";
-questions[i].o.forEach((op,idx)=>{
+questions[i].q;
+
+html="";
+
+questions[i].o = questions[i].o || [];
+
+questions[i].q; // (kept safe, unused)
+
+for(let j=0;j<4;j++){}
+
+html="";
+
+questions[i].q;
+
+html="";
+
+let q = questions[i];
+
+let optionsText = q.q.split("Options:")[1] || "";
+
+let opts = optionsText.split("•").filter(x=>x.trim()!=="");
+
+html="";
+
+opts.forEach((op,idx)=>{
 html+=`<div class="option" onclick="check(${idx})">${op}</div>`;
 });
 
