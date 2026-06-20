@@ -3,440 +3,143 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🏁 Robot Racing Championship</title>
+<title>🏁 Robot Race + Adjective Learning Game</title>
 
 <style>
-
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:Arial,sans-serif;
-}
-
 body{
+margin:0;
+font-family:Arial;
 overflow:hidden;
-background:black;
+background:linear-gradient(to bottom,#0f2027,#203a43,#2c5364);
 }
 
-#gameArea{
-position:relative;
-width:100vw;
-height:100vh;
-overflow:hidden;
-background:
-linear-gradient(to bottom,#0f2027,#203a43,#2c5364);
-}
-
-/* LIGHTS */
-
-.light{
-position:absolute;
-width:350px;
-height:350px;
-background:rgba(255,255,255,0.05);
-border-radius:50%;
-filter:blur(60px);
-animation:moveLight 12s infinite alternate;
-}
-
-.light2{
-animation-duration:18s;
-}
-
-@keyframes moveLight{
-from{
-transform:translate(-120px,-60px);
-}
-to{
-transform:translate(250px,150px);
-}
-}
-
-/* LOGO */
-
-#logoScreen{
-position:absolute;
-width:100%;
-height:100%;
-background:white;
+/* SCREENS */
+.screen{
+position:fixed;
+inset:0;
 display:flex;
 justify-content:center;
 align-items:center;
 flex-direction:column;
+background:white;
 z-index:9999;
 }
 
-#logoScreen img{
-width:260px;
-max-width:80%;
+/* GAME */
+#game{
+display:none;
+width:100vw;
+height:100vh;
+position:relative;
 }
 
-#logoText{
-margin-top:20px;
-font-size:32px;
-font-weight:bold;
-color:#333;
-}
-
-/* START + END */
-
-#startScreen,
-#endScreen{
+/* SCORE */
+#scoreBoard{
 position:absolute;
-width:100%;
-height:100%;
-background:rgba(0,0,0,0.85);
-display:flex;
-justify-content:center;
-align-items:center;
-flex-direction:column;
-text-align:center;
-padding:20px;
-color:white;
-z-index:5000;
-}
-
-.mainBtn{
-padding:16px 34px;
-font-size:22px;
-border:none;
-border-radius:18px;
-background:#ff9800;
-color:white;
-cursor:pointer;
-margin-top:25px;
-transition:0.3s;
-}
-
-.mainBtn:hover{
-transform:scale(1.05);
-background:#f57c00;
+top:10px;
+left:10px;
+background:white;
+padding:10px 14px;
+border-radius:10px;
+font-weight:bold;
 }
 
 /* TITLE */
-
-#arenaTitle{
+#title{
 position:absolute;
-top:15px;
+top:10px;
 left:50%;
 transform:translateX(-50%);
-width:88%;
-min-height:90px;
 background:white;
-border:8px solid #00e5ff;
-border-radius:20px;
-display:flex;
-justify-content:center;
-align-items:center;
-font-size:28px;
+padding:10px 14px;
+border-radius:10px;
 font-weight:bold;
-color:#006064;
-box-shadow:0 0 25px rgba(255,255,255,0.6);
-z-index:50;
-padding:15px;
+width:80%;
 text-align:center;
-line-height:1.3;
 }
 
-/* CHALLENGE BOX */
-
-#challengeBox{
-position:absolute;
-top:135px;
-left:50%;
-transform:translateX(-50%);
-background:#fff9c4;
-padding:18px 30px;
-border-radius:18px;
-font-size:26px;
-font-weight:bold;
-color:#e65100;
-z-index:200;
-text-align:center;
-box-shadow:0 0 20px rgba(0,0,0,0.3);
-max-width:88%;
-line-height:1.4;
-}
-
-/* TRACK */
-
+/* INTRO RACE */
 #track{
 position:absolute;
-top:290px;
+top:35%;
 left:50%;
-transform:translateX(-50%);
+transform:translate(-50%,-50%);
 width:90%;
-height:300px;
-background:#424242;
-border-radius:25px;
+height:220px;
+background:#222;
+border-radius:20px;
 overflow:hidden;
-border:8px solid #212121;
 }
 
 .lane{
 position:absolute;
 width:100%;
-height:33.33%;
-border-bottom:4px dashed white;
+height:33%;
+border-bottom:2px dashed white;
 }
-
-#finishLine{
-position:absolute;
-right:40px;
-top:0;
-width:20px;
-height:100%;
-background:
-repeating-linear-gradient(
-white 0px,
-white 20px,
-black 20px,
-black 40px
-);
-}
-
-/* ROBOTS */
 
 .robot{
 position:absolute;
-font-size:70px;
-left:20px;
-transition:left 0.15s linear;
-filter:drop-shadow(0 0 12px cyan);
+font-size:60px;
+left:0;
 }
 
-#robot1{top:20px;}
-#robot2{top:110px;}
-#robot3{top:205px;}
+#r1{top:20px;}
+#r2{top:80px;}
+#r3{top:140px;}
 
-/* ROBOT CHOICES */
-
-#robotChoices{
+/* BUTTONS */
+.robotBtns{
 position:absolute;
-bottom:45px;
+bottom:20px;
 left:50%;
 transform:translateX(-50%);
 display:flex;
-gap:25px;
-z-index:300;
-flex-wrap:wrap;
-justify-content:center;
+gap:20px;
 }
 
-.choiceBtn{
-width:110px;
-height:110px;
+.btn{
+padding:15px;
+font-size:40px;
 border:none;
-border-radius:22px;
-font-size:60px;
+border-radius:12px;
 cursor:pointer;
 background:white;
-transition:0.3s;
-box-shadow:0 0 15px rgba(0,0,0,0.3);
 }
 
-.choiceBtn:hover{
-transform:scale(1.12);
-background:#b2ebf2;
-}
-
-/* SCORE */
-
-#scoreBoard{
-position:absolute;
-top:15px;
-left:15px;
-background:white;
-padding:12px 18px;
-border-radius:15px;
-font-size:20px;
-font-weight:bold;
-z-index:300;
-}
-
-/* VOLUME */
-
-#volumeBox{
-position:absolute;
-top:15px;
-right:15px;
-background:white;
-padding:12px;
-border-radius:15px;
-z-index:300;
-}
-
-/* WIN MESSAGE */
-
-#winMessage{
-position:absolute;
-top:50%;
-left:50%;
-transform:translate(-50%,-50%);
-font-size:58px;
-font-weight:bold;
-color:#ffee58;
-text-shadow:0 0 20px gold;
-display:none;
-z-index:4000;
-animation:pop 0.8s;
-}
-
-/* QUESTIONS */
-
+/* QUESTION */
 #questionBox{
-position:absolute;
-top:50%;
-left:50%;
-transform:translate(-50%,-50%);
-width:92%;
-max-width:680px;
-background:#fff8e1;
-padding:28px;
-border-radius:25px;
 display:none;
-z-index:4500;
-box-shadow:0 0 25px rgba(0,0,0,0.5);
-animation:popup 0.5s;
-}
-
-#questionTitle{
-font-size:30px;
-color:#e65100;
-margin-bottom:18px;
+position:absolute;
+inset:0;
+background:rgba(0,0,0,0.92);
+color:white;
+justify-content:center;
+align-items:center;
+flex-direction:column;
 text-align:center;
+padding:20px;
 }
 
-#questionText{
-font-size:23px;
-line-height:1.6;
-margin-bottom:20px;
-color:#333;
-}
-
-.optionBtnQuestion{
-width:100%;
-padding:16px;
-margin:10px 0;
+.option{
+width:80%;
+padding:12px;
+margin:8px;
 border:none;
-border-radius:15px;
+border-radius:10px;
 background:#4caf50;
 color:white;
-font-size:18px;
-cursor:pointer;
-transition:0.3s;
 }
 
-.optionBtnQuestion:hover{
-background:#388e3c;
-transform:scale(1.03);
-}
-
-/* FEEDBACK */
-
-#feedback{
-text-align:center;
-font-size:30px;
-font-weight:bold;
-margin-top:15px;
-}
-
-.correct{
-color:green;
-}
-
-.wrong{
-color:red;
-}
-
-/* CONFETTI */
-
-.confetti{
-position:absolute;
-width:12px;
-height:12px;
-animation:fall 3s linear forwards;
-}
-
-@keyframes fall{
-from{
-transform:translateY(-100px) rotate(0deg);
-}
-to{
-transform:translateY(100vh) rotate(720deg);
-opacity:0;
-}
-}
-
-@keyframes pop{
-0%{
-transform:translate(-50%,-50%) scale(0.5);
-}
-100%{
-transform:translate(-50%,-50%) scale(1.15);
-}
-}
-
-@keyframes popup{
-from{
-transform:translate(-50%,-50%) scale(0.5);
-opacity:0;
-}
-to{
-transform:translate(-50%,-50%) scale(1);
-opacity:1;
-}
-}
-
-/* MOBILE */
-
-@media(max-width:768px){
-
-#arenaTitle{
-font-size:20px;
-padding:12px;
-min-height:80px;
-}
-
-#challengeBox{
-font-size:18px;
-width:90%;
-top:120px;
-padding:14px 18px;
-}
-
-#track{
-height:240px;
-top:300px;
-}
-
-.robot{
-font-size:48px;
-}
-
-#robot1{top:15px;}
-#robot2{top:85px;}
-#robot3{top:160px;}
-
-.choiceBtn{
-width:80px;
-height:80px;
-font-size:42px;
-}
-
-#questionText{
-font-size:18px;
-}
-
-.optionBtnQuestion{
-font-size:16px;
-}
-
-#winMessage{
-font-size:34px;
-}
-
+/* END */
+#end{
+display:none;
+position:fixed;
+inset:0;
+background:white;
+justify-content:center;
+align-items:center;
+flex-direction:column;
 }
 
 </style>
@@ -444,469 +147,165 @@ font-size:34px;
 
 <body>
 
-<div id="gameArea">
-
-<div class="light"></div>
-<div class="light light2"></div>
-
-<!-- LOGO -->
-
-<div id="logoScreen">
-<img src="assets/innovine-logo.png">
-<div id="logoText">Innovine Learning Adventures</div>
-</div>
-
-<!-- START SCREEN -->
-
-<div id="startScreen" style="display:none;">
-
-<h1 style="font-size:52px;">🏁 Robot Racing Championship</h1>
-
-<p style="margin-top:20px;font-size:24px;max-width:700px;">
-Win robot races and master adjective comparisons!
-</p>
-
-<button class="mainBtn" onclick="startGame()">
-Start Racing
-</button>
-
-</div>
-
-<!-- END SCREEN -->
-
-<div id="endScreen" style="display:none;">
-
-<h1>🏆 Championship Complete! 🏆</h1>
-
-<h2 id="finalText" style="margin-top:20px;"></h2>
-
-<button class="mainBtn" onclick="restartGame()">
-Race Again
-</button>
-
-</div>
-
-<!-- TITLE -->
-
-<div id="arenaTitle">
-🤖 Choose the Best Robot and Win the Race!
-</div>
-
-<!-- SCORE -->
-
-<div id="scoreBoard">
-Wins: <span id="raceCount">0</span> |
-Questions: <span id="questionCount">0</span>/10
-</div>
-
-<!-- VOLUME -->
-
-<div id="volumeBox">
-Volume
-<input type="range" id="volumeSlider" min="0" max="1" step="0.1" value="1">
-</div>
-
-<!-- CHALLENGE -->
-
-<div id="challengeBox">
-Choose the FASTEST robot!
-</div>
-
-<!-- TRACK -->
+<!-- INTRO SCREEN -->
+<div id="intro" class="screen">
+<h1>🏁 Choose the Fastest Robot!</h1>
 
 <div id="track">
+<div class="lane"></div>
+<div class="lane" style="top:33%"></div>
+<div class="lane" style="top:66%"></div>
 
-<div class="lane" style="top:0;"></div>
-<div class="lane" style="top:33%;"></div>
-
-<div id="finishLine"></div>
-
-<div class="robot" id="robot1">🤖</div>
-<div class="robot" id="robot2">🦾</div>
-<div class="robot" id="robot3">⚙️</div>
-
+<div class="robot" id="r1">🤖</div>
+<div class="robot" id="r2">🦾</div>
+<div class="robot" id="r3">⚙️</div>
 </div>
 
-<!-- ROBOT CHOICES -->
-
-<div id="robotChoices">
-
-<button class="choiceBtn" onclick="startRace(1)">🤖</button>
-<button class="choiceBtn" onclick="startRace(2)">🦾</button>
-<button class="choiceBtn" onclick="startRace(3)">⚙️</button>
-
+<div class="robotBtns">
+<button class="btn" onclick="pick(1)">🤖</button>
+<button class="btn" onclick="pick(2)">🦾</button>
+<button class="btn" onclick="pick(3)">⚙️</button>
 </div>
 
-<!-- WIN -->
-
-<div id="winMessage">
-🏆 RACE WON!
+<h3 id="introMsg"></h3>
+<button id="startBtn" style="display:none;padding:10px;margin-top:10px;" onclick="startGame()">Start Game</button>
 </div>
 
-<!-- QUESTION BOX -->
+<!-- GAME -->
+<div id="game">
+
+<div id="scoreBoard">
+Score: <span id="score">0</span> | Q: <span id="qno">0</span>/10
+</div>
+
+<div id="title">📚 Adjective Learning Game</div>
 
 <div id="questionBox">
-
-<div id="questionTitle">
-📚 Race Challenge
+<h2 id="qText"></h2>
+<div id="opts"></div>
+<div id="fb"></div>
 </div>
-
-<div id="questionText"></div>
-
-<div id="options"></div>
-
-<div id="feedback"></div>
 
 </div>
 
+<!-- END -->
+<div id="end">
+<h1>🎉 Completed</h1>
+<h2 id="final"></h2>
+<button onclick="location.reload()">Restart</button>
 </div>
 
 <script>
 
-/* LOGO SCREEN */
+/* INTRO RACE ENGINE */
+let chosen=-1;
+let correct=2;
 
-setTimeout(()=>{
+let pos=[0,0,0];
+let speeds=[2,2,2];
 
-document.getElementById("logoScreen").style.display="none";
-document.getElementById("startScreen").style.display="flex";
+function animate(){
+pos[0]+=speeds[0];
+pos[1]+=speeds[1];
+pos[2]+=speeds[2];
 
-},5000);
+document.getElementById("r1").style.left=pos[0]+"px";
+document.getElementById("r2").style.left=pos[1]+"px";
+document.getElementById("r3").style.left=pos[2]+"px";
 
-/* AUDIO */
+let boost=correct-1;
+speeds[boost]=4;
 
-const correctSound = new Audio("assets/correct.mp3");
-const wrongSound = new Audio("assets/wrong.mp3");
-const clapSound = new Audio("assets/clapping.mp3");
-
-const volumeSlider = document.getElementById("volumeSlider");
-
-function updateVolume(){
-
-correctSound.volume = volumeSlider.value;
-wrongSound.volume = volumeSlider.value;
-clapSound.volume = volumeSlider.value;
-
+if(pos[boost]>600){
+return;
 }
 
-volumeSlider.addEventListener("input",updateVolume);
-
-updateVolume();
-
-/* VARIABLES */
-
-let racesWon = 0;
-let currentQuestion = 0;
-
-/* QUESTIONS */
-
-const questions = [
-
-{
-q:`🏁 During the semifinal race, Robo-X moved faster than Bolt-7, but Turbo Max moved the fastest of all.<br><br>
-Which robot was the fastest?`,
-o:["Robo-X","Bolt-7","Turbo Max","all tied"],
-a:2
-},
-
-{
-q:`🤖 Mia built a strong robot for the competition.<br><br>
-Her brother upgraded his robot to make it even ___.`,
-o:["strongest","stronger","strong","more strongest"],
-a:1
-},
-
-{
-q:`🎤 The announcer shouted:<br><br>
-"This is the most exciting race our city has ever seen!"<br><br>
-What kind of comparison is "most exciting"?`,
-o:["positive","comparative","superlative","none"],
-a:2
-},
-
-{
-q:`⚡ Three racing robots crossed the river obstacle.<br><br>
-The blue robot was fast.<br>
-The red robot was faster.<br>
-The silver robot was the fastest.<br><br>
-Which robot came second in speed?`,
-o:["blue","red","silver","none"],
-a:1
-},
-
-{
-q:`🏆 Coach Lina told her team:<br><br>
-"We need the safest robot for the night race."<br><br>
-Which word shows the highest level of comparison?`,
-o:["need","robot","safest","night"],
-a:2
-},
-
-{
-q:`🚀 Aryan tested two rocket engines after school.<br><br>
-The first engine was powerful, but the second one was more powerful.<br><br>
-What does "more powerful" compare?`,
-o:["one engine","two engines","all engines","none"],
-a:1
-},
-
-{
-q:`🤖 Zoya's robot was smaller than Ethan's robot, but it was quicker during turns.<br><br>
-Which robot was bigger?`,
-o:["Zoya's","Ethan's","same size","unknown"],
-a:1
-},
-
-{
-q:`🏁 The crowd became louder as the final race began.<br><br>
-Later, during the championship round, the crowd became the loudest it had been all day.<br><br>
-Which sentence uses a superlative adjective?`,
-o:[
-"louder as the race began",
-"crowd became the loudest",
-"final race began",
-"all day"
-],
-a:1
-},
-
-{
-q:`🛠️ Three students designed robots for science class.<br><br>
-Leo's robot was smart.<br>
-Noah's robot was smarter.<br>
-Ava's robot was the smartest.<br><br>
-Who built the best robot?`,
-o:["Leo","Noah","Ava","all equal"],
-a:2
-},
-
-{
-q:`🎮 During practice, Team Falcon's robot moved quickly through the maze.<br><br>
-In the final match, it moved even ___.`,
-o:["quickest","quickly","quicker","more quickly"],
-a:3
+requestAnimationFrame(animate);
 }
 
-];
+animate();
 
-questions.sort(()=>Math.random()-0.5);
+/* PICK ROBOT */
+function pick(id){
+chosen=id;
+
+if(id===correct){
+document.getElementById("introMsg").innerText="🎉 Correct Robot Wins!";
+}else{
+document.getElementById("introMsg").innerText="❌ Good Try!";
+}
+
+document.getElementById("startBtn").style.display="block";
+}
 
 /* START GAME */
-
 function startGame(){
-
-document.getElementById("startScreen").style.display="none";
-
+document.getElementById("intro").style.display="none";
+document.getElementById("game").style.display="block";
+loadQ();
 }
 
-/* RACE */
+/* QUESTIONS */
+let qIndex=0;
+let score=0;
+let attempt=0;
 
-function startRace(choice){
-
-const robots = [
-document.getElementById("robot1"),
-document.getElementById("robot2"),
-document.getElementById("robot3")
+let qs=[
+{q:"Which is adjective of quality?",o:["beautiful","run","apple"],a:0},
+{q:"Which is adjective of number?",o:["many","run","blue"],a:0},
+{q:"Which is demonstrative?",o:["this","eat","jump"],a:0}
 ];
 
-robots.forEach(robot=>{
+qs.sort(()=>Math.random()-0.5);
 
-robot.style.left = "20px";
+function loadQ(){
+if(qIndex>=qs.length){
+end();
+return;
+}
 
+let q=qs[qIndex];
+document.getElementById("questionBox").style.display="flex";
+document.getElementById("qText").innerText=q.q;
+
+let box=document.getElementById("opts");
+box.innerHTML="";
+document.getElementById("fb").innerText="";
+
+q.o.forEach((x,i)=>{
+let b=document.createElement("button");
+b.className="option";
+b.innerText=x;
+b.onclick=()=>check(i,q.a);
+box.appendChild(b);
 });
+}
 
-let speeds = [
-2 + Math.random()*2,
-2 + Math.random()*2,
-2 + Math.random()*2
-];
+function check(sel,ans){
+let fb=document.getElementById("fb");
 
-speeds[choice-1] += 2;
-
-let positions = [20,20,20];
-
-let race = setInterval(()=>{
-
-for(let i=0;i<3;i++){
-
-positions[i] += speeds[i];
-
-robots[i].style.left = positions[i]+"px";
-
-if(positions[i] >= window.innerWidth*0.72){
-
-clearInterval(race);
-
-if(i === choice-1){
-
-raceWon();
-
+if(sel===ans){
+score++;
+document.getElementById("score").innerText=score;
+fb.innerText="Correct!";
+qIndex++;
+attempt=0;
+setTimeout(loadQ,1000);
 }else{
-
-wrongSound.play();
-
+attempt++;
+fb.innerText=attempt<2?"Try again":"Answer revealed";
+if(attempt>=2){
+qIndex++;
+attempt=0;
+setTimeout(loadQ,1000);
+}
+}
 }
 
-}
-
-}
-
-},40);
-
-}
-
-/* WIN */
-
-function raceWon(){
-
-racesWon++;
-
-document.getElementById("raceCount").innerText =
-racesWon;
-
-document.getElementById("winMessage").style.display =
-"block";
-
-clapSound.play();
-
-createConfetti();
-
-setTimeout(()=>{
-
-document.getElementById("winMessage").style.display =
-"none";
-
-showQuestion();
-
-},1500);
-
-}
-
-/* SHOW QUESTION */
-
-function showQuestion(){
-
-document.getElementById("questionBox").style.display =
-"block";
-
-const q = questions[currentQuestion];
-
-document.getElementById("questionText").innerHTML = q.q;
-
-const optionsDiv = document.getElementById("options");
-
-optionsDiv.innerHTML = "";
-
-document.getElementById("feedback").innerHTML = "";
-
-q.o.forEach((option,index)=>{
-
-const btn = document.createElement("button");
-
-btn.classList.add("optionBtnQuestion");
-
-btn.innerHTML = option;
-
-btn.onclick = ()=>checkAnswer(index,q.a);
-
-optionsDiv.appendChild(btn);
-
-});
-
-}
-
-/* CHECK ANSWER */
-
-function checkAnswer(selected,correct){
-
-const feedback = document.getElementById("feedback");
-
-if(selected === correct){
-
-feedback.innerHTML = "🎉 Correct!";
-feedback.className = "correct";
-
-correctSound.play();
-
-createConfetti();
-
-}else{
-
-feedback.innerHTML = "❌ Wrong!";
-feedback.className = "wrong";
-
-wrongSound.play();
-
-}
-
-currentQuestion++;
-
-document.getElementById("questionCount").innerText =
-currentQuestion;
-
-setTimeout(()=>{
-
-document.getElementById("questionBox").style.display =
-"none";
-
-if(currentQuestion >= 10){
-
-endGame();
-
-}
-
-},1800);
-
-}
-
-/* CONFETTI */
-
-function createConfetti(){
-
-for(let i=0;i<45;i++){
-
-const conf = document.createElement("div");
-
-conf.classList.add("confetti");
-
-conf.style.left = Math.random()*100 + "%";
-
-conf.style.background =
-`hsl(${Math.random()*360},100%,50%)`;
-
-conf.style.animationDuration =
-(2 + Math.random()*2) + "s";
-
-document.body.appendChild(conf);
-
-setTimeout(()=>{
-
-conf.remove();
-
-},4000);
-
-}
-
-}
-
-/* END */
-
-function endGame(){
-
-document.getElementById("endScreen").style.display =
-"flex";
-
-document.getElementById("finalText").innerHTML =
-"You won <b>" + racesWon +
-"</b> robot races and completed all comparison challenges!";
-
-}
-
-/* RESTART */
-
-function restartGame(){
-
-location.reload();
-
+function end(){
+document.getElementById("game").style.display="none";
+document.getElementById("end").style.display="flex";
+document.getElementById("final").innerText="Score: "+score;
 }
 
 </script>
