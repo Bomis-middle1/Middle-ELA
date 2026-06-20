@@ -1,36 +1,161 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Adverbs Treasure Hunt Game</title>
+
 <style>
-body { margin:0; font-family: Arial; background: #cceeff; overflow:hidden; }
-#logoScreen { position:fixed; top:0; left:0; width:100%; height:100%; background:white; display:flex; justify-content:center; align-items:center; z-index:100; }
-#gameContainer { display:none; width:100%; height:100vh; position:relative; overflow:hidden; }
-h2 { text-align:center; margin:10px; }
-#player { position:absolute; bottom:20px; left:50px; width:60px; height:80px; z-index:10; transition: bottom 0.3s; }
-.coin { position:absolute; width:50px; height:50px; z-index:5; cursor:pointer; }
-#questionBox { display:none; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); background:white; padding:20px; border-radius:10px; text-align:center; width:80%; max-width:400px; box-shadow:0 0 15px #0003; z-index:50; }
-#questionBox button { margin:5px; padding:10px 20px; font-size:16px; cursor:pointer; }
-#feedback { margin-top:10px; font-weight:bold; }
-#restartBtn { display:none; margin:20px auto; padding:10px 30px; font-size:18px; cursor:pointer; position:absolute; left:50%; transform:translateX(-50%); top:70%; }
-#volumeSlider { position:absolute; bottom:10px; left:50%; transform:translateX(-50%); }
-#treasure { position:absolute; bottom:20px; left:50%; width:100px; height:100px; transform:translateX(-50%); display:none; }
+body {
+  margin: 0;
+  font-family: Arial;
+  overflow: hidden;
+  background: linear-gradient(#cfefff, #e9f7ff);
+}
+
+/* LOGO SCREEN */
+#logoScreen {
+  position: fixed;
+  inset: 0;
+  background: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+/* GAME AREA */
+#gameContainer {
+  display: none;
+  width: 100%;
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+
+/* TITLE */
+h2 {
+  text-align: center;
+  margin: 12px;
+  font-size: 26px;
+  color: #1d3557;
+  text-shadow: 1px 1px 0 #fff;
+}
+
+/* PLAYER */
+#player {
+  position: absolute;
+  bottom: 20px;
+  left: 40px;
+  width: 90px;
+  height: auto;
+  z-index: 10;
+}
+
+/* COIN */
+.coin {
+  position: absolute;
+  width: 70px;
+  height: 70px;
+  z-index: 5;
+  cursor: pointer;
+  filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.3));
+}
+
+/* QUESTION BOX */
+#questionBox {
+  display: none;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%,-50%);
+  background: #ffffff;
+  padding: 25px;
+  border-radius: 16px;
+  text-align: center;
+  width: 90%;
+  max-width: 450px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  z-index: 50;
+}
+
+/* QUESTION TEXT */
+#questionText {
+  font-size: 20px;
+  margin-bottom: 15px;
+  font-weight: bold;
+  color: #222;
+}
+
+/* OPTIONS GRID */
+#optionsContainer {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+#questionBox button {
+  padding: 12px;
+  font-size: 16px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  background: #f1f1f1;
+  transition: 0.2s;
+}
+
+#questionBox button:hover {
+  background: #dbeafe;
+}
+
+/* FEEDBACK */
+#feedback {
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+/* RESTART */
+#restartBtn {
+  display: none;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: 70%;
+  padding: 12px 25px;
+  font-size: 18px;
+  cursor: pointer;
+  border-radius: 10px;
+  border: none;
+  background: #1d3557;
+  color: white;
+}
+
+/* TREASURE */
+#treasure {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  width: 120px;
+  transform: translateX(-50%);
+  display: none;
+}
 </style>
 </head>
+
 <body>
 
-<!-- Logo Screen -->
+<!-- LOGO -->
 <div id="logoScreen">
-  <img src="assets/innovine-logo.png" alt="Innovine Logo" width="200">
+  <img src="assets/innovine-logo.png" width="220">
 </div>
 
-<!-- Game Container -->
+<!-- GAME -->
 <div id="gameContainer">
+
   <h2>🎯 Adverbs Treasure Hunt Adventure 🎯</h2>
-  <img id="player" src="assets/player.png" alt="Player">
+
+  <img id="player" src="assets/player.png">
+
   <div id="coinsArea"></div>
 
   <div id="questionBox">
@@ -39,35 +164,31 @@ h2 { text-align:center; margin:10px; }
     <div id="feedback"></div>
   </div>
 
-  <img id="treasure" src="assets/treasure.png" alt="Treasure">
+  <img id="treasure" src="assets/treasure.png">
   <button id="restartBtn">Restart Adventure</button>
-  <input type="range" id="volumeSlider" min="0" max="1" step="0.1" value="0.8">
+
 </div>
 
-<!-- Sounds -->
+<!-- AUDIO -->
 <audio id="correctSound" src="assets/correct.mp3"></audio>
 <audio id="wrongSound" src="assets/wrong.mp3"></audio>
 <audio id="clapSound" src="assets/clapping.mp3"></audio>
 
 <script>
-// --- Questions ---
+
+// QUESTIONS
 const questions = [
   {q:"You’re running from mischievous monkeys. How do you run?", options:["quickly","slowly","yesterday","there"], answer:"quickly"},
   {q:"You shout across the mountain. How?", options:["loudly","carefully","softly","very"], answer:"loudly"},
   {q:"Tiptoe past a sleeping dragon. How?", options:["quietly","yesterday","everywhere","often"], answer:"quietly"},
   {q:"Flashlight flickers in cave. When do you turn it on?", options:["immediately","cleverly","very","tomorrow"], answer:"immediately"},
-  {q:"Squirrel hides backpack. Where?", options:["behind the tree","quickly","loudly","yesterday"], answer:"behind the tree"},
   {q:"Dance at festival. How?", options:["gracefully","there","sometimes","very"], answer:"gracefully"},
-  {q:"Solve riddle from statue. How?", options:["cleverly","carefully","often","when"], answer:"cleverly"},
-  {q:"Throw magic rope across river. How?", options:["accurately","there","yesterday","always"], answer:"accurately"},
-  {q:"Sneak past pirates. How?", options:["silently","cleverly","very","now"], answer:"silently"},
-  {q:"Open treasure chest. How do you celebrate?", options:["joyfully","yesterday","often","carefully"], answer:"joyfully"}
 ];
 
-// --- Variables ---
 let currentQ = 0;
+
+// ELEMENTS
 const gameContainer = document.getElementById('gameContainer');
-const player = document.getElementById('player');
 const coinsArea = document.getElementById('coinsArea');
 const questionBox = document.getElementById('questionBox');
 const questionText = document.getElementById('questionText');
@@ -75,112 +196,110 @@ const optionsContainer = document.getElementById('optionsContainer');
 const feedback = document.getElementById('feedback');
 const restartBtn = document.getElementById('restartBtn');
 const treasure = document.getElementById('treasure');
+
 const correctSound = document.getElementById('correctSound');
 const wrongSound = document.getElementById('wrongSound');
 const clapSound = document.getElementById('clapSound');
-const volumeSlider = document.getElementById('volumeSlider');
 
-volumeSlider.oninput = ()=>{
-  correctSound.volume = volumeSlider.value;
-  wrongSound.volume = volumeSlider.value;
-  clapSound.volume = volumeSlider.value;
-};
-correctSound.volume = volumeSlider.value;
-wrongSound.volume = volumeSlider.value;
-clapSound.volume = volumeSlider.value;
-
-// --- Logo Screen ---
+// START AFTER LOGO
 setTimeout(()=>{
   document.getElementById('logoScreen').style.display='none';
   gameContainer.style.display='block';
   spawnCoin();
 },5000);
 
-// --- Spawn Coin ---
+// SPAWN COIN
 function spawnCoin(){
   if(currentQ >= questions.length){
     endGame();
     return;
   }
+
   coinsArea.innerHTML = '';
+
   const coin = document.createElement('img');
   coin.src = 'assets/coin.png';
   coin.className = 'coin';
-  coin.style.left = Math.random()*80 + "%";
-  coin.style.bottom = "20px";
+
+  coin.style.left = Math.random()*70 + "%";
+  coin.style.bottom = "80px";
+
   coinsArea.appendChild(coin);
 
-  // Animate coin rising
-  let pos = 20;
+  let pos = 80;
+
   const id = setInterval(()=>{
-    pos += 1;
+    pos += 2;
     coin.style.bottom = pos + "px";
-    if(pos>400) { clearInterval(id); spawnCoin(); }
+
+    if(pos > 450){
+      clearInterval(id);
+      spawnCoin();
+    }
   }, 20);
 
-  // Click coin to answer question
-  coin.addEventListener('click', ()=>{
+  coin.onclick = ()=>{
     showQuestion(currentQ, coin, id);
-  });
+  };
 }
 
-// --- Show Question ---
+// QUESTION
 function showQuestion(index, coin, intervalId){
   clearInterval(intervalId);
+
   const q = questions[index];
   questionText.textContent = q.q;
   optionsContainer.innerHTML = '';
+  feedback.textContent = '';
+
   q.options.forEach(opt=>{
     const btn = document.createElement('button');
     btn.textContent = opt;
     btn.onclick = ()=>checkAnswer(opt, coin);
     optionsContainer.appendChild(btn);
   });
+
   questionBox.style.display='block';
-  feedback.textContent='';
 }
 
-// --- Check Answer ---
+// CHECK
 function checkAnswer(ans, coin){
   const q = questions[currentQ];
+
   if(ans === q.answer){
     feedback.textContent = "Correct! 🎉";
     feedback.style.color = "green";
-    correctSound.currentTime = 0; correctSound.play();
+
+    correctSound.play();
+
     questionBox.style.display='none';
-    if(coin && coinsArea.contains(coin)) coinsArea.removeChild(coin);
+    coin.remove();
+
     currentQ++;
     spawnCoin();
   } else {
-    feedback.textContent = "Oops! Try again.";
+    feedback.textContent = "Try again!";
     feedback.style.color = "red";
-    wrongSound.currentTime = 0; wrongSound.play();
+    wrongSound.play();
   }
 }
 
-// --- End Game ---
+// END
 function endGame(){
   questionBox.style.display='none';
   treasure.style.display='block';
-  clapSound.currentTime = 0; clapSound.play();
+  clapSound.play();
   restartBtn.style.display='block';
 }
 
-// --- Restart ---
+// RESTART
 restartBtn.onclick = ()=>{
   currentQ = 0;
-  treasure.style.display='none';
   restartBtn.style.display='none';
+  treasure.style.display='none';
   spawnCoin();
-}
+};
 
-// --- Player Jump ---
-function jump(){
-  player.style.bottom='150px';
-  setTimeout(()=>{ player.style.bottom='20px'; },400);
-}
-document.addEventListener('keydown', e=>{ if(e.code==='Space') jump(); });
-document.addEventListener('touchstart', jump);
 </script>
 
 </body>
