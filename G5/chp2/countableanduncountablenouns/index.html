@@ -3,519 +3,403 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Balloon Bomb Defusers</title>
+  <title>Countable and Uncountable Nouns Game</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { width: 100%; height: 100%; }
-    body {
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
       font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: linear-gradient(180deg, #cfefff 0%, #eafcff 55%, #ffffff 100%);
       min-height: 100vh;
       overflow: hidden;
-      background:
-        radial-gradient(circle at 18% 18%, rgba(255,255,255,.98), rgba(255,255,255,.28) 18%, transparent 38%),
-        radial-gradient(circle at 82% 14%, rgba(255, 245, 180, .95), rgba(255, 245, 180, .22) 18%, transparent 40%),
-        radial-gradient(circle at 50% 82%, rgba(180, 245, 255, .95), rgba(180, 245, 255, .2) 18%, transparent 42%),
-        linear-gradient(135deg, #fff7d6 0%, #dff6ff 45%, #ffe0f0 100%);
-      color: #17324d;
+    }
+
+    .screen {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .screen.active {
+      display: flex;
     }
 
     .splash {
-      position: fixed;
-      inset: 0;
-      background: linear-gradient(135deg, #fffef7, #eefbff);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-      transition: opacity .5s ease;
-    }
-    .splash.hidden { opacity: 0; pointer-events: none; }
-    .splash img {
-      width: min(520px, 90vw);
-      max-height: 82vh;
-      object-fit: contain;
-      filter: drop-shadow(0 12px 30px rgba(0,0,0,.15));
-      animation: floaty 2.5s ease-in-out infinite;
-    }
-    @keyframes floaty {
-      0%,100% { transform: translateY(0px); }
-      50% { transform: translateY(-16px); }
+      background: linear-gradient(180deg, #cfefff 0%, #ffffff 100%);
     }
 
-    .app {
+    .splash-card {
+      background: rgba(255, 255, 255, 0.92);
+      border-radius: 24px;
+      padding: 30px 24px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+      max-width: 420px;
       width: 100%;
-      height: 100vh;
-      opacity: 0;
-      transition: opacity .5s ease;
     }
-    .app.visible { opacity: 1; }
 
-    .topbar {
-      padding: 14px 16px 12px;
-      text-align: center;
-      background: linear-gradient(180deg, rgba(255,255,255,.82), rgba(255,255,255,.35));
-      backdrop-filter: blur(8px);
-      border-bottom: 1px solid rgba(255,255,255,.6);
-      box-shadow: 0 8px 30px rgba(255, 206, 125, .18);
+    .logo {
+      width: 180px;
+      max-width: 70vw;
+      height: auto;
+      display: block;
+      margin: 0 auto 18px;
     }
-    .topbar h1 {
-      font-size: clamp(24px, 3vw, 40px);
-      color: #ff5f8d;
-      text-shadow: 0 2px 0 rgba(255,255,255,.8);
-      letter-spacing: .5px;
+
+    h1 {
+      font-size: 2rem;
+      color: #1f5fa8;
+      margin-bottom: 10px;
     }
-    .subtitle {
-      margin-top: 6px;
-      font-size: 15px;
-      color: #4b6b86;
+
+    p {
+      color: #345;
+      line-height: 1.5;
+      margin-bottom: 18px;
+    }
+
+    button {
+      border: none;
+      border-radius: 14px;
+      padding: 14px 24px;
+      font-size: 1rem;
       font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.15s ease, opacity 0.15s ease;
     }
-    .hud {
-      display: flex;
-      justify-content: center;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin-top: 12px;
+
+    button:hover {
+      transform: translateY(-1px);
     }
-    .pill {
-      padding: 8px 14px;
-      border-radius: 999px;
-      background: rgba(255,255,255,.8);
-      border: 1px solid rgba(255,255,255,.9);
-      box-shadow: 0 6px 16px rgba(0,0,0,.08);
-      font-weight: 700;
-      color: #35506b;
-      min-width: 120px;
+
+    .start-btn, .restart-btn {
+      background: #ffb347;
+      color: #fff;
+      box-shadow: 0 6px 18px rgba(255, 179, 71, 0.35);
     }
 
     .game {
+      justify-content: flex-start;
+      padding-top: 20px;
+    }
+
+    .hud {
+      width: min(960px, 95vw);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+      color: #1f5fa8;
+      font-weight: 700;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .hud .pill {
+      background: rgba(255, 255, 255, 0.75);
+      padding: 10px 14px;
+      border-radius: 999px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .question-card {
+      width: min(960px, 95vw);
+      background: rgba(255, 255, 255, 0.92);
+      border-radius: 24px;
+      padding: 22px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
       position: relative;
-      width: 100%;
-      height: calc(100vh - 112px);
       overflow: hidden;
     }
 
-    .mission {
-      position: absolute;
-      top: 14px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 4;
-      width: min(900px, 92vw);
-      background: rgba(255,255,255,.84);
-      border: 1px solid rgba(255,255,255,.95);
-      backdrop-filter: blur(10px);
+    .question {
+      font-size: 1.5rem;
+      color: #173a63;
+      margin-bottom: 18px;
+      min-height: 52px;
+    }
+
+    .answers {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 14px;
+    }
+
+    .answer-btn {
+      background: #4da3ff;
+      color: white;
+      min-height: 64px;
       border-radius: 18px;
-      padding: 12px 16px;
-      box-shadow: 0 10px 28px rgba(0,0,0,.08);
+      font-size: 1.05rem;
+      box-shadow: 0 8px 18px rgba(77, 163, 255, 0.25);
     }
-    .mission .label {
-      font-size: 12px;
-      font-weight: 800;
-      letter-spacing: 1px;
-      color: #ff6d8f;
-      text-transform: uppercase;
-      margin-bottom: 4px;
+
+    .answer-btn.correct {
+      background: #43c97c;
     }
-    .mission .text {
-      font-size: clamp(15px, 1.7vw, 20px);
-      line-height: 1.45;
-      color: #24415b;
+
+    .answer-btn.wrong {
+      background: #ff6b6b;
+    }
+
+    .feedback {
+      margin-top: 16px;
+      min-height: 28px;
+      font-size: 1.1rem;
       font-weight: 700;
+      color: #1f5fa8;
     }
 
     .balloons {
-      position: absolute;
+      position: fixed;
       inset: 0;
-      z-index: 2;
+      pointer-events: none;
+      overflow: hidden;
     }
 
     .balloon {
       position: absolute;
-      width: clamp(175px, 21vw, 255px);
-      height: clamp(210px, 25vw, 290px);
-      padding: 20px 18px 50px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      color: #1d1d1d;
-      font-weight: 700;
-      line-height: 1.35;
-      cursor: pointer;
-      user-select: none;
-      border: 3px solid rgba(255,255,255,.9);
-      box-shadow:
-        inset 0 -18px 22px rgba(0,0,0,.12),
-        0 16px 30px rgba(0,0,0,.14);
-      transition: transform .18s ease, filter .18s ease, opacity .2s ease;
-      animation: drift 5s ease-in-out infinite;
-      border-radius: 50% 50% 46% 46% / 58% 58% 42% 42%;
-      clip-path: ellipse(50% 46% at 50% 42%);
+      bottom: -120px;
+      width: 52px;
+      height: 68px;
+      border-radius: 50% 50% 46% 46%;
+      opacity: 0.95;
+      animation: floatUp linear forwards;
+      box-shadow: inset -8px -10px 0 rgba(0,0,0,0.08);
     }
-    .balloon::before {
-      content: "";
-      position: absolute;
-      top: 28px;
-      left: 28px;
-      width: 28px;
-      height: 48px;
-      background: rgba(255,255,255,.22);
-      border-radius: 50%;
-      transform: rotate(24deg);
-      filter: blur(.2px);
-    }
+
     .balloon::after {
       content: "";
       position: absolute;
       left: 50%;
-      bottom: -8px;
-      width: 18px;
-      height: 18px;
-      transform: translateX(-50%) rotate(45deg);
-      clip-path: polygon(50% 100%, 0 0, 100% 0);
-      background: rgba(255,255,255,.65);
-      border-radius: 2px;
-    }
-    .balloon .string {
-      position: absolute;
-      left: 50%;
-      bottom: -88px;
+      bottom: -18px;
       width: 2px;
-      height: 84px;
-      background: rgba(110,110,110,.38);
+      height: 22px;
+      background: rgba(80, 80, 80, 0.6);
       transform: translateX(-50%);
     }
-    .balloon span {
-      display: block;
-      max-width: 92%;
-      padding: 0 4px;
-      font-size: clamp(12px, 1.45vw, 17px);
-    }
-    .balloon:hover {
-      transform: scale(1.04);
-      filter: brightness(1.03);
+
+    @keyframes floatUp {
+      from {
+        transform: translateY(0) translateX(0) rotate(0deg);
+      }
+      to {
+        transform: translateY(-120vh) translateX(var(--drift)) rotate(8deg);
+      }
     }
 
-    @keyframes drift {
-      0%,100% { transform: translateY(0px); }
-      50% { transform: translateY(-12px); }
-    }
-
-    .balloon.correct {
-      outline: 4px solid rgba(64, 193, 104, 0.55);
-      box-shadow:
-        inset 0 -18px 22px rgba(0,0,0,.12),
-        0 0 0 6px rgba(66, 220, 120, .18),
-        0 16px 30px rgba(0,0,0,.14);
-    }
-    .balloon.wrong {
-      outline: 4px solid rgba(255, 91, 91, 0.45);
-    }
-    .balloon.pop { animation: pop .18s ease forwards; }
-    @keyframes pop {
-      0% { transform: scale(1); opacity: 1; }
-      100% { transform: scale(0.2); opacity: 0; }
-    }
-
-    .feedback {
-      position: absolute;
-      left: 50%;
-      bottom: 18px;
-      transform: translateX(-50%);
-      z-index: 5;
-      width: min(880px, 92vw);
-      text-align: center;
-      padding: 12px 16px;
-      border-radius: 16px;
-      font-size: 16px;
-      font-weight: 700;
-      background: rgba(255,255,255,.84);
-      color: #24415b;
-      border: 1px solid rgba(255,255,255,.95);
-      box-shadow: 0 10px 28px rgba(0,0,0,.1);
-      display: none;
-    }
-
-    .next-btn {
-      position: absolute;
-      right: 18px;
-      bottom: 18px;
-      z-index: 5;
-      border: none;
-      border-radius: 999px;
-      padding: 12px 18px;
-      background: linear-gradient(135deg, #ff86aa, #ffb36b);
-      color: #fff;
-      font-weight: 800;
-      box-shadow: 0 10px 22px rgba(255, 130, 150, .32);
-      cursor: pointer;
-      display: none;
-    }
-
-    .end-screen {
-      position: absolute;
-      inset: 0;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 20;
-      background: rgba(255,255,255,.62);
-      backdrop-filter: blur(10px);
-    }
-    .end-card {
-      width: min(680px, 90vw);
-      background: rgba(255,255,255,.92);
-      border-radius: 24px;
-      padding: 28px 22px;
-      text-align: center;
-      box-shadow: 0 18px 40px rgba(0,0,0,.12);
-      border: 1px solid rgba(255,255,255,.95);
-    }
-    .end-card h2 {
-      font-size: clamp(24px, 3vw, 38px);
-      color: #ff5f8d;
+    .result-title {
+      font-size: 2.2rem;
+      color: #1f5fa8;
       margin-bottom: 10px;
     }
-    .end-card p {
-      font-size: 18px;
-      color: #35506b;
-      margin: 6px 0;
-      font-weight: 700;
-    }
-    .restart {
-      margin-top: 16px;
-      border: none;
-      border-radius: 999px;
-      padding: 12px 22px;
-      background: linear-gradient(135deg, #5fc7ff, #7fe6c5);
-      color: #14415d;
-      font-weight: 800;
-      cursor: pointer;
-      box-shadow: 0 10px 22px rgba(90, 180, 220, .28);
+
+    .result-score {
+      font-size: 1.3rem;
+      color: #345;
+      margin-bottom: 22px;
     }
 
-    .sparkle {
-      position: absolute;
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background: rgba(255,255,255,.9);
-      pointer-events: none;
-      animation: spark 650ms ease-out forwards;
-      z-index: 15;
-    }
-    @keyframes spark {
-      0% { transform: scale(1); opacity: 1; }
-      100% { transform: translate(var(--dx), var(--dy)) scale(0); opacity: 0; }
-    }
-
-    @media (max-width: 700px) {
-      .game { height: calc(100vh - 135px); }
-      .mission { top: 10px; }
-      .balloon {
-        width: 150px;
-        height: 185px;
-        padding: 18px 12px 44px;
-        font-size: 13px;
-      }
-      .next-btn { right: 12px; bottom: 12px; }
-      .feedback { bottom: 70px; }
+    @media (max-width: 600px) {
+      h1 { font-size: 1.6rem; }
+      .question { font-size: 1.2rem; }
+      .answer-btn { min-height: 56px; }
+      .logo { width: 140px; }
     }
   </style>
 </head>
 <body>
-  <div class="splash" id="splash">
-    <img src="Middle-ELA/G5/chp2/countableanduncountablenouns/assets/logo.png" alt="Innovine Logo" onerror="this.style.display='none'">
+  <div class="balloons" id="balloons"></div>
+
+  <div class="screen splash active" id="splashScreen">
+    <div class="splash-card">
+      <img src="assets/logo.png" alt="Innovine Logo" class="logo" />
+      <h1>Countable and Uncountable Nouns</h1>
+      <p>Play the game, answer the questions, and collect points while balloons float in the background.</p>
+      <button class="start-btn" id="startBtn">Start Game</button>
+    </div>
   </div>
 
-  <div class="app" id="app">
-    <div class="topbar">
-      <h1>🎈 Balloon Bomb Defusers</h1>
-      <div class="subtitle">Grade 5 Countable and Uncountable Nouns</div>
-      <div class="hud">
-        <div class="pill" id="scorePill">Score: 0</div>
-        <div class="pill" id="stepPill">Question 1 / 12</div>
-      </div>
+  <div class="screen game" id="gameScreen">
+    <div class="hud">
+      <div class="pill">Question: <span id="questionNumber">1</span>/12</div>
+      <div class="pill">Score: <span id="score">0</span></div>
     </div>
 
-    <div class="game" id="game">
-      <div class="mission">
-        <div class="label">Defuse Mission</div>
-        <div class="text" id="missionText"></div>
-      </div>
-
-      <div class="balloons" id="balloons"></div>
+    <div class="question-card">
+      <div class="question" id="questionText"></div>
+      <div class="answers" id="answers"></div>
       <div class="feedback" id="feedback"></div>
-      <button class="next-btn" id="nextBtn">Next Balloon →</button>
-
-      <div class="end-screen" id="endScreen">
-        <div class="end-card">
-          <h2 id="finalTitle">Mission Complete</h2>
-          <p id="finalScore"></p>
-          <p id="finalMsg"></p>
-          <button class="restart" id="restartBtn">Play Again</button>
-        </div>
-      </div>
     </div>
   </div>
 
-  <audio id="correctAudio" src="Middle-ELA/G5/chp2/countableanduncountablenouns/assets/correct.mp3"></audio>
-  <audio id="wrongAudio" src="Middle-ELA/G5/chp2/countableanduncountablenouns/assets/wrong.mp3"></audio>
-  <audio id="clapAudio" src="Middle-ELA/G5/chp2/countableanduncountablenouns/assets/freesound_community-claps-44774.mp3"></audio>
+  <div class="screen splash" id="resultScreen">
+    <div class="splash-card">
+      <div class="result-title">Game Complete!</div>
+      <div class="result-score">Your score: <span id="finalScore">0</span>/12</div>
+      <button class="restart-btn" id="restartBtn">Play Again</button>
+    </div>
+  </div>
+
+  <audio id="correctSound" src="assets/correct.mp3"></audio>
+  <audio id="wrongSound" src="assets/wrong.mp3"></audio>
+  <audio id="clapSound" src="assets/freesound_community-claps-44774.mp3"></audio>
 
   <script>
     const questions = [
-      { prompt: "Choose the correct sentence:", options: ["There is many information about projects explained to visitors", "There are much information about projects explained to visitors", "There is much information about projects explained to visitors", "There are many informations about project explained to visitor"], correct: 2, explain: "Information is uncountable, so we use much." },
-      { prompt: "Choose the correct sentence:", options: ["She bought many apples and bananas from the supermarket", "She bought much apples and bananas from supermarket", "She bought many apple and banana from supermarket", "She bought much apple and bananas from supermarket"], correct: 0, explain: "Apples and bananas are countable, so we use many." },
-      { prompt: "Choose the correct sentence:", options: ["There is many food served in cafeteria during lunch break", "There are much food served in cafeteria during lunch break", "There is much food served in the cafeteria during lunch break", "There are many foods served in cafeteria during lunch break"], correct: 2, explain: "Food is usually uncountable here, so we use much." },
-      { prompt: "Choose the correct sentence:", options: ["There are many water entering classroom during rain", "There is much water entering classroom during rain", "There is many water entering classroom during rains", "There are much waters entering classroom during rain"], correct: 1, explain: "Water is uncountable, so we use much." },
-      { prompt: "Choose the correct sentence:", options: ["There are many books arranged neatly on shelves", "There is many books arranged neatly on shelves", "There are much book arranged neatly on shelves", "There is much books arranged neatly on shelves"], correct: 0, explain: "Books are countable and plural, so we use many." },
-      { prompt: "Choose the correct sentence:", options: ["There are many equipment used during sports practice", "There is much equipment used during sports practice", "There are much equipments used during sports practice", "There is many equipments used during sports practice"], correct: 1, explain: "Equipment is uncountable, so we use much." },
-      { prompt: "Choose the correct sentence:", options: ["There is many juice served at picnic", "There are much juice served at picnic", "There is much juice served at the picnic", "There are many juices served at picnic"], correct: 2, explain: "Juice is uncountable here, so we use much." },
-      { prompt: "Choose the correct sentence:", options: ["There are many animals seen in zoo habitats", "There is many animal seen in zoo habitats", "There are much animals seen in zoo habitats", "There is much animal seen in zoo habitats"], correct: 0, explain: "Animals are countable and plural, so we use many." },
-      { prompt: "Choose the correct sentence:", options: ["There is many paint used in art class", "There are much paint used in art class", "There is much paint used in art class", "There are many paints used in art class"], correct: 2, explain: "Paint is uncountable in this context, so we use much." },
-      { prompt: "Choose the correct sentence:", options: ["There are many food stalls at village fair", "There is many food stalls at village fair", "There are much food stalls at village fair", "There is much food stalls at village fair"], correct: 0, explain: "Food stalls are countable and plural, so we use many." },
-      { prompt: "Choose the correct sentence:", options: ["There is many stationery used by students", "There are much stationery used by students", "There is much stationery used by students", "There are many stationeries used by students"], correct: 2, explain: "Stationery is uncountable, so we use much." },
-      { prompt: "Choose the correct sentence:", options: ["There are many information shared in assembly", "There is much information shared in assembly", "There are much information shared in assembly", "There is many informations shared in assembly"], correct: 1, explain: "Information is uncountable, so we use much." }
+      { q: "Choose the countable noun:", options: ["water", "rice", "apple", "milk"], answer: "apple" },
+      { q: "Choose the uncountable noun:", options: ["chair", "sand", "book", "pen"], answer: "sand" },
+      { q: "Which word is countable?", options: ["sugar", "orange", "juice", "bread"], answer: "orange" },
+      { q: "Which word is uncountable?", options: ["car", "table", "flour", "cup"], answer: "flour" },
+      { q: "Choose the countable noun:", options: ["butter", "egg", "oil", "salt"], answer: "egg" },
+      { q: "Choose the uncountable noun:", options: ["banana", "apple", "water", "pencil"], answer: "water" },
+      { q: "Which word is countable?", options: ["cheese", "milk", "banana", "tea"], answer: "banana" },
+      { q: "Which word is uncountable?", options: ["chair", "paper", "honey", "bottle"], answer: "honey" },
+      { q: "Choose the countable noun:", options: ["rice", "car", "salt", "flour"], answer: "car" },
+      { q: "Choose the uncountable noun:", options: ["apple", "desk", "jam", "bag"], answer: "jam" },
+      { q: "Which word is countable?", options: ["water", "sand", "cup", "milk"], answer: "cup" },
+      { q: "Which word is uncountable?", options: ["orange", "pencil", "bread", "shoe"], answer: "bread" }
     ];
 
-    const game = document.getElementById("game");
+    const splashScreen = document.getElementById("splashScreen");
+    const gameScreen = document.getElementById("gameScreen");
+    const resultScreen = document.getElementById("resultScreen");
+    const startBtn = document.getElementById("startBtn");
+    const restartBtn = document.getElementById("restartBtn");
+    const questionText = document.getElementById("questionText");
+    const answersEl = document.getElementById("answers");
+    const feedbackEl = document.getElementById("feedback");
+    const questionNumberEl = document.getElementById("questionNumber");
+    const scoreEl = document.getElementById("score");
+    const finalScoreEl = document.getElementById("finalScore");
     const balloonsEl = document.getElementById("balloons");
-    const missionText = document.getElementById("missionText");
-    const feedback = document.getElementById("feedback");
-    const nextBtn = document.getElementById("nextBtn");
-    const endScreen = document.getElementById("endScreen");
-    const scorePill = document.getElementById("scorePill");
-    const stepPill = document.getElementById("stepPill");
-    const correctAudio = document.getElementById("correctAudio");
-    const wrongAudio = document.getElementById("wrongAudio");
-    const clapAudio = document.getElementById("clapAudio");
+    const correctSound = document.getElementById("correctSound");
+    const wrongSound = document.getElementById("wrongSound");
+    const clapSound = document.getElementById("clapSound");
 
-    let index = 0;
+    let currentQuestion = 0;
     let score = 0;
     let locked = false;
+    let balloonTimer = null;
 
-    function play(a) { try { a.currentTime = 0; a.play(); } catch(e) {} }
-    function rand(min, max) { return Math.random() * (max - min) + min; }
+    function showScreen(screen) {
+      [splashScreen, gameScreen, resultScreen].forEach(s => s.classList.remove("active"));
+      screen.classList.add("active");
+    }
 
-    function createSparkles(x, y, count = 12) {
-      for (let i = 0; i < count; i++) {
-        const s = document.createElement("div");
-        s.className = "sparkle";
-        s.style.left = x + "px";
-        s.style.top = y + "px";
-        s.style.setProperty("--dx", `${rand(-80, 80)}px`);
-        s.style.setProperty("--dy", `${rand(-100, 40)}px`);
-        s.style.background = ["#fff","#ffe08a","#c9f7ff","#ffd0e8"][Math.floor(Math.random()*4)];
-        game.appendChild(s);
-        setTimeout(() => s.remove(), 700);
-      }
+    function startGame() {
+      currentQuestion = 0;
+      score = 0;
+      locked = false;
+      scoreEl.textContent = score;
+      feedbackEl.textContent = "";
+      showScreen(gameScreen);
+      renderQuestion();
+      startBalloons();
     }
 
     function renderQuestion() {
       locked = false;
-      balloonsEl.innerHTML = "";
-      feedback.style.display = "none";
-      nextBtn.style.display = "none";
-      endScreen.style.display = "none";
+      const item = questions[currentQuestion];
+      questionNumberEl.textContent = currentQuestion + 1;
+      questionText.textContent = item.q;
+      answersEl.innerHTML = "";
+      feedbackEl.textContent = "";
 
-      const q = questions[index];
-      missionText.textContent = q.prompt;
-      stepPill.textContent = `Question ${index + 1} / ${questions.length}`;
-      scorePill.textContent = `Score: ${score}`;
-
-      const colors = ["#ff8acb", "#7ed7ff", "#ffcf6b", "#a3f7bf"];
-      const positions = [
-        { left: "10%", top: "28%" },
-        { left: "34%", top: "16%" },
-        { left: "58%", top: "30%" },
-        { left: "76%", top: "18%" }
-      ];
-
-      q.options.forEach((text, i) => {
-        const b = document.createElement("div");
-        b.className = "balloon";
-        b.style.background = `radial-gradient(circle at 30% 20%, rgba(255,255,255,.65), transparent 22%), linear-gradient(180deg, ${colors[i]}, ${colors[(i+1)%colors.length]})`;
-        b.style.left = positions[i].left;
-        b.style.top = positions[i].top;
-        b.style.animationDelay = `${i * 0.2}s`;
-        b.innerHTML = `<span>${text}</span><div class="string"></div>`;
-        b.addEventListener("click", (e) => chooseAnswer(i, b, e));
-        balloonsEl.appendChild(b);
+      item.options.forEach(option => {
+        const btn = document.createElement("button");
+        btn.className = "answer-btn";
+        btn.textContent = option;
+        btn.onclick = () => chooseAnswer(btn, option);
+        answersEl.appendChild(btn);
       });
     }
 
-    function chooseAnswer(i, balloon, e) {
+    function chooseAnswer(btn, option) {
       if (locked) return;
       locked = true;
 
-      const q = questions[index];
-      const all = [...balloonsEl.children];
+      const item = questions[currentQuestion];
+      const buttons = [...document.querySelectorAll(".answer-btn")];
 
-      if (i === q.correct) {
-        balloon.classList.add("correct", "pop");
-        score++;
-        scorePill.textContent = `Score: ${score}`;
-        feedback.style.display = "block";
-        feedback.textContent = `✅ Correct! ${q.explain}`;
-        play(correctAudio);
-        play(clapAudio);
-        createSparkles(e.clientX, e.clientY, 14);
-      } else {
-        balloon.classList.add("wrong");
-        feedback.style.display = "block";
-        feedback.textContent = `❌ Not quite. ${q.explain}`;
-        play(wrongAudio);
-        all[q.correct].classList.add("correct");
-      }
-
-      all.forEach((el, idx) => {
-        el.style.pointerEvents = "none";
-        if (idx !== i && idx !== q.correct) el.style.opacity = ".88";
+      buttons.forEach(b => {
+        if (b.textContent === item.answer) b.classList.add("correct");
+        if (b.textContent === option && option !== item.answer) b.classList.add("wrong");
+        b.disabled = true;
       });
 
-      nextBtn.style.display = "inline-block";
-      nextBtn.textContent = index < questions.length - 1 ? "Next Balloon →" : "See Result →";
-    }
-
-    nextBtn.addEventListener("click", () => {
-      if (index < questions.length - 1) {
-        index++;
-        renderQuestion();
+      if (option === item.answer) {
+        score++;
+        scoreEl.textContent = score;
+        feedbackEl.textContent = "Correct!";
+        correctSound.currentTime = 0;
+        correctSound.play().catch(() => {});
       } else {
-        showResult();
+        feedbackEl.textContent = "Wrong!";
+        wrongSound.currentTime = 0;
+        wrongSound.play().catch(() => {});
       }
-    });
 
-    function showResult() {
-      balloonsEl.innerHTML = "";
-      missionText.textContent = "Mission completed!";
-      feedback.style.display = "none";
-      nextBtn.style.display = "none";
-      endScreen.style.display = "flex";
-
-      const percent = Math.round((score / questions.length) * 100);
-      document.getElementById("finalScore").textContent = `You scored ${score} out of ${questions.length} (${percent}%).`;
-      document.getElementById("finalMsg").textContent =
-        percent >= 90 ? "Amazing! You defused almost every grammar bomb."
-        : percent >= 70 ? "Great work! You have strong grammar skills."
-        : percent >= 50 ? "Nice! A little more practice will make you even stronger."
-        : "Keep going! You can beat the bombs next time.";
-
-      document.getElementById("finalTitle").textContent =
-        percent >= 90 ? "Mission Accomplished!"
-        : percent >= 70 ? "Mission Successful!"
-        : "Mission Complete!";
+      setTimeout(() => {
+        currentQuestion++;
+        if (currentQuestion < questions.length) {
+          renderQuestion();
+        } else {
+          endGame();
+        }
+      }, 900);
     }
 
-    document.getElementById("restartBtn").addEventListener("click", () => location.reload());
+    function endGame() {
+      stopBalloons();
+      finalScoreEl.textContent = score;
+      showScreen(resultScreen);
+      clapSound.currentTime = 0;
+      clapSound.play().catch(() => {});
+    }
 
-    setTimeout(() => {
-      document.getElementById("splash").classList.add("hidden");
-      document.getElementById("app").classList.add("visible");
-      renderQuestion();
-    }, 3000);
+    function createBalloon() {
+      const balloon = document.createElement("div");
+      balloon.className = "balloon";
+      const colors = ["#ff6b6b", "#ffd93d", "#6bcB77", "#4d96ff", "#b983ff", "#ff9f1c"];
+      const left = Math.random() * 100;
+      const size = 42 + Math.random() * 26;
+      const duration = 9 + Math.random() * 6;
+      const drift = (Math.random() * 80 - 40).toFixed(0) + "px";
+
+      balloon.style.left = left + "vw";
+      balloon.style.width = size + "px";
+      balloon.style.height = size * 1.32 + "px";
+      balloon.style.background = colors[Math.floor(Math.random() * colors.length)];
+      balloon.style.setProperty("--drift", drift);
+      balloon.style.animationDuration = duration + "s";
+
+      balloonsEl.appendChild(balloon);
+      setTimeout(() => balloon.remove(), duration * 1000);
+    }
+
+    function startBalloons() {
+      stopBalloons();
+      balloonTimer = setInterval(createBalloon, 500);
+      for (let i = 0; i < 8; i++) setTimeout(createBalloon, i * 180);
+    }
+
+    function stopBalloons() {
+      if (balloonTimer) clearInterval(balloonTimer);
+      balloonTimer = null;
+      balloonsEl.innerHTML = "";
+    }
+
+    startBtn.addEventListener("click", startGame);
+    restartBtn.addEventListener("click", startGame);
   </script>
 </body>
 </html>
