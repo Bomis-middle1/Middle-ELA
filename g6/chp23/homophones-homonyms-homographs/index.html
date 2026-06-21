@@ -1,420 +1,475 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pizza Master Academy AAA+</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<title>Pizza Panic - Homophones Game</title>
 
 <style>
-*{box-sizing:border-box;font-family:Arial, sans-serif;}
+    *{box-sizing:border-box;font-family:Arial, Helvetica, sans-serif;}
+    body{
+        margin:0;
+        background:#fff3e0;
+        overflow-x:hidden;
+    }
 
-body{
-margin:0;
-overflow:hidden;
-background:radial-gradient(circle at top,#ffd180,#ff8a65,#d84315);
-}
+    /* SCREENS */
+    .screen{
+        display:none;
+        width:100%;
+        min-height:100vh;
+        justify-content:center;
+        align-items:center;
+        flex-direction:column;
+        padding:20px;
+        text-align:center;
+    }
+    .active{display:flex;}
 
-/* ================= SCREENS ================= */
-.screen{
-position:absolute;
-width:100vw;
-height:100vh;
-display:none;
-align-items:center;
-justify-content:center;
-flex-direction:column;
-text-align:center;
-}
-.active{display:flex;}
+    /* LOGO */
+    #logoScreen{
+        background:#ffffff;
+    }
+    #logoScreen img{
+        width:220px;
+        animation:pop 1s ease-in-out infinite alternate;
+    }
 
-/* ================= LOGO ================= */
-#logoScreen{
-background:#fff3e0;
-}
-#logoScreen img{
-width:280px;
-animation:pulse 1.5s infinite alternate;
-}
-@keyframes pulse{
-from{transform:scale(1)}
-to{transform:scale(1.05)}
-}
+    @keyframes pop{
+        from{transform:scale(1);}
+        to{transform:scale(1.05);}
+    }
 
-/* ================= HUD ================= */
-.hud{
-height:70px;
-display:flex;
-justify-content:space-between;
-align-items:center;
-padding:10px 15px;
-background:#fff8e1;
-border-bottom:4px solid #6d3b1a;
-font-weight:bold;
-position:relative;
-}
+    /* INSTRUCTIONS */
+    #instructionBox{
+        background:#fff;
+        padding:20px;
+        border-radius:12px;
+        max-width:700px;
+        box-shadow:0 4px 15px rgba(0,0,0,0.2);
+    }
 
-.centerTitle{
-position:absolute;
-left:50%;
-transform:translateX(-50%);
-color:#b71c1c;
-}
+    button{
+        padding:12px 20px;
+        font-size:16px;
+        border:none;
+        border-radius:10px;
+        cursor:pointer;
+        background:#ff7043;
+        color:white;
+        margin-top:10px;
+    }
 
-/* ================= GAME ================= */
-.game{
-display:flex;
-height:calc(100vh - 70px);
-}
+    button:hover{background:#ff5722;}
 
-/* PANELS */
-.left,.right{
-width:25%;
-background:#fff8e1;
-padding:10px;
-}
+    /* GAME UI */
+    #gameScreen{
+        background:linear-gradient(180deg,#ffe0b2,#fff3e0);
+    }
 
-.center{
-flex:1;
-display:flex;
-align-items:center;
-justify-content:center;
-background:radial-gradient(circle,#fff3e0,#ffcc80,#6d3b1a);
-position:relative;
-overflow:hidden;
-}
+    .topBar{
+        width:100%;
+        display:flex;
+        justify-content:space-between;
+        padding:10px;
+        background:#ffcc80;
+        border-radius:10px;
+        font-weight:bold;
+    }
 
-/* ================= QUESTION ================= */
-.card{
-background:white;
-padding:12px;
-border-radius:12px;
-border:2px solid #6d3b1a;
-margin-bottom:10px;
-min-height:120px;
-line-height:1.5;
-}
+    .restaurant{
+        margin-top:10px;
+        width:100%;
+        max-width:900px;
+        background:#fff;
+        border-radius:15px;
+        padding:15px;
+        box-shadow:0 4px 10px rgba(0,0,0,0.2);
+    }
 
-/* ================= OPTIONS ================= */
-.option{
-background:linear-gradient(#fff,#ffe0b2);
-border:2px solid #ff6f00;
-padding:12px;
-margin:8px 0;
-border-radius:10px;
-cursor:pointer;
-transition:0.2s;
-}
-.option:hover{transform:scale(1.05);}
+    .customer{
+        font-size:18px;
+        margin-bottom:10px;
+        background:#fff8e1;
+        padding:10px;
+        border-radius:10px;
+    }
 
-/* ================= PIZZA ================= */
-.pizza{
-width:240px;
-height:240px;
-border-radius:50%;
-background:#f5c16c;
-position:relative;
-box-shadow:inset 0 0 20px rgba(0,0,0,0.4);
-animation:float 2s infinite ease-in-out;
-}
+    .pizza-area{
+        margin:10px 0;
+        padding:20px;
+        border:2px dashed #aaa;
+        border-radius:12px;
+        min-height:120px;
+    }
 
-@keyframes float{
-0%,100%{transform:translateY(0)}
-50%{transform:translateY(-8px)}
-}
+    .ingredients{
+        display:flex;
+        flex-wrap:wrap;
+        justify-content:center;
+        gap:10px;
+        margin-top:10px;
+    }
 
-/* LAYERS */
-.layer{
-position:absolute;
-width:100%;
-height:100%;
-border-radius:50%;
-animation:pop 0.3s ease;
-}
+    .ingredient{
+        background:#fff;
+        padding:10px;
+        border-radius:10px;
+        border:2px solid #ffb74d;
+        cursor:grab;
+        min-width:90px;
+    }
 
-@keyframes pop{
-from{transform:scale(0.4);opacity:0}
-to{transform:scale(1);opacity:1}
-}
+    .ingredient:active{
+        transform:scale(1.1);
+    }
 
-.sauce{background:rgba(200,30,30,0.35);}
-.cheese{background:rgba(255,220,100,0.5);}
-.topping{background:rgba(0,200,100,0.3);}
+    /* OPTIONS */
+    .options{
+        display:flex;
+        flex-wrap:wrap;
+        gap:10px;
+        justify-content:center;
+        margin-top:10px;
+    }
 
-/* ================= OVEN GLOW ================= */
-.ovenGlow{
-position:absolute;
-width:300px;
-height:300px;
-border-radius:50%;
-background:rgba(255,140,0,0.25);
-filter:blur(20px);
-animation:glow 1.2s infinite alternate;
-}
+    .optionBtn{
+        background:#fff;
+        border:2px solid #ff9800;
+        padding:10px;
+        border-radius:10px;
+        cursor:pointer;
+        min-width:120px;
+    }
 
-@keyframes glow{
-from{opacity:0.3}
-to{opacity:0.8}
-}
+    .optionBtn:hover{
+        background:#ffe0b2;
+    }
 
-/* ================= CUSTOMER MOOD ================= */
-.mood{
-margin-top:10px;
-padding:8px;
-border-radius:10px;
-background:#fff3e0;
-border:2px solid #6d3b1a;
-}
+    /* SCOREBOARD */
+    .scoreBoard{
+        display:flex;
+        justify-content:space-around;
+        width:100%;
+        background:#fff3e0;
+        padding:10px;
+        border-radius:10px;
+        margin-top:10px;
+        font-weight:bold;
+    }
 
-/* ================= PARTICLES ================= */
-.particle{
-position:absolute;
-width:8px;
-height:8px;
-background:gold;
-border-radius:50%;
-animation:fly 1s linear forwards;
-}
+    /* ANIMATION */
+    .celebrate{
+        animation:pop 0.5s ease-in-out 3;
+    }
 
-@keyframes fly{
-from{transform:translate(0,0);opacity:1}
-to{transform:translateY(-200px) scale(0);opacity:0}
-}
+    /* FINAL SCREEN */
+    #finalScreen{
+        background:#fff;
+    }
 
-/* ================= END ================= */
-#endScreen{
-background:#fff3e0;
-}
+    .trophy{
+        font-size:80px;
+    }
 
-button{
-padding:14px 20px;
-border:none;
-border-radius:10px;
-background:#ff6f00;
-color:white;
-font-size:18px;
-cursor:pointer;
-}
 </style>
 </head>
 
 <body>
 
-<!-- ================= LOGO ================= -->
+<!-- LOGO SCREEN -->
 <div id="logoScreen" class="screen active">
-<img src="assets/innovine-logo.png">
+    <img src="assets/innovine-logo.png" />
 </div>
 
-<!-- ================= INSTRUCTIONS ================= -->
+<!-- INSTRUCTIONS -->
 <div id="instructionScreen" class="screen">
-<div class="card" style="max-width:700px">
-<h2>🍕 Pizza Master Academy AAA+</h2>
-<p>
-Build pizzas + solve grammar challenges.<br>
-Drag, think, and learn Homophones, Homonyms & Homographs.<br><br>
-2 attempts per order. Become Master Chef 🏆
-</p>
-<button onclick="start()">Start Cooking</button>
-</div>
+    <div id="instructionBox">
+        <h1>🍕 Pizza Panic!</h1>
+        <p>Welcome Master Pizza Chef!</p>
+        <p>You will serve 10 pizzas by fixing confusing English words.</p>
+        <p>Drag ingredients, answer chef challenges, and serve customers!</p>
+        <button onclick="startGame()">Start Cooking</button>
+    </div>
 </div>
 
-<!-- ================= GAME ================= -->
+<!-- GAME SCREEN -->
 <div id="gameScreen" class="screen">
 
-<div class="hud">
-<div>⭐ Score: <span id="score">0</span></div>
-<div class="centerTitle">Pizza Master Academy AAA+</div>
-<div>Order <span id="order">1</span>/10</div>
-</div>
+    <div class="scoreBoard">
+        <div>⭐ Served: <span id="served">0</span>/10</div>
+        <div>⭐ Score: <span id="score">0</span></div>
+        <div>🍕 Remaining: <span id="remaining">10</span></div>
+    </div>
 
-<div class="game">
+    <div class="restaurant">
 
-<!-- LEFT -->
-<div class="left">
-<div class="card" id="question"></div>
-<div id="options"></div>
-<input type="range" id="vol" min="0" max="1" step="0.1">
-<div class="mood" id="mood">🙂 Customer Happy</div>
-</div>
+        <div class="customer" id="customerText"></div>
 
-<!-- CENTER -->
-<div class="center">
-<div class="ovenGlow"></div>
-<div id="pizza" class="pizza"></div>
-</div>
+        <div class="pizza-area" id="pizzaArea">
+            🍕 Drag ingredient here
+        </div>
 
-<!-- RIGHT -->
-<div class="right">
-<div class="card">
-<h3>Chef Feedback</h3>
-<div id="feedback"></div>
-</div>
+        <div class="ingredients" id="ingredients"></div>
 
-<button onclick="next()">Bake & Deliver</button>
-</div>
+        <div id="questionBox" style="margin-top:10px;"></div>
+
+    </div>
 
 </div>
+
+<!-- FINAL SCREEN -->
+<div id="finalScreen" class="screen">
+    <div class="trophy">🏆</div>
+    <h1>Golden Pizza Trophy!</h1>
+    <p id="finalScore"></p>
+    <button onclick="restartGame()">Play Again</button>
 </div>
 
-<!-- ================= END ================= -->
-<div id="endScreen" class="screen">
-<h1>🏆 MASTER CHEF 🏆</h1>
-<h2 id="final"></h2>
-<button onclick="location.reload()">Play Again</button>
-</div>
-
-<!-- ================= AUDIO ================= -->
-<audio id="c" src="assets/correct.mp3"></audio>
-<audio id="w" src="assets/wrong.mp3"></audio>
-<audio id="cl" src="assets/clapping.mp3"></audio>
+<audio id="correctSound" src="assets/correct.mp3"></audio>
+<audio id="wrongSound" src="assets/wrong.mp3"></audio>
+<audio id="clapSound" src="assets/clapping.mp3"></audio>
 
 <script>
 
-/* ================= QUESTION ENGINE ================= */
-let Q=[
+const orders = [
 {
-q:`We need flour to bake bread. What completes the sentence?`,
-o:["Flour","Flower","Floor","Flourr"],
-a:"Flour"
+customer:"We need ______ to bake fresh bread.",
+options:["Flour","Flower","Floor","Flourr"],
+answer:"Flour",
+challenge:{
+q:"Flour and flower sound same but different meaning. What type?",
+opts:["Homophones","Homonyms","Homographs","None"],
+ans:"Homophones"
+}
 },
 {
-q:`The bat flew out of the kitchen window at night.`,
-o:["Flying animal","Cricket bat","Tool","Object"],
-a:"Flying animal"
+customer:"The bat flew out of the kitchen window.",
+options:["A flying animal","A cricket bat","A spoon","A chef"],
+answer:"A flying animal",
+challenge:{
+q:"Bat has multiple meanings. What type?",
+opts:["Homophone","Homonym","Homograph","None"],
+ans:"Homonym"
+}
 },
 {
-q:`Wind the toy carefully. Meaning of wind?`,
-o:["Twist","Air","Storm","Push"],
-a:"Twist"
+customer:"Please ______ the toy before giving it to your little brother.",
+options:["Wind","Air","Blow","Storm"],
+answer:"Wind",
+challenge:{
+q:"Same spelling, different pronunciation?",
+opts:["Homophone","Homonym","Homograph","None"],
+ans:"Homograph"
+}
 },
 {
-q:`Knight sounds like which word?`,
-o:["Night","Light","Fight","Bright"],
-a:"Night"
+customer:"The fruit pizza needs a ripe ______.",
+options:["Pear","Pair","Peer","Bear"],
+answer:"Pear",
+challenge:{
+q:"Pear and pair are?",
+opts:["Homophones","Homonyms","Homographs","None"],
+ans:"Homophones"
+}
 },
 {
-q:`We sat on river bank and watched water.`,
-o:["Land beside river","Money bank","Road","House"],
-a:"Land beside river"
+customer:"Which sentence uses bank correctly?",
+options:[
+"We sat on the river bank.",
+"The river deposited money.",
+"The bank barked loudly.",
+"The bank flew away."
+],
+answer:"We sat on the river bank.",
+challenge:{
+q:"Bank meaning?",
+opts:["Homophone","Homonym","Homograph","None"],
+ans:"Homonym"
+}
 },
 {
-q:`Seal performed tricks at zoo.`,
-o:["Sea animal","Close","Stamp","Machine"],
-a:"Sea animal"
+customer:"The wind was strong and blew the chef's hat.",
+options:["Moving air","Twist","Wrap","Turn"],
+answer:"Moving air",
+challenge:{
+q:"Wind type?",
+opts:["Homophone","Homonym","Homograph","None"],
+ans:"Homograph"
+}
 },
 {
-q:`Final classification challenge`,
-o:["Homophones/Homonym/Homograph","Mixed","Wrong","None"],
-a:"Homophones/Homonym/Homograph"
+customer:"The knight protected the castle.",
+options:["Night","Light","Bright","Fight"],
+answer:"Night",
+challenge:{
+q:"Knight and night are?",
+opts:["Homophones","Homonyms","Homographs","None"],
+ans:"Homophones"
+}
+},
+{
+customer:"The seal balanced a ball.",
+options:["Sea animal","Close tightly","Pizza cutter","Chef"],
+answer:"Sea animal",
+challenge:{
+q:"Seal type?",
+opts:["Homophone","Homonym","Homograph","None"],
+ans:"Homonym"
+}
+},
+{
+customer:"I ate eight slices of pizza.",
+options:["Correct sentence","I ate ate","I eight pizza","Eight pizza"],
+answer:"Correct sentence",
+challenge:{
+q:"Ate and eight are?",
+opts:["Homophones","Homonyms","Homographs","None"],
+ans:"Homophones"
+}
+},
+{
+customer:"Please tear the basil leaves.",
+options:["Rip","Eye drop","Smile","Wash"],
+answer:"Rip",
+challenge:{
+q:"Tear type?",
+opts:["Homophone","Homonym","Homograph","None"],
+ans:"Homograph"
+}
 }
 ];
 
-let i=0,s=0,t=0,shuffled=[];
+let gameOrder = [];
+let current = 0;
+let score = 0;
+let served = 0;
+let attempts = 0;
 
-/* ================= FLOW ================= */
-setTimeout(()=>show(1),5000);
-
-function show(n){
-document.querySelectorAll(".screen").forEach(x=>x.classList.remove("active"));
-document.querySelectorAll(".screen")[n].classList.add("active");
+function shuffle(arr){
+return arr.sort(()=>Math.random()-0.5);
 }
 
-function start(){
-shuffled=[...Q].sort(()=>Math.random()-0.5);
-show(2);
-load();
+function show(id){
+document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+document.getElementById(id).classList.add('active');
 }
 
-/* ================= LOAD ================= */
-function load(){
-t=0;
-document.getElementById("question").innerText=shuffled[i].q;
-document.getElementById("order").innerText=i+1;
+setTimeout(()=>{
+show('instructionScreen');
+},5000);
 
-let box=document.getElementById("options");
-box.innerHTML="";
-
-shuffled[i].o.sort(()=>Math.random()-0.5).forEach(x=>{
-let d=document.createElement("div");
-d.className="option";
-d.innerText=x;
-d.onclick=()=>check(x);
-box.appendChild(d);
-});
+function startGame(){
+gameOrder = shuffle([...orders]);
+show('gameScreen');
+loadOrder();
 }
 
-/* ================= PARTICLES ================= */
-function burst(){
-for(let i=0;i<12;i++){
-let p=document.createElement("div");
-p.className="particle";
-p.style.left=Math.random()*200+"px";
-p.style.top=Math.random()*200+"px";
-document.querySelector(".center").appendChild(p);
-setTimeout(()=>p.remove(),1000);
-}
+function updateBoard(){
+document.getElementById("score").innerText = score;
+document.getElementById("served").innerText = served;
+document.getElementById("remaining").innerText = 10-served;
 }
 
-/* ================= AUDIO ================= */
-function play(id){
-let a=document.getElementById(id);
-a.volume=document.getElementById("vol").value;
-a.play();
-}
-
-/* ================= CHECK ================= */
-function check(x){
-let q=shuffled[i];
-
-if(x===q.a){
-s+=10;
-document.getElementById("score").innerText=s;
-
-play("c");
-setTimeout(()=>play("cl"),300);
-
-burst();
-addPizza();
-nextQ();
-}
-else{
-t++;
-play("w");
-
-if(t==1) feedback("Try again!");
-else if(t==2) feedback("Hint: Think meaning!");
-else{
-feedback("Answer: "+q.a);
-setTimeout(nextQ,1000);
-}
-}
-}
-
-function feedback(t){
-document.getElementById("feedback").innerText=t;
-}
-
-/* ================= PIZZA ================= */
-function addPizza(){
-let p=document.getElementById("pizza");
-let l=document.createElement("div");
-l.className="layer cheese";
-p.appendChild(l);
-}
-
-/* ================= NEXT ================= */
-function nextQ(){
-i++;
-if(i>=shuffled.length){
-end();
+function loadOrder(){
+if(current>=gameOrder.length){
+endGame();
 return;
 }
-load();
+
+attempts=0;
+let o = gameOrder[current];
+
+document.getElementById("customerText").innerText = "🍕 Customer: " + o.customer;
+
+let ing = document.getElementById("ingredients");
+ing.innerHTML="";
+
+o.options.forEach(opt=>{
+let div=document.createElement("div");
+div.className="ingredient";
+div.innerText=opt;
+div.onclick=()=>selectIngredient(opt);
+ing.appendChild(div);
+});
+
+document.getElementById("questionBox").innerHTML="";
+updateBoard();
 }
 
-/* ================= END ================= */
-function end(){
-show(3);
-document.getElementById("final").innerText="Score: "+s+"/100";
+function selectIngredient(opt){
+let o = gameOrder[current];
+
+if(opt===o.answer){
+document.getElementById("correctSound").play();
+document.getElementById("clapSound").play();
+score+=10;
+served++;
+updateBoard();
+nextChallenge();
+}else{
+document.getElementById("wrongSound").play();
+attempts++;
+if(attempts>=2){
+alert("Hint: Think carefully about meaning in context!");
+attempts=0;
+}
+}
+}
+
+function nextChallenge(){
+let o = gameOrder[current];
+
+let box=document.getElementById("questionBox");
+
+box.innerHTML=`
+<h3>👨‍🍳 Chef Challenge</h3>
+<p>${o.challenge.q}</p>
+`;
+
+let optsDiv=document.createElement("div");
+optsDiv.className="options";
+
+o.challenge.opts.forEach(opt=>{
+let b=document.createElement("div");
+b.className="optionBtn";
+b.innerText=opt;
+b.onclick=()=>checkChallenge(opt);
+optsDiv.appendChild(b);
+});
+
+box.appendChild(optsDiv);
+}
+
+function checkChallenge(opt){
+let o = gameOrder[current];
+
+if(opt===o.challenge.ans){
+document.getElementById("correctSound").play();
+document.getElementById("clapSound").play();
+current++;
+loadOrder();
+}else{
+document.getElementById("wrongSound").play();
+attempts++;
+if(attempts>=2){
+alert("Hint unlocked: revise concept carefully!");
+attempts=0;
+}
+}
+}
+
+function endGame(){
+show('finalScreen');
+document.getElementById("finalScore").innerText =
+"You served " + served + "/10 pizzas. Score: " + score;
+}
+
+function restartGame(){
+current=0;
+score=0;
+served=0;
+startGame();
 }
 
 </script>
