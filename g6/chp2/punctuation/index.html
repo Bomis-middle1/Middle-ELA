@@ -113,7 +113,7 @@ button {
 
 <!-- SPLASH (FIXED LOGO PATH) -->
 <div id="splash">
-  <img src="71824359-f243-48be-bf6f-db272e2d66a2.png" width="200">
+  <img src="assets/71824359-f243-48be-bf6f-db272e2d66a2.png" width="200">
 </div>
 
 <!-- TOPIC -->
@@ -159,7 +159,7 @@ button {
   <button onclick="location.reload()">RESTART</button>
 </div>
 
-<!-- AUDIO (FIXED PATHS) -->
+<!-- AUDIO -->
 <audio id="correct" src="assets/correct.mp3"></audio>
 <audio id="wrong" src="assets/wrong.mp3"></audio>
 <audio id="clap" src="assets/clapping.mp3"></audio>
@@ -184,8 +184,7 @@ const data = [
 {t:"If you work hard you will succeed",type:","},
 
 {t:"Did you complete your project",type:"?"},
-{t:"That is absolutely fantastic",type:"!"},
-{t:"He went to school early this morning",type:"."}
+{t:"That is absolutely fantastic",type:"!"}
 ];
 
 let correct=0;
@@ -239,7 +238,6 @@ document.querySelectorAll(".bucket").forEach(b=>{
   };
 });
 
-/* SPLASH FLOW FIXED */
 setTimeout(()=>{
   document.getElementById("splash").style.display="none";
   document.getElementById("topicScreen").style.display="flex";
@@ -251,14 +249,12 @@ setTimeout(()=>{
 
 },5000);
 
-/* START GAME */
 function startGame(){
   document.getElementById("startScreen").style.display="none";
   document.getElementById("game").style.display="block";
   shuffle();
 }
 
-/* CONFETTI FIXED */
 function confetti(){
   for(let i=0;i<25;i++){
     let c=document.createElement("div");
@@ -270,12 +266,9 @@ function confetti(){
   }
 }
 
-/* END SCREEN WITH TROPHY */
 function endGame(){
   document.getElementById("game").style.display="none";
   document.getElementById("endScreen").style.display="block";
-
-  let percent=100;
 
   document.getElementById("scoreText").innerText=
     "Score: "+correct+"/15";
