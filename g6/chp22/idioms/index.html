@@ -1,141 +1,148 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Idiom Adventure Path - Grade 6</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Idiom Detective Agency: The Missing Meaning</title>
 <style>
-body { margin:0; font-family:Arial; background:#f0f8ff; display:flex; justify-content:center; align-items:center; height:100vh; }
-#logoScreen { position:fixed; top:0; left:0; width:100%; height:100%; display:flex; justify-content:center; align-items:center; background:white; z-index:100;}
-#gameContainer { display:none; background:#fff; width:90%; max-width:600px; padding:20px; border-radius:10px; box-shadow:0 0 10px #aaa; text-align:center; position:relative;}
-#path { position:relative; height:200px; background:#cceeff; margin-bottom:20px; border-radius:10px; overflow:hidden;}
-#player { position:absolute; width:40px; height:40px; background:#ff4136; border-radius:50%; top:80px; left:0;}
-#question { font-weight:bold; font-size:16px; margin-bottom:10px; }
-.options { display:flex; flex-wrap:wrap; justify-content:center; gap:10px; margin-top:10px;}
-.option { background:#ffeb3b; padding:10px 15px; border-radius:5px; cursor:pointer; user-select:none; min-width:90px; text-align:center;}
-.option.wiggle { animation: wiggle 0.5s; }
-@keyframes wiggle {0%{transform:rotate(0deg);}25%{transform:rotate(-10deg);}50%{transform:rotate(10deg);}75%{transform:rotate(-10deg);}100%{transform:rotate(0deg);}}
-#feedback { margin-top:10px; height:24px; font-weight:bold; }
-#tick { display:none; font-size:30px; color:green; margin-top:10px; }
-#restartBtn { display:none; margin-top:20px; padding:10px 20px; font-size:18px; cursor:pointer; background:#4caf50; color:white; border:none; border-radius:5px; }
-.confetti-piece { position:absolute; width:8px; height:8px; border-radius:50%; top:0; animation: fall 2s linear forwards;}
-@keyframes fall {0%{transform:translateY(0);} 100%{transform:translateY(200px); opacity:0;}}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#203040;color:#222;overflow-x:hidden}
+#logo{position:fixed;inset:0;background:#fff;display:flex;align-items:center;justify-content:center;z-index:9999}
+#logo img{max-width:70%;max-height:70%}
+.hidden{display:none}
+.office{min-height:100vh;background:linear-gradient(#29415f,#6b4b2a);padding:10px;color:#fff}
+.hud{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;position:sticky;top:0;z-index:10}
+.panel{background:rgba(255,255,255,.15);backdrop-filter:blur(4px);padding:8px;border-radius:10px}
+.notice,.case{background:#f5ebcf;color:#222;border-radius:16px;padding:18px;max-width:1000px;margin:12px auto;box-shadow:0 4px 12px rgba(0,0,0,.3)}
+.options{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.opt{padding:14px;border-radius:12px;border:3px solid #8b6b3f;background:#fff;cursor:pointer;min-height:56px}
+.badges{display:flex;flex-wrap:wrap;gap:4px}
+.correct{animation:glow .6s alternate 3;background:#d4ffd4}
+.wrong{animation:shake .4s}
+@keyframes shake{25%{transform:translateX(-6px)}50%{transform:translateX(6px)}75%{transform:translateX(-6px)}}
+@keyframes glow{from{box-shadow:0 0 5px green}to{box-shadow:0 0 25px green}}
+.progress{height:16px;background:#ccc;border-radius:10px;overflow:hidden}
+.bar{height:100%;background:gold;width:0%}
+.center{text-align:center}
+button{padding:12px 22px;font-size:18px;border:none;border-radius:10px;cursor:pointer}
+#fx{position:fixed;inset:0;pointer-events:none}
+.conf{position:absolute;font-size:24px;animation:fall 2s linear forwards}
+@keyframes fall{to{transform:translateY(100vh) rotate(720deg);opacity:0}}
 </style>
 </head>
 <body>
+<div id="logo"><img src="assets/innovine-logo.png" onerror="this.outerHTML='<h1>Innovine</h1>'"></div>
 
-<div id="logoScreen">
-<img src="assets/innovine-logo.png" alt="Innovine Logo" width="200">
+<div id="app" class="office hidden">
+<div id="instructions" class="notice center">
+<h1>🕵️ Welcome to the Idiom Detective Agency!</h1>
+<p>The city is full of mysterious misunderstandings. Solve all 10 cases and collect badges.</p>
+<button onclick="startGame()">Start Investigation</button>
 </div>
 
-<div id="gameContainer">
-<div id="path"><div id="player"></div></div>
-<div id="question"></div>
-<div class="options" id="optionsContainer"></div>
-<div id="feedback"></div>
-<div id="tick">✔</div>
-<button id="restartBtn">Play Again</button>
+<div id="game" class="hidden">
+<div class="hud">
+<div class="panel">⭐ Score: <span id="score">0</span></div>
+<div class="panel">📁 Case: <span id="caseNo">1</span>/10</div>
+<div class="panel">🎯 Accuracy: <span id="acc">100</span>%</div>
+<div class="panel">🏅 Badges<div id="badges" class="badges"></div></div>
+<div class="panel">🔊 <input id="vol" type="range" min="0" max="1" step="0.1" value="1"></div>
+<div class="panel"><div class="progress"><div id="bar" class="bar"></div></div></div>
+</div>
+<div id="caseArea"></div>
 </div>
 
-<audio id="correctSound" src="assets/correct.mp3"></audio>
-<audio id="wrongSound" src="assets/wrong.mp3"></audio>
-<audio id="clapSound" src="assets/clapping.mp3"></audio>
+<div id="final" class="notice center hidden"></div>
+</div>
+<div id="fx"></div>
+
+<audio id="correct" src="assets/correct.mp3"></audio>
+<audio id="wrong" src="assets/wrong.mp3"></audio>
+<audio id="clap" src="assets/clapping.mp3"></audio>
 
 <script>
-const questions = [
-{q:"After fixing the roof perfectly, John really ___", correct:"hit the nail on the head", wrong:["bite the bullet","pull someone's leg","kick the bucket","burn the midnight oil","cry over spilt milk","cost an arm and a leg","break the ice","barking up the wrong tree","in hot water"]},
-{q:"She accepted the difficult task without complaining, she had to ___", correct:"bite the bullet", wrong:["hit the nail on the head","pull someone's leg","kick the bucket","burn the midnight oil","cry over spilt milk","cost an arm and a leg","break the ice","barking up the wrong tree","in hot water"]},
-{q:"I stayed up studying all night for the test, I really ___", correct:"burn the midnight oil", wrong:["hit the nail on the head","bite the bullet","pull someone's leg","kick the bucket","cry over spilt milk","cost an arm and a leg","break the ice","barking up the wrong tree","in hot water"]},
-{q:"Don’t worry about the mistake, there’s no use ___", correct:"cry over spilt milk", wrong:["hit the nail on the head","bite the bullet","pull someone's leg","kick the bucket","burn the midnight oil","cost an arm and a leg","break the ice","barking up the wrong tree","in hot water"]},
-{q:"The old car finally broke down; it’s about to ___", correct:"kick the bucket", wrong:["hit the nail on the head","bite the bullet","pull someone's leg","burn the midnight oil","cry over spilt milk","cost an arm and a leg","break the ice","barking up the wrong tree","in hot water"]},
-{q:"That new phone was very expensive, it really ___", correct:"cost an arm and a leg", wrong:["hit the nail on the head","bite the bullet","pull someone's leg","kick the bucket","burn the midnight oil","cry over spilt milk","break the ice","barking up the wrong tree","in hot water"]},
-{q:"To start the conversation, he told a funny joke to ___", correct:"break the ice", wrong:["hit the nail on the head","bite the bullet","pull someone's leg","kick the bucket","burn the midnight oil","cry over spilt milk","cost an arm and a leg","barking up the wrong tree","in hot water"]},
-{q:"She’s accusing the wrong person, she’s ___", correct:"barking up the wrong tree", wrong:["hit the nail on the head","bite the bullet","pull someone's leg","kick the bucket","burn the midnight oil","cry over spilt milk","break the ice","cost an arm and a leg","in hot water"]},
-{q:"He tricked his friend jokingly, he wanted to ___", correct:"pull someone's leg", wrong:["hit the nail on the head","bite the bullet","kick the bucket","burn the midnight oil","cry over spilt milk","cost an arm and a leg","break the ice","barking up the wrong tree","in hot water"]},
-{q:"After cheating, he was really ___", correct:"in hot water", wrong:["hit the nail on the head","bite the bullet","pull someone's leg","kick the bucket","burn the midnight oil","cry over spilt milk","cost an arm and a leg","break the ice","barking up the wrong tree"]}
+const hints={
+"Hit the nail on the head":"This idiom is used when someone is exactly correct.",
+"Bite the bullet":"Someone does something difficult even when nervous.",
+"Cry over spilt milk":"Complaining about something that already happened.",
+"Cost an arm and a leg":"Something is very expensive.",
+"Break the ice":"Used to start conversation.",
+"Barking up the wrong tree":"Blaming or accusing the wrong person.",
+"Pull someone's leg":"A playful joke.",
+"In hot water":"Someone is in trouble.",
+"Burn the midnight oil":"Studying or working very late.",
+"Kick the bucket":"Means to die."
+};
+
+let cases=[
+{t:"Case 1",s:"Emma guessed the answer exactly before anyone else.",q:"Which idiom fits best?",a:"Hit the nail on the head",o:["Bite the bullet","Pull someone's leg","Hit the nail on the head","Burn the midnight oil"]},
+{t:"Case 2",s:"Aarav was nervous about getting a vaccination, but he stayed calm and got it anyway.",q:"Which idiom fits best?",a:"Bite the bullet",o:["Cry over spilt milk","Bite the bullet","Break the ice","Cost an arm and a leg"]},
+{t:"Case 3",s:"Mia accidentally dropped her ice cream. She kept complaining about it all afternoon.",q:"What advice should her friend give?",a:"Cry over spilt milk",o:["Burn the midnight oil","Break the ice","Cry over spilt milk","Pull someone's leg"]},
+{t:"Case 4",s:"Sam bought a new gaming computer. It was extremely expensive.",q:"Which idiom fits best?",a:"Cost an arm and a leg",o:["Cost an arm and a leg","Kick the bucket","In hot water","Hit the nail on the head"]},
+{t:"Case 5",s:"Two new classmates were too shy to speak to each other.",q:"What should one of them do first?",a:"Break the ice",o:["Bite the bullet","Break the ice","Burn the midnight oil","Barking up the wrong tree"]},
+{t:"Case 6",s:"The teacher blamed Rahul for drawing on the desk, but his friend had actually done it.",q:"Which idiom fits best?",a:"Barking up the wrong tree",o:["Pull someone's leg","Barking up the wrong tree","Cost an arm and a leg","Bite the bullet"]},
+{t:"Case 7",s:"Ava told her brother that aliens had landed in the school playground. She was only joking.",q:"Which idiom fits best?",a:"Pull someone's leg",o:["Pull someone's leg","In hot water","Burn the midnight oil","Break the ice"]},
+{t:"Case 8",s:"Liam forgot to complete his homework for the third time this week. Now he has to explain it to his teacher.",q:"Which idiom fits best?",a:"In hot water",o:["Kick the bucket","In hot water","Cost an arm and a leg","Hit the nail on the head"]},
+{t:"Case 9",s:"Sofia stayed awake until 1:00 a.m. studying for her science test.",q:"Which idiom fits best?",a:"Burn the midnight oil",o:["Burn the midnight oil","Bite the bullet","Break the ice","Pull someone's leg"]},
+{t:"Case 10",s:"During a history lesson, the teacher explained that the old king had died many years ago.",q:'Which idiom means "to die"?',a:"Kick the bucket",o:["Kick the bucket","Break the ice","Cry over spilt milk","Barking up the wrong tree"]}
 ];
 
-let currentQ=0, wrongAttempts=0;
-const questionEl = document.getElementById("question");
-const optionsContainer = document.getElementById("optionsContainer");
-const feedback = document.getElementById("feedback");
-const tick = document.getElementById("tick");
-const player = document.getElementById("player");
-const restartBtn = document.getElementById("restartBtn");
-const correctSound=document.getElementById("correctSound");
-const wrongSound=document.getElementById("wrongSound");
-const clapSound=document.getElementById("clapSound");
+let order=[],idx=0,score=0,attempt=0,totalAttempts=0;
 
-function showQuestion(){
-  tick.style.display="none";
-  wrongAttempts=0;
-  const q = questions[currentQ];
-  questionEl.textContent = q.q;
-  optionsContainer.innerHTML="";
-  const opts = [q.correct,...q.wrong].sort(()=>Math.random()-0.5);
-  opts.forEach(opt=>{
-    const btn = document.createElement("div");
-    btn.className="option";
-    btn.textContent=opt;
-    btn.onclick = ()=>checkAnswer(btn,opt,q.correct);
-    optionsContainer.appendChild(btn);
-  });
-  feedback.textContent="";
+setTimeout(()=>{logo.classList.add('hidden');app.classList.remove('hidden')},5000);
+
+function shuffle(a){return a.sort(()=>Math.random()-0.5)}
+function startGame(){
+instructions.classList.add('hidden');game.classList.remove('hidden');
+order=shuffle([...cases]);idx=0;score=0;totalAttempts=0;badges.innerHTML='';render();
 }
-
-function checkAnswer(btn,opt,correct){
-  if(opt===correct){
-    feedback.textContent="Good Job! 🎉";
-    feedback.style.color="green";
-    tick.style.display="block";
-    correctSound.currentTime=0; correctSound.play();
-    movePlayer();
-    setTimeout(nextQuestion,800);
-  } else {
-    wrongAttempts++;
-    wrongSound.currentTime=0; wrongSound.play();
-    btn.classList.add("wiggle");
-    setTimeout(()=>btn.classList.remove("wiggle"),500);
-  }
+function render(){
+attempt=0;
+let c=order[idx];caseNo.textContent=idx+1;
+let opts=shuffle([...c.o]);
+caseArea.innerHTML=`<div class="case"><h2>📁 ${c.t}</h2><p><b>🕵 Witness Statement:</b> ${c.s}</p><p><b>📌 Evidence Card</b></p><p>${c.q}</p><div class="options">${opts.map(x=>`<button class="opt" onclick="pick(this,\`${x.replace(/`/g,'')}\`)">🧾 ${x}</button>`).join('')}</div><div id="hint"></div></div>`;
+updateHud();
 }
+function setVol(){[correct,wrong,clap].forEach(a=>a.volume=vol.value)}
+vol.oninput=setVol; setVol();
 
-function movePlayer(){
-  const step = 50; // distance to move along path
-  const currentLeft = parseInt(player.style.left||0);
-  player.style.left = (currentLeft + step) + "px";
+function play(a){a.currentTime=0;a.play().catch(()=>{})}
+
+function pick(el,ans){
+let c=order[idx]; totalAttempts++;
+if(ans===c.a){
+score++; el.classList.add('correct'); play(correct); setTimeout(()=>play(clap),300);
+burst(); badges.innerHTML+="🏅";
+setTimeout(nextCase,1200);
+}else{
+attempt++; el.classList.add('wrong'); play(wrong);
+if(attempt===2) hint.innerHTML=`<p><b>💡 Detective Note:</b> ${hints[c.a]}</p>`;
+if(attempt>=3){hint.innerHTML+=`<p>✔ Answer: <b>${c.a}</b></p>`; setTimeout(nextCase,1500);}
 }
-
-function nextQuestion(){
-  currentQ++;
-  if(currentQ>=questions.length){
-    showConfetti();
-    feedback.textContent="🎉 You completed all questions!";
-    clapSound.currentTime=0; clapSound.play();
-    restartBtn.style.display="block";
-  } else showQuestion();
+updateHud();
 }
-
-function showConfetti(){
-  for(let i=0;i<50;i++){
-    const c = document.createElement("div");
-    c.className="confetti-piece";
-    c.style.left=Math.random()*window.innerWidth+"px";
-    c.style.background=`hsl(${Math.random()*360},100%,50%)`;
-    document.body.appendChild(c);
-    setTimeout(()=>document.body.removeChild(c),2000);
-  }
+function updateHud(){
+scoreEl=document.getElementById('score');scoreEl.textContent=score;
+let solved=idx;
+bar.style.width=(solved/10*100)+'%';
+acc.textContent=totalAttempts?Math.round(score/totalAttempts*100):100;
 }
-
-restartBtn.onclick=()=>location.reload();
-
-// Show logo for 5 seconds
-setTimeout(()=>{
-  document.getElementById("logoScreen").style.display="none";
-  document.getElementById("gameContainer").style.display="block";
-  showQuestion();
-},5000);
+function nextCase(){
+idx++;
+bar.style.width=(idx/10*100)+'%';
+if(idx>=10) finish(); else render();
+}
+function finish(){
+game.classList.add('hidden');final.classList.remove('hidden');
+let rank=score==10?'Master Detective':score==9?'Chief Inspector':score==8?'Senior Detective':score>=6?'Junior Detective':'Detective Trainee';
+final.innerHTML=`<h1>🏆 Congratulations, Detective!</h1><h2>Score ${score}/10</h2><h2>Accuracy ${Math.round(score/Math.max(totalAttempts,1)*100)}%</h2><h2>${rank}</h2><p>The city mystery is solved!</p><button onclick="location.reload()">Play Again</button>`;
+burst(80); play(clap);
+}
+function burst(n=30){
+for(let i=0;i<n;i++){
+let d=document.createElement('div');d.className='conf';d.textContent=['✨','⭐','🎉','🏅'][Math.floor(Math.random()*4)];
+d.style.left=Math.random()*100+'vw';d.style.top='-20px';fx.appendChild(d);
+setTimeout(()=>d.remove(),2200);
+}
+}
 </script>
-
-</body>
-</html>
+</body></html>
