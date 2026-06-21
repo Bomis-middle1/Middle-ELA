@@ -391,7 +391,7 @@
   <div class="container" id="mainContainer">
     <div class="header">
       <div class="header-content">
-        <h1>📘 Subject-Verb Agreement Quest</h1>
+        <h1>🔎 Subject-Verb Agreement Quest</h1>
         <div class="subtitle">Grade 5 Subject-Verb Agreement</div>
         <div class="stage-indicator" id="stageIndicator">Step 1 of 10</div>
       </div>
@@ -399,15 +399,15 @@
 
     <div class="board-wrapper" id="gameWrapper">
       <div class="board-area">
-        <div class="board-title">Journey from Confusion to Clarity</div>
+        <div class="board-title">Detective Case Trail</div>
         <div class="board-path">
           <div class="path-line"></div>
           <div class="cells" id="cellsContainer"></div>
-          <div class="token" id="token">🔮</div>
+          <div class="token" id="token">🕵️</div>
         </div>
         <div class="info-panel">
-          <div>Start: Confusion about Grammar</div>
-          <div>Finish: Clarity of Subject-Verb Agreement</div>
+          <div>Start: Grammar Clue One</div>
+          <div>Finish: Case Solved</div>
         </div>
       </div>
 
@@ -473,220 +473,64 @@
 
     const questionBank = [
       {
-        type: 'mcq',
-        question: 'Soul Science is described as a blend of which two main areas?',
-        options: [
-          'Physics and chemistry',
-          'Spirituality and psychology',
-          'Mathematics and biology',
-          'History and geography'
-        ],
+        question: 'During the morning assembly, the principal informed everyone that a group of selected students ___ going to represent the school at the national science fair after weeks of preparation and interviews.',
+        options: ['are', 'is', 'were', 'have'],
         correctIndex: 1,
-        explanation: 'Spirituality and psychology are the two main areas. [file:12]'
+        explanation: '“Group” is singular, so the correct answer is “is”.'
       },
       {
-        type: 'mcq',
-        question: 'Which of these best describes SPIRITUALITY in the chapter?',
-        options: [
-          'Only following strict rituals without thinking',
-          'Connecting with something bigger than ourselves and finding meaning in life',
-          'Ignoring feelings and focusing only on marks',
-          'Memorising facts about the universe'
-        ],
+        question: 'Each of the students in Grade 5 ___ expected to complete their project work on time even if they are working in pairs or groups.',
+        options: ['are', 'is', 'were', 'have'],
         correctIndex: 1,
-        explanation: 'Spirituality means connecting with something bigger and finding meaning in life. [file:12]'
+        explanation: '“Each” takes a singular verb, so the correct answer is “is”.'
       },
       {
-        type: 'mcq',
-        question: 'What does PSYCHOLOGY help us understand, according to Soul Science?',
-        options: [
-          'Only how the brain grows physically',
-          'Why we feel, think, and behave in certain ways',
-          'How to memorise long answers quickly',
-          'Only how to score full marks in exams'
-        ],
+        question: 'The players of the school football team ___ training hard every evening for the upcoming inter-school championship match.',
+        options: ['is', 'were', 'have', 'are'],
+        correctIndex: 3,
+        explanation: '“Players” is plural, so the correct answer is “are”.'
+      },
+      {
+        question: 'The news coming from multiple cities ___ indicating that heavy rainfall has disrupted transport and school schedules.',
+        options: ['are', 'is', 'were', 'have'],
         correctIndex: 1,
-        explanation: 'Psychology helps us understand thoughts, feelings, and behaviour. [file:12]'
+        explanation: '“News” is singular, so the correct answer is “is”.'
       },
       {
-        type: 'mcq',
-        question: 'Everyday practice of Soul Science mainly helps students to…',
-        options: [
-          'Avoid responsibilities and relax all day',
-          'Hone their skills, set clear goals, and handle serious life situations carefully',
-          'Only focus on spiritual rituals',
-          'Forget about school and friends'
-        ],
-        correctIndex: 1,
-        explanation: 'It helps students hone skills, set goals, and handle situations carefully. [file:12]'
-      },
-      {
-        type: 'mcq',
-        question: 'Which of the following is an example of the MIND in “mind, body and soul”?',
-        options: [
-          'Your ability to run fast',
-          'Your beliefs, thoughts and behaviours',
-          'Your height and weight',
-          'Your fingerprints'
-        ],
-        correctIndex: 1,
-        explanation: 'Mind includes beliefs, thoughts, and behaviours. [file:12]'
-      },
-      {
-        type: 'mcq',
-        question: 'The BODY in “mind, body and soul” mainly refers to…',
-        options: [
-          'Only the brain',
-          'Your physical self that moves you through life using your senses',
-          'Invisible energy around you',
-          'Only your height'
-        ],
-        correctIndex: 1,
-        explanation: 'The body is your physical self using the senses. [file:12]'
-      },
-      {
-        type: 'mcq',
-        question: 'The SOUL is described in the chapter as…',
-        options: [
-          'Just another name for the brain',
-          'Your essence or spirit, the intangible part of you',
-          'Only your physical heart',
-          'Something that only religious people have'
-        ],
-        correctIndex: 1,
-        explanation: 'The soul is your essence or spirit. [file:12]'
-      },
-      {
-        type: 'mcq',
-        question: 'The “mind–body–soul connection” activity (breathing with eyes closed) shows that…',
-        options: [
-          'Breathing exercises are boring',
-          'Closing your eyes always makes you sleepy',
-          'How you breathe and focus can change how you feel in your mind and body',
-          'Only the body matters, not the mind'
-        ],
-        correctIndex: 2,
-        explanation: 'Breathing and focus can change how you feel physically and mentally. [file:12]'
-      },
-      {
-        type: 'mcq',
-        question: 'Which statement about YOGA in the chapter is most accurate?',
-        options: [
-          'Yoga is only physical exercise for weight loss',
-          'Yoga is an ancient spiritual practice that uses breath, postures and focus to create union and connection',
-          'Yoga is just sitting still and doing nothing',
-          'Yoga is only for adults'
-        ],
-        correctIndex: 1,
-        explanation: 'Yoga uses breath, posture, and focus to create connection. [file:12]'
-      },
-      {
-        type: 'mcq',
-        question: 'How do YOGA and MEDITATION work together, according to the text?',
-        options: [
-          'They cannot be done on the same day',
-          'Yoga is for the body, meditation is useless',
-          'Yoga prepares and relaxes the body, and meditation deepens awareness and connection',
-          'Meditation replaces all need for physical movement'
-        ],
-        correctIndex: 2,
-        explanation: 'Yoga prepares the body, and meditation deepens awareness. [file:12]'
-      },
-      {
-        type: 'mcq',
-        question: 'Which of these is a described BENEFIT of chanting shlokas?',
-        options: [
-          'They only improve singing voice',
-          'They can boost cognitive function and verbal memory',
-          'They only help in learning history dates',
-          'They make you forget your own language'
-        ],
-        correctIndex: 1,
-        explanation: 'Chanting shlokas can boost cognitive function and verbal memory. [file:12]'
-      },
-      {
-        type: 'mcq',
-        question: 'The story “The Invisible Chains” mainly teaches that…',
-        options: [
-          'Elephants are always gentle animals',
-          'We should never visit fairs',
-          'Old fears and limiting beliefs can hold us back even when we are strong enough to move forward',
-          'Ropes are dangerous'
-        ],
-        correctIndex: 2,
-        explanation: 'Old fears and limiting beliefs can hold us back. [file:12]'
-      },
-      {
-        type: 'mcq',
-        question: 'Which response BEST shows someone breaking their “invisible chains”?',
-        options: [
-          'Refusing to try again after one failure',
-          'Trying a new challenge even though they failed before',
-          'Avoiding all difficult tasks forever',
-          'Always blaming others for their problems'
-        ],
-        correctIndex: 1,
-        explanation: 'Trying again shows you are not controlled by old defeats. [file:12]'
-      },
-      {
-        type: 'mcq',
-        question: 'According to the chapter, everyday Soul Science practice can improve things like…',
-        options: [
-          'Effective communication, empathy and growth mindset',
-          'Only physical strength',
-          'Only exam marks in mathematics',
-          'How many social media followers you have'
-        ],
+        question: 'The committee of senior teachers and coordinators ___ unable to reach a final decision even after several long meetings and discussions.',
+        options: ['is', 'are', 'were', 'have'],
         correctIndex: 0,
-        explanation: 'It highlights communication, empathy, and growth mindset. [file:12]'
+        explanation: '“Committee” is singular here, so the correct answer is “is”.'
       },
       {
-        type: 'mcq',
-        question: 'What does the Gita shloka about the ocean and rivers mainly suggest?',
-        options: [
-          'We should never go near the sea',
-          'A peaceful person stays steady even when many desires or temptations come to them',
-          'We must fulfil every desire to be happy',
-          'Rivers make the ocean angry'
-        ],
+        question: 'A number of scientific experiments conducted in the laboratory ___ showing unexpected results that surprised even the senior researchers.',
+        options: ['is', 'have', 'was', 'has'],
         correctIndex: 1,
-        explanation: 'A wise person remains steady like the calm ocean. [file:12]'
+        explanation: '“Experiments” is plural, so the correct answer is “have”.'
       },
       {
-        type: 'mcq',
-        question: 'Which action matches the idea of mind–body–soul BALANCE from the chapter?',
-        options: [
-          'Only studying and never resting',
-          'Ignoring emotions completely',
-          'Using breath awareness, movement, and reflection to care for yourself',
-          'Thinking only about marks all the time'
-        ],
+        question: 'The collection of ancient manuscripts preserved in the school library ___ carefully maintained despite their fragile and aged condition.',
+        options: ['is', 'are', 'were', 'have'],
+        correctIndex: 0,
+        explanation: '“Collection” is singular, so the correct answer is “is”.'
+      },
+      {
+        question: 'The students who visited the river ecosystem ___ returning with detailed reports and observations for their environmental studies project.',
+        options: ['was', 'is', 'are', 'has'],
         correctIndex: 2,
-        explanation: 'Caring for mind, body, and soul together supports balance. [file:12]'
+        explanation: '“Students” is plural, so the correct answer is “are”.'
       },
       {
-        type: 'mcq',
-        question: 'Why does the chapter say Soul Science fits with 21st century skills?',
-        options: [
-          'It only teaches technology skills',
-          'It focuses on personal, social, professional, and spiritual growth, not just academics',
-          'It replaces all other school subjects',
-          'It is only about ancient stories'
-        ],
-        correctIndex: 1,
-        explanation: 'It supports holistic growth and life skills. [file:12]'
+        question: 'Either the principal or the teachers ___ responsible for approving the final schedule of the annual cultural event.',
+        options: ['are', 'is', 'were', 'have'],
+        correctIndex: 0,
+        explanation: 'The verb agrees with the nearest subject, “teachers”, so the correct answer is “are”.'
       },
       {
-        type: 'mcq',
-        question: 'Which everyday practice BEST shows applying Soul Science?',
-        options: [
-          'Ignoring your feelings so you can study more hours',
-          'Reflecting on your day, noticing your emotions, and planning small changes for tomorrow',
-          'Judging others for their beliefs',
-          'Only focusing on physical exercise'
-        ],
+        question: 'The group of scientists working on climate change research ___ presenting their findings to the international panel after years of continuous study.',
+        options: ['are', 'is', 'were', 'have'],
         correctIndex: 1,
-        explanation: 'Reflection and small changes tie mind, body, and soul together. [file:12]'
+        explanation: '“Group” is singular, so the correct answer is “is”.'
       }
     ];
 
@@ -720,12 +564,12 @@
         cell.classList.add('cell');
         if (i === 0) {
           cell.classList.add('start');
-          cell.innerHTML = '<span class="step-number">Start</span><span>Confusion</span>';
+          cell.innerHTML = '<span class="step-number">Start</span><span>Clue 1</span>';
         } else if (i === totalCells - 1) {
           cell.classList.add('finish');
-          cell.innerHTML = '<span class="step-number">Finish</span><span>Clarity</span>';
+          cell.innerHTML = '<span class="step-number">Finish</span><span>Solved</span>';
         } else {
-          cell.innerHTML = `<span class="step-number">${i}</span><span>Step ${i}</span>`;
+          cell.innerHTML = `<span class="step-number">${i}</span><span>Case ${i}</span>`;
         }
         cellsContainer.appendChild(cell);
       }
