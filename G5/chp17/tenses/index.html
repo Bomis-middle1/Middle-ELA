@@ -379,7 +379,7 @@
 <body>
     <!-- Splash Screen with Logo -->
     <div class="splash-screen" id="splashScreen">
-        <img src="G5/chp17/tenses/assets/logo.png" alt="Innovine Logo" onerror="this.style.display='none'">
+        <img src="assets/logo.png" alt="Innovine Logo" onerror="this.style.display='none'">
     </div>
 
     <div class="container" id="mainContainer">
@@ -439,7 +439,6 @@
     </div>
 
     <script>
-        // Hide splash screen and show game after 5 seconds
         setTimeout(() => {
             document.getElementById('splashScreen').classList.add('hidden');
             document.getElementById('mainContainer').classList.add('visible');
@@ -447,14 +446,11 @@
             draw();
         }, 5000);
 
-        // Audio elements for external sound files
         const correctSound = new Audio('assets/correct.mp3');
         const wrongSound = new Audio('assets/wrong.mp3');
         const celebrationSound = new Audio('assets/freesound_community-claps-44774.mp3');
         
         let volume = 0.8;
-
-        // Set initial volume
         correctSound.volume = volume;
         wrongSound.volume = volume;
         celebrationSound.volume = volume;
@@ -478,20 +474,15 @@
             const audioContext = new (window.AudioContext || window.webkitAudioContext)();
             const oscillator = audioContext.createOscillator();
             const gainNode = audioContext.createGain();
-            
             oscillator.connect(gainNode);
             gainNode.connect(audioContext.destination);
-            
             oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
-            
             gainNode.gain.setValueAtTime(volume * 0.2, audioContext.currentTime);
             gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
-            
             oscillator.start(audioContext.currentTime);
             oscillator.stop(audioContext.currentTime + 0.2);
         }
 
-        // Volume control
         document.getElementById('volumeSlider').addEventListener('input', function(e) {
             volume = e.target.value / 100;
             correctSound.volume = volume;
@@ -500,16 +491,10 @@
             document.getElementById('volumeLabel').textContent = e.target.value + '%';
         });
 
-        // Questions array
         const questions = [
             {
                 question: "She said that she ____ for the exam the previous night.",
-                options: [
-                    "is preparing",
-                    "was preparing",
-                    "has prepared",
-                    "prepares"
-                ],
+                options: ["is preparing", "was preparing", "has prepared", "prepares"],
                 correct: 1
             },
             {
@@ -524,12 +509,7 @@
             },
             {
                 question: "Identify the tense: “They had already left before we arrived.”",
-                options: [
-                    "Simple Past",
-                    "Past Perfect",
-                    "Present Perfect",
-                    "Past Continuous"
-                ],
+                options: ["Simple Past", "Past Perfect", "Present Perfect", "Past Continuous"],
                 correct: 1
             },
             {
@@ -621,12 +601,7 @@
 
         const gridSize = 40;
         const MAX_STARS = 3;
-        let player = {
-            x: 1,
-            y: 1,
-            speed: 1,
-            speedBoost: false
-        };
+        let player = { x: 1, y: 1, speed: 1, speedBoost: false };
 
         let stars = [];
         let walls = [];
@@ -668,13 +643,9 @@
 
         function isValidPosition(x, y) {
             const cellKey = `${x},${y}`;
-            if (occupiedCells.has(cellKey)) {
-                return false;
-            }
+            if (occupiedCells.has(cellKey)) return false;
             for (let star of stars) {
-                if (star.x === x && star.y === y) {
-                    return false;
-                }
+                if (star.x === x && star.y === y) return false;
             }
             return true;
         }
@@ -688,33 +659,23 @@
             while (attempts < maxAttempts) {
                 const starX = Math.floor(Math.random() * (cols - 2)) + 1;
                 const starY = Math.floor(Math.random() * (rows - 2)) + 1;
-                
-                if (isValidPosition(starX, starY)) {
-                    return {x: starX, y: starY};
-                }
+                if (isValidPosition(starX, starY)) return {x: starX, y: starY};
                 attempts++;
             }
-            
+
             for (let y = 1; y < rows - 1; y++) {
                 for (let x = 1; x < cols - 1; x++) {
-                    if (isValidPosition(x, y)) {
-                        return {x, y};
-                    }
+                    if (isValidPosition(x, y)) return {x, y};
                 }
             }
-            
             return null;
         }
 
-        // FIXED: Maintain exactly 3 stars at all times
         function maintainStarCount() {
             while (stars.length < MAX_STARS) {
                 const newStar = generateSingleStar();
-                if (newStar) {
-                    stars.push(newStar);
-                } else {
-                    break;
-                }
+                if (newStar) stars.push(newStar);
+                else break;
             }
         }
 
@@ -756,17 +717,13 @@
                     playStarSound();
                     updateScoreboard();
 
-                    // FIXED: Regenerate star after 1 second to maintain 3 stars
                     setTimeout(() => {
                         maintainStarCount();
                     }, 1000);
 
                     if (starsCollected >= 3) {
-                        if (currentQuestionIndex < shuffledQuestions.length) {
-                            showQuestion();
-                        } else {
-                            endGame();
-                        }
+                        if (currentQuestionIndex < shuffledQuestions.length) showQuestion();
+                        else endGame();
                     }
                 }
             }
@@ -786,16 +743,12 @@
                 const centerX = star.x * gridSize + gridSize / 2;
                 const centerY = star.y * gridSize + gridSize / 2;
                 const radius = gridSize / 3;
-                
                 for (let i = 0; i < 5; i++) {
                     const angle = (i * 4 * Math.PI) / 5 - Math.PI / 2;
                     const x = centerX + radius * Math.cos(angle);
                     const y = centerY + radius * Math.sin(angle);
-                    if (i === 0) {
-                        ctx.moveTo(x, y);
-                    } else {
-                        ctx.lineTo(x, y);
-                    }
+                    if (i === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
                 }
                 ctx.closePath();
                 ctx.fill();
@@ -803,13 +756,7 @@
 
             ctx.fillStyle = player.speedBoost ? '#4CAF50' : '#f5576c';
             ctx.beginPath();
-            ctx.arc(
-                player.x * gridSize + gridSize / 2,
-                player.y * gridSize + gridSize / 2,
-                gridSize / 2.5,
-                0,
-                2 * Math.PI
-            );
+            ctx.arc(player.x * gridSize + gridSize / 2, player.y * gridSize + gridSize / 2, gridSize / 2.5, 0, 2 * Math.PI);
             ctx.fill();
 
             ctx.fillStyle = 'white';
@@ -837,7 +784,6 @@
             const feedback = document.getElementById('feedback');
 
             const currentQuestion = shuffledQuestions[currentQuestionIndex];
-            
             questionNumber.textContent = currentQuestionIndex + 1;
             questionText.textContent = currentQuestion.question;
             optionsContainer.innerHTML = '';
@@ -864,18 +810,17 @@
 
             if (selectedIndex === currentQuestion.correct) {
                 button.classList.add('correct');
-                feedback.textContent = '🎉 Excellent! That\'s correct!';
+                feedback.textContent = "🎉 Excellent! That's correct!";
                 feedback.className = 'feedback correct';
                 feedback.style.display = 'block';
                 correctAnswers++;
                 playCorrectSound();
                 showCelebration();
-                
+
                 player.speedBoost = true;
                 setTimeout(() => {
                     player.speedBoost = false;
                 }, 5000);
-
             } else {
                 button.classList.add('wrong');
                 allButtons[currentQuestion.correct].classList.add('correct');
@@ -907,10 +852,9 @@
         function endGame() {
             const modal = document.getElementById('questionModal');
             const questionBox = document.querySelector('.question-box');
-            
             const percentage = Math.round((correctAnswers / shuffledQuestions.length) * 100);
             let message = '';
-            
+
             if (percentage >= 80) {
                 message = '🌟 Outstanding! You have excellent understanding of Tenses!';
                 playCelebrationSound();
@@ -943,22 +887,10 @@
             if (document.getElementById('questionModal').style.display === 'flex') return;
 
             switch(e.key) {
-                case 'ArrowUp':
-                    e.preventDefault();
-                    movePlayer(0, -1);
-                    break;
-                case 'ArrowDown':
-                    e.preventDefault();
-                    movePlayer(0, 1);
-                    break;
-                case 'ArrowLeft':
-                    e.preventDefault();
-                    movePlayer(-1, 0);
-                    break;
-                case 'ArrowRight':
-                    e.preventDefault();
-                    movePlayer(1, 0);
-                    break;
+                case 'ArrowUp': e.preventDefault(); movePlayer(0, -1); break;
+                case 'ArrowDown': e.preventDefault(); movePlayer(0, 1); break;
+                case 'ArrowLeft': e.preventDefault(); movePlayer(-1, 0); break;
+                case 'ArrowRight': e.preventDefault(); movePlayer(1, 0); break;
             }
         });
 
