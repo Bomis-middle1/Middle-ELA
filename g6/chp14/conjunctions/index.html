@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
 <title>Talent Show Chaos</title>
 
 <style>
@@ -147,9 +146,9 @@ html,body{
   left:50%;
   transform:translateX(-50%);
   width:94%;
-  height:42%;
-  min-height:230px;
-  max-height:410px;
+  height:48%;
+  min-height:260px;
+  max-height:430px;
   background:linear-gradient(180deg,#5d4037,#212121);
   border-radius:24px;
   border:6px solid #ff9800;
@@ -190,7 +189,7 @@ html,body{
 .performer{
   position:absolute;
   font-size:clamp(48px,12vw,86px);
-  bottom:18px;
+  bottom:30px;
   transition:0.4s;
 }
 
@@ -229,22 +228,6 @@ html,body{
   transition:0.4s;
 }
 
-#sceneText{
-  position:absolute;
-  bottom:31%;
-  left:50%;
-  transform:translateX(-50%);
-  width:92%;
-  background:rgba(0,0,0,0.86);
-  color:white;
-  padding:12px;
-  border-radius:18px;
-  font-size:clamp(16px,4vw,23px);
-  line-height:1.4;
-  text-align:center;
-  z-index:900;
-}
-
 #questionBox{
   position:absolute;
   left:50%;
@@ -252,7 +235,7 @@ html,body{
   transform:translateX(-50%);
   width:94%;
   max-width:950px;
-  max-height:37%;
+  max-height:38%;
   background:#fff8e1;
   padding:14px;
   border-radius:22px;
@@ -355,17 +338,12 @@ html,body{
 @media(max-height:650px){
   #stageArea{
     top:135px;
-    height:36%;
-    min-height:180px;
-  }
-
-  #sceneText{
-    bottom:34%;
-    padding:9px;
+    height:39%;
+    min-height:190px;
   }
 
   #questionBox{
-    max-height:40%;
+    max-height:42%;
     padding:11px;
   }
 
@@ -380,11 +358,11 @@ html,body{
   }
 
   #stageArea{
-    height:36%;
+    height:38%;
   }
 
   #questionBox{
-    max-height:43%;
+    max-height:44%;
   }
 
   #volumeSlider{
@@ -445,8 +423,6 @@ html,body{
       <div class="performer" id="drummer">🥁</div>
     </div>
 
-    <div id="sceneText">The crowd is waiting...</div>
-
     <div id="questionBox">
       <div id="questionText"></div>
       <div class="optionContainer" id="options"></div>
@@ -468,70 +444,60 @@ const TOTAL_QUESTIONS = 10;
 
 const allQuestions = [
   {
-    scene:"🎤 The singer forgot the lyrics. The audience still clapped loudly.",
     q:"The singer forgot the lyrics, ___ the audience still clapped loudly.",
     o:["but","because","either","unless"],
     a:0,
     e:"'But' shows contrast."
   },
   {
-    scene:"💃 The music started suddenly. The dancers rushed onto the stage.",
     q:"___ the music started, the dancers rushed onto the stage.",
     o:["When","Nor","But","Both"],
     a:0,
     e:"'When' connects the action to time."
   },
   {
-    scene:"🥁 The drummer was missing. The guitarist was also missing.",
     q:"___ the drummer nor the guitarist arrived on time.",
     o:["Either","Neither","Although","Because"],
     a:1,
     e:"'Neither...nor' is used to join two negative choices."
   },
   {
-    scene:"🎸 The band practiced hard. They won the talent trophy.",
     q:"The band practiced hard, ___ they won the trophy.",
     o:["so","unless","neither","although"],
     a:0,
     e:"'So' shows the result."
   },
   {
-    scene:"🎭 The curtains opened. The comedian entered.",
     q:"___ the curtains opened, the comedian entered.",
     o:["After","Either","But","Nor"],
     a:0,
     e:"'After' shows sequence."
   },
   {
-    scene:"🎤 The singer was nervous. She performed brilliantly.",
     q:"The singer was nervous, ___ she performed brilliantly.",
     o:["but","because","neither","unless"],
     a:0,
     e:"'But' joins opposite ideas."
   },
   {
-    scene:"💡 The lights failed. The dancers continued performing.",
     q:"The lights failed, ___ the dancers continued performing.",
     o:["but","before","either","since"],
     a:0,
     e:"'But' shows contrast."
   },
   {
-    scene:"🎸 The guitarist tuned his instrument. The drummer checked speakers.",
     q:"___ the guitarist and drummer prepared carefully, the show started smoothly.",
     o:["Because","Neither","But","Or"],
     a:0,
     e:"'Because' explains the reason."
   },
   {
-    scene:"🎆 The audience cheered loudly. Fireworks exploded.",
     q:"The audience cheered loudly, ___ fireworks exploded above the stage.",
     o:["and","unless","although","neither"],
     a:0,
     e:"'And' joins similar ideas."
   },
   {
-    scene:"🎭 The magician could perform. The comedian could perform.",
     q:"___ the magician or the comedian could host the finale.",
     o:["Either","Neither","Although","Because"],
     a:0,
@@ -554,7 +520,6 @@ const gameContent = document.getElementById("gameContent");
 const questionBox = document.getElementById("questionBox");
 const questionText = document.getElementById("questionText");
 const optionsBox = document.getElementById("options");
-const sceneText = document.getElementById("sceneText");
 const feedbackPopup = document.getElementById("feedbackPopup");
 const feedbackTitle = document.getElementById("feedbackTitle");
 const feedbackText = document.getElementById("feedbackText");
@@ -568,19 +533,9 @@ setTimeout(function(){
 },5000);
 
 const audioFiles = {
-  correct:[
-    "assets/correct.mp3",
-    "assets/right.mp3"
-  ],
-  wrong:[
-    "assets/wrong.mp3",
-    "assets/buzzer.mp3"
-  ],
-  clap:[
-    "assets/clapping.mp3",
-    "assets/clap.mp3",
-    "assets/freesound_community-claps-44774.mp3"
-  ]
+  correct:["assets/correct.mp3","assets/right.mp3"],
+  wrong:["assets/wrong.mp3","assets/buzzer.mp3"],
+  clap:["assets/clapping.mp3","assets/clap.mp3","assets/freesound_community-claps-44774.mp3"]
 };
 
 function createAudioPool(list){
@@ -672,11 +627,8 @@ function playFromPool(type, fallbackType){
       a.volume = Number(volumeSlider.value);
 
       const p = a.play();
-
       if(p && typeof p.catch === "function"){
-        p.catch(function(){
-          tryNext();
-        });
+        p.catch(function(){ tryNext(); });
       }
     }catch(e){
       tryNext();
@@ -741,7 +693,6 @@ function playFallback(type){
 function playCorrectSounds(){
   stopAllSounds();
   playFromPool("correct","correct");
-
   setTimeout(function(){
     playFromPool("clap","clap");
   },450);
@@ -754,14 +705,12 @@ function playWrongSound(){
 
 function shuffleArray(arr){
   const copy = arr.slice();
-
   for(let i=copy.length-1;i>0;i--){
     const j = Math.floor(Math.random() * (i + 1));
     const temp = copy[i];
     copy[i] = copy[j];
     copy[j] = temp;
   }
-
   return copy;
 }
 
@@ -785,7 +734,7 @@ function startGame(){
 
   updateScore();
   openCurtains();
-  loadScene();
+  loadQuestion();
 }
 
 function restartGame(){
@@ -809,7 +758,7 @@ function restartGame(){
 
   setTimeout(function(){
     openCurtains();
-    loadScene();
+    loadQuestion();
   },350);
 }
 
@@ -828,20 +777,37 @@ function updateScore(){
     ((correct / TOTAL_QUESTIONS) * 100) + "%";
 }
 
-function loadScene(){
+function loadQuestion(){
   acceptingAnswers = false;
   attempts = 0;
   questionBox.style.display = "none";
   feedbackPopup.style.display = "none";
 
-  const q = questions[currentQuestion];
-  sceneText.textContent = q.scene;
-
   animateStage();
 
   setTimeout(function(){
-    loadQuestion();
-  },900);
+    const q = questions[currentQuestion];
+
+    questionBox.style.display = "block";
+    questionText.textContent = q.q;
+    optionsBox.innerHTML = "";
+
+    q.o.forEach(function(option,index){
+      const btn = document.createElement("button");
+      btn.className = "optionBtn";
+      btn.textContent = option;
+      btn.type = "button";
+
+      btn.onclick = function(){
+        checkAnswer(index);
+      };
+
+      optionsBox.appendChild(btn);
+    });
+
+    acceptingAnswers = true;
+    updateScore();
+  },500);
 }
 
 function animateStage(){
@@ -856,33 +822,8 @@ function animateStage(){
   },500);
 }
 
-function loadQuestion(){
-  const q = questions[currentQuestion];
-
-  questionBox.style.display = "block";
-  questionText.textContent = q.q;
-  optionsBox.innerHTML = "";
-
-  q.o.forEach(function(option,index){
-    const btn = document.createElement("button");
-    btn.className = "optionBtn";
-    btn.textContent = option;
-    btn.type = "button";
-
-    btn.onclick = function(){
-      checkAnswer(index);
-    };
-
-    optionsBox.appendChild(btn);
-  });
-
-  acceptingAnswers = true;
-  updateScore();
-}
-
 function disableOptions(disabled){
   const buttons = optionsBox.querySelectorAll("button");
-
   buttons.forEach(function(btn){
     btn.disabled = disabled;
   });
@@ -964,7 +905,7 @@ function nextQuestion(){
   if(currentQuestion >= TOTAL_QUESTIONS){
     endGame();
   }else{
-    loadScene();
+    loadQuestion();
   }
 }
 
