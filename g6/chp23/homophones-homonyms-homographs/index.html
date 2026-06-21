@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Pizza Master Academy</title>
+<title>Pizza Master Academy - Engine</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
@@ -10,7 +10,7 @@
   margin:0;
   padding:0;
   box-sizing:border-box;
-  font-family:Arial, sans-serif;
+  font-family:Arial;
 }
 
 body{
@@ -19,19 +19,9 @@ body{
   background:linear-gradient(#ffb84d,#ff8c42);
 }
 
-/* =========================
-   GRID MASTER LAYOUT
-========================= */
-.game{
-  height:100vh;
-  display:grid;
-  grid-template-rows: 12vh 58vh 30vh;
-}
-
-/* =========================
-   TOP BAR
-========================= */
-.top{
+/* ================= TOP HUD ================= */
+#hud{
+  height:12vh;
   background:#fff3d6;
   border-bottom:4px solid #d35400;
   display:flex;
@@ -39,32 +29,28 @@ body{
   align-items:center;
   padding:10px;
   font-weight:bold;
-  font-size:16px;
 }
 
-/* =========================
-   MIDDLE WORLD
-========================= */
-.world{
+/* ================= WORLD ================= */
+#world{
+  height:56vh;
   position:relative;
   display:flex;
   justify-content:center;
   align-items:center;
 }
 
-/* QUESTION FIXED (NEVER CUT AGAIN) */
-.question{
+/* QUESTION SAFE PANEL */
+#question{
   position:absolute;
   top:10px;
   left:10px;
   right:10px;
   background:white;
-  padding:12px;
-  border-radius:12px;
   border:3px solid #d35400;
-  z-index:20;
-  max-height:45%;
-  overflow:auto;
+  border-radius:12px;
+  padding:10px;
+  z-index:10;
   font-size:16px;
 }
 
@@ -73,8 +59,7 @@ body{
   position:absolute;
   bottom:5%;
   left:5%;
-  width:22%;
-  z-index:1;
+  width:18%;
 }
 
 /* CHEF */
@@ -82,27 +67,28 @@ body{
   position:absolute;
   bottom:5%;
   right:5%;
-  width:20%;
-  z-index:2;
+  width:18%;
 }
 
-/* PIZZA BASE */
-.pizza{
-  width:200px;
-  height:200px;
+/* PIZZA */
+#pizza{
+  width:180px;
+  height:180px;
   border-radius:50%;
   background:#f2c572;
   border:6px solid #d35400;
   display:flex;
   justify-content:center;
   align-items:center;
-  z-index:3;
 }
 
-/* =========================
-   OPTIONS (ALWAYS VISIBLE)
-========================= */
-.options{
+/* ================= OPTIONS DOCK (FIXED) ================= */
+#options{
+  position:fixed;
+  bottom:0;
+  left:0;
+  width:100%;
+  height:32vh;
   background:#fff7e6;
   border-top:4px solid #d35400;
   display:flex;
@@ -111,82 +97,230 @@ body{
   align-items:center;
   gap:10px;
   padding:10px;
-  overflow-y:auto;
 }
 
-.option{
+/* OPTION BUTTONS */
+.opt{
+  width:45%;
   background:#ffcc66;
   border:3px solid #d35400;
-  padding:12px;
+  padding:10px;
   border-radius:10px;
-  min-width:45%;
   font-weight:bold;
-  font-size:15px;
   text-align:center;
   cursor:pointer;
 }
 
-/* =========================
-   IMAGE SAFETY FIX
-========================= */
-img{
-  max-width:100%;
-  max-height:100%;
-  object-fit:contain;
-  display:block;
+/* PROGRESS BAR */
+#progress{
+  height:6px;
+  width:100%;
+  background:#ffd9a0;
+}
+#bar{
+  height:100%;
+  width:0%;
+  background:#27ae60;
 }
 
-/* fallback hidden */
-.fallback{
-  display:none;
-  font-size:14px;
-  color:#333;
-}
+/* HIDDEN */
+.hidden{display:none;}
+
 </style>
 </head>
 
 <body>
 
-<div class="game">
+<!-- HUD -->
+<div id="hud">
+  <div>⭐ Score: <span id="score">0</span>/100</div>
+  <div>🍕 Pizza Master Academy</div>
+  <div>Order: <span id="level">1</span>/10</div>
+</div>
 
-  <!-- TOP -->
-  <div class="top">
-    <div>⭐ Score: 10/100</div>
-    <div>🍕 Pizza Master Academy</div>
-    <div>Order: 2/10 | Attempts: 0/2</div>
-  </div>
+<div id="progress"><div id="bar"></div></div>
 
-  <!-- WORLD -->
-  <div class="world">
+<!-- WORLD -->
+<div id="world">
 
-    <!-- QUESTION (FIXED NEVER CUT) -->
-    <div class="question">
-      <h3>Which sentence uses “bank” correctly?</h3>
-      <p>Choose the sentence that makes sense.</p>
-    </div>
+  <div id="question"></div>
 
-    <!-- OVEN -->
-    <img class="oven" src="assets/oven.png">
-
-    <!-- PIZZA -->
-    <div class="pizza">
-      <img src="assets/pizza-base.png">
-    </div>
-
-    <!-- CHEF -->
-    <img class="chef" src="assets/chef.png">
-
-  </div>
-
-  <!-- OPTIONS -->
-  <div class="options">
-    <div class="option">We sat on the river bank.</div>
-    <div class="option">The river deposited money.</div>
-    <div class="option">The bank flew away.</div>
-    <div class="option">Bank barked loudly.</div>
-  </div>
+  <img class="oven" src="assets/oven.png">
+  <div id="pizza">🍕</div>
+  <img class="chef" src="assets/chef.png">
 
 </div>
+
+<!-- OPTIONS -->
+<div id="options"></div>
+
+<script>
+
+/* ================= GAME DATA ================= */
+const questions = [
+{
+q:"We need ____ to bake bread.",
+options:["Flour","Flower","Floor","Flourr"],
+answer:"Flour",
+type:"Homophone check",
+hint:"Think bakery ingredient"
+},
+{
+q:"The bat flew in the kitchen. Bat means?",
+options:["Animal","Cricket bat","Spoon","Chef"],
+answer:"Animal",
+type:"Homonym",
+hint:"It is alive"
+},
+{
+q:"Wind the rope. Meaning?",
+options:["Twist","Air","Storm","Fan"],
+answer:"Twist",
+type:"Homograph",
+hint:"Verb action"
+},
+{
+q:"Pear and Pair are:",
+options:["Homophones","Homonyms","Homographs","None"],
+answer:"Homophones",
+type:"Word type",
+hint:"Sound same"
+},
+{
+q:"Bank (river) sentence?",
+options:[
+"We sat on river bank",
+"Bank gave money flew",
+"Bank barked",
+"Bank jumped"
+],
+answer:"We sat on river bank",
+type:"Meaning",
+hint:"River side"
+},
+{
+q:"Knight sounds like?",
+options:["Night","Light","Fight","Bright"],
+answer:"Night",
+type:"Homophone",
+hint:"Dark time"
+},
+{
+q:"Seal meaning here?",
+options:["Sea animal","Close bottle","Pizza cutter","Chef"],
+answer:"Sea animal",
+type:"Homonym",
+hint:"Lives in water"
+},
+{
+q:"Ate / Eight are:",
+options:["Homophones","Homonyms","Homographs","None"],
+answer:"Homophones",
+type:"Sound",
+hint:"Same sound"
+},
+{
+q:"Wind (air) is:",
+options:["Homograph","Homophone","Synonym","Verb only"],
+answer:"Homograph",
+type:"Meaning shift",
+hint:"Different meanings"
+},
+{
+q:"Flour / Flower relation?",
+options:["Homophones","Homonyms","Homographs","None"],
+answer:"Homophones",
+type:"Final",
+hint:"Sound same"
+}
+];
+
+let current=0;
+let score=0;
+let attempts=0;
+let order=[];
+
+/* shuffle */
+function shuffle(arr){
+return arr.sort(()=>Math.random()-0.5);
+}
+
+/* INIT GAME */
+function init(){
+order = shuffle([...questions]);
+current=0;
+score=0;
+load();
+}
+
+/* LOAD QUESTION */
+function load(){
+attempts=0;
+
+if(current>=order.length){
+endGame();
+return;
+}
+
+let q=order[current];
+
+document.getElementById("question").innerHTML=
+`<b>${q.q}</b><br><small>${q.type}</small>`;
+
+let opts=shuffle([...q.options]);
+
+let box=document.getElementById("options");
+box.innerHTML="";
+
+opts.forEach(o=>{
+let b=document.createElement("div");
+b.className="opt";
+b.innerText=o;
+b.onclick=()=>check(o,q);
+box.appendChild(b);
+});
+
+document.getElementById("level").innerText=current+1;
+updateBar();
+}
+
+/* CHECK */
+function check(val,q){
+if(val===q.answer){
+score+=10;
+document.getElementById("score").innerText=score;
+current++;
+load();
+}else{
+attempts++;
+if(attempts<2){
+alert("Try again! Hint: "+q.hint);
+}else{
+alert("Correct answer: "+q.answer);
+current++;
+load();
+}
+}
+}
+
+/* PROGRESS */
+function updateBar(){
+document.getElementById("bar").style.width=
+((current)/order.length)*100+"%";
+}
+
+/* END */
+function endGame(){
+document.getElementById("question").innerHTML=
+"🏆 GAME COMPLETE! Final Score: "+score;
+document.getElementById("options").innerHTML=
+"<div class='opt' onclick='init()'>Play Again</div>";
+}
+
+/* START */
+init();
+
+</script>
 
 </body>
 </html>
