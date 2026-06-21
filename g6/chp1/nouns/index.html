@@ -6,266 +6,96 @@
 <title>Noun Museum Adventure</title>
 
 <style>
-*{box-sizing:border-box;font-family:Arial, sans-serif;margin:0;padding:0}
-body{
-  background:linear-gradient(135deg,#dff6ff,#fff5d7,#e8ffe8);
-  overflow-x:hidden;
-}
-
-/* Screens */
-.screen{
-  display:none;
-  width:100%;
-  height:100vh;
-  justify-content:center;
-  align-items:center;
-  flex-direction:column;
-  text-align:center;
-  padding:20px;
-}
-.active{display:flex;}
-
-/* Logo */
-#logoScreen img{
-  width:220px;
-  animation:pulse 1.5s infinite;
-}
-@keyframes pulse{
-  0%{transform:scale(1);opacity:1}
-  50%{transform:scale(1.05);opacity:.8}
-  100%{transform:scale(1);opacity:1}
-}
-
-/* Title */
-.title{
-  font-size:28px;
-  font-weight:bold;
-  color:#333;
-}
-.subtitle{
-  margin-top:10px;
-  font-size:16px;
-}
-
-/* Card */
-.card{
-  background:white;
-  padding:20px;
-  border-radius:18px;
-  width:90%;
-  max-width:600px;
-  box-shadow:0 10px 25px rgba(0,0,0,0.15);
-}
-
-/* Buttons */
-.btn{
-  display:block;
-  width:100%;
-  margin:10px 0;
-  padding:14px;
-  border-radius:12px;
-  border:none;
-  font-size:16px;
-  cursor:pointer;
-  transition:0.3s;
-}
-.btn:hover{transform:scale(1.03)}
+*{box-sizing:border-box;font-family:Arial;margin:0;padding:0}
+body{background:linear-gradient(135deg,#dff6ff,#fff5d7,#e8ffe8);overflow-x:hidden}
+.screen{display:none;height:100vh;justify-content:center;align-items:center;flex-direction:column;text-align:center;padding:20px}
+.active{display:flex}
+.card{background:#fff;padding:20px;border-radius:18px;width:90%;max-width:600px;box-shadow:0 10px 25px rgba(0,0,0,0.15)}
+.btn{width:100%;padding:14px;margin:10px 0;border:none;border-radius:12px;font-size:16px;cursor:pointer}
 .opt{background:#f1f1f1}
 .correct{background:#b6f7c7 !important}
 .wrong{background:#ffb3b3 !important}
-
-.topbar{
-  width:100%;
-  display:flex;
-  justify-content:space-between;
-  padding:10px;
-  font-weight:bold;
-}
-
-.progress{
-  width:90%;
-  height:10px;
-  background:#ddd;
-  border-radius:10px;
-  margin:10px auto;
-  overflow:hidden;
-}
-.bar{
-  height:100%;
-  width:0%;
-  background:linear-gradient(90deg,#4facfe,#00f2fe);
-  transition:0.4s;
-}
-
-.volume{
-  margin-top:10px;
-}
-
-.confetti{
-  position:fixed;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
-  pointer-events:none;
-  overflow:hidden;
-}
-.confetti div{
-  position:absolute;
-  width:8px;
-  height:8px;
-  background:red;
-  animation:fall 3s linear forwards;
-}
-@keyframes fall{
-  to{transform:translateY(100vh) rotate(360deg);opacity:0}
-}
-
+.topbar{display:flex;justify-content:space-between;width:100%;padding:10px;font-weight:bold}
+.progress{width:90%;height:10px;background:#ddd;border-radius:10px;overflow:hidden}
+.bar{height:100%;width:0%;background:linear-gradient(90deg,#4facfe,#00f2fe);transition:0.4s}
+.confetti div{position:absolute;width:8px;height:8px;animation:fall 3s linear forwards}
+@keyframes fall{to{transform:translateY(100vh);opacity:0}}
 </style>
 </head>
 
 <body>
 
-<!-- LOGO -->
 <div id="logoScreen" class="screen active">
-  <img src="assets/innovine-logo.png">
+<img src="assets/innovine-logo.png" style="width:220px">
 </div>
 
-<!-- TITLE -->
 <div id="titleScreen" class="screen">
-  <div class="title">🏛️ Noun Museum Adventure</div>
-  <div class="subtitle">✨ Unlock the Secrets of Nouns</div>
+<h1>🏛️ Noun Museum Adventure</h1>
+<p>✨ Unlock the Secrets of Nouns</p>
 </div>
 
-<!-- INSTRUCTIONS -->
 <div id="instScreen" class="screen">
-  <div class="card">
-    <h2>🎯 How to Play</h2>
-    <p>Welcome to the Grand Noun Museum!</p>
-    <p>Choose correct noun types and unlock exhibits.</p>
-
-    <label>🔊 Volume</label>
-    <input type="range" min="0" max="1" step="0.1" id="vol" class="volume" value="1">
-
-    <button class="btn" onclick="startGame()">▶ Start Adventure</button>
-  </div>
+<div class="card">
+<h2>How to Play</h2>
+<p>Choose correct noun types to unlock museum rooms.</p>
+<button class="btn" onclick="startGame()">Start Adventure</button>
+</div>
 </div>
 
-<!-- GAME -->
 <div id="gameScreen" class="screen">
-  <div class="topbar">
-    <div id="room">Room 1/10</div>
-    <div id="score">⭐ 0</div>
-  </div>
+<div class="topbar">
+<div id="room"></div>
+<div id="score"></div>
+</div>
+<div class="progress"><div class="bar" id="bar"></div></div>
 
-  <div class="progress"><div class="bar" id="bar"></div></div>
-
-  <div class="card">
-    <h3 id="gallery">Gallery</h3>
-    <p id="qtext"></p>
-    <div id="options"></div>
-  </div>
+<div class="card">
+<h3 id="gallery"></h3>
+<p id="qtext"></p>
+<div id="options"></div>
+</div>
 </div>
 
-<!-- END -->
 <div id="endScreen" class="screen">
-  <h2>🎉 Congratulations!</h2>
-  <p id="finalScore"></p>
-  <button class="btn" onclick="restart()">🔄 Play Again</button>
+<h2>🎉 Completed!</h2>
+<p id="finalScore"></p>
+<button class="btn" onclick="location.reload()">Play Again</button>
 </div>
-
-<div class="confetti" id="confetti"></div>
 
 <audio id="correct" src="assets/correct.mp3"></audio>
 <audio id="wrong" src="assets/wrong.mp3"></audio>
 <audio id="clap" src="assets/clapping.mp3"></audio>
 
 <script>
-const questions = [
-{
-q:"The garden is full of colourful flowers and butterflies.",
-a:["Common Noun","Proper Noun","Material Noun","Abstract Noun"],
-c:"Common Noun",
-g:"🌿 Nature Gallery"
-},
-{
-q:"India is famous for its rich culture and festivals.",
-a:["Common Noun","Proper Noun","Collective Noun","Material Noun"],
-c:"Proper Noun",
-g:"🏛️ Famous Places Gallery"
-},
-{
-q:"The team celebrated their victory after the match.",
-a:["Abstract Noun","Collective Noun","Proper Noun","Common Noun"],
-c:"Collective Noun",
-g:"🏆 Teamwork Gallery"
-},
-{
-q:"The necklace was made of pure gold.",
-a:["Material Noun","Common Noun","Collective Noun","Proper Noun"],
-c:"Material Noun",
-g:"💎 Treasure Gallery"
-},
-{
-q:"Honesty is always appreciated by everyone.",
-a:["Proper Noun","Material Noun","Abstract Noun","Common Noun"],
-c:"Abstract Noun",
-g:"💖 Feelings Gallery"
-},
-{
-q:"The lion rested under a shady tree.",
-a:["Proper Noun","Common Noun","Material Noun","Collective Noun"],
-c:"Common Noun",
-g:"🐾 Animal Gallery"
-},
-{
-q:"Mrs. Gupta teaches Mathematics in our school.",
-a:["Proper Noun","Common Noun","Collective Noun","Material Noun"],
-c:"Proper Noun",
-g:"🏫 School Gallery"
-},
-{
-q:"A shoal of fish swam together near the coral reef.",
-a:["Material Noun","Common Noun","Collective Noun","Abstract Noun"],
-c:"Collective Noun",
-g:"🌊 Ocean Gallery"
-},
-{
-q:"The table is made from strong wood.",
-a:["Material Noun","Proper Noun","Common Noun","Collective Noun"],
-c:"Material Noun",
-g:"🌳 Builders Gallery"
-},
-{
-q:"Kindness makes the world a happier place.",
-a:["Material Noun","Collective Noun","Abstract Noun","Common Noun"],
-c:"Abstract Noun",
-g:"🌎 Values Gallery"
-}
+const questions=[
+{q:`The <b>flowers</b> in the garden are full of colourful flowers and butterflies.`,a:["Common Noun","Proper Noun","Material Noun","Abstract Noun"],c:"Common Noun",g:"🌿 Nature Gallery"},
+{q:`<b>India</b> is famous for its rich culture and festivals.`,a:["Common Noun","Proper Noun","Collective Noun","Material Noun"],c:"Proper Noun",g:"🏛️ Famous Places Gallery"},
+{q:`The <b>team</b> celebrated their victory after the match.`,a:["Abstract Noun","Collective Noun","Proper Noun","Common Noun"],c:"Collective Noun",g:"🏆 Teamwork Gallery"},
+{q:`The necklace was made of pure <b>gold</b>.`,a:["Material Noun","Common Noun","Collective Noun","Proper Noun"],c:"Material Noun",g:"💎 Treasure Gallery"},
+{q:`<b>Honesty</b> is always appreciated by everyone.`,a:["Proper Noun","Material Noun","Abstract Noun","Common Noun"],c:"Abstract Noun",g:"💖 Feelings Gallery"},
+{q:`The <b>lion</b> rested under a shady tree.`,a:["Proper Noun","Common Noun","Material Noun","Collective Noun"],c:"Common Noun",g:"🐾 Animal Gallery"},
+{q:`<b>Mrs. Gupta</b> teaches Mathematics in our school.`,a:["Proper Noun","Common Noun","Collective Noun","Material Noun"],c:"Proper Noun",g:"🏫 School Gallery"},
+{q:`A <b>shoal</b> of fish swam together near the coral reef.`,a:["Material Noun","Common Noun","Collective Noun","Abstract Noun"],c:"Collective Noun",g:"🌊 Ocean Gallery"},
+{q:`The table is made from strong <b>wood</b>.`,a:["Material Noun","Proper Noun","Common Noun","Collective Noun"],c:"Material Noun",g:"🌳 Builders Gallery"},
+{q:`<b>Kindness</b> makes the world a happier place.`,a:["Material Noun","Collective Noun","Abstract Noun","Common Noun"],c:"Abstract Noun",g:"🌎 Values Gallery"}
 ];
 
 let order=[],i=0,score=0,attempt=0;
 
-function shuffle(a){
-return a.sort(()=>Math.random()-0.5);
-}
+function shuffle(a){return a.sort(()=>Math.random()-0.5)}
 
-function init(){
-order=shuffle([...Array(10).keys()]);
-}
+function init(){order=shuffle([...Array(10).keys()])}
 
 function showQ(){
 let q=questions[order[i]];
 attempt=0;
-
 document.getElementById("room").innerText=`Room ${i+1}/10`;
 document.getElementById("score").innerText=`⭐ ${score}`;
 document.getElementById("gallery").innerText=q.g;
-document.getElementById("qtext").innerText=q.q;
+document.getElementById("qtext").innerHTML=`Read carefully:<br><br>${q.q}<br><br>Which type of noun is it?`;
 
 let opt=document.getElementById("options");
 opt.innerHTML="";
-
 shuffle(q.a).forEach(ans=>{
 let b=document.createElement("button");
 b.className="btn opt";
@@ -280,27 +110,20 @@ function check(btn,ans,q){
 if(ans===q.c){
 btn.classList.add("correct");
 document.getElementById("correct").play();
-setTimeout(()=>document.getElementById("clap").play(),500);
+setTimeout(()=>document.getElementById("clap").play(),400);
 score+=2;
 next();
 }else{
 attempt++;
 document.getElementById("wrong").play();
 btn.classList.add("wrong");
-if(attempt>=2){
-alert("Hint: "+q.c);
-setTimeout(()=>next(),1000);
-}
+if(attempt>=2){alert("Hint: "+q.c);next();}
 }
 }
 
 function next(){
 i++;
-if(i>=order.length){
-end();
-}else{
-setTimeout(showQ,800);
-}
+if(i>=order.length){end()}else{setTimeout(showQ,800)}
 }
 
 function updateBar(){
@@ -310,42 +133,15 @@ document.getElementById("bar").style.width=(i/10)*100+"%";
 function startGame(){
 document.getElementById("instScreen").classList.remove("active");
 document.getElementById("gameScreen").classList.add("active");
-init();
-showQ();
+init();showQ();
 }
 
 function end(){
 document.getElementById("gameScreen").classList.remove("active");
 document.getElementById("endScreen").classList.add("active");
-document.getElementById("finalScore").innerText="⭐ Score: "+score+"/20";
-confetti();
+document.getElementById("finalScore").innerText=`⭐ Score: ${score}/20`;
 document.getElementById("clap").play();
 }
-
-function restart(){
-location.reload();
-}
-
-function confetti(){
-for(let i=0;i<80;i++){
-let d=document.createElement("div");
-d.style.left=Math.random()*100+"%";
-d.style.background=["#ff4d4d","#4dd2ff","#ffd24d","#8cff66"][Math.floor(Math.random()*4)];
-d.style.animationDuration=(Math.random()*2+2)+"s";
-document.getElementById("confetti").appendChild(d);
-}
-}
-
-setTimeout(()=>{
-document.getElementById("logoScreen").classList.remove("active");
-document.getElementById("titleScreen").classList.add("active");
-},5000);
-
-setTimeout(()=>{
-document.getElementById("titleScreen").classList.remove("active");
-document.getElementById("instScreen").classList.add("active");
-},8000);
-
 </script>
 
 </body>
