@@ -1,165 +1,1327 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Magic Scroll Adventure - Direct & Indirect Speech</title>
+<title>Magic Scroll Adventure</title>
+
 <style>
-body { margin:0; font-family: Arial; background:#f0f8ff; overflow:hidden; }
-#logoScreen { position:fixed; top:0; left:0; width:100%; height:100%; background:white; display:flex; justify-content:center; align-items:center; z-index:100; }
-#gameContainer { display:none; width:100%; height:100vh; position:relative; overflow:hidden; }
-h2 { text-align:center; margin:10px; }
-#ladder { position:absolute; bottom:50px; left:50%; transform:translateX(-50%); width:80px; height:500px; background:#a0522d; border-radius:10px; }
-.step { width:80px; height:20px; background:#deb887; margin:10px 0; border-radius:5px; text-align:center; line-height:20px; color:#fff; font-weight:bold; }
-#player { position:absolute; width:60px; height:80px; z-index:10; left:50%; transform:translateX(-50%); bottom:50px; transition: bottom 0.3s; }
-#scroll { position:absolute; width:150px; height:50px; background:#ffe4b5; border-radius:10px; text-align:center; line-height:50px; font-weight:bold; cursor:pointer; left:50%; transform:translateX(-50%); top:20px; z-index:5; }
-.word { display:inline-block; padding:5px 10px; margin:5px; background:#ffcc00; border-radius:5px; cursor:pointer; user-select:none; }
-#dropZone { min-height:40px; background:#ddd; border:2px dashed #aaa; margin:10px auto; padding:5px; width:90%; text-align:left; border-radius:5px; }
-#questionBox { display:none; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); background:white; padding:20px; border-radius:10px; width:90%; max-width:400px; text-align:center; box-shadow:0 0 15px #0003; z-index:50; }
-#feedback { margin-top:10px; font-weight:bold; }
-#treasure { position:absolute; bottom:20px; left:50%; width:120px; height:120px; transform:translateX(-50%); display:none; z-index:20; }
-#restartBtn { display:none; position:absolute; left:50%; transform:translateX(-50%); top:70%; padding:10px 30px; font-size:18px; cursor:pointer; }
-#volumeSlider { position:absolute; bottom:10px; left:50%; transform:translateX(-50%); }
+*{
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
+}
+
+html,body{
+  margin:0;
+  padding:0;
+  width:100%;
+  min-height:100%;
+  overflow-x:hidden;
+  font-family:"Trebuchet MS", Arial, sans-serif;
+  background:#120826;
+  color:#fff;
+}
+
+.screen{
+  width:100%;
+  min-height:100vh;
+  display:none;
+}
+
+.screen.active{
+  display:flex;
+}
+
+#logoScreen{
+  background:#ffffff;
+  align-items:center;
+  justify-content:center;
+  padding:24px;
+}
+
+#logoScreen img{
+  width:min(420px,82vw);
+  max-height:70vh;
+  object-fit:contain;
+}
+
+#instructionScreen{
+  position:relative;
+  align-items:center;
+  justify-content:center;
+  padding:18px;
+  background:linear-gradient(145deg,#201046,#331a78,#132e63);
+  overflow:hidden;
+}
+
+.magic-bg::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background-image:radial-gradient(circle,rgba(255,255,255,.6) 0 2px,transparent 3px);
+  background-size:70px 70px;
+  animation:floatParticles 16s linear infinite;
+  opacity:.45;
+  pointer-events:none;
+}
+
+@keyframes floatParticles{
+  from{background-position:0 0}
+  to{background-position:0 -260px}
+}
+
+.instruction-card{
+  position:relative;
+  z-index:2;
+  width:min(900px,96vw);
+  max-height:94vh;
+  overflow:auto;
+  background:rgba(24,12,52,.9);
+  border:3px solid #ffd85e;
+  border-radius:28px;
+  padding:clamp(18px,3vw,34px);
+  text-align:center;
+  box-shadow:0 18px 50px rgba(0,0,0,.45);
+}
+
+.instruction-card h1{
+  margin:0 0 12px;
+  font-size:clamp(30px,5vw,54px);
+  color:#ffe082;
+}
+
+.instruction-card p{
+  font-size:clamp(17px,2.4vw,23px);
+  line-height:1.45;
+  margin:10px auto;
+  max-width:760px;
+}
+
+.controls-row{
+  display:flex;
+  flex-wrap:wrap;
+  gap:14px;
+  align-items:center;
+  justify-content:center;
+  margin-top:22px;
+}
+
+.volume-box{
+  background:rgba(255,255,255,.13);
+  border:2px solid rgba(255,255,255,.25);
+  border-radius:18px;
+  padding:12px 16px;
+  font-size:18px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+input[type="range"]{
+  width:150px;
+  accent-color:#ffd85e;
+}
+
+button{
+  border:0;
+  cursor:pointer;
+  font-family:inherit;
+  font-weight:900;
+  touch-action:manipulation;
+}
+
+.primary-btn{
+  font-size:clamp(19px,2.6vw,26px);
+  color:#351700;
+  background:linear-gradient(#fff3a9,#ffc53d);
+  border:3px solid #fff6c7;
+  border-radius:22px;
+  padding:15px 25px;
+  box-shadow:0 8px 0 #9d5a00;
+}
+
+.primary-btn:active{
+  transform:translateY(5px);
+  box-shadow:0 3px 0 #9d5a00;
+}
+
+#gameScreen{
+  position:relative;
+  flex-direction:column;
+  min-height:100vh;
+  background:linear-gradient(180deg,#130727,#241457,#101b46);
+  overflow:hidden;
+}
+
+.scoreboard{
+  position:sticky;
+  top:0;
+  z-index:15;
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:7px;
+  width:100%;
+  padding:8px;
+  background:rgba(10,4,24,.94);
+  border-bottom:2px solid rgba(255,218,95,.55);
+}
+
+.score-pill{
+  min-height:46px;
+  border-radius:16px;
+  background:rgba(255,255,255,.12);
+  border:1px solid rgba(255,255,255,.25);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:6px;
+  font-size:clamp(13px,2.1vw,18px);
+  font-weight:900;
+}
+
+.progress-wrap{
+  grid-column:1/-1;
+  height:13px;
+  border-radius:20px;
+  background:rgba(255,255,255,.18);
+  overflow:hidden;
+}
+
+#progressBar{
+  height:100%;
+  width:0%;
+  border-radius:20px;
+  background:linear-gradient(90deg,#7df9ff,#ffd85e,#ff9bea);
+  transition:width .45s ease;
+}
+
+.game-area{
+  position:relative;
+  flex:1;
+  display:grid;
+  grid-template-columns:minmax(150px,280px) 1fr;
+  gap:12px;
+  width:100%;
+  max-width:1180px;
+  margin:0 auto;
+  padding:12px;
+  z-index:1;
+}
+
+.tower-panel{
+  min-height:calc(100vh - 96px);
+  background:rgba(12,5,32,.5);
+  border:2px solid rgba(255,224,130,.42);
+  border-radius:24px;
+  padding:10px;
+  position:relative;
+  overflow:hidden;
+}
+
+.tower{
+  position:relative;
+  height:100%;
+  min-height:510px;
+  display:flex;
+  flex-direction:column-reverse;
+  justify-content:space-between;
+  align-items:center;
+  padding:42px 0 18px;
+}
+
+.tower::before{
+  content:"";
+  position:absolute;
+  left:50%;
+  top:28px;
+  bottom:12px;
+  width:72%;
+  transform:translateX(-50%);
+  border-radius:30px;
+  background:linear-gradient(90deg,#4e378f,#26195c,#5b43a6);
+  border:3px solid rgba(255,215,112,.45);
+}
+
+.tower-top{
+  position:absolute;
+  top:4px;
+  left:50%;
+  transform:translateX(-50%);
+  z-index:2;
+  font-size:38px;
+}
+
+.level{
+  position:relative;
+  z-index:3;
+  width:74%;
+  min-height:32px;
+  border-radius:14px;
+  border:1px solid rgba(255,255,255,.28);
+  background:rgba(255,255,255,.11);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:5px 8px;
+  font-weight:900;
+  font-size:13px;
+}
+
+.level.done{
+  background:rgba(255,214,69,.28);
+  border-color:#ffe082;
+  box-shadow:0 0 14px rgba(255,225,115,.5);
+}
+
+.level.current{
+  background:rgba(126,249,255,.25);
+  border-color:#7df9ff;
+  animation:levelGlow 1.2s ease-in-out infinite alternate;
+}
+
+@keyframes levelGlow{
+  from{box-shadow:0 0 8px rgba(125,249,255,.55)}
+  to{box-shadow:0 0 22px rgba(125,249,255,.95)}
+}
+
+.player{
+  position:absolute;
+  z-index:5;
+  left:50%;
+  bottom:18px;
+  transform:translateX(-50%);
+  font-size:34px;
+  transition:bottom .65s ease;
+}
+
+.challenge-panel{
+  min-height:calc(100vh - 96px);
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.story-strip{
+  background:rgba(255,255,255,.12);
+  border:2px solid rgba(255,224,130,.38);
+  border-radius:22px;
+  padding:10px 12px;
+  text-align:center;
+  font-size:clamp(16px,2.2vw,21px);
+  font-weight:900;
+  color:#fff3b0;
+}
+
+.scroll-stage{
+  flex:1;
+  min-height:420px;
+  background:rgba(255,255,255,.08);
+  border:2px solid rgba(255,255,255,.22);
+  border-radius:28px;
+  padding:14px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+  position:relative;
+}
+
+.scroll-button{
+  width:min(330px,86vw);
+  min-height:210px;
+  border-radius:28px;
+  background:linear-gradient(145deg,#fff0b9,#d89a35);
+  border:5px solid #7d4318;
+  box-shadow:0 0 35px rgba(255,221,104,.65);
+  color:#4b2503;
+  font-size:clamp(27px,4vw,43px);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  animation:scrollPulse 1.25s ease-in-out infinite alternate;
+}
+
+.scroll-button span{
+  font-size:clamp(68px,11vw,104px);
+}
+
+@keyframes scrollPulse{
+  from{transform:translateY(0) scale(1)}
+  to{transform:translateY(-7px) scale(1.025)}
+}
+
+.challenge-card{
+  width:min(820px,100%);
+  background:linear-gradient(145deg,#fff5c8,#f3cb77);
+  color:#3e2102;
+  border:5px solid #8a4b17;
+  border-radius:26px;
+  padding:clamp(14px,2.6vw,26px);
+  box-shadow:0 16px 35px rgba(0,0,0,.36);
+  display:none;
+}
+
+.challenge-card.open{
+  display:block;
+  animation:openScroll .38s ease both;
+}
+
+@keyframes openScroll{
+  from{opacity:0;transform:scaleX(.2) scaleY(.85)}
+  to{opacity:1;transform:scaleX(1) scaleY(1)}
+}
+
+.challenge-type{
+  display:inline-block;
+  background:#4b2d78;
+  color:#fff;
+  border-radius:99px;
+  padding:7px 14px;
+  font-weight:900;
+  font-size:clamp(13px,1.8vw,16px);
+  margin-bottom:10px;
+}
+
+.question-text{
+  font-size:clamp(19px,2.7vw,28px);
+  line-height:1.35;
+  font-weight:900;
+  margin:8px 0 16px;
+  white-space:pre-line;
+}
+
+.options{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+
+.option-btn{
+  min-height:64px;
+  border-radius:18px;
+  padding:12px;
+  font-size:clamp(16px,2.25vw,21px);
+  background:#fbf3dc;
+  color:#321b04;
+  border:3px solid #a76218;
+  box-shadow:0 5px 0 #7a3e10;
+  text-align:left;
+  line-height:1.25;
+}
+
+.option-btn:disabled{
+  cursor:default;
+  opacity:.9;
+}
+
+.option-btn.correct{
+  background:#d7ffd5;
+  border-color:#1a9b43;
+  box-shadow:0 0 18px rgba(22,194,89,.7);
+}
+
+.option-btn.wrong{
+  background:#ffd9d9;
+  border-color:#cc2626;
+  animation:shake .34s ease;
+}
+
+@keyframes shake{
+  0%,100%{transform:translateX(0)}
+  25%{transform:translateX(-8px)}
+  50%{transform:translateX(8px)}
+  75%{transform:translateX(-5px)}
+}
+
+.feedback{
+  min-height:54px;
+  margin-top:14px;
+  border-radius:18px;
+  padding:11px 13px;
+  font-size:clamp(16px,2.2vw,20px);
+  font-weight:900;
+  background:rgba(75,45,120,.12);
+  border:2px dashed rgba(75,45,120,.32);
+  display:none;
+}
+
+.feedback.show{
+  display:block;
+}
+
+.continue-btn{
+  display:none;
+  margin:14px auto 0;
+  font-size:clamp(17px,2.3vw,22px);
+  color:#fff;
+  background:linear-gradient(#6c4cff,#351c84);
+  border:3px solid #d8caff;
+  border-radius:20px;
+  padding:12px 22px;
+  box-shadow:0 6px 0 #160742;
+}
+
+.continue-btn.show{
+  display:block;
+}
+
+.sparkle-burst{
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  overflow:hidden;
+  z-index:10;
+}
+
+.spark{
+  position:absolute;
+  font-size:24px;
+  animation:sparkFly 900ms ease-out forwards;
+}
+
+@keyframes sparkFly{
+  from{opacity:1;transform:translate(0,0) scale(.6) rotate(0)}
+  to{opacity:0;transform:translate(var(--dx),var(--dy)) scale(1.8) rotate(180deg)}
+}
+
+.crystal-float{
+  position:absolute;
+  left:50%;
+  top:50%;
+  font-size:64px;
+  z-index:12;
+  animation:crystalCollect 1s ease-in forwards;
+  pointer-events:none;
+}
+
+@keyframes crystalCollect{
+  0%{opacity:0;transform:translate(-50%,-50%) scale(.5)}
+  25%{opacity:1;transform:translate(-50%,-80%) scale(1.25)}
+  100%{opacity:0;transform:translate(-50%,-260%) scale(.3)}
+}
+
+#endScreen{
+  position:relative;
+  align-items:center;
+  justify-content:center;
+  padding:18px;
+  text-align:center;
+  background:linear-gradient(145deg,#180832,#382078,#082451);
+  overflow:hidden;
+}
+
+.end-card{
+  position:relative;
+  z-index:2;
+  width:min(850px,96vw);
+  max-height:94vh;
+  overflow:auto;
+  background:rgba(16,7,40,.92);
+  border:4px solid #ffd85e;
+  border-radius:30px;
+  padding:clamp(18px,3vw,36px);
+  box-shadow:0 20px 50px rgba(0,0,0,.5);
+}
+
+.end-card h2{
+  margin:0 0 10px;
+  color:#ffe082;
+  font-size:clamp(34px,6vw,60px);
+}
+
+.book{
+  font-size:clamp(76px,15vw,130px);
+  margin:12px 0;
+  display:inline-block;
+  animation:bookOpen 1.4s ease-in-out infinite alternate;
+}
+
+@keyframes bookOpen{
+  from{transform:scale(.92) rotate(-3deg)}
+  to{transform:scale(1.06) rotate(3deg)}
+}
+
+.result-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+  margin:18px auto;
+  max-width:700px;
+}
+
+.result-box{
+  background:rgba(255,255,255,.12);
+  border:2px solid rgba(255,255,255,.25);
+  border-radius:20px;
+  padding:14px 8px;
+  font-size:clamp(16px,2.5vw,23px);
+  font-weight:900;
+}
+
+#remark{
+  font-size:clamp(21px,3vw,30px);
+  font-weight:900;
+  color:#fff1a8;
+  margin:10px 0 18px;
+}
+
+.confetti-piece{
+  position:absolute;
+  width:12px;
+  height:18px;
+  top:-20px;
+  opacity:.9;
+  animation:confettiFall 2.8s linear forwards;
+  z-index:30;
+}
+
+@keyframes confettiFall{
+  to{transform:translateY(110vh) rotate(720deg);opacity:1}
+}
+
+@media (max-width:780px){
+  .scoreboard{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .game-area{
+    grid-template-columns:1fr;
+    padding:8px;
+  }
+
+  .tower-panel{
+    min-height:auto;
+    height:154px;
+    border-radius:20px;
+  }
+
+  .tower{
+    min-height:132px;
+    height:132px;
+    flex-direction:row;
+    padding:18px 10px 10px;
+  }
+
+  .tower::before{
+    left:8px;
+    right:8px;
+    top:42%;
+    bottom:auto;
+    width:auto;
+    height:52px;
+    transform:none;
+    border-radius:22px;
+  }
+
+  .tower-top{
+    top:0;
+    left:auto;
+    right:12px;
+    transform:none;
+    font-size:30px;
+  }
+
+  .level{
+    width:auto;
+    min-width:28px;
+    height:58px;
+    min-height:58px;
+    flex-direction:column;
+    padding:3px;
+    font-size:10px;
+  }
+
+  .player{
+    left:10px;
+    bottom:78px;
+    transform:none;
+    font-size:28px;
+    transition:left .65s ease,bottom .65s ease;
+  }
+
+  .challenge-panel{
+    min-height:auto;
+  }
+
+  .scroll-stage{
+    min-height:calc(100vh - 350px);
+    padding:10px;
+  }
+
+  .options{
+    grid-template-columns:1fr;
+  }
+
+  .option-btn{
+    min-height:58px;
+  }
+
+  .result-grid{
+    grid-template-columns:1fr;
+  }
+}
+
+@media (max-width:420px){
+  .instruction-card,
+  .end-card{
+    border-radius:22px;
+    padding:16px 12px;
+  }
+
+  .score-pill{
+    min-height:42px;
+  }
+
+  .scroll-button{
+    min-height:180px;
+  }
+
+  .question-text{
+    font-size:18px;
+  }
+
+  .option-btn{
+    font-size:16px;
+    padding:10px;
+  }
+}
 </style>
 </head>
+
 <body>
 
-<div id="logoScreen">
-  <img src="assets/innovine-logo.png" alt="Innovine Logo" width="200">
+<div id="logoScreen" class="screen active">
+  <img src="assets/innovine-logo.png" alt="Innovine Logo">
 </div>
 
-<div id="gameContainer">
-<h2>🪄 Magic Scroll Adventure 🪄</h2>
-<div id="ladder"></div>
-<img id="player" src="assets/player.png" alt="Player">
-<div id="scroll">Click Scroll</div>
-
-<div id="questionBox">
-<div id="dropZone">Drag words here in order...</div>
-<div id="wordPool"></div>
-<button id="submitBtn">Submit</button>
-<div id="feedback"></div>
+<div id="instructionScreen" class="screen magic-bg">
+  <div class="instruction-card">
+    <h1>🪄 Magic Scroll Adventure</h1>
+    <p><strong>Welcome to Magic Scroll Adventure!</strong></p>
+    <p>The Ancient Library has lost its magical power.</p>
+    <p>Restore all ten enchanted scrolls. Each correct answer restores one scroll and gives you one Magic Crystal.</p>
+    <p>Climb the Magic Tower, reach the Ancient Spell Book, and become the <strong>Master Scroll Keeper</strong>.</p>
+    <div class="controls-row">
+      <button class="primary-btn" id="startBtn">Start Adventure</button>
+      <div class="volume-box">
+        🔊 Volume
+        <input id="volumeSlider" type="range" min="0" max="100" value="85">
+      </div>
+    </div>
+  </div>
 </div>
 
-<img id="treasure" src="assets/treasure.png" alt="Treasure">
-<button id="restartBtn">Restart Adventure</button>
-<input type="range" id="volumeSlider" min="0" max="1" step="0.1" value="0.8">
+<div id="gameScreen" class="screen magic-bg">
+  <div class="scoreboard">
+    <div class="score-pill" id="scoreText">⭐ Score: 0</div>
+    <div class="score-pill" id="crystalText">🔮 Crystals: 0</div>
+    <div class="score-pill" id="scrollText">📜 Scrolls: 0</div>
+    <div class="score-pill" id="questionText">Question: 1/10</div>
+    <div class="progress-wrap"><div id="progressBar"></div></div>
+  </div>
 
-<audio id="correctSound" src="assets/correct.mp3"></audio>
-<audio id="wrongSound" src="assets/wrong.mp3"></audio>
-<audio id="clapSound" src="assets/clapping.mp3"></audio>
+  <div class="game-area">
+    <div class="tower-panel">
+      <div class="tower" id="tower">
+        <div class="tower-top">📖</div>
+        <div class="player" id="player">🧙</div>
+      </div>
+    </div>
+
+    <div class="challenge-panel">
+      <div class="story-strip" id="storyStrip">Click the glowing scroll to reveal your grammar challenge.</div>
+      <div class="scroll-stage" id="scrollStage">
+        <button class="scroll-button" id="scrollBtn">
+          <span>📜</span>
+          Open Scroll
+        </button>
+
+        <div class="challenge-card" id="challengeCard">
+          <div class="challenge-type" id="challengeType"></div>
+          <div class="question-text" id="questionPrompt"></div>
+          <div class="options" id="optionsBox"></div>
+          <div class="feedback" id="feedbackBox"></div>
+          <button class="continue-btn" id="continueBtn">Continue Climbing ✨</button>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
+
+<div id="endScreen" class="screen magic-bg">
+  <div class="end-card">
+    <h2>🏆 Master Scroll Keeper</h2>
+    <div class="book">📖</div>
+    <div class="result-grid">
+      <div class="result-box" id="finalScore">⭐ Score: 0/10</div>
+      <div class="result-box" id="finalCrystals">🔮 Crystals: 0</div>
+      <div class="result-box" id="finalAccuracy">🎯 Accuracy: 0%</div>
+    </div>
+    <div id="remark">The Ancient Spell Book is open!</div>
+    <button class="primary-btn" id="playAgainBtn">Play Again</button>
+  </div>
+</div>
+
+<audio id="correctSound" src="assets/correct.mp3" preload="auto"></audio>
+<audio id="wrongSound" src="assets/wrong.mp3" preload="auto"></audio>
+<audio id="clapSound" src="assets/clapping.mp3" preload="auto"></audio>
 
 <script>
-// Simplified Direct → Indirect Speech questions
-const questions = [
-  {words:["Ravi","said","that","he","was","happy"], answer:"Ravi said that he was happy"},
-  {words:["Mother","told","us","not","to","touch","the","vase"], answer:"Mother told us not to touch the vase"},
-  {words:["Anna","said","that","they","would","meet","the","next","day"], answer:"Anna said that they would meet the next day"},
-  {words:["Ali","said","that","he","could","run","fast"], answer:"Ali said that he could run fast"},
-  {words:["The","teacher","asked","us","to","open","the","book","now"], answer:"The teacher asked us to open the book now"}
-];
+(function(){
+  "use strict";
 
-let currentQ = 0;
-const player = document.getElementById('player');
-const scroll = document.getElementById('scroll');
-const questionBox = document.getElementById('questionBox');
-const dropZone = document.getElementById('dropZone');
-const wordPool = document.getElementById('wordPool');
-const submitBtn = document.getElementById('submitBtn');
-const feedback = document.getElementById('feedback');
-const treasure = document.getElementById('treasure');
-const restartBtn = document.getElementById('restartBtn');
-const correctSound = document.getElementById('correctSound');
-const wrongSound = document.getElementById('wrongSound');
-const clapSound = document.getElementById('clapSound');
-const volumeSlider = document.getElementById('volumeSlider');
-
-volumeSlider.oninput = ()=>{
-  correctSound.volume = volumeSlider.value;
-  wrongSound.volume = volumeSlider.value;
-  clapSound.volume = volumeSlider.value;
-};
-correctSound.volume = volumeSlider.value;
-wrongSound.volume = volumeSlider.value;
-clapSound.volume = volumeSlider.value;
-
-// Logo splash
-setTimeout(()=>{
-  document.getElementById('logoScreen').style.display='none';
-  document.getElementById('gameContainer').style.display='block';
-},5000);
-
-// Scroll click
-scroll.addEventListener('click', ()=>{
-  showQuestion(currentQ);
-});
-
-// Show question
-function showQuestion(index){
-  questionBox.style.display='block';
-  dropZone.innerHTML="";
-  wordPool.innerHTML="";
-  feedback.innerHTML="";
-  let words = [...questions[index].words];
-  words.sort(()=>Math.random()-0.5); // shuffle
-  words.forEach(w=>{
-    let span = document.createElement('span');
-    span.className="word";
-    span.textContent=w;
-    span.draggable=true;
-    span.addEventListener('dragstart', dragStart);
-    wordPool.appendChild(span);
-  });
-}
-
-// Drag & Drop
-let dragged;
-function dragStart(e){ dragged=e.target; }
-dropZone.addEventListener('dragover', e=>e.preventDefault());
-dropZone.addEventListener('drop', e=>{
-  e.preventDefault();
-  dropZone.appendChild(dragged);
-});
-
-// Submit
-submitBtn.addEventListener('click', ()=>{
-  let formed = Array.from(dropZone.children).map(c=>c.textContent).join(" ");
-  if(formed===questions[currentQ].answer){
-    feedback.textContent="Correct! 🎉";
-    feedback.style.color="green";
-    correctSound.currentTime=0; correctSound.play();
-    questionBox.style.display='none';
-    currentQ++;
-    player.style.bottom=50+currentQ*60+"px";
-    if(currentQ<questions.length){
-      scroll.style.display='block';
-    }else{
-      endGame();
+  var allQuestions = [
+    {
+      type:"Identify Direct Speech",
+      q:"Which sentence is written in Direct Speech?",
+      options:[
+        "Riya said that she was tired.",
+        "Riya said, \"I am tired.\"",
+        "Riya was tired.",
+        "Riya had been tired."
+      ],
+      answer:"Riya said, \"I am tired.\"",
+      exp:"Direct speech shows the speaker's exact words inside quotation marks."
+    },
+    {
+      type:"Identify Indirect Speech",
+      q:"Which sentence is written in Indirect Speech?",
+      options:[
+        "\"I lost my bag,\" Aarav said.",
+        "\"We are ready,\" the players shouted.",
+        "Aarav said that he had lost his bag.",
+        "\"Please sit down,\" said the teacher."
+      ],
+      answer:"Aarav said that he had lost his bag.",
+      exp:"Indirect speech reports the speaker's words without quotation marks."
+    },
+    {
+      type:"Direct → Indirect",
+      q:"Maya said,\n\"I love reading books.\"\n\nChoose the correct indirect speech.",
+      options:[
+        "Maya said that she loved reading books.",
+        "Maya said she loves reading books.",
+        "Maya said, \"I love reading books.\"",
+        "Maya told reading books."
+      ],
+      answer:"Maya said that she loved reading books.",
+      exp:"In indirect speech, the tense changes from \"love\" to \"loved\" when appropriate."
+    },
+    {
+      type:"Indirect → Direct",
+      q:"Ravi said that he was hungry.\n\nChoose the correct direct speech.",
+      options:[
+        "Ravi said, \"I am hungry.\"",
+        "Ravi said he is hungry.",
+        "Ravi says, \"I was hungry.\"",
+        "Ravi was hungry."
+      ],
+      answer:"Ravi said, \"I am hungry.\"",
+      exp:"Direct speech uses the speaker's exact words in quotation marks."
+    },
+    {
+      type:"Reporting Verb",
+      q:"Mother ______ us to finish our homework.",
+      options:[
+        "asked",
+        "told",
+        "laughed",
+        "played"
+      ],
+      answer:"told",
+      exp:"\"Told\" is the correct reporting verb before an object."
+    },
+    {
+      type:"Correct Punctuation",
+      q:"Which sentence is punctuated correctly?",
+      options:[
+        "Rita said, \"Let's go home.\"",
+        "Rita said \"Let's go home\".",
+        "Rita said: Let's go home.",
+        "Rita said Lets go home."
+      ],
+      answer:"Rita said, \"Let's go home.\"",
+      exp:"Direct speech uses quotation marks and correct punctuation."
+    },
+    {
+      type:"Error Spotting",
+      q:"Which sentence is NOT correct?",
+      options:[
+        "\"I am ready,\" said Ravi.",
+        "Ravi said that he was ready.",
+        "Ravi said that I was ready.",
+        "\"I am ready,\" Ravi said."
+      ],
+      answer:"Ravi said that I was ready.",
+      exp:"The pronoun should change appropriately when reporting another person's speech."
+    },
+    {
+      type:"Conversation Based",
+      q:"Teacher:\n\"Please open your books.\"\n\nChoose the correct report.",
+      options:[
+        "The teacher told the students to open their books.",
+        "The teacher said open your books.",
+        "The teacher asked books.",
+        "The teacher told open books."
+      ],
+      answer:"The teacher told the students to open their books.",
+      exp:"Commands are commonly reported using \"told\" followed by an object and an infinitive."
+    },
+    {
+      type:"Fill in the Blank",
+      q:"\"I will help you,\"\nNeha said.\n\nNeha said that she ______ help me.",
+      options:[
+        "would",
+        "will",
+        "can",
+        "is"
+      ],
+      answer:"would",
+      exp:"\"Will\" usually changes to \"would\" in indirect speech."
+    },
+    {
+      type:"Mixed Final Challenge",
+      q:"Leo said,\n\"I can swim.\"\n\nChoose the correct indirect speech.",
+      options:[
+        "Leo said that he could swim.",
+        "Leo said he can swim.",
+        "Leo says he could swim.",
+        "Leo told he could swim."
+      ],
+      answer:"Leo said that he could swim.",
+      exp:"\"Can\" usually changes to \"could\" in indirect speech."
     }
-  }else{
-    feedback.textContent="Try again!";
-    feedback.style.color="red";
-    wrongSound.currentTime=0; wrongSound.play();
+  ];
+
+  var logoScreen = document.getElementById("logoScreen");
+  var instructionScreen = document.getElementById("instructionScreen");
+  var gameScreen = document.getElementById("gameScreen");
+  var endScreen = document.getElementById("endScreen");
+
+  var startBtn = document.getElementById("startBtn");
+  var playAgainBtn = document.getElementById("playAgainBtn");
+  var volumeSlider = document.getElementById("volumeSlider");
+
+  var scoreText = document.getElementById("scoreText");
+  var crystalText = document.getElementById("crystalText");
+  var scrollText = document.getElementById("scrollText");
+  var questionText = document.getElementById("questionText");
+  var progressBar = document.getElementById("progressBar");
+
+  var tower = document.getElementById("tower");
+  var player = document.getElementById("player");
+  var storyStrip = document.getElementById("storyStrip");
+  var scrollBtn = document.getElementById("scrollBtn");
+  var challengeCard = document.getElementById("challengeCard");
+  var challengeType = document.getElementById("challengeType");
+  var questionPrompt = document.getElementById("questionPrompt");
+  var optionsBox = document.getElementById("optionsBox");
+  var feedbackBox = document.getElementById("feedbackBox");
+  var continueBtn = document.getElementById("continueBtn");
+  var scrollStage = document.getElementById("scrollStage");
+
+  var finalScore = document.getElementById("finalScore");
+  var finalCrystals = document.getElementById("finalCrystals");
+  var finalAccuracy = document.getElementById("finalAccuracy");
+  var remark = document.getElementById("remark");
+
+  var correctSound = document.getElementById("correctSound");
+  var wrongSound = document.getElementById("wrongSound");
+  var clapSound = document.getElementById("clapSound");
+
+  var questions = [];
+  var currentIndex = 0;
+  var score = 0;
+  var crystals = 0;
+  var restoredScrolls = 0;
+  var attempts = 0;
+  var answered = false;
+  var waitingToContinue = false;
+
+  function showScreen(screen){
+    logoScreen.classList.remove("active");
+    instructionScreen.classList.remove("active");
+    gameScreen.classList.remove("active");
+    endScreen.classList.remove("active");
+    screen.classList.add("active");
   }
-});
 
-// End Game
-function endGame(){
-  treasure.style.display='block';
-  clapSound.currentTime=0; clapSound.play();
-  restartBtn.style.display='block';
-}
+  function shuffle(arr){
+    var copy = arr.slice();
+    for(var i=copy.length-1;i>0;i--){
+      var j = Math.floor(Math.random()*(i+1));
+      var temp = copy[i];
+      copy[i] = copy[j];
+      copy[j] = temp;
+    }
+    return copy;
+  }
 
-// Restart
-restartBtn.addEventListener('click', ()=>{
-  currentQ=0;
-  treasure.style.display='none';
-  restartBtn.style.display='none';
-  player.style.bottom="50px";
-  scroll.style.display='block';
-});
+  function setVolume(){
+    var v = Number(volumeSlider.value) / 100;
+    correctSound.volume = v;
+    wrongSound.volume = v;
+    clapSound.volume = v;
+  }
+
+  function playSound(audio){
+    try{
+      audio.pause();
+      audio.currentTime = 0;
+      var p = audio.play();
+      if(p && typeof p.catch === "function"){
+        p.catch(function(){});
+      }
+    }catch(e){}
+  }
+
+  function playCorrectSounds(){
+    playSound(correctSound);
+    setTimeout(function(){
+      playSound(clapSound);
+    },220);
+  }
+
+  function buildTower(){
+    var oldLevels = tower.querySelectorAll(".level");
+    for(var i=0;i<oldLevels.length;i++){
+      oldLevels[i].parentNode.removeChild(oldLevels[i]);
+    }
+
+    for(var level=1;level<=10;level++){
+      var div = document.createElement("div");
+      div.className = "level";
+      div.setAttribute("data-level",level);
+      div.innerHTML = "<span>L" + level + "</span><span>📜</span>";
+      tower.appendChild(div);
+    }
+  }
+
+  function updateTower(){
+    var levels = tower.querySelectorAll(".level");
+
+    for(var i=0;i<levels.length;i++){
+      var levelNum = Number(levels[i].getAttribute("data-level"));
+      levels[i].classList.remove("done");
+      levels[i].classList.remove("current");
+
+      if(levelNum <= restoredScrolls){
+        levels[i].classList.add("done");
+        levels[i].innerHTML = "<span>L" + levelNum + "</span><span>🔮</span>";
+      }else{
+        levels[i].innerHTML = "<span>L" + levelNum + "</span><span>📜</span>";
+      }
+
+      if(levelNum === restoredScrolls + 1 && restoredScrolls < 10){
+        levels[i].classList.add("current");
+      }
+    }
+
+    if(window.matchMedia("(max-width:780px)").matches){
+      var leftPos = 10 + (restoredScrolls * ((tower.clientWidth - 44) / 10));
+      player.style.left = leftPos + "px";
+      player.style.bottom = "78px";
+    }else{
+      var usable = Math.max(420,tower.clientHeight - 90);
+      var bottomPos = 18 + (restoredScrolls * (usable / 10));
+      player.style.bottom = bottomPos + "px";
+      player.style.left = "50%";
+    }
+  }
+
+  function updateScoreboard(){
+    scoreText.textContent = "⭐ Score: " + score;
+    crystalText.textContent = "🔮 Crystals: " + crystals;
+    scrollText.textContent = "📜 Scrolls: " + restoredScrolls;
+    var qNum = Math.min(currentIndex + 1, questions.length);
+    questionText.textContent = "Question: " + qNum + "/" + questions.length;
+    progressBar.style.width = ((currentIndex / questions.length) * 100) + "%";
+  }
+
+  function startGame(){
+    questions = shuffle(allQuestions).map(function(item){
+      return {
+        type:item.type,
+        q:item.q,
+        options:shuffle(item.options),
+        answer:item.answer,
+        exp:item.exp
+      };
+    });
+
+    currentIndex = 0;
+    score = 0;
+    crystals = 0;
+    restoredScrolls = 0;
+    attempts = 0;
+    answered = false;
+    waitingToContinue = false;
+
+    buildTower();
+    showScreen(gameScreen);
+    updateScoreboard();
+    updateTower();
+    showScrollButton();
+  }
+
+  function showScrollButton(){
+    challengeCard.classList.remove("open");
+    challengeCard.style.display = "none";
+    feedbackBox.className = "feedback";
+    feedbackBox.textContent = "";
+    continueBtn.className = "continue-btn";
+    scrollBtn.style.display = "flex";
+    scrollBtn.disabled = false;
+    storyStrip.textContent = "Click the glowing scroll to reveal your grammar challenge.";
+  }
+
+  function openScroll(){
+    if(currentIndex >= questions.length || waitingToContinue){
+      return;
+    }
+
+    attempts = 0;
+    answered = false;
+    scrollBtn.style.display = "none";
+    renderQuestion();
+  }
+
+  function renderQuestion(){
+    var q = questions[currentIndex];
+
+    challengeType.textContent = q.type;
+    questionPrompt.textContent = q.q;
+    optionsBox.innerHTML = "";
+    feedbackBox.className = "feedback";
+    feedbackBox.textContent = "";
+    continueBtn.className = "continue-btn";
+
+    challengeCard.style.display = "block";
+    challengeCard.classList.remove("open");
+    void challengeCard.offsetWidth;
+    challengeCard.classList.add("open");
+
+    storyStrip.textContent = "Level " + (currentIndex + 1) + ": Answer the scroll challenge.";
+
+    for(var i=0;i<q.options.length;i++){
+      var btn = document.createElement("button");
+      btn.className = "option-btn";
+      btn.textContent = String.fromCharCode(65+i) + ". " + q.options[i];
+      btn.setAttribute("data-answer",q.options[i]);
+      btn.onclick = handleAnswer;
+      optionsBox.appendChild(btn);
+    }
+  }
+
+  function handleAnswer(e){
+    if(answered || waitingToContinue){
+      return;
+    }
+
+    var selected = e.currentTarget;
+    var value = selected.getAttribute("data-answer");
+    var q = questions[currentIndex];
+
+    if(value === q.answer){
+      answered = true;
+      score++;
+      crystals++;
+      restoredScrolls++;
+
+      selected.classList.add("correct");
+      disableOptions();
+
+      feedbackBox.className = "feedback show";
+      feedbackBox.innerHTML = "✅ Correct! The magical scroll is restored.";
+      storyStrip.textContent = "Wonderful! A Magic Crystal has been collected.";
+
+      playCorrectSounds();
+      sparkleBurst();
+      crystalAnimation();
+
+      updateScoreboard();
+      updateTower();
+
+      waitingToContinue = true;
+      setTimeout(function(){
+        continueBtn.className = "continue-btn show";
+      },900);
+
+    }else{
+      attempts++;
+      selected.classList.add("wrong");
+      playSound(wrongSound);
+
+      feedbackBox.className = "feedback show";
+
+      if(attempts < 2){
+        feedbackBox.innerHTML = "❌ Not yet. Try once more!";
+        setTimeout(function(){
+          selected.classList.remove("wrong");
+        },520);
+      }else{
+        answered = true;
+        disableOptions();
+        revealCorrect();
+
+        feedbackBox.innerHTML = "📌 Correct answer: <strong>" + q.answer + "</strong><br>" + q.exp;
+        storyStrip.textContent = "The scroll shows the answer. Continue to the next challenge.";
+
+        restoredScrolls++;
+        updateScoreboard();
+        updateTower();
+
+        waitingToContinue = true;
+        setTimeout(function(){
+          continueBtn.className = "continue-btn show";
+        },900);
+      }
+    }
+  }
+
+  function disableOptions(){
+    var buttons = optionsBox.querySelectorAll("button");
+    for(var i=0;i<buttons.length;i++){
+      buttons[i].disabled = true;
+    }
+  }
+
+  function revealCorrect(){
+    var q = questions[currentIndex];
+    var buttons = optionsBox.querySelectorAll("button");
+
+    for(var i=0;i<buttons.length;i++){
+      if(buttons[i].getAttribute("data-answer") === q.answer){
+        buttons[i].classList.add("correct");
+      }
+    }
+  }
+
+  function continueGame(){
+    if(!waitingToContinue){
+      return;
+    }
+
+    currentIndex++;
+    waitingToContinue = false;
+    progressBar.style.width = ((currentIndex / questions.length) * 100) + "%";
+
+    if(currentIndex >= questions.length){
+      setTimeout(endGame,450);
+    }else{
+      updateScoreboard();
+      showScrollButton();
+    }
+  }
+
+  function sparkleBurst(){
+    var holder = document.createElement("div");
+    holder.className = "sparkle-burst";
+    scrollStage.appendChild(holder);
+
+    for(var i=0;i<28;i++){
+      var sp = document.createElement("div");
+      sp.className = "spark";
+      sp.textContent = i%3===0 ? "✨" : (i%3===1 ? "⭐" : "💫");
+      sp.style.left = (45 + Math.random()*10) + "%";
+      sp.style.top = (45 + Math.random()*10) + "%";
+      sp.style.setProperty("--dx",((Math.random()*420)-210) + "px");
+      sp.style.setProperty("--dy",((Math.random()*320)-190) + "px");
+      holder.appendChild(sp);
+    }
+
+    setTimeout(function(){
+      if(holder.parentNode){
+        holder.parentNode.removeChild(holder);
+      }
+    },1000);
+  }
+
+  function crystalAnimation(){
+    var c = document.createElement("div");
+    c.className = "crystal-float";
+    c.textContent = "🔮";
+    scrollStage.appendChild(c);
+
+    setTimeout(function(){
+      if(c.parentNode){
+        c.parentNode.removeChild(c);
+      }
+    },1050);
+  }
+
+  function endGame(){
+    showScreen(endScreen);
+
+    var accuracy = Math.round((score / allQuestions.length) * 100);
+
+    finalScore.textContent = "⭐ Score: " + score + "/" + allQuestions.length;
+    finalCrystals.textContent = "🔮 Crystals: " + crystals;
+    finalAccuracy.textContent = "🎯 Accuracy: " + accuracy + "%";
+
+    if(accuracy >= 80){
+      remark.textContent = "Excellent! You unlocked the Ancient Spell Book!";
+    }else if(accuracy >= 60){
+      remark.textContent = "Good job! Your scroll magic is growing strong!";
+    }else if(accuracy >= 45){
+      remark.textContent = "Well tried! Practise more and climb again!";
+    }else{
+      remark.textContent = "Let’s revise and come back stronger!";
+    }
+
+    makeConfetti();
+  }
+
+  function makeConfetti(){
+    var colors = ["#ffd85e","#7df9ff","#ff9bea","#ffffff","#9cffb5"];
+
+    for(var i=0;i<90;i++){
+      var piece = document.createElement("div");
+      piece.className = "confetti-piece";
+      piece.style.left = Math.random()*100 + "vw";
+      piece.style.background = colors[Math.floor(Math.random()*colors.length)];
+      piece.style.animationDelay = (Math.random()*1.2) + "s";
+      document.body.appendChild(piece);
+
+      (function(el){
+        setTimeout(function(){
+          if(el.parentNode){
+            el.parentNode.removeChild(el);
+          }
+        },4300);
+      })(piece);
+    }
+  }
+
+  volumeSlider.addEventListener("input",setVolume);
+
+  startBtn.addEventListener("click",function(){
+    setVolume();
+    startGame();
+  });
+
+  playAgainBtn.addEventListener("click",startGame);
+  scrollBtn.addEventListener("click",openScroll);
+  continueBtn.addEventListener("click",continueGame);
+
+  window.addEventListener("resize",function(){
+    if(gameScreen.classList.contains("active")){
+      updateTower();
+    }
+  });
+
+  setVolume();
+
+  setTimeout(function(){
+    showScreen(instructionScreen);
+  },5000);
+
+})();
 </script>
+
 </body>
 </html>
