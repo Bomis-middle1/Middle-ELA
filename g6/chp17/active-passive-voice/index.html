@@ -1,24 +1,84 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Treasure Island Grammar Quest</title>
 
 <style>
-body{
-margin:0;
-font-family:Arial;
-background:linear-gradient(120deg,#0077be,#00c6ff,#ffd166);
-background-size:300% 300%;
-animation:bg 8s infinite alternate;
-overflow-x:hidden;
+*{
+box-sizing:border-box;
 }
 
-@keyframes bg{
-0%{background-position:0% 50%;}
-100%{background-position:100% 50%;}
+html,body{
+margin:0;
+padding:0;
+width:100%;
+min-height:100%;
+font-family:Arial, Helvetica, sans-serif;
+overflow-x:hidden;
+background:#74d9ff;
+color:#1b2b3a;
+}
+
+body{
+background:
+radial-gradient(circle at 15% 15%, rgba(255,255,255,0.85) 0 6%, transparent 7%),
+radial-gradient(circle at 82% 12%, rgba(255,255,255,0.75) 0 5%, transparent 6%),
+linear-gradient(180deg,#7fe3ff 0%,#b7f4ff 38%,#ffe08a 39%,#ffcf76 55%,#20b486 56%,#0d8b72 100%);
+background-size:100% 100%;
+min-height:100vh;
+}
+
+body::before{
+content:"";
+position:fixed;
+left:0;
+right:0;
+bottom:0;
+height:26vh;
+background:
+repeating-radial-gradient(ellipse at center, rgba(255,255,255,0.35) 0 3px, transparent 4px 14px),
+linear-gradient(90deg,#0077be,#00b4d8,#48cae4,#0077be);
+background-size:90px 24px, 300% 100%;
+animation:oceanMove 8s linear infinite;
+z-index:-2;
+}
+
+body::after{
+content:"☁️        ☁️          ☁️";
+position:fixed;
+top:18px;
+left:-20%;
+font-size:42px;
+opacity:0.75;
+white-space:nowrap;
+animation:cloudDrift 28s linear infinite;
+z-index:-1;
+}
+
+@keyframes oceanMove{
+0%{background-position:0 0,0% 50%;}
+100%{background-position:90px 0,100% 50%;}
+}
+
+@keyframes cloudDrift{
+0%{transform:translateX(0);}
+100%{transform:translateX(140vw);}
+}
+
+/* SCREENS */
+.screen{
+min-height:100vh;
+width:100%;
+display:none;
+align-items:center;
+justify-content:center;
+padding:16px;
+}
+
+.screen.active{
+display:flex;
 }
 
 /* SPLASH */
@@ -26,146 +86,672 @@ overflow-x:hidden;
 position:fixed;
 inset:0;
 background:white;
-display:flex;
-flex-direction:column;
-justify-content:center;
-align-items:center;
 z-index:9999;
+display:flex;
+align-items:center;
+justify-content:center;
 }
 
-#splash img{width:180px;}
-
-/* MAIN CARD */
-.container{
-max-width:850px;
-margin:auto;
-padding:15px;
+#splash img{
+width:260px;
+max-width:82vw;
+height:auto;
 }
 
-.card{
-background:white;
-padding:20px;
-border-radius:15px;
-box-shadow:0 10px 25px rgba(0,0,0,0.2);
-margin-top:20px;
+/* INSTRUCTIONS */
+.instructions-card{
+width:min(880px,96vw);
+background:rgba(255,255,255,0.96);
+border-radius:28px;
+box-shadow:0 16px 40px rgba(0,0,0,0.25);
+padding:26px;
+border:5px solid #ffcc4d;
+text-align:center;
 }
 
-/* BUTTONS */
-button{
-width:100%;
-padding:12px;
-margin:8px 0;
+.instructions-card h1{
+margin:0 0 8px;
+font-size:clamp(28px,5vw,46px);
+color:#075985;
+}
+
+.instructions-card h2{
+margin:6px 0 18px;
+font-size:clamp(18px,3vw,26px);
+color:#0f766e;
+}
+
+.instructions-grid{
+display:grid;
+grid-template-columns:repeat(2,minmax(0,1fr));
+gap:14px;
+margin:20px 0;
+}
+
+.info-box{
+background:#e0f7ff;
+border:3px solid #74d9ff;
+border-radius:18px;
+padding:14px;
+font-size:clamp(15px,2.3vw,19px);
+line-height:1.45;
+font-weight:bold;
+}
+
+.start-btn,.play-again-btn{
 border:none;
-border-radius:12px;
-font-size:16px;
-cursor:pointer;
-transition:0.3s;
-background:#e8f6ff;
-}
-
-button:hover{
-background:#cdefff;
-transform:scale(1.02);
-}
-
-.correct{
-background:#b7f7c1 !important;
-animation:pop 0.4s;
-}
-
-.wrong{
-background:#ffb3b3 !important;
-animation:shake 0.3s;
-}
-
-@keyframes pop{50%{transform:scale(1.1);}}
-
-@keyframes shake{
-0%{transform:translateX(0);}
-25%{transform:translateX(-5px);}
-50%{transform:translateX(5px);}
-75%{transform:translateX(-5px);}
-100%{transform:translateX(0);}
-}
-
-/* PROGRESS BAR */
-#bar{
-height:12px;
-background:#eee;
 border-radius:20px;
-overflow:hidden;
-margin:10px 0;
+background:linear-gradient(135deg,#ffb703,#fb8500);
+color:#fff;
+font-weight:900;
+font-size:clamp(20px,3vw,28px);
+padding:16px 28px;
+cursor:pointer;
+box-shadow:0 8px 0 #c45d00, 0 14px 24px rgba(0,0,0,0.25);
+transition:transform 0.15s, box-shadow 0.15s;
+width:min(420px,90%);
 }
 
-#fill{
+.start-btn:active,.play-again-btn:active{
+transform:translateY(5px);
+box-shadow:0 3px 0 #c45d00, 0 7px 16px rgba(0,0,0,0.2);
+}
+
+/* GAME */
+#game{
+align-items:flex-start;
+padding:10px;
+}
+
+.game-shell{
+width:min(1100px,100%);
+margin:0 auto;
+}
+
+.top-title{
+background:rgba(255,255,255,0.94);
+border-radius:20px;
+padding:10px 14px;
+display:flex;
+align-items:center;
+justify-content:space-between;
+gap:10px;
+box-shadow:0 8px 22px rgba(0,0,0,0.18);
+margin-bottom:10px;
+}
+
+.top-title h1{
+margin:0;
+font-size:clamp(19px,3.2vw,34px);
+color:#075985;
+}
+
+.volume-box{
+display:flex;
+align-items:center;
+gap:8px;
+font-weight:bold;
+font-size:15px;
+background:#fff7cc;
+border-radius:14px;
+padding:8px 10px;
+white-space:nowrap;
+}
+
+#vol{
+width:120px;
+accent-color:#fb8500;
+}
+
+/* SCOREBOARD */
+.scoreboard{
+display:grid;
+grid-template-columns:repeat(5,1fr);
+gap:8px;
+margin-bottom:10px;
+}
+
+.stat{
+background:rgba(255,255,255,0.94);
+border-radius:16px;
+padding:10px 8px;
+text-align:center;
+font-weight:900;
+box-shadow:0 6px 16px rgba(0,0,0,0.16);
+font-size:clamp(13px,2vw,18px);
+border:2px solid rgba(255,255,255,0.9);
+}
+
+.progress-wrap{
+background:rgba(255,255,255,0.9);
+border-radius:18px;
+height:17px;
+overflow:hidden;
+margin-bottom:10px;
+border:2px solid white;
+}
+
+#progressFill{
 height:100%;
 width:0%;
-background:linear-gradient(90deg,#ffd166,#ff9f1c);
-transition:0.4s;
+background:linear-gradient(90deg,#ffd166,#fb8500,#2dd4bf);
+transition:width 0.5s ease;
 }
 
-/* COINS */
-.coin{
+/* MAP */
+.map-card{
+background:rgba(255,255,255,0.92);
+border-radius:24px;
+padding:14px 10px 18px;
+box-shadow:0 8px 22px rgba(0,0,0,0.18);
+position:relative;
+overflow:hidden;
+margin-bottom:10px;
+}
+
+.map-title{
+font-weight:900;
+color:#075985;
+font-size:clamp(16px,2.5vw,22px);
+margin-bottom:8px;
+text-align:center;
+}
+
+.map-track{
+position:relative;
+display:flex;
+align-items:center;
+justify-content:space-between;
+gap:4px;
+min-height:84px;
+padding:0 8px;
+}
+
+.map-track::before{
+content:"";
+position:absolute;
+left:5%;
+right:5%;
+top:52%;
+height:8px;
+border-radius:20px;
+background:repeating-linear-gradient(90deg,#8b5e34 0 18px,#d4a373 18px 34px);
+z-index:0;
+}
+
+.location{
+position:relative;
+z-index:1;
+width:9.5%;
+min-width:42px;
+text-align:center;
+font-size:clamp(24px,4vw,38px);
+filter:drop-shadow(0 3px 2px rgba(0,0,0,0.2));
+}
+
+.location.reached{
+animation:bounceLoc 0.5s ease;
+}
+
+@keyframes bounceLoc{
+50%{transform:translateY(-10px) scale(1.18);}
+}
+
+#explorer{
+position:absolute;
+z-index:5;
+top:6px;
+left:0;
+font-size:clamp(30px,5vw,48px);
+transition:left 0.85s ease-in-out, transform 0.25s;
+filter:drop-shadow(0 4px 3px rgba(0,0,0,0.28));
+}
+
+#explorer.walking{
+animation:walkBob 0.45s infinite alternate;
+}
+
+@keyframes walkBob{
+0%{transform:translateY(0) rotate(-4deg);}
+100%{transform:translateY(-8px) rotate(4deg);}
+}
+
+/* QUESTION CARD */
+.challenge-card{
+background:rgba(255,255,255,0.97);
+border-radius:26px;
+padding:18px;
+box-shadow:0 12px 30px rgba(0,0,0,0.25);
+border:4px solid #facc15;
+position:relative;
+overflow:hidden;
+}
+
+.challenge-card::before{
+content:"🌴";
+position:absolute;
+right:12px;
+top:4px;
+font-size:44px;
+opacity:0.32;
+}
+
+.location-name{
+font-size:clamp(17px,2.4vw,23px);
+font-weight:900;
+color:#0f766e;
+margin-bottom:8px;
+}
+
+#questionText{
+font-size:clamp(19px,2.8vw,28px);
+line-height:1.35;
+margin:10px 0 14px;
+font-weight:900;
+color:#263238;
+}
+
+#feedback{
+min-height:34px;
+font-size:clamp(18px,2.5vw,25px);
+font-weight:900;
+text-align:center;
+color:#0f766e;
+margin:6px 0;
+}
+
+.options{
+display:grid;
+grid-template-columns:repeat(2,minmax(0,1fr));
+gap:12px;
+}
+
+.option-btn{
+width:100%;
+min-height:62px;
+border:none;
+border-radius:18px;
+background:#e0f7ff;
+border:3px solid #7dd3fc;
+font-size:clamp(16px,2.3vw,22px);
+font-weight:800;
+color:#14313f;
+padding:12px;
+cursor:pointer;
+transition:transform 0.16s, background 0.2s, box-shadow 0.2s;
+touch-action:manipulation;
+}
+
+.option-btn:hover:not(:disabled){
+transform:scale(1.02);
+background:#ccfbf1;
+box-shadow:0 6px 14px rgba(0,0,0,0.18);
+}
+
+.option-btn:disabled{
+cursor:not-allowed;
+opacity:0.9;
+}
+
+.option-btn.correct{
+background:#bbf7d0 !important;
+border-color:#22c55e !important;
+box-shadow:0 0 22px rgba(34,197,94,0.85);
+animation:greenGlow 0.75s ease;
+}
+
+.option-btn.wrong{
+background:#fecaca !important;
+border-color:#ef4444 !important;
+animation:redShake 0.42s ease;
+}
+
+.option-btn.reveal{
+background:#bbf7d0 !important;
+border-color:#16a34a !important;
+box-shadow:0 0 18px rgba(22,163,74,0.75);
+}
+
+@keyframes greenGlow{
+0%{transform:scale(1);}
+50%{transform:scale(1.05);}
+100%{transform:scale(1);}
+}
+
+@keyframes redShake{
+0%,100%{transform:translateX(0);}
+20%{transform:translateX(-8px);}
+40%{transform:translateX(8px);}
+60%{transform:translateX(-6px);}
+80%{transform:translateX(6px);}
+}
+
+/* FLOATING ANIMATIONS */
+.float-item{
 position:fixed;
-font-size:24px;
-animation:float 2.8s linear forwards;
+z-index:5000;
+pointer-events:none;
+font-size:32px;
+animation:floatUp 1.3s ease-out forwards;
 }
 
-@keyframes float{
-0%{transform:translateY(0);}
-100%{transform:translateY(-220px);opacity:0;}
+@keyframes floatUp{
+0%{transform:translateY(0) scale(0.7);opacity:1;}
+60%{transform:translateY(-75px) scale(1.25);opacity:1;}
+100%{transform:translateY(-130px) scale(0.9);opacity:0;}
+}
+
+.splash-drop{
+position:fixed;
+z-index:5000;
+pointer-events:none;
+font-size:30px;
+animation:splashPop 0.85s ease-out forwards;
+}
+
+@keyframes splashPop{
+0%{transform:scale(0.4);opacity:0;}
+30%{transform:scale(1.25);opacity:1;}
+100%{transform:scale(0.7) translateY(45px);opacity:0;}
+}
+
+/* END */
+.end-card{
+width:min(900px,96vw);
+background:rgba(255,255,255,0.97);
+border-radius:30px;
+padding:24px;
+text-align:center;
+box-shadow:0 18px 42px rgba(0,0,0,0.28);
+border:5px solid #facc15;
+overflow:hidden;
+position:relative;
+}
+
+.end-card h1{
+font-size:clamp(34px,6vw,58px);
+margin:6px 0;
+color:#075985;
+}
+
+.chest{
+font-size:clamp(70px,14vw,140px);
+margin:10px 0;
+animation:chestOpen 1.2s ease-in-out infinite alternate;
+filter:drop-shadow(0 8px 5px rgba(0,0,0,0.28));
+}
+
+@keyframes chestOpen{
+0%{transform:scale(1) rotate(-2deg);}
+100%{transform:scale(1.08) rotate(2deg);}
+}
+
+.gems{
+font-size:clamp(32px,6vw,70px);
+animation:sparkle 0.9s infinite alternate;
+}
+
+@keyframes sparkle{
+0%{transform:scale(1);opacity:0.8;}
+100%{transform:scale(1.08);opacity:1;}
+}
+
+.end-stats{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:12px;
+margin:18px 0;
+}
+
+.end-stat{
+background:#e0f7ff;
+border-radius:18px;
+padding:16px 10px;
+font-size:clamp(17px,2.5vw,25px);
+font-weight:900;
+border:3px solid #7dd3fc;
+}
+
+.confetti-piece{
+position:fixed;
+z-index:6000;
+pointer-events:none;
+font-size:24px;
+animation:confettiFall 2.8s linear forwards;
+}
+
+@keyframes confettiFall{
+0%{transform:translateY(-10vh) rotate(0deg);opacity:1;}
+100%{transform:translateY(110vh) rotate(720deg);opacity:0;}
+}
+
+.hidden{
+display:none !important;
+}
+
+@media(max-width:760px){
+.screen{
+padding:10px;
+}
+
+.instructions-card{
+padding:18px;
+}
+
+.instructions-grid{
+grid-template-columns:1fr;
+gap:10px;
+}
+
+.top-title{
+flex-direction:column;
+align-items:stretch;
+text-align:center;
+}
+
+.volume-box{
+justify-content:center;
+}
+
+.scoreboard{
+grid-template-columns:repeat(2,1fr);
+}
+
+.stat:last-child{
+grid-column:1 / -1;
+}
+
+.map-track{
+min-height:76px;
+padding:0 2px;
+}
+
+.location{
+min-width:30px;
+font-size:25px;
+}
+
+#explorer{
+font-size:34px;
+top:9px;
+}
+
+.options{
+grid-template-columns:1fr;
+gap:9px;
+}
+
+.option-btn{
+min-height:56px;
+font-size:16px;
+padding:10px;
+}
+
+.challenge-card{
+padding:14px;
+}
+
+.end-stats{
+grid-template-columns:1fr;
+}
+}
+
+@media(max-height:620px) and (orientation:landscape){
+.screen{
+padding:8px;
+}
+
+.top-title{
+margin-bottom:6px;
+padding:7px 10px;
+}
+
+.scoreboard{
+grid-template-columns:repeat(5,1fr);
+gap:5px;
+margin-bottom:6px;
+}
+
+.stat{
+padding:6px 4px;
+font-size:13px;
+}
+
+.progress-wrap{
+height:12px;
+margin-bottom:6px;
+}
+
+.map-card{
+padding:7px 8px 10px;
+margin-bottom:6px;
+}
+
+.map-title{
+font-size:14px;
+margin-bottom:2px;
+}
+
+.map-track{
+min-height:54px;
+}
+
+.location{
+font-size:24px;
+}
+
+#explorer{
+font-size:29px;
+top:2px;
+}
+
+.challenge-card{
+padding:10px;
+}
+
+#questionText{
+font-size:18px;
+margin:5px 0 8px;
+}
+
+.option-btn{
+min-height:42px;
+font-size:14px;
+padding:7px;
+}
+
+#feedback{
+font-size:16px;
+min-height:24px;
+margin:2px 0;
+}
 }
 </style>
 </head>
 
 <body>
 
-<!-- SPLASH -->
 <div id="splash">
-<img src="assets/innovine-logo.png">
-<h2>Treasure Island Quest</h2>
-<p>Active & Passive Voice</p>
+<img src="assets/innovine-logo.png" alt="Innovine Logo">
 </div>
 
-<div class="container">
+<section id="instructions" class="screen">
+<div class="instructions-card">
+<h1>🏝️ Treasure Island Grammar Quest</h1>
+<h2>Active & Passive Voice Adventure</h2>
 
-<div class="card">
+<div class="instructions-grid">
+<div class="info-box">🎯 Goal: Help the young explorer travel across 10 island locations and reach the hidden treasure.</div>
+<div class="info-box">🧭 How to Play: Read each grammar challenge and tap the correct answer.</div>
+<div class="info-box">🔑 Scoring: Each correct answer gives you 1 key and moves the explorer forward.</div>
+<div class="info-box">💎 Treasure: Complete all 10 challenges to unlock the treasure chest.</div>
+</div>
 
-<h2>🏝️ Grammar Quest</h2>
+<button class="start-btn" id="startBtn">Start Adventure</button>
+</div>
+</section>
 
-<label>Volume:
+<section id="game" class="screen">
+<div class="game-shell">
+
+<div class="top-title">
+<h1>🏝️ Treasure Island Grammar Quest</h1>
+<label class="volume-box">🔊 Volume
 <input type="range" id="vol" min="0" max="1" step="0.1" value="1">
 </label>
-
-<p>Score: <span id="score">0</span>/10</p>
-
-<div id="bar"><div id="fill"></div></div>
-
-<h3 id="q"></h3>
-<div id="options"></div>
-
 </div>
 
-<div id="end" class="card" style="display:none">
-<h2>🎉 Treasure Master!</h2>
-<p id="result"></p>
-<button onclick="location.reload()">Play Again</button>
+<div class="scoreboard">
+<div class="stat">⭐ Score: <span id="score">0</span>/10</div>
+<div class="stat">🔑 Keys: <span id="keys">0</span></div>
+<div class="stat">📍 Location: <span id="locationNow">1</span>/10</div>
+<div class="stat">❓ Question: <span id="questionNo">1</span>/10</div>
+<div class="stat">🎯 Attempts Left: <span id="attemptsLeft">2</span></div>
+</div>
+
+<div class="progress-wrap">
+<div id="progressFill"></div>
+</div>
+
+<div class="map-card">
+<div class="map-title">Island Map Progress</div>
+<div class="map-track" id="mapTrack">
+<div id="explorer">🧭</div>
+</div>
+</div>
+
+<div class="challenge-card">
+<div class="location-name" id="locationName">🏖️ Sunny Beach</div>
+<h2 id="questionText"></h2>
+<div id="feedback"></div>
+<div id="options" class="options"></div>
 </div>
 
 </div>
+</section>
 
-<audio id="correctSound" src="assets/correct.mp3"></audio>
-<audio id="wrongSound" src="assets/wrong.mp3"></audio>
-<audio id="clapSound" src="assets/clapping.mp3"></audio>
+<section id="end" class="screen">
+<div class="end-card">
+<h1>🏆 Treasure Master!</h1>
+<div class="chest">🪙🎁🪙</div>
+<div class="gems">💎💎💎 ⭐ 🪙 ⭐ 💎💎💎</div>
+
+<div class="end-stats">
+<div class="end-stat">⭐ Final Score<br><span id="finalScore">0/10</span></div>
+<div class="end-stat">🔑 Keys Collected<br><span id="finalKeys">0</span></div>
+<div class="end-stat">🎯 Accuracy<br><span id="accuracy">0%</span></div>
+</div>
+
+<button class="play-again-btn" id="playAgainBtn">Play Again</button>
+</div>
+</section>
+
+<audio id="correctSound" src="assets/correct.mp3" preload="auto"></audio>
+<audio id="wrongSound" src="assets/wrong.mp3" preload="auto"></audio>
+<audio id="clapSound" src="assets/clapping.mp3" preload="auto"></audio>
 
 <script>
-
-setTimeout(()=>{
-document.getElementById("splash").style.display="none";
-},5000);
-
-/* YOUR EXACT QUESTIONS */
-const questions = [
+const originalQuestions = [
 {
 q:"During a class presentation, Mia says: 'I created the poster myself.' This sentence is:",
 a:"Active voice",
@@ -218,78 +804,327 @@ o:["Hide meaning","Focus on action/result","Make confusion","Shorten words"]
 }
 ];
 
-let i=0, score=0;
+const locations = [
+{icon:"🏖️",name:"Sunny Beach"},
+{icon:"🌴",name:"Palm Forest"},
+{icon:"🌊",name:"Blue Lagoon"},
+{icon:"🗿",name:"Ancient Statue"},
+{icon:"🌋",name:"Volcano Path"},
+{icon:"🌴",name:"Hidden Grove"},
+{icon:"⛰️",name:"Rocky Hill"},
+{icon:"🛕",name:"Temple Gate"},
+{icon:"💎",name:"Crystal Cave"},
+{icon:"🏆",name:"Treasure Point"}
+];
 
-function load(){
-let q = questions[i];
-document.getElementById("q").innerText = q.q;
+let gameQuestions = [];
+let currentIndex = 0;
+let score = 0;
+let keys = 0;
+let attempts = 0;
+let answeringLocked = false;
 
-let box = document.getElementById("options");
-box.innerHTML="";
+const splash = document.getElementById("splash");
+const instructions = document.getElementById("instructions");
+const game = document.getElementById("game");
+const end = document.getElementById("end");
 
-q.o.sort(()=>Math.random()-0.5).forEach(opt=>{
-let b=document.createElement("button");
-b.innerText=opt;
+const startBtn = document.getElementById("startBtn");
+const playAgainBtn = document.getElementById("playAgainBtn");
 
-b.onclick=()=>{
-check(opt,q.a,b);
-};
+const scoreEl = document.getElementById("score");
+const keysEl = document.getElementById("keys");
+const locationNowEl = document.getElementById("locationNow");
+const questionNoEl = document.getElementById("questionNo");
+const attemptsLeftEl = document.getElementById("attemptsLeft");
+const progressFill = document.getElementById("progressFill");
+const mapTrack = document.getElementById("mapTrack");
+const explorer = document.getElementById("explorer");
+const locationName = document.getElementById("locationName");
+const questionText = document.getElementById("questionText");
+const optionsBox = document.getElementById("options");
+const feedback = document.getElementById("feedback");
 
-box.appendChild(b);
+const correctSound = document.getElementById("correctSound");
+const wrongSound = document.getElementById("wrongSound");
+const clapSound = document.getElementById("clapSound");
+const vol = document.getElementById("vol");
+
+function shuffleArray(array){
+const arr = array.slice();
+for(let i=arr.length-1;i>0;i--){
+const j = Math.floor(Math.random()*(i+1));
+[arr[i],arr[j]] = [arr[j],arr[i]];
+}
+return arr;
+}
+
+function setScreen(activeScreen){
+[instructions,game,end].forEach(s=>s.classList.remove("active"));
+activeScreen.classList.add("active");
+}
+
+function applyVolume(){
+const v = Number(vol.value);
+correctSound.volume = v;
+wrongSound.volume = v;
+clapSound.volume = v;
+}
+
+function safePlay(audio){
+try{
+audio.pause();
+audio.currentTime = 0;
+audio.play().catch(()=>{});
+}catch(e){}
+}
+
+function buildMap(){
+mapTrack.innerHTML = "";
+mapTrack.appendChild(explorer);
+locations.forEach((loc,index)=>{
+const div = document.createElement("div");
+div.className = "location";
+div.id = "loc"+index;
+div.textContent = loc.icon;
+div.setAttribute("aria-label",loc.name);
+mapTrack.appendChild(div);
+});
+moveExplorer(false);
+}
+
+function moveExplorer(animate){
+const percent = locations.length === 1 ? 0 : (currentIndex/(locations.length-1))*100;
+const explorerWidth = explorer.offsetWidth || 40;
+const trackWidth = mapTrack.clientWidth || 1;
+const leftPx = (percent/100)*(trackWidth - explorerWidth);
+if(animate){
+explorer.classList.add("walking");
+}
+explorer.style.left = Math.max(0,leftPx) + "px";
+setTimeout(()=>explorer.classList.remove("walking"),900);
+locations.forEach((_,idx)=>{
+const loc = document.getElementById("loc"+idx);
+if(loc){
+if(idx <= currentIndex){
+loc.classList.add("reached");
+}else{
+loc.classList.remove("reached");
+}
+}
 });
 }
 
-function check(sel, correct, btn){
+function startGame(){
+gameQuestions = shuffleArray(originalQuestions).map(q=>({
+q:q.q,
+a:q.a,
+o:q.o.slice()
+}));
+currentIndex = 0;
+score = 0;
+keys = 0;
+attempts = 0;
+answeringLocked = false;
+scoreEl.textContent = score;
+keysEl.textContent = keys;
+buildMap();
+setScreen(game);
+loadQuestion();
+}
 
-let vol=document.getElementById("vol").value;
-correctSound.volume=vol;
-wrongSound.volume=vol;
+function loadQuestion(){
+answeringLocked = false;
+attempts = 0;
+feedback.textContent = "";
+feedback.style.color = "#0f766e";
 
-if(sel===correct){
+const q = gameQuestions[currentIndex];
+const loc = locations[currentIndex];
+
+scoreEl.textContent = score;
+keysEl.textContent = keys;
+locationNowEl.textContent = currentIndex + 1;
+questionNoEl.textContent = currentIndex + 1;
+attemptsLeftEl.textContent = 2;
+progressFill.style.width = (currentIndex / gameQuestions.length * 100) + "%";
+
+locationName.textContent = loc.icon + " " + loc.name;
+questionText.textContent = q.q;
+
+optionsBox.innerHTML = "";
+shuffleArray(q.o).forEach(opt=>{
+const btn = document.createElement("button");
+btn.className = "option-btn";
+btn.textContent = opt;
+btn.addEventListener("click",()=>checkAnswer(opt, q.a, btn));
+optionsBox.appendChild(btn);
+});
+
+moveExplorer(false);
+}
+
+function disableButtons(state){
+document.querySelectorAll(".option-btn").forEach(btn=>{
+btn.disabled = state;
+});
+}
+
+function checkAnswer(selected, correct, btn){
+if(answeringLocked) return;
+
+applyVolume();
+
+if(selected === correct){
+answeringLocked = true;
+disableButtons(true);
 btn.classList.add("correct");
-correctSound.play();
 score++;
-document.getElementById("score").innerText=score;
-coin();
-}
-else{
-btn.classList.add("wrong");
-wrongSound.play();
+keys++;
+scoreEl.textContent = score;
+keysEl.textContent = keys;
+feedback.textContent = "Correct! You earned a treasure key! 🔑";
+feedback.style.color = "#15803d";
+safePlay(correctSound);
+setTimeout(()=>safePlay(clapSound),220);
+burst(btn,"🔑");
+burst(btn,"🪙");
+burst(btn,"✨");
+coinBurst();
+setTimeout(()=>{
+advanceLocation(true);
+},1500);
+return;
 }
 
-i++;
-updateBar();
+attempts++;
+btn.classList.add("wrong");
+btn.disabled = true;
+safePlay(wrongSound);
+splashWrong(btn);
+
+if(attempts === 1){
+attemptsLeftEl.textContent = 1;
+feedback.textContent = "Try again!";
+feedback.style.color = "#dc2626";
+return;
+}
+
+answeringLocked = true;
+attemptsLeftEl.textContent = 0;
+feedback.textContent = "Correct answer highlighted. Moving ahead!";
+feedback.style.color = "#b45309";
+disableButtons(true);
+
+document.querySelectorAll(".option-btn").forEach(optionBtn=>{
+if(optionBtn.textContent === correct){
+optionBtn.classList.add("reveal");
+}
+});
 
 setTimeout(()=>{
-if(i<questions.length){
-load();
+advanceLocation(false);
+},1800);
+}
+
+function advanceLocation(wasCorrect){
+currentIndex++;
+progressFill.style.width = (currentIndex / gameQuestions.length * 100) + "%";
+
+if(currentIndex >= gameQuestions.length){
+setTimeout(showEndScreen,450);
+return;
+}
+
+if(wasCorrect){
+moveExplorer(true);
+setTimeout(loadQuestion,900);
 }else{
-end();
+moveExplorer(true);
+setTimeout(loadQuestion,900);
 }
-},900);
-}
-
-function updateBar(){
-document.getElementById("fill").style.width=(i/questions.length*100)+"%";
 }
 
-function coin(){
-let c=document.createElement("div");
-c.className="coin";
-c.innerHTML="🪙";
-c.style.left=Math.random()*80+"%";
-document.body.appendChild(c);
-setTimeout(()=>c.remove(),2800);
+function burst(anchor, icon){
+const rect = anchor.getBoundingClientRect();
+for(let i=0;i<5;i++){
+const item = document.createElement("div");
+item.className = "float-item";
+item.textContent = icon;
+item.style.left = (rect.left + rect.width/2 + (Math.random()*80-40)) + "px";
+item.style.top = (rect.top + rect.height/2 + (Math.random()*30-15)) + "px";
+item.style.animationDelay = (Math.random()*0.18) + "s";
+document.body.appendChild(item);
+setTimeout(()=>item.remove(),1500);
+}
 }
 
-function end(){
-clapSound.play();
-document.getElementById("end").style.display="block";
-document.getElementById("result").innerText="Score: "+score+"/10";
+function coinBurst(){
+for(let i=0;i<14;i++){
+const item = document.createElement("div");
+item.className = "float-item";
+item.textContent = ["🪙","⭐","✨","🔑"][Math.floor(Math.random()*4)];
+item.style.left = (20 + Math.random()*60) + "vw";
+item.style.top = (45 + Math.random()*25) + "vh";
+item.style.animationDelay = (Math.random()*0.25) + "s";
+document.body.appendChild(item);
+setTimeout(()=>item.remove(),1600);
+}
 }
 
-setTimeout(load,5000);
+function splashWrong(anchor){
+const rect = anchor.getBoundingClientRect();
+for(let i=0;i<5;i++){
+const item = document.createElement("div");
+item.className = "splash-drop";
+item.textContent = "💦";
+item.style.left = (rect.left + rect.width/2 + (Math.random()*90-45)) + "px";
+item.style.top = (rect.top + rect.height/2 + (Math.random()*30-15)) + "px";
+item.style.animationDelay = (Math.random()*0.12) + "s";
+document.body.appendChild(item);
+setTimeout(()=>item.remove(),950);
+}
+}
 
+function showEndScreen(){
+applyVolume();
+setScreen(end);
+document.getElementById("finalScore").textContent = score + "/10";
+document.getElementById("finalKeys").textContent = keys;
+document.getElementById("accuracy").textContent = Math.round((score/gameQuestions.length)*100) + "%";
+safePlay(clapSound);
+launchConfetti();
+}
+
+function launchConfetti(){
+const icons = ["🎉","✨","⭐","🪙","💎","🔑"];
+for(let i=0;i<90;i++){
+const piece = document.createElement("div");
+piece.className = "confetti-piece";
+piece.textContent = icons[Math.floor(Math.random()*icons.length)];
+piece.style.left = Math.random()*100 + "vw";
+piece.style.top = (-10 - Math.random()*30) + "vh";
+piece.style.animationDelay = Math.random()*1.1 + "s";
+piece.style.fontSize = (18 + Math.random()*20) + "px";
+document.body.appendChild(piece);
+setTimeout(()=>piece.remove(),4200);
+}
+}
+
+startBtn.addEventListener("click",startGame);
+playAgainBtn.addEventListener("click",startGame);
+vol.addEventListener("input",applyVolume);
+
+window.addEventListener("resize",()=>{
+if(game.classList.contains("active")){
+moveExplorer(false);
+}
+});
+
+setTimeout(()=>{
+splash.style.display = "none";
+setScreen(instructions);
+},5000);
 </script>
 
 </body>
