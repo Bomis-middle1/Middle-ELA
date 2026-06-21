@@ -1,1 +1,190 @@
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>Magic Academy Spell Lab</title>
+<style>
+:root{
+  --purple:#3b1478;--deep:#12052e;--blue:#2348b8;--cyan:#47f0ff;--gold:#ffd66b;--green:#40e09b;--lav:#c7b6ff;--pink:#ff75d8;--orange:#ff9d4d;--red:#ff5b71;--silver:#dbe9ff;
+  --glass:rgba(255,255,255,.12);--glass2:rgba(255,255,255,.2);--darkText:#201341;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;width:100%;min-height:100%;overflow-x:hidden;font-family:"Trebuchet MS",Verdana,sans-serif;background:#09021d;color:#fff}
+button,input{font-family:inherit}
+.screen{position:fixed;inset:0;display:none;overflow:hidden}.screen.active{display:block}
+#logoScreen{background:#fff;z-index:20;display:flex;align-items:center;justify-content:center}.logo-only{width:min(72vw,520px);height:auto;object-fit:contain}.fallback-logo{display:none;color:#6a1bb0;font-size:clamp(34px,8vw,72px);font-weight:900;text-align:center}
+#world,#instructionScreen,#gameScreen,#endScreen{background:radial-gradient(circle at 50% 18%,#344bb8 0%,#1b0f4c 35%,#100429 70%,#060116 100%)}
+.layer{position:absolute;inset:0;pointer-events:none}.moon{position:absolute;width:90px;height:90px;right:8%;top:8%;border-radius:50%;background:radial-gradient(circle,#fff9c7,#ffeaa0 55%,rgba(255,255,255,0));box-shadow:0 0 45px #ffe79a}.stars{background-image:radial-gradient(#fff 1px,transparent 2px),radial-gradient(#ffeaa0 1px,transparent 2px),radial-gradient(#bdf8ff 1px,transparent 2px);background-size:90px 90px,140px 140px,190px 190px;animation:twinkle 4s infinite alternate}.cloud{position:absolute;width:190px;height:55px;border-radius:40px;background:rgba(255,255,255,.18);filter:blur(.2px);animation:cloudMove 24s linear infinite}.cloud:before,.cloud:after{content:"";position:absolute;background:inherit;border-radius:50%}.cloud:before{width:80px;height:80px;left:28px;top:-38px}.cloud:after{width:95px;height:70px;right:28px;top:-28px}.c1{top:18%;left:-230px}.c2{top:34%;left:-370px;animation-duration:34s;transform:scale(.78)}.c3{top:10%;left:-520px;animation-duration:42s;transform:scale(.56)}
+.castle{position:absolute;left:50%;bottom:90px;transform:translateX(-50%);width:min(78vw,800px);height:42vh;min-height:230px;background:linear-gradient(180deg,rgba(121,108,214,.9),rgba(57,34,121,.96));clip-path:polygon(4% 100%,4% 48%,10% 48%,10% 25%,15% 25%,15% 48%,23% 48%,23% 32%,30% 32%,30% 12%,36% 12%,36% 32%,45% 32%,45% 45%,55% 45%,55% 32%,64% 32%,64% 12%,70% 12%,70% 32%,77% 32%,77% 48%,85% 48%,85% 25%,90% 25%,90% 48%,96% 48%,96% 100%);box-shadow:0 0 45px rgba(123,99,255,.6)}
+.castle.lit{filter:drop-shadow(0 0 25px #ffd76b) brightness(1.22)}.window{position:absolute;width:34px;height:54px;border-radius:20px 20px 6px 6px;background:#ffd96b;box-shadow:0 0 18px #ffd96b}.w1{left:22%;top:42%}.w2{left:37%;top:28%}.w3{left:49%;top:54%}.w4{right:37%;top:28%}.w5{right:22%;top:42%}.trees{position:absolute;bottom:45px;left:0;width:100%;height:120px;background:linear-gradient(transparent,rgba(0,0,0,.2))}.tree{position:absolute;bottom:0;width:100px;height:140px}.tree:before{content:"";position:absolute;bottom:20px;left:35px;width:30px;height:80px;background:#422916;border-radius:14px}.tree:after{content:"";position:absolute;bottom:68px;left:0;width:105px;height:90px;border-radius:50% 50% 44% 44%;background:linear-gradient(#2dd58a,#0a7a62);box-shadow:0 0 18px rgba(64,224,155,.5)}.t1{left:4%;transform:scale(.8)}.t2{right:4%;transform:scale(.9)}.t3{left:14%;transform:scale(.55)}.t4{right:15%;transform:scale(.58)}
+.floatItem{position:absolute;font-size:clamp(24px,3.5vw,44px);animation:floaty 5s ease-in-out infinite;filter:drop-shadow(0 0 12px #90f8ff)}.book1{left:8%;top:27%}.book2{right:12%;top:46%;animation-delay:1s}.candle1{left:14%;top:52%;animation-delay:.7s}.candle2{right:18%;top:20%;animation-delay:1.4s}.owl{left:-70px;top:20%;animation:owlFly 20s linear infinite;font-size:42px}.particle{position:absolute;width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.7);box-shadow:0 0 10px #fff;animation:rise 9s linear infinite}.magic-circle{position:absolute;left:50%;bottom:48px;width:min(42vw,360px);height:min(42vw,360px);transform:translateX(-50%);border-radius:50%;border:3px solid rgba(71,240,255,.35);box-shadow:0 0 25px rgba(71,240,255,.35),inset 0 0 24px rgba(255,214,107,.15);animation:spin 16s linear infinite}.magic-circle:before,.magic-circle:after{content:"";position:absolute;inset:16%;border-radius:50%;border:2px dashed rgba(255,214,107,.45)}.magic-circle:after{inset:32%;border-style:solid;border-color:rgba(199,182,255,.42)}
+.panel{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(92vw,880px);max-height:88vh;overflow:auto;padding:clamp(18px,3vw,34px);background:linear-gradient(145deg,rgba(255,255,255,.2),rgba(255,255,255,.08));border:1px solid rgba(255,255,255,.3);border-radius:32px;box-shadow:0 20px 60px rgba(0,0,0,.38),inset 0 0 30px rgba(255,255,255,.08);backdrop-filter:blur(10px);text-align:center}.panel h1{font-size:clamp(30px,6vw,58px);margin:0 0 14px;color:#fff3b5;text-shadow:0 0 18px #ffd66b}.panel p{font-size:clamp(17px,2.5vw,24px);line-height:1.55;margin:12px auto;max-width:760px}.startBtn,.playBtn{border:none;border-radius:999px;padding:16px 34px;margin-top:18px;min-height:56px;font-size:clamp(18px,2.8vw,26px);font-weight:900;color:#29113f;background:linear-gradient(135deg,#fff6a9,#ffc83d,#ff9d4d);box-shadow:0 0 22px rgba(255,214,107,.75),0 10px 0 #b5661d;cursor:pointer;transition:.18s}.startBtn:active,.playBtn:active{transform:translateY(6px);box-shadow:0 0 14px rgba(255,214,107,.75),0 4px 0 #b5661d}
+.hud{position:absolute;top:10px;left:10px;right:10px;z-index:6;display:grid;grid-template-columns:repeat(4,1fr) minmax(135px,1.3fr);gap:8px;align-items:center}.hudBox{background:rgba(22,8,62,.72);border:1px solid rgba(255,255,255,.24);border-radius:16px;padding:8px;text-align:center;font-weight:900;box-shadow:0 6px 18px rgba(0,0,0,.25);font-size:clamp(12px,1.9vw,17px)}.volumeBox{display:flex;gap:6px;align-items:center;justify-content:center}.volumeBox input{width:80px}.progressWrap{position:absolute;top:72px;left:14px;right:14px;height:14px;border-radius:20px;background:rgba(255,255,255,.16);overflow:hidden;border:1px solid rgba(255,255,255,.25);z-index:6}.progressFill{height:100%;width:0%;background:linear-gradient(90deg,#47f0ff,#ffd66b,#40e09b);border-radius:20px;box-shadow:0 0 16px #47f0ff;transition:.5s}
+.gameArea{position:absolute;inset:92px 12px 8px 12px;display:grid;grid-template-columns:minmax(150px,1fr) minmax(290px,760px) minmax(150px,1fr);gap:10px;align-items:end}.wizardWrap{grid-column:1/2;align-self:end;justify-self:center;text-align:center;z-index:3}.wizardImg{width:min(32vw,230px);max-height:34vh;object-fit:contain;filter:drop-shadow(0 0 18px #47f0ff)}.wizardFallback{font-size:min(30vw,190px);line-height:1;filter:drop-shadow(0 0 18px #47f0ff)}.wand{margin:auto;margin-top:-28px;width:18px;height:120px;border-radius:12px;background:linear-gradient(#805029,#3d210f);transform:rotate(33deg);box-shadow:0 0 10px rgba(255,255,255,.45);position:relative}.wand:after{content:"✦";position:absolute;top:-32px;left:-12px;font-size:34px;color:#fff}.wand.stage1{background:linear-gradient(#c09855,#6d421a)}.wand.stage2{background:linear-gradient(#5bfff4,#2560ff);box-shadow:0 0 20px #47f0ff}.wand.stage3{background:linear-gradient(#fff3a4,#ffbf2e);box-shadow:0 0 25px #ffd66b}.wand.stage4{background:linear-gradient(#ffcf70,#ff5d5d,#9a4cff);box-shadow:0 0 30px #ff75d8}.wand.stage5{background:linear-gradient(#fff,#47f0ff,#ffd66b,#40e09b);box-shadow:0 0 38px #fff}.wandGlow{animation:wandGlow .9s ease}
+.lab{grid-column:2/3;align-self:center;justify-self:center;width:100%;max-width:760px;position:relative;z-index:3}.spellBanner{text-align:center;margin:0 auto 8px;padding:10px 18px;width:fit-content;max-width:96%;border-radius:18px;background:linear-gradient(135deg,rgba(255,214,107,.95),rgba(255,117,216,.92));color:#2c1044;font-size:clamp(18px,3vw,28px);font-weight:900;box-shadow:0 0 18px rgba(255,214,107,.6)}.bookStage{position:relative;margin:auto;width:min(95vw,680px);min-height:430px;display:flex;align-items:center;justify-content:center}.bookBase{position:absolute;width:80%;height:72%;border-radius:35px 35px 60px 60px;background:linear-gradient(120deg,#6a37bb,#2d1b7a 48%,#7947d6);box-shadow:0 24px 55px rgba(0,0,0,.42),0 0 28px rgba(199,182,255,.4);transform:perspective(900px) rotateX(9deg)}.bookBase:before{content:"";position:absolute;left:49%;top:6%;bottom:6%;width:3px;background:rgba(255,255,255,.28);box-shadow:0 0 12px #fff}.bookBase.glow{animation:bookGlow 1s ease}.parchment{position:relative;width:74%;min-height:230px;padding:22px 20px;background:linear-gradient(135deg,#fff0bc,#f8d895 52%,#e8b870);border-radius:28px 10px 28px 10px;color:#31163d;box-shadow:inset 0 0 24px rgba(117,70,20,.25),0 0 22px rgba(255,214,107,.35);z-index:2;text-align:center}.spellNum{font-weight:900;color:#7c3a00}.sentence{font-family:Georgia,serif;font-size:clamp(20px,3.2vw,34px);line-height:1.25;margin:10px 0 8px;font-weight:700}.hint,.feedback{min-height:30px;font-size:clamp(14px,2.2vw,19px);font-weight:800}.hint{color:#743f00}.feedback{color:#1d6d3b}.crystalRing{position:absolute;inset:0;z-index:4;pointer-events:none}.crystalBtn{pointer-events:auto;position:absolute;width:94px;height:94px;border:none;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.2s}.gem{width:68px;height:76px;clip-path:polygon(50% 0%,86% 18%,100% 53%,50% 100%,0% 53%,14% 18%);box-shadow:0 0 18px currentColor, inset 0 0 18px rgba(255,255,255,.55);animation:pulse 2.1s infinite}.crystalBtn span{position:absolute;bottom:-8px;left:50%;transform:translateX(-50%);background:rgba(15,5,44,.82);border:1px solid rgba(255,255,255,.22);border-radius:12px;padding:3px 7px;color:#fff;font-size:12px;font-weight:900;white-space:nowrap;box-shadow:0 0 10px rgba(0,0,0,.3)}.crystalBtn:hover .gem,.crystalBtn:focus .gem{transform:scale(1.12);filter:brightness(1.25)}.crystalBtn.selected .gem{animation:selectedGem .45s ease}.crystalBtn.shake{animation:shake .45s ease}.beam{position:absolute;height:6px;background:linear-gradient(90deg,transparent,#fff,#47f0ff);transform-origin:left center;box-shadow:0 0 18px #47f0ff;z-index:8;pointer-events:none;border-radius:10px;animation:beam .45s ease forwards}.answerGrid{position:absolute;right:0;bottom:30px;width:100%;display:none}.answerGrid.show{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}.sideCrystals{grid-column:3/4;align-self:center;justify-self:center;display:grid;gap:10px;z-index:3}.miniCrystal{width:44px;height:48px;clip-path:polygon(50% 0%,86% 18%,100% 53%,50% 100%,0% 53%,14% 18%);background:#253050;opacity:.45;border:1px solid rgba(255,255,255,.3)}.miniCrystal.on{opacity:1;background:linear-gradient(135deg,#fff,#47f0ff,#ffd66b);box-shadow:0 0 18px #ffd66b}.crack{animation:crack .6s ease}.smoke{position:absolute;width:80px;height:80px;border-radius:50%;background:radial-gradient(rgba(90,90,90,.75),transparent 70%);animation:smoke .7s ease forwards;z-index:7;pointer-events:none}.effects{position:absolute;inset:0;pointer-events:none;z-index:10}.burst{position:absolute;font-size:28px;animation:burst 1s ease forwards}.confetti{position:absolute;width:10px;height:18px;animation:confetti 2.8s ease-out forwards}.firework{position:absolute;width:8px;height:8px;border-radius:50%;background:#fff;box-shadow:0 0 12px #fff;animation:firework 1.2s ease-out forwards}.collected{position:absolute;width:36px;height:42px;clip-path:polygon(50% 0%,86% 18%,100% 53%,50% 100%,0% 53%,14% 18%);background:linear-gradient(135deg,#fff,#47f0ff,#ffd66b);z-index:11;animation:collect 1s ease forwards}.dragonBattle{display:none;position:absolute;inset:0;z-index:12;align-items:center;justify-content:center;background:rgba(6,1,22,.78);text-align:center}.dragonBattle.show{display:flex;animation:fadeIn .4s}.dragonBox{max-width:900px;width:92%;padding:25px;border-radius:32px;background:linear-gradient(145deg,rgba(70,8,91,.88),rgba(20,9,70,.9));box-shadow:0 0 45px rgba(255,117,216,.45);border:1px solid rgba(255,255,255,.28)}.dragon{font-size:clamp(95px,18vw,180px);filter:drop-shadow(0 0 25px #ff75d8);animation:dragonBob 2s infinite}.rainbowSpell{height:18px;border-radius:20px;background:linear-gradient(90deg,red,orange,yellow,green,cyan,blue,violet);box-shadow:0 0 28px #fff;margin:15px auto;width:0%;animation:rainbowCast 2.4s ease forwards}.grandCrystal{font-size:clamp(90px,18vw,170px);filter:drop-shadow(0 0 35px #47f0ff);animation:pulse 1.3s infinite}.rankCard{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:18px 0}.stat{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.28);border-radius:20px;padding:14px;font-size:clamp(17px,3vw,25px);font-weight:900}.hidden{display:none!important}
+@keyframes twinkle{from{opacity:.6}to{opacity:1}}@keyframes cloudMove{to{transform:translateX(calc(100vw + 650px))}}@keyframes floaty{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-22px) rotate(5deg)}}@keyframes owlFly{0%{transform:translateX(0)}100%{transform:translateX(calc(100vw + 140px))}}@keyframes rise{0%{transform:translateY(100vh);opacity:0}15%{opacity:.9}100%{transform:translateY(-20vh);opacity:0}}@keyframes spin{to{transform:translateX(-50%) rotate(360deg)}}@keyframes pulse{0%,100%{transform:scale(1);filter:brightness(1)}50%{transform:scale(1.08);filter:brightness(1.25)}}@keyframes selectedGem{50%{transform:scale(1.28)}}@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-6px)}80%{transform:translateX(6px)}}@keyframes beam{from{opacity:1;transform:scaleX(0)}to{opacity:0;transform:scaleX(1)}}@keyframes bookGlow{50%{filter:brightness(1.45);box-shadow:0 0 55px #ffd66b}}@keyframes wandGlow{50%{filter:drop-shadow(0 0 35px #ffd66b) brightness(1.35)}}@keyframes crack{20%,60%{transform:rotate(-1deg)}40%,80%{transform:rotate(1deg);filter:contrast(1.2) sepia(.5)}}@keyframes smoke{to{transform:scale(1.8) translateY(-40px);opacity:0}}@keyframes burst{to{transform:translate(var(--x),var(--y)) scale(0);opacity:0}}@keyframes confetti{to{transform:translateY(110vh) rotate(720deg);opacity:0}}@keyframes firework{to{transform:translate(var(--x),var(--y));opacity:0}}@keyframes collect{to{left:86%!important;top:5%!important;transform:scale(.3);opacity:0}}@keyframes fadeIn{from{opacity:0}to{opacity:1}}@keyframes dragonBob{50%{transform:translateY(-12px) scale(1.02)}}@keyframes rainbowCast{to{width:100%}}
+@media(max-width:850px){.hud{grid-template-columns:repeat(2,1fr);top:6px}.hudBox{padding:6px}.progressWrap{top:110px}.gameArea{inset:128px 6px 6px 6px;grid-template-columns:1fr;align-items:center}.wizardWrap{grid-column:1;position:absolute;left:4px;bottom:4px}.wizardImg{width:90px}.wizardFallback{font-size:78px}.wand{height:70px;margin-top:-16px}.sideCrystals{display:none}.lab{grid-column:1;align-self:start}.bookStage{min-height:420px}.crystalBtn{width:75px;height:75px}.gem{width:53px;height:60px}.crystalBtn span{font-size:10px}.parchment{width:72%;padding:18px 12px}.rankCard{grid-template-columns:1fr}.panel{width:94vw}}
+@media(max-width:520px){.bookStage{min-height:470px}.parchment{width:68%;min-height:250px}.sentence{font-size:20px}.crystalBtn{width:68px;height:68px}.gem{width:48px;height:54px}.crystalBtn span{font-size:9px;bottom:-10px}.spellBanner{font-size:18px}.hud{gap:5px}.volumeBox input{width:58px}.wizardWrap{opacity:.88}.panel p{font-size:16px}.panel{padding:18px;border-radius:22px}}
+@media(max-height:620px) and (orientation:landscape){.hud{grid-template-columns:repeat(5,1fr)}.progressWrap{top:56px}.gameArea{inset:76px 8px 4px 8px;grid-template-columns:120px 1fr 80px}.wizardWrap{position:static;grid-column:1}.wizardFallback{font-size:88px}.wizardImg{width:110px}.bookStage{min-height:330px}.parchment{min-height:180px}.sentence{font-size:21px}.crystalBtn{width:72px;height:72px}.gem{width:50px;height:56px}.sideCrystals{display:grid}.panel{max-height:94vh}.rankCard{grid-template-columns:repeat(3,1fr)}}
+</style>
+</head>
+<body>
+<section id="logoScreen" class="screen active" aria-label="Innovine logo screen">
+  <img class="logo-only" src="assets/innovine-logo.png" alt="Innovine Logo" onerror="this.style.display='none';document.querySelector('.fallback-logo').style.display='block';" />
+  <div class="fallback-logo">INNOVINE</div>
+</section>
+<section id="instructionScreen" class="screen" aria-label="Instructions">
+  <div id="worldInst"></div>
+  <div class="panel">
+    <h1>🪄 Welcome to Magic Academy Spell Lab!</h1>
+    <p>Broken magical spells have scattered throughout the academy.</p>
+    <p>Read each spell carefully. Tap the glowing crystal that names the correct figure of speech.</p>
+    <p>Every correct answer restores magical energy. Complete all 14 spells to unlock the Grand Crystal!</p>
+    <button id="startBtn" class="startBtn">▶ Start Adventure</button>
+  </div>
+</section>
+<section id="gameScreen" class="screen" aria-label="Magic Academy Spell Lab game">
+  <div id="worldGame"></div>
+  <div class="hud" role="status" aria-live="polite">
+    <div class="hudBox" id="scoreBox">⭐ Score: 0</div>
+    <div class="hudBox" id="spellBox">✨ Spell: 1/14</div>
+    <div class="hudBox" id="crystalBox">💎 Crystals: 0</div>
+    <div class="hudBox" id="accuracyBox">🏆 Accuracy: 100%</div>
+    <div class="hudBox volumeBox">🔊 <input id="volume" type="range" min="0" max="1" step="0.05" value="0.9" aria-label="Volume" /></div>
+  </div>
+  <div class="progressWrap"><div id="progressFill" class="progressFill"></div></div>
+  <main class="gameArea">
+    <aside class="wizardWrap" aria-label="Young wizard">
+      <img id="wizardImg" class="wizardImg" src="assets/wizard.png" alt="Young Wizard" onerror="this.classList.add('hidden');document.getElementById('wizardFallback').classList.remove('hidden');" />
+      <div id="wizardFallback" class="wizardFallback hidden">🧙</div>
+      <div id="wand" class="wand stage1" aria-label="Wizard wand"></div>
+    </aside>
+    <section class="lab">
+      <div id="spellBanner" class="spellBanner">🔥 Fire Spell</div>
+      <div class="bookStage" id="bookStage">
+        <div id="bookBase" class="bookBase"></div>
+        <article id="parchment" class="parchment">
+          <div id="spellNum" class="spellNum">Spell 1 of 14</div>
+          <div id="sentence" class="sentence">Loading spell...</div>
+          <div id="hint" class="hint"></div>
+          <div id="feedback" class="feedback"></div>
+        </article>
+        <div id="crystalRing" class="crystalRing"></div>
+      </div>
+    </section>
+    <aside id="sideCrystals" class="sideCrystals" aria-label="Restored crystals"></aside>
+  </main>
+  <div id="dragonBattle" class="dragonBattle">
+    <div class="dragonBox">
+      <div class="dragon">🐉</div>
+      <h1>The Grammar Dragon Awakens!</h1>
+      <p>Use the restored crystals to cast the Final Rainbow Spell!</p>
+      <div class="rainbowSpell"></div>
+      <div class="grandCrystal">💎</div>
+    </div>
+  </div>
+  <div id="effects" class="effects"></div>
+</section>
+<section id="endScreen" class="screen" aria-label="Graduation Ceremony">
+  <div id="worldEnd"></div>
+  <div class="panel">
+    <h1>🎉 Congratulations!</h1>
+    <div class="grandCrystal">💎</div>
+    <h2>Grand Crystal unlocked!</h2>
+    <h2>🏆 You graduate as a <span id="rankText">MASTER WIZARD</span></h2>
+    <div class="rankCard">
+      <div class="stat" id="finalScore">⭐ Score: 0/14</div>
+      <div class="stat" id="finalAccuracy">🏆 Accuracy: 0%</div>
+      <div class="stat" id="finalCrystals">💎 Crystals: 0</div>
+    </div>
+    <button id="playAgain" class="playBtn">🔁 Play Again</button>
+  </div>
+  <div id="endEffects" class="effects"></div>
+</section>
+<audio id="correctSound" src="assets/correct.mp3" preload="auto"></audio>
+<audio id="wrongSound" src="assets/wrong.mp3" preload="auto"></audio>
+<audio id="clapSound" src="assets/clapping.mp3" preload="auto"></audio>
+<script>
+'use strict';
+const TYPES=[
+ {name:'Simile',color:'#43b7ff',hint:'This figure of speech compares two things using like or as.'},
+ {name:'Metaphor',color:'#9b5cff',hint:'This figure of speech says one thing is another thing.'},
+ {name:'Personification',color:'#40e09b',hint:'This gives human actions or feelings to non-human things.'},
+ {name:'Hyperbole',color:'#ff9d4d',hint:'This uses exaggeration for strong effect.'},
+ {name:'Alliteration',color:'#ffd66b',hint:'This repeats the same beginning sound in nearby words.'},
+ {name:'Onomatopoeia',color:'#ff5b71',hint:'This uses words that imitate sounds.'},
+ {name:'Idiom',color:'#dbe9ff',hint:'This phrase has a meaning different from the exact words.'}
+];
+const QUESTIONS=[
+ {s:'Her smile was as bright as the morning sun.',a:'Simile',spell:'☀ Solar Smile Spell'},
+ {s:'The classroom was a buzzing beehive before the exam.',a:'Metaphor',spell:'🐝 Hive Hall Spell'},
+ {s:'The tired old door groaned in the wind.',a:'Personification',spell:'🚪 Whispering Door Spell'},
+ {s:'I have told you a million times to bring your notebook.',a:'Hyperbole',spell:'📚 Million Scroll Spell'},
+ {s:'Silver snakes silently slid through the soft sand.',a:'Alliteration',spell:'🐍 Silent Sand Spell'},
+ {s:'The bells went clang, clang across the tower.',a:'Onomatopoeia',spell:'🔔 Tower Bell Spell'},
+ {s:'Do not spill the beans about the surprise party.',a:'Idiom',spell:'🫘 Secret Bean Spell'},
+ {s:'The moon was like a silver coin in the sky.',a:'Simile',spell:'🌙 Moon Coin Spell'},
+ {s:'His voice was thunder during the debate.',a:'Metaphor',spell:'⚡ Thunder Voice Spell'},
+ {s:'The flowers danced happily in the breeze.',a:'Personification',spell:'🌸 Dancing Garden Spell'},
+ {s:'My backpack weighs a ton today.',a:'Hyperbole',spell:'🎒 Heavy Bag Spell'},
+ {s:'Peter planted pretty purple pansies.',a:'Alliteration',spell:'💜 Purple Petal Spell'},
+ {s:'The leaves rustled softly under our feet.',a:'Onomatopoeia',spell:'🍂 Rustle Leaf Spell'},
+ {s:'After the hard test, Riya said it was a piece of cake.',a:'Idiom',spell:'🍰 Easy Cake Spell'}
+];
+let deck=[],index=0,score=0,attempts=0,answered=0,locked=false,volume=.9,crystals=0;
+const $=id=>document.getElementById(id);
+const screens={logo:$('logoScreen'),inst:$('instructionScreen'),game:$('gameScreen'),end:$('endScreen')};
+const correctSound=$('correctSound'),wrongSound=$('wrongSound'),clapSound=$('clapSound');
+function makeWorld(rootId){
+ const root=$(rootId); root.innerHTML='';
+ const layer=document.createElement('div'); layer.className='layer';
+ layer.innerHTML='<div class="stars"></div><div class="moon"></div><div class="cloud c1"></div><div class="cloud c2"></div><div class="cloud c3"></div><div class="castle" id="castle_'+rootId+'"><div class="window w1"></div><div class="window w2"></div><div class="window w3"></div><div class="window w4"></div><div class="window w5"></div></div><div class="trees"><div class="tree t1"></div><div class="tree t2"></div><div class="tree t3"></div><div class="tree t4"></div></div><div class="magic-circle"></div><div class="floatItem book1">📖</div><div class="floatItem book2">📚</div><div class="floatItem candle1">🕯️</div><div class="floatItem candle2">🕯️</div><div class="floatItem owl">🦉</div>';
+ root.appendChild(layer);
+ for(let i=0;i<42;i++){const p=document.createElement('div');p.className='particle';p.style.left=Math.random()*100+'%';p.style.animationDelay=(Math.random()*9)+'s';p.style.animationDuration=(7+Math.random()*7)+'s';root.appendChild(p)}
+}
+['worldInst','worldGame','worldEnd'].forEach(makeWorld);
+function show(name){Object.values(screens).forEach(s=>s.classList.remove('active'));screens[name].classList.add('active')}
+setTimeout(()=>show('inst'),5000);
+$('startBtn').addEventListener('click',startGame);$('playAgain').addEventListener('click',()=>{show('game');startGame()});$('volume').addEventListener('input',e=>{volume=Number(e.target.value);[correctSound,wrongSound,clapSound].forEach(a=>a.volume=volume)});
+function shuffle(arr){const a=arr.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function startGame(){deck=shuffle(QUESTIONS);index=0;score=0;attempts=0;answered=0;crystals=0;locked=false;$('sideCrystals').innerHTML='';for(let i=0;i<14;i++){const m=document.createElement('div');m.className='miniCrystal';$('sideCrystals').appendChild(m)}$('dragonBattle').classList.remove('show');$('effects').innerHTML='';show('game');updateHUD();renderQuestion()}
+function updateHUD(){
+ $('scoreBox').textContent='⭐ Score: '+score;
+ $('spellBox').textContent='✨ Spell: '+Math.min(index+1,14)+'/14';
+ $('crystalBox').textContent='💎 Crystals: '+crystals;
+ const acc=answered?Math.round((score/answered)*100):100;$('accuracyBox').textContent='🏆 Accuracy: '+acc+'%';
+ $('progressFill').style.width=(answered/14*100)+'%';
+ const stage=score>=12?5:score>=9?4:score>=6?3:score>=3?2:1;$('wand').className='wand stage'+stage;
+ const castle=$('castle_worldGame');if(castle&&score>=10)castle.classList.add('lit');
+}
+function renderQuestion(){
+ if(index>=deck.length){endAdventure();return}
+ locked=false;attempts=0;const q=deck[index];
+ $('spellBanner').textContent=q.spell;$('spellNum').textContent='Spell '+(index+1)+' of 14';$('sentence').textContent=q.s;$('hint').textContent='';$('feedback').textContent='';$('parchment').classList.remove('crack');
+ renderCrystals(q.a);updateHUD();
+}
+function renderCrystals(answer){
+ const ring=$('crystalRing');ring.innerHTML='';const opts=shuffle(TYPES);const cx=50,cy=50,rx=43,ry=42;
+ opts.forEach((t,i)=>{const angle=(Math.PI*2*i/opts.length)-Math.PI/2;const left=cx+rx*Math.cos(angle);const top=cy+ry*Math.sin(angle);const b=document.createElement('button');b.className='crystalBtn';b.style.left='calc('+left+'% - 47px)';b.style.top='calc('+top+'% - 47px)';b.setAttribute('aria-label',t.name);b.dataset.answer=t.name;b.innerHTML='<div class="gem" style="background:linear-gradient(135deg,#fff,'+t.color+',#34114f);color:'+t.color+'"></div><span>'+t.name+'</span>';b.addEventListener('click',()=>choose(b,answer,t));ring.appendChild(b)})
+}
+function choose(btn,answer,t){if(locked)return;attempts++;btn.classList.add('selected');setTimeout(()=>btn.classList.remove('selected'),450);beamFrom(btn);sparkAt(btn,10);if(t.name===answer){correct(btn)}else{wrong(btn,answer)}}
+function stopAudio(a){try{a.pause();a.currentTime=0}catch(e){}}
+function playAudio(a,then){stopAudio(correctSound);stopAudio(wrongSound);stopAudio(clapSound);a.volume=volume;a.currentTime=0;const p=a.play();if(p&&p.catch)p.catch(()=>{});if(then){a.onended=()=>{a.onended=null;then()}}}
+function correct(btn){locked=true;score++;crystals++;answered++;$('feedback').textContent='✔ Spell repaired! Crystal restored!';$('bookBase').classList.add('glow');$('wand').classList.add('wandGlow');setTimeout(()=>$('bookBase').classList.remove('glow'),900);setTimeout(()=>$('wand').classList.remove('wandGlow'),900);celebrate(36);collectCrystal(btn);const minis=document.querySelectorAll('.miniCrystal');if(minis[crystals-1])minis[crystals-1].classList.add('on');updateHUD();playAudio(correctSound,()=>playAudio(clapSound));setTimeout(()=>{index++;renderQuestion()},1500)}
+function wrong(btn,answer){btn.classList.add('shake');$('parchment').classList.add('crack');smokeAt(btn);$('feedback').textContent='✘ Magic fizzled. Try again!';playAudio(wrongSound);setTimeout(()=>{btn.classList.remove('shake');$('parchment').classList.remove('crack')},650);if(attempts===2){const typ=TYPES.find(x=>x.name===answer);$('hint').textContent='💡 Hint: '+(typ?typ.hint:'Think carefully about the figure of speech.')} if(attempts>=3){locked=true;answered++;$('hint').textContent='💡 Answer revealed: '+answer;Array.from(document.querySelectorAll('.crystalBtn')).forEach(b=>{if(b.dataset.answer===answer)b.querySelector('.gem').style.filter='brightness(1.7) drop-shadow(0 0 18px #40e09b)'});updateHUD();setTimeout(()=>{index++;renderQuestion()},1900)}}
+function rect(el){return el.getBoundingClientRect()}
+function beamFrom(btn){const r=rect(btn),stage=rect($('bookStage'));const x=r.left+r.width/2-stage.left,y=r.top+r.height/2-stage.top;const tx=stage.width/2,ty=stage.height/2;const len=Math.hypot(tx-x,ty-y);const ang=Math.atan2(ty-y,tx-x)*180/Math.PI;const beam=document.createElement('div');beam.className='beam';beam.style.left=x+'px';beam.style.top=y+'px';beam.style.width=len+'px';beam.style.transform='rotate('+ang+'deg) scaleX(0)';$('bookStage').appendChild(beam);setTimeout(()=>beam.remove(),500)}
+function sparkAt(el,n){const r=rect(el);for(let i=0;i<n;i++){const s=document.createElement('div');s.className='burst';s.textContent=['✨','⭐','💫','🌟'][Math.floor(Math.random()*4)];s.style.left=(r.left+r.width/2)+'px';s.style.top=(r.top+r.height/2)+'px';s.style.setProperty('--x',(Math.random()*180-90)+'px');s.style.setProperty('--y',(Math.random()*160-100)+'px');$('effects').appendChild(s);setTimeout(()=>s.remove(),1000)}}
+function smokeAt(el){const r=rect(el);const sm=document.createElement('div');sm.className='smoke';sm.style.left=(r.left+r.width/2-40)+'px';sm.style.top=(r.top+r.height/2-40)+'px';$('effects').appendChild(sm);setTimeout(()=>sm.remove(),750)}
+function collectCrystal(btn){const r=rect(btn);const c=document.createElement('div');c.className='collected';c.style.left=(r.left+r.width/2)+'px';c.style.top=(r.top+r.height/2)+'px';$('effects').appendChild(c);setTimeout(()=>c.remove(),1000)}
+function celebrate(n){const icons=['✨','⭐','💎','🌈','🦋','⚡','🌟','🎆'];for(let i=0;i<n;i++){const b=document.createElement('div');b.className='burst';b.textContent=icons[Math.floor(Math.random()*icons.length)];b.style.left=(30+Math.random()*40)+'vw';b.style.top=(25+Math.random()*35)+'vh';b.style.setProperty('--x',(Math.random()*480-240)+'px');b.style.setProperty('--y',(Math.random()*360-220)+'px');$('effects').appendChild(b);setTimeout(()=>b.remove(),1100)}}
+function endAdventure(){updateHUD();$('dragonBattle').classList.add('show');playAudio(clapSound);setTimeout(()=>{show('end');finishScreen()},3200)}
+function finishScreen(){const acc=answered?Math.round(score/answered*100):0;let rank='Keep Practising';if(score===14)rank='Legendary Wizard';else if(score>=12)rank='Master Wizard';else if(score>=10)rank='Skilled Wizard';else if(score>=8)rank='Apprentice Wizard';$('rankText').textContent=rank;$('finalScore').textContent='⭐ Score: '+score+'/14';$('finalAccuracy').textContent='🏆 Accuracy: '+acc+'%';$('finalCrystals').textContent='💎 Crystals: '+crystals;fireworks();confetti();}
+function confetti(){const root=$('endEffects');root.innerHTML='';const colors=['#ffd66b','#47f0ff','#40e09b','#ff75d8','#ff9d4d','#dbe9ff'];for(let i=0;i<130;i++){const c=document.createElement('div');c.className='confetti';c.style.left=Math.random()*100+'vw';c.style.top=(-20-Math.random()*60)+'px';c.style.background=colors[Math.floor(Math.random()*colors.length)];c.style.animationDelay=Math.random()*1.8+'s';root.appendChild(c);setTimeout(()=>c.remove(),4200)}}
+function fireworks(){const root=$('endEffects');for(let j=0;j<8;j++){setTimeout(()=>{const cx=15+Math.random()*70,cy=12+Math.random()*45;for(let i=0;i<34;i++){const f=document.createElement('div');f.className='firework';f.style.left=cx+'vw';f.style.top=cy+'vh';const a=Math.PI*2*i/34,d=50+Math.random()*120;f.style.setProperty('--x',Math.cos(a)*d+'px');f.style.setProperty('--y',Math.sin(a)*d+'px');root.appendChild(f);setTimeout(()=>f.remove(),1300)}},j*400)}}
+document.addEventListener('keydown',e=>{if(!screens.game.classList.contains('active')||locked)return;const nums=['1','2','3','4','5','6','7'];const idx=nums.indexOf(e.key);if(idx>-1){const btn=document.querySelectorAll('.crystalBtn')[idx];if(btn)btn.click()}});
+[correctSound,wrongSound,clapSound].forEach(a=>{a.volume=volume;a.addEventListener('error',()=>{})});
+</script>
+</body>
+</html>
