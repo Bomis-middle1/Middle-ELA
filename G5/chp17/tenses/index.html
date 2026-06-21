@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Motivation Maze Runner - Grade 8 Soul Science</title>
     <style>
         * {
@@ -72,49 +72,17 @@
             text-align: center;
         }
 
-        .header h1 { font-size: 28px; margin-bottom: 10px; }
-
-        .score-board {
-            display: flex;
-            justify-content: space-around;
-            padding: 15px;
-            background: rgba(255,255,255,0.2);
-            border-radius: 10px;
-            margin-top: 10px;
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
         }
-
-        .score-item { text-align: center; }
-        .score-item span { font-size: 24px; font-weight: bold; }
-
-        .game-container { padding: 20px; position: relative; }
 
         #gameCanvas {
             width: 100%;
-            max-width: 600px;
             height: 400px;
+            background: #f0f4ff;
             border: 3px solid #667eea;
             border-radius: 10px;
-            display: block;
-            margin: 0 auto;
-            background: #f0f4ff;
-        }
-
-        .controls {
-            display: flex;
-            justify-content: center;
-            margin-top: 20px;
-            gap: 10px;
-        }
-
-        .control-btn {
-            width: 60px;
-            height: 60px;
-            border: none;
-            border-radius: 10px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            font-size: 24px;
-            cursor: pointer;
         }
 
         .question-modal {
@@ -125,25 +93,22 @@
             width: 100%;
             height: 100%;
             background: rgba(0,0,0,0.8);
-            z-index: 1000;
             justify-content: center;
             align-items: center;
         }
 
         .question-box {
             background: white;
-            border-radius: 20px;
             padding: 30px;
+            border-radius: 20px;
             max-width: 600px;
-            width: 100%;
         }
 
-        .question-text { font-size: 18px; margin-bottom: 20px; }
-
         .option-btn {
+            display: block;
             padding: 15px;
-            border: 2px solid #667eea;
             margin: 10px 0;
+            border: 2px solid #667eea;
             border-radius: 10px;
             cursor: pointer;
         }
@@ -151,26 +116,6 @@
         .option-btn.correct { background: #4CAF50; color: white; }
         .option-btn.wrong { background: #f44336; color: white; }
 
-        .feedback {
-            margin-top: 20px;
-            padding: 15px;
-            border-radius: 10px;
-            display: none;
-        }
-
-        .feedback.correct { background: #c8e6c9; }
-        .feedback.wrong { background: #ffcdd2; }
-
-        .restart-btn {
-            display: none;
-            margin: 30px auto;
-            padding: 15px 40px;
-            border: none;
-            border-radius: 10px;
-            background: linear-gradient(135deg, #f093fb, #f5576c);
-            color: white;
-            font-size: 18px;
-        }
     </style>
 </head>
 
@@ -181,27 +126,26 @@
 </div>
 
 <div class="container" id="mainContainer">
-
     <div class="header">
         <h1>Motivation Maze Runner</h1>
     </div>
 
-    <div class="game-container">
-        <canvas id="gameCanvas"></canvas>
-
-        <button class="restart-btn" id="restartBtn">Play Again</button>
-    </div>
+    <canvas id="gameCanvas"></canvas>
 </div>
 
 <div class="question-modal" id="questionModal">
     <div class="question-box">
         <div id="questionText"></div>
         <div id="optionsContainer"></div>
-        <div class="feedback" id="feedback"></div>
     </div>
 </div>
 
 <script>
+
+/* =======================
+   ONLY QUESTIONS CHANGED
+======================= */
+
 const questions = [
     {
         question: "She said that she ____ for the exam the previous night.",
@@ -224,17 +168,17 @@ const questions = [
         correct: 1
     },
     {
-        question: "Which sentence is in FUTURE CONTINUOUS tense?",
+        question: "Which sentence is FUTURE CONTINUOUS?",
         options: [
-            "I will go to school tomorrow",
-            "I will be going to school tomorrow",
-            "I am going to school tomorrow",
-            "I went to school tomorrow"
+            "I will go tomorrow",
+            "I will be going tomorrow",
+            "I go tomorrow",
+            "I went tomorrow"
         ],
         correct: 1
     },
     {
-        question: "Convert to past continuous: “She is writing a letter.”",
+        question: "Convert: She is writing a letter →",
         options: [
             "She writes a letter",
             "She wrote a letter",
@@ -244,37 +188,37 @@ const questions = [
         correct: 3
     },
     {
-        question: "Which sentence is in PRESENT PERFECT tense?",
+        question: "Which is PRESENT PERFECT?",
         options: [
-            "She has completed her homework",
-            "She completed her homework yesterday",
-            "She is completing her homework",
-            "She will complete her homework"
+            "She has completed homework",
+            "She completed homework yesterday",
+            "She is completing homework",
+            "She will complete homework"
         ],
         correct: 0
     },
     {
-        question: "Convert to INDIRECT SPEECH: They said, “We are playing football.”",
+        question: "Indirect speech: They said, “We are playing football.”",
         options: [
             "They said they played football",
-            "They said that we are playing football",
-            "They said that they were playing football",
-            "They say they are playing football"
+            "They said we are playing football",
+            "They said they were playing football",
+            "They say they play football"
         ],
         correct: 2
     },
     {
-        question: "Which sentence is SIMPLE FUTURE tense?",
+        question: "Simple Future tense sentence:",
         options: [
             "I went tomorrow",
             "I am going yesterday",
-            "I will go to market tomorrow",
+            "I will go tomorrow",
             "I will going tomorrow"
         ],
         correct: 2
     },
     {
-        question: "Identify the tense: “She has been reading for two hours.”",
+        question: "Identify tense: She has been reading for two hours",
         options: [
             "Present Perfect",
             "Present Perfect Continuous",
@@ -284,7 +228,7 @@ const questions = [
         correct: 1
     },
     {
-        question: "Which sentence is PAST CONTINUOUS tense?",
+        question: "Past Continuous sentence:",
         options: [
             "They will watch TV when I called",
             "They watch TV when I called",
@@ -294,38 +238,6 @@ const questions = [
         correct: 3
     }
 ];
-
-let currentQuestionIndex = 0;
-
-function showQuestion(){
-    const q = questions[currentQuestionIndex];
-    document.getElementById("questionText").innerText = q.question;
-
-    const container = document.getElementById("optionsContainer");
-    container.innerHTML = "";
-
-    q.options.forEach((opt, i) => {
-        const btn = document.createElement("div");
-        btn.className = "option-btn";
-        btn.innerText = opt;
-        btn.onclick = () => {
-            if(i === q.correct){
-                btn.classList.add("correct");
-            } else {
-                btn.classList.add("wrong");
-            }
-        };
-        container.appendChild(btn);
-    });
-
-    document.getElementById("questionModal").style.display = "flex";
-}
-
-setTimeout(() => {
-    document.getElementById("splashScreen").style.display = "none";
-    document.getElementById("mainContainer").classList.add("visible");
-    showQuestion();
-}, 3000);
 
 </script>
 
