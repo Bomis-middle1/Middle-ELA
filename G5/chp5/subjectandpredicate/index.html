@@ -7,19 +7,16 @@
 <style>
 * { box-sizing: border-box; margin:0; padding:0; }
 body {
-  font-family: 'Arial', sans-serif;
+  font-family: Arial, sans-serif;
   background: linear-gradient(135deg, #fef6e4, #dff6ff, #fce1ff);
   height: 100vh;
-  width: 100vw;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
-  user-select: none;
 }
 
-/* Splash Logo */
 #splash {
   position: fixed;
   inset: 0;
@@ -30,264 +27,117 @@ body {
   z-index: 9999;
   animation: fadeOut 1s ease 4s forwards;
 }
-#splash img { width: 200px; animation: pulse 2s infinite; }
+#splash img { width: 200px; }
 @keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
-@keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.05); } }
 
 h1 { 
   color: #2b4eff; 
-  text-align: center; 
-  font-size: 26px; 
-  font-weight: bold;
-  margin-bottom: 8px;
+  font-size: 24px; 
+  margin-bottom: 10px;
 }
 
-/* Instructions */
 #instructions-screen {
-  width: 85%; max-width: 600px;
-  background: rgba(255, 255, 255, 0.95);
+  background: white;
   padding: 20px;
-  border-radius: 16px; 
+  border-radius: 16px;
   text-align: center;
-  box-shadow: 0 8px 30px rgba(43, 78, 255, 0.15);
+  margin-bottom: 10px;
 }
-#instructions-screen h2 { 
-  color: #2b4eff; 
-  margin-bottom: 10px; 
-  font-size: 24px; 
-}
-#instructions-screen p { 
-  font-size: 15px; 
-  color: #333; 
-  margin: 6px 0; 
-}
+#instructions-screen h2 { color: #2b4eff; margin-bottom: 8px; }
+#instructions-screen p { font-size: 14px; margin: 5px 0; }
 #start-btn {
-  padding: 12px 30px;
-  font-size: 17px;
-  background: linear-gradient(135deg, #4caf50, #45a049);
+  padding: 10px 25px;
+  font-size: 16px;
+  background: #4caf50;
   color: white;
   border: none;
-  border-radius: 12px;
+  border-radius: 10px;
   cursor: pointer;
-  font-weight: bold;
-  margin-top: 10px;
 }
-#start-btn:hover { transform: scale(1.05); }
 
-/* Game Area - FIXED SINGLE SCREEN */
 #game-area {
-  width: 95%;
-  height: 85vh;
+  display: none;
+  width: 90%;
+  height: 75vh;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
-  gap: 15px;
+  gap: 12px;
   padding: 15px;
-  display: none;
-  background: rgba(255, 255, 255, 0.7);
+  background: rgba(255,255,255,0.7);
   border-radius: 16px;
-  box-shadow: 0 6px 20px rgba(43, 78, 255, 0.1);
-  overflow: hidden;
 }
 
-/* Draggable Subjects - Smaller */
 .subject {
-  width: 140px;
-  padding: 12px 8px;
+  width: 130px;
+  padding: 10px;
   background: linear-gradient(135deg, #ffcc66, #ff9966);
-  color: white; 
+  color: white;
   font-weight: bold;
-  border-radius: 12px;
-  cursor: grab;
+  border-radius: 10px;
   text-align: center;
   font-size: 13px;
-  box-shadow: 3px 3px 8px rgba(255, 153, 102, 0.4);
-  transition: all 0.2s ease;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  touch-action: none;
-  line-height: 1.3;
+  cursor: pointer;
+  box-shadow: 3px 3px 8px rgba(0,0,0,0.2);
+  transition: 0.2s;
 }
-.subject:hover { 
-  transform: translateY(-3px) scale(1.02); 
-  box-shadow: 4px 4px 12px rgba(255, 153, 102, 0.5);
-}
-.subject.dragging { 
-  opacity: 0.6; 
-  transform: scale(0.95); 
-  position: fixed;
-  z-index: 10000;
-}
-.subject.matched { 
-  opacity: 0.25; 
-  pointer-events: none; 
-}
+.subject:hover { transform: scale(1.05); }
+.subject.selected { outline: 3px solid #4caf50; }
+.subject.matched { opacity: 0.2; pointer-events: none; }
 
-/* Droppable Predicates - Smaller */
 .predicate {
-  width: 180px;
-  min-height: 50px;
-  padding: 10px 6px;
-  background: linear-gradient(145deg, #66ccff, #3399ff);
-  color: white; 
+  width: 170px;
+  padding: 10px;
+  background: linear-gradient(135deg, #66ccff, #3399ff);
+  color: white;
   font-weight: bold;
-  border-radius: 12px;
+  border-radius: 10px;
   text-align: center;
   font-size: 12px;
-  box-shadow: 3px 3px 8px rgba(51, 153, 255, 0.4);
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  line-height: 1.2;
+  box-shadow: 3px 3px 8px rgba(0,0,0,0.2);
+  transition: 0.2s;
 }
-.predicate:hover { 
-  transform: translateY(-3px) scale(1.02); 
-}
-.predicate.drag-over { 
-  outline: 3px dashed #ffcc00; 
-  background: linear-gradient(145deg, #77d9ff, #44aaff);
-  transform: scale(1.05);
-}
-.predicate.correct { 
-  background: linear-gradient(145deg, #66ff99, #33cc66); 
-  animation: correctPulse 0.5s;
-}
+.predicate:hover { transform: scale(1.05); }
+.predicate.correct { background: linear-gradient(135deg, #66ff99, #33cc66); }
 
-@keyframes correctPulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.08); }
-}
+#result { font-size: 18px; color: #2b4eff; margin: 5px 0; font-weight: bold; }
+#score { font-size: 16px; font-weight: bold; color: #2b4eff; padding: 5px 15px; background: white; border-radius: 8px; }
+#restart-btn { display: none; padding: 10px 25px; background: #ff6b6b; color: white; border: none; border-radius: 10px; cursor: pointer; margin-top: 10px; }
 
-/* Result & Score - Compact */
-#result { 
-  font-size: 18px; 
-  min-height: 25px; 
-  color: #2b4eff; 
-  font-weight: bold;
-  text-align: center;
-  margin-bottom: 5px;
-}
-#score { 
-  font-size: 17px; 
-  font-weight: bold;
-  color: #2b4eff;
-  background: rgba(255, 255, 255, 0.8);
-  padding: 6px 18px;
-  border-radius: 10px;
-  font-size: 15px;
-}
-
-/* Confetti */
 .confetti {
   position: fixed;
-  font-size: 18px;
+  font-size: 20px;
   animation: fall 2s linear forwards;
-  pointer-events: none;
-  z-index: 10001;
+  z-index: 10000;
 }
 @keyframes fall {
-  0% { transform: translateY(-10px) rotate(0deg); opacity: 1; }
-  100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
-}
-
-/* Restart Button */
-#restart-btn {
-  padding: 12px 30px;
-  font-size: 17px;
-  background: linear-gradient(135deg, #ff6b6b, #ee5a5a);
-  color: white;
-  border: none;
-  border-radius: 12px;
-  cursor: pointer;
-  font-weight: bold;
-  margin-top: 10px;
-  display: none;
-}
-#restart-btn:hover { transform: scale(1.05); }
-
-/* Progress Bar - Compact */
-#progress-bar {
-  width: 85%;
-  max-width: 500px;
-  height: 8px;
-  background: rgba(255, 255, 255, 0.6);
-  border-radius: 6px;
-  margin: 5px auto;
-  overflow: hidden;
-}
-#progress-fill {
-  height: 100%;
-  background: linear-gradient(90deg, #4caf50, #66ff99);
-  width: 0%;
-  transition: width 0.5s ease;
+  to { transform: translateY(100vh) rotate(360deg); opacity: 0; }
 }
 </style>
 </head>
 <body>
 
-<!-- Splash Logo -->
 <div id="splash">
-  <img src="assets/logo.png" alt="Innovine Logo">
+  <img src="assets/logo.png" alt="Logo">
 </div>
 
-<h1>🎯 Subject and Predicate Match</h1>
+<h1>🎯 Subject + Predicate Match</h1>
 
-<!-- Instructions -->
 <div id="instructions-screen">
-  <h2>✨ How to Play</h2>
-  <p>Drag 🟡 **subject** to 🔵 **predicate**</p>
-  <p>✅ Correct: 🎉 Sound + Card disappears</p>
-  <p>🏆 Match all **15 pairs** to win!</p>
-  <button id="start-btn">🚀 Start Game</button>
+  <h2>How to Play</h2>
+  <p>1. Click a 🟡 <strong>subject</strong> (orange)</p>
+  <p>2. Click a 🔵 <strong>predicate</strong> (blue) to match</p>
+  <p>✅ Correct: Sound + Card disappears</p>
+  <p>🏆 Match all 15!</p>
+  <button id="start-btn">Start Game</button>
 </div>
 
-<!-- Game Area - FIXED SCREEN -->
-<div id="game-area">
-  <!-- Subjects (8 rows) -->
-  <div class="subject" draggable="true" data-predicate="climbed the tall tree quietly">The curious cat</div>
-  <div class="subject" draggable="true" data-predicate="organized the classroom efficiently">Our class monitor</div>
-  <div class="subject" draggable="true" data-predicate="scored the winning goal">The team of players</div>
-  <div class="subject" draggable="true" data-predicate="wrote an inspiring story">My favorite author</div>
-  <div class="subject" draggable="true" data-predicate="conducted an experiment">The young scientist</div>
-  <div class="subject" draggable="true" data-predicate="are flying kites">The children in park</div>
-  <div class="subject" draggable="true" data-predicate="welcomed new students">Our school principal</div>
-  <div class="subject" draggable="true" data-predicate="watered the plants">The old gardener</div>
-  
-  <!-- Predicates (8 rows) -->
-  <div class="predicate" data-subject="The curious cat">climbed the tall tree quietly</div>
-  <div class="predicate" data-subject="Our class monitor">organized the classroom efficiently</div>
-  <div class="predicate" data-subject="The team of players">scored the winning goal</div>
-  <div class="predicate" data-subject="My favorite author">wrote an inspiring story</div>
-  <div class="predicate" data-subject="The young scientist">conducted an experiment</div>
-  <div class="predicate" data-subject="The children in park">are flying kites</div>
-  <div class="predicate" data-subject="Our school principal">welcomed new students</div>
-  <div class="predicate" data-subject="The old gardener">watered the plants</div>
-  
-  <!-- More Subjects -->
-  <div class="subject" draggable="true" data-predicate="are chirping melodiously">The birds in sky</div>
-  <div class="subject" draggable="true" data-predicate="is helping with homework">My best friend</div>
-  <div class="subject" draggable="true" data-predicate="harvested the crops">The hardworking farmer</div>
-  <div class="subject" draggable="true" data-predicate="performed on stage">The famous singer</div>
-  <div class="subject" draggable="true" data-predicate="is laughing softly">The tiny baby</div>
-  <div class="subject" draggable="true" data-predicate="completed science project">Students of class 5B</div>
-  <div class="subject" draggable="true" data-predicate="baked delicious cookies">The cheerful neighbor</div>
-  
-  <!-- More Predicates -->
-  <div class="predicate" data-subject="The birds in sky">are chirping melodiously</div>
-  <div class="predicate" data-subject="My best friend">is helping with homework</div>
-  <div class="predicate" data-subject="The hardworking farmer">harvested the crops</div>
-  <div class="predicate" data-subject="The famous singer">performed on stage</div>
-  <div class="predicate" data-subject="The tiny baby">is laughing softly</div>
-  <div class="predicate" data-subject="Students of class 5B">completed science project</div>
-  <div class="predicate" data-subject="The cheerful neighbor">baked delicious cookies</div>
-</div>
+<div id="game-area"></div>
 
 <div id="result"></div>
 <div id="score">Score: 0 / 15</div>
-<div id="progress-bar"><div id="progress-fill"></div></div>
-<button id="restart-btn">🔄 Play Again</button>
+<button id="restart-btn">Play Again</button>
 
 <audio id="correct-sound" src="assets/correct.mp3"></audio>
 <audio id="wrong-sound" src="assets/wrong.mp3"></audio>
@@ -295,210 +145,139 @@ h1 {
 
 <script>
 const gameArea = document.getElementById('game-area');
-const instructionsScreen = document.getElementById('instructions-screen');
-const subjects = document.querySelectorAll('.subject');
-const predicates = document.querySelectorAll('.predicate');
+const instructions = document.getElementById('instructions-screen');
 const result = document.getElementById('result');
 const scoreEl = document.getElementById('score');
-const progressBar = document.getElementById('progress-fill');
 const restartBtn = document.getElementById('restart-btn');
+
+const pairs = [
+  {subject:'The curious cat',predicate:'climbed the tall tree quietly'},
+  {subject:'Our class monitor',predicate:'organized the classroom efficiently'},
+  {subject:'The team of players',predicate:'scored the winning goal'},
+  {subject:'My favorite author',predicate:'wrote an inspiring story'},
+  {subject:'The young scientist',predicate:'conducted an experiment'},
+  {subject:'The children in park',predicate:'are flying kites'},
+  {subject:'Our school principal',predicate:'welcomed new students'},
+  {subject:'The old gardener',predicate:'watered the plants'},
+  {subject:'The birds in sky',predicate:'are chirping melodiously'},
+  {subject:'My best friend',predicate:'is helping with homework'},
+  {subject:'The hardworking farmer',predicate:'harvested the crops'},
+  {subject:'The famous singer',predicate:'performed on stage'},
+  {subject:'The tiny baby',predicate:'is laughing softly'},
+  {subject:'Students of class 5B',predicate:'completed science project'},
+  {subject:'The cheerful neighbor',predicate:'baked delicious cookies'}
+];
+
+let selectedSubject = null;
 let score = 0;
-let matchedPairs = 0;
-let draggedElement = null;
+let matched = 0;
 
-// Shuffle function
-function shuffleArray(array) {
-  for (let i = array.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [array[i], array[j]] = [array[j], array[i]];
+function shuffle(arr) {
+  for(let i=arr.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]]=[arr[j],arr[i]];
   }
-  return array;
+  return arr;
 }
 
-// Shuffle cards
-function shuffleCards() {
-  const subjectArray = shuffleArray([...subjects]);
-  const predicateArray = shuffleArray([...predicates]);
-  
+function createCards() {
   gameArea.innerHTML = '';
-  subjectArray.forEach(sub => gameArea.appendChild(sub));
-  predicateArray.forEach(pred => gameArea.appendChild(pred));
+  const subjects = shuffle(pairs.map(p => ({...p, type:'subject'}})));
+  const predicates = shuffle(pairs.map(p => ({...p, type:'predicate'}})));
+  
+  subjects.forEach(s => {
+    const div = document.createElement('div');
+    div.className = 'subject';
+    div.textContent = s.subject;
+    div.dataset.subject = s.subject;
+    div.dataset.predicate = s.predicate;
+    div.onclick = () => selectSubject(div);
+    gameArea.appendChild(div);
+  });
+  
+  predicates.forEach(p => {
+    const div = document.createElement('div');
+    div.className = 'predicate';
+    div.textContent = p.predicate;
+    div.dataset.subject = p.subject;
+    div.dataset.predicate = p.predicate;
+    div.onclick = () => checkMatch(div);
+    gameArea.appendChild(div);
+  });
 }
 
-// Desktop drag
-subjects.forEach(sub => {
-  sub.addEventListener('dragstart', e => {
-    e.dataTransfer.setData('text/plain', sub.dataset.predicate);
-    e.dataTransfer.setData('text/subject', sub.innerText);
-    sub.classList.add('dragging');
-  });
-  
-  sub.addEventListener('dragend', e => {
-    sub.classList.remove('dragging');
-  });
-});
+function selectSubject(el) {
+  if(el.classList.contains('matched')) return;
+  document.querySelectorAll('.subject').forEach(s => s.classList.remove('selected'));
+  selectedSubject = el;
+  el.classList.add('selected');
+  result.textContent = `Selected: ${el.textContent}`;
+}
 
-predicates.forEach(pred => {
-  pred.addEventListener('dragover', e => e.preventDefault());
+function checkMatch(el) {
+  if(!selectedSubject || el.classList.contains('correct')) {
+    result.textContent = 'Click a subject first!';
+    return;
+  }
   
-  pred.addEventListener('dragenter', e => {
-    pred.classList.add('drag-over');
-  });
-  
-  pred.addEventListener('dragleave', e => {
-    pred.classList.remove('drag-over');
-  });
-  
-  pred.addEventListener('drop', e => {
-    e.preventDefault();
-    pred.classList.remove('drag-over');
+  if(el.dataset.subject === selectedSubject.dataset.subject) {
+    // Correct!
+    el.textContent = `${selectedSubject.dataset.subject} ${selectedSubject.dataset.predicate}`;
+    el.classList.add('correct');
+    selectedSubject.classList.add('matched');
+    selectedSubject.classList.remove('selected');
+    selectedSubject = null;
     
-    const draggedPredicate = e.dataTransfer.getData('text/plain');
-    const draggedSubject = e.dataTransfer.getData('text/subject');
-
-    if(pred.dataset.subject === draggedSubject){
-      pred.innerHTML = `${draggedSubject} ${draggedPredicate}`;
-      pred.classList.add('correct');
-      result.innerHTML = "🎉 Correct!";
-      result.style.color = "#4caf50";
-      
-      document.getElementById('correct-sound').play();
-      document.getElementById('clap-sound').play();
-      createConfetti();
-      
-      score++;
-      matchedPairs++;
-      
-      const subElement = document.querySelector(`.subject[draggable][data-predicate='${draggedPredicate}']`);
-      if(subElement) subElement.classList.add('matched');
-      
-      progressBar.style.width = (matchedPairs / 15 * 100) + '%';
-      
-      if(matchedPairs === 15){
-        result.innerHTML = "🏆 PERFECT! All 15 matched!";
-        scoreEl.innerHTML = `🎉 15 / 15 - PERFECT!`;
-        restartBtn.style.display = 'inline-block';
-      }
-    } else {
-      result.innerHTML = "❌ Try again!";
-      result.style.color = "#e76f51";
-      document.getElementById('wrong-sound').play();
+    result.textContent = '🎉 Correct!';
+    result.style.color = '#4caf50';
+    document.getElementById('correct-sound').play();
+    document.getElementById('clap-sound').play();
+    confetti();
+    
+    score++;
+    matched++;
+    scoreEl.textContent = `Score: ${score} / 15`;
+    
+    if(matched === 15) {
+      result.textContent = '🏆 PERFECT! All 15 matched!';
+      restartBtn.style.display = 'inline-block';
     }
-    
-    scoreEl.innerText = `Score: ${score} / 15`;
-    
-    setTimeout(() => {
-      if(matchedPairs < 15) result.innerHTML = "";
-    }, 1500);
-  });
-});
-
-// Touch support
-subjects.forEach(sub => {
-  sub.addEventListener('touchstart', e => {
-    e.preventDefault();
-    draggedElement = sub;
-    sub.classList.add('dragging');
-  });
-  
-  sub.addEventListener('touchmove', e => {
-    if (!draggedElement) return;
-    e.preventDefault();
-    const touch = e.touches[0];
-    draggedElement.style.left = (touch.clientX - draggedElement.offsetWidth/2) + 'px';
-    draggedElement.style.top = (touch.clientY - draggedElement.offsetHeight/2) + 'px';
-  });
-  
-  sub.addEventListener('touchend', e => {
-    if (!draggedElement) return;
-    const touch = e.changedTouches[0];
-    draggedElement.classList.remove('dragging');
-    draggedElement.style.position = '';
-    draggedElement.style.left = '';
-    draggedElement.style.top = '';
-    
-    const predicatesArray = document.querySelectorAll('.predicate:not(.correct)');
-    for(let pred of predicatesArray) {
-      const predRect = pred.getBoundingClientRect();
-      if(touch.clientX >= predRect.left && touch.clientX <= predRect.right &&
-         touch.clientY >= predRect.top && touch.clientY <= predRect.bottom) {
-        
-        const draggedPredicate = draggedElement.dataset.predicate;
-        const draggedSubject = draggedElement.innerText;
-        
-        if(pred.dataset.subject === draggedSubject){
-          pred.innerHTML = `${draggedSubject} ${draggedPredicate}`;
-          pred.classList.add('correct');
-          result.innerHTML = "🎉 Correct!";
-          result.style.color = "#4caf50";
-          
-          document.getElementById('correct-sound').play();
-          document.getElementById('clap-sound').play();
-          createConfetti();
-          
-          score++;
-          matchedPairs++;
-          draggedElement.classList.add('matched');
-          progressBar.style.width = (matchedPairs / 15 * 100) + '%';
-          
-          if(matchedPairs === 15){
-            result.innerHTML = "🏆 PERFECT! All 15 matched!";
-            scoreEl.innerHTML = `🎉 15 / 15 - PERFECT!`;
-            restartBtn.style.display = 'inline-block';
-          }
-        } else {
-          result.innerHTML = "❌ Try again!";
-          result.style.color = "#e76f51";
-          document.getElementById('wrong-sound').play();
-        }
-        
-        scoreEl.innerText = `Score: ${score} / 15`;
-        break;
-      }
-    }
-    
-    setTimeout(() => {
-      if(matchedPairs < 15) result.innerHTML = "";
-    }, 1500);
-    
-    draggedElement = null;
-  });
-});
-
-function createConfetti() {
-  for(let i=0; i<30; i++){
-    const conf = document.createElement('div');
-    conf.classList.add('confetti');
-    conf.innerHTML = ['⭐', '🎉', '✨'][Math.floor(Math.random()*3)];
-    conf.style.left = Math.random() * 100 + 'vw';
-    conf.style.top = '-10px';
-    document.body.appendChild(conf);
-    setTimeout(() => conf.remove(), 2000);
+  } else {
+    // Wrong
+    result.textContent = '❌ Try again!';
+    result.style.color = '#e76f51';
+    document.getElementById('wrong-sound').play();
   }
 }
 
-document.getElementById('start-btn').addEventListener('click', () => {
-  instructionsScreen.style.display = 'none';
-  gameArea.style.display = 'flex';
-  shuffleCards();
-  result.innerHTML = "";
-  scoreEl.innerHTML = "Score: 0 / 15";
-  progressBar.style.width = '0%';
-  restartBtn.style.display = 'none';
-  matchedPairs = 0;
-  score = 0;
-});
+function confetti() {
+  for(let i=0;i<30;i++){
+    const c=document.createElement('div');
+    c.className='confetti';
+    c.textContent=['⭐','🎉','✨'][Math.floor(Math.random()*3)];
+    c.style.left=Math.random()*100+'vw';
+    c.style.top='-10px';
+    document.body.appendChild(c);
+    setTimeout(()=>c.remove(),2000);
+  }
+}
 
-restartBtn.addEventListener('click', () => {
-  instructionsScreen.style.display = 'block';
-  gameArea.style.display = 'none';
-  subjects.forEach(sub => sub.classList.remove('matched'));
-  predicates.forEach(pred => pred.classList.remove('correct'));
-  result.innerHTML = "";
-  scoreEl.innerHTML = "Score: 0 / 15";
-  progressBar.style.width = '0%';
-  restartBtn.style.display = 'none';
-});
+document.getElementById('start-btn').onclick = () => {
+  instructions.style.display='none';
+  gameArea.style.display='flex';
+  createCards();
+  result.textContent='';
+  scoreEl.textContent='Score: 0 / 15';
+  restartBtn.style.display='none';
+  score=0;
+  matched=0;
+  selectedSubject=null;
+};
+
+restartBtn.onclick = () => {
+  instructions.style.display='block';
+  gameArea.style.display='none';
+};
 </script>
 
 </body>
