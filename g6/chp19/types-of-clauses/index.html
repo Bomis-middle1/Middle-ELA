@@ -1,179 +1,176 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Clause Treasure Hunt</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>Bridge Builder: Save the Kingdom</title>
 <style>
-body { margin:0; font-family: Arial; background:#e0f7fa; overflow:hidden; }
-#logoScreen { position:fixed; top:0; left:0; width:100%; height:100%; display:flex; justify-content:center; align-items:center; background:white; z-index:100;}
-#gameContainer { display:none; width:100%; height:100vh; position:relative; overflow:hidden;}
-#player { position:absolute; bottom:20px; left:50%; transform:translateX(-50%); width:60px; height:80px; transition:left 0.5s;}
-.chest { position:absolute; width:100px; height:80px; background:#ffeb3b; border-radius:10px; cursor:pointer; text-align:center; line-height:80px; font-weight:bold; }
-#questionBox { display:none; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:300px; background:white; padding:20px; border-radius:10px; text-align:center; box-shadow:0 0 15px #0003; z-index:50; }
-#questionBox button { margin:5px; padding:10px 15px; cursor:pointer;}
-#feedback { margin-top:10px; font-weight:bold;}
-#treasure { position:absolute; bottom:50px; left:50%; transform:translateX(-50%); width:120px; height:120px; display:none; z-index:20;}
-#restartBtn { position:absolute; display:none; left:50%; top:70%; transform:translateX(-50%); padding:10px 20px; font-size:18px; cursor:pointer;}
-#volumeSlider { position:absolute; bottom:10px; left:50%; transform:translateX(-50%);}
-.particle { position:absolute; width:8px; height:8px; background:linear-gradient(to right, #ff0,#f0f); border-radius:50%; pointer-events:none; animation: floatParticle 1s linear forwards;}
-@keyframes floatParticle { 0%{opacity:1; transform:translate(0,0);} 100%{opacity:0; transform:translate(calc(-50px + 100px*var(--randX)), -80px);}}
+:root{
+  --gold:#ffd66b;
+  --deep:#24345d;
+  --purple:#5a3f9a;
+  --sky1:#8fd8ff;
+  --sky2:#d9f6ff;
+  --grass:#3fbf72;
+  --river:#1fa7d6;
+  --wood:#b8793b;
+  --wood2:#8b5528;
+  --card:#fff8df;
+  --ink:#243047;
+  --good:#21a66f;
+  --bad:#d94747;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;width:100%;min-height:100%;overflow-x:hidden;font-family:"Trebuchet MS",Arial,sans-serif;color:var(--ink);background:#d9f6ff}
+button,input{font-family:inherit}
+.screen{display:none;min-height:100vh;width:100%;position:relative;overflow:hidden}
+.screen.active{display:flex}
+#splash{align-items:center;justify-content:center;background:#fff;z-index:1000}
+#splash img{width:min(72vw,440px);height:auto;display:block}
+#instructions{align-items:center;justify-content:center;padding:20px;background:linear-gradient(#83d6ff,#e6fbff 58%,#83c96b)}
+.cloud{position:absolute;background:white;border-radius:50px;opacity:.78;animation:cloudMove 30s linear infinite;box-shadow:35px 8px 0 6px white,70px 0 0 0 white}
+.cloud.c1{width:90px;height:34px;top:9%;left:-120px}.cloud.c2{width:120px;height:42px;top:18%;left:-240px;animation-duration:42s}.cloud.c3{width:75px;height:28px;top:6%;left:55%;animation-duration:35s}
+@keyframes cloudMove{from{transform:translateX(-10vw)}to{transform:translateX(120vw)}}
+.instructions-card{position:relative;z-index:2;width:min(92vw,760px);background:rgba(255,248,223,.96);border:5px solid var(--gold);border-radius:28px;padding:24px;text-align:center;box-shadow:0 18px 45px rgba(42,42,90,.25)}
+.instructions-card h1{font-size:clamp(28px,5vw,48px);margin:0 0 12px;color:#5b3a98;text-shadow:0 2px #fff}
+.instructions-card p{font-size:clamp(17px,2.6vw,24px);line-height:1.35;margin:9px 0;font-weight:700}
+.primary-btn{border:0;border-radius:22px;padding:15px 28px;font-size:clamp(18px,3vw,25px);font-weight:900;background:linear-gradient(#ffe58b,#ffb732);color:#4a2c00;box-shadow:0 8px 0 #bf761b,0 14px 28px rgba(0,0,0,.2);cursor:pointer;margin-top:16px;min-height:54px}
+.primary-btn:active{transform:translateY(5px);box-shadow:0 3px 0 #bf761b,0 8px 16px rgba(0,0,0,.16)}
+.volume-wrap{margin:16px auto 0;background:#fff;border:3px solid #8ed1ff;border-radius:18px;padding:10px 14px;display:flex;align-items:center;justify-content:center;gap:10px;max-width:360px;font-weight:900;font-size:17px}
+.volume-wrap input{width:160px;accent-color:#6f4cc8}
+#game{flex-direction:column;background:linear-gradient(#7fd4ff 0%,#dff8ff 40%,#7bd16f 41%,#3aa85e 100%);height:100vh;min-height:100vh;overflow:hidden}
+.hud{position:relative;z-index:20;background:rgba(255,255,255,.9);border-bottom:4px solid rgba(66,83,136,.22);padding:8px 10px;display:grid;grid-template-columns:repeat(4,1fr);gap:7px;box-shadow:0 4px 14px rgba(0,0,0,.1)}
+.hud-item{background:#fff7d7;border:2px solid #ffd66b;border-radius:14px;text-align:center;font-size:clamp(12px,2.1vw,18px);font-weight:900;padding:6px 3px;white-space:nowrap}
+.progress-shell{grid-column:1/-1;height:16px;background:#dce9ff;border:2px solid #4566a8;border-radius:20px;overflow:hidden}
+#progressBar{height:100%;width:0%;background:linear-gradient(90deg,#55d38f,#ffd75b,#ff9e4d);transition:width .55s ease;border-radius:20px}
+.adventure{position:relative;flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:6px 10px 10px;overflow:hidden}
+.sky-effects{position:absolute;inset:0;pointer-events:none;z-index:0}.particle{position:absolute;font-size:18px;opacity:.35;animation:floaty 5s ease-in-out infinite}.p1{left:8%;top:18%}.p2{left:78%;top:15%;animation-delay:1s}.p3{left:58%;top:33%;animation-delay:2s}.p4{left:22%;top:42%;animation-delay:.5s}
+@keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-18px)}}
+.scene{position:relative;z-index:1;width:min(98vw,1050px);height:clamp(180px,36vh,330px);margin-top:2px;border-radius:22px;overflow:hidden;background:linear-gradient(#77d3ff 0 46%,#23a9db 47% 78%,#51bf61 79%);border:4px solid rgba(255,255,255,.72);box-shadow:0 12px 25px rgba(0,0,0,.17)}
+.river{position:absolute;left:0;right:0;top:46%;height:33%;background:repeating-linear-gradient(-12deg,rgba(255,255,255,.18) 0 12px,transparent 12px 34px),linear-gradient(#1ab0e0,#1084ba);animation:water 3s linear infinite}
+@keyframes water{from{background-position:0 0,0 0}to{background-position:60px 0,0 0}}
+.bank-left,.bank-right{position:absolute;bottom:0;height:25%;background:linear-gradient(#65c95f,#319b4e);border-top:5px solid #2c8f48}.bank-left{left:0;width:21%}.bank-right{right:0;width:24%}
+.castle{position:absolute;right:2%;top:10%;width:150px;height:145px;display:flex;align-items:flex-end;justify-content:center;filter:drop-shadow(0 7px 4px rgba(0,0,0,.18))}
+.tower{width:40px;height:94px;background:linear-gradient(#b7b2d9,#8279bf);border:3px solid #5b5198;border-bottom:0;position:relative;border-radius:8px 8px 0 0}.tower:before{content:"";position:absolute;top:-25px;left:-6px;border-left:26px solid transparent;border-right:26px solid transparent;border-bottom:28px solid #8a4fd1}.tower.mid{height:120px;width:55px}.gate{position:absolute;bottom:0;width:38px;height:47px;background:#5b321a;border-radius:20px 20px 0 0;border:3px solid #3b1f0f;transition:transform 1s ease}.castle.open .gate{transform:translateY(45px)}
+.bridge{position:absolute;left:16%;right:22%;top:61%;height:18%;display:grid;grid-template-columns:repeat(10,1fr);gap:4px;align-items:center;z-index:3}.plank{height:32px;border-radius:7px;background:rgba(91,62,35,.22);border:2px dashed rgba(255,255,255,.35);transform:scale(.78);opacity:.35}.plank.built{background:linear-gradient(90deg,var(--wood),#d99a53,var(--wood2));border:3px solid #6a3d1d;opacity:1;transform:scale(1);box-shadow:0 0 18px #ffe987;animation:buildPlank .55s ease both}@keyframes buildPlank{0%{transform:translateY(-35px) scale(.3) rotate(-8deg);opacity:0}70%{transform:translateY(4px) scale(1.08)}100%{transform:translateY(0) scale(1)}}
+.hero{position:absolute;left:8%;top:49%;font-size:clamp(38px,7vw,66px);z-index:5;transition:left .8s ease,top .8s ease;filter:drop-shadow(0 4px 2px rgba(0,0,0,.25))}.hero.celebrate{animation:bounce 1s infinite}@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+.wizard{position:absolute;left:2%;bottom:17%;font-size:clamp(38px,6vw,58px);z-index:4}.king{position:absolute;right:4%;bottom:19%;font-size:0;z-index:5;transition:font-size .5s ease}.king.show{font-size:clamp(36px,6vw,58px)}
+.sparkle{position:absolute;font-size:24px;pointer-events:none;animation:spark .9s ease-out forwards;z-index:30}@keyframes spark{0%{transform:translateY(0) scale(.4);opacity:1}100%{transform:translateY(-70px) scale(1.6) rotate(180deg);opacity:0}}
+.question-card{position:relative;z-index:2;width:min(98vw,980px);background:rgba(255,248,223,.97);border:4px solid #f8cd61;border-radius:22px;padding:12px;box-shadow:0 10px 25px rgba(39,48,85,.18);max-height:calc(64vh - 18px);overflow:auto}.question-card.shake{animation:shake .32s ease}@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}50%{transform:translateX(8px)}75%{transform:translateX(-5px)}}
+.challenge-label{font-size:clamp(15px,2.2vw,20px);font-weight:900;color:#6b42b4;margin-bottom:5px}.sentence{font-size:clamp(17px,2.5vw,24px);font-weight:900;line-height:1.32;background:#fff;border:3px solid #d8e8ff;border-radius:16px;padding:10px;margin-bottom:9px}.options{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}.option{border:3px solid #7fb8ef;background:linear-gradient(#fff,#eaf6ff);border-radius:16px;min-height:50px;padding:10px;font-size:clamp(15px,2.2vw,20px);font-weight:900;color:#253650;cursor:pointer;box-shadow:0 5px 0 #4d86bd;text-align:left}.option:hover,.option:focus{outline:3px solid #ffd66b}.option:disabled{cursor:default;opacity:.92}.option.correct{background:linear-gradient(#d8ffe8,#80e5ac);border-color:#21a66f;box-shadow:0 5px 0 #128052}.option.wrong{background:linear-gradient(#ffe5e5,#ff9c9c);border-color:#d94747;box-shadow:0 5px 0 #9f2929}.feedback{display:none;margin-top:10px;background:#fff7cf;border:3px solid #f1c24b;border-radius:15px;padding:9px;font-size:clamp(15px,2.1vw,19px);font-weight:800;line-height:1.25}.feedback.show{display:block}.next-btn{display:none;margin:10px auto 0;border:0;border-radius:16px;padding:10px 22px;background:linear-gradient(#9ff0bf,#31ba70);color:#08361d;font-size:18px;font-weight:900;box-shadow:0 5px 0 #15864b;cursor:pointer}.next-btn.show{display:block}.crystal-fly{position:absolute;font-size:30px;z-index:50;animation:crystalFly 1.1s ease-out forwards}@keyframes crystalFly{0%{transform:translateY(0) scale(.5);opacity:1}100%{transform:translateY(-120px) scale(1.3);opacity:0}}
+#victory{align-items:center;justify-content:center;padding:18px;background:radial-gradient(circle at 50% 20%,#fff4b8,#9fdfff 45%,#6acb74 100%);overflow:hidden}.victory-card{position:relative;z-index:5;width:min(94vw,760px);background:rgba(255,255,255,.94);border:6px solid var(--gold);border-radius:30px;text-align:center;padding:22px;box-shadow:0 18px 45px rgba(0,0,0,.25)}.victory-card h2{font-size:clamp(30px,6vw,56px);margin:0;color:#5b3a98}.victory-card p{font-size:clamp(18px,3vw,26px);font-weight:900;margin:8px}.crown{font-size:clamp(70px,16vw,130px);animation:crownPop 1.3s ease infinite alternate}@keyframes crownPop{from{transform:scale(1) rotate(-3deg)}to{transform:scale(1.08) rotate(3deg)}}.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:14px auto;max-width:560px}.stat{background:#fff7d7;border:3px solid #ffd66b;border-radius:16px;padding:10px;font-size:clamp(16px,2.4vw,22px);font-weight:900}.confetti{position:absolute;width:12px;height:18px;top:-30px;animation:fall 3.2s linear forwards;z-index:4}@keyframes fall{to{transform:translateY(110vh) rotate(720deg);opacity:.1}}.firework{position:absolute;font-size:26px;animation:fire 1.2s ease-out forwards;z-index:3}@keyframes fire{0%{transform:scale(.2);opacity:1}100%{transform:scale(2.3);opacity:0}}
+@media (max-width:720px){.hud{grid-template-columns:repeat(2,1fr);padding:6px}.scene{height:31vh}.castle{width:112px;height:120px;right:0}.tower{width:30px;height:76px}.tower.mid{width:42px;height:98px}.bridge{left:18%;right:24%;gap:2px}.plank{height:25px}.options{grid-template-columns:1fr}.question-card{padding:9px;max-height:calc(69vh - 18px)}.option{min-height:46px}.wizard{display:none}.hero{top:51%}.stats{grid-template-columns:1fr}.instructions-card{padding:18px}}
+@media (max-height:620px){.scene{height:27vh}.question-card{max-height:calc(73vh - 80px)}.sentence{padding:7px;margin-bottom:6px}.option{padding:8px;min-height:42px}.feedback{font-size:14px;padding:7px}.instructions-card p{margin:5px 0}.primary-btn{padding:11px 22px}}
 </style>
 </head>
 <body>
-
-<div id="logoScreen">
-  <img src="assets/innovine-logo.png" alt="Innovine Logo" width="200">
-</div>
-
-<div id="gameContainer">
-<img id="player" src="assets/player.png" alt="Player">
-<div id="treasure" src="assets/treasure.png"></div>
-<div id="questionBox">
-<div id="questionText"></div>
-<div id="optionsContainer"></div>
-<div id="feedback"></div>
-</div>
-
-<button id="restartBtn">Restart Adventure</button>
-<input type="range" id="volumeSlider" min="0" max="1" step="0.1" value="0.8">
-
-<audio id="correctSound" src="assets/correct.mp3"></audio>
-<audio id="wrongSound" src="assets/wrong.mp3"></audio>
-<audio id="clapSound" src="assets/clapping.mp3"></audio>
-</div>
-
+<section id="splash" class="screen active" aria-label="Innovine logo splash">
+  <img src="assets/innovine-logo.png" alt="Innovine Logo" />
+</section>
+<section id="instructions" class="screen" aria-label="Instructions screen">
+  <div class="cloud c1"></div><div class="cloud c2"></div><div class="cloud c3"></div>
+  <div class="instructions-card">
+    <h1>🏰 Welcome to Bridge Builder!</h1>
+    <p>The magical bridge to Grammar Castle has collapsed.</p>
+    <p>Answer each clause challenge correctly to rebuild the bridge.</p>
+    <p>Every correct answer repairs one bridge plank.</p>
+    <p>Collect Magic Crystals. Reach the castle.</p>
+    <p>Become the Royal Grammar Champion!</p>
+    <div class="volume-wrap"><span>🔊 Volume</span><input id="volumeSlider" type="range" min="0" max="1" step="0.05" value="0.85" aria-label="Volume slider" /></div>
+    <button id="startBtn" class="primary-btn">Start Adventure</button>
+  </div>
+</section>
+<section id="game" class="screen" aria-label="Gameplay screen">
+  <div class="hud">
+    <div class="hud-item">⭐ Score: <span id="score">0</span></div>
+    <div class="hud-item">💎 Crystals: <span id="crystals">0</span></div>
+    <div class="hud-item">🪵 Built: <span id="built">0</span>/10</div>
+    <div class="hud-item">📖 Question: <span id="qnum">1</span>/10</div>
+    <div class="progress-shell"><div id="progressBar"></div></div>
+  </div>
+  <div class="adventure">
+    <div class="sky-effects"><span class="particle p1">✨</span><span class="particle p2">💫</span><span class="particle p3">⭐</span><span class="particle p4">🔮</span></div>
+    <div class="scene" id="scene">
+      <div class="river"></div><div class="bank-left"></div><div class="bank-right"></div>
+      <div class="castle" id="castle"><div class="tower"></div><div class="tower mid"><div class="gate"></div></div><div class="tower"></div></div>
+      <div class="bridge" id="bridge"></div>
+      <div class="wizard">🧙‍♂️</div><div class="hero" id="hero">🧝</div><div class="king" id="king">🤴</div>
+    </div>
+    <div class="question-card" id="questionCard">
+      <div class="challenge-label" id="challengeLabel"></div>
+      <div class="sentence" id="sentence"></div>
+      <div class="options" id="options"></div>
+      <div class="feedback" id="feedback"></div>
+      <button class="next-btn" id="nextBtn">Continue Building ➜</button>
+    </div>
+  </div>
+</section>
+<section id="victory" class="screen" aria-label="Victory screen">
+  <div class="victory-card">
+    <h2>🏆 Congratulations!</h2>
+    <p>You rebuilt the bridge!</p>
+    <p>You saved Grammar Kingdom!</p>
+    <div class="crown">👑</div>
+    <p>🏆 Royal Grammar Champion!</p>
+    <div class="stats">
+      <div class="stat">⭐ Final Score: <span id="finalScore">0</span>/10</div>
+      <div class="stat">🎯 Accuracy: <span id="accuracy">0</span>%</div>
+      <div class="stat">💎 Crystals: <span id="finalCrystals">0</span></div>
+      <div class="stat">🪵 Bridge Completed: 10/10</div>
+    </div>
+    <button id="playAgainBtn" class="primary-btn">Play Again</button>
+  </div>
+</section>
+<audio id="correctAudio" src="assets/correct.mp3" preload="auto"></audio>
+<audio id="wrongAudio" src="assets/wrong.mp3" preload="auto"></audio>
+<audio id="clapAudio" src="assets/clapping.mp3" preload="auto"></audio>
 <script>
-// --- 10 Questions ---
-const questions = [
-  {sentence:"I know who won the race.", type:"noun clause"},
-  {sentence:"This is the book that I borrowed.", type:"adjective clause"},
-  {sentence:"He ran fast because he wanted to catch the bus.", type:"adverb clause"},
-  {sentence:"The man who called yesterday is my uncle.", type:"adjective clause"},
-  {sentence:"I will wait until he returns.", type:"adverb clause"},
-  {sentence:"I heard the rumor that he had won the prize.", type:"noun clause"},
-  {sentence:"She stayed home because she was feeling sick.", type:"adverb clause"},
-  {sentence:"The student who answered all questions correctly got a medal.", type:"adjective clause"},
-  {sentence:"Do you know who is coming?", type:"noun clause"},
-  {sentence:"This is the house where I grew up.", type:"adjective clause"}
+(function(){
+'use strict';
+var TOTAL=10;
+var questions=[
+{level:'Easy Bridge Stone',prompt:'🏫 During English class, the teacher says,',sentence:'"The bell rang, but the students continued working." Which part is the MAIN clause?',options:['but the students continued working','The bell rang','working','the students'],answer:'The bell rang',explanation:'A main clause can stand alone as a complete sentence.'},
+{level:'Easy Bridge Stone',prompt:'🌧 Read the sentence.',sentence:'"We stayed indoors because it was raining." Which words form the SUBORDINATE clause?',options:['We stayed indoors','because it was raining','stayed indoors','We stayed'],answer:'because it was raining',explanation:'A subordinate clause cannot stand alone and adds extra information.'},
+{level:'Easy Bridge Stone',prompt:'🎈 Choose the sentence that helps the wizard build safely.',sentence:'Which sentence contains BOTH a main clause and a subordinate clause?',options:['The dog barked.','Although it was cold, we played outside.','Birds fly.','The baby laughed.'],answer:'Although it was cold, we played outside.',explanation:'The sentence contains an independent idea and a dependent idea.'},
+{level:'Magic River Crossing',prompt:'⚽ Rahul asked,',sentence:'"Do you know who scored the winning goal?" Which words are the NOUN clause?',options:['Do you know','who scored the winning goal','the winning goal','Rahul asked'],answer:'who scored the winning goal',explanation:'A noun clause acts like a noun in the sentence.'},
+{level:'Magic River Crossing',prompt:'📚 Read the sentence.',sentence:'"The girl who won the spelling competition received a trophy." Which words are the ADJECTIVE clause?',options:['The girl','received a trophy','who won the spelling competition','won the trophy'],answer:'who won the spelling competition',explanation:'An adjective clause describes the noun "girl."'},
+{level:'Magic River Crossing',prompt:'🚴 Aman wore a raincoat because dark clouds filled the sky.',sentence:'Which clause tells WHY Aman wore a raincoat?',options:['Aman wore a raincoat','because dark clouds filled the sky','dark clouds','filled the sky'],answer:'because dark clouds filled the sky',explanation:'An adverb clause often tells why, when, where, or how something happens.'},
+{level:'Magic River Crossing',prompt:'🚌 The bridge asks for a time clue.',sentence:'Which sentence contains an ADVERB clause?',options:['The teacher smiled happily.','We waited until the bus arrived.','The blue bus stopped.','Our bus was late.'],answer:'We waited until the bus arrived.',explanation:'"until the bus arrived" tells when we waited.'},
+{level:'Castle Gate Challenge',prompt:'🎂 Choose carefully before the next plank appears.',sentence:'Which sentence contains an ADJECTIVE clause?',options:['The cake tasted delicious.','The cake that Grandma baked was delicious.','The cake was baked.','Grandma baked a cake.'],answer:'The cake that Grandma baked was delicious.',explanation:'"that Grandma baked" describes the noun "cake."'},
+{level:'Castle Gate Challenge',prompt:'🎮 The wizard needs a noun-clause crystal.',sentence:'Which sentence contains a NOUN clause?',options:['The boy who plays chess is my cousin.','I believe that our team will win.','The players trained hard.','We played after school.'],answer:'I believe that our team will win.',explanation:'"that our team will win" acts as the object of the verb "believe."'},
+{level:'FINAL CASTLE CHALLENGE',prompt:'🏰 FINAL CASTLE CHALLENGE',sentence:'Which sentence is matched correctly?',options:['because the rain stopped → Adjective Clause','who solved the puzzle → Adjective Clause','that we were late → Adverb Clause','when the bell rang → Noun Clause'],answer:'who solved the puzzle → Adjective Clause',explanation:'"who solved the puzzle" describes a noun, making it an adjective clause.'}
 ];
-
-let player = document.getElementById('player');
-let questionBox = document.getElementById('questionBox');
-let questionText = document.getElementById('questionText');
-let optionsContainer = document.getElementById('optionsContainer');
-let feedback = document.getElementById('feedback');
-let treasure = document.getElementById('treasure');
-let restartBtn = document.getElementById('restartBtn');
-let gameContainer = document.getElementById('gameContainer');
-let scrollIndex = 0;
-let chests = [];
-const correctSound = document.getElementById('correctSound');
-const wrongSound = document.getElementById('wrongSound');
-const clapSound = document.getElementById('clapSound');
-const volumeSlider = document.getElementById('volumeSlider');
-
-volumeSlider.oninput = ()=>{
-  correctSound.volume = volumeSlider.value;
-  wrongSound.volume = volumeSlider.value;
-  clapSound.volume = volumeSlider.value;
-};
-correctSound.volume = volumeSlider.value;
-wrongSound.volume = volumeSlider.value;
-clapSound.volume = volumeSlider.value;
-
-// Logo splash
-setTimeout(()=>{
-  document.getElementById('logoScreen').style.display='none';
-  gameContainer.style.display='block';
-  createChests();
-},5000);
-
-// --- Create Treasure Chests ---
-function createChests(){
-  const spacing = window.innerWidth/(questions.length+1);
-  questions.forEach((q,i)=>{
-    const chest = document.createElement('div');
-    chest.className='chest';
-    chest.textContent="Chest";
-    chest.style.left=(spacing*(i+1)-50)+'px';
-    chest.style.bottom="100px";
-    chest.onclick = ()=>openChest(i,chest);
-    gameContainer.appendChild(chest);
-    chests.push(chest);
-  });
-}
-
-// --- Open Chest ---
-function openChest(index,chest){
-  questionBox.style.display='block';
-  questionText.textContent=questions[index].sentence;
-  optionsContainer.innerHTML='';
-  feedback.innerHTML='';
-  const types = ["noun clause","adjective clause","adverb clause"];
-  types.sort(()=>Math.random()-0.5);
-  types.forEach(opt=>{
-    const btn = document.createElement('button');
-    btn.textContent=opt;
-    btn.onclick = ()=>checkAnswer(opt,questions[index].type,chest,index);
-    optionsContainer.appendChild(btn);
-  });
-}
-
-// --- Particle Effect ---
-function createParticles(x,y){
-  for(let i=0;i<15;i++){
-    const p = document.createElement('div');
-    p.className='particle';
-    p.style.left = x+'px';
-    p.style.top = y+'px';
-    p.style.setProperty('--randX', Math.random());
-    document.body.appendChild(p);
-    setTimeout(()=>document.body.removeChild(p),1000);
-  }
-}
-
-// --- Check Answer ---
-function checkAnswer(selected,correct,chest,index){
-  if(selected===correct){
-    feedback.textContent="Correct! 🎉";
-    feedback.style.color="green";
-    correctSound.currentTime=0; correctSound.play();
-    createParticles(chest.offsetLeft+50,chest.offsetTop);
-    questionBox.style.display='none';
-    chest.style.background="#8bc34a";
-    chest.style.pointerEvents="none";
-    movePlayer(index);
-  } else {
-    feedback.textContent="Try again!";
-    feedback.style.color="red";
-    wrongSound.currentTime=0; wrongSound.play();
-  }
-}
-
-// --- Move Player ---
-function movePlayer(index){
-  player.style.left = chests[index].style.left;
-  scrollIndex++;
-  if(scrollIndex===questions.length){
-    treasure.style.display='block';
-    clapSound.currentTime=0; clapSound.play();
-    restartBtn.style.display='block';
-  }
-}
-
-// --- Restart ---
-restartBtn.onclick = ()=>{
-  scrollIndex=0;
-  player.style.left="50%";
-  treasure.style.display='none';
-  restartBtn.style.display='none';
-  chests.forEach(c=>{
-    c.style.background="#ffeb3b";
-    c.style.pointerEvents="auto";
-  });
-}
+var state={order:[],index:0,score:0,crystals:0,built:0,attempts:0,locked:false};
+var $=function(id){return document.getElementById(id)};
+var splash=$('splash'),instructions=$('instructions'),game=$('game'),victory=$('victory');
+var volume=$('volumeSlider'),correctAudio=$('correctAudio'),wrongAudio=$('wrongAudio'),clapAudio=$('clapAudio');
+function show(el){[splash,instructions,game,victory].forEach(function(s){s.classList.remove('active')});el.classList.add('active')}
+function shuffle(arr){var a=arr.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t}return a}
+function playSound(audio){try{audio.pause();audio.currentTime=0;audio.volume=parseFloat(volume.value||'0.85');var p=audio.play();if(p&&p.catch){p.catch(function(){})}}catch(e){}}
+function buildBridgeBase(){var b=$('bridge');b.innerHTML='';for(var i=0;i<TOTAL;i++){var p=document.createElement('div');p.className='plank';p.setAttribute('aria-label','Bridge plank '+(i+1));b.appendChild(p)}}
+function reset(){state={order:shuffle(questions),index:0,score:0,crystals:0,built:0,attempts:0,locked:false};buildBridgeBase();$('castle').classList.remove('open');$('king').classList.remove('show');$('hero').classList.remove('celebrate');$('hero').style.left='8%';$('hero').style.top='49%';updateHud();renderQuestion()}
+function updateHud(){$('score').textContent=state.score;$('crystals').textContent=state.crystals;$('built').textContent=state.built;$('qnum').textContent=Math.min(state.index+1,TOTAL);$('progressBar').style.width=(state.built/TOTAL*100)+'%'}
+function renderQuestion(){state.attempts=0;state.locked=false;var q=state.order[state.index];$('questionCard').classList.remove('shake');$('feedback').classList.remove('show');$('feedback').innerHTML='';$('nextBtn').classList.remove('show');$('challengeLabel').textContent=(state.index+1)+' / '+TOTAL+'  •  '+q.level+'  •  '+q.prompt;$('sentence').textContent=q.sentence;var opts=shuffle(q.options);var box=$('options');box.innerHTML='';opts.forEach(function(opt,idx){var btn=document.createElement('button');btn.className='option';btn.type='button';btn.textContent=String.fromCharCode(65+idx)+'. '+opt;btn.dataset.value=opt;btn.onclick=function(){answer(btn,q)};box.appendChild(btn)});updateHud()}
+function answer(btn,q){if(state.locked)return;var chosen=btn.dataset.value;if(chosen===q.answer){state.locked=true;btn.classList.add('correct');disableOptions();showFeedback('✅ Correct! A magic plank appears. '+q.explanation);successBuild(true)}else{state.attempts++;btn.classList.add('wrong');btn.disabled=true;playSound(wrongAudio);$('questionCard').classList.remove('shake');void $('questionCard').offsetWidth;$('questionCard').classList.add('shake');if(state.attempts>=2){state.locked=true;revealCorrect(q.answer);showFeedback('💡 Good learning moment! Correct answer: <strong>'+escapeHtml(q.answer)+'</strong><br>'+escapeHtml(q.explanation));disableOptions();successBuild(false)}else{showFeedback('🔔 Try once more. The wizard is still cheering for you!')}}}
+function escapeHtml(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function disableOptions(){Array.prototype.forEach.call(document.querySelectorAll('.option'),function(o){o.disabled=true})}
+function revealCorrect(ans){Array.prototype.forEach.call(document.querySelectorAll('.option'),function(o){if(o.dataset.value===ans)o.classList.add('correct')})}
+function showFeedback(msg){var f=$('feedback');f.innerHTML=msg;f.classList.add('show')}
+function successBuild(earned){if(earned){state.score++;state.crystals++;playSound(correctAudio);setTimeout(function(){playSound(clapAudio)},120)}state.built++;updateHud();animatePlank(state.built-1);moveHero();sparkles();crystalFloat();setTimeout(function(){if(state.index>=TOTAL-1){finish()}else{$('nextBtn').classList.add('show')}},950)}
+function animatePlank(i){var planks=document.querySelectorAll('.plank');if(planks[i])planks[i].classList.add('built')}
+function moveHero(){var step=8+(state.built*6.6);if(state.built>=TOTAL)step=77;$('hero').style.left=step+'%';$('hero').style.top=state.built>=TOTAL?'42%':'49%'}
+function sparkles(){var scene=$('scene');for(var i=0;i<10;i++){var s=document.createElement('span');s.className='sparkle';s.textContent=i%2?'✨':'⭐';s.style.left=(18+state.built*5.7+Math.random()*10)+'%';s.style.top=(48+Math.random()*24)+'%';scene.appendChild(s);setTimeout((function(x){return function(){if(x.parentNode)x.parentNode.removeChild(x)}})(s),950)}}
+function crystalFloat(){var scene=$('scene');var c=document.createElement('span');c.className='crystal-fly';c.textContent='💎';c.style.left=(20+state.built*5.7)+'%';c.style.top='54%';scene.appendChild(c);setTimeout(function(){if(c.parentNode)c.parentNode.removeChild(c)},1150)}
+function next(){if(state.index<TOTAL-1){state.index++;renderQuestion()}}
+function finish(){$('castle').classList.add('open');$('king').classList.add('show');$('hero').classList.add('celebrate');setTimeout(function(){show(victory);$('finalScore').textContent=state.score;$('accuracy').textContent=Math.round((state.score/TOTAL)*100);$('finalCrystals').textContent=state.crystals;celebrateEnd()},1200)}
+function celebrateEnd(){var colors=['#ff6b6b','#ffd66b','#5ed6ff','#8df28d','#c79bff','#ff9bd2'];for(var i=0;i<95;i++){var conf=document.createElement('div');conf.className='confetti';conf.style.left=Math.random()*100+'vw';conf.style.background=colors[Math.floor(Math.random()*colors.length)];conf.style.animationDelay=(Math.random()*1.4)+'s';conf.style.animationDuration=(2.4+Math.random()*2)+'s';victory.appendChild(conf);setTimeout((function(x){return function(){if(x.parentNode)x.parentNode.removeChild(x)}})(conf),5000)}for(var j=0;j<22;j++){var fw=document.createElement('div');fw.className='firework';fw.textContent=j%2?'✨':'💥';fw.style.left=(8+Math.random()*84)+'vw';fw.style.top=(10+Math.random()*65)+'vh';fw.style.animationDelay=(Math.random()*1.1)+'s';victory.appendChild(fw);setTimeout((function(x){return function(){if(x.parentNode)x.parentNode.removeChild(x)}})(fw),2500)}}
+$('startBtn').addEventListener('click',function(){reset();show(game)});
+$('nextBtn').addEventListener('click',next);
+$('playAgainBtn').addEventListener('click',function(){reset();show(game)});
+volume.addEventListener('input',function(){[correctAudio,wrongAudio,clapAudio].forEach(function(a){a.volume=parseFloat(volume.value||'0.85')})});
+document.addEventListener('keydown',function(e){if(!game.classList.contains('active'))return;var n=parseInt(e.key,10);if(n>=1&&n<=4){var opts=document.querySelectorAll('.option');if(opts[n-1])opts[n-1].click()}if(e.key==='Enter'&&$('nextBtn').classList.contains('show'))next()});
+setTimeout(function(){show(instructions)},5000);
+})();
 </script>
 </body>
 </html>
