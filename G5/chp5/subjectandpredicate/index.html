@@ -15,6 +15,7 @@ body {
   align-items: center;
   justify-content: flex-start;
   padding: 20px;
+  overflow-x: hidden;
 }
 
 /* Splash Logo */
@@ -52,6 +53,8 @@ h1 {
   font-size: 18px;
   box-shadow: 0 8px 30px rgba(43, 78, 255, 0.15);
   border: 2px solid rgba(43, 78, 255, 0.1);
+  position: relative;
+  z-index: 10;
 }
 #instructions-screen h2 { 
   color: #2b4eff; 
@@ -101,6 +104,8 @@ h1 {
   background: rgba(255, 255, 255, 0.6);
   border-radius: 24px;
   box-shadow: 0 8px 30px rgba(43, 78, 255, 0.1);
+  position: relative;
+  z-index: 10;
 }
 
 /* Draggable Subjects */
@@ -118,6 +123,7 @@ h1 {
   transition: all 0.3s ease;
   font-size: 16px;
   border: 2px solid rgba(255, 255, 255, 0.3);
+  touch-action: none;
 }
 .subject:hover { 
   transform: translateY(-5px) scale(1.02); 
@@ -126,6 +132,10 @@ h1 {
 .subject.dragging { 
   opacity: 0.6; 
   transform: scale(0.95); 
+  cursor: grabbing;
+  position: fixed;
+  z-index: 10000;
+  pointer-events: none;
 }
 .subject.matched { 
   opacity: 0.25; 
@@ -151,6 +161,8 @@ h1 {
   align-items: center;
   justify-content: center;
   border: 2px solid rgba(255, 255, 255, 0.3);
+  position: relative;
+  z-index: 1;
 }
 .predicate:hover { 
   transform: translateY(-5px) scale(1.02); 
@@ -181,6 +193,8 @@ h1 {
   font-weight: bold;
   text-align: center;
   text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+  position: relative;
+  z-index: 10;
 }
 #score { 
   margin-top: 15px; 
@@ -191,6 +205,8 @@ h1 {
   padding: 10px 25px;
   border-radius: 12px;
   box-shadow: 0 4px 15px rgba(43, 78, 255, 0.15);
+  position: relative;
+  z-index: 10;
 }
 
 /* Confetti */
@@ -199,7 +215,7 @@ h1 {
   font-size: 22px;
   animation: fall 2.5s linear forwards;
   pointer-events: none;
-  z-index: 10000;
+  z-index: 10001;
 }
 @keyframes fall {
   0% { transform: translateY(-10px) rotate(0deg); opacity: 1; }
@@ -220,6 +236,8 @@ h1 {
   transition: 0.3s;
   display: none;
   box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+  position: relative;
+  z-index: 10;
 }
 #restart-btn:hover { 
   background: linear-gradient(135deg, #ee5a5a, #dd4a4a);
@@ -260,6 +278,8 @@ h1 {
   margin: 15px auto;
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  position: relative;
+  z-index: 10;
 }
 #progress-fill {
   height: 100%;
@@ -285,7 +305,7 @@ h1 {
 <!-- Instructions -->
 <div id="instructions-screen">
   <h2>✨ How to Play</h2>
-  <p>Drag each <strong>subject</strong> (🟡 orange card) to match with its correct <strong>predicate</🔵 blue card).</p>
+  <p>Drag each <strong>subject</strong> (🟡 orange card) to match with its correct <strong>predicate</strong> (🔵 blue card).</p>
   <div class="emoji-tip">✅ <strong>Correct:</strong> 🎉 Sound + Confetti + Card disappears</div>
   <div class="emoji-tip">❌ <strong>Wrong:</strong> Try again!</div>
   <div class="emoji-tip">🏆 <strong>Goal:</strong> Match all 15 pairs!</div>
@@ -349,6 +369,9 @@ const progressBar = document.getElementById('progress-fill');
 const restartBtn = document.getElementById('restart-btn');
 let score = 0;
 let matchedPairs = 0;
+let draggedElement = null;
+let touchOffsetX = 0;
+let touchOffsetY = 0;
 
 // Create stars
 function createStars() {
@@ -383,7 +406,7 @@ function shuffleCards() {
   predicateArray.forEach(pred => gameArea.appendChild(pred));
 }
 
-// Drag events for subjects
+// Drag events for subjects (Desktop)
 subjects.forEach(sub => {
   sub.addEventListener('dragstart', e => {
     e.dataTransfer.setData('text/plain', sub.dataset.predicate);
@@ -396,7 +419,7 @@ subjects.forEach(sub => {
   });
 });
 
-// Drop events for predicates
+// Drop events for predicates (Desktop)
 predicates.forEach(pred => {
   pred.addEventListener('dragover', e => e.preventDefault());
   
@@ -415,7 +438,6 @@ predicates.forEach(pred => {
     const draggedPredicate = e.dataTransfer.getData('text/plain');
     const draggedSubject = e.dataTransfer.getData('text/subject');
 
-    // BUG FIX: Only correct matches work
     if(pred.dataset.subject === draggedSubject){
       // Correct match!
       pred.innerHTML = `${draggedSubject} ${draggedPredicate}`;
@@ -447,7 +469,7 @@ predicates.forEach(pred => {
         createConfetti();
       }
     } else {
-      // Wrong match - BUG FIX: Clear feedback
+      // Wrong match
       result.innerHTML = "❌ Try again! That's not the correct match.";
       result.style.color = "#e76f51";
       document.getElementById('wrong-sound').play();
@@ -461,6 +483,101 @@ predicates.forEach(pred => {
         result.style.color = "#2b4eff";
       }
     }, 2000);
+  });
+});
+
+// Touch events for mobile/tablet (FIXED SCROLL ISSUE)
+subjects.forEach(sub => {
+  sub.addEventListener('touchstart', e => {
+    e.preventDefault();
+    draggedElement = sub;
+    const touch = e.touches[0];
+    touchOffsetX = touch.clientX - sub.offsetLeft;
+    touchOffsetY = touch.clientY - sub.offsetTop;
+    sub.classList.add('dragging');
+  });
+  
+  sub.addEventListener('touchmove', e => {
+    if (!draggedElement) return;
+    e.preventDefault();
+    const touch = e.touches[0];
+    draggedElement.style.position = 'fixed';
+    draggedElement.style.left = (touch.clientX - draggedElement.offsetWidth/2) + 'px';
+    draggedElement.style.top = (touch.clientY - draggedElement.offsetHeight/2) + 'px';
+    draggedElement.style.zIndex = '10000';
+  });
+  
+  sub.addEventListener('touchend', e => {
+    if (!draggedElement) return;
+    
+    // Get the predicate under the touch point
+    const touch = e.changedTouches[0];
+    draggedElement.classList.remove('dragging');
+    draggedElement.style.position = '';
+    draggedElement.style.left = '';
+    draggedElement.style.top = '';
+    draggedElement.style.zIndex = '';
+    
+    // Hide element temporarily to get what's underneath
+    draggedElement.style.display = 'none';
+    const elementBelow = document.querySelector(`.predicate:not(.correct):not(.matched)`);
+    const predicatesArray = document.querySelectorAll('.predicate:not(.correct):not(.matched)');
+    
+    for(let pred of predicatesArray) {
+      const predRect = pred.getBoundingClientRect();
+      if(touch.clientX >= predRect.left && touch.clientX <= predRect.right &&
+         touch.clientY >= predRect.top && touch.clientY <= predRect.bottom) {
+        elementBelow = pred;
+        break;
+      }
+    }
+    
+    draggedElement.style.display = '';
+    
+    if(elementBelow && elementBelow.classList.contains('predicate')) {
+      const draggedPredicate = draggedElement.dataset.predicate;
+      const draggedSubject = draggedElement.innerText;
+      
+      if(elementBelow.dataset.subject === draggedSubject){
+        // Correct match!
+        elementBelow.innerHTML = `${draggedSubject} ${draggedPredicate}`;
+        elementBelow.classList.add('correct');
+        result.innerHTML = "🎉 Correct! Amazing job!";
+        result.style.color = "#4caf50";
+        
+        document.getElementById('correct-sound').play();
+        document.getElementById('clap-sound').play();
+        createConfetti();
+        
+        score++;
+        matchedPairs++;
+        draggedElement.classList.add('matched');
+        progressBar.style.width = (matchedPairs / 15 * 100) + '%';
+        
+        if(matchedPairs === 15){
+          result.innerHTML = "🏆 AMAZING! You matched all 15 pairs! PERFECT SCORE!";
+          result.style.color = "#4caf50";
+          scoreEl.innerHTML = `🎉 Score: 15 / 15 - PERFECT!`;
+          createConfetti();
+          restartBtn.style.display = 'inline-block';
+        }
+      } else {
+        result.innerHTML = "❌ Try again! That's not the correct match.";
+        result.style.color = "#e76f51";
+        document.getElementById('wrong-sound').play();
+      }
+      
+      scoreEl.innerText = `Score: ${score} / 15`;
+      
+      setTimeout(() => {
+        if(matchedPairs < 15) {
+          result.innerHTML = "";
+          result.style.color = "#2b4eff";
+        }
+      }, 2000);
+    }
+    
+    draggedElement = null;
   });
 });
 
@@ -505,19 +622,7 @@ restartBtn.addEventListener('click', () => {
   
   // Reset matched cards
   subjects.forEach(sub => sub.classList.remove('matched'));
-  predicates.forEach(pred => {
-    pred.classList.remove('correct');
-    const subjectText = pred.dataset.subject;
-    const predicateText = pred.querySelector('span') ? pred.textContent : pred.textContent;
-    for(let s of subjects) {
-      if(s.innerText === subjectText) {
-        pred.innerText = s.dataset.predicate;
-        break;
-      }
-    }
-  });
   
-  // Reset predicate text
   const predicateData = [
     "climbed the tall tree quietly",
     "organized the classroom efficiently",
@@ -537,6 +642,7 @@ restartBtn.addEventListener('click', () => {
   ];
   
   predicates.forEach((pred, i) => {
+    pred.classList.remove('correct');
     pred.innerText = predicateData[i];
   });
 });
