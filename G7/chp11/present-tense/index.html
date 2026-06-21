@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Grammar Factory</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Grammar Factory – Conveyor Belt Challenge</title>
 
 <style>
 body{
 margin:0;
-font-family:Arial;
+font-family:Arial, sans-serif;
 background:linear-gradient(135deg,#1e3c72,#2a5298,#ffb347);
 overflow:hidden;
 color:white;
@@ -24,22 +24,23 @@ justify-content:center;
 flex-direction:column;
 text-align:center;
 }
-
 .active{display:flex;}
 
 /* LOGO */
-#logoScreen{background:white;}
-#logoScreen img{width:220px;}
-
-/* TITLE */
-#titleScreen h1{font-size:30px;}
-
-/* GAME AREA */
-#gameScreen{
-background:linear-gradient(135deg,#1e3c72,#2a5298,#ffb347);
+#logoScreen{
+background:#fff;
+}
+#logoScreen img{
+width:220px;
 }
 
-/* HUD FIX (IMPORTANT) */
+/* TITLE */
+#titleScreen h1{
+font-size:28px;
+margin:0;
+}
+
+/* HUD */
 #hud{
 position:fixed;
 top:0;
@@ -47,66 +48,80 @@ left:0;
 right:0;
 display:flex;
 justify-content:space-around;
-background:rgba(0,0,0,0.5);
+gap:6px;
 padding:10px;
-z-index:999;
-font-size:14px;
+background:rgba(0,0,0,0.55);
+z-index:10;
+font-size:13px;
+flex-wrap:wrap;
 }
 
-/* PACKAGE CARD */
-#package{
-background:white;
-color:black;
-padding:20px;
-border-radius:15px;
-width:80%;
-max-width:500px;
-margin-top:120px;
+/* GAME AREA */
+#gameBox{
+width:90%;
+max-width:650px;
+background:#ffffff;
+color:#000;
+border-radius:16px;
+padding:18px;
+margin-top:90px;
+box-shadow:0 10px 25px rgba(0,0,0,0.2);
+}
+
+#sentence{
+font-size:18px;
 font-weight:bold;
+margin-bottom:12px;
 }
 
-/* OPTIONS */
 .options{
 display:flex;
 flex-wrap:wrap;
-justify-content:center;
 gap:10px;
-margin-top:20px;
+justify-content:center;
 }
 
 .option{
-background:#fff;
-color:#000;
+flex:1 1 45%;
 padding:10px;
 border-radius:10px;
-min-width:40%;
+background:#f2f2f2;
 cursor:pointer;
 font-weight:bold;
+user-select:none;
+transition:0.2s;
 }
 
-.option:active{transform:scale(0.95);}
+.option:active{transform:scale(0.96);}
 
-.correct{background:#2ecc71;color:white;}
-.wrong{background:#e74c3c;color:white;}
+.correct{background:#2ecc71 !important;color:#fff;}
+.wrong{background:#e74c3c !important;color:#fff;}
 
-/* CONVEYOR (visual only, NO interference) */
+/* CONVEYOR */
 .conveyor{
 position:fixed;
 bottom:0;
 left:0;
 right:0;
-height:60px;
-background:repeating-linear-gradient(90deg,#444,#444 20px,#666 20px,#666 40px);
+height:55px;
+background:repeating-linear-gradient(
+90deg,
+#444 0px,
+#444 18px,
+#666 18px,
+#666 36px
+);
 opacity:0.6;
 }
 
 /* BUTTON */
 button{
-padding:10px 15px;
+padding:10px 16px;
 border:none;
 border-radius:10px;
-background:orange;
+background:#ffb347;
 font-weight:bold;
+cursor:pointer;
 }
 
 /* POPUP */
@@ -116,12 +131,18 @@ top:50%;
 left:50%;
 transform:translate(-50%,-50%);
 background:#000;
-padding:15px;
+color:#fff;
+padding:14px 18px;
 border-radius:10px;
 display:none;
-z-index:9999;
+z-index:999;
 }
 
+/* MOBILE */
+@media(max-width:600px){
+.option{flex:1 1 100%;}
+#gameBox{margin-top:100px;}
+}
 </style>
 </head>
 
@@ -129,15 +150,15 @@ z-index:9999;
 
 <!-- LOGO -->
 <div id="logoScreen" class="screen active">
-<img src="assets/innovine-logo.png">
+<img src="assets/innovine-logo.png" />
 </div>
 
 <!-- TITLE -->
 <div id="titleScreen" class="screen">
 <div>
 <h1>🏭 Grammar Factory</h1>
-<p>Present Tense Challenge</p>
-<button onclick="startGame()">Start</button>
+<p>Conveyor Belt Challenge</p>
+<button onclick="startGame()">Start Factory</button>
 </div>
 </div>
 
@@ -145,158 +166,233 @@ z-index:9999;
 <div id="gameScreen" class="screen">
 
 <div id="hud">
-<div>⭐ Score: <span id="score">0</span></div>
-<div>🪙 Coins: <span id="coins">0</span></div>
-<div>❤️ Attempts: <span id="attempts">2</span></div>
-<div>📦 <span id="progress">0</span>/10</div>
+<div>📦 <span id="prog">0</span>/10</div>
+<div>⭐ <span id="score">0</span></div>
+<div>🪙 <span id="coins">0</span></div>
+<div>❤️ <span id="att">2</span></div>
 </div>
 
-<div id="package"></div>
+<div id="gameBox">
+<div id="sentence"></div>
+<div class="options" id="options"></div>
+</div>
 
 <div class="conveyor"></div>
 
 </div>
 
-<!-- POPUP -->
+<!-- END -->
+<div id="endScreen" class="screen">
+<h2>🏆 MASTER FACTORY ENGINEER</h2>
+<div id="result"></div>
+<button onclick="location.reload()">Play Again</button>
+</div>
+
 <div id="popup"></div>
 
 <script>
 
-const questions = [
-{q:"She goes to school by bus every day.",a:"Present Simple",hint:"Habit"},
-{q:"They are decorating the classroom for the annual day celebration.",a:"Present Continuous",hint:"Now"},
-{q:"We have finished our science project.",a:"Present Perfect",hint:"Completed"},
-{q:"My brother has been practising the guitar for two hours.",a:"Present Perfect Continuous",hint:"Ongoing"},
-{q:"The Earth revolves around the Sun.",a:"Present Simple",hint:"Fact"},
-{q:"Look! The children are flying kites.",a:"Present Continuous",hint:"Look clue"},
-{q:"Our teacher has checked all notebooks.",a:"Present Perfect",hint:"Done"},
-{q:"Riya has been reading since Monday.",a:"Present Perfect Continuous",hint:"Since"},
-{q:"The bus arrives at 7:30 every day.",a:"Present Simple",hint:"Routine"},
-{q:"I am helping my mother right now.",a:"Present Continuous",hint:"Now"}
-];
-
-let order=[],i=0,score=0,coins=0,attempts=2,lock=false;
-
-/* LOGO */
+/* ================= LOGO FLOW ================= */
 setTimeout(()=>{
 document.getElementById("logoScreen").classList.remove("active");
 document.getElementById("titleScreen").classList.add("active");
 },5000);
 
-/* START */
+/* ================= QUESTIONS ================= */
+const QUESTIONS = [
+{
+q:"She goes to school by bus every day.",
+a:"Present Simple",
+opts:["Present Simple","Present Continuous","Present Perfect","Present Perfect Continuous"],
+hint:"Daily routine"
+},
+{
+q:"They are decorating the classroom for the annual day celebration.",
+a:"Present Continuous",
+opts:["Present Perfect","Present Continuous","Present Simple","Present Perfect Continuous"],
+hint:"happening now"
+},
+{
+q:"We have finished our science project.",
+a:"Present Perfect",
+opts:["Present Continuous","Present Perfect","Present Simple","Present Perfect Continuous"],
+hint:"completed"
+},
+{
+q:"My brother has been practising the guitar for two hours.",
+a:"Present Perfect Continuous",
+opts:["Present Simple","Present Continuous","Present Perfect","Present Perfect Continuous"],
+hint:"ongoing"
+},
+{
+q:"The Earth revolves around the Sun.",
+a:"Present Simple",
+opts:["Present Continuous","Present Perfect","Present Simple","Present Perfect Continuous"],
+hint:"fact"
+},
+{
+q:"Look! The children are flying colourful kites in the park.",
+a:"Present Continuous",
+opts:["Present Continuous","Present Perfect","Present Simple","Present Perfect Continuous"],
+hint:"look clue"
+},
+{
+q:"Our teacher has checked all the notebooks.",
+a:"Present Perfect",
+opts:["Present Perfect","Present Continuous","Present Perfect Continuous","Present Simple"],
+hint:"done"
+},
+{
+q:"Riya has been reading the same novel since Monday.",
+a:"Present Perfect Continuous",
+opts:["Present Continuous","Present Perfect","Present Perfect Continuous","Present Simple"],
+hint:"since"
+},
+{
+q:"The school bus arrives at 7:30 every morning.",
+a:"Present Simple",
+opts:["Present Continuous","Present Perfect","Present Simple","Present Perfect Continuous"],
+hint:"schedule"
+},
+{
+q:"I am helping my mother prepare dinner right now.",
+a:"Present Continuous",
+opts:["Present Perfect","Present Continuous","Present Simple","Present Perfect Continuous"],
+hint:"right now"
+}
+];
+
+/* ================= STATE ================= */
+let order=[],i=0,score=0,coins=0,att=2,lock=false;
+
+/* shuffle */
+function shuffle(a){
+return [...a].sort(()=>Math.random()-0.5);
+}
+
+/* ================= START ================= */
 function startGame(){
+
+order = shuffle(QUESTIONS);
+
+i=0;
+score=0;
+coins=0;
+att=2;
+
 document.getElementById("titleScreen").classList.remove("active");
 document.getElementById("gameScreen").classList.add("active");
 
-order=[...questions].sort(()=>Math.random()-0.5);
-
-i=0;score=0;coins=0;
 loadQ();
 }
 
-/* LOAD QUESTION (SLOWED DOWN) */
+/* ================= LOAD ================= */
 function loadQ(){
 
-lock=false;
-attempts=2;
-
-updateHUD();
-
 if(i>=order.length){
-end();
+endGame();
 return;
 }
 
-let q=order[i];
+lock=false;
+att=2;
+updateHUD();
 
-document.getElementById("package").innerHTML=`
-📦 ${q.q}<br><br>
-<b>Choose Tense</b>
-<div class="options">
-${shuffle(q.options || [
-"Present Simple",
-"Present Continuous",
-"Present Perfect",
-"Present Perfect Continuous"
-]).map(o=>`<div class='option' onclick="check('${o}',this)">${o}</div>`).join("")}
-</div>
-`;
+let q = order[i];
+
+document.getElementById("sentence").innerText = q.q;
+
+let opts = shuffle(q.opts);
+
+let box = document.getElementById("options");
+box.innerHTML = "";
+
+opts.forEach(o=>{
+let d = document.createElement("div");
+d.className="option";
+d.innerText=o;
+d.onclick=()=>check(o,d);
+box.appendChild(d);
+});
 }
 
-/* HUD */
+/* ================= HUD ================= */
 function updateHUD(){
+document.getElementById("prog").innerText=i;
 document.getElementById("score").innerText=score;
 document.getElementById("coins").innerText=coins;
-document.getElementById("attempts").innerText=attempts;
-document.getElementById("progress").innerText=i;
+document.getElementById("att").innerText=att;
 }
 
-/* CHECK (SLOWED FLOW FIX) */
+/* ================= CHECK ================= */
 function check(ans,el){
 
 if(lock) return;
 lock=true;
 
-let q=order[i];
+let q = order[i];
 
 if(ans===q.a){
 
-score++;coins+=10;
+score++;
+coins+=10;
+
 el.classList.add("correct");
-popup("Correct!");
+popup("Correct ✔");
 
 setTimeout(()=>{
 i++;
 loadQ();
-},1200); // 🔴 SLOW CONTROL FIX
+},900);
 
 }else{
 
-attempts--;
+att--;
 updateHUD();
 
 el.classList.add("wrong");
+popup("Wrong!");
 
-if(attempts>0){
-popup("Hint: "+q.hint);
-lock=false;
-}
-else{
-popup("Answer: "+q.a);
+if(att>0){
+setTimeout(()=>{lock=false;},300);
+}else{
+popup("Answer: "+q.a+" ("+q.hint+")");
 
 setTimeout(()=>{
 i++;
 loadQ();
-},1500);
+},1200);
 }
 }
 }
 
-/* POPUP */
+/* ================= POPUP ================= */
 function popup(t){
 let p=document.getElementById("popup");
 p.innerText=t;
 p.style.display="block";
-
-setTimeout(()=>p.style.display="none",1200);
+setTimeout(()=>p.style.display="none",900);
 }
 
-/* SHUFFLE */
-function shuffle(a){
-return [...a].sort(()=>Math.random()-0.5);
-}
+/* ================= END ================= */
+function endGame(){
 
-/* END */
-function end(){
-document.getElementById("gameScreen").innerHTML=`
-<h2>🏆 Completed!</h2>
-<h3>Score: ${score}/10</h3>
-<h3>Coins: ${coins}</h3>
-<button onclick="location.reload()">Play Again</button>
+document.getElementById("gameScreen").classList.remove("active");
+document.getElementById("endScreen").classList.add("active");
+
+let acc = Math.round((score/order.length)*100);
+
+document.getElementById("result").innerHTML=`
+⭐ Score: ${score}/${order.length}<br>
+🪙 Coins: ${coins}<br>
+🎯 Accuracy: ${acc}%
 `;
+
 }
 
 </script>
+
+<div class="conveyor"></div>
 
 </body>
 </html>
