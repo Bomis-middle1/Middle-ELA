@@ -2,147 +2,310 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Idiom Detective Agency: The Missing Meaning</title>
 <style>
-*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#203040;color:#222;overflow-x:hidden}
-#logo{position:fixed;inset:0;background:#fff;display:flex;align-items:center;justify-content:center;z-index:9999}
-#logo img{max-width:70%;max-height:70%}
-.hidden{display:none}
-.office{min-height:100vh;background:linear-gradient(#29415f,#6b4b2a);padding:10px;color:#fff}
-.hud{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;position:sticky;top:0;z-index:10}
-.panel{background:rgba(255,255,255,.15);backdrop-filter:blur(4px);padding:8px;border-radius:10px}
-.notice,.case{background:#f5ebcf;color:#222;border-radius:16px;padding:18px;max-width:1000px;margin:12px auto;box-shadow:0 4px 12px rgba(0,0,0,.3)}
-.options{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
-.opt{padding:14px;border-radius:12px;border:3px solid #8b6b3f;background:#fff;cursor:pointer;min-height:56px}
-.badges{display:flex;flex-wrap:wrap;gap:4px}
-.correct{animation:glow .6s alternate 3;background:#d4ffd4}
-.wrong{animation:shake .4s}
-@keyframes shake{25%{transform:translateX(-6px)}50%{transform:translateX(6px)}75%{transform:translateX(-6px)}}
-@keyframes glow{from{box-shadow:0 0 5px green}to{box-shadow:0 0 25px green}}
-.progress{height:16px;background:#ccc;border-radius:10px;overflow:hidden}
-.bar{height:100%;background:gold;width:0%}
-.center{text-align:center}
-button{padding:12px 22px;font-size:18px;border:none;border-radius:10px;cursor:pointer}
-#fx{position:fixed;inset:0;pointer-events:none}
-.conf{position:absolute;font-size:24px;animation:fall 2s linear forwards}
-@keyframes fall{to{transform:translateY(100vh) rotate(720deg);opacity:0}}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;font-family:Arial,sans-serif;background:#172333;color:#241b12;overflow-x:hidden}
+#splash{position:fixed;inset:0;background:white;display:flex;align-items:center;justify-content:center;z-index:9999}
+#splash img{width:min(70vw,520px)}
+.screen{display:none;min-height:100vh;padding:12px;background:linear-gradient(#172333,#29415f,#6b4b2a)}
+.active{display:block}
+.office-bg{position:fixed;inset:0;pointer-events:none;overflow:hidden}
+.spotlight{position:absolute;width:45vw;height:45vw;border-radius:50%;background:radial-gradient(circle,rgba(255,229,150,.25),transparent 65%);animation:spot 8s infinite alternate}
+@keyframes spot{to{transform:translate(65vw,25vh)}}
+.desk{position:absolute;bottom:0;left:0;right:0;height:25vh;background:linear-gradient(#8a5830,#4b2c18)}
+.wrap{position:relative;z-index:1;max-width:1200px;margin:auto}
+.notice,.case,.final{background:#f5ebcf;border:6px solid #7b4c27;border-radius:24px;padding:24px;box-shadow:0 18px 40px #0008}
+.notice{max-width:900px;margin:7vh auto;text-align:center}
+button{min-height:52px;border:0;border-radius:14px;padding:12px 20px;font-size:18px;font-weight:bold;cursor:pointer}
+.start,.again{background:linear-gradient(#ffd45f,#c98914);color:#241b12}
+.hud{position:sticky;top:0;z-index:20;display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;background:#0d1728cc;padding:8px;border-radius:0 0 18px 18px}
+.hud div{background:#fff1bf;padding:8px;border-radius:12px;text-align:center;font-weight:bold}
+.progress{grid-column:1/-1;height:18px;background:#d2bd88;border-radius:999px;overflow:hidden}
+#bar{height:100%;width:0;background:linear-gradient(90deg,#1f8b4c,gold);transition:.4s}
+.grid{display:grid;grid-template-columns:260px 1fr;gap:14px;margin-top:14px}
+.board{background:#23160ecc;color:#fff8dd;border:6px solid #7b4c27;border-radius:20px;padding:12px}
+.case-tab{background:#f4dfaa;color:#2c1d10;border-radius:10px;padding:7px;margin:6px 0;display:flex;justify-content:space-between;font-weight:bold}
+.case-tab.closed{background:#bcc7b4}
+.badges{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:10px}
+.badge{width:34px;height:34px;border-radius:50%;background:gold;display:flex;align-items:center;justify-content:center;animation:pop .4s}
+@keyframes pop{from{transform:scale(0)}to{transform:scale(1)}}
+.case{animation:open .4s}
+@keyframes open{from{opacity:0;transform:translateY(18px)}to{opacity:1}}
+.case h1{text-align:center;color:#17324b}
+.card{background:#fff8df;border-radius:16px;padding:14px;margin:10px 0;font-size:20px;line-height:1.4}
+.options{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.opt{background:#fffaf0;border:3px solid #5f3a1f;box-shadow:0 6px 0 #875325;color:#24180c}
+.opt.correct{background:#d6ffd9;border-color:#187a38;animation:glow .6s 2}
+.opt.wrong{background:#ffd6d6;border-color:#a71928;animation:shake .4s}
+@keyframes glow{50%{box-shadow:0 0 25px green}}
+@keyframes shake{25%{transform:translateX(-7px)}50%{transform:translateX(7px)}75%{transform:translateX(-5px)}}
+.stamp{display:inline-block;border:5px solid #168144;color:#168144;padding:8px 18px;border-radius:10px;font-size:32px;font-weight:bold;transform:rotate(-8deg);animation:stamp .35s}
+.badstamp{border-color:#a71928;color:#a71928}
+@keyframes stamp{from{transform:scale(0) rotate(-8deg)}to{transform:scale(1) rotate(-8deg)}}
+.hint{background:#fff3c7;border-left:8px solid #c6851a;padding:12px;border-radius:12px;margin-top:10px}
+#fx{position:fixed;inset:0;pointer-events:none;z-index:5000}
+.conf{position:absolute;top:-30px;font-size:25px;animation:fall 2.3s linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg);opacity:0}}
+.final{text-align:center;max-width:900px;margin:5vh auto}
+.trophy{font-size:110px;animation:bounce 1s infinite alternate}
+@keyframes bounce{to{transform:translateY(-12px)}}
+@media(max-width:850px){.grid{grid-template-columns:1fr}.options{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
-<div id="logo"><img src="assets/innovine-logo.png" onerror="this.outerHTML='<h1>Innovine</h1>'"></div>
 
-<div id="app" class="office hidden">
-<div id="instructions" class="notice center">
-<h1>🕵️ Welcome to the Idiom Detective Agency!</h1>
-<p>The city is full of mysterious misunderstandings. Solve all 10 cases and collect badges.</p>
-<button onclick="startGame()">Start Investigation</button>
+<div id="splash">
+<img src="assets/innovine-logo.png" alt="Innovine Logo" onerror="this.outerHTML='<h1>Innovine</h1>'">
 </div>
 
-<div id="game" class="hidden">
-<div class="hud">
-<div class="panel">⭐ Score: <span id="score">0</span></div>
-<div class="panel">📁 Case: <span id="caseNo">1</span>/10</div>
-<div class="panel">🎯 Accuracy: <span id="acc">100</span>%</div>
-<div class="panel">🏅 Badges<div id="badges" class="badges"></div></div>
-<div class="panel">🔊 <input id="vol" type="range" min="0" max="1" step="0.1" value="1"></div>
-<div class="panel"><div class="progress"><div id="bar" class="bar"></div></div></div>
-</div>
-<div id="caseArea"></div>
-</div>
-
-<div id="final" class="notice center hidden"></div>
-</div>
 <div id="fx"></div>
 
-<audio id="correct" src="assets/correct.mp3"></audio>
-<audio id="wrong" src="assets/wrong.mp3"></audio>
-<audio id="clap" src="assets/clapping.mp3"></audio>
+<section id="instructions" class="screen">
+<div class="office-bg"><div class="spotlight"></div><div class="desk"></div></div>
+<div class="wrap">
+<div class="notice">
+<h1>🕵️ Welcome to the Idiom Detective Agency!</h1>
+<p>The city is full of mysterious misunderstandings.</p>
+<p>Read each witness statement carefully. Choose the idiom that best solves the mystery.</p>
+<p>Every solved case earns a Detective Badge. Collect all 10 badges to become the Master Idiom Detective!</p>
+<button class="start" onclick="startGame()">🕵️ Start Investigation</button>
+</div>
+</div>
+</section>
+
+<section id="game" class="screen">
+<div class="office-bg"><div class="spotlight"></div><div class="desk"></div></div>
+<div class="wrap">
+<div class="hud">
+<div>⭐ Score: <span id="score">0</span></div>
+<div>📁 Case: <span id="caseNo">1</span>/10</div>
+<div>🏅 Badges: <span id="badgeCount">0</span></div>
+<div>🎯 Accuracy: <span id="accuracy">100</span>%</div>
+<div>🔊 <input id="volume" type="range" min="0" max="1" step="0.05" value="1"></div>
+<div>Solved: <span id="solved">0</span>/10</div>
+<div class="progress"><div id="bar"></div></div>
+</div>
+
+<div class="grid">
+<aside class="board">
+<h2>📌 Case Board</h2>
+<div id="caseBoard"></div>
+<h2>🏅 Badge Board</h2>
+<div id="badges" class="badges"></div>
+</aside>
+<main id="caseArea"></main>
+</div>
+</div>
+</section>
+
+<section id="final" class="screen">
+<div class="office-bg"><div class="spotlight"></div><div class="desk"></div></div>
+<div class="final">
+<div class="trophy">🏆</div>
+<h1>Congratulations, Detective!</h1>
+<h2>Final Score: <span id="finalScore"></span>/10</h2>
+<h2>Accuracy: <span id="finalAccuracy"></span>%</h2>
+<h2 id="rank"></h2>
+<p>The city mystery is solved!</p>
+<button class="again" onclick="startGame()">🔁 Play Again</button>
+</div>
+</section>
+
+<audio id="correctSound" src="assets/correct.mp3"></audio>
+<audio id="wrongSound" src="assets/wrong.mp3"></audio>
+<audio id="clapSound" src="assets/clapping.mp3"></audio>
 
 <script>
-const hints={
-"Hit the nail on the head":"This idiom is used when someone is exactly correct.",
-"Bite the bullet":"Someone does something difficult even when nervous.",
-"Cry over spilt milk":"Complaining about something that already happened.",
-"Cost an arm and a leg":"Something is very expensive.",
-"Break the ice":"Used to start conversation.",
-"Barking up the wrong tree":"Blaming or accusing the wrong person.",
-"Pull someone's leg":"A playful joke.",
-"In hot water":"Someone is in trouble.",
-"Burn the midnight oil":"Studying or working very late.",
-"Kick the bucket":"Means to die."
-};
-
-let cases=[
-{t:"Case 1",s:"Emma guessed the answer exactly before anyone else.",q:"Which idiom fits best?",a:"Hit the nail on the head",o:["Bite the bullet","Pull someone's leg","Hit the nail on the head","Burn the midnight oil"]},
-{t:"Case 2",s:"Aarav was nervous about getting a vaccination, but he stayed calm and got it anyway.",q:"Which idiom fits best?",a:"Bite the bullet",o:["Cry over spilt milk","Bite the bullet","Break the ice","Cost an arm and a leg"]},
-{t:"Case 3",s:"Mia accidentally dropped her ice cream. She kept complaining about it all afternoon.",q:"What advice should her friend give?",a:"Cry over spilt milk",o:["Burn the midnight oil","Break the ice","Cry over spilt milk","Pull someone's leg"]},
-{t:"Case 4",s:"Sam bought a new gaming computer. It was extremely expensive.",q:"Which idiom fits best?",a:"Cost an arm and a leg",o:["Cost an arm and a leg","Kick the bucket","In hot water","Hit the nail on the head"]},
-{t:"Case 5",s:"Two new classmates were too shy to speak to each other.",q:"What should one of them do first?",a:"Break the ice",o:["Bite the bullet","Break the ice","Burn the midnight oil","Barking up the wrong tree"]},
-{t:"Case 6",s:"The teacher blamed Rahul for drawing on the desk, but his friend had actually done it.",q:"Which idiom fits best?",a:"Barking up the wrong tree",o:["Pull someone's leg","Barking up the wrong tree","Cost an arm and a leg","Bite the bullet"]},
-{t:"Case 7",s:"Ava told her brother that aliens had landed in the school playground. She was only joking.",q:"Which idiom fits best?",a:"Pull someone's leg",o:["Pull someone's leg","In hot water","Burn the midnight oil","Break the ice"]},
-{t:"Case 8",s:"Liam forgot to complete his homework for the third time this week. Now he has to explain it to his teacher.",q:"Which idiom fits best?",a:"In hot water",o:["Kick the bucket","In hot water","Cost an arm and a leg","Hit the nail on the head"]},
-{t:"Case 9",s:"Sofia stayed awake until 1:00 a.m. studying for her science test.",q:"Which idiom fits best?",a:"Burn the midnight oil",o:["Burn the midnight oil","Bite the bullet","Break the ice","Pull someone's leg"]},
-{t:"Case 10",s:"During a history lesson, the teacher explained that the old king had died many years ago.",q:'Which idiom means "to die"?',a:"Kick the bucket",o:["Kick the bucket","Break the ice","Cry over spilt milk","Barking up the wrong tree"]}
+const allCases=[
+{label:"Case 1",s:"Emma guessed the answer exactly before anyone else.",q:"Which idiom fits best?",a:"Hit the nail on the head",o:["Bite the bullet","Pull someone's leg","Hit the nail on the head","Burn the midnight oil"],h:"This idiom is used when someone says or guesses something exactly right."},
+{label:"Case 2",s:"Aarav was nervous about getting a vaccination, but he stayed calm and got it anyway.",q:"Which idiom fits best?",a:"Bite the bullet",o:["Cry over spilt milk","Bite the bullet","Break the ice","Cost an arm and a leg"],h:"This idiom is used when someone bravely does something difficult or unpleasant."},
+{label:"Case 3",s:"Mia accidentally dropped her ice cream. She kept complaining about it all afternoon.",q:"What advice should her friend give?",a:"Cry over spilt milk",o:["Burn the midnight oil","Break the ice","Cry over spilt milk","Pull someone's leg"],h:"This idiom reminds someone not to keep feeling upset about something that cannot be changed."},
+{label:"Case 4",s:"Sam bought a new gaming computer. It was extremely expensive.",q:"Which idiom fits best?",a:"Cost an arm and a leg",o:["Cost an arm and a leg","Kick the bucket","In hot water","Hit the nail on the head"],h:"This idiom describes something that costs a lot of money."},
+{label:"Case 5",s:"Two new classmates were too shy to speak to each other.",q:"What should one of them do first?",a:"Break the ice",o:["Bite the bullet","Break the ice","Burn the midnight oil","Barking up the wrong tree"],h:"This idiom means to start a friendly conversation and make people feel comfortable."},
+{label:"Case 6",s:"The teacher blamed Rahul for drawing on the desk, but his friend had actually done it.",q:"Which idiom fits best?",a:"Barking up the wrong tree",o:["Pull someone's leg","Barking up the wrong tree","Cost an arm and a leg","Bite the bullet"],h:"This idiom is used when someone is blaming or looking at the wrong person or reason."},
+{label:"Case 7",s:"Ava told her brother that aliens had landed in the school playground. She was only joking.",q:"Which idiom fits best?",a:"Pull someone's leg",o:["Pull someone's leg","In hot water","Burn the midnight oil","Break the ice"],h:"This idiom means to joke with someone in a playful way."},
+{label:"Case 8",s:"Liam forgot to complete his homework for the third time this week. Now he has to explain it to his teacher.",q:"Which idiom fits best?",a:"In hot water",o:["Kick the bucket","In hot water","Cost an arm and a leg","Hit the nail on the head"],h:"This idiom means someone is in trouble."},
+{label:"Case 9",s:"Sofia stayed awake until 1:00 a.m. studying for her science test.",q:"Which idiom fits best?",a:"Burn the midnight oil",o:["Burn the midnight oil","Bite the bullet","Break the ice","Pull someone's leg"],h:"This idiom means to work or study late into the night."},
+{label:"Case 10",s:"During a history lesson, the teacher explained that the old king had died many years ago.",q:'Which idiom means "to die"?',a:"Kick the bucket",o:["Kick the bucket","Break the ice","Cry over spilt milk","Barking up the wrong tree"],h:"This idiom is an informal way to say that someone died."}
 ];
 
-let order=[],idx=0,score=0,attempt=0,totalAttempts=0;
+let cases=[],idx=0,score=0,attempt=0,totalAttempts=0,solvedCount=0,locked=false,closed=[];
 
-setTimeout(()=>{logo.classList.add('hidden');app.classList.remove('hidden')},5000);
+setTimeout(()=>{
+document.getElementById("splash").style.display="none";
+show("instructions");
+},5000);
 
-function shuffle(a){return a.sort(()=>Math.random()-0.5)}
+function show(id){
+document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+document.getElementById(id).classList.add("active");
+}
+
+function shuffle(arr){
+let a=arr.slice();
+for(let i=a.length-1;i>0;i--){
+let j=Math.floor(Math.random()*(i+1));
+[a[i],a[j]]=[a[j],a[i]];
+}
+return a;
+}
+
+function setVolume(){
+[correctSound,wrongSound,clapSound].forEach(a=>a.volume=volume.value);
+}
+volume.addEventListener("input",setVolume);
+setVolume();
+
+function stopSounds(){
+[correctSound,wrongSound,clapSound].forEach(a=>{
+a.pause();
+a.currentTime=0;
+});
+}
+
+function play(a){
+a.currentTime=0;
+a.play().catch(()=>{});
+}
+
 function startGame(){
-instructions.classList.add('hidden');game.classList.remove('hidden');
-order=shuffle([...cases]);idx=0;score=0;totalAttempts=0;badges.innerHTML='';render();
+stopSounds();
+cases=shuffle(allCases);
+idx=0;score=0;attempt=0;totalAttempts=0;solvedCount=0;locked=false;closed=[];
+badges.innerHTML="";
+show("game");
+render();
 }
+
 function render(){
+locked=false;
 attempt=0;
-let c=order[idx];caseNo.textContent=idx+1;
-let opts=shuffle([...c.o]);
-caseArea.innerHTML=`<div class="case"><h2>📁 ${c.t}</h2><p><b>🕵 Witness Statement:</b> ${c.s}</p><p><b>📌 Evidence Card</b></p><p>${c.q}</p><div class="options">${opts.map(x=>`<button class="opt" onclick="pick(this,\`${x.replace(/`/g,'')}\`)">🧾 ${x}</button>`).join('')}</div><div id="hint"></div></div>`;
+let c=cases[idx];
+caseNo.textContent=idx+1;
 updateHud();
+renderBoard();
+let opts=shuffle(c.o);
+caseArea.innerHTML=`
+<div class="case" id="caseFile">
+<h1>📁 ${c.label} — Investigation File</h1>
+<div class="card"><b>🕵 Witness Statement:</b><br>${c.s}</div>
+<div class="card"><b>📌 Evidence Card:</b><br>Study the clue. Which idiom solves this case?</div>
+<div class="card"><b>📝 Detective Question:</b><br>${c.q}</div>
+<div class="options">
+${opts.map(o=>`<button class="opt" onclick="choose(this,'${safe(o)}')">🧾 ${o}</button>`).join("")}
+</div>
+<div id="feedback" style="text-align:center;margin-top:14px;font-weight:bold"></div>
+<div id="hint"></div>
+</div>`;
 }
-function setVol(){[correct,wrong,clap].forEach(a=>a.volume=vol.value)}
-vol.oninput=setVol; setVol();
 
-function play(a){a.currentTime=0;a.play().catch(()=>{})}
+function safe(t){
+return t.replace(/'/g,"&#39;");
+}
 
-function pick(el,ans){
-let c=order[idx]; totalAttempts++;
+function choose(btn,ans){
+if(locked)return;
+let c=cases[idx];
+attempt++;
+totalAttempts++;
+
 if(ans===c.a){
-score++; el.classList.add('correct'); play(correct); setTimeout(()=>play(clap),300);
-burst(); badges.innerHTML+="🏅";
-setTimeout(nextCase,1200);
+locked=true;
+score++;
+btn.classList.add("correct");
+solve(true);
 }else{
-attempt++; el.classList.add('wrong'); play(wrong);
-if(attempt===2) hint.innerHTML=`<p><b>💡 Detective Note:</b> ${hints[c.a]}</p>`;
-if(attempt>=3){hint.innerHTML+=`<p>✔ Answer: <b>${c.a}</b></p>`; setTimeout(nextCase,1500);}
+btn.classList.add("wrong");
+btn.disabled=true;
+feedback.innerHTML='<span class="stamp badstamp">Wrong Lead!</span>';
+playWrong();
+if(attempt===2){
+hint.innerHTML=`<div class="hint"><b>💡 Detective Note:</b> ${c.h}</div>`;
+}
+if(attempt>=3){
+locked=true;
+hint.innerHTML+=`<div class="hint"><b>✔ Case Reveal:</b> The correct idiom is <b>${c.a}</b>.</div>`;
+document.querySelectorAll(".opt").forEach(b=>{
+if(b.textContent.includes(c.a))b.classList.add("correct");
+b.disabled=true;
+});
+setTimeout(()=>solve(false),1200);
+}
 }
 updateHud();
 }
-function updateHud(){
-scoreEl=document.getElementById('score');scoreEl.textContent=score;
-let solved=idx;
-bar.style.width=(solved/10*100)+'%';
-acc.textContent=totalAttempts?Math.round(score/totalAttempts*100):100;
-}
-function nextCase(){
+
+function solve(point){
+let c=cases[idx];
+closed[idx]=true;
+solvedCount++;
+badges.innerHTML+="<div class='badge'>🏅</div>";
+feedback.innerHTML='<span class="stamp">✔ CASE SOLVED</span>';
+document.querySelectorAll(".opt").forEach(b=>b.disabled=true);
+playCorrect();
+confetti(35);
+renderBoard();
+updateHud();
+setTimeout(()=>{
 idx++;
-bar.style.width=(idx/10*100)+'%';
-if(idx>=10) finish(); else render();
+if(idx>=10)finish();
+else render();
+},1800);
 }
+
+function playCorrect(){
+stopSounds();
+play(correctSound);
+setTimeout(()=>play(clapSound),420);
+}
+
+function playWrong(){
+stopSounds();
+play(wrongSound);
+}
+
+function renderBoard(){
+caseBoard.innerHTML="";
+cases.forEach((c,i)=>{
+caseBoard.innerHTML+=`<div class="case-tab ${closed[i]?'closed':''}">
+<span>📁 ${i+1}</span><span>${closed[i]?'✔ Closed':'Open'}</span>
+</div>`;
+});
+}
+
+function updateHud(){
+score.textContent=score;
+badgeCount.textContent=solvedCount;
+solved.textContent=solvedCount;
+accuracy.textContent=totalAttempts?Math.round(score/totalAttempts*100):100;
+bar.style.width=(solvedCount/10*100)+"%";
+}
+
 function finish(){
-game.classList.add('hidden');final.classList.remove('hidden');
-let rank=score==10?'Master Detective':score==9?'Chief Inspector':score==8?'Senior Detective':score>=6?'Junior Detective':'Detective Trainee';
-final.innerHTML=`<h1>🏆 Congratulations, Detective!</h1><h2>Score ${score}/10</h2><h2>Accuracy ${Math.round(score/Math.max(totalAttempts,1)*100)}%</h2><h2>${rank}</h2><p>The city mystery is solved!</p><button onclick="location.reload()">Play Again</button>`;
-burst(80); play(clap);
+show("final");
+let acc=totalAttempts?Math.round(score/totalAttempts*100):100;
+let r=score===10?"Master Detective":score===9?"Chief Inspector":score===8?"Senior Detective":score>=6?"Junior Detective":"Detective Trainee";
+finalScore.textContent=score;
+finalAccuracy.textContent=acc;
+rank.textContent="🏅 "+r;
+stopSounds();
+play(clapSound);
+confetti(100);
 }
-function burst(n=30){
+
+function confetti(n){
 for(let i=0;i<n;i++){
-let d=document.createElement('div');d.className='conf';d.textContent=['✨','⭐','🎉','🏅'][Math.floor(Math.random()*4)];
-d.style.left=Math.random()*100+'vw';d.style.top='-20px';fx.appendChild(d);
-setTimeout(()=>d.remove(),2200);
+let d=document.createElement("div");
+d.className="conf";
+d.textContent=["🎉","✨","⭐","🏅","🌟"][Math.floor(Math.random()*5)];
+d.style.left=Math.random()*100+"vw";
+d.style.animationDelay=Math.random()*.3+"s";
+fx.appendChild(d);
+setTimeout(()=>d.remove(),2600);
 }
 }
 </script>
-</body></html>
+</body>
+</html>
