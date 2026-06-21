@@ -2,353 +2,351 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Noun Explorer Game</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Noun Museum Adventure</title>
 
 <style>
-body {
-    margin: 0;
-    font-family: Arial;
-    background: linear-gradient(135deg,#fff3cd,#d0f0ff,#ffd6e7);
+*{box-sizing:border-box;font-family:Arial, sans-serif;margin:0;padding:0}
+body{
+  background:linear-gradient(135deg,#dff6ff,#fff5d7,#e8ffe8);
+  overflow-x:hidden;
 }
 
-.screen {
-    position: fixed;
-    inset: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    background: white;
-    z-index: 999;
-    text-align: center;
-    padding: 20px;
+/* Screens */
+.screen{
+  display:none;
+  width:100%;
+  height:100vh;
+  justify-content:center;
+  align-items:center;
+  flex-direction:column;
+  text-align:center;
+  padding:20px;
+}
+.active{display:flex;}
+
+/* Logo */
+#logoScreen img{
+  width:220px;
+  animation:pulse 1.5s infinite;
+}
+@keyframes pulse{
+  0%{transform:scale(1);opacity:1}
+  50%{transform:scale(1.05);opacity:.8}
+  100%{transform:scale(1);opacity:1}
 }
 
-#logoScreen img {
-    width: 250px;
+/* Title */
+.title{
+  font-size:28px;
+  font-weight:bold;
+  color:#333;
+}
+.subtitle{
+  margin-top:10px;
+  font-size:16px;
 }
 
-#topicScreen {
-    font-size: 30px;
-    font-weight: bold;
-    color: #ff4d6d;
-    display: none;
+/* Card */
+.card{
+  background:white;
+  padding:20px;
+  border-radius:18px;
+  width:90%;
+  max-width:600px;
+  box-shadow:0 10px 25px rgba(0,0,0,0.15);
 }
 
-#instructionScreen {
-    display: none;
-    font-size: 18px;
-    line-height: 1.6;
+/* Buttons */
+.btn{
+  display:block;
+  width:100%;
+  margin:10px 0;
+  padding:14px;
+  border-radius:12px;
+  border:none;
+  font-size:16px;
+  cursor:pointer;
+  transition:0.3s;
+}
+.btn:hover{transform:scale(1.03)}
+.opt{background:#f1f1f1}
+.correct{background:#b6f7c7 !important}
+.wrong{background:#ffb3b3 !important}
+
+.topbar{
+  width:100%;
+  display:flex;
+  justify-content:space-between;
+  padding:10px;
+  font-weight:bold;
 }
 
-#gameContainer {
-    display: none;
-    padding: 10px;
+.progress{
+  width:90%;
+  height:10px;
+  background:#ddd;
+  border-radius:10px;
+  margin:10px auto;
+  overflow:hidden;
+}
+.bar{
+  height:100%;
+  width:0%;
+  background:linear-gradient(90deg,#4facfe,#00f2fe);
+  transition:0.4s;
 }
 
-.header {
-    display: flex;
-    justify-content: space-between;
-    padding: 10px;
-    font-weight: bold;
+.volume{
+  margin-top:10px;
 }
 
-#questionBox {
-    background: white;
-    padding: 20px;
-    margin: 10px;
-    border-radius: 15px;
-    font-size: 20px;
-    min-height: 100px;
+.confetti{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  pointer-events:none;
+  overflow:hidden;
+}
+.confetti div{
+  position:absolute;
+  width:8px;
+  height:8px;
+  background:red;
+  animation:fall 3s linear forwards;
+}
+@keyframes fall{
+  to{transform:translateY(100vh) rotate(360deg);opacity:0}
 }
 
-.option {
-    background: white;
-    margin: 10px;
-    padding: 12px;
-    border-radius: 10px;
-    border: 2px solid #ccc;
-    cursor: pointer;
-}
-
-.option:hover {
-    background: #f0f8ff;
-}
-
-#finalScreen {
-    display: none;
-    text-align: center;
-    padding: 20px;
-}
-
-.card {
-    background: white;
-    padding: 20px;
-    border-radius: 15px;
-}
-
-button {
-    padding: 10px 20px;
-    margin: 10px;
-    border: none;
-    border-radius: 10px;
-}
-
-.startBtn { background: #28a745; color: white; }
-.restartBtn { background: #007bff; color: white; }
-.endBtn { background: #dc3545; color: white; }
-
-.confetti {
-    position: fixed;
-    width: 10px;
-    height: 10px;
-    background: red;
-    top: 0;
-    animation: fall 2s linear forwards;
-}
-
-@keyframes fall {
-    to { transform: translateY(100vh); opacity: 0; }
-}
 </style>
 </head>
 
 <body>
 
 <!-- LOGO -->
-<div id="logoScreen" class="screen">
-    <img src="assets/innovine-logo.png">
+<div id="logoScreen" class="screen active">
+  <img src="assets/innovine-logo.png">
 </div>
 
-<!-- TOPIC -->
-<div id="topicScreen" class="screen">
-    🌟 Noun Explorer Challenge 🌟
+<!-- TITLE -->
+<div id="titleScreen" class="screen">
+  <div class="title">🏛️ Noun Museum Adventure</div>
+  <div class="subtitle">✨ Unlock the Secrets of Nouns</div>
 </div>
 
-<!-- INSTRUCTION -->
-<div id="instructionScreen" class="screen">
+<!-- INSTRUCTIONS -->
+<div id="instScreen" class="screen">
+  <div class="card">
     <h2>🎯 How to Play</h2>
-    <p>
-        Read each sentence carefully.<br><br>
-        The <b>highlighted word</b> is the noun to focus on.<br><br>
-        Tap the correct type of noun.<br>
-        Earn points and reach the winning level 🏆
-    </p>
-    <button class="startBtn" onclick="startGame()">Start Game</button>
+    <p>Welcome to the Grand Noun Museum!</p>
+    <p>Choose correct noun types and unlock exhibits.</p>
+
+    <label>🔊 Volume</label>
+    <input type="range" min="0" max="1" step="0.1" id="vol" class="volume" value="1">
+
+    <button class="btn" onclick="startGame()">▶ Start Adventure</button>
+  </div>
 </div>
 
 <!-- GAME -->
-<div id="gameContainer">
+<div id="gameScreen" class="screen">
+  <div class="topbar">
+    <div id="room">Room 1/10</div>
+    <div id="score">⭐ 0</div>
+  </div>
 
-    <div class="header">
-        <div id="qCount">1/10</div>
-        <div id="timer">80</div>
-    </div>
+  <div class="progress"><div class="bar" id="bar"></div></div>
 
-    <div id="questionBox"></div>
+  <div class="card">
+    <h3 id="gallery">Gallery</h3>
+    <p id="qtext"></p>
     <div id="options"></div>
+  </div>
 </div>
 
-<!-- FINAL -->
-<div id="finalScreen">
-    <div class="card">
-        <h2 id="scoreText"></h2>
-        <p id="remark"></p>
-        <p id="timeTaken"></p>
-        <p id="attempts"></p>
-
-        <button class="restartBtn" onclick="restartGame()">Restart</button>
-        <button class="endBtn" onclick="location.reload()">End</button>
-    </div>
+<!-- END -->
+<div id="endScreen" class="screen">
+  <h2>🎉 Congratulations!</h2>
+  <p id="finalScore"></p>
+  <button class="btn" onclick="restart()">🔄 Play Again</button>
 </div>
 
-<audio id="correctSound" src="assets/correct.mp3"></audio>
-<audio id="wrongSound" src="assets/wrong.mp3"></audio>
+<div class="confetti" id="confetti"></div>
+
+<audio id="correct" src="assets/correct.mp3"></audio>
+<audio id="wrong" src="assets/wrong.mp3"></audio>
+<audio id="clap" src="assets/clapping.mp3"></audio>
 
 <script>
-
-/* ---------------- QUESTIONS WITH BOLD WORDS ---------------- */
-let questions = [
+const questions = [
 {
-q:"The <b>committee</b> decided to organize a science fair.",
-options:["Common Noun","Proper Noun","Collective Noun","Abstract Noun"],
-answer:2
+q:"The garden is full of colourful flowers and butterflies.",
+a:["Common Noun","Proper Noun","Material Noun","Abstract Noun"],
+c:"Common Noun",
+g:"🌿 Nature Gallery"
 },
 {
-q:"<b>Copper</b> is used to make electrical wires.",
-options:["Common Noun","Material Noun","Countable Noun","Collective Noun"],
-answer:1
+q:"India is famous for its rich culture and festivals.",
+a:["Common Noun","Proper Noun","Collective Noun","Material Noun"],
+c:"Proper Noun",
+g:"🏛️ Famous Places Gallery"
 },
 {
-q:"<b>Friendship</b> becomes stronger when people trust each other.",
-options:["Common Noun","Proper Noun","Material Noun","Abstract Noun"],
-answer:3
+q:"The team celebrated their victory after the match.",
+a:["Abstract Noun","Collective Noun","Proper Noun","Common Noun"],
+c:"Collective Noun",
+g:"🏆 Teamwork Gallery"
 },
 {
-q:"The <b>children</b> visited the museum.",
-options:["Uncountable Noun","Collective Noun","Countable Noun","Material Noun"],
-answer:2
+q:"The necklace was made of pure gold.",
+a:["Material Noun","Common Noun","Collective Noun","Proper Noun"],
+c:"Material Noun",
+g:"💎 Treasure Gallery"
 },
 {
-q:"We need more <b>sand</b> to complete the model.",
-options:["Material Noun","Countable Noun","Uncountable Noun","Collective Noun"],
-answer:2
+q:"Honesty is always appreciated by everyone.",
+a:["Proper Noun","Material Noun","Abstract Noun","Common Noun"],
+c:"Abstract Noun",
+g:"💖 Feelings Gallery"
 },
 {
-q:"<b>Ms. Sharma</b> encouraged students.",
-options:["Common Noun","Collective Noun","Proper Noun","Abstract Noun"],
-answer:2
+q:"The lion rested under a shady tree.",
+a:["Proper Noun","Common Noun","Material Noun","Collective Noun"],
+c:"Common Noun",
+g:"🐾 Animal Gallery"
 },
 {
-q:"The <b>garden</b> is filled with flowers.",
-options:["Common Noun","Proper Noun","Material Noun","Collective Noun"],
-answer:0
+q:"Mrs. Gupta teaches Mathematics in our school.",
+a:["Proper Noun","Common Noun","Collective Noun","Material Noun"],
+c:"Proper Noun",
+g:"🏫 School Gallery"
 },
 {
-q:"A <b>fleet</b> of ships arrived.",
-options:["Common Noun","Countable Noun","Material Noun","Collective Noun"],
-answer:3
+q:"A shoal of fish swam together near the coral reef.",
+a:["Material Noun","Common Noun","Collective Noun","Abstract Noun"],
+c:"Collective Noun",
+g:"🌊 Ocean Gallery"
 },
 {
-q:"<b>Knowledge</b> helps people make wise decisions.",
-options:["Common Noun","Material Noun","Abstract Noun","Proper Noun"],
-answer:2
+q:"The table is made from strong wood.",
+a:["Material Noun","Proper Noun","Common Noun","Collective Noun"],
+c:"Material Noun",
+g:"🌳 Builders Gallery"
 },
 {
-q:"The temple floor was built using <b>marble</b>.",
-options:["Countable Noun","Common Noun","Material Noun","Collective Noun"],
-answer:2
+q:"Kindness makes the world a happier place.",
+a:["Material Noun","Collective Noun","Abstract Noun","Common Noun"],
+c:"Abstract Noun",
+g:"🌎 Values Gallery"
 }
 ];
 
-let current=0, score=0, time=80, timer;
-let totalTime=0, attempts=0;
+let order=[],i=0,score=0,attempt=0;
 
-/* ---------------- SPLASH FLOW ---------------- */
+function shuffle(a){
+return a.sort(()=>Math.random()-0.5);
+}
+
+function init(){
+order=shuffle([...Array(10).keys()]);
+}
+
+function showQ(){
+let q=questions[order[i]];
+attempt=0;
+
+document.getElementById("room").innerText=`Room ${i+1}/10`;
+document.getElementById("score").innerText=`⭐ ${score}`;
+document.getElementById("gallery").innerText=q.g;
+document.getElementById("qtext").innerText=q.q;
+
+let opt=document.getElementById("options");
+opt.innerHTML="";
+
+shuffle(q.a).forEach(ans=>{
+let b=document.createElement("button");
+b.className="btn opt";
+b.innerText=ans;
+b.onclick=()=>check(b,ans,q);
+opt.appendChild(b);
+});
+updateBar();
+}
+
+function check(btn,ans,q){
+if(ans===q.c){
+btn.classList.add("correct");
+document.getElementById("correct").play();
+setTimeout(()=>document.getElementById("clap").play(),500);
+score+=2;
+next();
+}else{
+attempt++;
+document.getElementById("wrong").play();
+btn.classList.add("wrong");
+if(attempt>=2){
+alert("Hint: "+q.c);
+setTimeout(()=>next(),1000);
+}
+}
+}
+
+function next(){
+i++;
+if(i>=order.length){
+end();
+}else{
+setTimeout(showQ,800);
+}
+}
+
+function updateBar(){
+document.getElementById("bar").style.width=(i/10)*100+"%";
+}
+
+function startGame(){
+document.getElementById("instScreen").classList.remove("active");
+document.getElementById("gameScreen").classList.add("active");
+init();
+showQ();
+}
+
+function end(){
+document.getElementById("gameScreen").classList.remove("active");
+document.getElementById("endScreen").classList.add("active");
+document.getElementById("finalScore").innerText="⭐ Score: "+score+"/20";
+confetti();
+document.getElementById("clap").play();
+}
+
+function restart(){
+location.reload();
+}
+
+function confetti(){
+for(let i=0;i<80;i++){
+let d=document.createElement("div");
+d.style.left=Math.random()*100+"%";
+d.style.background=["#ff4d4d","#4dd2ff","#ffd24d","#8cff66"][Math.floor(Math.random()*4)];
+d.style.animationDuration=(Math.random()*2+2)+"s";
+document.getElementById("confetti").appendChild(d);
+}
+}
+
 setTimeout(()=>{
-    document.getElementById("logoScreen").style.display="none";
-    document.getElementById("topicScreen").style.display="flex";
-
-    setTimeout(()=>{
-        document.getElementById("topicScreen").style.display="none";
-        document.getElementById("instructionScreen").style.display="flex";
-    },3000);
-
+document.getElementById("logoScreen").classList.remove("active");
+document.getElementById("titleScreen").classList.add("active");
 },5000);
 
-/* ---------------- START GAME ---------------- */
-function startGame(){
-    document.getElementById("instructionScreen").style.display="none";
-    document.getElementById("gameContainer").style.display="block";
-    loadQuestion();
-}
-
-/* ---------------- LOAD ---------------- */
-function loadQuestion(){
-    clearInterval(timer);
-    time=80;
-
-    if(current>=questions.length){
-        endGame();
-        return;
-    }
-
-    document.getElementById("qCount") .innerText=(current+1)+"/10";
-    document.getElementById("questionBox").innerHTML=questions[current].q;
-
-    let box=document.getElementById("options");
-    box.innerHTML="";
-
-    questions[current].options.forEach((opt,i)=>{
-        let d=document.createElement("div");
-        d.className="option";
-        d.innerText=opt;
-        d.onclick=()=>check(i);
-        box.appendChild(d);
-    });
-
-    startTimer();
-}
-
-/* ---------------- TIMER ---------------- */
-function startTimer(){
-    document.getElementById("timer").innerText=time;
-
-    timer=setInterval(()=>{
-        time--; totalTime++;
-        document.getElementById("timer").innerText=time;
-
-        if(time<=0){
-            current++;
-            loadQuestion();
-        }
-    },1000);
-}
-
-/* ---------------- CHECK ---------------- */
-function check(i){
-    if(i===questions[current].answer){
-        score++;
-        correct();
-    } else {
-        attempts++;
-        wrong();
-    }
-
-    setTimeout(()=>{
-        current++;
-        loadQuestion();
-    },600);
-}
-
-function correct(){
-    document.getElementById("correctSound").play();
-    for(let i=0;i<20;i++){
-        let c=document.createElement("div");
-        c.className="confetti";
-        c.style.left=Math.random()*100+"vw";
-        c.style.background=["#ff4d6d","#ffd166","#06d6a0","#4d96ff"][Math.random()*4|0];
-        document.body.appendChild(c);
-        setTimeout(()=>c.remove(),2000);
-    }
-}
-
-function wrong(){
-    document.getElementById("wrongSound").play();
-}
-
-/* ---------------- END ---------------- */
-function endGame(){
-
-    document.getElementById("gameContainer").style.display="none";
-    document.getElementById("finalScreen").style.display="block";
-
-    let percent=(score/questions.length)*100;
-
-    let remark=
-        percent>=80?"Excellent 🌟":
-        percent>=60?"Good Job 👍":
-        percent>=45?"Well Tried 🙂":
-        "Let's revise 📘";
-
-    document.getElementById("scoreText").innerText=
-        `Score: ${score}/10`;
-
-    document.getElementById("remark").innerText=remark;
-    document.getElementById("timeTaken").innerText="Time: "+totalTime+" sec";
-    document.getElementById("attempts").innerText="Wrong Attempts: "+attempts;
-}
-
-/* ---------------- RESTART ---------------- */
-function restartGame(){
-    current=0; score=0; time=80;
-    totalTime=0; attempts=0;
-    document.getElementById("finalScreen").style.display="none";
-    document.getElementById("gameContainer").style.display="block";
-    loadQuestion();
-}
+setTimeout(()=>{
+document.getElementById("titleScreen").classList.remove("active");
+document.getElementById("instScreen").classList.add("active");
+},8000);
 
 </script>
+
 </body>
 </html>
