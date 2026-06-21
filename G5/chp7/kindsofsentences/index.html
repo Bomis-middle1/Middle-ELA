@@ -1,1 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kinds of Sentences Quiz</title>
+<style>
+* { box-sizing: border-box; margin:0; padding:0; }
+body {
+  font-family: 'Arial', sans-serif;
+  background: linear-gradient(135deg, #fff6d1, #ffd1e0, #d1f0ff);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-x: hidden;
+  position: relative;
+}
 
+/* Floating stars background */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background-image: radial-gradient(circle, #fff7 1px, #fff0 1px);
+  background-size: 25px 25px;
+  pointer-events: none;
+  animation: moveStars 20s linear infinite;
+}
+@keyframes moveStars {
+  0% { background-position: 0 0; }
+  100% { background-position: 1000px 500px; }
+}
+
+/* Splash Logo */
+#splash {
+  position: fixed;
+  inset: 0;
+  background: #fff9f0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  animation: fadeOut 1s ease 4s forwards;
+}
+#splash img { width: 220px; max-width: 80%; animation: pulse 2s infinite; }
+@keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
+@keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+
+h1 { 
+  margin: 20px; 
+  color: #2b4eff; 
+  text-align: center; 
+  font-size: 30px; 
+  font-weight: bold;
+  text-shadow: 2px 2px 4px rgba(43, 78, 255, 0.2);
+}
+
+/* Instructions */
+#instructions-screen {
+  width: 90%; max-width: 700px;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 25px;
+  border-radius: 16px;
+  margin-bottom: 20px;
+  text-align: center;
+  font-size: 18px;
+  box-shadow: 0 8px 30px rgba(43, 78, 255, 0.15);
+  border: 2px solid rgba(43, 78, 255, 0.1);
+}
+#instructions-screen h2 { 
+  color: #2b4eff; 
+  margin-bottom: 12px; 
+  font-size: 26px; 
+  font-weight: bold;
+}
+#instructions-screen p { 
+  font-size: 16px; 
+  color: #333; 
+  margin: 8px 0; 
+  line-height: 1.5;
+}
+#instructions-screen .tip {
+  font-size: 17px;
+  color: #4caf50;
+  font-weight: bold;
+  margin: 10px 0;
+}
+#start-btn {
+  padding: 14px 30px;
+  font-size: 18px;
+  background: linear-gradient(135deg, #4caf50, #45a049);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: bold;
+  margin-top: 12px;
+  box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
+  transition: 0.3s;
+}
+#start-btn:hover { 
+  background: linear-gradient(135deg, #45a049, #3d8b40);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(76, 175, 80, 0.5);
+}
+
+/* Game Area */
+#game-area { 
+  width: 90%; max-width: 900px;
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 20px;
+  padding: 25px;
+  display: none;
+  position: relative;
+  box-shadow: 0 8px 30px rgba(43, 78, 255, 0.1);
+  border: 2px solid rgba(43, 78, 255, 0.1);
+}
+
+/* Question + mascot */
+#question-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+  flex-wrap: wrap;
+}
+#question { 
+  font-size: 22px; 
+  font-weight: bold; 
+  flex: 1; 
+  color: #2b4eff;
+  line-height: 1.4;
+  padding: 15px;
+  background: rgba(43, 78, 255, 0.05);
+  border-radius: 12px;
+}
+
+/* CSS mascot */
+#mascot {
+  width: 90px; height: 90px;
+  background: radial-gradient(circle, #ffcc66, #ff6699);
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: bounce 1s infinite alternate, wiggle 2s infinite alternate;
+  font-size: 32px;
+  font-weight: bold;
+  color: white;
+  margin-left: 15px;
+  position: relative;
+  box-shadow: 0 4px 15px rgba(255, 102, 153, 0.4);
+}
+#mascot::after {
+  content: "👀";
+  position: absolute;
+  top: 12px;
+  left: 18px;
+  font-size: 22px;
+}
+
+/* Mascot Animations */
+@keyframes bounce {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-15px); }
+}
+@keyframes wiggle {
+  0% { transform: translateY(-15px) rotate(-10deg); }
+  50% { transform: translateY(-10px) rotate(10deg); }
+  100% { transform: translateY(-15px) rotate(-10deg); }
+}
+
+/* Answer buttons */
+.answer-btn {
+  width: 100%;
+  max-width: 400px;
+  padding: 14px;
+  margin: 10px 0;
+  font-size: 17px;
+  background: linear-gradient(135deg, #ff9966, #ffcc66);
+  color: white;
+  border: none;
+  border-radius: 14px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.3s;
+  box-shadow: 0 3px 10px rgba(255, 153, 102, 0.3);
+}
+.answer-btn:hover { 
+  transform: scale(1.05); 
+  background: linear-gradient(135deg, #ffcc66, #ff9966);
+  box-shadow: 0 5px 15px rgba(255, 153, 102, 0.4);
+}
+.answer-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Result & Score */
+#result { 
+  margin-top: 20px; 
+  font-size: 20px; 
+  min-height: 28px; 
+  color: #2b4eff; 
+  font-weight: bold;
+  text-align: center;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 10px;
+}
+
+#score { 
+  margin-top: 15px; 
+  font-size: 18px; 
+  color: #333;
+  font-weight: bold;
+  background: rgba(255, 255, 255, 0.8);
+  padding: 8px 20px;
+  border-radius: 10px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+}
+
+/* Progress Bar */
+#progress-bar {
+  width: 100%;
+  max-width: 700px;
+  height: 10px;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 8px;
+  margin: 15px auto;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+#progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #4caf50, #66ff99);
+  width: 0%;
+  transition: width 0.5s ease;
+  box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
+}
+
+/* Attempts Indicator */
+#attempts {
+  font-size: 16px;
+  color: #e76f51;
+  font-weight: bold;
+  margin: 10px 0;
+  padding: 8px 15px;
+  background: rgba(231, 111, 81, 0.1);
+  border-radius: 8px;
+  display: none;
+}
+
+/* Confetti */
+.confetti {
+  position: fixed;
+  font-size: 22px;
+  animation: fall 2.5s linear forwards;
+  pointer-events: none;
+  z-index: 10000;
+}
+@keyframes fall {
+  0% { transform: translateY(-10px) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+}
+
+/* Correct/Wrong Animations */
+.correct-answer {
+  background: linear-gradient(135deg, #66ff99, #33cc66);
+  animation: correctPulse 0.5s;
+}
+.wrong-answer {
+  background: linear-gradient(135deg, #ff6666, #ff3333);
+  animation: wrongShake 0.5s;
+}
+
+@keyframes correctPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+}
+@keyframes wrongShake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+/* Final Screen */
+#final-screen {
+  display: none;
+  width: 90%; max-width: 700px;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 30px;
+  border-radius: 20px;
+  text-align: center;
+  box-shadow: 0 8px 30px rgba(43, 78, 255, 0.15);
+}
+#final-screen h2 {
+  color: #2b4eff;
+  font-size: 32px;
+  margin-bottom: 15px;
+}
+#final-score {
+  font-size: 48px;
+  color: #4caf50;
+  font-weight: bold;
+  margin: 20px 0;
+}
+#restart-btn {
+  padding: 14px 30px;
+  font-size: 18px;
+  background: linear-gradient(135deg, #ff6b6b, #ee5a5a);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: bold;
+  margin-top: 15px;
+  box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+}
+#restart-btn:hover {
+  background: linear-gradient(135deg, #ee5a5a, #dd4a4a);
+  transform: translateY(-3px);
+}
+</style>
+</head>
+<body>
+
+<!-- Splash Logo -->
+<div id="splash">
+  <img src="assets/logo.png" alt="Innovine Logo">
+</div>
+
+<h1>📚 Kinds of Sentences Quiz</h1>
+
+<!-- Instructions -->
+<div id="instructions-screen">
+  <h2>✨ How to Play</h2>
+  <p>Read each sentence and identify its type:</p>
+  <p><strong>Declarative</strong> (statement) • <strong>Interrogative</strong> (question) • <strong>Imperative</strong> (command) • <strong>Exclamatory</strong> (excitement)</p>
+  <div class="tip">🔄 You have 2 attempts per question!</div>
+  <div class="tip">✅ Correct: 🎉 Sound + Confetti</div>
+  <div class="tip">❌ Wrong: Show correct answer + Move to next</div>
+  <button id="start-btn">🚀 Start Quiz</button>
+</div>
+
+<!-- Game Area -->
+<div id="game-area">
+  <div id="question-container">
+    <div id="question"></div>
+    <div id="mascot">🎯</div>
+  </div>
+  <div id="attempts">Attempts left: 2</div>
+  <div id="answers"></div>
+  <div id="result"></div>
+  <div id="score">Score: 0 / 15</div>
+  <div id="progress-bar"><div id="progress-fill"></div></div>
+</div>
+
+<!-- Final Screen -->
+<div id="final-screen">
+  <h2>🏆 Quiz Completed!</h2>
+  <div id="final-score">Score: 0 / 15</div>
+  <p id="final-message"></p>
+  <button id="restart-btn">🔄 Play Again</button>
+</div>
+
+<audio id="correct-sound" src="assets/correct.mp3"></audio>
+<audio id="wrong-sound" src="assets/wrong.mp3"></audio>
+<audio id="clap-sound" src="assets/freesound_community-claps-44774.mp3"></audio>
+
+<script>
+const questions = [
+  {sentence:"I enjoy reading novels.", type:"Declarative"},
+  {sentence:"Did you finish your homework?", type:"Interrogative"},
+  {sentence:"Close the window, please.", type:"Imperative"},
+  {sentence:"What a magnificent painting!", type:"Exclamatory"},
+  {sentence:"The children are playing in the garden.", type:"Declarative"},
+  {sentence:"Can you solve this puzzle?", type:"Interrogative"},
+  {sentence:"Write your name on the board.", type:"Imperative"},
+  {sentence:"Wow! That was incredible!", type:"Exclamatory"},
+  {sentence:"My dog loves to chase balls.", type:"Declarative"},
+  {sentence:"Have you seen my notebook?", type:"Interrogative"},
+  {sentence:"Stand up and stretch.", type:"Imperative"},
+  {sentence:"Hurrah! We won the match!", type:"Exclamatory"},
+  {sentence:"The teacher explained the lesson clearly.", type:"Declarative"},
+  {sentence:"Where did you put the keys?", type:"Interrogative"},
+  {sentence:"Don't touch the wet paint!", type:"Imperative"}
+];
+
+let current = 0;
+let score = 0;
+let attempts = 2;
+let selectedQuestion = null;
+
+const startBtn = document.getElementById('start-btn');
+const instructionsScreen = document.getElementById('instructions-screen');
+const gameArea = document.getElementById('game-area');
+const finalScreen = document.getElementById('final-screen');
+const questionEl = document.getElementById('question');
+const answersEl = document.getElementById('answers');
+const resultEl = document.getElementById('result');
+const scoreEl = document.getElementById('score');
+const attemptsEl = document.getElementById('attempts');
+const progressFill = document.getElementById('progress-fill');
+const finalScoreEl = document.getElementById('final-score');
+const finalMessageEl = document.getElementById('final-message');
+const restartBtn = document.getElementById('restart-btn');
+
+function shuffle(array) {
+  for(let i=array.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [array[i],array[j]]=[array[j],array[i]];
+  }
+  return array;
+}
+
+function loadQuestion() {
+  resultEl.innerText = '';
+  answersEl.innerHTML = '';
+  attemptsEl.style.display = 'none';
+  
+  if(current >= questions.length) {
+    showFinalScreen();
+    return;
+  }
+  
+  selectedQuestion = questions[current];
+  questionEl.innerText = selectedQuestion.sentence;
+  attempts = 2;
+  attemptsEl.innerText = 'Attempts left: ' + attempts;
+  attemptsEl.style.display = 'block';
+  
+  const options = shuffle(["Declarative","Interrogative","Imperative","Exclamatory"]);
+  options.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.innerText = opt;
+    btn.className = "answer-btn";
+    btn.onclick = () => checkAnswer(btn, opt);
+    answersEl.appendChild(btn);
+  });
+  
+  // Update progress bar
+  progressFill.style.width = ((current) / questions.length * 100) + '%';
+}
+
+function checkAnswer(btn, selected) {
+  if(selected === selectedQuestion.type) {
+    // Correct!
+    btn.classList.add('correct-answer');
+    resultEl.innerText = '🎉 Correct! Amazing!';
+    resultEl.style.color = '#4caf50';
+    
+    document.getElementById('correct-sound').play();
+    document.getElementById('clap-sound').play();
+    createConfetti();
+    
+    score++;
+    scoreEl.innerText = 'Score: ' + score + ' / ' + questions.length;
+    
+    current++;
+    setTimeout(loadQuestion, 1200);
+  } else {
+    // Wrong!
+    btn.classList.add('wrong-answer');
+    btn.disabled = true;
+    
+    attempts--;
+    attemptsEl.innerText = 'Attempts left: ' + attempts;
+    
+    if(attempts === 0) {
+      // No more attempts - show correct answer
+      resultEl.innerText = '❌ Wrong! Correct answer is: ' + selectedQuestion.type;
+      resultEl.style.color = '#e76f51';
+      document.getElementById('wrong-sound').play();
+      
+      current++;
+      setTimeout(loadQuestion, 1500);
+    } else {
+      // One attempt left - give hint
+      resultEl.innerText = '❌ Try again! Hint: ' + getHint(selectedQuestion.type);
+      resultEl.style.color = '#e76f51';
+      document.getElementById('wrong-sound').play();
+    }
+  }
+}
+
+function getHint(type) {
+  if(type === 'Declarative') return 'It makes a statement or tells something';
+  if(type === 'Interrogative') return 'It asks a question (has ?)';
+  if(type === 'Imperative') return 'It gives a command or request';
+  if(type === 'Exclamatory') return 'It shows strong emotion (has !)';
+  return '';
+}
+
+function createConfetti() {
+  for(let i=0;i<30;i++){
+    const conf = document.createElement('div');
+    conf.classList.add('confetti');
+    conf.innerHTML = ['⭐','🎉','✨','🌟'][Math.floor(Math.random()*4)];
+    conf.style.left = Math.random() * 100 + 'vw';
+    conf.style.top = '-10px';
+    conf.style.fontSize = (Math.random() * 25 + 15) + 'px';
+    document.body.appendChild(conf);
+    setTimeout(() => conf.remove(), 2500);
+  }
+}
+
+function showFinalScreen() {
+  gameArea.style.display = 'none';
+  finalScreen.style.display = 'block';
+  progressFill.style.width = '100%';
+  
+  finalScoreEl.innerText = 'Score: ' + score + ' / 15';
+  
+  if(score >= 12) {
+    finalMessageEl.innerText = '🏆 AMAZING! You are a sentence expert!';
+  } else if(score >= 8) {
+    finalMessageEl.innerText = '😊 Good job! Keep practicing!';
+  } else {
+    finalMessageEl.innerText = '💪 Try again to improve your score!';
+  }
+  
+  if(score >= 10) {
+    createConfetti();
+  }
+}
+
+startBtn.addEventListener('click', () => {
+  instructionsScreen.style.display = 'none';
+  gameArea.style.display = 'block';
+  shuffle(questions);
+  current = 0;
+  score = 0;
+  loadQuestion();
+});
+
+restartBtn.addEventListener('click', () => {
+  finalScreen.style.display = 'none';
+  instructionsScreen.style.display = 'block';
+  current = 0;
+  score = 0;
+  progressFill.style.width = '0%';
+});
+</script>
+
+</body>
+</html>
