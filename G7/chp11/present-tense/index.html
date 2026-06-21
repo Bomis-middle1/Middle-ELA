@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Grammar Factory – Conveyor Belt Challenge</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grammar Factory</title>
 
 <style>
 body{
 margin:0;
-font-family:Arial, sans-serif;
+font-family:Arial;
 background:linear-gradient(135deg,#1e3c72,#2a5298,#ffb347);
 overflow:hidden;
 color:white;
@@ -27,18 +27,11 @@ text-align:center;
 .active{display:flex;}
 
 /* LOGO */
-#logoScreen{
-background:#fff;
-}
-#logoScreen img{
-width:220px;
-}
+#logoScreen{background:#fff;}
+#logoScreen img{width:220px;}
 
 /* TITLE */
-#titleScreen h1{
-font-size:28px;
-margin:0;
-}
+#titleScreen h1{font-size:30px;}
 
 /* HUD */
 #hud{
@@ -48,30 +41,27 @@ left:0;
 right:0;
 display:flex;
 justify-content:space-around;
-gap:6px;
 padding:10px;
-background:rgba(0,0,0,0.55);
+background:rgba(0,0,0,0.6);
 z-index:10;
 font-size:13px;
-flex-wrap:wrap;
 }
 
-/* GAME AREA */
+/* GAME BOX */
 #gameBox{
 width:90%;
 max-width:650px;
-background:#ffffff;
+background:#fff;
 color:#000;
 border-radius:16px;
 padding:18px;
 margin-top:90px;
-box-shadow:0 10px 25px rgba(0,0,0,0.2);
 }
 
 #sentence{
 font-size:18px;
 font-weight:bold;
-margin-bottom:12px;
+margin-bottom:10px;
 }
 
 .options{
@@ -84,45 +74,17 @@ justify-content:center;
 .option{
 flex:1 1 45%;
 padding:10px;
-border-radius:10px;
 background:#f2f2f2;
+border-radius:10px;
 cursor:pointer;
 font-weight:bold;
 user-select:none;
-transition:0.2s;
 }
 
-.option:active{transform:scale(0.96);}
+.option:active{transform:scale(0.97);}
 
-.correct{background:#2ecc71 !important;color:#fff;}
-.wrong{background:#e74c3c !important;color:#fff;}
-
-/* CONVEYOR */
-.conveyor{
-position:fixed;
-bottom:0;
-left:0;
-right:0;
-height:55px;
-background:repeating-linear-gradient(
-90deg,
-#444 0px,
-#444 18px,
-#666 18px,
-#666 36px
-);
-opacity:0.6;
-}
-
-/* BUTTON */
-button{
-padding:10px 16px;
-border:none;
-border-radius:10px;
-background:#ffb347;
-font-weight:bold;
-cursor:pointer;
-}
+.correct{background:#2ecc71;color:#fff;}
+.wrong{background:#e74c3c;color:#fff;}
 
 /* POPUP */
 #popup{
@@ -132,16 +94,31 @@ left:50%;
 transform:translate(-50%,-50%);
 background:#000;
 color:#fff;
-padding:14px 18px;
+padding:14px;
 border-radius:10px;
 display:none;
 z-index:999;
 }
 
-/* MOBILE */
-@media(max-width:600px){
-.option{flex:1 1 100%;}
-#gameBox{margin-top:100px;}
+/* CONVEYOR */
+.conveyor{
+position:fixed;
+bottom:0;
+left:0;
+right:0;
+height:60px;
+background:repeating-linear-gradient(90deg,#444,#444 20px,#666 20px,#666 40px);
+opacity:0.6;
+}
+
+/* BUTTON */
+button{
+padding:10px 16px;
+border:none;
+border-radius:10px;
+background:orange;
+font-weight:bold;
+cursor:pointer;
 }
 </style>
 </head>
@@ -150,7 +127,7 @@ z-index:999;
 
 <!-- LOGO -->
 <div id="logoScreen" class="screen active">
-<img src="assets/innovine-logo.png" />
+<img src="assets/innovine-logo.png">
 </div>
 
 <!-- TITLE -->
@@ -192,13 +169,22 @@ z-index:999;
 
 <script>
 
-/* ================= LOGO FLOW ================= */
-setTimeout(()=>{
-document.getElementById("logoScreen").classList.remove("active");
-document.getElementById("titleScreen").classList.add("active");
-},5000);
+/* ================= AUDIO SYSTEM ================= */
+const audio = {
+correct: new Audio("assets/correct.mp3"),
+wrong: new Audio("assets/wrong.mp3"),
+clap: new Audio("assets/clapping.mp3")
+};
 
-/* ================= QUESTIONS ================= */
+function playSound(type){
+let a = audio[type];
+if(!a) return;
+a.pause();
+a.currentTime = 0;
+a.play().catch(()=>{});
+}
+
+/* ================= LOGIC ================= */
 const QUESTIONS = [
 {
 q:"She goes to school by bus every day.",
@@ -222,7 +208,7 @@ hint:"completed"
 q:"My brother has been practising the guitar for two hours.",
 a:"Present Perfect Continuous",
 opts:["Present Simple","Present Continuous","Present Perfect","Present Perfect Continuous"],
-hint:"ongoing"
+hint:"ongoing action"
 },
 {
 q:"The Earth revolves around the Sun.",
@@ -231,34 +217,34 @@ opts:["Present Continuous","Present Perfect","Present Simple","Present Perfect C
 hint:"fact"
 },
 {
-q:"Look! The children are flying colourful kites in the park.",
+q:"Look! The children are flying kites.",
 a:"Present Continuous",
 opts:["Present Continuous","Present Perfect","Present Simple","Present Perfect Continuous"],
-hint:"look clue"
+hint:"now"
 },
 {
-q:"Our teacher has checked all the notebooks.",
+q:"Our teacher has checked all notebooks.",
 a:"Present Perfect",
 opts:["Present Perfect","Present Continuous","Present Perfect Continuous","Present Simple"],
 hint:"done"
 },
 {
-q:"Riya has been reading the same novel since Monday.",
+q:"Riya has been reading since Monday.",
 a:"Present Perfect Continuous",
 opts:["Present Continuous","Present Perfect","Present Perfect Continuous","Present Simple"],
-hint:"since"
+hint:"since clue"
 },
 {
-q:"The school bus arrives at 7:30 every morning.",
+q:"The bus arrives at 7:30 every day.",
 a:"Present Simple",
 opts:["Present Continuous","Present Perfect","Present Simple","Present Perfect Continuous"],
 hint:"schedule"
 },
 {
-q:"I am helping my mother prepare dinner right now.",
+q:"I am helping my mother right now.",
 a:"Present Continuous",
 opts:["Present Perfect","Present Continuous","Present Simple","Present Perfect Continuous"],
-hint:"right now"
+hint:"now"
 }
 ];
 
@@ -266,19 +252,17 @@ hint:"right now"
 let order=[],i=0,score=0,coins=0,att=2,lock=false;
 
 /* shuffle */
-function shuffle(a){
-return [...a].sort(()=>Math.random()-0.5);
-}
+function shuffle(a){return [...a].sort(()=>Math.random()-0.5);}
 
 /* ================= START ================= */
+setTimeout(()=>{
+document.getElementById("logoScreen").classList.remove("active");
+document.getElementById("titleScreen").classList.add("active");
+},5000);
+
 function startGame(){
-
 order = shuffle(QUESTIONS);
-
-i=0;
-score=0;
-coins=0;
-att=2;
+i=0;score=0;coins=0;att=2;
 
 document.getElementById("titleScreen").classList.remove("active");
 document.getElementById("gameScreen").classList.add("active");
@@ -305,10 +289,10 @@ document.getElementById("sentence").innerText = q.q;
 let opts = shuffle(q.opts);
 
 let box = document.getElementById("options");
-box.innerHTML = "";
+box.innerHTML="";
 
 opts.forEach(o=>{
-let d = document.createElement("div");
+let d=document.createElement("div");
 d.className="option";
 d.innerText=o;
 d.onclick=()=>check(o,d);
@@ -338,7 +322,8 @@ score++;
 coins+=10;
 
 el.classList.add("correct");
-popup("Correct ✔");
+playSound("correct");
+playSound("clap");
 
 setTimeout(()=>{
 i++;
@@ -351,27 +336,17 @@ att--;
 updateHUD();
 
 el.classList.add("wrong");
-popup("Wrong!");
+playSound("wrong");
 
 if(att>0){
-setTimeout(()=>{lock=false;},300);
+lock=false;
 }else{
-popup("Answer: "+q.a+" ("+q.hint+")");
-
 setTimeout(()=>{
 i++;
 loadQ();
 },1200);
 }
 }
-}
-
-/* ================= POPUP ================= */
-function popup(t){
-let p=document.getElementById("popup");
-p.innerText=t;
-p.style.display="block";
-setTimeout(()=>p.style.display="none",900);
 }
 
 /* ================= END ================= */
@@ -388,6 +363,7 @@ document.getElementById("result").innerHTML=`
 🎯 Accuracy: ${acc}%
 `;
 
+playSound("clap");
 }
 
 </script>
