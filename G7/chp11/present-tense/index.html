@@ -14,7 +14,7 @@ overflow:hidden;
 color:white;
 }
 
-/* SCREEN SYSTEM FIXED */
+/* SCREEN SYSTEM (ROBUST) */
 .screen{
 position:fixed;
 inset:0;
@@ -25,9 +25,7 @@ flex-direction:column;
 text-align:center;
 }
 
-.active{
-display:flex;
-}
+.active{ display:flex; }
 
 /* LOGO */
 #logoScreen{
@@ -45,8 +43,8 @@ to{transform:scale(1);opacity:1;}
 
 /* TITLE */
 #titleScreen h1{
-font-size:40px;
-animation:pulse 1s infinite;
+font-size:clamp(28px,5vw,40px);
+animation:pulse 1.2s infinite;
 }
 
 @keyframes pulse{
@@ -58,25 +56,26 @@ animation:pulse 1s infinite;
 /* GAME */
 #gameScreen{
 flex-direction:column;
-padding-top:60px;
+padding-top:70px;
 }
 
 #score{
 position:fixed;
 top:10px;
 left:10px;
-font-size:18px;
+font-size:16px;
 font-weight:bold;
 }
 
 #instruction{
-font-size:18px;
+font-size:16px;
 margin-bottom:10px;
 opacity:0.9;
+padding:0 10px;
 }
 
 #sentence{
-font-size:22px;
+font-size:20px;
 font-weight:bold;
 margin:10px;
 padding:10px;
@@ -89,6 +88,7 @@ flex-wrap:wrap;
 justify-content:center;
 gap:10px;
 margin-top:20px;
+padding:10px;
 }
 
 .option{
@@ -97,12 +97,18 @@ color:black;
 padding:12px;
 border-radius:10px;
 cursor:pointer;
-min-width:220px;
+min-width:200px;
 font-weight:bold;
 transition:0.2s;
+user-select:none;
 }
 
 .option:active{transform:scale(0.95);}
+
+.option.disabled{
+pointer-events:none;
+opacity:0.7;
+}
 
 .correct{background:#2ecc71 !important;color:white;}
 .wrong{background:#e74c3c !important;color:white;}
@@ -113,12 +119,14 @@ position:fixed;
 top:50%;
 left:50%;
 transform:translate(-50%,-50%);
-padding:20px;
+padding:16px 20px;
 border-radius:10px;
-font-size:22px;
+font-size:18px;
 display:none;
 z-index:9999;
 color:white;
+max-width:80%;
+text-align:center;
 }
 
 /* BUTTON */
@@ -129,6 +137,12 @@ border-radius:10px;
 background:#ffca28;
 font-weight:bold;
 cursor:pointer;
+}
+
+/* MOBILE SAFETY */
+@media (max-width:600px){
+.option{min-width:80%; font-size:14px;}
+#sentence{font-size:18px;}
 }
 </style>
 </head>
@@ -151,15 +165,10 @@ cursor:pointer;
 
 <!-- GAME -->
 <div id="gameScreen" class="screen">
-
 <div id="score">Score: 0</div>
-
 <div id="instruction">👉 Identify the tense used in the sentence</div>
-
 <div id="sentence"></div>
-
 <div id="options"></div>
-
 </div>
 
 <!-- POPUP -->
@@ -167,7 +176,21 @@ cursor:pointer;
 
 <script>
 
-/* ================= SCREEN FLOW ================= */
+/* ================= SAFE STATE ================= */
+let qBank = [];
+let i = 0;
+let score = 0;
+let attempts = 2;
+let isLocked = false;
+let timers = [];
+
+/* ================= UTIL ================= */
+function clearTimers(){
+timers.forEach(t=>clearTimeout(t));
+timers=[];
+}
+
+/* ================= LOGO FLOW ================= */
 setTimeout(()=>{
 document.getElementById("logoScreen").classList.remove("active");
 document.getElementById("titleScreen").classList.add("active");
@@ -175,20 +198,21 @@ document.getElementById("titleScreen").classList.add("active");
 
 /* ================= QUESTIONS ================= */
 const questions = [
-{q:"She goes to school by bus every day.",a:"Present Simple",hint:"Habit or routine",exp:"Used for regular actions"},
-{q:"He has been studying for three hours.",a:"Present Perfect Continuous",hint:"Ongoing action",exp:"Action continuing over time"},
-{q:"They are playing football now.",a:"Present Continuous",hint:"happening now",exp:"Action in progress"},
-{q:"We have visited Jaipur twice.",a:"Present Perfect",hint:"past experience",exp:"Past action with present relevance"},
-{q:"The Earth moves around the Sun.",a:"Present Simple",hint:"universal truth",exp:"Scientific fact"}
+{q:"She goes to school by bus every day.",a:"Present Simple",hint:"Habit or routine",exp:"Regular action"},
+{q:"He has been studying for three hours.",a:"Present Perfect Continuous",hint:"Ongoing action",exp:"Duration action"},
+{q:"They are playing football now.",a:"Present Continuous",hint:"happening now",exp:"Now action"},
+{q:"We have visited Jaipur twice.",a:"Present Perfect",hint:"past experience",exp:"Life experience"},
+{q:"The Earth moves around the Sun.",a:"Present Simple",hint:"universal truth",exp:"Fact"}
 ];
-
-let qBank = questions.sort(()=>Math.random()-0.5);
-let i=0;
-let score=0;
-let attempts=2;
 
 /* ================= START ================= */
 function startGame(){
+
+qBank = [...questions].sort(()=>Math.random()-0.5);
+i=0;
+score=0;
+attempts=2;
+isLocked=false;
 
 document.getElementById("titleScreen").classList.remove("active");
 document.getElementById("gameScreen").classList.add("active");
@@ -196,17 +220,19 @@ document.getElementById("gameScreen").classList.add("active");
 loadQ();
 }
 
-/* ================= LOAD QUESTION ================= */
+/* ================= LOAD ================= */
 function loadQ(){
+
+isLocked=false;
+attempts=2;
+
+document.getElementById("score").innerText="Score: "+score;
 
 if(i>=qBank.length){
 endGame();
 return;
 }
 
-attempts=2;
-
-document.getElementById("score").innerText="Score: "+score;
 document.getElementById("sentence").innerText=qBank[i].q;
 
 const box=document.getElementById("options");
@@ -223,44 +249,59 @@ opts.forEach(opt=>{
 const div=document.createElement("div");
 div.className="option";
 div.innerText=opt;
+
 div.onclick=()=>check(opt,div);
+
 box.appendChild(div);
 });
 }
 
-/* ================= CHECK ================= */
+/* ================= CHECK (BUG SAFE) ================= */
 function check(ans,el){
 
+if(isLocked) return;
+isLocked = true;
+
 let correct=qBank[i].a;
+let options=document.querySelectorAll(".option");
+
+function disableAll(){
+options.forEach(o=>o.classList.add("disabled"));
+}
 
 if(ans===correct){
 
 score++;
-showPopup("Correct 🎉","green");
 el.classList.add("correct");
+disableAll();
 
-setTimeout(()=>{
+showPopup("Correct 🎉","#2ecc71");
+
+timers.push(setTimeout(()=>{
 i++;
 loadQ();
-},900);
+},900));
 
 }else{
+
+el.classList.add("wrong");
+disableAll();
 
 attempts--;
 
 if(attempts===1){
+isLocked=false;
 showPopup("Hint: "+qBank[i].hint,"orange");
+options.forEach(o=>o.classList.remove("disabled"));
 }
 else{
-showPopup("Answer: "+correct+" | "+qBank[i].exp,"red");
+showPopup("Answer: "+correct+" | "+qBank[i].exp,"#e74c3c");
 
-setTimeout(()=>{
+timers.push(setTimeout(()=>{
 i++;
 loadQ();
-},1500);
+},1400));
 }
-
-el.classList.add("wrong");
 }
 }
 
@@ -278,13 +319,15 @@ setTimeout(()=>p.style.display="none",1200);
 /* ================= END ================= */
 function endGame(){
 
+clearTimers();
+
 document.getElementById("gameScreen").innerHTML=`
 <h2>🎉 Game Completed</h2>
 <h3>Score: ${score} / ${qBank.length}</h3>
-<button onclick="location.reload()">Restart</button>
+<button onclick="location.reload()">Play Again</button>
 `;
-
 }
+
 </script>
 
 </body>
