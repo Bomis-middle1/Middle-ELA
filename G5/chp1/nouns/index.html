@@ -37,11 +37,6 @@ animation:none;
 to{opacity:0;visibility:hidden}
 }
 
-@keyframes pulse{
-0%,100%{transform:scale(1)}
-50%{transform:scale(1.08)}
-}
-
 .stars{
 position:fixed;
 inset:0;
@@ -259,12 +254,12 @@ const nouns=[
 {word:'diamond',type:'Material',explanation:'Diamond is a precious gemstone material.'}
 ];
 
-const colors=['#ffd6a5','#fdffb6','#caffbf','#9bf6ff','#a0c4ff'];
+const colors=['#ffd6a5','#fdffb6','#caffbf','#9bf6ff','#a0c4ff','#bdb2ff','#ffc6ff','#ffadad','#d0f4de','#fef9c3','#ffb3ba','#ffdfba','#ffffba','#baffc9','#bae1ff'];
 
 const canvas=document.getElementById('wheel');
 const ctx=canvas.getContext('2d');
 const radius=150;
-const arc=(Math.PI*2)/5;
+const arc=(Math.PI*2)/nouns.length;
 
 let currentNoun=null;
 let currentRotation=0;
@@ -274,8 +269,7 @@ let usedIndices=[];
 let canSpin=true;
 
 function drawWheel(){
-const types=['Common','Proper','Collective','Abstract','Material'];
-for(let i=0;i<5;i++){
+for(let i=0;i<nouns.length;i++){
 let angle=(i*arc)-(Math.PI/2);
 
 ctx.beginPath();
@@ -292,8 +286,8 @@ ctx.translate(radius,radius);
 ctx.rotate(angle+arc/2);
 ctx.textAlign='right';
 ctx.fillStyle='#222';
-ctx.font='bold 18px Arial';
-ctx.fillText(types[i],radius-20,5);
+ctx.font='bold 14px Arial';
+ctx.fillText(nouns[i].word,radius-20,5);
 ctx.restore();
 }
 }
@@ -327,7 +321,7 @@ usedIndices.push(selectedIndex);
 
 currentNoun=nouns[selectedIndex];
 
-const sectionAngle=360/5;
+const sectionAngle=360/nouns.length;
 const stopAngle=360-(selectedIndex*sectionAngle)-(sectionAngle/2);
 
 wheel.style.transition='none';
