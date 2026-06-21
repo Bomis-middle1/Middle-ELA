@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pizza Master Academy - FINAL</title>
+<title>Pizza Master Academy AAA+</title>
 
 <style>
 *{box-sizing:border-box;font-family:Arial, sans-serif;}
@@ -11,10 +11,10 @@
 body{
 margin:0;
 overflow:hidden;
-background:linear-gradient(135deg,#ffe0b2,#ffb74d,#e65100);
+background:radial-gradient(circle at top,#ffd180,#ff8a65,#d84315);
 }
 
-/* SCREEN SYSTEM */
+/* ================= SCREENS ================= */
 .screen{
 position:absolute;
 width:100vw;
@@ -27,54 +27,30 @@ text-align:center;
 }
 .active{display:flex;}
 
-/* LOGO */
+/* ================= LOGO ================= */
 #logoScreen{
 background:#fff3e0;
 }
 #logoScreen img{
 width:280px;
+animation:pulse 1.5s infinite alternate;
+}
+@keyframes pulse{
+from{transform:scale(1)}
+to{transform:scale(1.05)}
 }
 
-/* INSTRUCTIONS */
-#instructionScreen{
-background:#fff8e1;
-}
-.box{
-max-width:800px;
-background:white;
-padding:20px;
-border-radius:15px;
-border:2px solid #6d3b1a;
-line-height:1.5;
-}
-
-/* BUTTON */
-button{
-padding:14px 20px;
-border:none;
-border-radius:10px;
-background:#ff6f00;
-color:white;
-font-size:18px;
-margin-top:15px;
-cursor:pointer;
-}
-
-/* GAME LAYOUT */
-#gameScreen{
-flex-direction:column;
-}
-
-.top{
-width:100%;
+/* ================= HUD ================= */
+.hud{
 height:70px;
 display:flex;
 justify-content:space-between;
 align-items:center;
 padding:10px 15px;
-background:#fff3e0;
+background:#fff8e1;
 border-bottom:4px solid #6d3b1a;
 font-weight:bold;
+position:relative;
 }
 
 .centerTitle{
@@ -82,9 +58,9 @@ position:absolute;
 left:50%;
 transform:translateX(-50%);
 color:#b71c1c;
-font-size:18px;
 }
 
+/* ================= GAME ================= */
 .game{
 display:flex;
 height:calc(100vh - 70px);
@@ -102,22 +78,23 @@ flex:1;
 display:flex;
 align-items:center;
 justify-content:center;
-background:radial-gradient(circle,#fff3e0,#ffcc80,#8d4b1a);
+background:radial-gradient(circle,#fff3e0,#ffcc80,#6d3b1a);
+position:relative;
+overflow:hidden;
 }
 
-/* QUESTION */
+/* ================= QUESTION ================= */
 .card{
 background:white;
 padding:12px;
 border-radius:12px;
 border:2px solid #6d3b1a;
 margin-bottom:10px;
-line-height:1.5;
 min-height:120px;
-font-size:16px;
+line-height:1.5;
 }
 
-/* OPTIONS */
+/* ================= OPTIONS ================= */
 .option{
 background:linear-gradient(#fff,#ffe0b2);
 border:2px solid #ff6f00;
@@ -125,17 +102,19 @@ padding:12px;
 margin:8px 0;
 border-radius:10px;
 cursor:pointer;
+transition:0.2s;
 }
+.option:hover{transform:scale(1.05);}
 
-/* PIZZA */
+/* ================= PIZZA ================= */
 .pizza{
 width:240px;
 height:240px;
 border-radius:50%;
 background:#f5c16c;
 position:relative;
-box-shadow: inset 0 0 20px rgba(0,0,0,0.4);
-animation:float 2s infinite;
+box-shadow:inset 0 0 20px rgba(0,0,0,0.4);
+animation:float 2s infinite ease-in-out;
 }
 
 @keyframes float{
@@ -143,6 +122,7 @@ animation:float 2s infinite;
 50%{transform:translateY(-8px)}
 }
 
+/* LAYERS */
 .layer{
 position:absolute;
 width:100%;
@@ -152,65 +132,117 @@ animation:pop 0.3s ease;
 }
 
 @keyframes pop{
-from{transform:scale(0.5);opacity:0}
+from{transform:scale(0.4);opacity:0}
 to{transform:scale(1);opacity:1}
 }
 
+.sauce{background:rgba(200,30,30,0.35);}
 .cheese{background:rgba(255,220,100,0.5);}
-.sauce{background:rgba(200,30,30,0.4);}
 .topping{background:rgba(0,200,100,0.3);}
 
-/* END */
+/* ================= OVEN GLOW ================= */
+.ovenGlow{
+position:absolute;
+width:300px;
+height:300px;
+border-radius:50%;
+background:rgba(255,140,0,0.25);
+filter:blur(20px);
+animation:glow 1.2s infinite alternate;
+}
+
+@keyframes glow{
+from{opacity:0.3}
+to{opacity:0.8}
+}
+
+/* ================= CUSTOMER MOOD ================= */
+.mood{
+margin-top:10px;
+padding:8px;
+border-radius:10px;
+background:#fff3e0;
+border:2px solid #6d3b1a;
+}
+
+/* ================= PARTICLES ================= */
+.particle{
+position:absolute;
+width:8px;
+height:8px;
+background:gold;
+border-radius:50%;
+animation:fly 1s linear forwards;
+}
+
+@keyframes fly{
+from{transform:translate(0,0);opacity:1}
+to{transform:translateY(-200px) scale(0);opacity:0}
+}
+
+/* ================= END ================= */
 #endScreen{
 background:#fff3e0;
+}
+
+button{
+padding:14px 20px;
+border:none;
+border-radius:10px;
+background:#ff6f00;
+color:white;
+font-size:18px;
+cursor:pointer;
 }
 </style>
 </head>
 
 <body>
 
-<!-- LOGO -->
+<!-- ================= LOGO ================= -->
 <div id="logoScreen" class="screen active">
 <img src="assets/innovine-logo.png">
 </div>
 
-<!-- INSTRUCTIONS -->
+<!-- ================= INSTRUCTIONS ================= -->
 <div id="instructionScreen" class="screen">
-<div class="box">
-<h2>🍕 Pizza Master Academy</h2>
+<div class="card" style="max-width:700px">
+<h2>🍕 Pizza Master Academy AAA+</h2>
 <p>
-Complete 10 grammar pizza orders.<br>
-Learn Homophones, Homonyms & Homographs.<br><br>
-You get 2 attempts per question.<br>
-Build pizza step by step and become Master Chef!
+Build pizzas + solve grammar challenges.<br>
+Drag, think, and learn Homophones, Homonyms & Homographs.<br><br>
+2 attempts per order. Become Master Chef 🏆
 </p>
 <button onclick="start()">Start Cooking</button>
 </div>
 </div>
 
-<!-- GAME -->
+<!-- ================= GAME ================= -->
 <div id="gameScreen" class="screen">
 
-<div class="top">
+<div class="hud">
 <div>⭐ Score: <span id="score">0</span></div>
-<div class="centerTitle">Pizza Master Academy</div>
+<div class="centerTitle">Pizza Master Academy AAA+</div>
 <div>Order <span id="order">1</span>/10</div>
 </div>
 
 <div class="game">
 
+<!-- LEFT -->
 <div class="left">
 <div class="card" id="question"></div>
 <div id="options"></div>
-
-<label>Volume</label>
 <input type="range" id="vol" min="0" max="1" step="0.1">
+<div class="mood" id="mood">🙂 Customer Happy</div>
 </div>
 
+<!-- CENTER -->
 <div class="center">
+<div class="ovenGlow"></div>
 <div id="pizza" class="pizza"></div>
 </div>
 
+<!-- RIGHT -->
 <div class="right">
 <div class="card">
 <h3>Chef Feedback</h3>
@@ -223,35 +255,35 @@ Build pizza step by step and become Master Chef!
 </div>
 </div>
 
-<!-- END -->
+<!-- ================= END ================= -->
 <div id="endScreen" class="screen">
 <h1>🏆 MASTER CHEF 🏆</h1>
 <h2 id="final"></h2>
 <button onclick="location.reload()">Play Again</button>
 </div>
 
-<!-- AUDIO -->
+<!-- ================= AUDIO ================= -->
 <audio id="c" src="assets/correct.mp3"></audio>
 <audio id="w" src="assets/wrong.mp3"></audio>
 <audio id="cl" src="assets/clapping.mp3"></audio>
 
 <script>
 
-/* QUESTIONS (CLEAN CBSE FINAL) */
+/* ================= QUESTION ENGINE ================= */
 let Q=[
 {
-q:`We need flour to bake fresh bread in the kitchen. What completes the sentence correctly?`,
+q:`We need flour to bake bread. What completes the sentence?`,
 o:["Flour","Flower","Floor","Flourr"],
 a:"Flour"
 },
 {
-q:`The bat flew out of the kitchen window at night. What does "bat" mean?`,
-o:["Flying animal","Cricket bat","Wood tool","Chef tool"],
+q:`The bat flew out of the kitchen window at night.`,
+o:["Flying animal","Cricket bat","Tool","Object"],
 a:"Flying animal"
 },
 {
-q:`Please wind the toy carefully. What does wind mean?`,
-o:["Twist","Air","Storm","Windmill"],
+q:`Wind the toy carefully. Meaning of wind?`,
+o:["Twist","Air","Storm","Push"],
 a:"Twist"
 },
 {
@@ -260,43 +292,29 @@ o:["Night","Light","Fight","Bright"],
 a:"Night"
 },
 {
-q:`We sat on the river bank and watched water flow. Meaning of bank?`,
-o:["Land beside river","Money place","Road","House"],
+q:`We sat on river bank and watched water.`,
+o:["Land beside river","Money bank","Road","House"],
 a:"Land beside river"
 },
 {
-q:`The seal performed tricks at the zoo. Meaning of seal?`,
-o:["Sea animal","Close tightly","Stamp","Machine"],
+q:`Seal performed tricks at zoo.`,
+o:["Sea animal","Close","Stamp","Machine"],
 a:"Sea animal"
 },
 {
-q:`I ate eight slices of pizza. Choose correct sentence.`,
-o:["I ate eight slices","I eight pizza","Ate I eight","Eight ate pizza"],
-a:"I ate eight slices"
-},
-{
-q:`The wind was very strong today. Meaning of wind?`,
-o:["Moving air","Twist","Fold","Push"],
-a:"Moving air"
-},
-{
-q:`Which word sounds like pear?`,
-o:["Pair","Bear","Peer","Bare"],
-a:"Pair"
-},
-{
-q:`Final Challenge: classify correctly.`,
+q:`Final classification challenge`,
 o:["Homophones/Homonym/Homograph","Mixed","Wrong","None"],
 a:"Homophones/Homonym/Homograph"
 }
 ];
 
-let i=0,score=0,t=0,shuffled=[];
+let i=0,s=0,t=0,shuffled=[];
 
+/* ================= FLOW ================= */
 setTimeout(()=>show(1),5000);
 
 function show(n){
-document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+document.querySelectorAll(".screen").forEach(x=>x.classList.remove("active"));
 document.querySelectorAll(".screen")[n].classList.add("active");
 }
 
@@ -306,18 +324,16 @@ show(2);
 load();
 }
 
+/* ================= LOAD ================= */
 function load(){
 t=0;
-document.getElementById("feedback").innerText="";
+document.getElementById("question").innerText=shuffled[i].q;
 document.getElementById("order").innerText=i+1;
-
-let q=shuffled[i];
-document.getElementById("question").innerText=q.q;
 
 let box=document.getElementById("options");
 box.innerHTML="";
 
-q.o.sort(()=>Math.random()-0.5).forEach(x=>{
+shuffled[i].o.sort(()=>Math.random()-0.5).forEach(x=>{
 let d=document.createElement("div");
 d.className="option";
 d.innerText=x;
@@ -326,25 +342,41 @@ box.appendChild(d);
 });
 }
 
+/* ================= PARTICLES ================= */
+function burst(){
+for(let i=0;i<12;i++){
+let p=document.createElement("div");
+p.className="particle";
+p.style.left=Math.random()*200+"px";
+p.style.top=Math.random()*200+"px";
+document.querySelector(".center").appendChild(p);
+setTimeout(()=>p.remove(),1000);
+}
+}
+
+/* ================= AUDIO ================= */
 function play(id){
 let a=document.getElementById(id);
 a.volume=document.getElementById("vol").value;
 a.play();
 }
 
+/* ================= CHECK ================= */
 function check(x){
 let q=shuffled[i];
 
 if(x===q.a){
-score+=10;
-document.getElementById("score").innerText=score;
+s+=10;
+document.getElementById("score").innerText=s;
 
 play("c");
 setTimeout(()=>play("cl"),300);
 
+burst();
 addPizza();
 nextQ();
-}else{
+}
+else{
 t++;
 play("w");
 
@@ -361,6 +393,7 @@ function feedback(t){
 document.getElementById("feedback").innerText=t;
 }
 
+/* ================= PIZZA ================= */
 function addPizza(){
 let p=document.getElementById("pizza");
 let l=document.createElement("div");
@@ -368,6 +401,7 @@ l.className="layer cheese";
 p.appendChild(l);
 }
 
+/* ================= NEXT ================= */
 function nextQ(){
 i++;
 if(i>=shuffled.length){
@@ -377,12 +411,10 @@ return;
 load();
 }
 
-function next(){
-}
-
+/* ================= END ================= */
 function end(){
 show(3);
-document.getElementById("final").innerText="Score: "+score+"/100";
+document.getElementById("final").innerText="Score: "+s+"/100";
 }
 
 </script>
