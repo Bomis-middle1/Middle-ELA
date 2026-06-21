@@ -1,389 +1,159 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 <title>Pizza Master Academy</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif;}
-
-body{
-  overflow:hidden;
-  height:100vh;
-  background:linear-gradient(#ffb84d,#ff8c42);
+:root{
+  --red:#c93b2b;--orange:#f28c28;--yellow:#ffd166;--cream:#fff1cc;--brown:#6f3f22;--green:#2f9e44;
+  --dark:#2d1a12;--soft:#fff8e6;--shadow:0 10px 25px rgba(64,31,11,.25);--radius:22px;
 }
-
-/* ================= SCREENS ================= */
-.screen{
-  position:fixed;
-  inset:0;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  flex-direction:column;
-  background:#fff3d6;
-  z-index:999;
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;width:100%;min-height:100%;overflow-x:hidden;font-family:"Trebuchet MS",Arial,sans-serif;color:var(--dark);background:#f9d98c}
+button{font-family:inherit;border:0;cursor:pointer;touch-action:manipulation}
+.screen{position:fixed;inset:0;width:100%;min-height:100dvh;display:none;overflow:hidden}
+.screen.active{display:flex}
+#logoScreen{background:#fff;align-items:center;justify-content:center;z-index:20}
+#logoScreen img{width:min(72vw,470px);max-height:70vh;object-fit:contain;animation:logoPulse 1.7s ease-in-out infinite}
+@keyframes logoPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.035)}}
+.bg{
+  background:radial-gradient(circle at 12% 12%,#fff5cf 0 13%,transparent 14%),radial-gradient(circle at 88% 15%,#ffd166 0 12%,transparent 13%),linear-gradient(135deg,#f85f3c 0%,#ffb43f 44%,#fff1cc 100%);
 }
-
-.hidden{display:none;}
-
-/* ================= LOGO ================= */
-#logoScreen img{
-  width:220px;
-}
-
-/* ================= INSTRUCTIONS ================= */
-#instBox{
-  width:90%;
-  max-width:600px;
-  background:white;
-  border:3px solid #d35400;
-  border-radius:12px;
-  padding:15px;
-  font-size:14px;
-  line-height:1.4;
-}
-
-button{
-  margin-top:15px;
-  padding:12px 18px;
-  border:none;
-  background:#ff9800;
-  color:white;
-  font-weight:bold;
-  border-radius:10px;
-  font-size:16px;
-}
-
-/* ================= HUD ================= */
-#hud{
-  height:10vh;
-  background:#fff3d6;
-  border-bottom:4px solid #d35400;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:8px;
-  font-weight:bold;
-  font-size:14px;
-}
-
-/* ================= GAME LAYOUT ================= */
-#game{
-  height:90vh;
-  display:grid;
-  grid-template-rows: 22vh 38vh 30vh;
-}
-
-/* QUESTION */
-#question{
-  margin:8px;
-  background:white;
-  border:3px solid #d35400;
-  border-radius:12px;
-  padding:10px;
-  font-size:16px;
-  overflow:auto;
-}
-
-/* WORLD */
-#world{
-  position:relative;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-}
-
-#pizza{
-  width:160px;
-  height:160px;
-  border-radius:50%;
-  background:#f2c572;
-  border:6px solid #d35400;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  font-size:40px;
-}
-
-/* CHEF / OVEN */
-.chef,.oven{
-  position:absolute;
-  width:16%;
-  opacity:0.9;
-}
-.oven{left:5%;bottom:5%;}
-.chef{right:5%;bottom:5%;}
-
-/* OPTIONS */
-#options{
-  background:#fff7e6;
-  border-top:4px solid #d35400;
-  display:flex;
-  flex-wrap:wrap;
-  justify-content:center;
-  align-items:center;
-  gap:8px;
-  padding:10px;
-}
-
-.opt{
-  width:47%;
-  background:#ffcc66;
-  border:2px solid #d35400;
-  padding:10px;
-  border-radius:10px;
-  font-weight:bold;
-  font-size:14px;
-  text-align:center;
-  cursor:pointer;
-}
-
-/* HUD EXTRA */
-#bar{
-  height:6px;
-  width:100%;
-  background:#ffd39b;
-}
-#fill{
-  height:100%;
-  width:0%;
-  background:#27ae60;
-}
-
-/* END SCREEN */
-#endScreen{
-  position:fixed;
-  inset:0;
-  background:#fff3d6;
-  display:none;
-  justify-content:center;
-  align-items:center;
-  flex-direction:column;
-  z-index:1000;
-  text-align:center;
-  padding:20px;
-}
-
+.bg:before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(111,63,34,.08) 1px,transparent 1px),linear-gradient(rgba(111,63,34,.08) 1px,transparent 1px);background-size:54px 34px;opacity:.35;pointer-events:none}
+.float{position:absolute;font-size:clamp(22px,4vw,42px);animation:float 8s ease-in-out infinite;opacity:.7;pointer-events:none;filter:drop-shadow(0 4px 3px rgba(0,0,0,.12))}
+.f1{top:12%;left:7%;animation-delay:0s}.f2{top:18%;right:10%;animation-delay:1.4s}.f3{bottom:16%;left:9%;animation-delay:2.6s}.f4{bottom:19%;right:7%;animation-delay:3.7s}.f5{top:51%;left:3%;animation-delay:4.8s}.f6{top:54%;right:4%;animation-delay:5.9s}
+@keyframes float{0%,100%{transform:translateY(0) rotate(-5deg)}50%{transform:translateY(-20px) rotate(7deg)}}
+#instructionScreen{align-items:center;justify-content:center;padding:16px;z-index:10}
+.panel{width:min(960px,96vw);max-height:94dvh;overflow:auto;background:rgba(255,248,230,.96);border:6px solid #8b4f2a;border-radius:30px;box-shadow:var(--shadow);padding:clamp(16px,3vw,34px);position:relative;text-align:center}
+.panel h1{margin:0 0 8px;font-size:clamp(28px,5.4vw,54px);color:#9f241b;text-shadow:2px 2px 0 #ffd166}
+.panel p{font-size:clamp(16px,2.3vw,23px);line-height:1.35;margin:10px auto;max-width:790px;font-weight:700}
+.bigBtn{background:linear-gradient(#38b000,#2d8d00);color:#fff;border:4px solid #176b00;border-radius:22px;padding:15px 28px;font-size:clamp(20px,3.2vw,31px);font-weight:900;box-shadow:0 7px 0 #155e00,0 12px 22px rgba(0,0,0,.22);margin-top:14px}
+.bigBtn:active{transform:translateY(5px);box-shadow:0 2px 0 #155e00}
+.volumeWrap{display:flex;align-items:center;justify-content:center;gap:10px;font-weight:900;font-size:clamp(15px,2.5vw,20px);margin-top:10px}.volumeWrap input{width:min(260px,55vw);accent-color:#c93b2b}
+#gameScreen{z-index:5;flex-direction:column;background:linear-gradient(#f35a37 0 33%,#f9c16a 33% 65%,#d78a4a 65%)}
+.topbar{position:relative;z-index:5;width:100%;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px;padding:8px 10px;background:rgba(255,248,230,.94);border-bottom:4px solid #8b4f2a;box-shadow:0 4px 10px rgba(0,0,0,.18)}
+.scoreBox{font-weight:900;font-size:clamp(15px,2.4vw,24px);background:#fff3cd;border:3px solid #8b4f2a;border-radius:16px;padding:8px 12px;white-space:nowrap}.scoreBox:nth-child(3){justify-self:end}
+.titleBox{text-align:center;font-size:clamp(18px,3.2vw,30px);font-weight:1000;color:#9f241b}.progressPizzas{letter-spacing:2px;font-size:clamp(14px,2.1vw,22px);margin-top:3px}
+.stage{position:relative;flex:1;min-height:0;display:grid;grid-template-columns:minmax(150px,1fr) minmax(260px,1.4fr) minmax(150px,1fr);gap:10px;padding:10px;overflow:hidden}.stage:before{content:"";position:absolute;left:0;right:0;bottom:0;height:35%;background:linear-gradient(#9b5d30,#6f3f22);border-top:8px solid #4f2d18;z-index:0}.stage>*{position:relative;z-index:1}
+.side{display:flex;flex-direction:column;gap:10px;align-items:center;justify-content:space-between;min-width:0}.card{background:rgba(255,248,230,.94);border:4px solid #8b4f2a;border-radius:22px;box-shadow:var(--shadow);padding:10px;width:100%;text-align:center}.customerCard{min-height:160px}.customerRow{display:flex;align-items:center;justify-content:center;gap:8px}.asset{object-fit:contain;max-width:100%;user-select:none;pointer-events:none}.chef{height:clamp(92px,20vh,210px);animation:chefIdle 2.2s ease-in-out infinite}.customer{height:clamp(78px,17vh,180px);animation:customerIdle 2.5s ease-in-out infinite}.oven{width:min(270px,90%);filter:drop-shadow(0 9px 8px rgba(0,0,0,.18));animation:ovenGlow 1.8s ease-in-out infinite}.shelf{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;min-height:74px}.boxStack{background:#f7b267;border:3px solid #8b4f2a;border-radius:10px;min-height:38px;display:flex;align-items:center;justify-content:center;font-size:24px;transform:scale(.8);opacity:.35}.boxStack.done{opacity:1;animation:boxPop .55s ease}.orderText{font-weight:900;font-size:clamp(15px,2.1vw,22px);line-height:1.25}.hintText{font-size:clamp(13px,1.9vw,18px);font-weight:900;color:#8f2200;min-height:26px;margin-top:5px}
+.kitchen{display:flex;flex-direction:column;align-items:center;justify-content:space-between;gap:8px;min-width:0}.challengeCard{width:100%;background:rgba(255,248,230,.97);border:5px solid #8b4f2a;border-radius:24px;box-shadow:var(--shadow);padding:10px;text-align:center}.levelBadge{display:inline-block;background:#9f241b;color:#fff;border-radius:99px;padding:7px 14px;font-weight:900;font-size:clamp(13px,2vw,18px);margin-bottom:5px}.prompt{font-weight:1000;font-size:clamp(17px,2.6vw,27px);line-height:1.25;margin:2px auto 6px;max-width:850px}.subprompt{font-size:clamp(13px,2vw,19px);font-weight:800;color:#5b321c}.pizzaZone{width:100%;display:grid;grid-template-columns:1fr minmax(160px,270px) 1fr;align-items:center;gap:8px}.ovenWrap,.pizzaWrap,.deliveryWrap{display:flex;align-items:center;justify-content:center;min-height:clamp(112px,23vh,230px)}.pizzaPlate{position:relative;width:clamp(135px,24vw,265px);aspect-ratio:1;border-radius:50%;display:flex;align-items:center;justify-content:center;filter:drop-shadow(0 14px 12px rgba(54,24,8,.28));transition:.35s}.pizzaPlate img{width:100%;height:100%;object-fit:contain}.pizzaLayer{position:absolute;border-radius:50%;opacity:0;transform:scale(.5);transition:.45s ease}.layer-dough{inset:8%;background:#f4c56d;border:6px solid #c57a34;opacity:1}.layer-sauce{inset:16%;background:#cf2e24}.layer-cheese{inset:22%;background:#ffe08a;clip-path:polygon(50% 0%,65% 30%,98% 35%,72% 57%,79% 91%,50% 72%,21% 91%,28% 57%,2% 35%,35% 30%)}.layer-toppings{inset:11%;background:radial-gradient(circle at 24% 24%,#2f9e44 0 6%,transparent 7%),radial-gradient(circle at 67% 26%,#bb1e10 0 7%,transparent 8%),radial-gradient(circle at 38% 58%,#5c9f2d 0 6%,transparent 7%),radial-gradient(circle at 73% 68%,#bb1e10 0 7%,transparent 8%),radial-gradient(circle at 52% 42%,#7b3f16 0 5%,transparent 6%)}.pizzaPlate.step0 .layer-dough{opacity:1;transform:scale(1)}.pizzaPlate.step1 .layer-sauce,.pizzaPlate.step2 .layer-cheese,.pizzaPlate.step3 .layer-toppings{opacity:1;transform:scale(1)}.pizzaPlate.step2 .layer-cheese{animation:melt .8s ease}.pizzaPlate.bake{animation:bake 1s ease}.pizzaPlate.boxed{border-radius:16px;background:#f7b267;border:5px solid #8b4f2a}.pizzaPlate.boxed .pizzaLayer{display:none}.pizzaPlate.boxed:after{content:"🍕 BOXED";font-weight:1000;color:#8f2200;font-size:clamp(18px,3vw,28px)}
+@keyframes melt{0%{clip-path:polygon(50% 0%,65% 30%,98% 35%,72% 57%,79% 91%,50% 72%,21% 91%,28% 57%,2% 35%,35% 30%)}100%{clip-path:polygon(50% 0%,73% 26%,98% 40%,75% 66%,82% 96%,50% 79%,20% 96%,28% 66%,2% 40%,27% 26%)}}
+@keyframes bake{0%,100%{transform:scale(1)}40%{transform:scale(1.08) rotate(4deg);filter:brightness(1.18) drop-shadow(0 14px 12px rgba(54,24,8,.28))}}
+@keyframes chefIdle{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-7px) rotate(-2deg)}}@keyframes customerIdle{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}@keyframes ovenGlow{0%,100%{filter:drop-shadow(0 9px 8px rgba(0,0,0,.18))}50%{filter:drop-shadow(0 0 16px #ffb703)}}@keyframes boxPop{0%{transform:scale(.2);opacity:0}70%{transform:scale(1.12)}100%{transform:scale(1);opacity:1}}
+.interactArea{width:100%;min-height:clamp(150px,28vh,300px);display:flex;align-items:center;justify-content:center}.gameMode{display:none;width:100%;height:100%;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap}.gameMode.active{display:flex}.optionBtn,.dragCard,.sortItem,.matchCard{background:#fff8e6;border:4px solid #8b4f2a;border-radius:18px;padding:14px 16px;min-height:58px;min-width:min(42vw,150px);font-size:clamp(17px,2.6vw,27px);font-weight:1000;color:#3b2112;box-shadow:0 7px 0 #9b5d30;display:flex;align-items:center;justify-content:center;text-align:center;transition:.15s}.optionBtn:active,.dragCard:active,.sortItem:active,.matchCard:active{transform:translateY(5px);box-shadow:0 2px 0 #9b5d30}.optionBtn.selected,.dragCard.selected,.sortItem.selected,.matchCard.selected{background:#ffe08a;border-color:#2f9e44;outline:5px solid rgba(47,158,68,.25)}.optionBtn.good{background:#d8f3dc;border-color:#2f9e44}.optionBtn.bad{background:#ffd6d6;border-color:#c92a2a}.dropTray{min-width:min(78vw,420px);min-height:88px;border:5px dashed #9f241b;border-radius:22px;background:rgba(255,255,255,.62);display:flex;align-items:center;justify-content:center;padding:10px;font-size:clamp(18px,2.7vw,26px);font-weight:1000;text-align:center}.dropTray.ready{background:#d8f3dc;border-color:#2f9e44}.sortBoard{display:grid;grid-template-columns:repeat(3,minmax(95px,1fr));gap:8px;width:100%;max-width:720px}.category{background:rgba(255,241,204,.95);border:4px solid #8b4f2a;border-radius:20px;padding:8px;min-height:110px}.category h3{margin:0 0 6px;color:#9f241b;font-size:clamp(14px,2vw,20px)}.slot{border:3px dashed #b45f26;border-radius:14px;min-height:58px;display:flex;align-items:center;justify-content:center;font-weight:900;background:#fff}.matchGrid{display:grid;grid-template-columns:repeat(3,minmax(85px,1fr));gap:8px;width:100%;max-width:650px}.coin,.spark,.smoke,.confettiPiece{position:fixed;pointer-events:none;z-index:1000}.coin{font-size:28px;animation:coinFly .9s ease forwards}.spark{font-size:25px;animation:sparkle .8s ease forwards}.smoke{width:28px;height:28px;border-radius:50%;background:rgba(80,80,80,.45);animation:smokeUp 1s ease forwards}.confettiPiece{width:10px;height:16px;animation:fall 2.5s ease-out forwards}
+@keyframes coinFly{to{transform:translate(var(--x),var(--y)) rotate(720deg);opacity:0}}@keyframes sparkle{to{transform:translateY(-60px) scale(1.8);opacity:0}}@keyframes smokeUp{to{transform:translateY(-75px) scale(2.2);opacity:0}}@keyframes fall{to{transform:translateY(105vh) rotate(900deg);opacity:.2}}
+.feedbackToast{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%) scale(.8);background:#fff8e6;border:6px solid #8b4f2a;border-radius:24px;padding:18px 25px;font-size:clamp(24px,5vw,52px);font-weight:1000;z-index:900;display:none;text-align:center;box-shadow:0 15px 35px rgba(0,0,0,.35)}.feedbackToast.show{display:block;animation:toast .95s ease forwards}@keyframes toast{0%{opacity:0;transform:translate(-50%,-50%) scale(.5)}30%{opacity:1;transform:translate(-50%,-50%) scale(1.06)}80%{opacity:1}100%{opacity:0;transform:translate(-50%,-60%) scale(1)}}
+#endScreen{align-items:center;justify-content:center;padding:14px;z-index:12}.endPizzas{display:flex;flex-wrap:wrap;justify-content:center;gap:7px;font-size:clamp(26px,5vw,50px);margin:12px auto}.stars{font-size:clamp(28px,5vw,54px);margin:4px;color:#c93b2b}.chefCelebrate{height:clamp(105px,22vh,220px);animation:celebrate .8s ease-in-out infinite}@keyframes celebrate{0%,100%{transform:rotate(-5deg) translateY(0)}50%{transform:rotate(5deg) translateY(-10px)}}
+.locked{pointer-events:none;opacity:.7}
+@media(max-width:850px){.topbar{grid-template-columns:1fr 1fr}.titleBox{grid-column:1/-1;grid-row:1}.scoreBox{font-size:14px}.scoreBox:nth-child(1){grid-row:2;justify-self:start}.scoreBox:nth-child(3){grid-row:2;justify-self:end}.stage{grid-template-columns:1fr;grid-template-rows:auto 1fr auto;overflow:auto}.side{flex-direction:row;align-items:stretch}.leftSide{order:2}.rightSide{order:3}.kitchen{order:1}.card{padding:7px}.customerCard{min-height:auto}.chef,.customer{height:88px}.ovenWrap,.deliveryWrap{display:none}.pizzaZone{grid-template-columns:1fr}.interactArea{min-height:210px}.sortBoard{grid-template-columns:1fr}.side .card{flex:1}.shelf{grid-template-columns:repeat(5,1fr)}}
+@media(max-width:520px){.panel{border-width:4px;border-radius:22px;padding:14px}.panel p{font-size:15px}.bigBtn{width:100%;padding:14px 10px}.stage{padding:7px}.prompt{font-size:17px}.subprompt{font-size:13px}.optionBtn,.dragCard,.sortItem,.matchCard{min-width:44%;font-size:17px;padding:11px 9px}.matchGrid{grid-template-columns:1fr 1fr}.sortItem{min-width:100%}.side{gap:6px}.orderText{font-size:13px}.customer,.chef{height:72px}.pizzaPlate{width:150px}.progressPizzas{font-size:13px;letter-spacing:0}.topbar{padding:6px}.scoreBox{padding:6px 8px}.float{display:none}}
+@media(orientation:landscape) and (max-height:560px){.stage{grid-template-columns:.8fr 1.5fr .8fr;overflow:hidden;padding:6px}.topbar{padding:4px 8px}.chef,.customer{height:70px}.pizzaPlate{width:120px}.interactArea{min-height:115px}.prompt{font-size:16px}.subprompt{font-size:12px}.optionBtn,.dragCard,.sortItem,.matchCard{min-height:44px;font-size:15px;padding:8px}.card{padding:5px}.customerCard{min-height:auto}.ovenWrap,.deliveryWrap{min-height:80px}.oven{width:120px}.panel{max-height:96dvh;padding:12px}.panel p{font-size:14px;margin:6px auto}.panel h1{font-size:28px}.bigBtn{font-size:18px;padding:10px 18px}}
 </style>
 </head>
-
 <body>
-
-<!-- LOGO -->
-<div id="logoScreen" class="screen">
-  <img src="assets/innovine-logo.png">
-</div>
-
-<!-- INSTRUCTIONS -->
-<div id="instScreen" class="screen hidden">
-  <div id="instBox">
-    🍕 Welcome to Pizza Master Academy!<br><br>
-    The kitchen has mixed confusing words.<br><br>
-    Complete 10 pizza orders by choosing correct meanings of homophones, homonyms & homographs.<br><br>
-    You get 2 attempts per question.<br><br>
-    Build pizzas, earn points and become Master Chef!
+<section id="logoScreen" class="screen active"><img src="assets/innovine-logo.png" alt="Innovine Logo"></section>
+<section id="instructionScreen" class="screen bg">
+  <span class="float f1">🍅</span><span class="float f2">🧀</span><span class="float f3">🍄</span><span class="float f4">🌿</span><span class="float f5">🍕</span><span class="float f6">🫑</span>
+  <div class="panel">
+    <h1>🍕 Welcome to Pizza Master Academy!</h1>
+    <p>The kitchen helpers have mixed up many confusing words.</p>
+    <p>Your mission is to complete 10 pizza orders. Read each customer order carefully and choose the correct word or meaning.</p>
+    <p>Sometimes Chef will ask you to identify whether the words are <b>Homophones</b>, <b>Homonyms</b> or <b>Homographs</b>.</p>
+    <p>You have TWO attempts for each challenge. Complete every pizza order to become the Master Pizza Chef!</p>
+    <div class="volumeWrap">🔊 Volume <input id="volumeIntro" type="range" min="0" max="1" step="0.05" value="0.8"></div>
+    <button id="startBtn" class="bigBtn">Start Cooking</button>
   </div>
-  <button onclick="startGame()">Start Cooking</button>
-</div>
-
-<!-- GAME -->
-<div id="hud">
-  <div>⭐ <span id="score">0</span>/100</div>
-  <div>🍕 Order <span id="level">1</span>/10</div>
-  <div>
-    🔊 <input type="range" id="vol" min="0" max="1" step="0.1" value="0.5">
+</section>
+<section id="gameScreen" class="screen">
+  <div class="topbar">
+    <div class="scoreBox">⭐ Score: <span id="scoreText">0</span>/100</div>
+    <div class="titleBox">🍕 Pizza Master Academy<div id="progressPizzas" class="progressPizzas">⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜</div></div>
+    <div class="scoreBox">Order: <span id="orderText">1</span>/10&nbsp; | &nbsp;Attempts: <span id="attemptText">0</span>/2</div>
   </div>
-</div>
-
-<div id="bar"><div id="fill"></div></div>
-
-<div id="game">
-  <div id="question"></div>
-
-  <div id="world">
-    <img class="oven" src="assets/oven.png">
-    <div id="pizza">🍕</div>
-    <img class="chef" src="assets/chef.png">
+  <main class="stage">
+    <aside class="side leftSide">
+      <div class="card customerCard"><div class="customerRow"><img class="customer asset" src="assets/customer.png" alt="Customer"><div class="orderText" id="customerSpeech">Customer order loading...</div></div><div id="hintText" class="hintText"></div></div>
+      <div class="card"><b>Delivery Shelf</b><div id="shelf" class="shelf"></div></div>
+    </aside>
+    <section class="kitchen">
+      <div class="challengeCard"><div id="levelBadge" class="levelBadge">Order 1</div><div id="prompt" class="prompt"></div><div id="subprompt" class="subprompt"></div></div>
+      <div class="pizzaZone"><div class="ovenWrap"><img src="assets/oven.png" class="oven asset" alt="Oven"></div><div class="pizzaWrap"><div id="pizzaPlate" class="pizzaPlate step0"><div class="pizzaLayer layer-dough"></div><div class="pizzaLayer layer-sauce"></div><div class="pizzaLayer layer-cheese"></div><div class="pizzaLayer layer-toppings"></div></div></div><div class="deliveryWrap"><img src="assets/pizza-box.png" class="asset" style="width:min(210px,80%)" alt="Pizza box"></div></div>
+      <div id="interactArea" class="interactArea"></div>
+    </section>
+    <aside class="side rightSide">
+      <div class="card"><img class="chef asset" src="assets/chef.png" alt="Chef"><div class="orderText" id="chefLine">Chef is ready!</div></div>
+      <div class="card"><div class="volumeWrap" style="margin:0">🔊 <input id="volumeGame" type="range" min="0" max="1" step="0.05" value="0.8"></div></div>
+    </aside>
+  </main>
+</section>
+<section id="endScreen" class="screen bg">
+  <span class="float f1">🍕</span><span class="float f2">🏆</span><span class="float f3">🧀</span><span class="float f4">⭐</span>
+  <div class="panel">
+    <img class="chefCelebrate asset" src="assets/chef.png" alt="Chef celebrates">
+    <h1>🏆 MASTER PIZZA CHEF 🏆</h1>
+    <div class="endPizzas" id="endPizzas"></div>
+    <p>Final Score: <span id="finalScore">0</span>/100</p>
+    <p>Percentage: <span id="percentage">0</span>%</p>
+    <div id="stars" class="stars"></div>
+    <p id="remark"></p>
+    <button id="playAgain" class="bigBtn">Play Again</button>
   </div>
-
-  <div id="options"></div>
-</div>
-
-<!-- END -->
-<div id="endScreen">
-  <h1>🏆 Master Pizza Chef</h1>
-  <h2 id="finalScore"></h2>
-  <button onclick="restart()">Play Again</button>
-</div>
-
-<audio id="correct" src="assets/correct.mp3"></audio>
-<audio id="wrong" src="assets/wrong.mp3"></audio>
-<audio id="clap" src="assets/clapping.mp3"></audio>
-
+</section>
+<div id="feedbackToast" class="feedbackToast"></div>
+<audio id="correctAudio" preload="auto" src="assets/correct.mp3"></audio>
+<audio id="wrongAudio" preload="auto" src="assets/wrong.mp3"></audio>
+<audio id="clapAudio" preload="auto" src="assets/clapping.mp3"></audio>
 <script>
-
-/* ================= DATA ================= */
+(function(){
+'use strict';
+const $=id=>document.getElementById(id);
+const screens={logo:$('logoScreen'),instructions:$('instructionScreen'),game:$('gameScreen'),end:$('endScreen')};
+const correctAudio=$('correctAudio'),wrongAudio=$('wrongAudio'),clapAudio=$('clapAudio');
+let volume=.8,score=0,current=0,attempts=0,locked=false,orderSet=[],selected=null,phaseIndex=0;
+const chefLines=["Slice the confusion!","Choose carefully, chef!","The oven is warm!","A tasty word challenge!","Customers are waiting happily!"];
 const questions=[
-{
-q:'We need ____ to bake bread.',
-options:['Flour','Flower','Floor','Flourr'],
-a:'Flour'
-},
-{
-q:'The bat flew in kitchen. Bat means?',
-options:['Animal','Cricket bat','Spoon','Chef'],
-a:'Animal'
-},
-{
-q:'Wind the rope. Meaning?',
-options:['Twist','Air','Storm','Fan'],
-a:'Twist'
-},
-{
-q:'Pear and Pair are?',
-options:['Homophones','Homonyms','Homographs','None'],
-a:'Homophones'
-},
-{
-q:'Bank sentence?',
-options:[
-'We sat on river bank',
-'Bank gave money flew',
-'Bank barked',
-'Bank jumped'
-],
-a:'We sat on river bank'
-},
-{
-q:'Knight sounds like?',
-options:['Night','Light','Fight','Bright'],
-a:'Night'
-},
-{
-q:'Seal here means?',
-options:['Sea animal','Close bottle','Cutter','Chef'],
-a:'Sea animal'
-},
-{
-q:'Ate / Eight are?',
-options:['Homophones','Homonyms','Homographs','None'],
-a:'Homophones'
-},
-{
-q:'Wind (air) is?',
-options:['Homograph','Homophone','Synonym','Verb'],
-a:'Homograph'
-},
-{
-q:'Flour / Flower?',
-options:['Homophones','Homonyms','Homographs','None'],
-a:'Homophones'
-}
-];
-
-let order=[],idx=0,score=0,attempts=0;
-let audioVol=0.5;
-
-/* ================= INIT SCREENS ================= */
-setTimeout(()=>{
-  document.getElementById('logoScreen').classList.add('hidden');
-  document.getElementById('instScreen').classList.remove('hidden');
-},5000);
-
-/* ================= START ================= */
-function startGame(){
-document.getElementById('instScreen').classList.add('hidden');
-order=[...questions].sort(()=>Math.random()-0.5);
-idx=0;score=0;
-load();
-}
-
-/* ================= LOAD ================= */
-function load(){
-attempts=0;
-if(idx>=order.length){end();return;}
-
-let q=order[idx];
-document.getElementById('level').innerText=idx+1;
-
-document.getElementById('question').innerHTML=
-`<b>${q.q}</b>`;
-
-let opts=[...q.options].sort(()=>Math.random()-0.5);
-
-let box=document.getElementById('options');
-box.innerHTML='';
-
-opts.forEach(o=>{
-let d=document.createElement('div');
-d.className='opt';
-d.innerText=o;
-d.onclick=()=>check(o,q);
-box.appendChild(d);
-});
-
-document.getElementById('fill').style.width=
-(idx/order.length)*100+'%';
-}
-
-/* ================= CHECK ================= */
-function check(val,q){
-if(val===q.a){
-play('correct');
-score+=10;
-idx++;
-load();
-}else{
-attempts++;
-play('wrong');
-if(attempts<2){
-alert('Try again!');
-}else{
-alert('Answer: '+q.a);
-idx++;
-load();
-}
-}
-updateScore();
-}
-
-function updateScore(){
-document.getElementById('score').innerText=score;
-}
-
-/* ================= AUDIO ================= */
-function play(type){
-let a=document.getElementById(type);
-a.volume=audioVol;
-a.currentTime=0;
-a.play();
-if(type==='correct'){
-setTimeout(()=>document.getElementById('clap').play(),300);
-}
-}
-
-document.getElementById('vol').oninput=(e)=>{
-audioVol=e.target.value;
-};
-
-/* ================= END ================= */
-function end(){
-document.getElementById('game').style.display='none';
-document.getElementById('hud').style.display='none';
-document.getElementById('bar').style.display='none';
-document.getElementById('endScreen').style.display='flex';
-document.getElementById('finalScore').innerText=
-`Score: ${score}/100`;
-}
-
-/* ================= RESTART ================= */
-function restart(){
-location.reload();
-}
-
+{ id:1, customer:'Customer says: “We need ______ to bake fresh bread.”', style:'ingredient', hint:'Bread uses flour. Flower is a plant.', parts:[{type:'choice', badge:'Choose the ingredient', prompt:'Drag or tap the correct ingredient into the dough bowl.', sub:'Complete the order: “We need ______ to bake fresh bread.”', options:['Flour','Flower','Floor','Flourr'], answer:'Flour', hint:'Flour is used for baking bread.'},{type:'choice', badge:'Chef Check', prompt:'The words “flour” and “flower” are:', sub:'They sound the same but have different meanings and spellings.', options:['Homophones','Homonyms','Homographs','None'], answer:'Homophones', hint:'Same sound, different spelling and meaning = Homophones.'}]},
+{ id:2, customer:'The chef says: “The bat flew out of the kitchen.”', style:'meaning', hint:'Here “flew” tells you it is an animal.', parts:[{type:'choice', badge:'Meaning Mixer', prompt:'What does “bat” mean in this order?', sub:'The bat flew out of the kitchen.', options:['A flying animal','A cricket bat','A spoon','A chef'], answer:'A flying animal', hint:'A bat that flies is an animal.'},{type:'choice', badge:'Word Type Stamp', prompt:'The word “bat” is a:', sub:'Same spelling and sound, different meanings.', options:['Homophone','Homonym','Homograph','None'], answer:'Homonym', hint:'Bat can mean an animal or sports equipment.'}]},
+{ id:3, customer:'Customer order: “Please ______ the old toy before giving it away.”', style:'fix', hint:'A toy may need to be wound to make it work.', parts:[{type:'choice', badge:'Fix the Recipe', prompt:'Pick the word that fixes the chef’s sentence.', sub:'“Please ______ the old toy before giving it away.”', options:['Wind','Air','Blow','Turn'], answer:'Wind', hint:'To wind a toy means to twist it to make it work.'},{type:'choice', badge:'Meaning Sauce', prompt:'Here, “wind” means:', sub:'Choose the meaning used in the sentence.', options:['Twist something','Moving air','Storm','Fan'], answer:'Twist something', hint:'Wind can be pronounced differently and mean twist.'},{type:'choice', badge:'Chef Check', prompt:'Wind is a:', sub:'Same spelling, different pronunciation and meaning.', options:['Homophone','Homonym','Homograph','None'], answer:'Homograph', hint:'Same spelling, different sound/meaning = Homograph.'}]},
+{ id:4, customer:'Chef forgot the dessert word.', style:'ingredient', hint:'A pear is a fruit. A pair means two.', parts:[{type:'choice', badge:'Dessert Topping', prompt:'Choose the correct fruit for dessert.', sub:'“We need a ripe ______ for dessert.”', options:['Pear','Pair','Peer','Bear'], answer:'Pear', hint:'Pear is a fruit.'},{type:'choice', badge:'Word Type Stamp', prompt:'Pear and Pair are:', sub:'They sound alike but are spelled differently.', options:['Homophones','Homographs','Homonyms','None'], answer:'Homophones', hint:'Same sound, different spelling and meaning.'}]},
+{ id:5, customer:'The menu has a confusing word: bank.', style:'sentence', hint:'A river bank is the land beside a river.', parts:[{type:'choice', badge:'Menu Reader', prompt:'Which sentence uses “bank” correctly?', sub:'Choose the sentence that makes sense.', options:['We sat on the river bank.','The river deposited money.','The bank barked loudly.','The bank flew away.'], answer:'We sat on the river bank.', hint:'A river bank is land along the side of a river.'},{type:'choice', badge:'Chef Check', prompt:'The word “bank” is:', sub:'Same spelling and sound, different meanings.', options:['Homophone','Homonym','Homograph','None'], answer:'Homonym', hint:'Bank can mean a money place or land beside water.'}]},
+{ id:6, customer:'Recipe note: “The wind was very strong today.”', style:'meaning', hint:'Strong wind moves air around.', parts:[{type:'choice', badge:'Recipe Reader', prompt:'Here, the word “wind” means:', sub:'“The wind was very strong today.”', options:['Twist something','Moving air','Wrap tightly','Fold carefully'], answer:'Moving air', hint:'Strong wind means moving air.'},{type:'choice', badge:'Word Type Stamp', prompt:'The word “wind” is a:', sub:'Same spelling, different pronunciation and meaning.', options:['Homophone','Homonym','Homograph','None'], answer:'Homograph', hint:'Wind can mean moving air or twist something.'}]},
+{ id:7, customer:'Customer says: “The knight protected the castle.”', style:'sound', hint:'Knight sounds like night.', parts:[{type:'choice', badge:'Sound Match', prompt:'Which word sounds the same as “knight”?', sub:'Find the word with the same sound.', options:['Night','Light','Fight','Bright'], answer:'Night', hint:'Knight and night sound the same.'},{type:'choice', badge:'Chef Check', prompt:'Knight and Night are:', sub:'Same sound, different spelling and meaning.', options:['Homophones','Homonyms','Homographs','None'], answer:'Homophones', hint:'Words that sound the same are homophones.'}]},
+{ id:8, customer:'Chef says: “The seal balanced a ball on its nose.”', style:'meaning', hint:'A seal with a nose and ball is an animal.', parts:[{type:'choice', badge:'Customer Order Challenge', prompt:'What does “seal” mean here?', sub:'“The seal balanced a ball on its nose.”', options:['A sea animal','To close tightly','A pizza cutter','A chef'], answer:'A sea animal', hint:'The sentence describes a sea animal.'},{type:'choice', badge:'Word Type Stamp', prompt:'The word “seal” is a:', sub:'Same spelling and sound, different meanings.', options:['Homophone','Homonym','Homograph','None'], answer:'Homonym', hint:'Seal can mean an animal or to close something tightly.'}]},
+{ id:9, customer:'The pizza review has ate/eight confusion.', style:'sentence', hint:'Ate means consumed. Eight is the number 8.', parts:[{type:'choice', badge:'Review Fixer', prompt:'Choose the correct sentence.', sub:'Pick the sentence that uses ate/eight correctly.', options:['I ate eight slices of pizza yesterday.','I ate ate slices of pizza.','I eight a pizza yesterday.','Eight the pizza was delicious.'], answer:'I ate eight slices of pizza yesterday.', hint:'Ate is the action. Eight is the number.'},{type:'choice', badge:'Chef Check', prompt:'Ate and Eight are:', sub:'They sound alike but have different meanings.', options:['Homophones','Homonyms','Homographs','None'], answer:'Homophones', hint:'Same sound, different spelling and meaning.'}]},
+{ id:10, customer:'⭐ MASTER CHEF FINAL CHALLENGE ⭐', style:'final', hint:'Use all three word-type clues.', parts:[{type:'sort', badge:'Final Sorting Board', prompt:'Sort each word item into the correct pizza box.', sub:'Tap an item, then tap the correct category box.', items:[{text:'Flour / Flower',answer:'Homophones'},{text:'Bat',answer:'Homonym'},{text:'Wind',answer:'Homograph'}], categories:['Homophones','Homonym','Homograph'], hint:'Flour/flower sound alike. Bat has two meanings. Wind is spelled the same but can sound different.'}]}];
+function showScreen(name){Object.values(screens).forEach(s=>s.classList.remove('active'));screens[name].classList.add('active')}
+function setVolume(v){volume=Number(v);[correctAudio,wrongAudio,clapAudio].forEach(a=>a.volume=volume);$('volumeIntro').value=volume;$('volumeGame').value=volume}
+function play(a){try{a.pause();a.currentTime=0;a.volume=volume;const p=a.play();if(p&&p.catch)p.catch(()=>{});}catch(e){}}
+function playCorrect(){play(correctAudio);setTimeout(()=>play(clapAudio),450)}
+function shuffle(arr){const a=arr.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function initShelf(){const s=$('shelf');s.innerHTML='';for(let i=0;i<10;i++){const b=document.createElement('div');b.className='boxStack';b.textContent='🍕';s.appendChild(b)}}
+function updateTop(){ $('scoreText').textContent=score; $('orderText').textContent=Math.min(current+1,10); $('attemptText').textContent=attempts; let p=''; for(let i=0;i<10;i++)p+=i<current?'🍕':'⬜'; $('progressPizzas').textContent=p; [...$('shelf').children].forEach((b,i)=>b.classList.toggle('done',i<current));}
+function startGame(){score=0;current=0;attempts=0;locked=false;orderSet=shuffle(questions);initShelf();showScreen('game');loadOrder()}
+function resetPizza(){const p=$('pizzaPlate');p.className='pizzaPlate step0';p.innerHTML='<div class="pizzaLayer layer-dough"></div><div class="pizzaLayer layer-sauce"></div><div class="pizzaLayer layer-cheese"></div><div class="pizzaLayer layer-toppings"></div>'}
+function loadOrder(){if(current>=orderSet.length){endGame();return}attempts=0;phaseIndex=0;selected=null;resetPizza();$('hintText').textContent='';$('chefLine').textContent=chefLines[current%chefLines.length];$('customerSpeech').textContent=orderSet[current].customer;updateTop();renderPart()}
+function renderPart(){locked=false;selected=null;const q=orderSet[current];const part=q.parts[phaseIndex];$('levelBadge').textContent='Order '+(current+1)+' • '+part.badge;$('prompt').textContent=part.prompt;$('subprompt').textContent=part.sub||'';$('hintText').textContent='';attempts=0;updateTop();const area=$('interactArea');area.innerHTML='';if(part.type==='sort')renderSort(part,area);else renderChoice(part,area,q.style)}
+function renderChoice(part,area,style){const wrap=document.createElement('div');wrap.className='gameMode active';const tray=document.createElement('div');tray.className='dropTray';tray.textContent=style==='ingredient'?'Tap a word ingredient and serve it here.':style==='sentence'?'Tap the correct menu card.':style==='meaning'?'Tap the meaning card and add it to the recipe.':style==='sound'?'Tap the matching sound card.':'Tap the correct card.';if(['ingredient','fix'].includes(style)){wrap.appendChild(tray)}
+shuffle(part.options).forEach(opt=>{const btn=document.createElement('button');btn.className=['ingredient','fix'].includes(style)?'dragCard':'optionBtn';btn.textContent=opt;btn.addEventListener('click',()=>{if(locked)return;if(['ingredient','fix'].includes(style)){[...wrap.querySelectorAll('.dragCard')].forEach(b=>b.classList.remove('selected'));btn.classList.add('selected');selected=opt;tray.classList.add('ready');tray.textContent='Serve: '+opt;checkAnswer(opt,part)}else checkAnswer(opt,part)});wrap.appendChild(btn)});if(['ingredient','fix'].includes(style)){tray.addEventListener('click',()=>{if(selected&&!locked)checkAnswer(selected,part)})}area.appendChild(wrap)}
+function renderSort(part,area){const wrapper=document.createElement('div');wrapper.style.width='100%';wrapper.style.display='flex';wrapper.style.flexDirection='column';wrapper.style.gap='10px';wrapper.style.alignItems='center';const items=document.createElement('div');items.className='gameMode active';let remaining=part.items.map(x=>({...x,done:false}));let selectedItem=null;remaining=shuffle(remaining);remaining.forEach(it=>{const b=document.createElement('button');b.className='sortItem';b.textContent=it.text;b.addEventListener('click',()=>{if(locked||it.done)return;[...items.children].forEach(c=>c.classList.remove('selected'));b.classList.add('selected');selectedItem={it,b};});items.appendChild(b)});const board=document.createElement('div');board.className='sortBoard';part.categories.forEach(cat=>{const c=document.createElement('div');c.className='category';c.innerHTML='<h3>'+cat+'</h3><div class="slot">Tap here</div>';c.addEventListener('click',()=>{if(locked||!selectedItem)return; if(selectedItem.it.answer===cat){selectedItem.b.classList.add('good');selectedItem.b.textContent='✅ '+selectedItem.it.text;selectedItem.b.disabled=true;selectedItem.it.done=true;c.querySelector('.slot').textContent=selectedItem.it.text;selectedItem=null;items.querySelectorAll('.selected').forEach(x=>x.classList.remove('selected'));miniPositive(); if(remaining.every(x=>x.done)){setTimeout(()=>completePart(part),550)}}else{handleWrong(part)}});board.appendChild(c)});wrapper.appendChild(items);wrapper.appendChild(board);area.appendChild(wrapper)}
+function checkAnswer(ans,part){if(locked)return;if(ans===part.answer){document.querySelectorAll('button').forEach(b=>{if(b.textContent===ans)b.classList.add('good')});completePart(part)}else handleWrong(part,ans)}
+function handleWrong(part,ans){attempts++;updateTop();play(wrongAudio);burnPizza();toast(attempts>=2?'Hint time!':'Try once more!');if(ans){document.querySelectorAll('button').forEach(b=>{if(b.textContent===ans)b.classList.add('bad')})} if(attempts>=2){$('hintText').textContent='Hint: '+(part.hint||orderSet[current].hint);locked=true;setTimeout(()=>{revealCorrect(part);},1600)}}
+function revealCorrect(part){if(part.type==='sort'){$('hintText').textContent='Correct: '+part.items.map(i=>i.text+' → '+i.answer).join(' | ')}else{$('hintText').textContent='Correct answer: '+part.answer}setTimeout(()=>completePart(part,true),1700)}
+function completePart(part,revealed){if(locked&& !revealed)return;locked=true;animatePizzaStep();playCorrect();coinBurst();sparkles();toast(revealed?'Answer revealed!':'Great cooking!');phaseIndex++;if(phaseIndex<orderSet[current].parts.length){setTimeout(()=>renderPart(),1450)}else{setTimeout(()=>completeOrder(),1500)}}
+function completeOrder(){score+=10;const p=$('pizzaPlate');p.classList.add('bake');setTimeout(()=>{p.className='pizzaPlate boxed';customerCelebrate();current++;updateTop();toast('+10 points! 🍕');setTimeout(()=>{if(current>=orderSet.length)endGame();else loadOrder()},1400)},900)}
+function animatePizzaStep(){const step=Math.min(phaseIndex+1,3);const p=$('pizzaPlate');p.classList.remove('step0','step1','step2','step3');p.classList.add('step'+step)}
+function miniPositive(){playCorrect();coinBurst();sparkles();animatePizzaStep()}
+function burnPizza(){const rect=$('pizzaPlate').getBoundingClientRect();for(let i=0;i<8;i++){const s=document.createElement('div');s.className='smoke';s.style.left=(rect.left+rect.width*(.25+Math.random()*.5))+'px';s.style.top=(rect.top+rect.height*(.15+Math.random()*.45))+'px';document.body.appendChild(s);setTimeout(()=>s.remove(),1000)}}
+function coinBurst(){const rect=$('pizzaPlate').getBoundingClientRect();for(let i=0;i<14;i++){const c=document.createElement('div');c.className='coin';c.textContent='🪙';c.style.left=(rect.left+rect.width/2)+'px';c.style.top=(rect.top+rect.height/2)+'px';c.style.setProperty('--x',(Math.random()*260-130)+'px');c.style.setProperty('--y',(-80-Math.random()*160)+'px');document.body.appendChild(c);setTimeout(()=>c.remove(),950)}}
+function sparkles(){const rect=$('pizzaPlate').getBoundingClientRect();for(let i=0;i<16;i++){const s=document.createElement('div');s.className='spark';s.textContent='✨';s.style.left=(rect.left+Math.random()*rect.width)+'px';s.style.top=(rect.top+Math.random()*rect.height)+'px';document.body.appendChild(s);setTimeout(()=>s.remove(),850)}}
+function customerCelebrate(){const c=document.querySelector('.customer');c.style.animation='celebrate .55s ease-in-out 3';setTimeout(()=>c.style.animation='',1700)}
+function toast(txt){const t=$('feedbackToast');t.textContent=txt;t.classList.remove('show');void t.offsetWidth;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1000)}
+function confetti(){const colors=['#c93b2b','#f28c28','#ffd166','#2f9e44','#8b4f2a','#fff1cc'];for(let i=0;i<130;i++){const p=document.createElement('div');p.className='confettiPiece';p.style.left=Math.random()*100+'vw';p.style.top=(-20-Math.random()*80)+'px';p.style.background=colors[i%colors.length];p.style.transform='rotate('+Math.random()*180+'deg)';p.style.animationDelay=(Math.random()*1.2)+'s';document.body.appendChild(p);setTimeout(()=>p.remove(),3700)}}
+function endGame(){showScreen('end');play(clapAudio);confetti();$('finalScore').textContent=score;const pct=Math.round(score/100*100);$('percentage').textContent=pct;$('endPizzas').textContent='🍕'.repeat(10);let stars= pct>=90?5:pct>=75?4:pct>=60?3:pct>=45?2:1;$('stars').textContent='⭐'.repeat(stars);$('remark').textContent=stars>=5?'⭐⭐⭐⭐⭐ Master Pizza Chef':stars>=4?'⭐⭐⭐⭐ Great Pizza Chef':stars>=3?'⭐⭐⭐ Pizza Apprentice':stars>=2?'⭐⭐ Keep Practising Chef':'⭐ Let’s revise and cook again!'}
+$('startBtn').addEventListener('click',startGame);$('playAgain').addEventListener('click',startGame);$('volumeIntro').addEventListener('input',e=>setVolume(e.target.value));$('volumeGame').addEventListener('input',e=>setVolume(e.target.value));
+setVolume(.8);setTimeout(()=>showScreen('instructions'),5000);
+})();
 </script>
-
 </body>
 </html>
