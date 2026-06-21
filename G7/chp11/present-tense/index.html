@@ -14,18 +14,20 @@ overflow:hidden;
 color:white;
 }
 
-/* SCREENS */
+/* SCREEN SYSTEM FIXED */
 .screen{
 position:fixed;
 inset:0;
-display:flex;
+display:none;
 align-items:center;
 justify-content:center;
 flex-direction:column;
 text-align:center;
 }
 
-.hidden{display:none;}
+.active{
+display:flex;
+}
 
 /* LOGO */
 #logoScreen{
@@ -134,12 +136,12 @@ cursor:pointer;
 <body>
 
 <!-- LOGO -->
-<div id="logoScreen" class="screen">
+<div id="logoScreen" class="screen active">
 <img src="assets/innovine-logo.png">
 </div>
 
 <!-- TITLE -->
-<div id="titleScreen" class="screen hidden">
+<div id="titleScreen" class="screen">
 <div>
 <h1>🏭 Grammar Factory</h1>
 <p>Present Tense Challenge</p>
@@ -148,7 +150,7 @@ cursor:pointer;
 </div>
 
 <!-- GAME -->
-<div id="gameScreen" class="screen hidden">
+<div id="gameScreen" class="screen">
 
 <div id="score">Score: 0</div>
 
@@ -165,13 +167,13 @@ cursor:pointer;
 
 <script>
 
-/* ================= CLEAN FLOW ================= */
+/* ================= SCREEN FLOW ================= */
 setTimeout(()=>{
-document.getElementById("logoScreen").classList.add("hidden");
-document.getElementById("titleScreen").classList.remove("hidden");
+document.getElementById("logoScreen").classList.remove("active");
+document.getElementById("titleScreen").classList.add("active");
 },5000);
 
-/* ================= QUESTION BANK ================= */
+/* ================= QUESTIONS ================= */
 const questions = [
 {q:"She goes to school by bus every day.",a:"Present Simple",hint:"Habit or routine",exp:"Used for regular actions"},
 {q:"He has been studying for three hours.",a:"Present Perfect Continuous",hint:"Ongoing action",exp:"Action continuing over time"},
@@ -187,12 +189,14 @@ let attempts=2;
 
 /* ================= START ================= */
 function startGame(){
-document.getElementById("titleScreen").classList.add("hidden");
-document.getElementById("gameScreen").classList.remove("hidden");
+
+document.getElementById("titleScreen").classList.remove("active");
+document.getElementById("gameScreen").classList.add("active");
+
 loadQ();
 }
 
-/* ================= LOAD QUESTION (SAFE - NO BUGS) ================= */
+/* ================= LOAD QUESTION ================= */
 function loadQ(){
 
 if(i>=qBank.length){
@@ -219,14 +223,12 @@ opts.forEach(opt=>{
 const div=document.createElement("div");
 div.className="option";
 div.innerText=opt;
-
 div.onclick=()=>check(opt,div);
-
 box.appendChild(div);
 });
 }
 
-/* ================= CHECK LOGIC ================= */
+/* ================= CHECK ================= */
 function check(ans,el){
 
 let correct=qBank[i].a;
@@ -283,7 +285,6 @@ document.getElementById("gameScreen").innerHTML=`
 `;
 
 }
-
 </script>
 
 </body>
