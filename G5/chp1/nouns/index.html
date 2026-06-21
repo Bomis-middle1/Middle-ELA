@@ -1,1 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Noun Type Spinner Game</title>
+<style>
+*{box-sizing:border-box}
+body{
+margin:0;
+font-family:Arial,sans-serif;
+overflow-x:hidden;
+background:linear-gradient(135deg,#fef6e4,#dff6ff,#fce1ff);
+color:#333;
+text-align:center;
+min-height:100vh;
+}
 
+#splash{
+position:fixed;
+inset:0;
+background:#ffffff;
+display:flex;
+justify-content:center;
+align-items:center;
+z-index:9999;
+animation:fadeOut 1s ease 4s forwards;
+}
+
+#splash img{
+width:220px;
+max-width:80%;
+animation:none;
+}
+
+@keyframes fadeOut{
+to{opacity:0;visibility:hidden}
+}
+
+@keyframes pulse{
+0%,100%{transform:scale(1)}
+50%{transform:scale(1.08)}
+}
+
+.stars{
+position:fixed;
+inset:0;
+pointer-events:none;
+overflow:hidden;
+}
+
+.star{
+position:absolute;
+width:4px;
+height:4px;
+background:#fff4d6;
+border-radius:50%;
+animation:twinkle 4s linear infinite;
+opacity:.7;
+}
+
+@keyframes twinkle{
+0%{transform:translateY(0);opacity:.3}
+50%{opacity:1}
+100%{transform:translateY(-20px);opacity:.3}
+}
+
+.container{
+padding:20px;
+max-width:900px;
+margin:auto;
+}
+
+h1{
+font-size:clamp(2rem,4vw,3rem);
+margin-top:20px;
+}
+
+.game-card{
+background:rgba(255,255,255,0.75);
+backdrop-filter:blur(10px);
+border-radius:24px;
+padding:20px;
+box-shadow:0 6px 20px rgba(0,0,0,0.12);
+}
+
+#wheel{
+width:300px;
+height:300px;
+border-radius:50%;
+border:8px solid white;
+background:#fff4d6;
+transition:transform 4s cubic-bezier(.17,.67,.83,.67);
+}
+
+.pointer{
+font-size:40px;
+position:absolute;
+top:-18px;
+left:50%;
+transform:translateX(-50%);
+z-index:5;
+}
+
+#spinBtn{
+padding:14px 28px;
+font-size:18px;
+border:none;
+border-radius:14px;
+background:#7bd389;
+color:#222;
+font-weight:bold;
+cursor:pointer;
+margin-top:20px;
+transition:.3s;
+}
+
+#spinBtn:hover{
+transform:scale(1.05);
+}
+
+#spinBtn.disabled{
+background:#ccc;
+cursor:not-allowed;
+transform:none;
+}
+
+.options{
+display:flex;
+flex-wrap:wrap;
+justify-content:center;
+gap:12px;
+margin-top:20px;
+}
+
+button.option{
+padding:12px 18px;
+border:none;
+border-radius:14px;
+font-size:16px;
+font-weight:bold;
+background:#fff9f0;
+color:#222;
+cursor:pointer;
+transition:.3s;
+}
+
+button.option:hover{
+transform:translateY(-2px);
+}
+
+#noun{
+font-size:38px;
+font-weight:bold;
+margin-top:20px;
+min-height:50px;
+}
+
+#result{
+font-size:22px;
+margin-top:15px;
+min-height:40px;
+}
+
+#score{
+font-size:20px;
+margin-top:12px;
+}
+
+.cross{
+animation:shake .4s;
+color:#e76f51;
+}
+
+@keyframes shake{
+0%,100%{transform:translateX(0)}
+25%{transform:translateX(-5px)}
+75%{transform:translateX(5px)}
+}
+
+.confetti{
+position:fixed;
+font-size:20px;
+animation:fall 2s linear forwards;
+pointer-events:none;
+}
+
+@keyframes fall{
+0%{transform:translateY(-10px) rotate(0deg);opacity:1}
+100%{transform:translateY(100vh) rotate(360deg);opacity:0}
+}
+
+@media(max-width:600px){
+#wheel{
+width:260px;
+height:260px;
+}
+#noun{
+font-size:30px;
+}
+}
+</style>
+</head>
+<body>
+
+<div id="splash">
+<img src="assets/logo.png" alt="Innovine Logo">
+</div>
+
+<div class="stars" id="stars"></div>
+
+<div class="container">
+<h1>🎡 Noun Type Spinner Game</h1>
+<div class="game-card">
+<p>Spin the wheel and choose the correct noun type!</p>
+
+<div style="position:relative;width:320px;margin:auto;">
+<div class="pointer">⬇️</div>
+<canvas id="wheel" width="300" height="300"></canvas>
+</div>
+
+<button id="spinBtn" onclick="spinWheel()">SPIN</button>
+
+<div id="noun"></div>
+
+<div class="options">
+<button class="option" onclick="check('Common')">Common</button>
+<button class="option" onclick="check('Proper')">Proper</button>
+<button class="option" onclick="check('Collective')">Collective</button>
+<button class="option" onclick="check('Abstract')">Abstract</button>
+<button class="option" onclick="check('Material')">Material</button>
+</div>
+
+<div id="result"></div>
+<div id="score">Score: 0 | Words Remaining: 0</div>
+</div>
+</div>
+
+<audio id="correctSound" src="assets/correct.mp3"></audio>
+<audio id="wrongSound" src="assets/wrong.mp3"></audio>
+<audio id="clapSound" src="assets/freesound_community-claps-44774.mp3"></audio>
+
+<script>
+const nouns=[
+{word:'architect',type:'Common',explanation:'An architect is a general name for a person who designs buildings.'},
+{word:'Beijing',type:'Proper',explanation:'Beijing is the specific name of a capital city.'},
+{word:'audience',type:'Collective',explanation:'An audience is a group of people watching a performance.'},
+{word:'bravery',type:'Abstract',explanation:'Bravery is a quality of courage you cannot touch.'},
+{word:'bronze',type:'Material',explanation:'Bronze is a metal made from copper and tin.'},
+{word:'doctor',type:'Common',explanation:'A doctor is any person who treats medical patients.'},
+{word:'Garuda Aerospace',type:'Proper',explanation:'Garuda Aerospace is a specific company name.'},
+{word:'board',type:'Collective',explanation:'A board is a group of people managing an organization.'},
+{word:'justice',type:'Abstract',explanation:'Justice is a concept of fairness you cannot touch.'},
+{word:'iron',type:'Material',explanation:'Iron is a strong metal material.'},
+{word:'scientist',type:'Common',explanation:'A scientist is a general name for someone who studies science.'},
+{word:'Maharashtra',type:'Proper',explanation:'Maharashtra is the specific name of a state in India.'},
+{word:'choir',type:'Collective',explanation:'A choir is a group of singers performing together.'},
+{word:'freedom',type:'Abstract',explanation:'Freedom is the right to act without restriction you cannot touch.'},
+{word:'diamond',type:'Material',explanation:'Diamond is a precious gemstone material.'}
+];
+
+const colors=['#ffd6a5','#fdffb6','#caffbf','#9bf6ff','#a0c4ff'];
+
+const canvas=document.getElementById('wheel');
+const ctx=canvas.getContext('2d');
+const radius=150;
+const arc=(Math.PI*2)/5;
+
+let currentNoun=null;
+let currentRotation=0;
+let score=0;
+let wrongAttempts=0;
+let usedIndices=[];
+let canSpin=true;
+
+function drawWheel(){
+const types=['Common','Proper','Collective','Abstract','Material'];
+for(let i=0;i<5;i++){
+let angle=(i*arc)-(Math.PI/2);
+
+ctx.beginPath();
+ctx.moveTo(radius,radius);
+ctx.arc(radius,radius,radius,angle,angle+arc);
+ctx.fillStyle=colors[i];
+ctx.fill();
+ctx.strokeStyle='#fff';
+ctx.lineWidth=2;
+ctx.stroke();
+
+ctx.save();
+ctx.translate(radius,radius);
+ctx.rotate(angle+arc/2);
+ctx.textAlign='right';
+ctx.fillStyle='#222';
+ctx.font='bold 18px Arial';
+ctx.fillText(types[i],radius-20,5);
+ctx.restore();
+}
+}
+
+drawWheel();
+
+function spinWheel(){
+if(!canSpin){
+document.getElementById('result').innerHTML='🎯 Please answer first!';
+return;
+}
+
+if(usedIndices.length===nouns.length){
+document.getElementById('result').innerHTML='🎉 All words completed! Game reset!';
+usedIndices=[];
+score=0;
+document.getElementById('score').innerText=`Score: ${score} | Words Remaining: ${nouns.length}`;
+}
+
+wrongAttempts=0;
+canSpin=false;
+document.getElementById('result').innerHTML='';
+document.getElementById('spinBtn').classList.add('disabled');
+
+const wheel=document.getElementById('wheel');
+
+// Select a random noun that hasn't been used yet
+let availableIndices=nouns.map((_,i)=>i).filter(i=>!usedIndices.includes(i));
+const selectedIndex=availableIndices[Math.floor(Math.random()*availableIndices.length)];
+usedIndices.push(selectedIndex);
+
+currentNoun=nouns[selectedIndex];
+
+const sectionAngle=360/5;
+const stopAngle=360-(selectedIndex*sectionAngle)-(sectionAngle/2);
+
+wheel.style.transition='none';
+wheel.style.transform='rotate(0deg)';
+
+setTimeout(()=>{
+wheel.style.transition='transform 4s cubic-bezier(.17,.67,.83,.67)';
+currentRotation=1800+stopAngle;
+wheel.style.transform=`rotate(${currentRotation}deg)`;
+
+setTimeout(()=>{
+document.getElementById('noun').innerText=currentNoun.word;
+document.getElementById('score').innerText=`Score: ${score} | Words Remaining: ${nouns.length-usedIndices.length}`;
+},4000);
+},50);
+}
+
+function check(answer){
+if(!currentNoun){
+document.getElementById('result').innerHTML='🎯 Spin the wheel first!';
+return;
+}
+
+const result=document.getElementById('result');
+
+if(answer===currentNoun.type){
+score++;
+result.innerHTML='🎉 Correct! Amazing job!';
+result.className='';
+playCorrect();
+createConfetti();
+canSpin=true;
+document.getElementById('spinBtn').classList.remove('disabled');
+currentNoun=null;
+wrongAttempts=0;
+}else{
+wrongAttempts++;
+result.className='cross';
+playWrong();
+
+if(wrongAttempts>=2){
+result.innerHTML=`❌ Correct Answer: <b>${currentNoun.type}</b><br>${currentNoun.explanation}`;
+canSpin=true;
+document.getElementById('spinBtn').classList.remove('disabled');
+currentNoun=null;
+wrongAttempts=0;
+}else{
+result.innerHTML='❌ Try again!';
+}
+}
+
+document.getElementById('score').innerText=`Score: ${score} | Words Remaining: ${nouns.length-usedIndices.length}`;
+}
+
+function playCorrect(){
+document.getElementById('correctSound').play();
+document.getElementById('clapSound').play();
+}
+
+function playWrong(){
+document.getElementById('wrongSound').play();
+}
+
+function createConfetti(){
+for(let i=0;i<20;i++){
+const conf=document.createElement('div');
+conf.classList.add('confetti');
+conf.innerHTML='⭐';
+conf.style.left=Math.random()*100+'vw';
+conf.style.top='-10px';
+conf.style.fontSize=(Math.random()*20+10)+'px';
+document.body.appendChild(conf);
+
+setTimeout(()=>{
+conf.remove();
+},2000);
+}
+}
+
+function createStars(){
+const stars=document.getElementById('stars');
+for(let i=0;i<25;i++){
+const star=document.createElement('div');
+star.classList.add('star');
+star.style.left=Math.random()*100+'vw';
+star.style.top=Math.random()*100+'vh';
+star.style.animationDelay=Math.random()*4+'s';
+stars.appendChild(star);
+}
+}
+
+createStars();
+
+console.assert(nouns.length===15,'Nouns array should contain 15 items');
+console.assert(typeof spinWheel==='function','spinWheel missing');
+console.assert(typeof check==='function','check missing');
+</script>
+</body>
+</html>
