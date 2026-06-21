@@ -111,9 +111,9 @@ button {
 
 <body>
 
-<!-- SPLASH (FIXED LOGO PATH) -->
+<!-- SPLASH (FIXED LOGO) -->
 <div id="splash">
-  <img src="assets/71824359-f243-48be-bf6f-db272e2d66a2.png" width="200">
+  <img src="assets/innovine-logo.png" width="200">
 </div>
 
 <!-- TOPIC -->
@@ -166,7 +166,6 @@ button {
 
 <script>
 
-/* FIXED GRADE 6 SET */
 const data = [
 {t:"Where are you going",type:"?"},
 {t:"What a beautiful day it is",type:"!"},
@@ -192,17 +191,14 @@ let correct=0;
 function shuffle(){
   let box=document.getElementById("list");
   box.innerHTML="";
-
   data.forEach(d=>{
     let div=document.createElement("div");
     div.className="sentence";
     div.draggable=true;
     div.innerText=d.t;
-
     div.ondragstart=(e)=>{
       e.dataTransfer.setData("text",JSON.stringify(d));
     };
-
     box.appendChild(div);
   });
 }
@@ -214,7 +210,6 @@ document.querySelectorAll(".bucket").forEach(b=>{
     let d=JSON.parse(e.dataTransfer.getData("text"));
 
     let vol=document.getElementById("vol").value;
-
     correctSound.volume=vol;
     wrongSound.volume=vol;
     clapSound.volume=vol;
@@ -270,11 +265,8 @@ function endGame(){
   document.getElementById("game").style.display="none";
   document.getElementById("endScreen").style.display="block";
 
-  document.getElementById("scoreText").innerText=
-    "Score: "+correct+"/15";
-
-  document.getElementById("remark").innerText=
-    "Excellent Performance 🎉 You reached the Trophy Zone!";
+  document.getElementById("scoreText").innerText="Score: "+correct+"/15";
+  document.getElementById("remark").innerText="Excellent Performance 🎉 You reached the Trophy Zone!";
 }
 
 </script>
