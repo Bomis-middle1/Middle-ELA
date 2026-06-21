@@ -1,414 +1,1028 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Grammar Construction Site</title>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Elements of a Sentence</title>
 
 <style>
-    *{box-sizing:border-box;margin:0;padding:0;font-family:Arial, sans-serif;}
-    body{
-        background: linear-gradient(#87CEEB,#dff6ff);
-        overflow:hidden;
-        height:100vh;
-    }
 
-    /* Screens */
-    .screen{
-        position:absolute;
-        width:100%;
-        height:100%;
-        display:none;
-        justify-content:center;
-        align-items:center;
-        flex-direction:column;
-        text-align:center;
-    }
-    .active{display:flex;}
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,Helvetica,sans-serif;
+}
 
-    /* Logo */
-    #logoScreen img{
-        width:220px;
-        animation: zoomIn 5s ease-in-out;
-    }
-    @keyframes zoomIn{
-        0%{transform:scale(0.7);opacity:0;}
-        50%{opacity:1;}
-        100%{transform:scale(1.1);opacity:1;}
-    }
+body{
 
-    /* Instruction */
-    #instructionScreen{
-        background:linear-gradient(#87CEEB,#fff);
-        padding:20px;
-    }
-    h1{font-size:26px;color:#222;margin-bottom:10px;}
-    .card{
-        background:white;
-        padding:15px;
-        border-radius:15px;
-        box-shadow:0 5px 15px rgba(0,0,0,0.2);
-        max-width:90%;
-    }
-    button{
-        padding:15px 30px;
-        margin-top:15px;
-        font-size:18px;
-        border:none;
-        border-radius:10px;
-        background:orange;
-        color:white;
-        cursor:pointer;
-    }
+background:linear-gradient(135deg,#7dd3fc,#fde68a,#bbf7d0);
+overflow:hidden;
+height:100vh;
 
-    /* Game UI */
-    #gameScreen{
-        flex-direction:row;
-    }
+}
 
-    #world{
-        position:absolute;
-        width:100%;
-        height:100%;
-        z-index:0;
-        overflow:hidden;
-    }
+/******** Floating Background ********/
 
-    .cloud{
-        position:absolute;
-        width:80px;
-        height:40px;
-        background:white;
-        border-radius:50px;
-        opacity:0.7;
-        animation: moveClouds 20s linear infinite;
-    }
-    @keyframes moveClouds{
-        from{transform:translateX(-200px);}
-        to{transform:translateX(120vw);}
-    }
+body::before{
 
-    .crane{
-        position:absolute;
-        bottom:120px;
-        left:10%;
-        font-size:40px;
-        animation: swing 2s infinite alternate;
-    }
-    @keyframes swing{
-        from{transform:rotate(-5deg);}
-        to{transform:rotate(5deg);}
-    }
+content:"";
+position:absolute;
+width:250px;
+height:250px;
+background:rgba(255,255,255,.3);
+border-radius:50%;
+left:-80px;
+top:-80px;
+animation=float1 9s infinite alternate;
 
-    /* Scoreboard */
-    #hud{
-        position:fixed;
-        top:10px;
-        left:10px;
-        background:white;
-        padding:10px;
-        border-radius:10px;
-        z-index:5;
-        font-size:14px;
-    }
+}
 
-    /* Question panel */
-    #panel{
-        position:relative;
-        z-index:2;
-        background:white;
-        padding:15px;
-        border-radius:15px;
-        width:90%;
-        max-width:500px;
-    }
+body::after{
 
-    .option{
-        padding:10px;
-        margin:8px;
-        background:#f2f2f2;
-        border-radius:8px;
-        cursor:pointer;
-    }
+content:"";
+position:absolute;
+width:220px;
+height:220px;
+background:rgba(255,255,255,.25);
+border-radius:50%;
+right:-80px;
+bottom:-80px;
+animation=float2 10s infinite alternate;
 
-    .option:hover{background:#ddd;}
+}
 
-    .hint{
-        margin-top:10px;
-        color:#d35400;
-        font-size:14px;
-    }
+@keyframes float1{
 
-    .building{
-        position:absolute;
-        bottom:0;
-        width:120px;
-        height:0;
-        background:#c49a6c;
-        margin:10px;
-        transition:0.5s;
-    }
+from{transform:translateY(0);}
+to{transform:translateY(45px);}
 
-    .complete{
-        background:linear-gradient(#ffd700,#ff8c00);
-    }
+}
 
-    #finalScreen{
-        background:#fff;
-    }
+@keyframes float2{
+
+from{transform:translateY(0);}
+to{transform:translateY(-35px);}
+
+}
+
+.screen{
+
+position:absolute;
+width:100%;
+height:100%;
+display:flex;
+justify-content:center;
+align-items:center;
+flex-direction:column;
+padding:20px;
+
+}
+
+/******** Splash ********/
+
+#splash{
+
+background:white;
+z-index:10;
+
+}
+
+#logo{
+
+width:220px;
+animation:zoom 2s infinite alternate;
+
+}
+
+@keyframes zoom{
+
+from{transform:scale(1);}
+to{transform:scale(1.08);}
+
+}
+
+#splash h2{
+
+margin-top:20px;
+font-size:34px;
+color:#0ea5e9;
+
+}
+
+/******** Topic ********/
+
+#topic{
+
+display:none;
+background:linear-gradient(135deg,#06b6d4,#9333ea);
+color:white;
+text-align:center;
+
+}
+
+#topic h1{
+
+font-size:54px;
+animation:flash .8s infinite;
+text-shadow:3px 3px 10px black;
+
+}
+
+#topic h2{
+
+margin-top:15px;
+font-size:28px;
+
+}
+
+@keyframes flash{
+
+0%{transform:scale(1);}
+50%{transform:scale(1.08);}
+100%{transform:scale(1);}
+
+}
+
+/******** Start ********/
+
+#startScreen{
+
+display:none;
+
+}
+
+.card{
+
+background:white;
+padding:35px;
+border-radius:25px;
+box-shadow:0 10px 25px rgba(0,0,0,.25);
+max-width:800px;
+width:95%;
+text-align:center;
+
+}
+
+.card h1{
+
+color:#f97316;
+font-size:45px;
+margin-bottom:15px;
+
+}
+
+.card h2{
+
+color:#0ea5e9;
+margin-bottom:15px;
+
+}
+
+.card p{
+
+font-size:22px;
+margin:10px 0;
+
+}
+
+#startBtn{
+
+margin-top:25px;
+padding:18px 55px;
+font-size:28px;
+border:none;
+border-radius:50px;
+background:#22c55e;
+color:white;
+cursor:pointer;
+transition:.3s;
+
+}
+
+#startBtn:hover{
+
+transform:scale(1.05);
+
+}
+
+/******** Volume ********/
+
+.volume{
+
+margin-top:25px;
+display:flex;
+justify-content:center;
+align-items:center;
+gap:15px;
+font-size:22px;
+
+}
+
+input[type=range]{
+
+width:220px;
+
+}
+
+/******** Game ********/
+
+#gameScreen{
+
+display:none;
+
+}
+
+.gameCard{
+
+background:white;
+width:95%;
+max-width:900px;
+padding:30px;
+border-radius:25px;
+box-shadow:0 10px 25px rgba(0,0,0,.25);
+
+}
+
+#progress{
+
+font-size:22px;
+font-weight:bold;
+color:#0284c7;
+margin-bottom:15px;
+
+}
+
+#question{
+
+font-size:32px;
+font-weight:bold;
+margin-bottom:30px;
+line-height:1.4;
+
+}
+
+#answers{
+
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:15px;
+
+}
+
+.answerBtn{
+
+padding:18px;
+font-size:22px;
+border:none;
+border-radius:15px;
+background:#f1f5f9;
+cursor:pointer;
+transition:.3s;
+
+}
+
+.answerBtn:hover{
+
+background:#dbeafe;
+transform:scale(1.02);
+
+}
+
+.correct{
+
+background:#4ade80!important;
+color:white;
+
+}
+
+.wrong{
+
+background:#f87171!important;
+color:white;
+
+}
+
+#score{
+
+margin-top:20px;
+font-size:24px;
+font-weight:bold;
+color:#ea580c;
+
+}
+
+/******** Result ********/
+
+#resultScreen{
+
+display:none;
+
+}
+
+#restartBtn{
+
+margin-top:25px;
+padding:18px 50px;
+font-size:26px;
+background:#0ea5e9;
+color:white;
+border:none;
+border-radius:50px;
+cursor:pointer;
+
+}
+
+/******** Confetti ********/
+
+canvas{
+
+position:absolute;
+top:0;
+left:0;
+pointer-events:none;
+
+}
+
+/******** Mobile ********/
+
+@media(max-width:768px){
+
+#logo{
+
+width:170px;
+
+}
+
+#topic h1{
+
+font-size:38px;
+
+}
+
+.card h1{
+
+font-size:34px;
+
+}
+
+.card p{
+
+font-size:20px;
+
+}
+
+#question{
+
+font-size:24px;
+
+}
+
+#answers{
+
+grid-template-columns:1fr;
+
+}
+
+.answerBtn{
+
+font-size:18px;
+
+}
+
+}
 
 </style>
+
 </head>
 
 <body>
 
-<!-- AUDIO -->
+<canvas id="confetti"></canvas>
+
 <audio id="correctSound" src="assets/correct.mp3"></audio>
 <audio id="wrongSound" src="assets/wrong.mp3"></audio>
 <audio id="clapSound" src="assets/clapping.mp3"></audio>
 
-<!-- LOGO -->
-<div id="logoScreen" class="screen active">
-    <img src="assets/innovine-logo.png"/>
+<!-- Splash -->
+
+<div id="splash" class="screen">
+
+<img src="assets/innovine-logo.png" id="logo">
+
+<h2>Innovine Learning Games</h2>
+
 </div>
 
-<!-- INSTRUCTIONS -->
-<div id="instructionScreen" class="screen">
-    <div class="card">
-        <h1>🏗 Grammar Construction Site</h1>
-        <p>Become the Chief Engineer!</p>
-        <p>Build Grammar City by identifying:</p>
-        <p><b>Subject • Predicate • Direct Object • Complement</b></p>
-        <button onclick="startGame()">START</button>
-    </div>
+<!-- Topic -->
+
+<div id="topic" class="screen">
+
+<h1>✨ ELEMENTS OF A SENTENCE ✨</h1>
+
+<h2>Subject • Predicate • Object • Complement</h2>
+
 </div>
 
-<!-- GAME -->
+<!-- Start -->
+
+<div id="startScreen" class="screen">
+
+<div class="card">
+
+<h1>🎯 Ready to Play?</h1>
+
+<h2>Grade 7 English</h2>
+
+<p>Identify the Subject, Predicate, Object, and Complement.</p>
+
+<p><strong>10 Questions</strong></p>
+
+<div class="volume">
+
+🔊 Volume
+
+<input type="range" id="volume" min="0" max="1" value="1" step=".1">
+
+</div>
+
+<button id="startBtn">
+
+START GAME
+
+</button>
+
+</div>
+
+</div>
+
+<!-- Game -->
+
 <div id="gameScreen" class="screen">
 
-<div id="world">
-    <div class="cloud" style="top:50px;"></div>
-    <div class="cloud" style="top:120px;animation-duration:30s;"></div>
-    <div class="crane">🏗️</div>
-</div>
+<div class="gameCard">
 
-<div id="hud">
-Score: <span id="score">0</span><br>
-Building: <span id="bIndex">1</span>/10<br>
-Stage: <span id="stage">Subject</span>
-</div>
+<div id="progress"></div>
 
-<div id="panel">
-    <div id="sentence"></div>
-    <h3 id="task"></h3>
-    <div id="options"></div>
-    <div id="hint" class="hint"></div>
+<div id="question"></div>
+
+<div id="answers"></div>
+
+<div id="score"></div>
+
 </div>
 
 </div>
 
-<!-- FINAL -->
-<div id="finalScreen" class="screen">
-    <h1>🎉 Grammar City Complete!</h1>
-    <p id="finalStats"></p>
-    <button onclick="restart()">Play Again</button>
+<!-- Result -->
+
+<div id="resultScreen" class="screen">
+
+<div class="card">
+
+<h1>🎉 Great Job!</h1>
+
+<h2 id="finalScore"></h2>
+
+<button id="restartBtn">
+
+Play Again
+
+</button>
+
+</div>
+
 </div>
 
 <script>
 
-/* DATA */
-const levels = [
+const splash=document.getElementById("splash");
+const topic=document.getElementById("topic");
+const startScreen=document.getElementById("startScreen");
+const gameScreen=document.getElementById("gameScreen");
+const resultScreen=document.getElementById("resultScreen");
+
+const correctSound=document.getElementById("correctSound");
+const wrongSound=document.getElementById("wrongSound");
+const clapSound=document.getElementById("clapSound");
+
+const volume=document.getElementById("volume");
+
+volume.oninput=function(){
+
+correctSound.volume=this.value;
+wrongSound.volume=this.value;
+clapSound.volume=this.value;
+
+};
+
+setTimeout(()=>{
+
+splash.style.display="none";
+topic.style.display="flex";
+
+},5000);
+
+setTimeout(()=>{
+
+topic.style.display="none";
+startScreen.style.display="flex";
+
+},8000);
+
+let questions=[];
+let currentQuestion=0;
+let score=0;
+/*************************************************
+                QUESTIONS
+*************************************************/
+
+questions=[
+
 {
-sentence:"The students completed the science project on time.",
-subject:"The students",
-predicate:"completed the science project on time",
-object:"the science project",
-complement:null
+question:"Identify the subject in the sentence.<br><br><b>The students completed the science project on time.</b>",
+options:[
+"completed the science project",
+"the science project",
+"The students",
+"on time"
+],
+answer:2
 },
+
 {
-sentence:"The little puppy barked loudly all night.",
-subject:"The little puppy",
-predicate:"barked loudly all night",
-object:null,
-complement:null
+question:"Identify the predicate in the sentence.<br><br><b>The little puppy barked loudly all night.</b>",
+options:[
+"The little puppy",
+"loudly",
+"barked loudly all night",
+"all night"
+],
+answer:2
 },
+
 {
-sentence:"Maria baked a delicious cake yesterday.",
-subject:"Maria",
-predicate:"baked a delicious cake yesterday",
-object:"a delicious cake",
-complement:null
+question:"Which words form the direct object in the sentence?<br><br><b>Maria baked a delicious cake yesterday.</b>",
+options:[
+"Maria",
+"baked",
+"a delicious cake",
+"yesterday"
+],
+answer:2
 },
+
 {
-sentence:"The sky became dark before the storm.",
-subject:"The sky",
-predicate:"became dark before the storm",
-object:null,
-complement:"dark"
+question:"Identify the complement in the sentence.<br><br><b>The sky became dark before the storm.</b>",
+options:[
+"The sky",
+"became",
+"dark",
+"before the storm"
+],
+answer:2
 },
+
 {
-sentence:"My brother plays basketball every Saturday.",
-subject:"My brother",
-predicate:"plays basketball every Saturday",
-object:"basketball",
-complement:null
+question:"Which part of the sentence is the predicate?<br><br><b>My brother plays basketball every Saturday.</b>",
+options:[
+"My brother",
+"plays basketball every Saturday",
+"basketball",
+"every Saturday"
+],
+answer:1
 },
+
 {
-sentence:"After school, the children visited the library.",
-subject:"the children",
-predicate:"visited the library",
-object:"the library",
-complement:null
+question:"Identify the subject in the sentence.<br><br><b>After school, the children visited the library.</b>",
+options:[
+"visited",
+"the library",
+"After school",
+"the children"
+],
+answer:3
 },
+
 {
-sentence:"The teacher explained the lesson clearly.",
-subject:"The teacher",
-predicate:"explained the lesson clearly",
-object:"the lesson",
-complement:null
+question:"Which words are the direct object in the sentence?<br><br><b>The teacher explained the lesson clearly.</b>",
+options:[
+"The teacher",
+"explained",
+"the lesson",
+"clearly"
+],
+answer:2
 },
+
 {
-sentence:"Our classroom looks beautiful after the decorations.",
-subject:"Our classroom",
-predicate:"looks beautiful after the decorations",
-object:null,
-complement:"beautiful"
+question:"Identify the complement in the sentence.<br><br><b>Our classroom looks beautiful after the decorations.</b>",
+options:[
+"Our classroom",
+"looks",
+"beautiful",
+"after the decorations"
+],
+answer:2
 },
+
 {
-sentence:"Several colourful birds flew across the lake.",
-subject:"Several colourful birds",
-predicate:"flew across the lake",
-object:null,
-complement:null
+question:"Which part of the sentence is the subject?<br><br><b>Several colorful birds flew across the lake.</b>",
+options:[
+"Several colorful birds",
+"flew",
+"across the lake",
+"the lake"
+],
+answer:0
 },
+
 {
-sentence:"The firefighters rescued the family safely.",
-subject:"The firefighters",
-predicate:"rescued the family safely",
-object:"the family",
-complement:null
+question:"Identify the predicate in the sentence.<br><br><b>The firefighters rescued the family safely.</b>",
+options:[
+"The firefighters",
+"rescued the family safely",
+"the family",
+"safely"
+],
+answer:1
 }
+
 ];
 
-let order = [];
-let i = 0;
-let score = 0;
-let stageList = ["subject","predicate","object","complement"];
-let stageIndex = 0;
-let attempts = 0;
+/*************************************************
+            RANDOMIZE QUESTIONS
+*************************************************/
 
-/* INIT */
-function shuffle(arr){return arr.sort(()=>Math.random()-0.5);}
+questions.sort(()=>Math.random()-0.5);
 
-function startGame(){
-    document.getElementById("instructionScreen").classList.remove("active");
-    document.getElementById("gameScreen").classList.add("active");
+/*************************************************
+              START GAME
+*************************************************/
 
-    order = shuffle([...levels]);
-    loadLevel();
+document.getElementById("startBtn").onclick=function(){
+
+startScreen.style.display="none";
+gameScreen.style.display="flex";
+
+currentQuestion=0;
+score=0;
+
+showQuestion();
+
+};
+
+/*************************************************
+            SHOW QUESTION
+*************************************************/
+
+function showQuestion(){
+
+document.getElementById("progress").innerHTML=
+"Question "+(currentQuestion+1)+" of "+questions.length;
+
+document.getElementById("score").innerHTML=
+"Score : "+score;
+
+document.getElementById("question").innerHTML=
+questions[currentQuestion].question;
+
+const answers=document.getElementById("answers");
+
+answers.innerHTML="";
+
+questions[currentQuestion].options.forEach(function(option,index){
+
+const btn=document.createElement("button");
+
+btn.className="answerBtn";
+
+btn.innerHTML=option;
+
+btn.onclick=function(){
+
+checkAnswer(index,btn);
+
+};
+
+answers.appendChild(btn);
+
+});
+
 }
 
-function loadLevel(){
-    stageIndex = 0;
-    attempts = 0;
-    document.getElementById("hint").innerText="";
-    showStage();
+/*************************************************
+            CHECK ANSWER
+*************************************************/
+
+function checkAnswer(choice,button){
+
+let correct=questions[currentQuestion].answer;
+
+let buttons=document.querySelectorAll(".answerBtn");
+
+buttons.forEach(btn=>btn.disabled=true);
+
+if(choice===correct){
+
+button.classList.add("correct");
+
+correctSound.currentTime=0;
+correctSound.play();
+
+score++;
+
+launchConfetti();
+
+}else{
+
+button.classList.add("wrong");
+
+buttons[correct].classList.add("correct");
+
+wrongSound.currentTime=0;
+wrongSound.play();
+
 }
 
-function showStage(){
-    let lvl = order[i];
-    let stage = stageList[stageIndex];
+document.getElementById("score").innerHTML=
+"Score : "+score;
 
-    if(stage==="object" && !lvl.object){
-        stageIndex++;
-        return showStage();
-    }
-    if(stage==="complement" && !lvl.complement){
-        nextLevel();
-        return;
-    }
+setTimeout(function(){
 
-    document.getElementById("sentence").innerText = lvl.sentence;
-    document.getElementById("task").innerText = "Find the " + stage.toUpperCase();
+currentQuestion++;
 
-    document.getElementById("stage").innerText = stage;
+if(currentQuestion<questions.length){
 
-    let correct = lvl[stage];
-    let opts = generateOptions(lvl, stage);
+showQuestion();
 
-    let html="";
-    opts.forEach(o=>{
-        html += `<div class='option' onclick="checkAnswer('${o.replace(/'/g,"")}','${correct.replace(/'/g,"")}')">${o}</div>`;
-    });
+}else{
 
-    document.getElementById("options").innerHTML = html;
+showResults();
+
 }
 
-function generateOptions(lvl, stage){
-    let correct = lvl[stage];
-    let pool = [lvl.subject,lvl.predicate,lvl.object,lvl.complement,"on time","yesterday","clearly","safely"];
-    pool = pool.filter(Boolean);
-    pool = pool.filter(x=>x!==correct);
-    shuffle(pool);
-    let opts = [correct,...pool.slice(0,3)];
-    return shuffle(opts);
+},1200);
+
+}
+/*************************************************
+            CONFETTI ANIMATION
+*************************************************/
+
+const canvas = document.getElementById("confetti");
+const ctx = canvas.getContext("2d");
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+window.addEventListener("resize",function(){
+
+canvas.width=window.innerWidth;
+canvas.height=window.innerHeight;
+
+});
+
+let confetti=[];
+
+function launchConfetti(){
+
+confetti=[];
+
+for(let i=0;i<180;i++){
+
+confetti.push({
+
+x:Math.random()*canvas.width,
+
+y:-20,
+
+r:Math.random()*8+4,
+
+d:Math.random()*180,
+
+speed:Math.random()*5+3,
+
+tilt:Math.random()*10-5,
+
+color:
+
+"hsl("+Math.random()*360+",100%,60%)"
+
+});
+
 }
 
-function checkAnswer(choice, correct){
-    if(choice===correct){
-        document.getElementById("correctSound").play();
-        score += 10;
-        attempts=0;
-        stageIndex++;
-        document.getElementById("score").innerText=score;
-        document.getElementById("bIndex").innerText=i+1;
-        document.getElementById("hint").innerText="";
-        setTimeout(showStage,500);
-    } else {
-        document.getElementById("wrongSound").play();
-        attempts++;
-        if(attempts===1){
-            document.getElementById("hint").innerText="❌ Try again!";
-        } else {
-            document.getElementById("hint").innerText="💡 The " + stageList[stageIndex] + " is a key part of the sentence.";
-            setTimeout(()=>{
-                stageIndex++;
-                attempts=0;
-                showStage();
-            },1200);
-        }
-    }
+animateConfetti();
+
 }
 
-function nextLevel(){
-    i++;
-    if(i>=order.length){
-        endGame();
-    } else {
-        loadLevel();
-    }
+function animateConfetti(){
+
+let frame=0;
+
+function draw(){
+
+ctx.clearRect(0,0,canvas.width,canvas.height);
+
+confetti.forEach(function(c){
+
+ctx.beginPath();
+
+ctx.fillStyle=c.color;
+
+ctx.fillRect(c.x,c.y,c.r,c.r);
+
+c.y+=c.speed;
+
+c.x+=Math.sin(c.d);
+
+c.d+=0.1;
+
+});
+
+frame++;
+
+if(frame<90){
+
+requestAnimationFrame(draw);
+
+}else{
+
+ctx.clearRect(0,0,canvas.width,canvas.height);
+
 }
 
-function endGame(){
-    document.getElementById("gameScreen").classList.remove("active");
-    document.getElementById("finalScreen").classList.add("active");
-
-    let acc = Math.round((score/200)*100);
-
-    document.getElementById("finalStats").innerText =
-    `Score: ${score}
-Accuracy: ${acc}%`;
 }
 
-function restart(){
-    location.reload();
+draw();
+
 }
 
-/* SPLASH TIMER */
-setTimeout(()=>{
-    document.getElementById("logoScreen").classList.remove("active");
-    document.getElementById("instructionScreen").classList.add("active");
-},5000);
+/*************************************************
+        BUTTON FEEDBACK ANIMATION
+*************************************************/
+
+const style=document.createElement("style");
+
+style.innerHTML=`
+
+.answerBtn{
+
+transition:.25s;
+
+}
+
+.answerBtn:hover{
+
+transform:scale(1.05);
+
+}
+
+.correct{
+
+animation:pop .5s;
+
+}
+
+.wrong{
+
+animation:shake .5s;
+
+}
+
+@keyframes pop{
+
+0%{transform:scale(1);}
+
+50%{transform:scale(1.18);}
+
+100%{transform:scale(1);}
+
+}
+
+@keyframes shake{
+
+0%{transform:translateX(0);}
+
+20%{transform:translateX(-10px);}
+
+40%{transform:translateX(10px);}
+
+60%{transform:translateX(-8px);}
+
+80%{transform:translateX(8px);}
+
+100%{transform:translateX(0);}
+
+}
+
+`;
+
+document.head.appendChild(style);
+
+/*************************************************
+      SHOW RESULT SCREEN
+*************************************************/
+
+function showResults(){
+
+gameScreen.style.display="none";
+
+resultScreen.style.display="flex";
+
+document.getElementById("finalScore").innerHTML=
+
+"You scored <br><br><span style='font-size:60px;color:#16a34a;'>"
+
++score+
+
+" / "
+
++questions.length+
+
+"</span>";
+
+clapSound.currentTime=0;
+
+clapSound.play();
+
+}
+/*************************************************
+            RESTART GAME
+*************************************************/
+
+document.getElementById("restartBtn").onclick=function(){
+
+// Hide result screen
+resultScreen.style.display="none";
+
+// Show game screen
+gameScreen.style.display="flex";
+
+// Reset values
+score=0;
+currentQuestion=0;
+
+// Shuffle questions again
+questions.sort(()=>Math.random()-0.5);
+
+// Show first question
+showQuestion();
+
+};
+
+/*************************************************
+      OPTIONAL: ENTER KEY SUPPORT
+*************************************************/
+
+document.addEventListener("keydown",function(e){
+
+if(e.key==="Enter"){
+
+const startVisible=
+startScreen.style.display==="flex";
+
+const resultVisible=
+resultScreen.style.display==="flex";
+
+if(startVisible){
+
+document.getElementById("startBtn").click();
+
+}
+
+if(resultVisible){
+
+document.getElementById("restartBtn").click();
+
+}
+
+}
+
+});
+
+/*************************************************
+      PRELOAD SOUNDS
+*************************************************/
+
+window.onload=function(){
+
+correctSound.load();
+wrongSound.load();
+clapSound.load();
+
+correctSound.volume=1;
+wrongSound.volume=1;
+clapSound.volume=1;
+
+};
+
+/*************************************************
+      END OF SCRIPT
+*************************************************/
 
 </script>
 
