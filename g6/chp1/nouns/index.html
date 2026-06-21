@@ -3,17 +3,50 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Noun Museum Adventure</title>
+<title>AAA Noun Museum</title>
 
 <style>
-*{box-sizing:border-box;font-family:Arial;margin:0;padding:0}
+*{box-sizing:border-box;margin:0;padding:0;font-family:Arial}
 
 body{
-background:linear-gradient(135deg,#dff6ff,#fff5d7,#e8ffe8);
 overflow:hidden;
+background:radial-gradient(circle at top,#ffffff,#e9f6ff,#fff3d6);
 }
 
-/* SCREEN SYSTEM FIX */
+/* 🌟 ambient museum lighting */
+body::before{
+content:"";
+position:fixed;
+inset:0;
+background:
+radial-gradient(circle at 20% 30%,rgba(255,215,0,0.12),transparent 40%),
+radial-gradient(circle at 70% 60%,rgba(0,180,255,0.12),transparent 40%),
+radial-gradient(circle at 50% 80%,rgba(255,120,200,0.10),transparent 40%);
+animation:ambient 8s infinite alternate;
+pointer-events:none;
+}
+
+@keyframes ambient{
+0%{transform:scale(1)}
+100%{transform:scale(1.05)}
+}
+
+/* floating dust particles */
+.particle{
+position:fixed;
+width:6px;
+height:6px;
+background:rgba(255,255,255,0.7);
+border-radius:50%;
+animation:float 6s linear infinite;
+}
+@keyframes float{
+0%{transform:translateY(100vh);opacity:0}
+20%{opacity:1}
+100%{transform:translateY(-10vh);opacity:0}
+}
+
+/* SCREEN SYSTEM */
 .screen{
 display:none;
 height:100vh;
@@ -21,85 +54,137 @@ width:100%;
 justify-content:center;
 align-items:center;
 flex-direction:column;
-text-align:center;
-padding:20px;
 position:absolute;
-top:0;
-left:0;
+inset:0;
+text-align:center;
 }
-
-.active{display:flex;}
+.active{display:flex}
 
 /* LOGO */
 #logoScreen img{
-width:220px;
-animation:pulse 1.5s infinite;
+width:230px;
+animation:logoGlow 2s infinite;
+}
+@keyframes logoGlow{
+0%{transform:scale(1);filter:drop-shadow(0 0 0px gold)}
+50%{transform:scale(1.05);filter:drop-shadow(0 0 20px gold)}
+100%{transform:scale(1);filter:drop-shadow(0 0 0px gold)}
 }
 
-@keyframes pulse{
-0%{transform:scale(1)}
-50%{transform:scale(1.08)}
-100%{transform:scale(1)}
+/* TITLE */
+.title{
+font-size:32px;
+font-weight:bold;
+color:#1e2a38;
+animation:fadeUp 1s ease;
 }
 
-/* CARD */
+.subtitle{
+margin-top:10px;
+color:#444;
+}
+
+@keyframes fadeUp{
+from{opacity:0;transform:translateY(20px)}
+to{opacity:1;transform:translateY(0)}
+}
+
+/* GLASS CARD */
 .card{
-background:white;
-padding:20px;
-border-radius:18px;
+background:rgba(255,255,255,0.75);
+backdrop-filter:blur(14px);
+border-radius:24px;
+padding:24px;
 width:92%;
-max-width:650px;
-box-shadow:0 10px 25px rgba(0,0,0,0.15);
+max-width:700px;
+box-shadow:0 20px 60px rgba(0,0,0,0.15);
+border:1px solid rgba(255,255,255,0.4);
 }
 
-/* BUTTONS */
+/* BUTTONS AAA */
 .btn{
 width:100%;
 padding:14px;
 margin-top:10px;
 border:none;
-border-radius:12px;
+border-radius:14px;
 font-size:16px;
 cursor:pointer;
-background:#f1f1f1;
+background:linear-gradient(135deg,#ffffff,#f3f3f3);
+box-shadow:0 8px 18px rgba(0,0,0,0.1);
+transition:0.25s;
+}
+.btn:hover{
+transform:translateY(-2px);
+box-shadow:0 12px 25px rgba(0,0,0,0.15);
 }
 
-/* TOP BAR */
+/* TOPBAR */
 .topbar{
 display:flex;
 justify-content:space-between;
 width:100%;
-padding:10px;
+padding:12px 18px;
 font-weight:bold;
+color:#1f2d3a;
 }
 
+/* PROGRESS AAA */
 .progress{
 width:90%;
-height:10px;
-background:#ddd;
-border-radius:10px;
+height:14px;
+background:rgba(0,0,0,0.06);
+border-radius:20px;
 overflow:hidden;
+margin-top:5px;
 }
 .bar{
 height:100%;
 width:0%;
-background:linear-gradient(90deg,#4facfe,#00f2fe);
+background:linear-gradient(90deg,#4facfe,#00f2fe,#7afcff);
+box-shadow:0 0 20px rgba(0,200,255,0.4);
 transition:0.4s;
 }
 
-/* HIGHLIGHT */
+/* 🎯 EXHIBIT Noun Glow */
 .noun{
-background:rgba(255,215,0,0.25);
+display:inline-block;
+padding:3px 8px;
+border-radius:8px;
+background:rgba(255,215,0,0.18);
 border:2px solid gold;
-padding:2px 6px;
-border-radius:6px;
 font-weight:bold;
+animation:glow 1.2s infinite alternate;
+}
+@keyframes glow{
+0%{box-shadow:0 0 5px gold}
+100%{box-shadow:0 0 22px gold}
+}
+
+/* ROOM TRANSITION */
+.roomFade{
+animation:roomIn 0.6s ease;
+}
+@keyframes roomIn{
+from{opacity:0;transform:scale(0.95)}
+to{opacity:1;transform:scale(1)}
 }
 
 </style>
 </head>
 
 <body>
+
+<!-- particles -->
+<script>
+for(let i=0;i<18;i++){
+let p=document.createElement("div");
+p.className="particle";
+p.style.left=Math.random()*100+"%";
+p.style.animationDuration=(3+Math.random()*5)+"s";
+document.body.appendChild(p);
+}
+</script>
 
 <!-- LOGO -->
 <div id="logoScreen" class="screen active">
@@ -108,16 +193,16 @@ font-weight:bold;
 
 <!-- TITLE -->
 <div id="titleScreen" class="screen">
-<h1>🏛️ Noun Museum Adventure</h1>
-<p>Unlock Grammar Exhibits</p>
+<div class="title">🏛️ Noun Museum</div>
+<div class="subtitle">AAA Interactive Adventure</div>
 </div>
 
 <!-- INSTRUCTIONS -->
 <div id="instScreen" class="screen">
 <div class="card">
-<h2>How to Play</h2>
-<p>Find the noun type in each sentence.</p>
-<button class="btn" onclick="startGame()">Start</button>
+<h2>🎯 Museum Guide</h2>
+<p>Explore exhibits. Identify noun types. Unlock galleries.</p>
+<button class="btn" onclick="startGame()">Enter Museum</button>
 </div>
 </div>
 
@@ -130,7 +215,7 @@ font-weight:bold;
 
 <div class="progress"><div class="bar" id="bar"></div></div>
 
-<div class="card">
+<div class="card roomFade">
 <h3 id="gallery"></h3>
 <p id="qtext"></p>
 <div id="options"></div>
@@ -139,9 +224,9 @@ font-weight:bold;
 
 <!-- END -->
 <div id="endScreen" class="screen">
-<h2>🎉 Completed!</h2>
+<h2>🏆 Museum Complete</h2>
 <p id="finalScore"></p>
-<button class="btn" onclick="location.reload()">Play Again</button>
+<button class="btn" onclick="location.reload()">Replay Museum</button>
 </div>
 
 <audio id="correct" src="assets/correct.mp3"></audio>
@@ -150,35 +235,20 @@ font-weight:bold;
 
 <script>
 
-/* ✅ FIXED SCREEN CONTROLLER */
-function showScreen(id){
-document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
-document.getElementById(id).classList.add("active");
-}
-
-/* FLOW (SAFE) */
-window.onload=function(){
-setTimeout(()=>showScreen("titleScreen"),5000);
-setTimeout(()=>showScreen("instScreen"),8000);
-};
-
-/* GAME DATA */
 const questions=[
-{q:`The <span class="noun">flowers</span> in the garden are full of colourful flowers and butterflies.`,a:["Common Noun","Proper Noun","Material Noun","Abstract Noun"],c:"Common Noun",g:"Nature"},
-{q:`<span class="noun">India</span> is famous for its rich culture and festivals.`,a:["Common Noun","Proper Noun","Collective Noun","Material Noun"],c:"Proper Noun",g:"Places"},
-{q:`The <span class="noun">team</span> celebrated their victory after the match.`,a:["Abstract Noun","Collective Noun","Proper Noun","Common Noun"],c:"Collective Noun",g:"Teamwork"},
-{q:`The necklace was made of pure <span class="noun">gold</span>.`,a:["Material Noun","Common Noun","Collective Noun","Proper Noun"],c:"Material Noun",g:"Treasure"},
-{q:`<span class="noun">Honesty</span> is always appreciated by everyone.`,a:["Proper Noun","Material Noun","Abstract Noun","Common Noun"],c:"Abstract Noun",g:"Values"},
-{q:`The <span class="noun">lion</span> rested under a shady tree.`,a:["Proper Noun","Common Noun","Material Noun","Collective Noun"],c:"Common Noun",g:"Animals"},
-{q:`<span class="noun">Mrs. Gupta</span> teaches Mathematics in our school.`,a:["Proper Noun","Common Noun","Collective Noun","Material Noun"],c:"Proper Noun",g:"School"},
-{q:`A <span class="noun">shoal</span> of fish swam together near the coral reef.`,a:["Material Noun","Common Noun","Collective Noun","Abstract Noun"],c:"Collective Noun",g:"Ocean"},
-{q:`The table is made from strong <span class="noun">wood</span>.`,a:["Material Noun","Proper Noun","Common Noun","Collective Noun"],c:"Material Noun",g:"Builders"},
-{q:`<span class="noun">Kindness</span> makes the world a happier place.`,a:["Material Noun","Collective Noun","Abstract Noun","Common Noun"],c:"Abstract Noun",g:"Values"}
+{q:`The <span class="noun">flowers</span> in the garden are full of colourful flowers and butterflies.`,a:["Common Noun","Proper Noun","Material Noun","Abstract Noun"],c:"Common Noun",g:"🌿 Nature Gallery"},
+{q:`<span class="noun">India</span> is famous for its rich culture and festivals.`,a:["Common Noun","Proper Noun","Collective Noun","Material Noun"],c:"Proper Noun",g:"🏛️ Famous Gallery"},
+{q:`The <span class="noun">team</span> celebrated their victory after the match.`,a:["Abstract Noun","Collective Noun","Proper Noun","Common Noun"],c:"Collective Noun",g:"🏆 Team Gallery"},
+{q:`The necklace was made of pure <span class="noun">gold</span>.`,a:["Material Noun","Common Noun","Collective Noun","Proper Noun"],c:"Material Noun",g:"💎 Treasure Gallery"},
+{q:`<span class="noun">Honesty</span> is always appreciated by everyone.`,a:["Proper Noun","Material Noun","Abstract Noun","Common Noun"],c:"Abstract Noun",g:"💖 Values Gallery"},
+{q:`The <span class="noun">lion</span> rested under a shady tree.`,a:["Proper Noun","Common Noun","Material Noun","Collective Noun"],c:"Common Noun",g:"🐾 Animal Gallery"},
+{q:`<span class="noun">Mrs. Gupta</span> teaches Mathematics in our school.`,a:["Proper Noun","Common Noun","Collective Noun","Material Noun"],c:"Proper Noun",g:"🏫 School Gallery"},
+{q:`A <span class="noun">shoal</span> of fish swam together near the coral reef.`,a:["Material Noun","Common Noun","Collective Noun","Abstract Noun"],c:"Collective Noun",g:"🌊 Ocean Gallery"},
+{q:`The table is made from strong <span class="noun">wood</span>.`,a:["Material Noun","Proper Noun","Common Noun","Collective Noun"],c:"Material Noun",g:"🌳 Builders Gallery"},
+{q:`<span class="noun">Kindness</span> makes the world a happier place.`,a:["Material Noun","Collective Noun","Abstract Noun","Common Noun"],c:"Abstract Noun",g:"🌎 Values Gallery"}
 ];
 
 let order=[],i=0,score=0,attempt=0;
-
-function shuffle(a){return a.sort(()=>Math.random()-0.5)}
 
 function startGame(){
 showScreen("gameScreen");
@@ -186,9 +256,15 @@ init();
 showQ();
 }
 
-function init(){
-order=shuffle([...Array(10).keys()]);
+function showScreen(id){
+document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+document.getElementById(id).classList.add("active");
 }
+
+setTimeout(()=>showScreen("titleScreen"),5000);
+setTimeout(()=>showScreen("instScreen"),8000);
+
+function init(){order=[...Array(10).keys()].sort(()=>Math.random()-0.5)}
 
 function showQ(){
 let q=questions[order[i]];
@@ -203,13 +279,15 @@ document.getElementById("qtext").innerHTML=
 let opt=document.getElementById("options");
 opt.innerHTML="";
 
-shuffle(q.a).forEach(ans=>{
+q.a.sort(()=>Math.random()-0.5).forEach(ans=>{
 let b=document.createElement("button");
 b.className="btn";
 b.innerText=ans;
 b.onclick=()=>check(b,ans,q);
 opt.appendChild(b);
 });
+
+document.querySelector(".card").classList.add("roomFade");
 
 updateBar();
 }
@@ -239,12 +317,8 @@ showScreen("endScreen");
 document.getElementById("finalScore").innerText=`⭐ Score: ${score}/20`;
 document.getElementById("clap").play();
 }else{
-setTimeout(showQ,500);
+setTimeout(showQ,600);
 }
-}
-
-function updateBar(){
-document.getElementById("bar").style.width=(i/10)*100+"%";
 }
 
 </script>
