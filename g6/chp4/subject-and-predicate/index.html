@@ -2,11 +2,10 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Temple Treasure Grammar Adventure</title>
 
 <style>
-
 *{
     margin:0;
     padding:0;
@@ -24,9 +23,10 @@ body{
     width:100vw;
     height:100vh;
     overflow:hidden;
-    background:linear-gradient(to bottom,#87ceeb,#dfffb0);
+    background:linear-gradient(to bottom,#85cde8 0%,#80d6a4 65%,#74cf75 100%);
 }
 
+/* LOGO SCREEN */
 #logoScreen{
     position:absolute;
     width:100%;
@@ -40,7 +40,7 @@ body{
 }
 
 #logoScreen img{
-    width:250px;
+    width:280px;
     max-width:80%;
 }
 
@@ -51,49 +51,175 @@ body{
     color:#333;
 }
 
+/* SCENE */
 #ground{
     position:absolute;
     bottom:0;
     width:100%;
     height:120px;
-    background:#8B5A2B;
-    border-top:8px solid #4caf50;
+    background:#5d3b2e;
+    border-top:8px solid #258b39;
+    z-index:10;
 }
 
+#tree{
+    position:absolute;
+    right:260px;
+    bottom:120px;
+    width:130px;
+    height:210px;
+    z-index:6;
+}
+
+.treeTop{
+    position:absolute;
+    width:130px;
+    height:130px;
+    background:#2e9b42;
+    border-radius:50%;
+    top:0;
+    left:0;
+    box-shadow:
+        -35px 35px 0 #3aae50,
+        35px 35px 0 #278a3b,
+        0 60px 0 #35a84a;
+}
+
+.treeTrunk{
+    position:absolute;
+    width:38px;
+    height:115px;
+    background:#9b5a2e;
+    left:46px;
+    bottom:0;
+    border-radius:14px;
+}
+
+#house{
+    position:absolute;
+    right:45px;
+    bottom:120px;
+    width:145px;
+    height:120px;
+    z-index:7;
+}
+
+#house .base{
+    position:absolute;
+    bottom:0;
+    left:18px;
+    width:105px;
+    height:75px;
+    background:#d49a63;
+    border-radius:8px;
+}
+
+#house .roof{
+    position:absolute;
+    top:0;
+    left:8px;
+    width:120px;
+    height:120px;
+    transform:rotate(45deg);
+    border-left:12px solid #ef4d32;
+    border-top:12px solid #ef4d32;
+    border-radius:7px;
+}
+
+#house .door{
+    position:absolute;
+    bottom:0;
+    left:48px;
+    width:34px;
+    height:55px;
+    background:#704336;
+    border-radius:7px 7px 0 0;
+}
+
+#house .window{
+    position:absolute;
+    right:22px;
+    bottom:38px;
+    width:28px;
+    height:28px;
+    background:#46b6ff;
+    border-radius:5px;
+}
+
+/* PLAYER */
 #player{
     position:absolute;
-    width:70px;
-    height:70px;
+    width:90px;
+    height:90px;
     left:80px;
     bottom:120px;
-    font-size:55px;
     display:flex;
     justify-content:center;
     align-items:center;
-    z-index:20;
+    z-index:30;
+    transition:transform 0.1s;
 }
 
+#boyBody{
+    font-size:70px;
+    line-height:1;
+    filter:drop-shadow(0 4px 3px rgba(0,0,0,0.25));
+}
+
+.jumpPose{
+    animation:jumpPose 0.55s ease;
+}
+
+@keyframes jumpPose{
+    0%{transform:rotate(0deg) scale(1);}
+    40%{transform:rotate(-12deg) scale(1.08);}
+    100%{transform:rotate(0deg) scale(1);}
+}
+
+/* COINS / GEMS */
 .coin{
     position:absolute;
-    width:40px;
-    height:40px;
+    width:62px;
+    height:62px;
     background:gold;
     border-radius:50%;
     display:flex;
     justify-content:center;
     align-items:center;
-    font-size:24px;
+    font-size:30px;
+    box-shadow:0 0 25px rgba(255,215,0,0.8);
+    animation:floatGem 1s ease-in-out infinite alternate;
+    z-index:15;
 }
 
+@keyframes floatGem{
+    from{transform:translateY(0);}
+    to{transform:translateY(-13px);}
+}
+
+/* OBSTACLE */
 .obstacle{
     position:absolute;
-    width:45px;
-    height:70px;
-    background:#5d4037;
-    border-radius:10px;
+    width:58px;
+    height:58px;
+    background:#7a5145;
+    border:7px solid #5d3a31;
+    border-radius:50%;
     bottom:120px;
+    z-index:16;
 }
 
+.obstacle::before{
+    content:"🪵";
+    position:absolute;
+    inset:0;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:34px;
+}
+
+/* SCORE */
 #scoreBoard{
     position:absolute;
     top:10px;
@@ -114,15 +240,17 @@ body{
     padding:12px;
     border-radius:15px;
     z-index:50;
+    font-size:18px;
 }
 
+/* QUESTIONS */
 #questionBox{
     position:absolute;
     top:50%;
     left:50%;
     transform:translate(-50%,-50%);
     width:92%;
-    max-width:550px;
+    max-width:620px;
     background:white;
     border-radius:25px;
     padding:25px;
@@ -136,6 +264,7 @@ body{
     font-size:24px;
     margin-bottom:20px;
     color:#333;
+    line-height:1.35;
 }
 
 .optionBtn{
@@ -184,12 +313,13 @@ body{
     100%{transform:translateX(0);}
 }
 
+/* START / END */
 #startScreen,
 #endScreen{
     position:absolute;
     width:100%;
     height:100%;
-    background:rgba(0,0,0,0.7);
+    background:rgba(0,0,0,0.68);
     color:white;
     display:flex;
     flex-direction:column;
@@ -198,6 +328,17 @@ body{
     text-align:center;
     z-index:500;
     padding:20px;
+}
+
+#startScreen h1,
+#endScreen h1{
+    font-size:38px;
+}
+
+#startScreen p{
+    max-width:700px;
+    font-size:22px;
+    line-height:1.5;
 }
 
 .mainBtn{
@@ -215,6 +356,7 @@ body{
     background:#fb8c00;
 }
 
+/* CONFETTI */
 #confetti{
     position:absolute;
     width:100%;
@@ -232,15 +374,61 @@ body{
 }
 
 @keyframes fall{
-    from{
-        transform:translateY(-100px) rotate(0deg);
-    }
-    to{
-        transform:translateY(100vh) rotate(720deg);
-    }
+    from{transform:translateY(-100px) rotate(0deg);}
+    to{transform:translateY(100vh) rotate(720deg);}
 }
 
 @media(max-width:768px){
+    #scoreBoard{
+        font-size:15px;
+        padding:10px;
+    }
+
+    #volumeBox{
+        font-size:14px;
+        padding:9px;
+    }
+
+    #volumeSlider{
+        width:90px;
+    }
+
+    #player{
+        width:75px;
+        height:75px;
+        left:45px;
+    }
+
+    #boyBody{
+        font-size:58px;
+    }
+
+    #tree{
+        right:155px;
+        width:100px;
+        height:165px;
+    }
+
+    .treeTop{
+        width:95px;
+        height:95px;
+    }
+
+    .treeTrunk{
+        height:90px;
+        left:34px;
+    }
+
+    #house{
+        width:110px;
+        right:20px;
+    }
+
+    .coin{
+        width:50px;
+        height:50px;
+        font-size:25px;
+    }
 
     #questionText{
         font-size:20px;
@@ -250,17 +438,15 @@ body{
         font-size:16px;
     }
 
-    #player{
-        width:55px;
-        height:55px;
-        font-size:42px;
+    #startScreen h1,
+    #endScreen h1{
+        font-size:28px;
     }
 
-    #scoreBoard{
-        font-size:16px;
+    #startScreen p{
+        font-size:18px;
     }
 }
-
 </style>
 </head>
 
@@ -268,84 +454,81 @@ body{
 
 <div id="gameArea">
 
-<div id="logoScreen">
-<img src="assets/innovine-logo.png">
-<div id="logoText">Innovine Learning Adventures</div>
-</div>
+    <div id="logoScreen">
+        <img src="assets/innovine-logo.png" alt="Innovine Logo">
+        <div id="logoText">Innovine Learning Adventures</div>
+    </div>
 
-<div id="ground"></div>
+    <div id="scoreBoard">
+        Gems: <span id="coinCount">0</span>/3 |
+        Questions: <span id="questionCount">0</span>/10
+    </div>
 
-<div id="player">🏃</div>
+    <div id="volumeBox">
+        Volume
+        <input type="range" id="volumeSlider" min="0" max="1" step="0.1" value="1">
+    </div>
 
-<div id="scoreBoard">
-Coins: <span id="coinCount">0</span> |
-Questions: <span id="questionCount">0</span>/10
-</div>
+    <div id="tree">
+        <div class="treeTrunk"></div>
+        <div class="treeTop"></div>
+    </div>
 
-<div id="volumeBox">
-Volume
-<input type="range" id="volumeSlider" min="0" max="1" step="0.1" value="1">
-</div>
+    <div id="house">
+        <div class="roof"></div>
+        <div class="base"></div>
+        <div class="door"></div>
+        <div class="window"></div>
+    </div>
 
-<div id="questionBox">
-<div id="questionText"></div>
-<div id="options"></div>
-<div id="feedback"></div>
-</div>
+    <div id="ground"></div>
 
-<div id="confetti"></div>
+    <div id="player">
+        <div id="boyBody">🧑‍🌾</div>
+    </div>
 
-<div id="startScreen" style="display:none;">
+    <div id="questionBox">
+        <div id="questionText"></div>
+        <div id="options"></div>
+        <div id="feedback"></div>
+    </div>
 
-<h1>💎 Temple Treasure Grammar Adventure 💎</h1>
+    <div id="confetti"></div>
 
-<p style="margin-top:20px;">
-Collect treasure and answer grammar questions about
-Subjects and Predicates!
-</p>
+    <div id="startScreen" style="display:none;">
+        <h1>💎 Temple Treasure Grammar Adventure 💎</h1>
+        <p style="margin-top:20px;">
+            Jump to collect 3 gems. Then answer a grammar question about Subjects and Predicates.
+        </p>
+        <p style="margin-top:20px;">
+            Desktop: SPACE or ↑ to jump<br>
+            Mobile/Tablet: Tap the screen to jump
+        </p>
+        <button class="mainBtn" onclick="startGame()">Start Adventure</button>
+    </div>
 
-<p style="margin-top:20px;">
-Desktop: SPACE or ↑ to jump<br>
-Mobile: Tap screen to jump
-</p>
-
-<button class="mainBtn" onclick="startGame()">
-Start Adventure
-</button>
-
-</div>
-
-<div id="endScreen" style="display:none;">
-
-<h1>🎉 Adventure Complete! 🎉</h1>
-
-<h2 id="finalMessage" style="margin-top:20px;"></h2>
-
-<button class="mainBtn" onclick="restartGame()">
-Restart Game
-</button>
-
-</div>
+    <div id="endScreen" style="display:none;">
+        <h1>🎉 Adventure Complete! 🎉</h1>
+        <h2 id="finalMessage" style="margin-top:20px;"></h2>
+        <button class="mainBtn" onclick="restartGame()">Play Again</button>
+    </div>
 
 </div>
 
 <script>
-
 setTimeout(()=>{
     document.getElementById("logoScreen").style.display="none";
     document.getElementById("startScreen").style.display="flex";
 },5000);
 
+const gameArea = document.getElementById("gameArea");
 const player = document.getElementById("player");
-
 const questionBox = document.getElementById("questionBox");
 const questionText = document.getElementById("questionText");
 const optionsDiv = document.getElementById("options");
 const feedback = document.getElementById("feedback");
-
 const coinCount = document.getElementById("coinCount");
 const questionCount = document.getElementById("questionCount");
-
 const volumeSlider = document.getElementById("volumeSlider");
 
 const correctSound = new Audio("assets/correct.mp3");
@@ -353,187 +536,120 @@ const wrongSound = new Audio("assets/wrong.mp3");
 const clapSound = new Audio("assets/clapping.mp3");
 
 let gameRunning = false;
-
 let jumping = false;
 let velocity = 0;
-const gravity = 0.8;
-
+const gravity = 0.9;
 let playerY = 120;
 
-let coins = 0;
+let gems = 0;
+let totalGems = 0;
 let currentQuestion = 0;
+let answeredCorrect = 0;
+let animationId;
 
 const questions = [
-
 {
 q:"During assembly, the principal gave an inspiring speech. Which words tell what the principal did?",
-o:[
-"During assembly",
-"the principal",
-"gave an inspiring speech",
-"inspiring speech"
-],
+o:["During assembly","the principal","gave an inspiring speech","inspiring speech"],
 a:2
 },
-
 {
 q:"Riya and her friends practiced basketball after school. Who is the sentence mainly about?",
-o:[
-"Riya and her friends",
-"practiced basketball",
-"after school",
-"basketball"
-],
+o:["Riya and her friends","practiced basketball","after school","basketball"],
 a:0
 },
-
 {
 q:"Which option shows the COMPLETE predicate? 'The baby panda slept peacefully in the zoo.'",
-o:[
-"peacefully",
-"in the zoo",
-"slept peacefully in the zoo",
-"baby panda"
-],
+o:["peacefully","in the zoo","slept peacefully in the zoo","baby panda"],
 a:2
 },
-
 {
 q:"During the festival, colorful lights decorated the streets. What is the subject of the sentence?",
-o:[
-"decorated the streets",
-"During the festival",
-"colorful lights",
-"the streets"
-],
+o:["decorated the streets","During the festival","colorful lights","the streets"],
 a:2
 },
-
 {
 q:"The students completed the science project on time. Which part tells what the students did?",
-o:[
-"The students",
-"science project",
-"completed the science project on time",
-"on time"
-],
+o:["The students","science project","completed the science project on time","on time"],
 a:2
 },
-
 {
 q:"Which option correctly identifies the SUBJECT? 'My little brother enjoys reading comic books.'",
-o:[
-"enjoys reading",
-"comic books",
-"My little brother",
-"reading comic books"
-],
+o:["enjoys reading","comic books","My little brother","reading comic books"],
 a:2
 },
-
 {
 q:"The tour bus arrived late because of traffic. What is the predicate?",
-o:[
-"The tour bus",
-"because of traffic",
-"arrived late because of traffic",
-"traffic"
-],
+o:["The tour bus","because of traffic","arrived late because of traffic","traffic"],
 a:2
 },
-
 {
 q:"In the morning, the parrots chirped loudly near the window. Who or what is the sentence about?",
-o:[
-"chirped loudly",
-"near the window",
-"the parrots",
-"In the morning"
-],
+o:["chirped loudly","near the window","the parrots","In the morning"],
 a:2
 },
-
 {
 q:"Choose the option that contains ONLY the predicate. 'The chef prepared delicious pasta for the guests.'",
-o:[
-"The chef",
-"delicious pasta",
-"prepared delicious pasta for the guests",
-"for the guests"
-],
+o:["The chef","delicious pasta","prepared delicious pasta for the guests","for the guests"],
 a:2
 },
-
 {
 q:"After dinner, my father fixed the computer quickly. Which part is the subject?",
-o:[
-"fixed the computer quickly",
-"After dinner",
-"my father",
-"the computer"
-],
+o:["fixed the computer quickly","After dinner","my father","the computer"],
 a:2
 }
-
 ];
 
 questions.sort(()=>Math.random()-0.5);
 
 function updateVolumes(){
-
     correctSound.volume = volumeSlider.value;
     wrongSound.volume = volumeSlider.value;
     clapSound.volume = volumeSlider.value;
 }
-
 volumeSlider.addEventListener("input",updateVolumes);
-
 updateVolumes();
 
 function startGame(){
-
     document.getElementById("startScreen").style.display="none";
-
     gameRunning = true;
-
     spawnCoin();
     spawnObstacle();
-
-    requestAnimationFrame(gameLoop);
+    animationId = requestAnimationFrame(gameLoop);
 }
 
 function jump(){
+    if(!gameRunning || questionBox.style.display === "block") return;
 
     if(!jumping){
-
-        velocity = -18;
+        velocity = -22;
         jumping = true;
+        player.classList.add("jumpPose");
+
+        setTimeout(()=>{
+            player.classList.remove("jumpPose");
+        },550);
     }
 }
 
 document.addEventListener("keydown",(e)=>{
-
     if(e.code==="Space" || e.code==="ArrowUp"){
-
         jump();
     }
 });
 
-document.addEventListener("touchstart",()=>{
-
+document.addEventListener("touchstart",(e)=>{
+    if(e.target.classList.contains("optionBtn") || e.target.classList.contains("mainBtn")) return;
     jump();
 });
 
 function gameLoop(){
-
     if(!gameRunning) return;
 
     velocity += gravity;
-
     playerY -= velocity;
 
     if(playerY <= 120){
-
         playerY = 120;
         velocity = 0;
         jumping = false;
@@ -541,232 +657,201 @@ function gameLoop(){
 
     player.style.bottom = playerY + "px";
 
-    requestAnimationFrame(gameLoop);
+    animationId = requestAnimationFrame(gameLoop);
 }
 
 function spawnCoin(){
-
     if(!gameRunning) return;
 
     const coin = document.createElement("div");
-
     coin.classList.add("coin");
-
-    coin.innerHTML = "💰";
-
-    coin.style.left = "100%";
-    coin.style.top = (180 + Math.random()*180) + "px";
-
-    document.getElementById("gameArea").appendChild(coin);
+    coin.innerHTML = "💎";
+    coin.style.left = window.innerWidth + "px";
+    coin.style.top = (window.innerHeight - 330 - Math.random()*160) + "px";
+    gameArea.appendChild(coin);
 
     let move = setInterval(()=>{
+        if(!document.body.contains(coin)){
+            clearInterval(move);
+            return;
+        }
+
+        if(!gameRunning){
+            return;
+        }
 
         let left = parseInt(coin.style.left);
-
-        left -= 3;
-
+        left -= 4;
         coin.style.left = left + "px";
 
         const c = coin.getBoundingClientRect();
         const p = player.getBoundingClientRect();
 
-        if(
-            c.left < p.right &&
-            c.right > p.left &&
-            c.top < p.bottom &&
-            c.bottom > p.top
-        ){
-
-            coins++;
-
-            coinCount.innerText = coins;
-
+        if(c.left < p.right && c.right > p.left && c.top < p.bottom && c.bottom > p.top){
+            gems++;
+            totalGems++;
+            coinCount.innerText = gems;
             coin.remove();
-
             clearInterval(move);
 
-            if(coins % 3 === 0 && currentQuestion < 10){
-
-                showQuestion();
+            if(gems >= 3 && currentQuestion < questions.length){
+                gems = 0;
+                setTimeout(showQuestion,300);
             }
         }
 
-        if(left < -50){
-
+        if(left < -80){
             coin.remove();
             clearInterval(move);
         }
-
     },20);
 
-    setTimeout(spawnCoin,2600);
+    setTimeout(spawnCoin,2300);
 }
 
 function spawnObstacle(){
-
     if(!gameRunning) return;
 
     const obstacle = document.createElement("div");
-
     obstacle.classList.add("obstacle");
-
-    obstacle.style.left = "100%";
-
-    document.getElementById("gameArea").appendChild(obstacle);
+    obstacle.style.left = window.innerWidth + "px";
+    gameArea.appendChild(obstacle);
 
     let move = setInterval(()=>{
+        if(!document.body.contains(obstacle)){
+            clearInterval(move);
+            return;
+        }
+
+        if(!gameRunning){
+            return;
+        }
 
         let left = parseInt(obstacle.style.left);
-
-        left -= 4;
-
+        left -= 5;
         obstacle.style.left = left + "px";
 
         const o = obstacle.getBoundingClientRect();
         const p = player.getBoundingClientRect();
 
-        if(
-            o.left < p.right &&
-            o.right > p.left &&
-            o.top < p.bottom &&
-            o.bottom > p.top
-        ){
-
-            coins = Math.max(0,coins-1);
-
-            coinCount.innerText = coins;
-
+        if(o.left < p.right && o.right > p.left && o.top < p.bottom && o.bottom > p.top){
+            gems = Math.max(0,gems-1);
+            coinCount.innerText = gems;
             obstacle.remove();
-
             clearInterval(move);
         }
 
-        if(left < -50){
-
+        if(left < -80){
             obstacle.remove();
-
             clearInterval(move);
         }
-
     },20);
 
-    setTimeout(spawnObstacle,3500);
+    setTimeout(spawnObstacle,3600);
 }
 
 function showQuestion(){
-
     gameRunning = false;
+    cancelAnimationFrame(animationId);
 
     questionBox.style.display = "block";
-
     const q = questions[currentQuestion];
 
     questionText.innerText = q.q;
-
     optionsDiv.innerHTML = "";
-
     feedback.innerText = "";
+    feedback.className = "";
 
     q.o.forEach((option,index)=>{
-
         const btn = document.createElement("button");
-
         btn.classList.add("optionBtn");
-
         btn.innerText = option;
-
         btn.onclick = ()=>checkAnswer(index,q.a);
-
         optionsDiv.appendChild(btn);
     });
 }
 
 function checkAnswer(selected,correct){
+    const buttons = document.querySelectorAll(".optionBtn");
+    buttons.forEach(btn=>btn.disabled = true);
 
     if(selected === correct){
-
+        answeredCorrect++;
         feedback.innerText = "✅ Correct!";
         feedback.className = "correctAnim";
-
+        correctSound.currentTime = 0;
+        clapSound.currentTime = 0;
         correctSound.play();
         clapSound.play();
-
         createConfetti();
-
     }else{
-
         feedback.innerText = "❌ Wrong!";
         feedback.className = "wrongAnim";
-
+        wrongSound.currentTime = 0;
         wrongSound.play();
+
+        buttons[correct].style.background = "#4caf50";
+        buttons[correct].innerText = "✅ " + buttons[correct].innerText;
     }
 
     currentQuestion++;
-
     questionCount.innerText = currentQuestion;
 
     setTimeout(()=>{
-
         questionBox.style.display = "none";
+        document.querySelectorAll(".coin,.obstacle").forEach(el=>el.remove());
 
-        if(currentQuestion >= 10){
-
+        if(currentQuestion >= questions.length){
             endGame();
-
         }else{
-
+            coinCount.innerText = gems;
             gameRunning = true;
-
-            requestAnimationFrame(gameLoop);
+            spawnCoin();
+            spawnObstacle();
+            animationId = requestAnimationFrame(gameLoop);
         }
-
-    },1700);
+    },2200);
 }
 
 function createConfetti(){
-
     const confetti = document.getElementById("confetti");
 
-    for(let i=0;i<30;i++){
-
+    for(let i=0;i<45;i++){
         const piece = document.createElement("div");
-
         piece.classList.add("confettiPiece");
-
         piece.style.left = Math.random()*100 + "%";
-
-        piece.style.background =
-        `hsl(${Math.random()*360},100%,50%)`;
-
-        piece.style.animationDuration =
-        (1 + Math.random()*2) + "s";
-
+        piece.style.background = `hsl(${Math.random()*360},100%,50%)`;
+        piece.style.animationDuration = (1 + Math.random()*2) + "s";
         confetti.appendChild(piece);
 
         setTimeout(()=>{
-
             piece.remove();
-
         },3000);
     }
 }
 
-function endGame(){
+function getRemark(score){
+    if(score >= 8) return "Excellent!";
+    if(score >= 6) return "Good job!";
+    if(score >= 5) return "Well tried!";
+    return "Let us revise and come back!";
+}
 
+function endGame(){
     gameRunning = false;
+    cancelAnimationFrame(animationId);
+    document.querySelectorAll(".coin,.obstacle").forEach(el=>el.remove());
 
     document.getElementById("endScreen").style.display = "flex";
-
     document.getElementById("finalMessage").innerText =
-    "You collected " + coins +
-    " treasure coins and completed all 10 grammar challenges!";
+    "You answered " + answeredCorrect + " out of 10 correct. " + getRemark(answeredCorrect);
+
+    createConfetti();
 }
 
 function restartGame(){
-
     location.reload();
 }
-
 </script>
 
 </body>
