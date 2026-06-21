@@ -56,10 +56,8 @@ h1 {
 }
 
 #game-area {
-  display: none;
   width: 90%;
   height: 75vh;
-  display: flex;
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
@@ -67,6 +65,7 @@ h1 {
   padding: 15px;
   background: rgba(255,255,255,0.7);
   border-radius: 16px;
+  display: none;
 }
 
 .subject {
@@ -182,10 +181,10 @@ function shuffle(arr) {
 
 function createCards() {
   gameArea.innerHTML = '';
-  const subjects = shuffle(pairs.map(p => ({...p, type:'subject'}})));
-  const predicates = shuffle(pairs.map(p => ({...p, type:'predicate'}})));
+  const subjectsArr = shuffle(pairs.map(p => ({...p, type:'subject'})));
+  const predicatesArr = shuffle(pairs.map(p => ({...p, type:'predicate'})));
   
-  subjects.forEach(s => {
+  subjectsArr.forEach(s => {
     const div = document.createElement('div');
     div.className = 'subject';
     div.textContent = s.subject;
@@ -195,7 +194,7 @@ function createCards() {
     gameArea.appendChild(div);
   });
   
-  predicates.forEach(p => {
+  predicatesArr.forEach(p => {
     const div = document.createElement('div');
     div.className = 'predicate';
     div.textContent = p.predicate;
@@ -211,7 +210,7 @@ function selectSubject(el) {
   document.querySelectorAll('.subject').forEach(s => s.classList.remove('selected'));
   selectedSubject = el;
   el.classList.add('selected');
-  result.textContent = `Selected: ${el.textContent}`;
+  result.textContent = 'Selected: ' + el.textContent;
 }
 
 function checkMatch(el) {
@@ -221,8 +220,7 @@ function checkMatch(el) {
   }
   
   if(el.dataset.subject === selectedSubject.dataset.subject) {
-    // Correct!
-    el.textContent = `${selectedSubject.dataset.subject} ${selectedSubject.dataset.predicate}`;
+    el.textContent = selectedSubject.dataset.subject + ' ' + selectedSubject.dataset.predicate;
     el.classList.add('correct');
     selectedSubject.classList.add('matched');
     selectedSubject.classList.remove('selected');
@@ -236,14 +234,13 @@ function checkMatch(el) {
     
     score++;
     matched++;
-    scoreEl.textContent = `Score: ${score} / 15`;
+    scoreEl.textContent = 'Score: ' + score + ' / 15';
     
     if(matched === 15) {
       result.textContent = '🏆 PERFECT! All 15 matched!';
       restartBtn.style.display = 'inline-block';
     }
   } else {
-    // Wrong
     result.textContent = '❌ Try again!';
     result.style.color = '#e76f51';
     document.getElementById('wrong-sound').play();
@@ -262,22 +259,24 @@ function confetti() {
   }
 }
 
-document.getElementById('start-btn').onclick = () => {
-  instructions.style.display='none';
-  gameArea.style.display='flex';
+// FIXED: Start button event listener
+document.getElementById('start-btn').addEventListener('click', function() {
+  console.log('Start button clicked!');
+  instructions.style.display = 'none';
+  gameArea.style.display = 'flex';
   createCards();
-  result.textContent='';
-  scoreEl.textContent='Score: 0 / 15';
-  restartBtn.style.display='none';
-  score=0;
-  matched=0;
-  selectedSubject=null;
-};
+  result.textContent = '';
+  scoreEl.textContent = 'Score: 0 / 15';
+  restartBtn.style.display = 'none';
+  score = 0;
+  matched = 0;
+  selectedSubject = null;
+});
 
-restartBtn.onclick = () => {
-  instructions.style.display='block';
-  gameArea.style.display='none';
-};
+restartBtn.addEventListener('click', function() {
+  instructions.style.display = 'block';
+  gameArea.style.display = 'none';
+});
 </script>
 
 </body>
