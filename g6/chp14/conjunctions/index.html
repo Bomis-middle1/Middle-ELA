@@ -1,467 +1,396 @@
-
-<!--
-=========================================================
-🎭 TALENT SHOW CHAOS
-FIXED VERSION
-✅ MP3 AUDIO FIXED
-✅ AUDIO NOW RESTARTS PROPERLY
-✅ MOBILE AUDIO COMPATIBLE
-✅ SOUND OVERLAP FIXED
-✅ FULL CODE
-
-TOPIC:
-- Coordinating Conjunctions
-- Subordinating Conjunctions
-- Correlative Conjunctions
-
-=========================================================
-📁 REQUIRED FILES
-=========================================================
-
-project-folder/
-│
-├── index.html
-│
-└── assets/
-    ├── innovine-logo.png
-    ├── correct.mp3
-    └── wrong.mp3
-
-=========================================================
--->
-
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-<meta name="viewport"
-content="width=device-width, initial-scale=1.0">
-
-<title>🎭 Talent Show Chaos</title>
+<title>Talent Show Chaos</title>
 
 <style>
-
 *{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:Arial,sans-serif;
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:Arial, sans-serif;
+  -webkit-tap-highlight-color:transparent;
 }
 
-body{
-overflow:hidden;
-background:black;
+html,body{
+  width:100%;
+  height:100%;
+  overflow:hidden;
+  background:#000;
 }
 
 #gameArea{
-position:relative;
-width:100vw;
-height:100vh;
-overflow:hidden;
-background:linear-gradient(to bottom,#1a237e,#000);
+  position:relative;
+  width:100vw;
+  height:100dvh;
+  overflow:hidden;
+  background:linear-gradient(180deg,#1a237e,#311b92,#000);
 }
 
-/* LOGO */
-
 #logoScreen{
-position:absolute;
-width:100%;
-height:100%;
-background:white;
-display:flex;
-justify-content:center;
-align-items:center;
-flex-direction:column;
-z-index:9999;
+  position:absolute;
+  inset:0;
+  background:white;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  z-index:9999;
 }
 
 #logoScreen img{
-width:260px;
-max-width:80%;
+  width:min(75vw,360px);
+  height:auto;
+  object-fit:contain;
 }
 
-#logoText{
-margin-top:20px;
-font-size:34px;
-font-weight:bold;
-color:#333;
+.screen{
+  position:absolute;
+  inset:0;
+  display:none;
+  justify-content:center;
+  align-items:center;
+  flex-direction:column;
+  text-align:center;
+  padding:20px;
+  color:white;
+  z-index:5000;
+  background:linear-gradient(180deg,#311b92,#000);
 }
 
-/* START + END */
+.screen h1{
+  font-size:clamp(30px,7vw,56px);
+  margin-bottom:16px;
+}
 
-#startScreen,
-#endScreen{
-position:absolute;
-width:100%;
-height:100%;
-background:rgba(0,0,0,0.92);
-display:flex;
-justify-content:center;
-align-items:center;
-flex-direction:column;
-text-align:center;
-padding:20px;
-color:white;
-z-index:5000;
+.screen p{
+  font-size:clamp(18px,4vw,25px);
+  max-width:760px;
+  line-height:1.5;
 }
 
 .mainBtn{
-padding:16px 34px;
-font-size:22px;
-border:none;
-border-radius:18px;
-background:#ff9800;
-color:white;
-cursor:pointer;
-margin-top:25px;
-transition:0.3s;
-font-weight:bold;
+  margin-top:24px;
+  padding:15px 32px;
+  font-size:clamp(18px,4vw,24px);
+  border:none;
+  border-radius:18px;
+  background:#ff9800;
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
+  min-width:170px;
+  min-height:56px;
+  box-shadow:0 6px 0 #bf6d00;
 }
 
-.mainBtn:hover{
-transform:scale(1.05);
+.mainBtn:active{
+  transform:translateY(4px);
+  box-shadow:0 2px 0 #bf6d00;
 }
-
-/* TITLE */
 
 #titleBox{
-position:absolute;
-top:10px;
-left:50%;
-transform:translateX(-50%);
-width:92%;
-background:#212121;
-padding:15px;
-border-radius:20px;
-font-size:28px;
-font-weight:bold;
-text-align:center;
-color:#ffeb3b;
-border:5px solid #ff9800;
-z-index:100;
+  position:absolute;
+  top:8px;
+  left:50%;
+  transform:translateX(-50%);
+  width:94%;
+  background:#212121;
+  padding:10px 12px;
+  border-radius:18px;
+  font-size:clamp(17px,4vw,28px);
+  font-weight:bold;
+  text-align:center;
+  color:#ffeb3b;
+  border:4px solid #ff9800;
+  z-index:100;
 }
-
-/* SCORE */
 
 #scoreBoard{
-position:absolute;
-top:100px;
-left:20px;
-background:#212121;
-color:white;
-padding:12px 18px;
-border-radius:15px;
-font-size:18px;
-font-weight:bold;
-z-index:200;
-line-height:1.7;
-border:3px solid #ff9800;
+  position:absolute;
+  top:82px;
+  left:10px;
+  background:#212121;
+  color:white;
+  padding:9px 12px;
+  border-radius:14px;
+  font-size:clamp(13px,3vw,18px);
+  font-weight:bold;
+  z-index:200;
+  line-height:1.6;
+  border:3px solid #ff9800;
 }
-
-/* VOLUME */
 
 #volumeBox{
-position:absolute;
-top:100px;
-right:20px;
-background:#212121;
-color:white;
-padding:12px;
-border-radius:15px;
-z-index:200;
-border:3px solid #ff9800;
+  position:absolute;
+  top:82px;
+  right:10px;
+  background:#212121;
+  color:white;
+  padding:9px;
+  border-radius:14px;
+  z-index:200;
+  border:3px solid #ff9800;
+  font-size:clamp(13px,3vw,16px);
 }
 
-/* STAGE */
+#volumeSlider{
+  width:95px;
+  height:28px;
+}
 
 #stageArea{
-position:absolute;
-top:170px;
-left:50%;
-transform:translateX(-50%);
-width:95%;
-height:50%;
-background:linear-gradient(to bottom,#4e342e,#212121);
-border-radius:25px;
-border:8px solid #ff9800;
-overflow:hidden;
+  position:absolute;
+  top:155px;
+  left:50%;
+  transform:translateX(-50%);
+  width:94%;
+  height:42%;
+  min-height:230px;
+  max-height:410px;
+  background:linear-gradient(180deg,#5d4037,#212121);
+  border-radius:24px;
+  border:6px solid #ff9800;
+  overflow:hidden;
 }
-
-/* CURTAINS */
 
 .curtain{
-position:absolute;
-top:0;
-width:50%;
-height:100%;
-background:#b71c1c;
-z-index:50;
-transition:1.5s;
+  position:absolute;
+  top:0;
+  width:50%;
+  height:100%;
+  background:#b71c1c;
+  z-index:50;
+  transition:1.2s ease;
 }
 
-#curtainLeft{
-left:0;
-border-right:4px solid gold;
-}
-
-#curtainRight{
-right:0;
-border-left:4px solid gold;
-}
-
-/* SPOTLIGHTS */
+#curtainLeft{left:0;border-right:4px solid gold;}
+#curtainRight{right:0;border-left:4px solid gold;}
 
 .spotlight{
-position:absolute;
-width:120px;
-height:120px;
-background:rgba(255,255,0,0.25);
-border-radius:50%;
-filter:blur(15px);
-animation:pulse 2s infinite;
+  position:absolute;
+  width:110px;
+  height:110px;
+  background:rgba(255,255,0,0.22);
+  border-radius:50%;
+  filter:blur(14px);
+  animation:pulse 2s infinite;
 }
 
-#spot1{
-top:20px;
-left:15%;
-}
-
-#spot2{
-top:20px;
-right:15%;
-}
+#spot1{top:18px;left:13%;}
+#spot2{top:18px;right:13%;}
 
 @keyframes pulse{
-0%{transform:scale(1);}
-50%{transform:scale(1.2);}
-100%{transform:scale(1);}
+  0%,100%{transform:scale(1);}
+  50%{transform:scale(1.15);}
 }
-
-/* PERFORMERS */
 
 .performer{
-position:absolute;
-font-size:80px;
-transition:1s;
+  position:absolute;
+  font-size:clamp(48px,12vw,86px);
+  bottom:18px;
+  transition:0.4s;
 }
 
-#singer{
-left:12%;
-bottom:20px;
-animation:bounce 2s infinite;
-}
-
-#dancer{
-left:42%;
-bottom:20px;
-animation:dance 1.5s infinite;
-}
-
-#drummer{
-right:12%;
-bottom:20px;
-animation:bounce 2s infinite;
-}
+#singer{left:12%;animation:bounce 2s infinite;}
+#dancer{left:42%;animation:dance 1.5s infinite;}
+#drummer{right:12%;animation:bounce 2s infinite;}
 
 @keyframes bounce{
-0%{transform:translateY(0);}
-50%{transform:translateY(-12px);}
-100%{transform:translateY(0);}
+  0%,100%{transform:translateY(0);}
+  50%{transform:translateY(-10px);}
 }
 
 @keyframes dance{
-0%{transform:rotate(-10deg);}
-50%{transform:rotate(10deg);}
-100%{transform:rotate(-10deg);}
+  0%,100%{transform:rotate(-8deg);}
+  50%{transform:rotate(8deg);}
 }
 
-/* APPLAUSE */
-
 #applauseContainer{
-position:absolute;
-top:15px;
-left:50%;
-transform:translateX(-50%);
-width:55%;
-height:28px;
-background:#333;
-border-radius:20px;
-overflow:hidden;
-border:3px solid gold;
+  position:absolute;
+  top:14px;
+  left:50%;
+  transform:translateX(-50%);
+  width:58%;
+  height:26px;
+  background:#333;
+  border-radius:20px;
+  overflow:hidden;
+  border:3px solid gold;
+  z-index:80;
 }
 
 #applauseBar{
-height:100%;
-width:0%;
-background:linear-gradient(to right,#4caf50,#ffeb3b);
-transition:0.5s;
+  height:100%;
+  width:0%;
+  background:linear-gradient(90deg,#4caf50,#ffeb3b);
+  transition:0.4s;
 }
-
-/* SCENE */
 
 #sceneText{
-position:absolute;
-bottom:120px;
-left:50%;
-transform:translateX(-50%);
-width:90%;
-background:rgba(0,0,0,0.85);
-color:white;
-padding:16px;
-border-radius:20px;
-font-size:24px;
-text-align:center;
-z-index:900;
+  position:absolute;
+  bottom:31%;
+  left:50%;
+  transform:translateX(-50%);
+  width:92%;
+  background:rgba(0,0,0,0.86);
+  color:white;
+  padding:12px;
+  border-radius:18px;
+  font-size:clamp(16px,4vw,23px);
+  line-height:1.4;
+  text-align:center;
+  z-index:900;
 }
 
-/* QUESTION */
-
 #questionBox{
-position:absolute;
-bottom:10px;
-left:50%;
-transform:translateX(-50%);
-width:94%;
-max-width:900px;
-background:#fff8e1;
-padding:20px;
-border-radius:25px;
-z-index:1000;
-box-shadow:0 0 20px rgba(0,0,0,0.5);
-display:none;
+  position:absolute;
+  left:50%;
+  bottom:10px;
+  transform:translateX(-50%);
+  width:94%;
+  max-width:950px;
+  max-height:37%;
+  background:#fff8e1;
+  padding:14px;
+  border-radius:22px;
+  z-index:1000;
+  box-shadow:0 0 18px rgba(0,0,0,0.55);
+  display:none;
+  overflow-y:auto;
 }
 
 #questionText{
-font-size:22px;
-line-height:1.6;
-margin-bottom:18px;
-color:#333;
-text-align:center;
+  font-size:clamp(16px,3.8vw,22px);
+  line-height:1.45;
+  margin-bottom:12px;
+  color:#2b2b2b;
+  text-align:center;
+  font-weight:bold;
 }
 
 .optionContainer{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:12px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
 }
 
 .optionBtn{
-padding:15px;
-border:none;
-border-radius:15px;
-background:#8e24aa;
-color:white;
-font-size:18px;
-cursor:pointer;
-transition:0.3s;
-font-weight:bold;
+  padding:13px 8px;
+  border:none;
+  border-radius:15px;
+  background:#8e24aa;
+  color:white;
+  font-size:clamp(15px,3.5vw,19px);
+  cursor:pointer;
+  font-weight:bold;
+  min-height:52px;
 }
 
-.optionBtn:hover{
-background:#6a1b9a;
-transform:scale(1.03);
+.optionBtn:disabled{
+  opacity:0.65;
 }
 
-/* FEEDBACK */
+.optionBtn.correctGlow{
+  background:#2e7d32;
+  animation:glow 0.8s infinite alternate;
+}
+
+@keyframes glow{
+  from{box-shadow:0 0 5px #fff;}
+  to{box-shadow:0 0 22px #4caf50;}
+}
 
 #feedbackPopup{
-position:absolute;
-top:50%;
-left:50%;
-transform:translate(-50%,-50%);
-background:white;
-padding:30px;
-border-radius:25px;
-width:90%;
-max-width:650px;
-display:none;
-z-index:9999;
-text-align:center;
-box-shadow:0 0 30px rgba(0,0,0,0.5);
-animation:popup 0.4s;
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  background:white;
+  padding:24px;
+  border-radius:24px;
+  width:90%;
+  max-width:650px;
+  display:none;
+  z-index:9998;
+  text-align:center;
+  box-shadow:0 0 30px rgba(0,0,0,0.65);
 }
 
 #feedbackTitle{
-font-size:36px;
-margin-bottom:15px;
-font-weight:bold;
+  font-size:clamp(28px,7vw,40px);
+  margin-bottom:12px;
+  font-weight:bold;
 }
 
 #feedbackText{
-font-size:22px;
-line-height:1.6;
-color:#333;
+  font-size:clamp(17px,4vw,22px);
+  line-height:1.55;
+  color:#333;
 }
-
-@keyframes popup{
-from{
-transform:translate(-50%,-50%) scale(0.5);
-opacity:0;
-}
-to{
-transform:translate(-50%,-50%) scale(1);
-opacity:1;
-}
-}
-
-/* CONFETTI */
 
 .confetti{
-position:absolute;
-width:12px;
-height:12px;
-animation:fall 3s linear forwards;
+  position:fixed;
+  top:-20px;
+  width:12px;
+  height:12px;
+  z-index:9997;
+  pointer-events:none;
+  animation:fall linear forwards;
 }
 
 @keyframes fall{
-from{
-transform:translateY(-100px) rotate(0deg);
-}
-to{
-transform:translateY(100vh) rotate(720deg);
-opacity:0;
-}
+  to{
+    transform:translateY(110vh) rotate(720deg);
+    opacity:0;
+  }
 }
 
-/* MOBILE */
-
-@media(max-width:768px){
-
-#titleBox{
-font-size:18px;
+.hiddenGame{
+  visibility:hidden;
 }
 
-#questionText{
-font-size:17px;
+@media(max-height:650px){
+  #stageArea{
+    top:135px;
+    height:36%;
+    min-height:180px;
+  }
+
+  #sceneText{
+    bottom:34%;
+    padding:9px;
+  }
+
+  #questionBox{
+    max-height:40%;
+    padding:11px;
+  }
+
+  #scoreBoard,#volumeBox{
+    top:70px;
+  }
 }
 
-.optionBtn{
-font-size:15px;
-padding:12px;
-}
+@media(max-width:520px){
+  .optionContainer{
+    grid-template-columns:1fr;
+  }
 
-.performer{
-font-size:55px;
-}
+  #stageArea{
+    height:36%;
+  }
 
-#sceneText{
-font-size:18px;
-bottom:135px;
-}
+  #questionBox{
+    max-height:43%;
+  }
 
-#feedbackTitle{
-font-size:28px;
+  #volumeSlider{
+    width:78px;
+  }
 }
-
-#feedbackText{
-font-size:18px;
-}
-
-}
-
 </style>
 </head>
 
@@ -469,612 +398,623 @@ font-size:18px;
 
 <div id="gameArea">
 
-<!-- LOGO -->
+  <div id="logoScreen">
+    <img src="assets/innovine-logo.png" alt="Innovine Logo">
+  </div>
 
-<div id="logoScreen">
+  <div id="startScreen" class="screen">
+    <h1>🎭 Talent Show Chaos</h1>
+    <p>Fix the talent show using the correct conjunctions before the audience gets upset!</p>
+    <button class="mainBtn" onclick="startGame()">Start Show</button>
+  </div>
 
-<img src="assets/innovine-logo.png">
+  <div id="endScreen" class="screen">
+    <h1>🏆 Show Complete! 🏆</h1>
+    <p id="finalText"></p>
+    <button class="mainBtn" onclick="restartGame()">Play Again</button>
+  </div>
 
-<div id="logoText">
-Innovine Learning Adventures
-</div>
+  <div id="gameContent" class="hiddenGame">
 
-</div>
+    <div id="titleBox">🎤 Fix Stage Problems Using Conjunctions!</div>
 
-<!-- START -->
+    <div id="scoreBoard">
+      ✅ Correct: <span id="correctScore">0</span><br>
+      ❌ Wrong: <span id="wrongScore">0</span><br>
+      📘 Question: <span id="questionNumber">0</span>/<span id="totalQuestions">10</span>
+    </div>
 
-<div id="startScreen"
-style="display:none;">
+    <div id="volumeBox">
+      🔊 Volume<br>
+      <input type="range" id="volumeSlider" min="0" max="1" step="0.1" value="1">
+    </div>
 
-<h1 style="font-size:50px;">
-🎭 Talent Show Chaos
-</h1>
+    <div id="stageArea">
+      <div class="curtain" id="curtainLeft"></div>
+      <div class="curtain" id="curtainRight"></div>
 
-<p style="margin-top:20px;font-size:24px;max-width:700px;">
-Fix the talent show using conjunctions before the audience gets angry!
-</p>
+      <div class="spotlight" id="spot1"></div>
+      <div class="spotlight" id="spot2"></div>
 
-<button class="mainBtn"
-onclick="startGame()">
-Start Show
-</button>
+      <div id="applauseContainer">
+        <div id="applauseBar"></div>
+      </div>
 
-</div>
+      <div class="performer" id="singer">🎤</div>
+      <div class="performer" id="dancer">💃</div>
+      <div class="performer" id="drummer">🥁</div>
+    </div>
 
-<!-- END -->
+    <div id="sceneText">The crowd is waiting...</div>
 
-<div id="endScreen"
-style="display:none;">
+    <div id="questionBox">
+      <div id="questionText"></div>
+      <div class="optionContainer" id="options"></div>
+    </div>
 
-<h1>🏆 SHOW SAVED! 🏆</h1>
+  </div>
 
-<h2 id="finalText"
-style="margin-top:20px; line-height:1.8;"></h2>
-
-<button class="mainBtn"
-onclick="restartGame()">
-Play Again
-</button>
-
-</div>
-
-<!-- TITLE -->
-
-<div id="titleBox">
-🎤 Fix Stage Problems Using Conjunctions!
-</div>
-
-<!-- SCORE -->
-
-<div id="scoreBoard">
-✅ Correct: <span id="correctScore">0</span><br>
-❌ Wrong: <span id="wrongScore">0</span><br>
-📘 Question: <span id="questionNumber">0</span>/10
-</div>
-
-<!-- VOLUME -->
-
-<div id="volumeBox">
-🔊 Volume
-<input type="range"
-id="volumeSlider"
-min="0"
-max="1"
-step="0.1"
-value="1">
-</div>
-
-<!-- STAGE -->
-
-<div id="stageArea">
-
-<div class="curtain"
-id="curtainLeft"></div>
-
-<div class="curtain"
-id="curtainRight"></div>
-
-<div class="spotlight"
-id="spot1"></div>
-
-<div class="spotlight"
-id="spot2"></div>
-
-<div id="applauseContainer">
-<div id="applauseBar"></div>
-</div>
-
-<div class="performer"
-id="singer">
-🎤
-</div>
-
-<div class="performer"
-id="dancer">
-💃
-</div>
-
-<div class="performer"
-id="drummer">
-🥁
-</div>
-
-</div>
-
-<!-- SCENE -->
-
-<div id="sceneText">
-The crowd is waiting...
-</div>
-
-<!-- QUESTION -->
-
-<div id="questionBox">
-
-<div id="questionText"></div>
-
-<div class="optionContainer"
-id="options"></div>
-
-</div>
-
-<!-- FEEDBACK -->
-
-<div id="feedbackPopup">
-
-<div id="feedbackTitle"></div>
-
-<div id="feedbackText"></div>
-
-</div>
+  <div id="feedbackPopup">
+    <div id="feedbackTitle"></div>
+    <div id="feedbackText"></div>
+  </div>
 
 </div>
 
 <script>
+"use strict";
 
-/* LOGO */
+const TOTAL_QUESTIONS = 10;
 
-setTimeout(()=>{
-
-document.getElementById("logoScreen")
-.style.display="none";
-
-document.getElementById("startScreen")
-.style.display="flex";
-
-},5000);
-
-/* AUDIO FIX */
-
-const correctSound =
-new Audio("assets/correct.mp3");
-
-const wrongSound =
-new Audio("assets/wrong.mp3");
-
-correctSound.preload = "auto";
-wrongSound.preload = "auto";
-
-function playCorrect(){
-
-correctSound.pause();
-correctSound.currentTime = 0;
-correctSound.play();
-
-}
-
-function playWrong(){
-
-wrongSound.pause();
-wrongSound.currentTime = 0;
-wrongSound.play();
-
-}
-
-const volumeSlider =
-document.getElementById("volumeSlider");
-
-function updateVolume(){
-
-correctSound.volume =
-volumeSlider.value;
-
-wrongSound.volume =
-volumeSlider.value;
-
-}
-
-volumeSlider.addEventListener(
-"input",
-updateVolume
-);
-
-updateVolume();
-
-/* QUESTIONS */
-
-const questions = [
-
-{
-scene:"🎤 The singer forgot the lyrics. The audience still clapped loudly.",
-q:"The singer forgot the lyrics, ___ the audience still clapped loudly.",
-o:["but","because","either","unless"],
-a:0,
-e:"'But' shows contrast."
-},
-
-{
-scene:"💃 The music started suddenly. The dancers rushed onto the stage.",
-q:"___ the music started, the dancers rushed onto the stage.",
-o:["When","Nor","But","Both"],
-a:0,
-e:"'When' connects the action to time."
-},
-
-{
-scene:"🥁 The drummer was missing. The guitarist was also missing.",
-q:"___ the drummer nor the guitarist arrived on time.",
-o:["Either","Neither","Although","Because"],
-a:1,
-e:"'Neither...nor' is correlative."
-},
-
-{
-scene:"🎸 The band practiced hard. They won the talent trophy.",
-q:"The band practiced hard, ___ they won the trophy.",
-o:["so","unless","neither","although"],
-a:0,
-e:"'So' shows result."
-},
-
-{
-scene:"🎭 The curtains opened. The comedian entered.",
-q:"___ the curtains opened, the comedian entered.",
-o:["After","Either","But","Nor"],
-a:0,
-e:"'After' shows sequence."
-},
-
-{
-scene:"🎤 The singer was nervous. She performed brilliantly.",
-q:"The singer was nervous, ___ she performed brilliantly.",
-o:["but","because","neither","unless"],
-a:0,
-e:"'But' joins opposite ideas."
-},
-
-{
-scene:"💡 The lights failed. The dancers continued performing.",
-q:"The lights failed, ___ the dancers continued performing.",
-o:["but","before","either","since"],
-a:0,
-e:"'But' shows contrast."
-},
-
-{
-scene:"🎸 The guitarist tuned his instrument. The drummer checked speakers.",
-q:"___ the guitarist and drummer prepared carefully, the show started smoothly.",
-o:["Because","Neither","But","Or"],
-a:0,
-e:"'Because' explains reason."
-},
-
-{
-scene:"🎆 The audience cheered loudly. Fireworks exploded.",
-q:"The audience cheered loudly, ___ fireworks exploded above the stage.",
-o:["and","unless","although","neither"],
-a:0,
-e:"'And' joins similar ideas."
-},
-
-{
-scene:"🎭 The magician could perform. The comedian could perform.",
-q:"___ the magician or the comedian could host the finale.",
-o:["Either","Neither","Although","Because"],
-a:0,
-e:"'Either...or' offers choices."
-}
-
+const allQuestions = [
+  {
+    scene:"🎤 The singer forgot the lyrics. The audience still clapped loudly.",
+    q:"The singer forgot the lyrics, ___ the audience still clapped loudly.",
+    o:["but","because","either","unless"],
+    a:0,
+    e:"'But' shows contrast."
+  },
+  {
+    scene:"💃 The music started suddenly. The dancers rushed onto the stage.",
+    q:"___ the music started, the dancers rushed onto the stage.",
+    o:["When","Nor","But","Both"],
+    a:0,
+    e:"'When' connects the action to time."
+  },
+  {
+    scene:"🥁 The drummer was missing. The guitarist was also missing.",
+    q:"___ the drummer nor the guitarist arrived on time.",
+    o:["Either","Neither","Although","Because"],
+    a:1,
+    e:"'Neither...nor' is used to join two negative choices."
+  },
+  {
+    scene:"🎸 The band practiced hard. They won the talent trophy.",
+    q:"The band practiced hard, ___ they won the trophy.",
+    o:["so","unless","neither","although"],
+    a:0,
+    e:"'So' shows the result."
+  },
+  {
+    scene:"🎭 The curtains opened. The comedian entered.",
+    q:"___ the curtains opened, the comedian entered.",
+    o:["After","Either","But","Nor"],
+    a:0,
+    e:"'After' shows sequence."
+  },
+  {
+    scene:"🎤 The singer was nervous. She performed brilliantly.",
+    q:"The singer was nervous, ___ she performed brilliantly.",
+    o:["but","because","neither","unless"],
+    a:0,
+    e:"'But' joins opposite ideas."
+  },
+  {
+    scene:"💡 The lights failed. The dancers continued performing.",
+    q:"The lights failed, ___ the dancers continued performing.",
+    o:["but","before","either","since"],
+    a:0,
+    e:"'But' shows contrast."
+  },
+  {
+    scene:"🎸 The guitarist tuned his instrument. The drummer checked speakers.",
+    q:"___ the guitarist and drummer prepared carefully, the show started smoothly.",
+    o:["Because","Neither","But","Or"],
+    a:0,
+    e:"'Because' explains the reason."
+  },
+  {
+    scene:"🎆 The audience cheered loudly. Fireworks exploded.",
+    q:"The audience cheered loudly, ___ fireworks exploded above the stage.",
+    o:["and","unless","although","neither"],
+    a:0,
+    e:"'And' joins similar ideas."
+  },
+  {
+    scene:"🎭 The magician could perform. The comedian could perform.",
+    q:"___ the magician or the comedian could host the finale.",
+    o:["Either","Neither","Although","Because"],
+    a:0,
+    e:"'Either...or' offers choices."
+  }
 ];
 
+let questions = [];
 let currentQuestion = 0;
 let correct = 0;
 let wrong = 0;
+let attempts = 0;
+let acceptingAnswers = false;
+let audioUnlocked = false;
 
-/* START */
+const logoScreen = document.getElementById("logoScreen");
+const startScreen = document.getElementById("startScreen");
+const endScreen = document.getElementById("endScreen");
+const gameContent = document.getElementById("gameContent");
+const questionBox = document.getElementById("questionBox");
+const questionText = document.getElementById("questionText");
+const optionsBox = document.getElementById("options");
+const sceneText = document.getElementById("sceneText");
+const feedbackPopup = document.getElementById("feedbackPopup");
+const feedbackTitle = document.getElementById("feedbackTitle");
+const feedbackText = document.getElementById("feedbackText");
+const volumeSlider = document.getElementById("volumeSlider");
+
+document.getElementById("totalQuestions").textContent = TOTAL_QUESTIONS;
+
+setTimeout(function(){
+  logoScreen.style.display = "none";
+  startScreen.style.display = "flex";
+},5000);
+
+const audioFiles = {
+  correct:[
+    "assets/correct.mp3",
+    "assets/right.mp3"
+  ],
+  wrong:[
+    "assets/wrong.mp3",
+    "assets/buzzer.mp3"
+  ],
+  clap:[
+    "assets/clapping.mp3",
+    "assets/clap.mp3",
+    "assets/freesound_community-claps-44774.mp3"
+  ]
+};
+
+function createAudioPool(list){
+  return list.map(function(src){
+    const a = new Audio(src);
+    a.preload = "auto";
+    a.volume = Number(volumeSlider.value);
+    return a;
+  });
+}
+
+const sounds = {
+  correct:createAudioPool(audioFiles.correct),
+  wrong:createAudioPool(audioFiles.wrong),
+  clap:createAudioPool(audioFiles.clap)
+};
+
+function setVolume(){
+  const v = Number(volumeSlider.value);
+  Object.keys(sounds).forEach(function(key){
+    sounds[key].forEach(function(a){
+      a.volume = v;
+    });
+  });
+}
+
+volumeSlider.addEventListener("input",setVolume);
+setVolume();
+
+let audioCtx = null;
+
+function unlockAudio(){
+  if(audioUnlocked) return;
+  audioUnlocked = true;
+
+  Object.keys(sounds).forEach(function(key){
+    sounds[key].forEach(function(a){
+      a.muted = true;
+      const p = a.play();
+      if(p && typeof p.then === "function"){
+        p.then(function(){
+          a.pause();
+          a.currentTime = 0;
+          a.muted = false;
+        }).catch(function(){
+          a.muted = false;
+        });
+      }else{
+        a.pause();
+        a.currentTime = 0;
+        a.muted = false;
+      }
+    });
+  });
+
+  try{
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if(audioCtx.state === "suspended") audioCtx.resume();
+  }catch(e){}
+}
+
+function stopAllSounds(){
+  Object.keys(sounds).forEach(function(key){
+    sounds[key].forEach(function(a){
+      try{
+        a.pause();
+        a.currentTime = 0;
+      }catch(e){}
+    });
+  });
+}
+
+function playFromPool(type, fallbackType){
+  const pool = sounds[type];
+  let index = 0;
+
+  function tryNext(){
+    if(index >= pool.length){
+      playFallback(fallbackType);
+      return;
+    }
+
+    const a = pool[index];
+    index++;
+
+    try{
+      a.pause();
+      a.currentTime = 0;
+      a.volume = Number(volumeSlider.value);
+
+      const p = a.play();
+
+      if(p && typeof p.catch === "function"){
+        p.catch(function(){
+          tryNext();
+        });
+      }
+    }catch(e){
+      tryNext();
+    }
+  }
+
+  tryNext();
+}
+
+function playFallback(type){
+  try{
+    if(!audioCtx){
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+
+    if(audioCtx.state === "suspended") audioCtx.resume();
+
+    const volume = Number(volumeSlider.value);
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    if(type === "correct"){
+      osc.frequency.setValueAtTime(660,audioCtx.currentTime);
+      osc.frequency.setValueAtTime(880,audioCtx.currentTime + 0.12);
+      gain.gain.setValueAtTime(0.0001,audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(Math.max(0.01,volume * 0.18),audioCtx.currentTime + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001,audioCtx.currentTime + 0.35);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.36);
+    }else if(type === "wrong"){
+      osc.type = "sawtooth";
+      osc.frequency.setValueAtTime(180,audioCtx.currentTime);
+      osc.frequency.setValueAtTime(120,audioCtx.currentTime + 0.18);
+      gain.gain.setValueAtTime(0.0001,audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(Math.max(0.01,volume * 0.16),audioCtx.currentTime + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001,audioCtx.currentTime + 0.38);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.39);
+    }else{
+      for(let i=0;i<4;i++){
+        const clickOsc = audioCtx.createOscillator();
+        const clickGain = audioCtx.createGain();
+
+        clickOsc.connect(clickGain);
+        clickGain.connect(audioCtx.destination);
+
+        clickOsc.frequency.value = 900 + (i * 80);
+        clickGain.gain.setValueAtTime(0.0001,audioCtx.currentTime + i * 0.12);
+        clickGain.gain.exponentialRampToValueAtTime(Math.max(0.01,volume * 0.12),audioCtx.currentTime + i * 0.12 + 0.01);
+        clickGain.gain.exponentialRampToValueAtTime(0.0001,audioCtx.currentTime + i * 0.12 + 0.08);
+
+        clickOsc.start(audioCtx.currentTime + i * 0.12);
+        clickOsc.stop(audioCtx.currentTime + i * 0.12 + 0.09);
+      }
+    }
+  }catch(e){}
+}
+
+function playCorrectSounds(){
+  stopAllSounds();
+  playFromPool("correct","correct");
+
+  setTimeout(function(){
+    playFromPool("clap","clap");
+  },450);
+}
+
+function playWrongSound(){
+  stopAllSounds();
+  playFromPool("wrong","wrong");
+}
+
+function shuffleArray(arr){
+  const copy = arr.slice();
+
+  for(let i=copy.length-1;i>0;i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    const temp = copy[i];
+    copy[i] = copy[j];
+    copy[j] = temp;
+  }
+
+  return copy;
+}
+
+function prepareQuestions(){
+  questions = shuffleArray(allQuestions).slice(0,TOTAL_QUESTIONS);
+}
 
 function startGame(){
+  unlockAudio();
 
-document.getElementById("startScreen")
-.style.display="none";
+  startScreen.style.display = "none";
+  endScreen.style.display = "none";
+  gameContent.classList.remove("hiddenGame");
 
-openCurtains();
+  prepareQuestions();
 
-playScene();
+  currentQuestion = 0;
+  correct = 0;
+  wrong = 0;
+  attempts = 0;
 
+  updateScore();
+  openCurtains();
+  loadScene();
 }
-
-/* CURTAINS */
-
-function openCurtains(){
-
-document.getElementById("curtainLeft")
-.style.transform = "translateX(-100%)";
-
-document.getElementById("curtainRight")
-.style.transform = "translateX(100%)";
-
-}
-
-/* PLAY SCENE */
-
-function playScene(){
-
-const q = questions[currentQuestion];
-
-document.getElementById("sceneText")
-.innerHTML = q.scene;
-
-animateStage();
-
-setTimeout(()=>{
-
-loadQuestion();
-
-},3000);
-
-}
-
-/* STAGE ANIMATION */
-
-function animateStage(){
-
-const singer =
-document.getElementById("singer");
-
-const dancer =
-document.getElementById("dancer");
-
-const drummer =
-document.getElementById("drummer");
-
-singer.style.transform =
-"translateY(-20px)";
-
-dancer.style.transform =
-"rotate(15deg)";
-
-drummer.style.transform =
-"translateY(-15px)";
-
-setTimeout(()=>{
-
-singer.style.transform =
-"translateY(0px)";
-
-dancer.style.transform =
-"rotate(-15deg)";
-
-drummer.style.transform =
-"translateY(0px)";
-
-},1000);
-
-}
-
-/* LOAD QUESTION */
-
-function loadQuestion(){
-
-document.getElementById("questionBox")
-.style.display = "block";
-
-const q = questions[currentQuestion];
-
-document.getElementById("questionText")
-.innerHTML = q.q;
-
-const options =
-document.getElementById("options");
-
-options.innerHTML = "";
-
-q.o.forEach((option,index)=>{
-
-const btn =
-document.createElement("button");
-
-btn.classList.add("optionBtn");
-
-btn.innerHTML = option;
-
-btn.onclick = ()=>checkAnswer(index);
-
-options.appendChild(btn);
-
-});
-
-}
-
-/* CHECK ANSWER */
-
-function checkAnswer(selected){
-
-document.getElementById("questionBox")
-.style.display = "none";
-
-const q = questions[currentQuestion];
-
-const popup =
-document.getElementById("feedbackPopup");
-
-popup.style.display = "block";
-
-if(selected === q.a){
-
-correct++;
-
-document.getElementById("correctScore")
-.innerHTML = correct;
-
-playCorrect();
-
-createConfetti();
-
-document.getElementById("feedbackTitle")
-.innerHTML = "✅ Performance Saved!";
-
-document.getElementById("feedbackTitle")
-.style.color = "green";
-
-document.getElementById("feedbackText")
-.innerHTML = q.e;
-
-updateApplause();
-
-}else{
-
-wrong++;
-
-document.getElementById("wrongScore")
-.innerHTML = wrong;
-
-playWrong();
-
-document.getElementById("feedbackTitle")
-.innerHTML = "❌ Stage Disaster!";
-
-document.getElementById("feedbackTitle")
-.style.color = "red";
-
-document.getElementById("feedbackText")
-.innerHTML =
-`
-Correct Answer:<br><br>
-<b>${q.o[q.a]}</b><br><br>
-${q.e}
-`;
-
-flashStage();
-
-}
-
-document.getElementById("questionNumber")
-.innerHTML = currentQuestion + 1;
-
-setTimeout(()=>{
-
-popup.style.display = "none";
-
-currentQuestion++;
-
-if(currentQuestion >= 10){
-
-endGame();
-
-}else{
-
-playScene();
-
-}
-
-},2500);
-
-}
-
-/* APPLAUSE */
-
-function updateApplause(){
-
-document.getElementById("applauseBar")
-.style.width =
-(correct * 10) + "%";
-
-}
-
-/* WRONG FLASH */
-
-function flashStage(){
-
-const stage =
-document.getElementById("stageArea");
-
-stage.style.background = "darkred";
-
-setTimeout(()=>{
-
-stage.style.background =
-"linear-gradient(to bottom,#4e342e,#212121)";
-
-},600);
-
-}
-
-/* CONFETTI */
-
-function createConfetti(){
-
-for(let i=0;i<40;i++){
-
-const conf =
-document.createElement("div");
-
-conf.classList.add("confetti");
-
-conf.style.left =
-Math.random()*100 + "%";
-
-conf.style.background =
-`hsl(${Math.random()*360},100%,50%)`;
-
-conf.style.animationDuration =
-(2 + Math.random()*2)+"s";
-
-document.body.appendChild(conf);
-
-setTimeout(()=>{
-conf.remove();
-},4000);
-
-}
-
-}
-
-/* END */
-
-function endGame(){
-
-document.getElementById("endScreen")
-.style.display = "flex";
-
-let percentage =
-Math.round((correct / 10) * 100);
-
-let message = "";
-
-if(correct === 10){
-
-message =
-"🌟 PERFECT SHOW! Standing ovation from the audience!";
-
-}else if(correct >= 8){
-
-message =
-"🎭 Amazing Stage Director Skills!";
-
-}else if(correct >= 6){
-
-message =
-"👏 Great Job Saving The Talent Show!";
-
-}else{
-
-message =
-"🎉 Nice Try! The audience still enjoyed the show!";
-}
-
-document.getElementById("finalText")
-.innerHTML =
-`
-🏆 Correct Answers: ${correct}/10<br><br>
-
-❌ Wrong Answers: ${wrong}<br><br>
-
-⭐ Score Percentage: ${percentage}%<br><br>
-
-${message}
-`;
-
-}
-
-/* RESTART */
 
 function restartGame(){
+  unlockAudio();
 
-location.reload();
+  endScreen.style.display = "none";
+  gameContent.classList.remove("hiddenGame");
 
+  document.getElementById("curtainLeft").style.transform = "translateX(0)";
+  document.getElementById("curtainRight").style.transform = "translateX(0)";
+  document.getElementById("applauseBar").style.width = "0%";
+
+  prepareQuestions();
+
+  currentQuestion = 0;
+  correct = 0;
+  wrong = 0;
+  attempts = 0;
+
+  updateScore();
+
+  setTimeout(function(){
+    openCurtains();
+    loadScene();
+  },350);
 }
 
+function openCurtains(){
+  document.getElementById("curtainLeft").style.transform = "translateX(-100%)";
+  document.getElementById("curtainRight").style.transform = "translateX(100%)";
+}
+
+function updateScore(){
+  document.getElementById("correctScore").textContent = correct;
+  document.getElementById("wrongScore").textContent = wrong;
+  document.getElementById("questionNumber").textContent =
+    currentQuestion + 1 <= TOTAL_QUESTIONS ? currentQuestion + 1 : TOTAL_QUESTIONS;
+
+  document.getElementById("applauseBar").style.width =
+    ((correct / TOTAL_QUESTIONS) * 100) + "%";
+}
+
+function loadScene(){
+  acceptingAnswers = false;
+  attempts = 0;
+  questionBox.style.display = "none";
+  feedbackPopup.style.display = "none";
+
+  const q = questions[currentQuestion];
+  sceneText.textContent = q.scene;
+
+  animateStage();
+
+  setTimeout(function(){
+    loadQuestion();
+  },900);
+}
+
+function animateStage(){
+  document.getElementById("singer").style.transform = "translateY(-18px)";
+  document.getElementById("dancer").style.transform = "rotate(14deg)";
+  document.getElementById("drummer").style.transform = "translateY(-14px)";
+
+  setTimeout(function(){
+    document.getElementById("singer").style.transform = "translateY(0)";
+    document.getElementById("dancer").style.transform = "rotate(-14deg)";
+    document.getElementById("drummer").style.transform = "translateY(0)";
+  },500);
+}
+
+function loadQuestion(){
+  const q = questions[currentQuestion];
+
+  questionBox.style.display = "block";
+  questionText.textContent = q.q;
+  optionsBox.innerHTML = "";
+
+  q.o.forEach(function(option,index){
+    const btn = document.createElement("button");
+    btn.className = "optionBtn";
+    btn.textContent = option;
+    btn.type = "button";
+
+    btn.onclick = function(){
+      checkAnswer(index);
+    };
+
+    optionsBox.appendChild(btn);
+  });
+
+  acceptingAnswers = true;
+  updateScore();
+}
+
+function disableOptions(disabled){
+  const buttons = optionsBox.querySelectorAll("button");
+
+  buttons.forEach(function(btn){
+    btn.disabled = disabled;
+  });
+}
+
+function checkAnswer(selected){
+  if(!acceptingAnswers) return;
+
+  const q = questions[currentQuestion];
+  const buttons = optionsBox.querySelectorAll("button");
+
+  if(selected === q.a){
+    acceptingAnswers = false;
+    disableOptions(true);
+
+    correct++;
+    updateScore();
+
+    playCorrectSounds();
+    createConfetti();
+
+    showFeedback("✅ Correct!", "green", q.e);
+
+    setTimeout(function(){
+      nextQuestion();
+    },2600);
+
+  }else{
+    attempts++;
+    playWrongSound();
+
+    if(attempts < 2){
+      wrong++;
+      updateScore();
+
+      showFeedback("❌ Try Again!", "red", "Look carefully and choose once more.");
+
+      setTimeout(function(){
+        feedbackPopup.style.display = "none";
+      },1300);
+
+    }else{
+      acceptingAnswers = false;
+      disableOptions(true);
+
+      wrong++;
+      updateScore();
+
+      if(buttons[q.a]){
+        buttons[q.a].classList.add("correctGlow");
+      }
+
+      showFeedback(
+        "💡 Correct Answer",
+        "#ef6c00",
+        "The correct answer is <b>" + q.o[q.a] + "</b>.<br><br>" + q.e
+      );
+
+      setTimeout(function(){
+        nextQuestion();
+      },3000);
+    }
+  }
+}
+
+function showFeedback(title,color,text){
+  feedbackTitle.innerHTML = title;
+  feedbackTitle.style.color = color;
+  feedbackText.innerHTML = text;
+  feedbackPopup.style.display = "block";
+}
+
+function nextQuestion(){
+  feedbackPopup.style.display = "none";
+  questionBox.style.display = "none";
+
+  currentQuestion++;
+
+  if(currentQuestion >= TOTAL_QUESTIONS){
+    endGame();
+  }else{
+    loadScene();
+  }
+}
+
+function endGame(){
+  gameContent.classList.add("hiddenGame");
+  endScreen.style.display = "flex";
+
+  const percentage = Math.round((correct / TOTAL_QUESTIONS) * 100);
+  let remark = "";
+
+  if(percentage >= 80){
+    remark = "🌟 Excellent!";
+  }else if(percentage >= 60){
+    remark = "👏 Good job!";
+  }else if(percentage >= 45){
+    remark = "😊 Well tried!";
+  }else{
+    remark = "📘 Let us revise and come back!";
+  }
+
+  document.getElementById("finalText").innerHTML =
+    "You answered <b>" + correct + " out of " + TOTAL_QUESTIONS + "</b> correctly.<br><br>" +
+    "Score: <b>" + percentage + "%</b><br><br>" +
+    remark;
+
+  createConfetti();
+}
+
+function createConfetti(){
+  const colors = ["#ffeb3b","#ff9800","#4caf50","#03a9f4","#e91e63","#ffffff"];
+
+  for(let i=0;i<50;i++){
+    const conf = document.createElement("div");
+    conf.className = "confetti";
+    conf.style.left = Math.random() * 100 + "vw";
+    conf.style.background = colors[Math.floor(Math.random() * colors.length)];
+    conf.style.animationDuration = (2 + Math.random() * 1.8) + "s";
+    conf.style.transform = "rotate(" + (Math.random() * 360) + "deg)";
+
+    document.body.appendChild(conf);
+
+    setTimeout(function(){
+      conf.remove();
+    },4200);
+  }
+}
+
+window.addEventListener("pointerdown",unlockAudio,{once:true});
+window.addEventListener("touchstart",unlockAudio,{once:true});
+window.addEventListener("keydown",unlockAudio,{once:true});
 </script>
 
 </body>
