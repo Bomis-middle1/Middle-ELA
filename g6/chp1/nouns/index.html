@@ -1,325 +1,1236 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Noun Museum</title>
+
+<title>🏛️ Noun Museum Adventure</title>
 
 <style>
-*{box-sizing:border-box;margin:0;padding:0;font-family:Arial}
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,Helvetica,sans-serif;
+}
 
 body{
 overflow:hidden;
-background:radial-gradient(circle at top,#ffffff,#e9f6ff,#fff3d6);
+background:
+linear-gradient(135deg,#f8fbff,#fff6d6,#e8fff1);
+height:100vh;
 }
 
-/* 🌟 ambient museum lighting */
-body::before{
+/* ===========================
+BACKGROUND
+=========================== */
+
+body:before{
 content:"";
 position:fixed;
-inset:0;
-background:
-radial-gradient(circle at 20% 30%,rgba(255,215,0,0.12),transparent 40%),
-radial-gradient(circle at 70% 60%,rgba(0,180,255,0.12),transparent 40%),
-radial-gradient(circle at 50% 80%,rgba(255,120,200,0.10),transparent 40%);
-animation:ambient 8s infinite alternate;
+width:500px;
+height:500px;
+left:-150px;
+top:-150px;
+background:rgba(255,215,0,.15);
+border-radius:50%;
+animation:float1 12s infinite alternate;
+}
+
+body:after{
+content:"";
+position:fixed;
+width:400px;
+height:400px;
+right:-120px;
+bottom:-120px;
+background:rgba(0,170,255,.15);
+border-radius:50%;
+animation:float2 10s infinite alternate;
+}
+
+@keyframes float1{
+from{transform:translateY(0);}
+to{transform:translateY(60px);}
+}
+
+@keyframes float2{
+from{transform:translateY(0);}
+to{transform:translateY(-50px);}
+}
+
+/* Floating museum sparkles */
+
+.sparkle{
+position:fixed;
+width:8px;
+height:8px;
+background:white;
+border-radius:50%;
+opacity:.6;
+animation:spark linear infinite;
 pointer-events:none;
 }
 
-@keyframes ambient{
-0%{transform:scale(1)}
-100%{transform:scale(1.05)}
+@keyframes spark{
+from{
+transform:translateY(110vh);
+opacity:0;
+}
+20%{
+opacity:1;
+}
+to{
+transform:translateY(-10vh);
+opacity:0;
+}
 }
 
-/* floating dust particles */
-.particle{
-position:fixed;
-width:6px;
-height:6px;
-background:rgba(255,255,255,0.7);
-border-radius:50%;
-animation:float 6s linear infinite;
-}
-@keyframes float{
-0%{transform:translateY(100vh);opacity:0}
-20%{opacity:1}
-100%{transform:translateY(-10vh);opacity:0}
-}
+/* ===========================
+SCREEN SYSTEM
+=========================== */
 
-/* SCREEN SYSTEM */
 .screen{
-display:none;
-height:100vh;
+position:absolute;
 width:100%;
+height:100%;
+display:none;
 justify-content:center;
 align-items:center;
 flex-direction:column;
-position:absolute;
-inset:0;
+padding:20px;
 text-align:center;
 }
-.active{display:flex}
 
-/* LOGO */
-#logoScreen img{
-width:230px;
-animation:logoGlow 2s infinite;
-}
-@keyframes logoGlow{
-0%{transform:scale(1);filter:drop-shadow(0 0 0px gold)}
-50%{transform:scale(1.05);filter:drop-shadow(0 0 20px gold)}
-100%{transform:scale(1);filter:drop-shadow(0 0 0px gold)}
-}
-
-/* TITLE */
-.title{
-font-size:32px;
-font-weight:bold;
-color:#1e2a38;
-animation:fadeUp 1s ease;
-}
-
-.subtitle{
-margin-top:10px;
-color:#444;
-}
-
-@keyframes fadeUp{
-from{opacity:0;transform:translateY(20px)}
-to{opacity:1;transform:translateY(0)}
-}
-
-/* GLASS CARD */
-.card{
-background:rgba(255,255,255,0.75);
-backdrop-filter:blur(14px);
-border-radius:24px;
-padding:24px;
-width:92%;
-max-width:700px;
-box-shadow:0 20px 60px rgba(0,0,0,0.15);
-border:1px solid rgba(255,255,255,0.4);
-}
-
-/* BUTTONS AAA */
-.btn{
-width:100%;
-padding:14px;
-margin-top:10px;
-border:none;
-border-radius:14px;
-font-size:16px;
-cursor:pointer;
-background:linear-gradient(135deg,#ffffff,#f3f3f3);
-box-shadow:0 8px 18px rgba(0,0,0,0.1);
-transition:0.25s;
-}
-.btn:hover{
-transform:translateY(-2px);
-box-shadow:0 12px 25px rgba(0,0,0,0.15);
-}
-
-/* TOPBAR */
-.topbar{
+.active{
 display:flex;
+}
+
+/* ===========================
+LOGO SCREEN
+=========================== */
+
+#logoScreen{
+background:white;
+z-index:20;
+}
+
+#logo{
+width:230px;
+animation:logoPulse 2s infinite alternate;
+}
+
+@keyframes logoPulse{
+from{
+transform:scale(1);
+}
+to{
+transform:scale(1.08);
+}
+}
+
+/* ===========================
+TITLE
+=========================== */
+
+#titleScreen{
+
+background:
+linear-gradient(135deg,#dff5ff,#fff7d1);
+
+}
+
+#titleScreen h1{
+
+font-size:58px;
+color:#0f4c81;
+text-shadow:2px 2px white;
+
+animation:titleGlow 1s infinite alternate;
+
+}
+
+#titleScreen h2{
+
+margin-top:18px;
+
+font-size:30px;
+
+color:#ff7b00;
+
+}
+
+@keyframes titleGlow{
+
+from{
+transform:scale(1);
+}
+
+to{
+transform:scale(1.04);
+}
+
+}
+
+/* ===========================
+CARDS
+=========================== */
+
+.card{
+
+background:rgba(255,255,255,.92);
+
+border-radius:28px;
+
+padding:30px;
+
+width:94%;
+
+max-width:820px;
+
+box-shadow:0 15px 40px rgba(0,0,0,.18);
+
+}
+
+/* ===========================
+BUTTONS
+=========================== */
+
+button{
+
+padding:16px 32px;
+
+border:none;
+
+border-radius:18px;
+
+font-size:22px;
+
+font-weight:bold;
+
+cursor:pointer;
+
+margin-top:18px;
+
+transition:.25s;
+
+}
+
+button:hover{
+
+transform:scale(1.05);
+
+}
+
+.startBtn{
+
+background:#22c55e;
+
+color:white;
+
+}
+
+.restartBtn{
+
+background:#0ea5e9;
+
+color:white;
+
+}
+
+/* ===========================
+TOP BAR
+=========================== */
+
+#topBar{
+
+width:96%;
+
+display:flex;
+
 justify-content:space-between;
-width:100%;
-padding:12px 18px;
+
+align-items:center;
+
+font-size:22px;
+
 font-weight:bold;
-color:#1f2d3a;
+
+color:#0f4c81;
+
+margin-bottom:10px;
+
 }
 
-/* PROGRESS AAA */
-.progress{
-width:90%;
-height:14px;
-background:rgba(0,0,0,0.06);
-border-radius:20px;
+#progressOuter{
+
+width:95%;
+
+height:18px;
+
+background:#dbeafe;
+
+border-radius:30px;
+
 overflow:hidden;
-margin-top:5px;
+
+margin-bottom:20px;
+
 }
-.bar{
-height:100%;
+
+#progressBar{
+
 width:0%;
-background:linear-gradient(90deg,#4facfe,#00f2fe,#7afcff);
-box-shadow:0 0 20px rgba(0,200,255,0.4);
-transition:0.4s;
+
+height:100%;
+
+background:linear-gradient(90deg,#06b6d4,#3b82f6,#22c55e);
+
+transition:.4s;
+
 }
 
-/* 🎯 EXHIBIT Noun Glow */
+/* ===========================
+QUESTION CARD
+=========================== */
+
+#questionCard{
+
+background:white;
+
+width:95%;
+
+max-width:900px;
+
+padding:28px;
+
+border-radius:28px;
+
+box-shadow:0 15px 35px rgba(0,0,0,.15);
+
+animation:roomFade .6s;
+
+}
+
+@keyframes roomFade{
+
+from{
+
+opacity:0;
+
+transform:scale(.95);
+
+}
+
+to{
+
+opacity:1;
+
+transform:scale(1);
+
+}
+
+}
+
+#gallery{
+
+font-size:26px;
+
+color:#ff7b00;
+
+margin-bottom:15px;
+
+}
+
+#question{
+
+font-size:28px;
+
+line-height:1.6;
+
+margin-bottom:25px;
+
+}
+
+/* Highlighted noun */
+
 .noun{
-display:inline-block;
-padding:3px 8px;
+
+background:#ffe66d;
+
+padding:4px 8px;
+
 border-radius:8px;
-background:rgba(255,215,0,0.18);
-border:2px solid gold;
+
 font-weight:bold;
-animation:glow 1.2s infinite alternate;
-}
-@keyframes glow{
-0%{box-shadow:0 0 5px gold}
-100%{box-shadow:0 0 22px gold}
+
+border:2px solid gold;
+
+animation:glow 1s infinite alternate;
+
 }
 
-/* ROOM TRANSITION */
-.roomFade{
-animation:roomIn 0.6s ease;
+@keyframes glow{
+
+from{
+
+box-shadow:0 0 5px gold;
+
 }
-@keyframes roomIn{
-from{opacity:0;transform:scale(0.95)}
-to{opacity:1;transform:scale(1)}
+
+to{
+
+box-shadow:0 0 18px gold;
+
+}
+
+}
+
+/* ===========================
+OPTIONS
+=========================== */
+
+#options{
+
+display:grid;
+
+grid-template-columns:1fr 1fr;
+
+gap:15px;
+
+}
+
+.option{
+
+padding:18px;
+
+background:#eef7ff;
+
+border-radius:16px;
+
+font-size:22px;
+
+cursor:pointer;
+
+transition:.25s;
+
+font-weight:bold;
+
+}
+
+.option:hover{
+
+background:#d9f0ff;
+
+transform:scale(1.03);
+
+}
+
+.correct{
+
+background:#4ade80!important;
+
+color:white;
+
+}
+
+.wrong{
+
+background:#f87171!important;
+
+color:white;
+
+}
+
+/* ===========================
+HINT POPUP
+=========================== */
+
+#hintPopup{
+
+position:fixed;
+
+left:50%;
+
+top:50%;
+
+transform:translate(-50%,-50%);
+
+background:white;
+
+padding:25px;
+
+border-radius:20px;
+
+box-shadow:0 15px 35px rgba(0,0,0,.25);
+
+display:none;
+
+z-index:1000;
+
+font-size:24px;
+
+}
+
+/* ===========================
+RESULT
+=========================== */
+
+#resultScreen h1{
+
+font-size:60px;
+
+color:#16a34a;
+
+}
+
+#finalScore{
+
+font-size:34px;
+
+margin:20px;
+
+}
+
+/* ===========================
+CONFETTI
+=========================== */
+
+canvas{
+
+position:fixed;
+
+left:0;
+
+top:0;
+
+pointer-events:none;
+
+}
+
+/* ===========================
+MOBILE
+=========================== */
+
+@media(max-width:768px){
+
+#titleScreen h1{
+
+font-size:40px;
+
+}
+
+#titleScreen h2{
+
+font-size:22px;
+
+}
+
+#question{
+
+font-size:22px;
+
+}
+
+#options{
+
+grid-template-columns:1fr;
+
+}
+
+.option{
+
+font-size:18px;
+
+padding:16px;
+
+}
+
+button{
+
+font-size:18px;
+
+padding:14px 22px;
+
+}
+
 }
 
 </style>
+
 </head>
 
 <body>
 
-<!-- particles -->
-<script>
-for(let i=0;i<18;i++){
-let p=document.createElement("div");
-p.className="particle";
-p.style.left=Math.random()*100+"%";
-p.style.animationDuration=(3+Math.random()*5)+"s";
-document.body.appendChild(p);
-}
-</script>
+<canvas id="confetti"></canvas>
+
+<audio id="correctSound" src="assets/correct.mp3"></audio>
+<audio id="wrongSound" src="assets/wrong.mp3"></audio>
+<audio id="clapSound" src="assets/clapping.mp3"></audio>
 
 <!-- LOGO -->
 <div id="logoScreen" class="screen active">
-<img src="assets/innovine-logo.png">
+<img src="assets/innovine-logo.png" id="logo">
 </div>
 
 <!-- TITLE -->
 <div id="titleScreen" class="screen">
-<div class="title">🏛️ Noun Museum</div>
-<div class="subtitle">AAA Interactive Adventure</div>
+<h1>🏛️ Noun Museum Adventure</h1>
+<h2>Discover the Secret Galleries of Nouns!</h2>
 </div>
 
 <!-- INSTRUCTIONS -->
-<div id="instScreen" class="screen">
+<div id="instructionScreen" class="screen">
+
 <div class="card">
-<h2>🎯 Museum Guide</h2>
-<p>Explore exhibits. Identify noun types. Unlock galleries.</p>
-<button class="btn" onclick="startGame()">Enter Museum</button>
-</div>
+
+<h1>🎯 Museum Guide</h1>
+
+<br>
+
+<p style="font-size:22px;line-height:1.8">
+
+Each museum room displays a highlighted noun.
+
+<br><br>
+
+Study the highlighted word carefully.
+
+<br><br>
+
+Choose the correct type of noun to unlock the next gallery.
+
+<br><br>
+
+⭐ Score points and complete all 10 museum rooms!
+
+</p>
+
+<button class="startBtn" id="startBtn">
+ENTER THE MUSEUM
+</button>
+
 </div>
 
-<!-- GAME -->
+</div>
+
+<!-- GAME SCREEN -->
+
 <div id="gameScreen" class="screen">
-<div class="topbar">
-<div id="room"></div>
-<div id="score"></div>
+
+<div id="topBar">
+
+<div id="roomText"></div>
+
+<div id="scoreText"></div>
+
 </div>
 
-<div class="progress"><div class="bar" id="bar"></div></div>
+<div id="progressOuter">
 
-<div class="card roomFade">
-<h3 id="gallery"></h3>
-<p id="qtext"></p>
+<div id="progressBar"></div>
+
+</div>
+
+<div id="questionCard">
+
+<h2 id="gallery"></h2>
+
+<div id="question"></div>
+
 <div id="options"></div>
-</div>
-</div>
 
-<!-- END -->
-<div id="endScreen" class="screen">
-<h2>🏆 Museum Complete</h2>
-<p id="finalScore"></p>
-<button class="btn" onclick="location.reload()">Replay Museum</button>
 </div>
 
-<audio id="correct" src="assets/correct.mp3"></audio>
-<audio id="wrong" src="assets/wrong.mp3"></audio>
-<audio id="clap" src="assets/clapping.mp3"></audio>
+</div>
 
-<script>
+<!-- Hint Popup -->
+
+<div id="hintPopup"></div>
+
+<!-- Result Screen -->
+
+<div id="resultScreen" class="screen">
+
+<div class="card">
+
+<h1>🏆</h1>
+
+<h2>Congratulations!</h2>
+
+<div id="finalScore"></div>
+
+<button class="restartBtn" id="restartBtn">
+
+Play Again
+
+</button>
+
+</div>
+
+</div> <script>
+
+/*****************************************************
+        CREATE FLOATING SPARKLES
+*****************************************************/
+
+for(let i=0;i<25;i++){
+
+let s=document.createElement("div");
+
+s.className="sparkle";
+
+s.style.left=Math.random()*100+"vw";
+
+s.style.animationDuration=(4+Math.random()*6)+"s";
+
+s.style.animationDelay=Math.random()*5+"s";
+
+document.body.appendChild(s);
+
+}
+
+/*****************************************************
+        SCREEN REFERENCES
+*****************************************************/
+
+const logoScreen=document.getElementById("logoScreen");
+const titleScreen=document.getElementById("titleScreen");
+const instructionScreen=document.getElementById("instructionScreen");
+const gameScreen=document.getElementById("gameScreen");
+const resultScreen=document.getElementById("resultScreen");
+
+const gallery=document.getElementById("gallery");
+const question=document.getElementById("question");
+const options=document.getElementById("options");
+
+const roomText=document.getElementById("roomText");
+const scoreText=document.getElementById("scoreText");
+
+const progressBar=document.getElementById("progressBar");
+
+const hintPopup=document.getElementById("hintPopup");
+
+const correctSound=document.getElementById("correctSound");
+const wrongSound=document.getElementById("wrongSound");
+const clapSound=document.getElementById("clapSound");
+
+/*****************************************************
+        SCREEN FLOW
+*****************************************************/
+
+setTimeout(function(){
+
+logoScreen.classList.remove("active");
+
+titleScreen.classList.add("active");
+
+},5000);
+
+setTimeout(function(){
+
+titleScreen.classList.remove("active");
+
+instructionScreen.classList.add("active");
+
+},8000);
+
+/*****************************************************
+        QUESTIONS
+*****************************************************/
 
 const questions=[
-{q:`The <span class="noun">flowers</span> in the garden are full of colourful flowers and butterflies.`,a:["Common Noun","Proper Noun","Material Noun","Abstract Noun"],c:"Common Noun",g:"🌿 Nature Gallery"},
-{q:`<span class="noun">India</span> is famous for its rich culture and festivals.`,a:["Common Noun","Proper Noun","Collective Noun","Material Noun"],c:"Proper Noun",g:"🏛️ Famous Gallery"},
-{q:`The <span class="noun">team</span> celebrated their victory after the match.`,a:["Abstract Noun","Collective Noun","Proper Noun","Common Noun"],c:"Collective Noun",g:"🏆 Team Gallery"},
-{q:`The necklace was made of pure <span class="noun">gold</span>.`,a:["Material Noun","Common Noun","Collective Noun","Proper Noun"],c:"Material Noun",g:"💎 Treasure Gallery"},
-{q:`<span class="noun">Honesty</span> is always appreciated by everyone.`,a:["Proper Noun","Material Noun","Abstract Noun","Common Noun"],c:"Abstract Noun",g:"💖 Values Gallery"},
-{q:`The <span class="noun">lion</span> rested under a shady tree.`,a:["Proper Noun","Common Noun","Material Noun","Collective Noun"],c:"Common Noun",g:"🐾 Animal Gallery"},
-{q:`<span class="noun">Mrs. Gupta</span> teaches Mathematics in our school.`,a:["Proper Noun","Common Noun","Collective Noun","Material Noun"],c:"Proper Noun",g:"🏫 School Gallery"},
-{q:`A <span class="noun">shoal</span> of fish swam together near the coral reef.`,a:["Material Noun","Common Noun","Collective Noun","Abstract Noun"],c:"Collective Noun",g:"🌊 Ocean Gallery"},
-{q:`The table is made from strong <span class="noun">wood</span>.`,a:["Material Noun","Proper Noun","Common Noun","Collective Noun"],c:"Material Noun",g:"🌳 Builders Gallery"},
-{q:`<span class="noun">Kindness</span> makes the world a happier place.`,a:["Material Noun","Collective Noun","Abstract Noun","Common Noun"],c:"Abstract Noun",g:"🌎 Values Gallery"}
+
+{
+gallery:"🌿 Nature Gallery",
+question:'The <span class="noun">garden</span> is full of colourful flowers and butterflies.',
+options:["Common Noun","Proper Noun","Collective Noun","Material Noun"],
+answer:"Common Noun"
+},
+
+{
+gallery:"🏛 Famous Places Gallery",
+question:'<span class="noun">India</span> is famous for its rich culture and festivals.',
+options:["Proper Noun","Common Noun","Collective Noun","Abstract Noun"],
+answer:"Proper Noun"
+},
+
+{
+gallery:"🏆 Team Gallery",
+question:'The <span class="noun">team</span> celebrated their victory after the match.',
+options:["Collective Noun","Proper Noun","Material Noun","Common Noun"],
+answer:"Collective Noun"
+},
+
+{
+gallery:"💎 Treasure Gallery",
+question:'The necklace was made of pure <span class="noun">gold</span>.',
+options:["Material Noun","Proper Noun","Common Noun","Abstract Noun"],
+answer:"Material Noun"
+},
+
+{
+gallery:"💖 Values Gallery",
+question:'<span class="noun">Honesty</span> is always appreciated by everyone.',
+options:["Abstract Noun","Proper Noun","Material Noun","Common Noun"],
+answer:"Abstract Noun"
+},
+
+{
+gallery:"🦁 Animal Gallery",
+question:'The <span class="noun">lion</span> rested under a shady tree.',
+options:["Common Noun","Proper Noun","Collective Noun","Material Noun"],
+answer:"Common Noun"
+},
+
+{
+gallery:"🏫 School Gallery",
+question:'<span class="noun">Mrs. Gupta</span> teaches Mathematics in our school.',
+options:["Proper Noun","Common Noun","Material Noun","Collective Noun"],
+answer:"Proper Noun"
+},
+
+{
+gallery:"🌊 Ocean Gallery",
+question:'A <span class="noun">shoal</span> of fish swam together near the coral reef.',
+options:["Collective Noun","Material Noun","Common Noun","Abstract Noun"],
+answer:"Collective Noun"
+},
+
+{
+gallery:"🌳 Builders Gallery",
+question:'The table is made from strong <span class="noun">wood</span>.',
+options:["Material Noun","Proper Noun","Common Noun","Collective Noun"],
+answer:"Material Noun"
+},
+
+{
+gallery:"🌎 Kindness Gallery",
+question:'<span class="noun">Kindness</span> makes the world a happier place.',
+options:["Abstract Noun","Material Noun","Collective Noun","Common Noun"],
+answer:"Abstract Noun"
+}
+
 ];
 
-let order=[],i=0,score=0,attempt=0;
+/*****************************************************
+        GAME VARIABLES
+*****************************************************/
 
-function startGame(){
-showScreen("gameScreen");
-init();
-showQ();
+let currentQuestion=0;
+
+let score=0;
+
+let mistakes=0;
+
+let order=[];
+
+/*****************************************************
+        SHUFFLE
+*****************************************************/
+
+function shuffle(array){
+
+return array.sort(()=>Math.random()-0.5);
+
 }
 
-function showScreen(id){
-document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
-document.getElementById(id).classList.add("active");
-}
+/*****************************************************
+        START GAME
+*****************************************************/
 
-setTimeout(()=>showScreen("titleScreen"),5000);
-setTimeout(()=>showScreen("instScreen"),8000);
+document.getElementById("startBtn").onclick=function(){
 
-function init(){order=[...Array(10).keys()].sort(()=>Math.random()-0.5)}
+instructionScreen.classList.remove("active");
 
-function showQ(){
-let q=questions[order[i]];
-attempt=0;
+gameScreen.classList.add("active");
 
-document.getElementById("room").innerText=`Room ${i+1}/10`;
-document.getElementById("score").innerText=`⭐ ${score}`;
-document.getElementById("gallery").innerText=q.g;
-document.getElementById("qtext").innerHTML=
-`Read carefully:<br><br>${q.q}<br><br>Choose noun type`;
+currentQuestion=0;
 
-let opt=document.getElementById("options");
-opt.innerHTML="";
+score=0;
 
-q.a.sort(()=>Math.random()-0.5).forEach(ans=>{
-let b=document.createElement("button");
-b.className="btn";
-b.innerText=ans;
-b.onclick=()=>check(b,ans,q);
-opt.appendChild(b);
+mistakes=0;
+
+order=[...Array(questions.length).keys()];
+
+shuffle(order);
+
+showQuestion();
+
+};
+
+/*****************************************************
+        SHOW QUESTION
+*****************************************************/
+
+function showQuestion(){
+
+let q=questions[order[currentQuestion]];
+
+roomText.innerHTML=
+
+"🚪 Room "+(currentQuestion+1)+" / "+questions.length;
+
+scoreText.innerHTML=
+
+"⭐ Score : "+score;
+
+progressBar.style.width=
+
+(currentQuestion/questions.length)*100+"%";
+
+gallery.innerHTML=q.gallery;
+
+question.innerHTML=q.question;
+
+options.innerHTML="";
+
+let shuffled=[...q.options];
+
+shuffle(shuffled);
+
+shuffled.forEach(function(option){
+
+let btn=document.createElement("button");
+
+btn.className="option";
+
+btn.innerHTML=option;
+
+btn.onclick=function(){
+
+checkAnswer(btn,option,q.answer);
+
+};
+
+options.appendChild(btn);
+
 });
 
-document.querySelector(".card").classList.add("roomFade");
-
-updateBar();
 }
 
-function check(btn,ans,q){
-if(ans===q.c){
-btn.style.background="#b7f7c5";
-document.getElementById("correct").play();
-setTimeout(()=>document.getElementById("clap").play(),300);
-score+=2;
-next();
+/*****************************************************
+        CHECK ANSWER
+*****************************************************/
+
+function checkAnswer(button,selected,correct){
+
+let buttons=document.querySelectorAll(".option");
+
+buttons.forEach(function(btn){
+
+btn.disabled=true;
+
+});
+
+if(selected===correct){
+
+button.classList.add("correct");
+
+correctSound.currentTime=0;
+
+correctSound.play();
+
+score++;
+
+launchConfetti();
+
+setTimeout(nextRoom,900);
+
+}
+
+else{
+
+button.classList.add("wrong");
+
+wrongSound.currentTime=0;
+
+wrongSound.play();
+
+mistakes++;
+
+buttons.forEach(function(btn){
+
+if(btn.innerHTML===correct){
+
+btn.classList.add("correct");
+
+}
+
+});
+
+hintPopup.innerHTML=
+
+"<h3>💡 Museum Guide</h3><br>Correct Answer:<br><b>"+correct+"</b>";
+
+hintPopup.style.display="block";
+
+setTimeout(function(){
+
+hintPopup.style.display="none";
+
+nextRoom();
+
+},1800);
+
+}
+
+}
+
+/*****************************************************
+        NEXT ROOM
+*****************************************************/
+
+function nextRoom(){
+
+currentQuestion++;
+
+if(currentQuestion>=questions.length){
+
+showResults();
+
+}
+
+else{
+
+document.getElementById("questionCard").classList.remove("roomFade");
+
+void document.getElementById("questionCard").offsetWidth;
+
+document.getElementById("questionCard").classList.add("roomFade");
+
+showQuestion();
+
+}
+
+} /*****************************************************
+        CONFETTI
+*****************************************************/
+
+const canvas=document.getElementById("confetti");
+const ctx=canvas.getContext("2d");
+
+canvas.width=window.innerWidth;
+canvas.height=window.innerHeight;
+
+window.addEventListener("resize",function(){
+
+canvas.width=window.innerWidth;
+canvas.height=window.innerHeight;
+
+});
+
+let confetti=[];
+
+function launchConfetti(){
+
+confetti=[];
+
+for(let i=0;i<180;i++){
+
+confetti.push({
+
+x:Math.random()*canvas.width,
+
+y:-20,
+
+r:Math.random()*8+4,
+
+speed:Math.random()*5+3,
+
+angle:Math.random()*360,
+
+color:"hsl("+Math.random()*360+",100%,60%)"
+
+});
+
+}
+
+animateConfetti();
+
+}
+
+function animateConfetti(){
+
+let frame=0;
+
+function draw(){
+
+ctx.clearRect(0,0,canvas.width,canvas.height);
+
+confetti.forEach(function(c){
+
+ctx.save();
+
+ctx.translate(c.x,c.y);
+
+ctx.rotate(c.angle);
+
+ctx.fillStyle=c.color;
+
+ctx.fillRect(-c.r/2,-c.r/2,c.r,c.r);
+
+ctx.restore();
+
+c.y+=c.speed;
+
+c.x+=Math.sin(c.angle)*0.4;
+
+c.angle+=0.05;
+
+});
+
+frame++;
+
+if(frame<100){
+
+requestAnimationFrame(draw);
+
 }else{
-btn.style.background="#ffb3b3";
-document.getElementById("wrong").play();
-attempt++;
-if(attempt>=2){
-alert("Hint: "+q.c);
-next();
-}
-}
+
+ctx.clearRect(0,0,canvas.width,canvas.height);
+
 }
 
-function next(){
-i++;
-if(i>=order.length){
-showScreen("endScreen");
-document.getElementById("finalScore").innerText=`⭐ Score: ${score}/20`;
-document.getElementById("clap").play();
-}else{
-setTimeout(showQ,600);
 }
+
+draw();
+
 }
+
+/*****************************************************
+        RESULTS
+*****************************************************/
+
+function showResults(){
+
+gameScreen.classList.remove("active");
+
+resultScreen.classList.add("active");
+
+progressBar.style.width="100%";
+
+let percent=Math.round(score/questions.length*100);
+
+let remark="";
+
+if(percent>=90){
+
+remark="🏆 Museum Master! Outstanding Work!";
+
+}
+
+else if(percent>=75){
+
+remark="🌟 Excellent Explorer!";
+
+}
+
+else if(percent>=60){
+
+remark="👏 Great Job!";
+
+}
+
+else if(percent>=40){
+
+remark="🙂 Good Try! Keep Exploring.";
+
+}
+
+else{
+
+remark="📘 Revise the noun types and play again!";
+
+}
+
+document.getElementById("finalScore").innerHTML=
+
+`
+<h2>⭐ ${score} / ${questions.length}</h2>
+
+<h3>${percent}%</h3>
+
+<p>${remark}</p>
+
+<p>Wrong Attempts: ${mistakes}</p>
+`;
+
+clapSound.currentTime=0;
+
+clapSound.play();
+
+launchConfetti();
+
+}
+
+/*****************************************************
+        RESTART
+*****************************************************/
+
+document.getElementById("restartBtn").onclick=function(){
+
+resultScreen.classList.remove("active");
+
+gameScreen.classList.add("active");
+
+currentQuestion=0;
+
+score=0;
+
+mistakes=0;
+
+order=[...Array(questions.length).keys()];
+
+shuffle(order);
+
+showQuestion();
+
+};
+
+/*****************************************************
+        PRELOAD SOUNDS
+*****************************************************/
+
+window.onload=function(){
+
+correctSound.load();
+
+wrongSound.load();
+
+clapSound.load();
+
+};
+
+/*****************************************************
+        KEYBOARD SUPPORT
+*****************************************************/
+
+document.addEventListener("keydown",function(e){
+
+if(e.key==="Enter"){
+
+if(instructionScreen.classList.contains("active")){
+
+document.getElementById("startBtn").click();
+
+}
+
+if(resultScreen.classList.contains("active")){
+
+document.getElementById("restartBtn").click();
+
+}
+
+}
+
+});
+
+/*****************************************************
+        END
+*****************************************************/
 
 </script>
 
