@@ -1,133 +1,94 @@
-
 <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Figures of Speech Game</title>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Magic Academy Spell Lab</title>
 <style>
-body { margin:0; font-family:Arial; background:#f0f8ff; display:flex; justify-content:center; align-items:center; height:100vh; }
-#logoScreen { position:fixed; top:0; left:0; width:100%; height:100%; display:flex; justify-content:center; align-items:center; background:white; z-index:100;}
-#gameContainer { display:none; background:#fff; width:90%; max-width:500px; padding:20px; border-radius:10px; box-shadow:0 0 10px #aaa; text-align:center; }
-#question { font-weight:bold; font-size:18px; margin-bottom:15px; }
-.options { display:flex; flex-wrap:wrap; justify-content:center; gap:10px; }
-.option { background:#ffeb3b; padding:10px 15px; border-radius:5px; cursor:pointer; user-select:none; font-size:16px; min-width:80px; text-align:center; }
-.option.wiggle { animation: wiggle 0.5s; }
-@keyframes wiggle {0%{transform:rotate(0deg);}25%{transform:rotate(-10deg);}50%{transform:rotate(10deg);}75%{transform:rotate(-10deg);}100%{transform:rotate(0deg);}}
-#feedback { margin-top:15px; font-weight:bold; height:24px; }
-#tick { display:none; font-size:30px; color:green; margin-top:10px; }
-#restartBtn { display:none; margin-top:20px; padding:10px 20px; font-size:18px; cursor:pointer; background:#4caf50; color:white; border:none; border-radius:5px; display:block;}
-.confetti-piece { position:absolute; width:8px; height:8px; border-radius:50%; top:0; animation: fall 2s linear forwards;}
-@keyframes fall {0%{transform:translateY(0);} 100%{transform:translateY(400px); opacity:0;}}
-</style>
-</head>
+body{margin:0;font-family:Arial;background:linear-gradient(#1d2350,#3b2070);color:#fff;overflow-x:hidden}
+.screen{display:none;min-height:100vh;align-items:center;justify-content:center;flex-direction:column;padding:20px;box-sizing:border-box}
+#logo{display:flex;background:#fff}
+#logo img{max-width:80%;max-height:60vh}
+.card{background:rgba(255,255,255,.12);padding:20px;border-radius:20px;max-width:900px;width:100%}
+.top{display:flex;gap:10px;flex-wrap:wrap}
+.badge{background:rgba(255,255,255,.15);padding:8px 12px;border-radius:12px}
+#crystals{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px;margin-top:15px}
+.crystal{border:none;border-radius:20px;padding:18px;color:#fff;font-weight:bold;cursor:pointer;animation:pulse 1.5s infinite}
+@keyframes pulse{50%{transform:scale(1.08)}}
+.bar{height:16px;background:#333;border-radius:20px;overflow:hidden}
+.fill{height:100%;background:linear-gradient(90deg,cyan,magenta,gold);width:0%}
+button{padding:14px 22px;border:none;border-radius:16px;font-size:18px}
+#end img{max-width:200px}
+</style></head>
 <body>
-
-<!-- Logo Screen -->
-<div id="logoScreen">
-<img src="assets/innovine-logo.png" alt="Innovine Logo" width="200">
+<div id="logo" class="screen"><img src="assets/innovine-logo.png" onerror="this.outerHTML='<div style=\'color:black;font-size:40px\'>Innovine</div>'"></div>
+<div id="instructions" class="screen"><div class="card"><h1>🪄 Welcome to the Magic Academy!</h1><p>Read each magical spell carefully and tap the glowing crystal that matches the figure of speech.</p><button onclick="startGame()">▶ Start Magic Exam</button></div></div>
+<div id="game" class="screen">
+<div class="card">
+<div class="top">
+<div class="badge">⭐ <span id="pts">0</span></div>
+<div class="badge">🪄 <span id="spellno">1/14</span></div>
+<div class="badge">🏆 <span id="acc">100</span>%</div>
+<div class="badge">🔊 <input type="range" id="vol" min="0" max="1" step="0.1" value="1"></div>
 </div>
-
-<div id="gameContainer">
-<div id="question"></div>
-<div class="options" id="optionsContainer"></div>
-<div id="feedback"></div>
-<div id="tick">✔</div>
-<button id="restartBtn">Play Again</button>
+<div class="bar"><div id="energy" class="fill"></div></div>
+<h2 id="spell"></h2>
+<p id="sentence"></p>
+<p id="msg"></p>
+<div id="crystals"></div>
 </div>
-
-<audio id="correctSound" src="assets/correct.mp3"></audio>
-<audio id="wrongSound" src="assets/wrong.mp3"></audio>
-<audio id="clapSound" src="assets/clapping.mp3"></audio>
-
+</div>
+<div id="end" class="screen"><div class="card"><h1>🏆 MASTER WIZARD</h1><p id="final"></p><button onclick="location.reload()">🔁 Play Again</button></div></div>
+<audio id="correct" src="assets/correct.mp3"></audio>
+<audio id="wrong" src="assets/wrong.mp3"></audio>
+<audio id="clap" src="assets/clapping.mp3"></audio>
 <script>
-// --- Questions ---
-const questions = [
-{q:"She is as brave as a lion.", correct:"Simile", wrong:["Metaphor","Alliteration","Onomatopoeia","Personification","Hyperbole","Idiom"]},
-{q:"Time is a thief that steals our moments.", correct:"Metaphor", wrong:["Simile","Alliteration","Onomatopoeia","Personification","Hyperbole","Idiom"]},
-{q:"Peter Piper picked a peck of pickled peppers.", correct:"Alliteration", wrong:["Simile","Metaphor","Onomatopoeia","Personification","Hyperbole","Idiom"]},
-{q:"The bees buzzed angrily in the garden.", correct:"Onomatopoeia", wrong:["Simile","Metaphor","Alliteration","Personification","Hyperbole","Idiom"]},
-{q:"The wind whispered secrets through the trees.", correct:"Personification", wrong:["Simile","Metaphor","Alliteration","Onomatopoeia","Hyperbole","Idiom"]},
-{q:"I am so hungry I could eat a horse.", correct:"Hyperbole", wrong:["Simile","Metaphor","Alliteration","Onomatopoeia","Personification","Idiom"]},
-{q:"Break a leg before your performance!", correct:"Idiom", wrong:["Simile","Metaphor","Alliteration","Onomatopoeia","Personification","Hyperbole"]},
-{q:"Her smile was like sunshine.", correct:"Simile", wrong:["Metaphor","Alliteration","Onomatopoeia","Personification","Hyperbole","Idiom"]},
-{q:"He is a shining star in our class.", correct:"Metaphor", wrong:["Simile","Alliteration","Onomatopoeia","Personification","Hyperbole","Idiom"]},
-{q:"The car screeched to a halt.", correct:"Onomatopoeia", wrong:["Simile","Metaphor","Alliteration","Personification","Hyperbole","Idiom"]}
+const figures=["Simile","Metaphor","Personification","Hyperbole","Alliteration","Onomatopoeia","Idiom"];
+const qs=[
+["🔥 Fire Spell","The campfire danced happily in the darkness.","Personification"],
+["❄ Ice Spell","The frozen lake was as smooth as glass.","Simile"],
+["⚡ Thunder Spell","Boom! Crash! The thunder echoed through the mountains.","Onomatopoeia"],
+["🌟 Magic Shield","Break the ice before speaking to the new student.","Idiom"],
+["🌪 Wind Spell","Busy buzzing bees flew around the flowers.","Alliteration"],
+["🐉 Dragon Spell","I've told you a million times to clean your room!","Hyperbole"],
+["🌈 Rainbow Spell","Knowledge is a treasure.","Metaphor"],
+["🍃 Forest Spell","The leaves whispered in the cool breeze.","Personification"],
+["🧊 Crystal Spell","The baby dragon was as playful as a puppy.","Simile"],
+["🏰 Castle Spell","Time is a thief.","Metaphor"],
+["🦉 Owl Spell","Tick-tock! Tick-tock! The old magical clock echoed through the castle.","Onomatopoeia"],
+["⭐ Moon Spell","Hold your horses before casting the spell!","Idiom"],
+["🦄 Unicorn Spell","Silly snakes silently slithered through the enchanted grass.","Alliteration"],
+["👑 Grammar Dragon","I'm so hungry I could eat an entire castle!","Hyperbole"]
 ];
-
-let currentQ=0, wrongAttempts=0;
-const questionEl = document.getElementById("question");
-const optionsContainer = document.getElementById("optionsContainer");
-const feedback = document.getElementById("feedback");
-const tick = document.getElementById("tick");
-const restartBtn = document.getElementById("restartBtn");
-const correctSound=document.getElementById("correctSound");
-const wrongSound=document.getElementById("wrongSound");
-const clapSound=document.getElementById("clapSound");
-
-// --- Show Question ---
-function showQuestion(){
-  tick.style.display="none";
-  wrongAttempts=0;
-  const q = questions[currentQ];
-  questionEl.textContent = q.q;
-  optionsContainer.innerHTML="";
-  const opts = [q.correct,...q.wrong].sort(()=>Math.random()-0.5);
-  opts.forEach(opt=>{
-    const btn = document.createElement("div");
-    btn.className="option";
-    btn.textContent=opt;
-    btn.onclick = ()=>checkAnswer(btn,opt,q.correct);
-    optionsContainer.appendChild(btn);
-  });
-  feedback.textContent="";
+let q=[],i=0,score=0,corrects=0,attempt=0,totalAttempts=0;
+function shuffle(a){return a.sort(()=>Math.random()-0.5)}
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.style.display='none');document.getElementById(id).style.display='flex'}
+show('logo'); setTimeout(()=>show('instructions'),5000);
+function startGame(){q=shuffle([...qs]);i=0;score=0;corrects=0;loadQ();show('game')}
+function loadQ(){
+attempt=0; let cur=q[i];
+spell.textContent=cur[0]; sentence.textContent=cur[1]; msg.textContent="";
+spellno.textContent=(i+1)+"/14"; pts.textContent=score;
+acc.textContent=totalAttempts?Math.round(corrects/totalAttempts*100):100;
+energy.style.width=((i)/14*100)+'%';
+let opts=shuffle([...figures]); crystals.innerHTML='';
+opts.forEach(o=>{let b=document.createElement('button');b.className='crystal';b.textContent=o;b.onclick=()=>pick(o);crystals.appendChild(b)})
 }
-
-function checkAnswer(btn,opt,correct){
-  if(opt===correct){
-    feedback.textContent="Good Job! 🎉";
-    feedback.style.color="green";
-    tick.style.display="block";
-    correctSound.currentTime=0; correctSound.play();
-    setTimeout(nextQuestion,800);
-  } else {
-    wrongAttempts++;
-    wrongSound.currentTime=0; wrongSound.play();
-    btn.classList.add("wiggle");
-    setTimeout(()=>btn.classList.remove("wiggle"),500);
-  }
+function play(id){let a=document.getElementById(id);a.volume=vol.value;a.play().catch(()=>{})}
+function pick(ans){
+totalAttempts++;
+let correct=q[i][2];
+if(ans===correct){
+corrects++; score+=10; play('correct'); setTimeout(()=>play('clap'),300);
+msg.textContent="✨ Spell Activated!";
+setTimeout(()=>{i++; if(i>=14) endGame(); else loadQ();},1200);
+}else{
+attempt++; play('wrong');
+if(attempt==2){msg.textContent="Hint: Think about how the sentence creates meaning."; }
+else if(attempt>=3){msg.textContent="Correct answer: "+correct; setTimeout(()=>{i++; if(i>=14) endGame(); else loadQ();},1800);}
+else msg.textContent="Try again.";
 }
-
-function nextQuestion(){
-  currentQ++;
-  if(currentQ>=questions.length){
-    showConfetti();
-    feedback.textContent="🎉 You completed all questions!";
-    clapSound.currentTime=0; clapSound.play();
-    restartBtn.style.display="block";
-  } else showQuestion();
+pts.textContent=score;
 }
-
-function showConfetti(){
-  for(let i=0;i<50;i++){
-    const c = document.createElement("div");
-    c.className="confetti-piece";
-    c.style.left=Math.random()*window.innerWidth+"px";
-    c.style.background=`hsl(${Math.random()*360},100%,50%)`;
-    document.body.appendChild(c);
-    setTimeout(()=>document.body.removeChild(c),2000);
-  }
+function endGame(){
+show('end');
+final.textContent=`Final Magic Points: ${score} | Accuracy: ${Math.round(corrects/Math.max(totalAttempts,1)*100)}% | Spells Mastered: 14/14`;
 }
-
-restartBtn.onclick=()=>location.reload();
-
-// Show logo for 5 seconds, then start game
-setTimeout(()=>{
-  document.getElementById("logoScreen").style.display="none";
-  document.getElementById("gameContainer").style.display="block";
-  showQuestion();
-},5000);
-</script>
-
-</body>
-</html>
+</script></body></html>
