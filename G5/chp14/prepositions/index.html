@@ -498,7 +498,7 @@
     <div class="topbar">
       <div class="title-wrap">
         <div class="title">Preposition Simon Says</div>
-        <div class="sub">Grade 5 • Easy actions and easy rules</div>
+        <div class="sub">Grade 5 • Mixed easy commands</div>
       </div>
       <div class="stats">
         <div class="pill">Score: <span id="score">0</span></div>
@@ -547,7 +547,7 @@
             <li>Listen carefully.</li>
             <li>Do the action only when the command starts with <strong>Simon says</strong>.</li>
             <li>If Simon does not say it, stay still.</li>
-            <li>Easy actions: touch your nose, clap, stand up, sit down, turn around, freeze.</li>
+            <li>Mixed actions: touch your toes, wave, hop, raise hands, smile, turn, freeze, and more.</li>
             <li>Try to follow fast and get a high score.</li>
           </ul>
         </div>
@@ -570,18 +570,19 @@
 
 <script>
 const commands = [
-  {text:'Simon says touch your nose', pose:'pose-front', truth:true},
-  {text:'Simon says clap your hands', pose:'pose-front', truth:true},
-  {text:'Simon says stand up', pose:'pose-up', truth:true},
-  {text:'Simon says sit down', pose:'pose-under', truth:true},
-  {text:'Simon says turn around', pose:'pose-between', truth:true},
+  {text:'Simon says touch your toes', pose:'pose-under', truth:true},
+  {text:'Simon says wave your hand', pose:'pose-front', truth:true},
+  {text:'Simon says hop on one foot', pose:'pose-over', truth:true},
+  {text:'Simon says raise your right hand', pose:'pose-up', truth:true},
+  {text:'Simon says raise your left hand', pose:'pose-up', truth:true},
+  {text:'Simon says smile big', pose:'pose-front', truth:true},
+  {text:'Simon says turn in a circle', pose:'pose-between', truth:true},
   {text:'Simon says freeze like a statue', pose:'pose-front', truth:true},
-  {text:'Simon says jump once', pose:'pose-over', truth:true},
-  {text:'Simon says smile', pose:'pose-front', truth:true},
-  {text:'Touch your nose', pose:'pose-front', truth:false},
-  {text:'Clap your hands', pose:'pose-front', truth:false},
-  {text:'Stand up', pose:'pose-up', truth:false},
-  {text:'Freeze like a statue', pose:'pose-front', truth:false}
+  {text:'Touch your toes', pose:'pose-under', truth:false},
+  {text:'Wave your hand', pose:'pose-front', truth:false},
+  {text:'Hop on one foot', pose:'pose-over', truth:false},
+  {text:'Raise your right hand', pose:'pose-up', truth:false},
+  {text:'Smile big', pose:'pose-front', truth:false}
 ];
 
 const el = id => document.getElementById(id);
