@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-select=none">
-<title>Infinitives, Gerunds & Participles Quiz</title>
+<title>Infinitives, Gerunds & Participles Arcade Challenge</title>
 <style>
 /* ==========================================================================
-   GLOBAL GAME ENVIRONMENT
+   GLOBAL DESIGN SYSTEM & RESETS
    ========================================================================== */
 * {
     box-sizing: border-box;
@@ -29,7 +29,11 @@ body {
     overflow: hidden;
 }
 
-/* SCREEN MANAGER */
+html {
+    height: -webkit-fill-available;
+}
+
+/* SCREEN MANAGEMENT FLUID GRID */
 .screen {
     display: none;
     width: 100vw;
@@ -43,12 +47,13 @@ body {
     text-align: center;
     padding: 20px;
     box-sizing: border-box;
+    overflow: hidden;
 }
 .screen.active {
     display: flex;
 }
 
-/* STAGE 1: BRAND INTRO LOGO SCREEN */
+/* STAGE 1: LOGO SCREEN (STRICTLY LOGO ONLY FOR 5s) */
 #logoScreen {
     background: #ffffff;
     z-index: 9999;
@@ -63,7 +68,35 @@ body {
     display: block;
 }
 
-/* STAGE 2: ADVENTURE MAIN HUD */
+/* STAGE 2: INSTRUCTIONS SCREEN */
+#instructionScreen {
+    background: #140f3d;
+}
+.panel-card {
+    background: rgba(255, 255, 255, 0.96);
+    color: #2d2340;
+    border-radius: 24px;
+    padding: 30px 24px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    max-width: 480px;
+    width: 100%;
+    text-align: center;
+    box-sizing: border-box;
+    border-bottom: 6px solid #cfc7e8;
+}
+.panel-card h1 {
+    font-size: 26px;
+    color: #140f3d;
+    margin-bottom: 12px;
+}
+.panel-card p {
+    color: #5c5470;
+    line-height: 1.5;
+    margin-bottom: 24px;
+    font-size: 15px;
+}
+
+/* STAGE 3: GAME RUNTIME HUD & ARENA */
 .game-layout {
     display: flex;
     flex-direction: column;
@@ -71,7 +104,8 @@ body {
     justify-content: space-between;
     width: 100%;
     max-width: 520px;
-    height: 90%;
+    height: 92%;
+    box-sizing: border-box;
 }
 
 .hud-panel {
@@ -79,14 +113,20 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 14px 20px;
-    background: rgba(255, 255, 255, 0.07);
+    padding: 12px 20px;
+    background: rgba(255, 255, 255, 0.08);
     border-radius: 16px;
     backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.1);
     font-weight: bold;
     font-size: 15px;
     letter-spacing: 0.5px;
+    box-sizing: border-box;
+}
+
+.score-counter {
+    color: #ffd60a;
 }
 
 .health-track {
@@ -99,56 +139,60 @@ body {
 }
 .health-fill {
     background: linear-gradient(90deg, #ffb703, #fb8500);
-    width: 10%;
+    width: 0%;
     height: 100%;
-    transition: width 0.4s ease;
+    transition: width 0.3s ease;
 }
 
-/* STAGE 3: RUNTIME ENEMY AND DIALOGUE CARD */
 .boss-arena {
-    font-size: 64px;
+    font-size: 56px;
     margin: 10px 0;
     animation: floating 3s ease-in-out infinite;
 }
 
 .question-card {
-    background: rgba(255, 255, 255, 0.95);
+    background: rgba(255, 255, 255, 0.96);
     color: #1a153b;
     border-radius: 24px;
-    padding: 24px;
+    padding: 22px;
     width: 100%;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.4);
     border-bottom: 6px solid #cfc7e8;
+    box-sizing: border-box;
 }
 
 .question-text {
-    font-size: 18px;
+    font-size: 17px;
     font-weight: 700;
     line-height: 1.45;
-    margin-bottom: 20px;
+    margin-bottom: 18px;
+    text-align: left;
 }
 
 .options-grid {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 10px;
 }
 
-/* STAGE 4: CONTROL ELEMENTS */
+/* INTERACTIVE ACTION BUTTONS */
 button.game-btn {
-    padding: 14px 20px;
+    width: 100%;
+    padding: 12px 18px;
     border: none;
     border-radius: 14px;
     background: #f0ecfa;
     color: #2d2340;
     font-weight: bold;
-    font-size: 16px;
+    font-size: 15px;
     cursor: pointer;
     border-bottom: 4px solid #cfc7e8;
     transition: transform 0.1s, background 0.2s;
     text-align: left;
+    box-sizing: border-box;
 }
 button.game-btn:active { transform: scale(0.98); }
+button.game-btn:disabled { pointer-events: none; }
 
 button.game-btn.correct {
     background: #b7efc5 !important;
@@ -161,45 +205,69 @@ button.game-btn.wrong {
     color: #5c0d12;
 }
 
+.action-trigger {
+    background: linear-gradient(135deg, #ffb703, #fb8500) !important;
+    color: #fff !important;
+    border-bottom: 4px solid #b86200 !important;
+    text-align: center !important;
+}
+
 .banner-action {
-    margin-top: 15px;
+    margin-top: 12px;
     font-weight: bold;
-    font-size: 15px;
-    min-height: 22px;
+    font-size: 14px;
+    min-height: 20px;
+    text-align: center;
 }
 .banner-action.text-correct { color: #2a9d8f; }
 .banner-action.text-wrong { color: #e63946; }
 
-/* SUMMARY CARD OVERLAY */
+/* STAGE 4: VISUAL CAPSTONE SUMMARY CARD */
 .summary-box {
     background: rgba(255, 255, 255, 0.96);
     color: #2d2340;
     border-radius: 28px;
-    padding: 40px 30px;
+    padding: 35px 25px;
     max-width: 440px;
     width: 100%;
     box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-}
-.action-restart {
-    background: linear-gradient(135deg, #ffb703, #fb8500);
-    color: #fff;
-    border-bottom: 4px solid #b86200;
-    width: 100%;
-    text-align: center;
+    box-sizing: border-box;
+    border-bottom: 6px solid #cfc7e8;
 }
 
-/* SCREEN RENDERING FX */
+/* RENDER EFFECTS FOREGROUND LAYER */
 canvas#visualFX {
     position: fixed;
     inset: 0;
     pointer-events: none;
     z-index: 99999;
+    width: 100vw;
+    height: 100vh;
 }
 
+/* ANIMATION TRACKS */
 @keyframes floating {
     0% { transform: translateY(0px); }
-    50% { transform: translateY(-10px); }
+    50% { transform: translateY(-8px); }
     100% { transform: translateY(0px); }
+}
+
+/* RESPONSIBILITY SCALE & ADAPTIVE VIEWPORTS */
+@media (max-width: 480px) {
+    .question-text { font-size: 15px; }
+    button.game-btn { padding: 10px 14px; font-size: 14px; }
+    .boss-arena { font-size: 44px; margin: 5px 0; }
+    .hud-panel { padding: 10px 14px; font-size: 13px; }
+}
+
+@media (max-height: 600px) and (orientation: landscape) {
+    .game-layout { height: 95%; max-width: 100%; flex-direction: row; gap: 15px; justify-content: center; }
+    .hud-panel { width: auto; flex-direction: column; gap: 8px; height: fit-content; padding: 10px; }
+    .boss-arena { display: none; }
+    .question-card { max-width: 420px; padding: 14px; max-height: 92vh; overflow-y: auto; }
+    .question-text { margin-bottom: 10px; font-size: 14px; }
+    button.game-btn { padding: 8px 12px; font-size: 13px; margin-bottom: 2px; }
+    .banner-action { margin-top: 6px; }
 }
 </style>
 </head>
@@ -207,21 +275,34 @@ canvas#visualFX {
 
 <canvas id="visualFX"></canvas>
 
+<!-- CORE BRAND AUDIO NODES -->
 <audio id="correctSound" src="assets/correct.mp3" preload="auto"></audio>
 <audio id="wrongSound" src="assets/wrong.mp3" preload="auto"></audio>
 <audio id="clapSound" src="assets/clapping.mp3" preload="auto"></audio>
 
+<!-- STAGE 1: INTRO (5 SECONDS COMPLIANCE) -->
 <div id="logoScreen" class="screen active">
     <div class="logo-container">
         <img src="assets/innovine-logo.png" alt="Innovine Logo">
     </div>
 </div>
 
+<!-- STAGE 2: INSTRUCTIONS SCREEN -->
+<div id="instructionScreen" class="screen">
+    <div class="panel-card">
+        <h1>Grammar Quest Initialized</h1>
+        <p>Defeat the grammar matrix by identifying Infinitives, Gerunds, and Participles! You have 2 attempts per stage before the system moves forward.</p>
+        <button class="game-btn action-trigger" onclick="launchGamePipeline()">Begin Quest</button>
+    </div>
+</div>
+
+<!-- STAGE 3: GAMEPLAY RUNTIME RUNNER -->
 <div id="quizScreen" class="screen">
     <div class="game-layout">
         
         <div class="hud-panel">
             <div id="scoreText">STAGE 1 / 10</div>
+            <div>SCORE: <span id="pointsHUD" class="score-counter">0</span></div>
             <div class="health-track">
                 <div id="healthBar" class="health-fill"></div>
             </div>
@@ -233,144 +314,216 @@ canvas#visualFX {
             <div id="questionText" class="question-text">Loading encounter parameters...</div>
             <div id="optionsBox" class="options-grid"></div>
             <div id="feedback" class="banner-action"></div>
+            <button id="continueBtn" class="game-btn action-trigger" style="display: none; margin-top: 12px;" onclick="advancePipelineFloor()">Continue</button>
         </div>
 
     </div>
 </div>
 
+<!-- STAGE 4: CAPSTONE EVALUATION OVERLAY -->
 <div id="endScreen" class="screen">
     <div class="summary-box">
         <div style="font-size: 64px; margin-bottom: 12px;">🏆</div>
-        <h1 style="color: #2d2340; font-size: 28px; margin-bottom: 10px;">Adventure Clear!</h1>
-        <p id="finalScore" style="font-size: 18px; margin-bottom: 25px; font-weight: 600; color: #5c5470;"></p>
-        <button class="game-btn action-restart" onclick="restartQuiz()">Challenge Again</button>
+        <h1 style="color: #2d2340; font-size: 26px; margin-bottom: 10px;">Quest Completed!</h1>
+        <p id="finalScore" style="font-size: 17px; margin-bottom: 25px; font-weight: 600; color: #5c5470;"></p>
+        <button class="game-btn action-trigger" onclick="restartFullPipeline()">Play Again</button>
     </div>
 </div>
 
 <script>
-// MCQs untouched context values
-const mcqs=[
-{q:'The infinitive in the sentence is: "Riya wants to learn coding during her summer vacation."',opts:["wants","learn","to learn","coding"],ans:"to learn"},
-{q:'Which word is a gerund? "Swimming every morning makes Aryan feel energetic."',opts:["morning","energetic","feel","Swimming"],ans:"Swimming"},
-{q:'Find the participle in the sentence: "The excited fans cheered loudly after the goal."',opts:["fans","goal","cheered","excited"],ans:"excited"},
-{q:'Which option contains an infinitive?',opts:["Dancing is fun.","To dance is fun.","Danced happily.","Dancing happily."],ans:"To dance is fun."},
-{q:'The gerund in the sentence is: "Playing video games can improve problem-solving skills."',opts:["improve","skills","Playing","games"],ans:"Playing"},
-{q:'Choose the participle: "The barking dog woke everyone up."',opts:["woke","barking","everyone","dog"],ans:"barking"},
-{q:'What is the underlined phrase? "The students gathered early to watch the science show."',opts:["Gerund","Participle","Infinitive Phrase","Noun Phrase"],ans:"Infinitive Phrase"},
-{q:'Identify the gerund: "Maya enjoys painting superheroes in her notebook."',opts:["enjoys","superheroes","notebook","painting"],ans:"painting"},
-{q:'Find the participle: "The broken skateboard lay beside the ramp."',opts:["lay","beside","broken","ramp"],ans:"broken"},
-{q:'Which sentence contains a gerund?',opts:["I want to travel the world.","Running helps me stay fit.","The tired player rested.","She plans to win."],ans:"Running helps me stay fit."}
-];
-
-let currentQ = 0;
-let score = 0;
-
-const logoScreen = document.getElementById('logoScreen');
-const quizScreen = document.getElementById('quizScreen');
-const questionText = document.getElementById('questionText');
-const optionsBox = document.getElementById('optionsBox');
-const feedback = document.getElementById('feedback');
-const scoreText = document.getElementById('scoreText');
-const healthBar = document.getElementById('healthBar');
-const endScreen = document.getElementById('endScreen');
-const finalScore = document.getElementById('finalScore');
-
-const correctAudio = document.getElementById('correctSound');
-const wrongAudio = document.getElementById('wrongSound');
-const clapAudio = document.getElementById('clapSound');
-
-// Audio engine standard initialization wrapper
-window.onload = () => {
-    setTimeout(() => {
-        logoScreen.classList.remove('active');
-        quizScreen.classList.add('active');
-        showQuestion();
-    }, 5000);
+/* ==========================================================================
+   SYNTHETIC AUDIO ENGINE BACKUPS (FOR FAILSFE SAFETY PLUGINS)
+   ========================================================================== */
+const audioFailsafes = {
+    correct: "data:audio/wav;base64,UklGRjIAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQYAAAAAe3vLew==",
+    wrong: "data:audio/wav;base64,UklGRjIAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQYAAAAAhH94fA==",
+    clap: "data:audio/wav;base64,UklGRjIAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQYAAAAAnp6Xng=="
 };
 
-function showQuestion() {
-    feedback.innerText = "";
-    feedback.className = "banner-action";
-    
-    const q = mcqs[currentQ];
-    questionText.innerText = q.q;
-    optionsBox.innerHTML = '';
-    
-    // Smoothly scale health map indicator metrics
-    healthBar.style.width = `${((currentQ + 1) / mcqs.length) * 100}%`;
-    scoreText.innerText = `STAGE ${currentQ + 1} / ${mcqs.length}`;
-    
-    q.opts.forEach(opt => {
-        const btn = document.createElement('button');
-        btn.className = "game-btn";
-        btn.innerText = opt;
-        btn.onclick = () => checkAnswer(opt, btn);
-        optionsBox.appendChild(btn);
+const mcqs = [
+    {q:'The infinitive in the sentence is: "Riya wants to learn coding during her summer vacation."',opts:["wants","learn","to learn","coding"],ans:"to learn"},
+    {q:'Which word is a gerund? "Swimming every morning makes Aryan feel energetic."',opts:["morning","energetic","feel","Swimming"],ans:"Swimming"},
+    {q:'Find the participle in the sentence: "The excited fans cheered loudly after the goal."',opts:["fans","goal","cheered","excited"],ans:"excited"},
+    {q:'Which option contains an infinitive?',opts:["Dancing is fun.","To dance is fun.","Danced happily.","Dancing happily."],ans:"To dance is fun."},
+    {q:'The gerund in the sentence is: "Playing video games can improve problem-solving skills."',opts:["improve","skills","Playing","games"],ans:"Playing"},
+    {q:'Choose the participle: "The barking dog woke everyone up."',opts:["woke","barking","everyone","dog"],ans:"barking"},
+    {q:'What is the underlined phrase? "The students gathered early to watch the science show."',opts:["Gerund","Participle","Infinitive Phrase","Noun Phrase"],ans:"Infinitive Phrase"},
+    {q:'Identify the gerund: "Maya enjoys painting superheroes in her notebook."',opts:["enjoys","superheroes","notebook","painting"],ans:"painting"},
+    {q:'Find the participle: "The broken skateboard lay beside the ramp."',opts:["lay","beside","broken","ramp"],ans:"broken"},
+    {q:'Which sentence contains a gerund?',opts:["I want to travel the world.","Running helps me stay fit.","The tired player rested.","She plans to win."],ans:"Running helps me stay fit."}
+];
+
+let activePlayList = [];
+let currentFloorIndex = 0;
+let pointsScore = 0;
+let currentQuestionAttempts = 0;
+
+const audioChannels = {
+    correct: document.getElementById('correctSound'),
+    wrong: document.getElementById('wrongSound'),
+    clap: document.getElementById('clapSound')
+};
+
+// Error resilience recovery wrapper
+Object.keys(audioChannels).forEach(key => {
+    audioChannels[key].addEventListener('error', () => {
+        audioChannels[key].src = audioFailsafes[key];
+        audioChannels[key].load();
     });
-}
+});
 
-function checkAnswer(selected, btn) {
-    const q = mcqs[currentQ];
-    const buttons = document.querySelectorAll('#optionsBox button');
-    buttons.forEach(b => b.disabled = true);
-    
-    if (selected === q.ans) {
-        btn.classList.add('correct');
-        feedback.innerText = "✨ Critical Strike! Correct!";
-        feedback.classList.add('text-correct');
-        try { correctAudio.currentTime = 0; correctAudio.play().catch(()=>{}); } catch(e){}
-        score++;
-        triggerFXBurst();
-    } else {
-        btn.classList.add('wrong');
-        feedback.innerText = "💥 Deflected! Correct: " + q.ans;
-        feedback.classList.add('text-wrong');
-        try { wrongAudio.currentTime = 0; wrongAudio.play().catch(()=>{}); } catch(e){}
-        buttons.forEach(b => {
-            if (b.innerText === q.ans) b.classList.add('correct');
+function fireAudioChannel(key) {
+    const channel = audioChannels[key];
+    if (!channel) return;
+    try {
+        channel.currentTime = 0;
+        channel.play().catch(() => {
+            // Backup immediate injection track mapping
+            let contextFallback = new Audio(audioFailsafes[key]);
+            contextFallback.play().catch(() => {});
         });
-    }
-    setTimeout(nextQuestion, 1600);
-}
-
-function nextQuestion() {
-    currentQ++;
-    if (currentQ >= mcqs.length) {
-        quizScreen.classList.remove('active');
-        endScreen.classList.add('active');
-        finalScore.innerText = `You completed the dungeon scoring ${score} out of ${mcqs.length}!`;
-        try { clapAudio.currentTime = 0; clapAudio.play().catch(()=>{}); } catch(e){}
-    } else {
-        showQuestion();
-    }
-}
-
-function restartQuiz() {
-    currentQ = 0;
-    score = 0;
-    endScreen.classList.remove('active');
-    quizScreen.classList.add('active');
-    showQuestion();
+    } catch(err) {}
 }
 
 /* ==========================================================================
-   PARTICLE RENDER CONTEXT ENGINE
+   TIMING COORDINATION ENGINE
+   ========================================================================== */
+window.onload = () => {
+    setTimeout(() => {
+        document.getElementById('logoScreen').classList.remove('active');
+        document.getElementById('instructionScreen').classList.add('active');
+    }, 5000);
+};
+
+function launchGamePipeline() {
+    document.getElementById('instructionScreen').classList.remove('active');
+    document.getElementById('quizScreen').classList.add('active');
+    
+    // Unlock interaction permissions for core background audio contexts
+    Object.values(audioChannels).forEach(node => {
+        if (node) { node.play().then(() => node.pause()).catch(() => {}); }
+    });
+    
+    resetAndGenerateGameArray();
+}
+
+function resetAndGenerateGameArray() {
+    activePlayList = [...mcqs].sort(() => Math.random() - 0.5);
+    currentFloorIndex = 0;
+    pointsScore = 0;
+    renderActiveQuestionCard();
+}
+
+function renderActiveQuestionCard() {
+    currentQuestionAttempts = 0;
+    
+    document.getElementById('continueBtn').style.display = "none";
+    const feedbackNode = document.getElementById('feedback');
+    feedbackNode.innerText = "";
+    feedbackNode.className = "banner-action";
+    
+    const activeTarget = activePlayList[currentFloorIndex];
+    document.getElementById('questionText').innerText = activeTarget.q;
+    
+    // Manage and map layout HUD tracking configurations
+    document.getElementById('pointsHUD').innerText = pointsScore;
+    document.getElementById('scoreText').innerText = `STAGE ${currentFloorIndex + 1} / ${activePlayList.length}`;
+    document.getElementById('healthBar').style.width = `${((currentFloorIndex) / activePlayList.length) * 100}%`;
+    
+    const optionsContainer = document.getElementById('optionsBox');
+    optionsContainer.innerHTML = '';
+    
+    activeTarget.opts.forEach(optionText => {
+        const btn = document.createElement('button');
+        btn.className = "game-btn";
+        btn.innerText = optionText;
+        btn.onclick = () => validateUserSelection(optionText, btn);
+        optionsContainer.appendChild(btn);
+    });
+}
+
+function validateUserSelection(selectedText, clickedButton) {
+    const activeTarget = activePlayList[currentFloorIndex];
+    const optionButtons = document.querySelectorAll('#optionsBox button');
+    
+    if (selectedText === activeTarget.ans) {
+        clickedButton.classList.add('correct');
+        optionButtons.forEach(b => b.disabled = true);
+        
+        pointsScore++;
+        document.getElementById('pointsHUD').innerText = pointsScore;
+        
+        const feedbackNode = document.getElementById('feedback');
+        feedbackNode.innerText = "✨ Excellent! Correct Answer!";
+        feedbackNode.className = "banner-action text-correct";
+        
+        fireAudioChannel('correct');
+        fireAudioChannel('clap');
+        renderConfettiBlast();
+        
+        document.getElementById('continueBtn').style.display = "block";
+    } else {
+        currentQuestionAttempts++;
+        clickedButton.classList.add('wrong');
+        clickedButton.disabled = true;
+        fireAudioChannel('wrong');
+        
+        if (currentQuestionAttempts >= 2) {
+            optionButtons.forEach(b => {
+                b.disabled = true;
+                if (b.innerText === activeTarget.ans) b.classList.add('correct');
+            });
+            
+            const feedbackNode = document.getElementById('feedback');
+            feedbackNode.innerText = `System Notice: Correct Answer is ${activeTarget.ans}`;
+            feedbackNode.className = "banner-action text-wrong";
+            
+            document.getElementById('continueBtn').style.display = "block";
+        } else {
+            const feedbackNode = document.getElementById('feedback');
+            feedbackNode.innerText = "❌ Incorrect option. Try your final attempt!";
+            feedbackNode.className = "banner-action text-wrong";
+        }
+    }
+}
+
+function advancePipelineFloor() {
+    currentFloorIndex++;
+    if (currentFloorIndex >= activePlayList.length) {
+        document.getElementById('healthBar').style.width = "100%";
+        document.getElementById('quizScreen').classList.remove('active');
+        document.getElementById('endScreen').classList.add('active');
+        document.getElementById('finalScore').innerText = `You completed the dungeon scoring ${pointsScore} out of ${activePlayList.length}!`;
+        fireAudioChannel('clap');
+    } else {
+        renderActiveQuestionCard();
+    }
+}
+
+function restartFullPipeline() {
+    document.getElementById('endScreen').classList.remove('active');
+    document.getElementById('quizScreen').classList.add('active');
+    resetAndGenerateGameArray();
+}
+
+/* ==========================================================================
+   PARTICLE RENDER VISUAL CONTEXT ENGINE
    ========================================================================== */
 const canvas = document.getElementById("visualFX");
 const ctx = canvas.getContext("2d");
 let pieces = [], animationRef = null;
 
-function syncCanvas() {
+function syncCanvasLayout() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 }
-window.addEventListener("resize", syncCanvas);
-syncCanvas();
+window.addEventListener("resize", syncCanvasLayout);
+syncCanvasLayout();
 
-function triggerFXBurst() {
+function renderConfettiBlast() {
     pieces = [];
     cancelAnimationFrame(animationRef);
-    const colors = ["#ffb703", "#fb8500", "#ffd60a", "#4cc9f0", "#f72585"];
+    const pallet = ["#ffb703", "#fb8500", "#ffd60a", "#4cc9f0", "#f72585"];
     
     for (let i = 0; i < 50; i++) {
         pieces.push({
@@ -381,11 +534,11 @@ function triggerFXBurst() {
             vy: Math.random() * -5 - 2,
             vx: Math.random() * 8 - 4,
             rot: Math.random() * 360,
-            color: colors[Math.floor(Math.random() * colors.length)]
+            color: pallet[Math.floor(Math.random() * pallet.length)]
         });
     }
     
-    let ticks = 0;
+    let runtimeTicks = 0;
     function loop() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         pieces.forEach(p => {
@@ -399,7 +552,7 @@ function triggerFXBurst() {
             p.x += p.vx;
             p.rot += 2;
         });
-        if (++ticks < 75) animationRef = requestAnimationFrame(loop);
+        if (++runtimeTicks < 75) animationRef = requestAnimationFrame(loop);
         else ctx.clearRect(0, 0, canvas.width, canvas.height);
     }
     loop();
