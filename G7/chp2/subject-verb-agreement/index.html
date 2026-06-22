@@ -275,12 +275,13 @@ canvas { position: fixed; inset: 0; pointer-events: none; z-index: 999; width: 1
 
 <!-- COMPILER SYSTEM MEDIA NODES -->
 <audio id="correctSound" src="assets/correct.mp3" preload="auto"></audio>
-<audio id="wrongSound" src="assets/wrong.mp3" preload="auto"></preload>
+<audio id="wrongSound" src="assets/wrong.mp3" preload="auto"></audio>
 <audio id="clapSound" src="assets/clapping.mp3" preload="auto"></audio>
 
 <!-- SCREEN 1: SPLASH INTRO -->
-<div id="splash" class="screen">
-    <img src="assets/innovine-logo.png" id="logo" alt="Innovine Logo">
+<div id="logoScreen" class="screen">
+    <img src="assets/innovine-logo.png" id="logo" alt="Innovine Engine">
+    <h2>Innovine Learning Games</h2>
 </div>
 
 <!-- SCREEN 2: THEATER TITLE SEQUENCER -->
@@ -427,7 +428,7 @@ function renderSequenceStage() {
     ui.launchLeverBtn.disabled = true;
     ui.feedbackTray.innerHTML = "";
     
-    ui.progressBadge.innerText = `CORE CORE: ${currentStageIdx + 1} / ${questionSet.length}`;
+    ui.progressBadge.innerText = `CORE SLOT: ${currentStageIdx + 1} / ${questionSet.length}`;
     ui.scoreBadge.innerText = `STABILITY STREAK: ${runtimeScore}`;
     ui.progressFill.style.width = `${(currentStageIdx / questionSet.length) * 100}%`;
 
