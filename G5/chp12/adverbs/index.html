@@ -1,1 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Adverb Magic Show</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { width: 100%; min-height: 100%; }
+    body {
+      font-family: Arial, sans-serif;
+      background: radial-gradient(circle at top, #4d0070 0%, #21002f 55%, #0f0016 100%);
+      color: #fff;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    .screen {
+      min-height: 100vh;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .screen.show { display: flex; }
+    .card {
+      width: min(980px, 100%);
+      background: linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0.04));
+      border: 2px solid rgba(255,255,255,0.16);
+      border-radius: 24px;
+      padding: 18px;
+      box-shadow: 0 0 30px rgba(255, 105, 180, 0.22);
+      backdrop-filter: blur(8px);
+    }
+    .splash {
+      text-align: center;
+    }
+    .splash img {
+      width: min(320px, 72vw);
+      height: auto;
+      filter: drop-shadow(0 0 18px rgba(255,105,180,0.7));
+      animation: logoPulse 3s ease-in-out forwards;
+    }
+    .splash h1 {
+      margin-top: 14px;
+      font-size: clamp(22px, 4vw, 40px);
+      color: #ffb5ea;
+      text-shadow: 0 0 12px rgba(255,102,204,0.6);
+    }
+    @keyframes logoPulse {
+      0% { transform: scale(0.8); opacity: 0; }
+      15% { transform: scale(1.04); opacity: 1; }
+      70% { transform: scale(1); opacity: 1; }
+      100% { transform: scale(1); opacity: 0.98; }
+    }
+    .title {
+      text-align: center;
+      font-size: clamp(26px, 5vw, 46px);
+      color: #ff90e6;
+      text-shadow: 0 0 12px rgba(255,102,204,0.7);
+      margin-bottom: 10px;
+      font-weight: 800;
+    }
+    .top {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      margin: 8px 0 12px;
+    }
+    .badge {
+      background: rgba(255,255,255,0.12);
+      border-radius: 14px;
+      padding: 10px 14px;
+      font-weight: 700;
+      flex: 1 1 120px;
+      text-align: center;
+    }
+    .progress {
+      width: 100%;
+      height: 10px;
+      background: rgba(255,255,255,0.12);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-bottom: 16px;
+    }
+    .bar {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, #ff66cc, #7b7bff, #57f3ff);
+      transition: width .35s ease;
+    }
+    .magician {
+      text-align: center;
+      font-size: clamp(72px, 12vw, 120px);
+      margin: 6px 0 2px;
+    }
+    .trick {
+      text-align: center;
+      font-size: clamp(18px, 3.6vw, 28px);
+      color: #a8ffe9;
+      font-weight: 800;
+      margin: 10px 0;
+    }
+    .question {
+      text-align: center;
+      font-size: clamp(22px, 4vw, 32px);
+      line-height: 1.5;
+      margin: 8px auto 18px;
+      max-width: 860px;
+      padding: 0 8px;
+    }
+    .options {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin: 10px 0 16px;
+    }
+    .opt {
+      appearance: none;
+      border: 2px solid rgba(255,255,255,0.18);
+      background: linear-gradient(180deg, #7531ba, #55248c);
+      color: #fff;
+      border-radius: 18px;
+      min-height: 66px;
+      padding: 14px 12px;
+      font-size: clamp(18px, 3.5vw, 26px);
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform .15s ease, opacity .15s ease;
+    }
+    .opt:hover { transform: translateY(-1px) scale(1.01); }
+    .opt:disabled { opacity: .55; cursor: not-allowed; transform: none; }
+    .msg, .explain { min-height: 8px; }
+    .next, .restart {
+      width: 100%;
+      border: none;
+      border-radius: 18px;
+      padding: 16px 18px;
+      font-size: clamp(18px, 3.6vw, 24px);
+      font-weight: 800;
+      cursor: pointer;
+      color: white;
+      background: linear-gradient(180deg, #ff5fbf, #c63d8f);
+      box-shadow: 0 10px 24px rgba(255, 95, 191, .25);
+    }
+    .next:disabled { opacity: .45; cursor: not-allowed; box-shadow: none; }
+    .final { text-align: center; }
+    .final h2 {
+      font-size: clamp(28px, 5vw, 44px);
+      color: #ff96e6;
+      margin-bottom: 12px;
+    }
+    .final p {
+      font-size: clamp(20px, 4vw, 28px);
+      margin: 10px 0 18px;
+      color: #f1ff8a;
+    }
+    .confetti {
+      position: fixed;
+      top: -14px;
+      width: 10px;
+      height: 14px;
+      border-radius: 3px;
+      animation: fall 2.8s linear forwards;
+      z-index: 9999;
+    }
+    @keyframes fall {
+      to { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+    }
+    .sparkle {
+      position: fixed;
+      font-size: 28px;
+      animation: sparkle 1s ease-out forwards;
+      z-index: 9999;
+      pointer-events: none;
+    }
+    @keyframes sparkle {
+      0% { transform: scale(.2); opacity: 0; }
+      25% { transform: scale(1.2); opacity: 1; }
+      100% { transform: scale(0); opacity: 0; }
+    }
+    @media (max-width: 700px) {
+      .options { grid-template-columns: 1fr; }
+      .card { padding: 14px; border-radius: 20px; }
+      .badge { flex: 1 1 100%; }
+    }
+  </style>
+</head>
+<body>
+  <div class="screen show" id="splashScreen">
+    <div class="card splash">
+      <img src="assets/logo.png" alt="Innovine logo">
+      <h1>Adverb Magic Show</h1>
+    </div>
+  </div>
 
+  <div class="screen" id="gameScreen">
+    <div class="card">
+      <div class="title">🎪 Adverb Magic Show 🎪</div>
+      <div class="top">
+        <div class="badge" id="scoreText">Score: 0</div>
+        <div class="badge" id="trickText">Question 1 / 15</div>
+        <div class="badge" id="attemptText">Attempt 1 / 2</div>
+      </div>
+      <div class="progress"><div class="bar" id="bar"></div></div>
+      <div class="magician" id="magician">🧙‍♂️</div>
+      <div class="trick" id="trickName"></div>
+      <div class="question" id="question"></div>
+      <div class="options" id="options"></div>
+      <div class="msg" id="message"></div>
+      <div class="explain" id="explain"></div>
+      <button class="next" id="nextBtn" disabled>Next Question 🪄</button>
+    </div>
+  </div>
+
+  <div class="screen" id="finalScreen">
+    <div class="card final">
+      <h2>🎉 Game Complete! 🎉</h2>
+      <div class="magician">🧙‍♂️✨🎪✨</div>
+      <p id="finalScore"></p>
+      <p id="finalMsg"></p>
+      <button class="restart" id="restartBtn">Play Again 🪄</button>
+    </div>
+  </div>
+
+  <script>
+    const tricks = [
+      {
+        type: "Adverb of Manner",
+        name: "Question 1",
+        question: "During the school performance, Riya spoke so ___ that everyone in the hall could understand her words clearly.",
+        options: ["quickly", "clearly", "here", "often"],
+        correct: "clearly",
+        explain: "This tells us how she spoke, so it is an adverb of manner."
+      },
+      {
+        type: "Adverb of Frequency",
+        name: "Question 2",
+        question: "My grandmother ___ waters the plants early in the morning, even before the birds begin to sing.",
+        options: ["always", "behind", "slowly", "yesterday"],
+        correct: "always",
+        explain: "This tells us how often she waters the plants."
+      },
+      {
+        type: "Adverb of Place",
+        name: "Question 3",
+        question: "The little puppy was hiding ___ the sofa when we searched the entire room.",
+        options: ["because", "nearby", "under", "very"],
+        correct: "under",
+        explain: "This tells us where the puppy was hiding."
+      },
+      {
+        type: "Adverb of Degree",
+        name: "Question 4",
+        question: "The mango shake was ___ sweet, so my brother asked for another glass immediately.",
+        options: ["almost", "very", "tomorrow", "outside"],
+        correct: "very",
+        explain: "This tells us the intensity of sweetness."
+      },
+      {
+        type: "Adverb of Reason",
+        name: "Question 5",
+        question: "The children stayed inside the classroom ___ it started raining heavily during the sports period.",
+        options: ["because", "quickly", "there", "soon"],
+        correct: "because",
+        explain: "This tells us the reason they stayed inside."
+      },
+      {
+        type: "Adverb of Time",
+        name: "Question 6",
+        question: "We will visit our cousins ___ after the examination is over and the holidays begin.",
+        options: ["yesterday", "above", "carefully", "soon"],
+        correct: "soon",
+        explain: "This tells us when the visit will happen."
+      },
+      {
+        type: "Adverb of Manner",
+        name: "Question 7",
+        question: "The teacher asked us to write the answers ___ so that our notebooks look neat and organized.",
+        options: ["neatly", "often", "there", "later"],
+        correct: "neatly",
+        explain: "This tells us how to write the answers."
+      },
+      {
+        type: "Adverb of Frequency",
+        name: "Question 8",
+        question: "Although he is busy with homework, Arjun ___ reads a storybook before going to sleep.",
+        options: ["inside", "usually", "brightly", "tomorrow"],
+        correct: "usually",
+        explain: "This tells us how often Arjun reads a storybook."
+      },
+      {
+        type: "Adverb of Place",
+        name: "Question 9",
+        question: "Please keep your shoes ___ the door before coming into the classroom.",
+        options: ["outside", "always", "very", "today"],
+        correct: "outside",
+        explain: "This tells us where to keep the shoes."
+      },
+      {
+        type: "Adverb of Degree",
+        name: "Question 10",
+        question: "The crowd was ___ excited when the school team scored the winning goal in the last minute.",
+        options: ["where", "soon", "extremely", "loudly"],
+        correct: "extremely",
+        explain: "This shows a very high degree of excitement."
+      },
+      {
+        type: "Adverb of Reason",
+        name: "Question 11",
+        question: "The road was blocked, ___ the bus had to take a longer route to reach the station.",
+        options: ["since", "neatly", "here", "often"],
+        correct: "since",
+        explain: "This tells us the reason for taking the longer route."
+      },
+      {
+        type: "Adverb of Time",
+        name: "Question 12",
+        question: "The school annual function will begin ___ after the chief guest arrives on the stage.",
+        options: ["later", "outside", "because", "carefully"],
+        correct: "later",
+        explain: "This tells us when the function will begin."
+      },
+      {
+        type: "Adverb of Manner",
+        name: "Question 13",
+        question: "The baby slept so ___ that even the loud thunder did not wake him up.",
+        options: ["quietly", "peacefully", "there", "often"],
+        correct: "peacefully",
+        explain: "This tells us how the baby slept."
+      },
+      {
+        type: "Adverb of Frequency",
+        name: "Question 14",
+        question: "Our class goes to the library ___, especially when we need extra reading practice.",
+        options: ["sometimes", "very", "outside", "tomorrow"],
+        correct: "sometimes",
+        explain: "This tells us how often the class goes to the library."
+      },
+      {
+        type: "Adverb of Place",
+        name: "Question 15",
+        question: "The treasure map was hidden ___ in the old cupboard behind the school stage.",
+        options: ["inside", "slowly", "because", "yesterday"],
+        correct: "inside",
+        explain: "This tells us where the map was hidden."
+      }
+    ];
+
+    let current = 0;
+    let attempts = 0;
+    let score = 0;
+    let locked = false;
+    let audioReady = false;
+
+    const splashScreen = document.getElementById("splashScreen");
+    const gameScreen = document.getElementById("gameScreen");
+    const finalScreen = document.getElementById("finalScreen");
+    const scoreText = document.getElementById("scoreText");
+    const trickText = document.getElementById("trickText");
+    const attemptText = document.getElementById("attemptText");
+    const bar = document.getElementById("bar");
+    const magician = document.getElementById("magician");
+    const trickName = document.getElementById("trickName");
+    const question = document.getElementById("question");
+    const optionsBox = document.getElementById("options");
+    const message = document.getElementById("message");
+    const explain = document.getElementById("explain");
+    const nextBtn = document.getElementById("nextBtn");
+    const finalScore = document.getElementById("finalScore");
+    const finalMsg = document.getElementById("finalMsg");
+    const restartBtn = document.getElementById("restartBtn");
+
+    const correctAudio = new Audio("assets/correct.mp3");
+    const wrongAudio = new Audio("assets/wrong.mp3");
+    const clapAudio = new Audio("assets/freesound_community-claps-44774.mp3");
+
+    function prepareAudio() {
+      if (audioReady) return;
+      [correctAudio, wrongAudio, clapAudio].forEach(a => {
+        a.preload = "auto";
+        a.volume = 1;
+      });
+      audioReady = true;
+    }
+
+    function playSound(aud) {
+      try {
+        aud.currentTime = 0;
+        aud.play().catch(() => {});
+      } catch (e) {}
+    }
+
+    function showConfetti() {
+      const colors = ["#ff66cc", "#ffe066", "#66ffcc", "#8a7dff", "#ff7f50"];
+      for (let i = 0; i < 36; i++) {
+        const d = document.createElement("div");
+        d.className = "confetti";
+        d.style.left = Math.random() * 100 + "vw";
+        d.style.background = colors[Math.floor(Math.random() * colors.length)];
+        d.style.animationDelay = (Math.random() * 0.4) + "s";
+        d.style.transform = `rotate(${Math.random() * 180}deg)`;
+        document.body.appendChild(d);
+        setTimeout(() => d.remove(), 3200);
+      }
+    }
+
+    function showSparkles() {
+      const items = ["✨", "⭐", "💫"];
+      for (let i = 0; i < 16; i++) {
+        const s = document.createElement("div");
+        s.className = "sparkle";
+        s.textContent = items[Math.floor(Math.random() * items.length)];
+        s.style.left = Math.random() * 100 + "vw";
+        s.style.top = Math.random() * 100 + "vh";
+        document.body.appendChild(s);
+        setTimeout(() => s.remove(), 1200);
+      }
+    }
+
+    function render() {
+      if (current >= tricks.length) return showFinal();
+      const t = tricks[current];
+      trickText.textContent = `Question ${current + 1} / ${tricks.length}`;
+      attemptText.textContent = `Attempt ${attempts + 1} / 2`;
+      scoreText.textContent = `Score: ${score}`;
+      bar.style.width = `${(current / tricks.length) * 100}%`;
+      trickName.textContent = t.type + " — " + t.name;
+      question.textContent = t.question;
+      message.textContent = "";
+      explain.textContent = "";
+      nextBtn.disabled = true;
+      locked = false;
+      optionsBox.innerHTML = "";
+      t.options.forEach(opt => {
+        const b = document.createElement("button");
+        b.className = "opt";
+        b.textContent = opt;
+        b.onclick = () => answer(opt, b);
+        optionsBox.appendChild(b);
+      });
+    }
+
+    function disableOptions() {
+      optionsBox.querySelectorAll("button").forEach(b => b.disabled = true);
+    }
+
+    function answer(opt, btn) {
+      if (locked) return;
+      const t = tricks[current];
+      if (opt === t.correct) {
+        locked = true;
+        score += 10;
+        magician.textContent = "🧙‍♂️✨";
+        playSound(correctAudio);
+        setTimeout(() => playSound(clapAudio), 900);
+        showConfetti();
+        showSparkles();
+        disableOptions();
+        nextBtn.disabled = false;
+        scoreText.textContent = `Score: ${score}`;
+        message.textContent = "";
+        explain.textContent = "";
+      } else {
+        playSound(wrongAudio);
+        attempts += 1;
+        magician.textContent = "🧙‍♂️❌";
+        btn.disabled = true;
+        btn.style.opacity = "0.4";
+        if (attempts < 2) {
+          attemptText.textContent = `Attempt ${attempts + 1} / 2`;
+        } else {
+          locked = true;
+          disableOptions();
+          nextBtn.disabled = false;
+        }
+        message.textContent = "";
+        explain.textContent = "";
+      }
+    }
+
+    function next() {
+      current += 1;
+      attempts = 0;
+      magician.textContent = "🧙‍♂️";
+      if (current >= tricks.length) showFinal();
+      else render();
+    }
+
+    function showFinal() {
+      gameScreen.classList.remove("show");
+      finalScreen.classList.add("show");
+      finalScore.textContent = `Your Final Score: ${score} / ${tricks.length * 10}`;
+      finalMsg.textContent =
+        score === 150 ? "✨ Perfect! You are an Adverb Magic Master!" :
+        score >= 120 ? "🎉 Amazing! You are a great adverb magician!" :
+        score >= 90 ? "😊 Good job! Keep practicing your grammar magic!" :
+        "🪄 Keep trying and you'll become a grammar master!";
+      playSound(clapAudio);
+      bar.style.width = "100%";
+    }
+
+    function restartGame() {
+      current = 0;
+      attempts = 0;
+      score = 0;
+      locked = false;
+      finalScreen.classList.remove("show");
+      gameScreen.classList.add("show");
+      magician.textContent = "🧙‍♂️";
+      render();
+    }
+
+    nextBtn.addEventListener("click", next);
+    restartBtn.addEventListener("click", restartGame);
+
+    setTimeout(() => {
+      splashScreen.classList.remove("show");
+      gameScreen.classList.add("show");
+      prepareAudio();
+      render();
+    }, 3000);
+
+    document.addEventListener("click", prepareAudio, { once: true });
+    document.addEventListener("touchstart", prepareAudio, { once: true });
+  </script>
+</body>
+</html>
