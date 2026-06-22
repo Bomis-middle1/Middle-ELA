@@ -1,1 +1,739 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>Preposition Simon Says</title>
+<style>
+  :root{
+    --bg1:#7c3aed; --bg2:#22c55e; --bg3:#06b6d4; --card:#ffffff; --ink:#1f2937;
+    --accent:#f97316; --good:#16a34a; --bad:#dc2626; --soft:#f8fafc; --line:#dbeafe;
+  }
+  *{box-sizing:border-box}
+  html,body{
+    height:100%;
+    margin:0;
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+    background:linear-gradient(135deg,var(--bg1),var(--bg3));
+    color:var(--ink);
+    overflow:hidden;
+  }
+  .app{
+    min-height:100%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:14px;
+  }
+  .shell{
+    width:min(1100px,100%);
+    height:min(720px,calc(100vh - 28px));
+    display:grid;
+    grid-template-rows:auto 1fr auto;
+    gap:12px;
+  }
+  .topbar,.footer,.panel,.screen{
+    border-radius:24px;
+    background:rgba(255,255,255,.92);
+    backdrop-filter:blur(8px);
+    box-shadow:0 18px 50px rgba(0,0,0,.18);
+  }
+  .topbar{
+    padding:12px 16px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+  }
+  .brand{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    min-width:0;
+  }
+  .logo-badge{
+    width:48px;
+    height:48px;
+    border-radius:14px;
+    background:linear-gradient(135deg,#fde68a,#fb7185);
+    display:grid;
+    place-items:center;
+    overflow:hidden;
+    flex:0 0 auto;
+  }
+  .logo-badge img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+  }
+  .title-wrap{min-width:0}
+  .title{
+    font-weight:900;
+    font-size:clamp(18px,2.5vw,30px);
+    line-height:1.05;
+  }
+  .sub{
+    font-size:12px;
+    opacity:.8;
+  }
+  .stats{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    justify-content:flex-end;
+  }
+  .pill{
+    background:#f1f5f9;
+    border:2px solid var(--line);
+    padding:8px 12px;
+    border-radius:999px;
+    font-weight:800;
+  }
+  .main{
+    display:grid;
+    grid-template-columns:1.15fr .85fr;
+    gap:12px;
+    min-height:0;
+  }
+  .panel{
+    padding:16px;
+    min-height:0;
+    display:flex;
+    flex-direction:column;
+  }
+  .scene{
+    flex:1;
+    position:relative;
+    border-radius:22px;
+    background:linear-gradient(180deg,#dbeafe 0%,#eff6ff 40%,#d9f99d 40%,#bbf7d0 100%);
+    overflow:hidden;
+    border:3px solid rgba(255,255,255,.7);
+  }
+  .cloud{
+    position:absolute;
+    background:#fff;
+    border-radius:999px;
+    opacity:.9;
+    filter:drop-shadow(0 8px 12px rgba(0,0,0,.08));
+  }
+  .cloud:before,.cloud:after{
+    content:"";
+    position:absolute;
+    background:#fff;
+    border-radius:999px;
+  }
+  .cloud.c1{width:110px;height:38px;top:22px;left:22px}
+  .cloud.c1:before{width:44px;height:44px;left:14px;top:-18px}
+  .cloud.c1:after{width:52px;height:52px;left:50px;top:-24px}
+  .cloud.c2{width:120px;height:42px;top:56px;right:34px}
+  .cloud.c2:before{width:50px;height:50px;left:18px;top:-20px}
+  .cloud.c2:after{width:56px;height:56px;left:58px;top:-25px}
+  .board{
+    position:absolute;
+    left:50%;
+    top:16px;
+    transform:translateX(-50%);
+    background:#fff8dc;
+    border:6px solid #8b5e34;
+    border-radius:18px;
+    padding:10px 16px;
+    min-width:min(92%,560px);
+    text-align:center;
+    box-shadow:0 10px 0 rgba(139,94,52,.2);
+  }
+  .board .cmd{
+    font-weight:900;
+    font-size:clamp(16px,2.7vw,26px);
+    line-height:1.2;
+  }
+  .board .hint{
+    font-size:12px;
+    opacity:.75;
+    margin-top:4px;
+  }
+  .classroom{
+    position:absolute;
+    left:0;
+    right:0;
+    bottom:0;
+    height:42%;
+    background:linear-gradient(180deg,#fde68a 0%,#f59e0b 100%);
+    border-top:5px solid #fff;
+  }
+  .floor{
+    position:absolute;
+    inset:auto 0 0 0;
+    height:18px;
+    background:#92400e;
+    opacity:.55;
+  }
+  .desk{
+    position:absolute;
+    bottom:28px;
+    width:120px;
+    height:68px;
+    background:#a16207;
+    border-radius:10px 10px 16px 16px;
+    box-shadow:inset 0 -12px rgba(0,0,0,.12);
+  }
+  .desk:before{
+    content:"";
+    position:absolute;
+    inset:10px 8px auto 8px;
+    height:8px;
+    background:#fef3c7;
+    border-radius:6px;
+  }
+  .desk:after{
+    content:"";
+    position:absolute;
+    left:14px;
+    right:14px;
+    bottom:-18px;
+    height:20px;
+    border-left:6px solid #92400e;
+    border-right:6px solid #92400e;
+    border-bottom:6px solid transparent;
+    border-radius:0 0 6px 6px;
+  }
+  .desk.d1{left:14%}
+  .desk.d2{right:14%}
+  .student{
+    position:absolute;
+    bottom:38px;
+    left:50%;
+    transform:translateX(-50%);
+    width:190px;
+    height:210px;
+    display:grid;
+    place-items:end center;
+    transition:transform .35s ease;
+  }
+  .head{
+    width:74px;
+    height:74px;
+    border-radius:50%;
+    background:#ffd7b3;
+    border:5px solid #333;
+    position:relative;
+    z-index:2;
+  }
+  .hair{
+    position:absolute;
+    top:-10px;
+    left:-6px;
+    width:86px;
+    height:42px;
+    background:#8b5cf6;
+    border-radius:60px 60px 40px 40px;
+  }
+  .eye{
+    position:absolute;
+    top:29px;
+    width:8px;
+    height:8px;
+    background:#333;
+    border-radius:50%;
+  }
+  .eye.l{left:19px}
+  .eye.r{right:19px}
+  .smile{
+    position:absolute;
+    bottom:14px;
+    left:50%;
+    transform:translateX(-50%);
+    width:26px;
+    height:12px;
+    border-bottom:5px solid #333;
+    border-radius:0 0 20px 20px;
+  }
+  .body{
+    width:96px;
+    height:84px;
+    background:linear-gradient(180deg,#60a5fa,#2563eb);
+    border:5px solid #333;
+    border-radius:18px 18px 26px 26px;
+    position:relative;
+    margin-top:-8px;
+    z-index:1;
+  }
+  .arm{
+    position:absolute;
+    top:16px;
+    width:60px;
+    height:18px;
+    border-top:7px solid #333;
+    border-radius:12px;
+  }
+  .arm.l{left:-54px;transform-origin:right center}
+  .arm.r{right:-54px;transform-origin:left center}
+  .leg{
+    position:absolute;
+    bottom:-52px;
+    width:20px;
+    height:62px;
+    background:#334155;
+    border:5px solid #333;
+    border-top:none;
+    border-radius:0 0 14px 14px;
+  }
+  .leg.l{left:20px}
+  .leg.r{right:20px}
+  .prop{
+    position:absolute;
+    background:#fff;
+    border:4px solid #333;
+    border-radius:18px;
+    box-shadow:0 8px 0 rgba(0,0,0,.1);
+  }
+  .book{
+    width:90px;
+    height:70px;
+    left:8%;
+    bottom:34px;
+    background:linear-gradient(135deg,#fb7185,#f59e0b);
+  }
+  .book:before{
+    content:"";
+    position:absolute;
+    inset:10px;
+    border:3px dashed rgba(255,255,255,.9);
+    border-radius:12px;
+  }
+  .pencil{
+    width:24px;
+    height:110px;
+    right:10%;
+    bottom:26px;
+    transform:rotate(20deg);
+    background:linear-gradient(180deg,#fde047 0 70%,#fb7185 70% 85%,#cbd5e1 85%);
+  }
+  .window{
+    position:absolute;
+    top:80px;
+    left:18px;
+    width:160px;
+    height:110px;
+    background:#bae6fd;
+    border:5px solid #334155;
+    border-radius:18px;
+    overflow:hidden;
+  }
+  .window:before,.window:after{
+    content:"";
+    position:absolute;
+    background:#7dd3fc;
+  }
+  .window:before{
+    inset:0 50% 0 0;
+    border-right:4px solid #334155;
+  }
+  .window:after{
+    inset:50% 0 0 0;
+    border-top:4px solid #334155;
+  }
+  .rightcard{
+    display:grid;
+    grid-template-rows:auto auto 1fr;
+    gap:12px;
+  }
+  .instruction{
+    background:linear-gradient(180deg,#ecfeff,#f0fdf4);
+    border:2px solid #a7f3d0;
+    border-radius:20px;
+    padding:14px;
+  }
+  .instruction h3{
+    margin:0 0 8px;
+    font-size:18px;
+  }
+  .instruction ul{
+    margin:0;
+    padding-left:18px;
+    font-size:14px;
+    line-height:1.35;
+  }
+  .controls{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+  }
+  button{
+    border:none;
+    border-radius:16px;
+    padding:14px 16px;
+    font-size:16px;
+    font-weight:900;
+    cursor:pointer;
+    transition:transform .08s ease,filter .2s ease;
+  }
+  button:active{transform:scale(.98)}
+  .start{
+    background:linear-gradient(135deg,#22c55e,#16a34a);
+    color:#fff;
+  }
+  .next{
+    background:linear-gradient(135deg,#f97316,#ea580c);
+    color:#fff;
+  }
+  .again{
+    background:linear-gradient(135deg,#8b5cf6,#6366f1);
+    color:#fff;
+  }
+  .sound{
+    background:#e2e8f0;
+    color:#0f172a;
+  }
+  .feedback{
+    margin-top:6px;
+    padding:12px 14px;
+    border-radius:16px;
+    background:#f8fafc;
+    border:2px dashed #cbd5e1;
+    min-height:92px;
+    font-weight:800;
+    line-height:1.4;
+  }
+  .feedback.good{
+    border-color:#86efac;
+    background:#f0fdf4;
+  }
+  .feedback.bad{
+    border-color:#fca5a5;
+    background:#fef2f2;
+  }
+  .feedback.neutral{
+    border-color:#cbd5e1;
+  }
+  .mini{
+    font-size:13px;
+    font-weight:700;
+    opacity:.85;
+  }
+  .overlay{
+    position:fixed;
+    inset:0;
+    display:grid;
+    place-items:center;
+    background:linear-gradient(135deg,rgba(124,58,237,.92),rgba(6,182,212,.9));
+    z-index:30;
+  }
+  .overlay.hidden{display:none}
+  .splash{
+    width:min(540px,92vw);
+    background:#fff;
+    border-radius:28px;
+    padding:26px;
+    box-shadow:0 30px 90px rgba(0,0,0,.25);
+    text-align:center;
+  }
+  .splash img{
+    width:min(280px,70vw);
+    max-height:180px;
+    object-fit:contain;
+    margin:8px auto 12px;
+    display:block;
+  }
+  .bigtitle{
+    font-size:clamp(28px,5vw,48px);
+    font-weight:1000;
+    color:#6d28d9;
+    margin:0;
+  }
+  .splash p{
+    margin:10px 0 0;
+    font-size:16px;
+    line-height:1.45;
+  }
+  .center{
+    display:grid;
+    place-items:center;
+    min-height:0;
+  }
+  .message{
+    font-size:clamp(16px,2.4vw,22px);
+    font-weight:900;
+    text-align:center;
+    padding:10px 12px;
+    border-radius:16px;
+    background:#fff7ed;
+    border:2px solid #fed7aa;
+  }
+  .hidden{display:none !important}
+  .pose-up .arm.l,.pose-up .arm.r{transform:rotate(-90deg)}
+  .pose-behind .arm.l,.pose-behind .arm.r{transform:rotate(35deg)}
+  .pose-between{transform:translateX(-50%) scale(.98)}
+  .pose-over{transform:translateX(-50%) translateY(-12px) rotate(-6deg)}
+  .pose-under{transform:translateX(-50%) translateY(26px) scale(.92)}
+  .pose-nextto{transform:translateX(calc(-50% + 38px))}
+  .pose-front{transform:translateX(-50%) translateY(-4px)}
+  .pose-on .student{transform:translateX(-50%) translateY(-54px) scale(.88)}
+  @media (max-width:900px){
+    .shell{
+      height:auto;
+      min-height:calc(100vh - 28px);
+    }
+    .main{
+      grid-template-columns:1fr;
+      grid-template-rows:minmax(360px,1fr) auto;
+    }
+    .scene{min-height:380px}
+  }
+  @media (max-width:540px){
+    .topbar{
+      flex-direction:column;
+      align-items:flex-start;
+    }
+    .stats{
+      justify-content:flex-start;
+    }
+    .controls{
+      grid-template-columns:1fr;
+    }
+    .board{
+      min-width:90%;
+    }
+    .student{
+      width:160px;
+      height:190px;
+    }
+    .head{
+      transform:scale(.92);
+    }
+  }
+</style>
+</head>
+<body>
+<div class="overlay" id="splash">
+  <div class="splash">
+    <img src="assets/logo.png" alt="Logo">
+    <h1 class="bigtitle">Preposition Simon Says</h1>
+    <p>Get ready for a fun classroom game full of movement, colors, and prepositions!</p>
+    <p><strong>Loading in 3 seconds...</strong></p>
+  </div>
+</div>
 
+<div class="app">
+  <div class="shell">
+    <div class="topbar">
+      <div class="brand">
+        <div class="logo-badge"><img src="assets/logo.png" alt="Logo"></div>
+        <div class="title-wrap">
+          <div class="title">Preposition Simon Says</div>
+          <div class="sub">Grade 5 • Classroom + Cartoon Fun</div>
+        </div>
+      </div>
+      <div class="stats">
+        <div class="pill">Score: <span id="score">0</span></div>
+        <div class="pill">Round: <span id="round">1</span>/10</div>
+        <div class="pill">Timer: <span id="time">15</span>s</div>
+      </div>
+    </div>
+
+    <div class="main">
+      <div class="panel">
+        <div class="scene" id="scene">
+          <div class="cloud c1"></div>
+          <div class="cloud c2"></div>
+          <div class="window"></div>
+          <div class="board">
+            <div class="cmd" id="command">Wait for the game to start...</div>
+            <div class="hint" id="rulehint">Listen carefully. Follow only commands that begin with Simon says.</div>
+          </div>
+          <div class="desk d1"></div>
+          <div class="desk d2"></div>
+          <div class="classroom"></div>
+          <div class="floor"></div>
+          <div class="prop book"></div>
+          <div class="prop pencil"></div>
+          <div class="student pose-front" id="student">
+            <div class="head">
+              <div class="hair"></div>
+              <div class="eye l"></div>
+              <div class="eye r"></div>
+              <div class="smile"></div>
+            </div>
+            <div class="body">
+              <div class="arm l"></div>
+              <div class="arm r"></div>
+              <div class="leg l"></div>
+              <div class="leg r"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel rightcard">
+        <div class="instruction">
+          <h3>How to play</h3>
+          <ul>
+            <li>Only move when the command starts with <strong>Simon says</strong>.</li>
+            <li>Tap <strong>Do it</strong> if Simon says the action.</li>
+            <li>Tap <strong>Don’t do it</strong> if it does not start with Simon says.</li>
+            <li>Try to get the highest score before 10 rounds end.</li>
+          </ul>
+        </div>
+        <div class="controls">
+          <button class="start" id="startBtn">Start Game</button>
+          <button class="sound" id="soundBtn">Sound: On</button>
+          <button class="next hidden" id="yesBtn">Do it</button>
+          <button class="next hidden" id="noBtn">Don’t do it</button>
+        </div>
+        <div class="feedback neutral" id="feedback">Press Start Game to begin.</div>
+        <div class="center">
+          <div class="message hidden" id="finalMsg"></div>
+        </div>
+        <button class="again hidden" id="replayBtn">Play Again</button>
+      </div>
+    </div>
+
+    <div class="footer" style="padding:12px 16px;text-align:center;font-weight:700;background:rgba(255,255,255,.85)">
+      Responsive web game for mobile, tablet, laptop, and desktop.
+    </div>
+  </div>
+</div>
+
+<audio id="correctAudio" src="assets/correct.mp3" preload="auto"></audio>
+<audio id="wrongAudio" src="assets/wrong.mp3" preload="auto"></audio>
+<audio id="clapAudio" src="assets/freesound_community-claps-44774.mp3" preload="auto"></audio>
+
+<script>
+const commands = [
+  {text:'Simon says stand ABOVE your chair', pose:'pose-up', truth:true},
+  {text:'Simon says stand BEHIND the desk', pose:'pose-behind', truth:true},
+  {text:'Simon says stand BETWEEN the desks', pose:'pose-between', truth:true},
+  {text:'Simon says jump OVER the book', pose:'pose-over', truth:true},
+  {text:'Simon says crouch UNDER the table', pose:'pose-under', truth:true},
+  {text:'Simon says stand NEXT TO your friend', pose:'pose-nextto', truth:true},
+  {text:'Touch the ceiling', pose:'pose-up', truth:false},
+  {text:'Walk to the board', pose:'pose-front', truth:false},
+  {text:'Put your hands on your head', pose:'pose-on', truth:false},
+  {text:'Stand in front of the desk', pose:'pose-front', truth:false}
+];
+
+const el = id => document.getElementById(id);
+const scene = el('scene'), student = el('student'), commandEl = el('command'), hintEl = el('rulehint');
+const scoreEl = el('score'), roundEl = el('round'), timeEl = el('time'), feedback = el('feedback');
+const startBtn = el('startBtn'), yesBtn = el('yesBtn'), noBtn = el('noBtn'), replayBtn = el('replayBtn'), soundBtn = el('soundBtn');
+const splash = el('splash'), finalMsg = el('finalMsg');
+const correctAudio = el('correctAudio'), wrongAudio = el('wrongAudio'), clapAudio = el('clapAudio');
+
+let score=0, round=0, time=15, timer=null, current=null, playing=false, soundOn=true, answered=false;
+
+function setFeedback(text, cls='neutral'){
+  feedback.className = 'feedback '+cls;
+  feedback.innerHTML = text;
+}
+function playAudio(a){
+  if(soundOn){
+    a.currentTime=0;
+    a.play().catch(()=>{});
+  }
+}
+function showButtons(show){
+  yesBtn.classList.toggle('hidden', !show);
+  noBtn.classList.toggle('hidden', !show);
+}
+function updateStats(){
+  scoreEl.textContent = score;
+  roundEl.textContent = Math.min(round+1,10);
+  timeEl.textContent = time;
+}
+function setPose(pose){
+  student.className = 'student '+pose;
+}
+function pickCommand(){
+  return commands[Math.floor(Math.random()*commands.length)];
+}
+function nextRound(){
+  if(round>=10){
+    endGame();
+    return;
+  }
+  answered=false;
+  current = pickCommand();
+  commandEl.innerHTML = current.text.replace('Simon says','<span style="color:#7c3aed">Simon says</span>');
+  hintEl.textContent = current.truth ? 'This one starts with Simon says.' : 'Careful! This command does not start with Simon says.';
+  setPose(current.pose);
+  setFeedback('Choose the correct button before time runs out.', 'neutral');
+  round++;
+  updateStats();
+}
+function startTimer(){
+  clearInterval(timer);
+  time=15;
+  updateStats();
+  timer = setInterval(()=>{
+    if(!playing) return;
+    time--;
+    updateStats();
+    if(time<=0){
+      clearInterval(timer);
+      handleChoice(false, true);
+    }
+  },1000);
+}
+function handleChoice(choice, timeout=false){
+  if(answered || !playing) return;
+  answered=true;
+  clearInterval(timer);
+  const correct = (choice === current.truth);
+  if(correct){
+    score++;
+    playAudio(correctAudio);
+    setFeedback(timeout ? 'Time up, but your logic was correct. Great job!' : 'Correct! Nice listening and movement!', 'good');
+  } else {
+    playAudio(wrongAudio);
+    setFeedback(timeout ? 'Time ran out. The correct answer was the other choice.' : 'Oops! That was the wrong choice.', 'bad');
+  }
+  updateStats();
+  setTimeout(()=>{
+    if(playing){
+      time=15;
+      startTimer();
+      nextRound();
+    }
+  },1100);
+}
+function startGame(){
+  playing=true;
+  score=0;
+  round=0;
+  time=15;
+  updateStats();
+  finalMsg.classList.add('hidden');
+  replayBtn.classList.add('hidden');
+  showButtons(true);
+  startBtn.textContent='Restart Game';
+  setFeedback('Game started! Listen carefully and choose fast.', 'neutral');
+  nextRound();
+  startTimer();
+}
+function endGame(){
+  playing=false;
+  clearInterval(timer);
+  showButtons(false);
+  playAudio(clapAudio);
+  finalMsg.classList.remove('hidden');
+  replayBtn.classList.remove('hidden');
+  finalMsg.textContent = score >= 8 ? `Amazing! You scored ${score}/10 and won the classroom challenge!` : `You finished with ${score}/10. Try again to beat your score!`;
+  commandEl.textContent = 'Game over!';
+  hintEl.textContent = 'Tap Play Again to try another round.';
+  setFeedback('Tap Play Again to start a new game.', 'neutral');
+}
+startBtn.onclick = ()=>{
+  if(!playing){ startGame(); } else { startGame(); }
+};
+yesBtn.onclick = ()=> handleChoice(true);
+noBtn.onclick = ()=> handleChoice(false);
+replayBtn.onclick = ()=> startGame();
+soundBtn.onclick = ()=>{
+  soundOn=!soundOn;
+  soundBtn.textContent = 'Sound: ' + (soundOn ? 'On' : 'Off');
+};
+setTimeout(()=> splash.classList.add('hidden'), 3000);
+updateStats();
+showButtons(false);
+</script>
+</body>
+</html>
