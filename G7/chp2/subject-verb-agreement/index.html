@@ -189,4 +189,167 @@ input[type=range] { accent-color: #10b981; cursor: pointer; width: 140px; }
     box-shadow: 0 8px 20px rgba(37, 99, 235, 0.35);
     border-color: #3b82f6;
 }
-.verb-cell
+.verb-cell-node.active-load {
+    background: linear-gradient(135deg, #a855f7, #7c3aed);
+    color: white;
+    border-color: #c084fc;
+    box-shadow: 0 0 20px rgba(168, 85, 247, 0.4);
+}
+
+/* SUBMIT ENGINE MASTER LEVER */
+#launchLeverBtn {
+    margin: 12px auto 0 auto;
+    padding: 16px 50px;
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    border: none;
+    border-radius: 50px;
+    color: white;
+    cursor: pointer;
+    background: linear-gradient(135deg, #f59e0b, #ea580c);
+    box-shadow: 0 6px 20px rgba(234, 88, 12, 0.35);
+    transition: all 0.2s ease;
+    display: block;
+    text-transform: uppercase;
+}
+#launchLeverBtn:disabled {
+    background: #1e293b;
+    color: #475569;
+    box-shadow: none;
+    cursor: not-allowed;
+}
+#launchLeverBtn:hover:not(:disabled) { transform: translateY(-2px); filter: brightness(1.1); }
+
+/* SYSTEM GRADING STATE RESPONSES */
+.syntax-gap-core.correct-payload { background: #10b981 !important; border-color: #34d399 !important; color: white !important; text-shadow: none; animation: popUp 0.4s ease; }
+.syntax-gap-core.wrong-payload { background: #ef4444 !important; border-color: #f87171 !important; color: white !important; text-shadow: none; animation: engineShunt 0.45s ease; }
+
+@keyframes popUp {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+    100% { transform: scale(1); }
+}
+@keyframes engineShunt {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-8px); }
+    40%, 80% { transform: translateX(8px); }
+}
+
+/* REAL-TIME FEEDBACK BAR TRAY */
+#feedbackTray {
+    font-size: 20px;
+    font-weight: 700;
+    min-height: 30px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: -6px;
+}
+
+/* GLOBAL CONTROL BUTTON BASES */
+.action-prime-btn {
+    padding: 16px 50px;
+    font-size: 20px;
+    font-weight: 700;
+    border: none;
+    border-radius: 50px;
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+#startBtn { background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4); }
+#restartBtn { background: linear-gradient(135deg, #0ea5e9, #2563eb); box-shadow: 0 4px 14px rgba(14, 165, 233, 0.4); }
+.action-prime-btn:hover { transform: translateY(-3px); filter: brightness(1.1); }
+
+canvas { position: fixed; inset: 0; pointer-events: none; z-index: 999; width: 100vw; height: 100vh; }
+
+/* PHONE DISPLAY CALIBRATIONS */
+@media (max-width: 768px) {
+    #topicScreen h1 { font-size: 32px; }
+    .dashboard-card h1 { font-size: 28px; }
+    #sentenceCanvas { font-size: 20px; }
+    .verb-cell-node { font-size: 18px; padding: 12px 24px; }
+    .syntax-gap-core { min-width: 90px; height: 36px; font-size: 20px; }
+}
+</style>
+</head>
+
+<body>
+
+<canvas id="confetti"></canvas>
+
+<audio id="correctSound" src="assets/correct.mp3" preload="auto"></audio>
+<audio id="wrongSound" src="assets/wrong.mp3" preload="auto"></audio>
+<audio id="clapSound" src="assets/clapping.mp3" preload="auto"></audio>
+
+<div id="logoScreen" class="screen">
+   <img src="assets/innovine-logo.png" id="logo" alt="Innovine Logo">
+</div>
+
+<div id="topicScreen" class="screen">
+    <h1>FUSION CORE ENGINE</h1>
+    <h2>SUBJECT–VERB HARMONIZER</h2>
+</div>
+
+<div id="startScreen" class="screen">
+    <div class="dashboard-card">
+        <h1>🎯 Structural Fusion</h1>
+        <h2>Subject–Verb Agreement</h2>
+        <p>Don't click basic multiple choice blocks. Analyze the subject pattern and manually load the correct verb node directly into the engine line core layout slot.</p>
+        <p style="color: #eab308; font-weight: 700;">⚡ 10 Gaps to Fuse</p>
+        
+        <button id="startBtn" class="action-prime-btn">ENGAGE HARMONIZER</button>
+
+        <div class="volume-rack">
+            <span>🔊 System Volume</span>
+            <input id="volume" type="range" min="0" max="1" value="0.8" step="0.1">
+        </div>
+    </div>
+</div>
+
+<div id="gameScreen" class="screen">
+    <div class="workbench-layout">
+        <div class="hud-metrics">
+            <div id="progressBadge">CORE SLOT: 1 / 10</div>
+            <div id="scoreBadge">STABILITY STREAK: 0</div>
+        </div>
+
+        <div class="quantum-progress-bar">
+            <div id="progressFill"></div>
+        </div>
+
+        <div class="sentence-processor-card">
+            <div id="sentenceCanvas">Sentence loading line streams...</div>
+        </div>
+
+        <div id="feedbackTray"></div>
+
+        <div class="verb-pool-container" id="verbPool"></div>
+
+        <button id="launchLeverBtn" disabled>FUSE AND VERIFY</button>
+    </div>
+</div>
+
+<div id="resultScreen" class="screen">
+    <div class="dashboard-card">
+        <h1 style="color: #10b981;">🚀 Fusion Run Complete</h1>
+        <div id="finalScoreDisplay"></div>
+        <button id="restartBtn" class="action-prime-btn">REBOOT GRID DATA</button>
+    </div>
+</div>
+
+<script>
+/* ==========================================================================
+   SYSTEM RUNTIME EXECUTION ARCHITECTURE
+   ========================================================================== */
+
+const screens = {
+    logo: document.getElementById("logoScreen"),
+    topic: document.getElementById("topicScreen"),
+    start: document.getElementById("startScreen"),
+    game: document.getElementById("gameScreen"),
+    result: document.getElementById("resultScreen")
+};
+
+const audioChannels = {
+    correct: document
