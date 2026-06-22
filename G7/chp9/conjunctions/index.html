@@ -85,28 +85,34 @@ body, html {
 </head>
 <body>
 
+<!-- COMPLIANCE AUDIO PATH CHANNELS -->
 <audio id="correctSound" src="Middle-ELA/G7/chp9/conjunctions/assets/correct.mp3" preload="auto"></audio>
 <audio id="wrongSound" src="Middle-ELA/G7/chp9/conjunctions/assets/wrong.mp3" preload="auto"></audio>
 <audio id="clapSound" src="Middle-ELA/G7/chp9/conjunctions/assets/clapping.mp3" preload="auto"></audio>
 
+<!-- STAGE 1: LOGO INTRO SCREEN -->
 <div id="logoScreen" class="screen active">
     <div class="logo-container">
         <img src="Middle-ELA/G7/chp9/conjunctions/assets/innovine-logo.png" alt="Logo">
     </div>
 </div>
 
+<!-- STAGE 2: INSTRUCTIONS -->
 <div id="instructionScreen" class="screen">
     <div class="panel-card">
         <h1>🚀 Conjunction Space Arcade</h1>
-        <p>Move your Blue Launcher block Left/Right using your <b>Mouse/Touch Dragging</b> or <b>Arrow Keys (A/D)</b>. Line up under the correct answer target to claim points!</p>
+        <p>1. Move Left/Right using <b>Arrow Keys (A/D)</b> or <b>Dragging your finger/mouse</b>.<br>
+           2. Line up under an answer, then <b>Press Space / Tap Screen</b> to Scan & Select it!</p>
         <button class="action-btn" onclick="startGameArena()">Launch Mission</button>
     </div>
 </div>
 
+<!-- STAGE 3: GAME RUNTIME CORE -->
 <div id="gameScreen" class="screen">
     <canvas id="gameCanvas"></canvas>
 </div>
 
+<!-- STAGE 4: CAPSTONE GAME OVER OVERLAY -->
 <div id="endScreen" class="screen">
     <div class="panel-card">
         <h1 style="font-size: 40px;">🏆</h1>
@@ -139,24 +145,25 @@ let currentIndex = 0;
 let totalScore = 0;
 let lives = 2;
 let feedbackMessage = "";
-let feedbackTimer = 0;
 let showContinuePrompt = false;
 
-// PLAYER SHIP CONFIGURATION
+// TRACTOR BEAM ANIMATION EFFECT CONTROL
+let laserBeamActive = false;
+let laserX = 0;
+let laserAlpha = 0;
+
 const player = {
     x: 0,
     y: 0,
     width: 70,
     height: 45,
-    speed: 12
+    speed: 14
 };
 
-// INPUT CONTROLS REGISTER
 const inputs = { Left: false, Right: false };
 let targetOptionDiamonds = [];
 let backgroundStars = [];
 
-// TIMEOUT TIMER FOR INITIAL LOGO
 window.onload = () => {
     buildStarsBackground();
     setTimeout(() => {
@@ -175,7 +182,7 @@ function buildStarsBackground() {
 function resizeViewports() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
-    player.y = canvas.height - player.height - 30;
+    player.y = canvas.height - player.height - 40;
     if(!gameActive && player.x === 0) {
         player.x = canvas.width / 2 - player.width / 2;
     }
@@ -183,13 +190,15 @@ function resizeViewports() {
 window.addEventListener("resize", resizeViewports);
 
 /* ==========================================================================
-   INPUT EVENT LISTENERS (FIX FOR THE STUCK BLUE BOX)
+   INPUT EVENT LISTENERS (FREEMOVE FIX + INTENTIONAL CLICK SELECTION)
    ========================================================================== */
 window.addEventListener("keydown", (e) => {
     if(e.key === "ArrowLeft" || e.key === "a" || e.key === "A") inputs.Left = true;
     if(e.key === "ArrowRight" || e.key === "d" || e.key === "D") inputs.Right = true;
-    if(e.key === "Enter" || e.key === " ") {
-        if(showContinuePrompt) nextStageFloor();
+    
+    if(e.key === " " || e.key === "Enter") {
+        e.preventDefault();
+        triggerIntentionalSelection();
     }
 });
 
@@ -198,11 +207,9 @@ window.addEventListener("keyup", (e) => {
     if(e.key === "ArrowRight" || e.key === "d" || e.key === "D") inputs.Right = false;
 });
 
-// TOUCH & MOUSE DRAGGING CAPABILITY FOR DESKTOP AND SMART DEVICES
 function handlePointerMovement(clientX) {
     if(!gameActive || showContinuePrompt) return;
     player.x = clientX - player.width / 2;
-    // Bound Constraints
     if(player.x < 0) player.x = 0;
     if(player.x > canvas.width - player.width) player.x = canvas.width - player.width;
 }
@@ -212,16 +219,36 @@ canvas.addEventListener("touchmove", (e) => {
     if(e.touches.length > 0) handlePointerMovement(e.touches[0].clientX);
 }, { passive: true });
 
-// Tap screen to progress when matching answers are locked
-canvas.addEventListener("click", () => {
-    if(showContinuePrompt) nextStageFloor();
-});
-canvas.addEventListener("touchstart", () => {
-    if(showContinuePrompt) nextStageFloor();
+// TAP OR CLICK TRIGGERS ACTION
+canvas.addEventListener("click", (e) => {
+    triggerIntentionalSelection();
 });
 
+function triggerIntentionalSelection() {
+    if (!gameActive) return;
+    
+    if(showContinuePrompt) {
+        nextStageFloor();
+        return;
+    }
+    
+    // Fire tractor beam alignment check
+    laserX = player.x + player.width / 2;
+    laserBeamActive = true;
+    laserAlpha = 1.0;
+    
+    // Check which diamond is lined up perfectly with our X axis center point
+    targetOptionDiamonds.forEach(diamond => {
+        if(diamond.disabled) return;
+        
+        if(laserX >= (diamond.x - diamond.width/2) && laserX <= (diamond.x + diamond.width/2)) {
+            evaluateSelection(diamond);
+        }
+    });
+}
+
 /* ==========================================================================
-   GAME LOGIC LOOP ENGINE
+   GAME MECHANICS
    ========================================================================== */
 function startGameArena() {
     document.getElementById('instructionScreen').classList.remove('active');
@@ -242,6 +269,7 @@ function setupQuestionFloor() {
     lives = 2;
     showContinuePrompt = false;
     feedbackMessage = "";
+    laserBeamActive = false;
     
     const activeData = activeQuizList[currentIndex];
     const optionCount = activeData.opts.length;
@@ -254,9 +282,9 @@ function setupQuestionFloor() {
         targetOptionDiamonds.push({
             text: text,
             x: (segmentWidth * idx) + (segmentWidth / 2),
-            y: canvas.height * 0.45 + (Math.random() * 40 - 20), // Floating placement align
-            width: 130,
-            height: 70,
+            y: canvas.height * 0.42, 
+            width: 140,
+            height: 75,
             color: itemColors[idx % itemColors.length],
             isCorrect: text === activeData.ans,
             disabled: false
@@ -267,36 +295,22 @@ function setupQuestionFloor() {
 function animateEngineLoop() {
     if(!gameActive) return;
     
-    updateStateCalculations();
-    renderGraphicsWorkspace();
-    
-    requestAnimationFrame(animateEngineLoop);
-}
-
-function updateStateCalculations() {
-    // Smooth Keyboard translation physics logic
     if(inputs.Left && player.x > 0) player.x -= player.speed;
     if(inputs.Right && player.x < canvas.width - player.width) player.x += player.speed;
     
-    if(showContinuePrompt) return; // Freeze check collision once an answer is chosen
+    if (laserBeamActive) {
+        laserAlpha -= 0.05;
+        if (laserAlpha <= 0) laserBeamActive = false;
+    }
     
-    // Check intersection hit bounds
-    targetOptionDiamonds.forEach(diamond => {
-        if(diamond.disabled) return;
-        
-        // Accurate bounding range overlap calculations
-        const pxCenter = player.x + player.width / 2;
-        if(pxCenter >= (diamond.x - diamond.width/2) && pxCenter <= (diamond.x + diamond.width/2)) {
-            // Hit recorded!
-            evaluateSelection(diamond);
-        }
-    });
+    renderGraphicsWorkspace();
+    requestAnimationFrame(animateEngineLoop);
 }
 
 function evaluateSelection(diamond) {
     if(diamond.isCorrect) {
         totalScore++;
-        feedbackMessage = "✨ OUTSTANDING WORK, DETECTIVE! (Tap to Continue)";
+        feedbackMessage = "✨ OUTSTANDING WORK, DETECTIVE! (Tap Screen to Advance)";
         document.getElementById("correctSound").play().catch(()=>{});
         document.getElementById("clapSound").play().catch(()=>{});
         diamond.color = "#00ffcc";
@@ -304,14 +318,14 @@ function evaluateSelection(diamond) {
     } else {
         lives--;
         diamond.disabled = true;
-        diamond.color = "#331122"; // Darken option out
+        diamond.color = "#241623"; 
         document.getElementById("wrongSound").play().catch(()=>{});
         
         if(lives <= 0) {
-            feedbackMessage = `❌ CASE CLOSED! Solution was: ${activeQuizList[currentIndex].ans} (Tap to Continue)`;
+            feedbackMessage = `❌ CASE CLOSED! Solution was: ${activeQuizList[currentIndex].ans} (Tap Screen)`;
             showContinuePrompt = true;
         } else {
-            feedbackMessage = "❌ FALSE LEAD! Try your final life attempt!";
+            feedbackMessage = "❌ FALSE LEAD! Try your last check scan!";
         }
     }
 }
@@ -334,12 +348,12 @@ function restartEntireGame() {
 }
 
 /* ==========================================================================
-   WORKSPACE UI GRAPHICS RENDER ENGINE
+   RENDER MATRIX Engine
    ========================================================================== */
 function renderGraphicsWorkspace() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
-    // 1. Draw Starfield
+    // 1. Draw Background Stars
     ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
     backgroundStars.forEach(s => {
         ctx.beginPath();
@@ -347,8 +361,22 @@ function renderGraphicsWorkspace() {
         ctx.fill();
     });
     
-    // 2. Draw HUD Header Layout Bar
-    ctx.fillStyle = "rgba(20, 15, 61, 0.8)";
+    // 2. Laser beam display calculation
+    if (laserBeamActive) {
+        ctx.save();
+        ctx.strokeStyle = `rgba(0, 255, 204, ${laserAlpha})`;
+        ctx.lineWidth = 6;
+        ctx.shadowBlur = 15;
+        ctx.shadowColor = "#00ffcc";
+        ctx.beginPath();
+        ctx.moveTo(laserX, player.y);
+        ctx.lineTo(laserX, 0);
+        ctx.stroke();
+        ctx.restore();
+    }
+    
+    // 3. Header HUD setup
+    ctx.fillStyle = "rgba(20, 15, 61, 0.85)";
     ctx.fillRect(0, 0, canvas.width, 70);
     ctx.strokeStyle = "#00ffcc";
     ctx.lineWidth = 2;
@@ -356,36 +384,39 @@ function renderGraphicsWorkspace() {
     
     ctx.fillStyle = "#ffffff";
     ctx.font = "bold 15px sans-serif";
+    ctx.textAlign = "left";
     ctx.fillText(`STAGE: ${currentIndex + 1} / ${activeQuizList.length}`, 25, 42);
-    ctx.fillText(`SCORE: ${totalScore}`, canvas.width / 2 - 40, 42);
+    
+    ctx.textAlign = "center";
+    ctx.fillText(`SCORE: ${totalScore}`, canvas.width / 2, 42);
     
     let hearts = "";
     for(let l=0; l<lives; l++) hearts += "❤️ ";
-    ctx.fillText(`SHIELD: ${hearts}`, canvas.width - 150, 42);
+    ctx.textAlign = "right";
+    ctx.fillText(`SHIELD: ${hearts}`, canvas.width - 25, 42);
     
-    // 3. Render Question Display Banner
+    // 4. Render Question Banner Box
     const activeData = activeQuizList[currentIndex];
-    ctx.fillStyle = "rgba(10, 5, 36, 0.9)";
-    ctx.strokeStyle = "#8ac926";
+    ctx.fillStyle = "rgba(10, 5, 36, 0.95)";
+    ctx.strokeStyle = "#ffca3a";
     ctx.lineWidth = 3;
     
-    const qw = Math.min(canvas.width * 0.85, 750);
+    const qw = Math.min(canvas.width * 0.9, 750);
     const qx = canvas.width / 2 - qw / 2;
-    ctx.fillRect(qx, 100, qw, 70);
-    ctx.strokeRect(qx, 100, qw, 70);
+    ctx.fillRect(qx, 100, qw, 80);
+    ctx.strokeRect(qx, 100, qw, 80);
     
     ctx.fillStyle = "#ffffff";
-    ctx.font = "16px sans-serif";
+    ctx.font = "bold 16px sans-serif";
     ctx.textAlign = "center";
-    ctx.fillText(activeData.q, canvas.width / 2, 142, qw - 40);
+    ctx.fillText(activeData.q, canvas.width / 2, 146, qw - 40);
     
-    // 4. Render Floating Options (The Diamonds from image_800143)
+    // 5. Render Question Diamonds
     targetOptionDiamonds.forEach(diamond => {
         ctx.save();
         ctx.translate(diamond.x, diamond.y);
         
-        // Draw glow paths effect
-        ctx.shadowBlur = 15;
+        ctx.shadowBlur = diamond.disabled ? 0 : 15;
         ctx.shadowColor = diamond.color;
         
         ctx.fillStyle = diamond.color;
@@ -399,36 +430,31 @@ function renderGraphicsWorkspace() {
         
         ctx.restore();
         
-        // Draw option text inside
-        ctx.fillStyle = "#000000";
-        ctx.font = "bold 15px sans-serif";
+        ctx.fillStyle = diamond.disabled ? "#555555" : "#000000";
+        ctx.font = "bold 14px sans-serif";
         ctx.textAlign = "center";
-        ctx.fillText(diamond.text, diamond.x, diamond.y + 5, diamond.width - 20);
+        ctx.fillText(diamond.text, diamond.x, diamond.y + 5, diamond.width - 25);
     });
     
-    // 5. Draw Dynamic Action Notification Banners
+    // 6. Notifications Action Display Text
     if(feedbackMessage !== "") {
         ctx.fillStyle = feedbackMessage.startsWith("✨") ? "#00ffcc" : "#ff595e";
-        ctx.font = "bold 18px sans-serif";
+        ctx.font = "bold 17px sans-serif";
         ctx.textAlign = "center";
-        ctx.fillText(feedbackMessage, canvas.width / 2, canvas.height - 120);
+        ctx.fillText(feedbackMessage, canvas.width / 2, canvas.height - 110);
     }
     
-    // 6. Draw Player Asset Avatar (The Interactive Blue Box with white square inside)
+    // 7. Render Blue Player Block
     ctx.save();
-    ctx.shadowBlur = 10;
-    ctx.shadowColor = "#00ffff";
+    ctx.shadowBlur = 12;
+    ctx.shadowColor = "#00b4d8";
     
-    // Base blue ship container block
     ctx.fillStyle = "#00b4d8";
     ctx.fillRect(player.x, player.y, player.width, player.height);
     
-    // Accent white inner display signal light window box
     ctx.fillStyle = "#ffffff";
     ctx.fillRect(player.x + (player.width / 2) - 10, player.y + 8, 20, 15);
-    
     ctx.restore();
-    ctx.textAlign = "left"; // Reset defaults alignment
 }
 </script>
 </body>
