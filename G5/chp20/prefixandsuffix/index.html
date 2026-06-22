@@ -515,13 +515,22 @@ function safePlay(audioEl) {
   if (p && typeof p.catch === 'function') p.catch(() => {});
 }
 
+function shuffleArray(array) {
+  const a = [...array];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
 function setupPositions() {
   const belt = document.getElementById('belt-container');
-  const maxX = Math.max(0, belt.clientWidth - 140);
+  const maxX = Math.max(0, belt.clientWidth - 150);
   const steps = Math.max(1, questions.length - 1);
   questionPositions = [];
   for (let i = 0; i < questions.length; i++) {
-    questionPositions.push(25 + (maxX * i / steps));
+    questionPositions.push(24 + (maxX * i / steps));
   }
   characterContainer.style.left = questionPositions[0] + 'px';
 }
@@ -564,7 +573,8 @@ function showQuestion() {
 
   progressEl.textContent = `Question ${usedIndices.length} / ${questions.length}`;
 
-  q.options.forEach(opt => {
+  const opts = shuffleArray(q.options);
+  opts.forEach(opt => {
     const btn = document.createElement('button');
     btn.textContent = opt;
     btn.className = 'option';
