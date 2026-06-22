@@ -31,6 +31,8 @@
       padding: 18px;
       box-shadow: 0 20px 45px rgba(31, 99, 100, 0.12);
       backdrop-filter: blur(10px);
+      position: relative;
+      overflow: hidden;
     }
     .splash {
       text-align: center;
@@ -145,6 +147,7 @@
       font-size: clamp(20px, 3vw, 30px);
       color: #16757f;
       font-weight: 800;
+      z-index: 1;
     }
     .wardrobe {
       position: absolute;
@@ -156,6 +159,7 @@
       border-radius: 24px;
       background: linear-gradient(180deg, #27b9c4 0%, #1f8fa1 100%);
       box-shadow: inset 0 0 0 2px rgba(255,255,255,0.18), 0 14px 30px rgba(28, 129, 143, 0.20);
+      z-index: 1;
     }
     .door {
       position: absolute;
@@ -181,24 +185,25 @@
       font-size: clamp(40px, 7vw, 72px);
       opacity: 0.18;
     }
-    .item {
+    .item-box {
       position: absolute;
-      right: 18px;
-      top: 18px;
-      width: 120px;
-      height: 120px;
-      border-radius: 22px;
-      background: rgba(255,255,255,0.28);
-      border: 1px dashed rgba(255,255,255,0.45);
+      right: 20px;
+      top: 90px;
+      width: 140px;
+      height: 140px;
+      border-radius: 24px;
+      background: rgba(255,255,255,0.35);
+      border: 1px solid rgba(255,255,255,0.5);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 64px;
+      font-size: 76px;
       opacity: 0;
-      transform: scale(0.85);
-      transition: all .45s ease;
+      transform: scale(0.9);
+      transition: all .35s ease;
+      z-index: 2;
     }
-    .item.show {
+    .item-box.show {
       opacity: 1;
       transform: scale(1);
     }
@@ -210,6 +215,7 @@
       font-size: clamp(74px, 12vw, 136px);
       filter: drop-shadow(0 10px 14px rgba(0,0,0,0.08));
       transition: transform .3s ease;
+      z-index: 2;
     }
     .question-side {
       border-radius: 26px;
@@ -220,6 +226,7 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
+      overflow: hidden;
     }
     .question {
       text-align: center;
@@ -229,6 +236,7 @@
       margin: 10px auto 18px;
       max-width: 560px;
       font-weight: 700;
+      min-height: 110px;
     }
     .options {
       display: grid;
@@ -292,14 +300,20 @@
       margin: 10px 0 18px;
       color: #4c676b;
     }
-    .confetti {
+    .confetti-layer {
       position: fixed;
-      top: -14px;
-      width: 10px;
-      height: 14px;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 50;
+    }
+    .confetti {
+      position: absolute;
+      top: -16px;
+      width: 12px;
+      height: 12px;
       border-radius: 3px;
       animation: fall 2.8s linear forwards;
-      z-index: 9999;
     }
     @keyframes fall {
       to { transform: translateY(110vh) rotate(720deg); opacity: 0; }
@@ -308,7 +322,7 @@
       position: fixed;
       font-size: 28px;
       animation: sparkle 1s ease-out forwards;
-      z-index: 9999;
+      z-index: 60;
       pointer-events: none;
     }
     @keyframes sparkle {
@@ -326,10 +340,14 @@
       .card { padding: 14px; border-radius: 20px; }
       .badge { flex: 1 1 100%; }
       .wardrobe { width: min(320px, 80vw); }
+      .item-box { right: 12px; width: 118px; height: 118px; font-size: 64px; top: 98px; }
+      .question { min-height: auto; }
     }
   </style>
 </head>
 <body>
+  <div class="confetti-layer" id="confettiLayer"></div>
+
   <div class="screen show" id="splashScreen">
     <div class="card splash">
       <img src="assets/logo.png" alt="Innovine logo">
@@ -357,7 +375,7 @@
               <div class="door left-door">✨</div>
               <div class="door right-door">✨</div>
               <div class="hanger">👚</div>
-              <div class="item" id="item">🎀</div>
+              <div class="item-box" id="itemBox">🎀</div>
               <div class="model" id="model">🧍‍♀️</div>
             </div>
           </div>
@@ -388,21 +406,21 @@
 
   <script>
     const allQuestions = [
-      { item: "scarf", visual: "🧣", q: "Which word best describes a scarf that feels gentle and comfortable?", options: ["soft", "three", "these", "our"], correct: "soft", explain: "‘Soft’ matches the scarf." },
-      { item: "shoes", visual: "👟", q: "Which word best describes shoes that shine under bright lights?", options: ["dirty", "shiny", "many", "your"], correct: "shiny", explain: "‘Shiny’ fits the shoes." },
-      { item: "hat", visual: "🎩", q: "Which word best describes a hat made for a royal party?", options: ["plain", "grand", "little", "this"], correct: "grand", explain: "‘Grand’ suits a royal party hat." },
-      { item: "dress", visual: "👗", q: "Which word best describes a dress that looks elegant and expensive?", options: ["heavy", "beautiful", "few", "my"], correct: "beautiful", explain: "‘Beautiful’ is the best describing word for the dress." },
-      { item: "jacket", visual: "🧥", q: "Which word best describes a jacket that feels warm in winter?", options: ["warm", "two", "those", "their"], correct: "warm", explain: "‘Warm’ describes the jacket." },
-      { item: "bag", visual: "👜", q: "Which word best describes a bag that can hold many books?", options: ["tiny", "spacious", "these", "his"], correct: "spacious", explain: "‘Spacious’ tells us the bag can hold a lot." },
-      { item: "belt", visual: "🧵", q: "Which word best describes a belt that looks modern and stylish?", options: ["old", "stylish", "several", "our"], correct: "stylish", explain: "‘Stylish’ is the best choice." },
-      { item: "gloves", visual: "🧤", q: "Which word best describes a pair of gloves that look fancy?", options: ["fancy", "some", "my", "that"], correct: "fancy", explain: "‘Fancy’ matches the gloves." },
-      { item: "necklace", visual: "📿", q: "Which word best describes a necklace that looks lovely and special?", options: ["lovely", "several", "our", "those"], correct: "lovely", explain: "‘Lovely’ is the best adjective here." },
-      { item: "bracelet", visual: "💎", q: "Which word best describes a bracelet that looks delicate and light?", options: ["delicate", "many", "those", "his"], correct: "delicate", explain: "‘Delicate’ fits the bracelet." },
-      { item: "coat", visual: "🧥", q: "Which word best describes a coat that is very thick and cozy?", options: ["thick", "that", "four", "her"], correct: "thick", explain: "‘Thick’ describes the coat." },
-      { item: "earrings", visual: "💍", q: "Which word best describes earrings that sparkle beautifully?", options: ["sparkling", "little", "this", "my"], correct: "sparkling", explain: "‘Sparkling’ is the best describing word." },
-      { item: "shirt", visual: "👕", q: "Which word best describes a shirt that feels smooth to touch?", options: ["smooth", "five", "our", "these"], correct: "smooth", explain: "‘Smooth’ best describes the shirt." },
-      { item: "gown", visual: "👗", q: "Which word best describes a gown that looks elegant and graceful?", options: ["bright", "elegant", "few", "their"], correct: "elegant", explain: "‘Elegant’ suits the gown." },
-      { item: "sunglasses", visual: "🕶️", q: "Which word best describes sunglasses that look cool and trendy?", options: ["cool", "two", "my", "those"], correct: "cool", explain: "‘Cool’ matches the sunglasses." }
+      { visual: "🧣", q: "Which word best describes this scarf?", options: ["soft", "three", "these", "our"], correct: "soft", explain: "Soft fits a scarf." },
+      { visual: "👟", q: "Which word best describes these shoes?", options: ["dirty", "shiny", "many", "your"], correct: "shiny", explain: "Shiny fits the shoes." },
+      { visual: "🎩", q: "Which word best describes this hat?", options: ["plain", "grand", "little", "this"], correct: "grand", explain: "Grand fits the hat." },
+      { visual: "👗", q: "Which word best describes this dress?", options: ["heavy", "beautiful", "few", "my"], correct: "beautiful", explain: "Beautiful fits the dress." },
+      { visual: "🧥", q: "Which word best describes this jacket?", options: ["warm", "two", "those", "their"], correct: "warm", explain: "Warm fits the jacket." },
+      { visual: "👜", q: "Which word best describes this bag?", options: ["tiny", "spacious", "these", "his"], correct: "spacious", explain: "Spacious fits the bag." },
+      { visual: "🧵", q: "Which word best describes this belt?", options: ["old", "stylish", "several", "our"], correct: "stylish", explain: "Stylish fits the belt." },
+      { visual: "🧤", q: "Which word best describes these gloves?", options: ["fancy", "some", "my", "that"], correct: "fancy", explain: "Fancy fits the gloves." },
+      { visual: "📿", q: "Which word best describes this necklace?", options: ["lovely", "several", "our", "those"], correct: "lovely", explain: "Lovely fits the necklace." },
+      { visual: "💎", q: "Which word best describes this bracelet?", options: ["delicate", "many", "those", "his"], correct: "delicate", explain: "Delicate fits the bracelet." },
+      { visual: "🧥", q: "Which word best describes this coat?", options: ["thick", "that", "four", "her"], correct: "thick", explain: "Thick fits the coat." },
+      { visual: "💍", q: "Which word best describes these earrings?", options: ["sparkling", "little", "this", "my"], correct: "sparkling", explain: "Sparkling fits the earrings." },
+      { visual: "👕", q: "Which word best describes this shirt?", options: ["smooth", "five", "our", "these"], correct: "smooth", explain: "Smooth fits the shirt." },
+      { visual: "👗", q: "Which word best describes this gown?", options: ["bright", "elegant", "few", "their"], correct: "elegant", explain: "Elegant fits the gown." },
+      { visual: "🕶️", q: "Which word best describes these sunglasses?", options: ["cool", "two", "my", "those"], correct: "cool", explain: "Cool fits the sunglasses." }
     ];
 
     const questions = shuffle(allQuestions.map(q => ({ ...q })));
@@ -417,7 +435,7 @@
     const attemptText = document.getElementById("attemptText");
     const bar = document.getElementById("bar");
     const model = document.getElementById("model");
-    const item = document.getElementById("item");
+    const itemBox = document.getElementById("itemBox");
     const question = document.getElementById("question");
     const optionsBox = document.getElementById("options");
     const message = document.getElementById("message");
@@ -426,6 +444,7 @@
     const finalScore = document.getElementById("finalScore");
     const finalMsg = document.getElementById("finalMsg");
     const restartBtn = document.getElementById("restartBtn");
+    const confettiLayer = document.getElementById("confettiLayer");
 
     const correctAudio = new Audio("assets/correct.mp3");
     const wrongAudio = new Audio("assets/wrong.mp3");
@@ -456,27 +475,30 @@
     }
 
     function showConfetti() {
+      confettiLayer.innerHTML = "";
       const colors = ["#22c1c3", "#6ee7b7", "#3bb2d0", "#b6f2ff", "#98f5d0"];
-      for (let i = 0; i < 34; i++) {
+      const icons = ["⭐", "✨", "💫"];
+      for (let i = 0; i < 26; i++) {
         const d = document.createElement("div");
         d.className = "confetti";
+        d.textContent = icons[Math.floor(Math.random() * icons.length)];
         d.style.left = Math.random() * 100 + "vw";
-        d.style.background = colors[Math.floor(Math.random() * colors.length)];
-        d.style.animationDelay = (Math.random() * 0.4) + "s";
-        d.style.transform = `rotate(${Math.random() * 180}deg)`;
-        document.body.appendChild(d);
+        d.style.color = colors[Math.floor(Math.random() * colors.length)];
+        d.style.animationDelay = (Math.random() * 0.3) + "s";
+        d.style.fontSize = (14 + Math.random() * 12) + "px";
+        confettiLayer.appendChild(d);
         setTimeout(() => d.remove(), 3200);
       }
     }
 
     function showSparkles() {
       const items = ["✨", "⭐", "💫"];
-      for (let i = 0; i < 16; i++) {
+      for (let i = 0; i < 12; i++) {
         const s = document.createElement("div");
         s.className = "sparkle";
         s.textContent = items[Math.floor(Math.random() * items.length)];
         s.style.left = Math.random() * 100 + "vw";
-        s.style.top = Math.random() * 100 + "vh";
+        s.style.top = (10 + Math.random() * 75) + "vh";
         document.body.appendChild(s);
         setTimeout(() => s.remove(), 1200);
       }
@@ -490,12 +512,12 @@
       scoreText.textContent = `Score: ${score}`;
       bar.style.width = `${(current / questions.length) * 100}%`;
       question.textContent = t.q;
-      item.textContent = t.visual;
+      itemBox.textContent = t.visual;
       message.textContent = "";
       explain.textContent = "";
       nextBtn.disabled = true;
       locked = false;
-      item.classList.remove("show");
+      itemBox.classList.remove("show");
       optionsBox.innerHTML = "";
       t.options.forEach(opt => {
         const b = document.createElement("button");
@@ -517,7 +539,7 @@
         locked = true;
         score += 10;
         model.textContent = "🧍‍♀️✨";
-        item.classList.add("show");
+        itemBox.classList.add("show");
         playSound(correctAudio);
         setTimeout(() => playSound(clapAudio), 850);
         showConfetti();
@@ -525,19 +547,21 @@
         disableOptions();
         nextBtn.disabled = false;
         scoreText.textContent = `Score: ${score}`;
-        message.textContent = "";
-        explain.textContent = "";
+        message.textContent = "Correct!";
+        explain.textContent = t.explain;
       } else {
         playSound(wrongAudio);
         attempts += 1;
         btn.disabled = true;
         btn.style.opacity = "0.4";
+        message.textContent = attempts < 2 ? "Try again!" : "No worries, moving on!";
         if (attempts < 2) {
           attemptText.textContent = `Attempt ${attempts + 1} / 2`;
         } else {
           locked = true;
           disableOptions();
           nextBtn.disabled = false;
+          explain.textContent = t.explain;
         }
       }
     }
@@ -546,7 +570,7 @@
       current += 1;
       attempts = 0;
       model.textContent = "🧍‍♀️";
-      item.classList.remove("show");
+      itemBox.classList.remove("show");
       if (current >= questions.length) showFinal();
       else render();
     }
@@ -556,7 +580,7 @@
       finalScreen.classList.add("show");
       finalScore.textContent = `Your Final Score: ${score} / ${questions.length * 10}`;
       finalMsg.textContent =
-        score === questions.length * 10 ? "✨ Perfect! You have amazing adjective style!" :
+        score === questions.length * 10 ? "✨ Perfect! You are a style superstar!" :
         score >= 120 ? "🎉 Excellent! Your choices are strong and stylish!" :
         score >= 90 ? "😊 Great job! Keep practicing your describing words!" :
         "👗 Keep playing and your style will get even better!";
@@ -573,7 +597,7 @@
       finalScreen.classList.remove("show");
       gameScreen.classList.add("show");
       model.textContent = "🧍‍♀️";
-      item.classList.remove("show");
+      itemBox.classList.remove("show");
       render();
     }
 
