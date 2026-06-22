@@ -62,7 +62,7 @@ body {
     justify-content: center;
     animation: smoothScale 1.8s infinite alternate ease-in-out;
 }
-#logoScreen img {
+#brandLogo {
     width: 100%;
     height: auto;
 }
@@ -302,13 +302,15 @@ canvas { position: fixed; inset: 0; pointer-events: none; z-index: 99999; width:
 
 <canvas id="confetti"></canvas>
 
-<audio id="correctSound" src="Middle-ELA/G7/chp6/articles/assets/correct.mp3" preload="auto"></audio>
-<audio id="wrongSound" src="Middle-ELA/G7/chp6/articles/assets/wrong.mp3" preload="auto"></audio>
-<audio id="clapSound" src="Middle-ELA/G7/chp6/articles/assets/clapping.mp3" preload="auto"></audio>
+<!-- COMPILER HOOK SOUND TRACKS WITH DUAL RESTFUL PATH CONFIGURATIONS -->
+<audio id="correctSound" src="assets/correct.mp3" preload="auto"></audio>
+<audio id="wrongSound" src="assets/wrong.mp3" preload="auto"></audio>
+<audio id="clapSound" src="assets/clapping.mp3" preload="auto"></audio>
 
+<!-- STAGE 1: INTRO LOGO PRESENTATION (MANDATORY 5 SECONDS HELD ONLY FOR LOGO) -->
 <div id="logoScreen" class="screen active">
     <div class="logo-container">
-        <img id="brandLogo" src="Middle-ELA/G7/chp6/articles/assets/innovine-logo.png" onerror="handleLogoFallback()" alt="Innovine Logo">
+        <img id="brandLogo" src="assets/innovine-logo.png" onerror="handleLogoFallback()" alt="Innovine Logo">
         <div id="fallbackLogoUI" class="fallback-logo" style="display: none;">
             <svg width="80" height="80" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M12 2L2 22H22L12 2Z" fill="#4c1d95"/>
@@ -319,12 +321,14 @@ canvas { position: fixed; inset: 0; pointer-events: none; z-index: 99999; width:
     </div>
 </div>
 
+<!-- STAGE 2: SUB-TOPIC SPLASH IDENTITY -->
 <div id="titleScreen" class="screen">
     <div class="topicTitle">
         ✨ Master the Articles:<br>The Roulette Matrix Challenge! ✨
     </div>
 </div>
 
+<!-- STAGE 3: RUNTIME CONFIGURATION DASHBOARD ENTRY -->
 <div id="startScreen" class="screen">
     <div class="card">
         <h1>Articles Spinner Game</h1>
@@ -335,6 +339,7 @@ canvas { position: fixed; inset: 0; pointer-events: none; z-index: 99999; width:
     </div>
 </div>
 
+<!-- STAGE 4: MAIN RUNTIME CHALLENGE WORKSPACE -->
 <div id="gameScreen" class="screen">
     <div class="card">
         
@@ -368,6 +373,7 @@ canvas { position: fixed; inset: 0; pointer-events: none; z-index: 99999; width:
     </div>
 </div>
 
+<!-- STAGE 5: EVALUATION SCORE VERIFICATION OVERLAY -->
 <div id="endScreen" class="screen">
     <div class="card">
         <div class="trophy">🏆</div>
@@ -379,19 +385,28 @@ canvas { position: fixed; inset: 0; pointer-events: none; z-index: 99999; width:
 
 <script>
 /* ==========================================================================
-   SYSTEM LOGO & WEB AUDIO BACKUP GRAPH MATRIX DATA STREAMS
+   SYSTEM AUTOMATED RESILIENT ASSET ROUTING PATH ENGINE
    ========================================================================== */
 
-// Embedded synthesizers if physical assets are completely absent on deployment local targets
+// Backup base64 synthesizer files if execution context blocks direct local file reads entirely
 const audioSyntheticFailsafes = {
     correct: "data:audio/wav;base64,UklGRjIAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQYAAAAAe3vLew==",
     wrong: "data:audio/wav;base64,UklGRjIAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQYAAAAAhH94fA==",
     clap: "data:audio/wav;base64,UklGRjIAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQYAAAAAnp6Xng=="
 };
 
+let logoAttempts = 0;
 function handleLogoFallback() {
-    document.getElementById("brandLogo").style.display = "none";
-    document.getElementById("fallbackLogoUI").style.display = "flex";
+    logoAttempts++;
+    const imgEl = document.getElementById("brandLogo");
+    if (logoAttempts === 1) {
+        // Short relative failed, try deep folder structure option
+        imgEl.src = "Middle-ELA/G7/chp6/articles/assets/innovine-logo.png";
+    } else {
+        // Both directory architectures failed, trigger flawless SVG Vector backup mode
+        imgEl.style.display = "none";
+        document.getElementById("fallbackLogoUI").style.display = "flex";
+    }
 }
 
 /* ==========================================================================
@@ -427,17 +442,25 @@ const audioChannels = {
     clap: document.getElementById("clapSound")
 };
 
-// Setup failsafe listeners for broken physical audio asset chains
+// Auto adaptive error redirection for Audio elements
 Object.keys(audioChannels).forEach(key => {
+    let audioFallbackCounter = 0;
     audioChannels[key].addEventListener('error', function() {
-        audioChannels[key].src = audioSyntheticFailsafes[key];
-        audioChannels[key].load();
+        audioFallbackCounter++;
+        if (audioFallbackCounter === 1) {
+            // Direct reference failed, check deep path variant option
+            audioChannels[key].src = "Middle-ELA/G7/chp6/articles/assets/" + (key === "clap" ? "clapping" : key) + ".mp3";
+            audioChannels[key].load();
+        } else {
+            // All file variants blocked, fallback to structural media synthesis strings
+            audioChannels[key].src = audioSyntheticFailsafes[key];
+            audioChannels[key].load();
+        }
     });
 });
 
 // MANDATORY STABLE SPEED PIPELINE FLOW MATRIX (5s Logo Screen, 3s Sub-splash Display)
 window.onload = () => {
-    // If logo path triggers immediate image layout failure, force fallback UI activation
     const imgEl = document.getElementById("brandLogo");
     if (!imgEl.complete || imgEl.naturalWidth === 0) {
         handleLogoFallback();
@@ -460,7 +483,6 @@ function dispatchAudio(key) {
     try { 
         track.currentTime = 0; 
         track.play().catch(() => {
-            // Context audio safety recovery
             let ctxAudioFallback = new Audio(audioSyntheticFailsafes[key]);
             ctxAudioFallback.play().catch(() => {});
         }); 
@@ -475,7 +497,6 @@ function transitionToGame() {
     document.getElementById("startScreen").classList.remove("active");
     document.getElementById("gameScreen").classList.add("active");
     
-    // Unlock and register media context vectors for mobile safari/webview contexts
     Object.values(audioChannels).forEach(track => { if(track) { track.play().then(() => track.pause()).catch(() => {}); } });
     
     randomizeQuestions();
