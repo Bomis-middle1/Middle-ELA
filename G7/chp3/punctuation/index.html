@@ -2,271 +2,529 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Punctuation Masters - Grade 7</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-select=none">
+<title>Sentence Shredder — Grade 7 Grammar Engine</title>
 
 <style>
-body{
-margin:0;
-overflow:hidden;
-font-family:Arial;
-background:linear-gradient(#b3e5ff,#e6f7ff);
+/* ==========================================================================
+   GAME ENGINE CORE RESET & COSMETICS
+   ========================================================================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    -webkit-tap-highlight-color: transparent;
 }
 
-/* ================= LOGO ================= */
-#logoScreen{
-position:fixed;
-inset:0;
-background:white;
-display:flex;
-justify-content:center;
-align-items:center;
-z-index:9999;
-}
-#logoScreen img{
-width:220px;
-animation:pulse 1.5s infinite alternate;
+body {
+    background: #090d16;
+    color: #f8fafc;
+    overflow: hidden;
+    height: 100vh;
+    position: relative;
 }
 
-@keyframes pulse{
-from{transform:scale(1);}
-to{transform:scale(1.08);}
+/* GLOBAL SPACE-STATION GRADIENTS */
+body::before {
+    content: "";
+    position: absolute;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(16, 185, 129, 0.12) 0%, transparent 70%);
+    border-radius: 50%;
+    left: -150px;
+    top: -150px;
+    pointer-events: none;
 }
 
-/* ================= TITLE ================= */
-#titleScreen{
-position:fixed;
-inset:0;
-display:none;
-justify-content:center;
-align-items:center;
-flex-direction:column;
-background:linear-gradient(#4fc3f7,#e1f5fe);
-z-index:9998;
-text-align:center;
+body::after {
+    content: "";
+    position: absolute;
+    width: 350px;
+    height: 350px;
+    background: radial-gradient(circle, rgba(249, 115, 22, 0.12) 0%, transparent 70%);
+    border-radius: 50%;
+    right: -100px;
+    bottom: -100px;
+    pointer-events: none;
 }
 
-#titleScreen h1{
-font-size:48px;
-color:#0d47a1;
-animation:bounce 1.2s infinite;
+.screen {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 24px;
+    text-align: center;
+    z-index: 100;
 }
 
-@keyframes bounce{
-0%{transform:translateY(0);}
-50%{transform:translateY(-12px);}
-100%{transform:translateY(0);}
+/* TIMED INTRO ANIMATIONS */
+#splash { background: #ffffff; z-index: 9999; }
+#logo { width: 220px; max-width: 80%; animation: pulseLogo 2s infinite alternate ease-in-out; }
+@keyframes pulseLogo {
+    from { transform: scale(1); filter: drop-shadow(0 0 0px rgba(16,185,129,0)); }
+    to { transform: scale(1.04); filter: drop-shadow(0 4px 15px rgba(16,185,129,0.2)); }
+}
+#splash h2 { margin-top: 16px; font-size: 22px; color: #334155; }
+
+#topic { background: radial-gradient(circle at center, #020617 0%, #090d16 100%); z-index: 9000; display: none; }
+#topic h1 { font-size: 46px; font-weight: 900; color: #10b981; text-shadow: 0 0 20px rgba(16,185,129,0.4); margin-bottom: 12px; }
+#topic h2 { font-size: 22px; color: #f59e0b; letter-spacing: 1px; }
+
+/* LAYOUT CONTAINER INTERFACES */
+.dashboard-card {
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    padding: 36px;
+    border-radius: 28px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    max-width: 650px;
+    width: 100%;
 }
 
-/* ================= START ================= */
-#startScreen{
-position:fixed;
-inset:0;
-display:none;
-justify-content:center;
-align-items:center;
-background:#e3f2fd;
-z-index:9997;
+#startScreen, #resultScreen { display: none; z-index: 8000; }
+.dashboard-card h1 { font-size: 38px; font-weight: 800; color: #f97316; margin-bottom: 12px; }
+.dashboard-card p { font-size: 17px; color: #94a3b8; line-height: 1.6; margin-bottom: 24px; }
+
+/* THE INTERACTIVE HUD WORKBENCH */
+#gameScreen { display: none; flex-direction: column; justify-content: center; }
+.workbench-layout { width: 100%; max-width: 800px; display: flex; flex-direction: column; gap: 20px; }
+
+.hud-row { display: flex; justify-content: space-between; align-items: center; width: 100%; }
+#progressBadge { font-size: 14px; font-weight: 700; color: #10b981; background: rgba(16, 185, 129, 0.1); padding: 8px 16px; border-radius: 20px; border: 1px solid rgba(16, 185, 129, 0.2); }
+#scoreBadge { font-size: 14px; font-weight: 700; color: #f59e0b; background: rgba(245, 158, 11, 0.1); padding: 8px 16px; border-radius: 20px; border: 1px solid rgba(245, 158, 11, 0.2); }
+
+/* TARGET PROMPT CARD */
+.mission-control {
+    background: #1e293b;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 16px;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+}
+#missionDirective { font-size: 22px; font-weight: 800; color: #38bdf8; text-transform: uppercase; letter-spacing: 0.5px; }
+
+/* ==========================================================================
+   THE TEXT INTERACTION SHREDDER BLOCKS (THE LIVE SENTENCE)
+   ========================================================================= */
+.sentence-shredder-box {
+    background: rgba(15, 23, 42, 0.8);
+    border: 2px dashed rgba(255, 255, 255, 0.15);
+    padding: 32px 24px;
+    border-radius: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    min-height: 120px;
+    align-items: center;
 }
 
-button{
-padding:15px 30px;
-font-size:18px;
-border:none;
-border-radius:10px;
-background:#ffca28;
-font-weight:bold;
-cursor:pointer;
+.word-block {
+    font-size: 24px;
+    font-weight: 600;
+    padding: 6px 14px;
+    background: #1e293b;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px;
+    cursor: pointer;
+    color: #e2e8f0;
+    user-select: none;
+    transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.word-block:hover:not(.locked) {
+    background: #334155;
+    transform: scale(1.05) translateY(-2px);
+    border-color: #38bdf8;
+    box-shadow: 0 4px 12px rgba(56, 189, 248, 0.2);
+}
+.word-block.selected {
+    background: #38bdf8;
+    color: #0f172a;
+    border-color: #7dd3fc;
+    transform: scale(1.03);
+    box-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
 }
 
-/* ================= GAME ================= */
-#game{
-display:none;
-width:100%;
-height:100vh;
-position:relative;
-overflow:hidden;
+/* FEEDBACK GRAPHICS STATE STYLES */
+.word-block.success-flash { background: #10b981 !important; color: white !important; border-color: #34d399 !important; }
+.word-block.error-flash { background: #ef4444 !important; color: white !important; border-color: #f87171 !important; }
+.word-block.missed-flash { background: rgba(16, 185, 129, 0.25) !important; border: 2px dashed #10b981 !important; color: #4ade80 !important; }
+
+/* ACTION ENGINE TRIGGER INJECTORS */
+.action-button {
+    padding: 16px 44px;
+    font-size: 18px;
+    font-weight: bold;
+    border: none;
+    border-radius: 50px;
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
-
-#question{
-position:absolute;
-top:80px;
-width:100%;
-text-align:center;
-font-size:28px;
-font-weight:bold;
-color:#0d47a1;
-padding:10px;
+#submitBtn {
+    background: linear-gradient(135deg, #f59e0b, #ea580c);
+    box-shadow: 0 4px 14px rgba(234, 88, 12, 0.4);
+    margin: 10px auto 0 auto;
+    display: block;
 }
-
-#score{
-position:absolute;
-top:10px;
-left:10px;
-font-size:20px;
-font-weight:bold;
-color:#0d47a1;
+#submitBtn:disabled {
+    background: #334155;
+    color: #64748b;
+    box-shadow: none;
+    cursor: not-allowed;
 }
+#startBtn { background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4); }
+#restartBtn { background: linear-gradient(135deg, #38bdf8, #2563eb); box-shadow: 0 4px 14px rgba(56, 189, 248, 0.4); }
 
-/* ================= BALLOON ================= */
-.balloon{
-position:absolute;
-width:60px;
-height:75px;
-border-radius:50% 50% 45% 45%;
-display:flex;
-justify-content:center;
-align-items:center;
-font-size:26px;
-font-weight:bold;
-color:white;
-cursor:pointer;
-animation:floatUp 8s linear forwards;
-box-shadow:inset -3px -5px rgba(0,0,0,0.2);
+.action-button:hover:not(:disabled) { transform: translateY(-3px); filter: brightness(1.1); }
+.action-button:active:not(:disabled) { transform: translateY(0); }
+
+.volume-rack { display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 24px; color: #64748b; font-size: 14px; }
+input[type=range] { accent-color: #10b981; cursor: pointer; width: 120px; }
+
+#confetti { position: fixed; inset: 0; pointer-events: none; z-index: 999; width: 100vw; height: 100vh; }
+
+/* MOBILE BREAKPOINT CORRECTIONS */
+@media (max-width: 640px) {
+    #topic h1 { font-size: 32px; }
+    .dashboard-card h1 { font-size: 28px; }
+    #missionDirective { font-size: 18px; }
+    .word-block { font-size: 18px; padding: 4px 10px; }
 }
-
-.balloon::after{
-content:"";
-position:absolute;
-bottom:-12px;
-width:2px;
-height:14px;
-background:#444;
-}
-
-@keyframes floatUp{
-0%{transform:translateY(100vh);}
-100%{transform:translateY(-120vh);}
-}
-
-.red{background:#ff5252;}
-.blue{background:#42a5f5;}
-.green{background:#66bb6a;}
-.yellow{background:#ffca28;}
-.purple{background:#ab47bc;}
-
 </style>
 </head>
 
 <body>
 
-<!-- ================= LOGO ================= -->
-<div id="logoScreen">
-<img src="G7/chp3/punctuation/assets/innovine-logo.png">
+<canvas id="confetti"></canvas>
+
+<!-- AUDIO LOG CHANNELS -->
+<audio id="correctSound" src="assets/correct.mp3" preload="auto"></audio>
+<audio id="wrongSound" src="assets/wrong.mp3" preload="auto"></audio>
+<audio id="clapSound" src="assets/clapping.mp3" preload="auto"></audio>
+
+<!-- SCREEN 1: SPLASH -->
+<div id="splash" class="screen">
+    <img src="assets/innovine-logo.png" id="logo" alt="Innovine Logo">
+    <h2>Innovine Learning Games</h2>
 </div>
 
-<!-- ================= TITLE ================= -->
-<div id="titleScreen">
-<h1>Punctuation Masters 🎯</h1>
-<p>Grade 7 Grammar Challenge</p>
+<!-- SCREEN 2: TOPIC HEADER TRAILER -->
+<div id="topic" class="screen">
+    <h1>SENTENCE SHREDDER</h1>
+    <h2>Isolate and Parse Grammatical Syntax Elements</h2>
 </div>
 
-<!-- ================= START ================= -->
-<div id="startScreen">
-<button onclick="startGame()">Start Game</button>
+<!-- SCREEN 3: MENU LOBBY BOARD -->
+<div id="startScreen" class="screen">
+    <div class="dashboard-card">
+        <h1>🎯 Sentence Shredder</h1>
+        <p>Don't just tap options—destroy the sentence structure directly! Tap the actual words inside each sequence line to highlight the exact target element required.</p>
+        
+        <button id="startBtn" class="action-button">LAUNCH COMPILER</button>
+
+        <div class="volume-rack">
+            <span>🔊 Audio Volume</span>
+            <input type="range" id="volume" min="0" max="1" value="0.8" step="0.1">
+        </div>
+    </div>
 </div>
 
-<!-- ================= GAME ================= -->
-<div id="game">
-<div id="score">Score: 0</div>
-<div id="question">Loading...</div>
+<!-- SCREEN 4: RUNTIME RECONSTRUCTION ENVIRONMENT -->
+<div id="gameScreen" class="screen">
+    <div class="workbench-layout">
+        <div class="hud-row">
+            <div id="progressBadge">ANALYZING: 0 / 10</div>
+            <div id="scoreBadge">ACCURACY: 0%</div>
+        </div>
+
+        <div class="mission-control">
+            <div id="missionDirective">Locate target token array</div>
+        </div>
+
+        <!-- CLICKABLE WORD INTERACTION CANVAS -->
+        <div class="sentence-shredder-box" id="shredderBox"></div>
+
+        <button id="submitBtn" class="action-button" disabled>SUBMIT HIGHLIGHT</button>
+    </div>
+</div>
+
+<!-- SCREEN 5: FINAL EVALUATION SCORECARD -->
+<div id="resultScreen" class="screen">
+    <div class="dashboard-card">
+        <h1 style="color: #10b981;">🚀 Evaluation Finished</h1>
+        <p>Your diagnostic processing performance output score:</p>
+        <div id="finalScore" style="font-size: 54px; font-weight: 900; color: #f59e0b; margin: 16px 0;">0 / 10</div>
+        <button id="restartBtn" class="action-button">RELOAD DATASTREAMS</button>
+    </div>
 </div>
 
 <script>
+/* ==========================================================================
+   COMPILER RUNTIME CONTROLLER ENGINE
+   ========================================================================== */
 
-/* ================= FLOW ================= */
-setTimeout(()=>{
-document.getElementById("logoScreen").style.display="none";
-document.getElementById("titleScreen").style.display="flex";
-},5000);
-
-setTimeout(()=>{
-document.getElementById("titleScreen").style.display="none";
-document.getElementById("startScreen").style.display="flex";
-},8000);
-
-/* ================= QUESTIONS (GRADE 7 CLEAN SET) ================= */
-const questions=[
-{q:"I can’t believe we finally finished the project ___", a:[".","!","?"], c:"!"},
-{q:"Where are you going after school ___", a:[".","!","?"], c:"?"},
-{q:"She whispered, ‘Don’t tell anyone’ ___", a:[".","!","?"], c:"."},
-{q:"You need to bring notebook pen and ruler ___", a:[".",":","!"], c:":"},
-{q:"What a beautiful performance ___", a:[".","!","?"], c:"!"},
-{q:"The teacher said ‘Submit your work’ ___", a:[".","!","?"], c:"."},
-{q:"Are you coming with us ___", a:[".","!","?"], c:"?"},
-{q:"The sun is shining brightly ___", a:[".","!","?"], c:"."},
-{q:"Stop right there ___", a:[".","!","?"], c:"!"},
-{q:"Let’s go to the park tomorrow ___", a:[".",",","!"], c:"."}
-];
-
-let i=0;
-let score=0;
-let currentAnswer="";
-
-/* ================= START ================= */
-function startGame(){
-document.getElementById("startScreen").style.display="none";
-document.getElementById("game").style.display="block";
-
-i=0;
-score=0;
-
-loadQuestion();
-spawnLoop();
-}
-
-/* ================= LOAD QUESTION ================= */
-function loadQuestion(){
-
-if(i>=questions.length){
-document.getElementById("question").innerText=
-"🎉 Game Over! Final Score: " + score;
-return;
-}
-
-currentAnswer = questions[i].c;
-document.getElementById("question").innerText = questions[i].q;
-document.getElementById("score").innerText = "Score: " + score;
-}
-
-/* ================= BALLOONS ================= */
-const symbols=["!","?","."];
-const colors=["red","blue","green","yellow","purple"];
-
-function spawnBalloon(){
-
-let q = questions[i];
-if(!q) return;
-
-let symbol = q.a[Math.floor(Math.random()*q.a.length)];
-
-let b=document.createElement("div");
-b.className="balloon "+colors[Math.floor(Math.random()*colors.length)];
-b.innerText=symbol;
-b.style.left=Math.random()*85+"vw";
-
-b.onclick=()=>{
-
-if(symbol===currentAnswer){
-score+=10;
-i++;
-loadQuestion();
-}
-
-b.remove();
+const ui = {
+    splash: document.getElementById("splash"),
+    topic: document.getElementById("topic"),
+    start: document.getElementById("startScreen"),
+    game: document.getElementById("gameScreen"),
+    result: document.getElementById("resultScreen"),
+    shredderBox: document.getElementById("shredderBox"),
+    submitBtn: document.getElementById("submitBtn"),
+    directive: document.getElementById("missionDirective"),
+    progress: document.getElementById("progressBadge"),
+    score: document.getElementById("scoreBadge")
 };
 
-document.body.appendChild(b);
+const audioTracks = {
+    correct: document.getElementById("correctSound"),
+    wrong: document.getElementById("wrongSound"),
+    clap: document.getElementById("clapSound")
+};
 
-setTimeout(()=>b.remove(),7000);
+let rawQuestions = [], parsedQuestions = [], activeIndex = 0, currentScore = 0;
+let userSelectionIndices = [];
+
+// Static Volume Synchronization
+document.getElementById("volume").oninput = function() {
+    Object.values(audioTracks).forEach(t => { if(t) t.volume = this.value; });
+};
+
+/* 
+   ==========================================================================
+   AUDITED SCHEMA MATRIX WITH EXPLICIT ZERO-BASED INDEX TARGETS
+   ==========================================================================
+*/
+rawQuestions = [
+    {
+        sentence: "The students completed the science project on time.",
+        target: "Subject",
+        targetIndices: [0, 1] // "The students"
+    },
+    {
+        sentence: "The little puppy barked loudly all night.",
+        target: "Predicate",
+        targetIndices: [3, 4, 5, 6] // "barked loudly all night."
+    },
+    {
+        sentence: "Maria baked a delicious cake yesterday.",
+        target: "Direct Object",
+        targetIndices: [2, 3, 4] // "a delicious cake"
+    },
+    {
+        sentence: "The sky became dark before the storm.",
+        target: "Complement",
+        targetIndices: [3] // "dark" (Subject Complement following linking verb 'became')
+    },
+    {
+        sentence: "My brother plays basketball every Saturday.",
+        target: "Predicate",
+        targetIndices: [2, 3, 4, 5] // "plays basketball every Saturday."
+    },
+    {
+        sentence: "After school, the children visited the library.",
+        target: "Subject",
+        targetIndices: [2, 3] // "the children" ('After school,' is an introductory adverbial phrase)
+    },
+    {
+        sentence: "The teacher explained the lesson clearly.",
+        target: "Direct Object",
+        targetIndices: [2, 3] // "the lesson"
+    },
+    {
+        sentence: "Our classroom looks beautiful after the decorations.",
+        target: "Complement",
+        targetIndices: [2] // "beautiful" (Subject Complement following linking verb 'looks')
+    },
+    {
+        sentence: "Several colorful birds flew across the lake.",
+        target: "Subject",
+        targetIndices: [0, 1, 2] // "Several colorful birds"
+    },
+    {
+        sentence: "The firefighters rescued the family safely.",
+        target: "Predicate",
+        targetIndices: [2, 3, 4, 5] // "rescued the family safely."
+    }
+];
+
+// Linear Cinematic Timeline Gates
+setTimeout(() => { ui.splash.style.display = "none"; ui.topic.style.display = "flex"; }, 3500);
+setTimeout(() => { ui.topic.style.display = "none"; ui.start.style.display = "flex"; }, 6500);
+
+function triggerAudio(key) {
+    const track = audioTracks[key];
+    if(!track) return;
+    try {
+        track.currentTime = 0;
+        track.play().catch(() => {});
+    } catch(err) {}
 }
 
-/* ================= LOOP ================= */
-function spawnLoop(){
-setInterval(spawnBalloon,1500);
+document.getElementById("startBtn").onclick = function() {
+    ui.start.style.display = "none";
+    ui.game.style.display = "flex";
+
+    // Unblock sandboxed mobile audio instantly
+    Object.values(audioTracks).forEach(t => { if(t) { t.play().then(() => t.pause()).catch(() => {}); } });
+
+    activeIndex = 0;
+    currentScore = 0;
+    
+    // Parse structural components dynamically
+    parsedQuestions = rawQuestions.map(item => {
+        const wordsArray = item.sentence.split(" ");
+        return { ...item, wordTokens: wordsArray };
+    });
+
+    parsedQuestions.sort(() => Math.random() - 0.5);
+    loadQuestionStage();
+};
+
+function loadQuestionStage() {
+    userSelectionIndices = [];
+    ui.submitBtn.disabled = true;
+    
+    ui.progress.innerText = `ANALYZING: ${activeIndex + 1} / ${parsedQuestions.length}`;
+    ui.score.innerText = `ACCURACY: ${Math.round((currentScore / (activeIndex || 1)) * 100)}%`;
+
+    const q = parsedQuestions[activeIndex];
+    ui.directive.innerText = `Find the: ${q.target}`;
+
+    ui.shredderBox.innerHTML = "";
+    q.wordTokens.forEach((word, idx) => {
+        const block = document.createElement("div");
+        block.className = "word-block";
+        block.innerText = word;
+        block.onclick = () => toggleWordBlock(idx, block);
+        ui.shredderBox.appendChild(block);
+    });
 }
 
+function toggleWordBlock(index, element) {
+    if (element.classList.contains("locked")) return;
+
+    if (userSelectionIndices.includes(index)) {
+        userSelectionIndices = userSelectionIndices.filter(i => i !== index);
+        element.classList.remove("selected");
+    } else {
+        userSelectionIndices.push(index);
+        element.classList.add("selected");
+    }
+
+    ui.submitBtn.disabled = (userSelectionIndices.length === 0);
+}
+
+ui.submitBtn.onclick = function() {
+    ui.submitBtn.disabled = true;
+    const q = parsedQuestions[activeIndex];
+    const targetSet = q.targetIndices;
+    const blocks = ui.shredderBox.querySelectorAll(".word-block");
+
+    blocks.forEach(b => b.classList.add("locked"));
+
+    let errorsFound = false;
+    
+    // 1. Validate if choices have incorrect structural targets
+    userSelectionIndices.forEach(idx => {
+        if (targetSet.includes(idx)) {
+            blocks[idx].classList.remove("selected");
+            blocks[idx].classList.add("success-flash");
+        } else {
+            blocks[idx].classList.remove("selected");
+            blocks[idx].classList.add("error-flash");
+            errorsFound = true;
+        }
+    });
+
+    // 2. Map structural elements missed out by player selection
+    targetSet.forEach(idx => {
+        if (!userSelectionIndices.includes(idx)) {
+            blocks[idx].classList.add("missed-flash");
+            errorsFound = true;
+        }
+    });
+
+    if (!errorsFound) {
+        currentScore++;
+        triggerAudio("correct");
+        launchCelebrationConfetti();
+    } else {
+        triggerAudio("wrong");
+    }
+
+    setTimeout(() => {
+        activeIndex++;
+        if(activeIndex < parsedQuestions.length) {
+            loadQuestionStage();
+        } else {
+            showEvaluationSummary();
+        }
+    }, 2400);
+};
+
+function showEvaluationSummary() {
+    ui.game.style.display = "none";
+    ui.result.style.display = "flex";
+    document.getElementById("finalScore").innerText = `${currentScore} / ${parsedQuestions.length}`;
+    triggerAudio("clap");
+}
+
+document.getElementById("restartBtn").onclick = function() {
+    ui.result.style.display = "none";
+    ui.game.style.display = "flex";
+    activeIndex = 0;
+    currentScore = 0;
+    parsedQuestions.sort(() => Math.random() - 0.5);
+    loadQuestionStage();
+};
+
+/* ==========================================================================
+   CONFETTI ENGINE ANIMATION BLOCKS
+   ========================================================================== */
+const canvas = document.getElementById("confetti");
+const ctx = canvas.getContext("2d");
+let confettiData = [], animFrameRef = null;
+
+function scaleCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+window.addEventListener("resize", scaleCanvas);
+scaleCanvas();
+
+function launchCelebrationConfetti() {
+    confettiData = [];
+    cancelAnimationFrame(animFrameRef);
+    for (let i = 0; i < 110; i++) {
+        confettiData.push({
+            x: Math.random() * canvas.width,
+            y: -20,
+            size: Math.random() * 6 + 5,
+            speedY: Math.random() * 5 + 3,
+            speedX: Math.random() * 4 - 2,
+            color: `hsl(${Math.random() * 360}, 95%, 55%)`
+        });
+    }
+    let lifespan = 0;
+    function cycle() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        confettiData.forEach(p => {
+            ctx.fillStyle = p.color;
+            ctx.fillRect(p.x, p.y, p.size, p.size);
+            p.y += p.speedY; p.x += p.speedX;
+        });
+        lifespan++;
+        if (lifespan < 130) { animFrameRef = requestAnimationFrame(cycle); }
+        else { ctx.clearRect(0, 0, canvas.width, canvas.height); }
+    }
+    cycle();
+}
 </script>
-
 </body>
 </html>
