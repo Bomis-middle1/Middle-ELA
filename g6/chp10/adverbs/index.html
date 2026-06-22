@@ -3,181 +3,349 @@
 <head>
 <meta charset="UTF-8">
 <title>Quest for Adverb Crystals</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-select=none">
 
 <style>
-body{
-margin:0;
-font-family:Arial;
-background:linear-gradient(to bottom,#142850,#27496d);
-color:white;
-overflow:auto;
+/* ==========================================================================
+   GAME PLATFORM BASICS & GLOBAL STYLING
+   ========================================================================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+    -webkit-tap-highlight-color: transparent;
 }
 
-/* SPLASH */
-#splash{
-position:fixed;
-inset:0;
-background:white;
-display:flex;
-align-items:center;
-justify-content:center;
-z-index:9999;
+body {
+    background: #0b132b;
+    color: white;
+    overflow: hidden;
+    height: 100vh;
 }
 
-#splash img{
-width:240px;
-max-width:80%;
+/* SPLASH SCREEN INTRO */
+#splash {
+    position: fixed;
+    inset: 0;
+    background: #ffffff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+#splash img {
+    width: 220px;
+    max-width: 80%;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+}
+#logoText {
+    margin-top: 15px;
+    font-size: 20px;
+    font-weight: bold;
+    color: #333;
 }
 
-/* TITLE */
-#titleScreen{
-display:none;
-height:100vh;
-align-items:center;
-justify-content:center;
-text-align:center;
-font-size:28px;
-font-weight:bold;
-padding:20px;
+/* SCENE LAYOUT MANAGEMENT CONTAINER */
+.scene-container {
+    display: none;
+    width: 100vw;
+    height: 100vh;
+    padding: 16px;
+    background: linear-gradient(135deg, #0b132b 0%, #1c2541 50%, #3a506b 100%);
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
 }
 
-/* INSTRUCTIONS */
-#instructionScreen{
-display:none;
-padding:20px;
-font-size:15px;
-line-height:1.6;
+/* TYPOGRAPHY COMPONENTS */
+h1 {
+    font-size: 32px;
+    color: #ffd54f;
+    text-shadow: 0 4px 10px rgba(255,213,79,0.3);
+    margin-bottom: 20px;
+}
+p {
+    font-size: 16px;
+    line-height: 1.6;
+    max-width: 500px;
+    color: #e0e1dd;
+    margin-bottom: 25px;
 }
 
-/* BUTTON */
-button{
-padding:12px 18px;
-border:none;
-border-radius:10px;
-background:#ffd54f;
-font-weight:bold;
-cursor:pointer;
-margin-top:10px;
+/* CORE INTERACTION CONTROLS */
+button.action-btn {
+    padding: 14px 36px;
+    font-size: 18px;
+    font-weight: bold;
+    border: none;
+    border-radius: 25px;
+    background: linear-gradient(135deg, #ffd54f, #ffb300);
+    color: #111;
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(255,213,79,0.4);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+button.action-btn:active {
+    transform: scale(0.95);
 }
 
-/* GAME */
-#game{
-display:none;
-padding:10px;
-max-height:100vh;
-overflow:auto;
+/* ==========================================================================
+   IMMERSIVE QUEST DASHBOARD HUD STAGE
+   ========================================================================== */
+#game {
+    padding: 12px;
+    display: none;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100vh;
+    background: linear-gradient(to bottom, #0f172a, #1e293b);
 }
 
-.topBar{
-display:flex;
-justify-content:space-between;
-font-size:16px;
-margin-bottom:10px;
+/* HUD METRICS STRIP */
+.hud-panel {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 10px 16px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 10px;
+}
+.hud-item {
+    font-size: 14px;
+    font-weight: bold;
+    background: rgba(0,0,0,0.3);
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(255,213,79,0.2);
 }
 
-.box{
-background:white;
-color:black;
-padding:18px;
-border-radius:10px;
-min-height:180px;
-white-space:pre-line;
-word-wrap:break-word;
-font-size:18px;
-line-height:1.5;
+/* CRYStAL COLLECTOR VAULT DISPLAY */
+#crystalVault {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin-bottom: 10px;
+    background: rgba(0,0,0,0.2);
+    padding: 8px;
+    border-radius: 12px;
+}
+.vault-slot {
+    font-size: 20px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255,255,255,0.05);
+    border: 1px dashed rgba(255,255,255,0.2);
+    border-radius: 50%;
+    filter: grayscale(100%);
+    opacity: 0.3;
+    transition: all 0.3s ease;
+}
+.vault-slot.active {
+    filter: grayscale(0%);
+    opacity: 1;
+    border-style: solid;
+    border-color: #ffd54f;
+    transform: scale(1.1);
 }
 
-.option{
-background:#f0f0f0;
-margin:8px 0;
-padding:10px;
-border-radius:8px;
-cursor:pointer;
+/* SCENARIO TEXT ARENA BOARD */
+.scenario-box {
+    flex: 1;
+    background: rgba(15, 23, 42, 0.8);
+    border: 2px solid #38bdf8;
+    box-shadow: 0 0 20px rgba(56, 189, 248, 0.15);
+    padding: 20px;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin-bottom: 15px;
+    min-height: 160px;
+}
+#question {
+    font-size: 18px;
+    font-weight: bold;
+    line-height: 1.5;
+    color: #f1f5f9;
+    text-align: center;
 }
 
-.option:hover{
-background:#ddd;
+/* DYNAMIC ADVERB CRYSTAL CARDS GRID */
+#options {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 5px;
+}
+.option {
+    background: linear-gradient(135deg, #1e293b, #0f172a);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #f8fafc;
+    padding: 16px 12px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 600;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 55px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+    transition: all 0.2s ease;
+}
+.option:active {
+    transform: scale(0.96);
 }
 
-/* END */
-#endScreen{
-display:none;
-text-align:center;
-padding:20px;
+/* FEEDBACK OVERLAY UTILITY */
+#feedbackOverlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(11, 19, 43, 0.85);
+    backdrop-filter: blur(8px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    z-index: 5000;
+}
+#feedbackText {
+    font-size: 28px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+#feedbackSub {
+    font-size: 16px;
+    color: #cbd5e1;
 }
 
-.flash{
-font-size:26px;
-font-weight:bold;
-animation:flash 0.8s infinite;
+/* ==========================================================================
+   END SUMMARY PERFORMANCE SCOREBOARD
+   ========================================================================== */
+#endScreen {
+    background: linear-gradient(to bottom, #0f172a, #111827);
+}
+.flash {
+    font-size: 28px;
+    font-weight: bold;
+    color: #ffd54f;
+    text-shadow: 0 0 15px rgba(255,213,79,0.5);
+    margin-bottom: 20px;
+    animation: pulse 1.5s infinite;
+}
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+.stats-card {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 20px;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 400px;
+    margin-bottom: 25px;
+}
+.stats-line {
+    display: flex;
+    justify-content: space-between;
+    font-size: 16px;
+    margin: 8px 0;
+    border-bottom: 1px dashed rgba(255,255,255,0.1);
+    padding-bottom: 6px;
+}
+.stats-line:last-child { border: none; }
+
+.confetti {
+    position: fixed;
+    width: 8px;
+    height: 8px;
+    top: -10px;
+    animation: fall 2.5s linear forwards;
+    z-index: 8000;
+}
+@keyframes fall {
+    to { transform: translateY(105vh) rotate(360deg); opacity: 0; }
 }
 
-@keyframes flash{
-0%{opacity:1}
-50%{opacity:0.3}
-100%{opacity:1}
+/* MINOR PLATFORM BREAKPOINTS SETUP */
+@media (min-width: 601px) {
+    #options { gap: 16px; }
+    .option { font-size: 17px; min-height: 65px; }
+    #question { font-size: 22px; }
+    .scenario-box { max-width: 600px; width: 100%; margin-left: auto; margin-right: auto; }
+    #options { max-width: 600px; width: 100%; margin-left: auto; margin-right: auto; }
+    #crystalVault { max-width: 600px; width: 100%; margin-left: auto; margin-right: auto; }
+    .hud-panel { max-width: 600px; width: 100%; margin-left: auto; margin-right: auto; }
 }
-
-.confetti{
-position:fixed;
-width:8px;
-height:8px;
-top:0;
-animation:fall 3s linear forwards;
-}
-
-@keyframes fall{
-to{transform:translateY(100vh) rotate(360deg);}
-}
-
 </style>
 </head>
 
 <body>
 
-<!-- SPLASH -->
 <div id="splash">
-<img src="/mnt/data/ae80f07f-381f-4db7-bebe-7a48b91cdd96.png">
+    <img src="assets/innovine-logo.png" alt="Innovine Logo">
+    <div id="logoText">Innovine Learning Adventures</div>
 </div>
 
-<!-- TITLE -->
-<div id="titleScreen">
-🏰 Quest for the Seven Adverb Crystals 🏰
+<div id="titleScreen" class="scene-container">
+    <h1>🏰 Quest for the Seven Adverb Crystals 🏰</h1>
 </div>
 
-<!-- INSTRUCTIONS -->
-<div id="instructionScreen">
-<h2>🏰 Welcome to the Quest for the Seven Adverb Crystals!</h2>
-
-<p>The magical kingdom is in danger! Answer correctly to collect crystals.</p>
-
-<button onclick="startGame()">Start Game</button>
+<div id="instructionScreen" class="scene-container">
+    <h1>Game Instructions</h1>
+    <p>The magical kingdom is in danger! Journey through 15 structural challenges, correctly identify the hidden adverbs, and collect your crystals to crack open the final vault.</p>
+    <button class="action-btn" onclick="startGame()">Start Game</button>
 </div>
 
-<!-- GAME -->
 <div id="game">
-<div class="topBar">
-<div id="qCount">1/15</div>
-<div>⏳ <span id="timer">80</span>s</div>
+    <div class="hud-panel">
+        <div class="hud-item" id="qCount">1/15</div>
+        <div class="hud-item" style="color:#ffd54f;">⏳ <span id="timer">80</span>s</div>
+    </div>
+
+    <div id="crystalVault">
+        <div class="vault-slot">💎</div>
+        <div class="vault-slot">💎</div>
+        <div class="vault-slot">💎</div>
+        <div class="vault-slot">💎</div>
+        <div class="vault-slot">💎</div>
+        <div class="vault-slot">💎</div>
+        <div class="vault-slot">💎</div>
+    </div>
+
+    <div class="scenario-box">
+        <div id="question"></div>
+    </div>
+
+    <div id="options"></div>
 </div>
 
-<div class="box">
-<div id="question"></div>
-<div id="options"></div>
+<div id="feedbackOverlay">
+    <div id="feedbackText"></div>
+    <div id="feedbackSub"></div>
 </div>
-</div>
 
-<!-- END -->
-<div id="endScreen">
-<div class="flash">🏆 TREASURE UNLOCKED!</div>
+<div id="endScreen" class="scene-container">
+    <div class="flash">🏆 TREASURE UNLOCKED!</div>
+    
+    <div class="stats-card">
+        <div class="stats-line"><span>Performance:</span> <span id="remark" style="font-weight:bold; color:#ffd54f;"></span></div>
+        <div class="stats-line"><span>Total Score:</span> <span id="scoreText" style="font-weight:bold;"></span></div>
+        <div class="stats-line"><span>Exploration Time:</span> <span id="timeTaken"></span></div>
+        <div class="stats-line"><span>Wrong Coordinates:</span> <span id="wrongCount" style="color:#f87171;"></span></div>
+    </div>
 
-<h3 id="scoreText"></h3>
-<p id="remark"></p>
-<p id="timeTaken"></p>
-<p id="wrongCount"></p>
-
-<button onclick="restart()">Restart</button>
+    <button class="action-btn" onclick="restart()">Restart</button>
 </div>
 
 <audio id="correctSound" src="assets/correct.mp3"></audio>
@@ -185,8 +353,7 @@ to{transform:translateY(100vh) rotate(360deg);}
 <audio id="clapSound" src="assets/clapping.mp3"></audio>
 
 <script>
-
-/* ✅ EXACT QUESTIONS — NO CUTTING / NO SHORTENING */
+/* FULL UNMODIFIED SYSTEM DATABASE MATRIX */
 let questions = [
 {
 q:`1.A sleeping lion blocks your path. How do you walk past it?`,
@@ -267,7 +434,7 @@ answer:`The knight carefully crossed the shaky bridge.`
 
 let index=0,score=0,wrong=0,time=0,timer=80,interval;
 
-/* SHUFFLE */
+/* SHUFFLE CONFIGURATIONS */
 function shuffle(a){
 for(let i=a.length-1;i>0;i--){
 let j=Math.floor(Math.random()*(i+1));
@@ -276,127 +443,153 @@ let j=Math.floor(Math.random()*(i+1));
 return a;
 }
 
-/* SPLASH FLOW */
+/* INTRO SPLASH PIPELINE FLOW CONTROL */
 setTimeout(()=>{
-document.getElementById("splash").style.display="none";
-document.getElementById("titleScreen").style.display="flex";
+    document.getElementById("splash").style.display="none";
+    document.getElementById("titleScreen").style.display="flex";
 
-setTimeout(()=>{
-document.getElementById("titleScreen").style.display="none";
-document.getElementById("instructionScreen").style.display="block";
-},3000);
-},5000);
+    setTimeout(()=>{
+        document.getElementById("titleScreen").style.display="none";
+        document.getElementById("instructionScreen").style.display="flex";
+    }, 3000);
+}, 5000);
 
-/* START */
+/* START ENGINE TRIGGER */
 function startGame(){
-document.getElementById("instructionScreen").style.display="none";
-document.getElementById("game").style.display="block";
-
-questions = shuffle(questions);
-loadQ();
-startTimer();
+    document.getElementById("instructionScreen").style.display="none";
+    document.getElementById("game").style.display="flex";
+    questions = shuffle(questions);
+    loadQ();
+    startTimer();
 }
 
-/* LOAD QUESTION */
+/* CARD CANVAS GENERATOR STAGE */
 function loadQ(){
+    if(index>=questions.length){
+        endGame();
+        return;
+    }
 
-if(index>=questions.length){
-endGame();
-return;
+    document.getElementById("qCount").innerText="Challenge: " + (index+1)+"/15";
+    let q = questions[index];
+    document.getElementById("question").innerHTML = q.q;
+
+    let opts = shuffle([...q.options]);
+    let box = document.getElementById("options");
+    box.innerHTML = "";
+
+    opts.forEach(o=>{
+        let div=document.createElement("div");
+        div.className="option";
+        div.innerText=o;
+        div.onclick=()=>check(o);
+        box.appendChild(div);
+    });
 }
 
-document.getElementById("qCount").innerText=(index+1)+"/15";
-
-let q = questions[index];
-
-document.getElementById("question").innerText = q.q;
-
-let opts = shuffle([...q.options]);
-
-let box = document.getElementById("options");
-box.innerHTML = "";
-
-opts.forEach(o=>{
-let div=document.createElement("div");
-div.className="option";
-div.innerText=o;
-div.onclick=()=>check(o);
-box.appendChild(div);
-});
-}
-
-/* CHECK */
+/* SYSTEM INTERACTION ACTION MECHANICS */
 function check(ans){
+    let currentQuestionObj = questions[index];
+    let isCorrect = ans === currentQuestionObj.answer;
+    
+    // Safety lock pointer mechanics during runtime updates
+    const elements = document.querySelectorAll(".option");
+    elements.forEach(el => el.style.pointerEvents = "none");
 
-let correct = ans===questions[index].answer;
+    const feedbackOverlay = document.getElementById("feedbackOverlay");
+    const feedbackText = document.getElementById("feedbackText");
+    const feedbackSub = document.getElementById("feedbackSub");
 
-document.getElementById(correct?"correctSound":"wrongSound").play();
+    feedbackOverlay.style.display = "flex";
 
-if(correct){
-score++;
-document.getElementById("clapSound").play();
-confetti();
+    if(isCorrect){
+        document.getElementById("correctSound").play();
+        document.getElementById("clapSound").play();
+        score++;
+        
+        feedbackText.innerText = "✨ CRYSTAL DETECTED! ✨";
+        feedbackText.style.color = "#a7f3d0";
+        feedbackSub.innerText = `"${ans}" perfectly answered the challenge context.`;
+        
+        // Track up to 7 distinct visually illuminated milestones dynamically
+        updateCrystalVault();
+        confetti();
+    } else {
+        document.getElementById("wrongSound").play();
+        wrong++;
+        feedbackText.innerText = "💥 ENERGY SHIELD ACTIVATED 💥";
+        feedbackText.style.color = "#fca5a5";
+        feedbackSub.innerText = `The matrix needed: "${currentQuestionObj.answer}"`;
+    }
+
+    setTimeout(() => {
+        feedbackOverlay.style.display = "none";
+        next();
+    }, 2000);
 }
-else wrong++;
 
-next();
+function updateCrystalVault() {
+    let slots = document.querySelectorAll(".vault-slot");
+    // Distribute up to 7 visual upgrades over the 15 question slots proportionally
+    let unlockedSlotsCount = Math.min(7, Math.floor((score / 15) * 7) || 1);
+    for(let i=0; i<unlockedSlotsCount; i++) {
+        if(slots[i]) slots[i].classList.add("active");
+    }
 }
 
 function next(){
-index++;
-timer=80;
-loadQ();
+    index++;
+    timer=80;
+    loadQ();
 }
 
-/* TIMER */
+/* STAGE CLOCK METRIC RUNNERS */
 function startTimer(){
-interval=setInterval(()=>{
-timer--;
-time++;
-document.getElementById("timer").innerText=timer;
+    interval=setInterval(()=>{
+        timer--;
+        time++;
+        document.getElementById("timer").innerText=timer;
 
-if(timer<=0) next();
-},1000);
+        if(timer<=0) next();
+    },1000);
 }
 
-/* CONFETTI */
+/* PARTICLE SYSTEM MATRIX EFFECTS */
 function confetti(){
-for(let i=0;i<25;i++){
-let c=document.createElement("div");
-c.className="confetti";
-c.style.left=Math.random()*100+"vw";
-c.style.background=["red","blue","yellow","green"][i%4];
-document.body.appendChild(c);
-setTimeout(()=>c.remove(),3000);
-}
+    for(let i=0;i<25;i++){
+        let c=document.createElement("div");
+        c.className="confetti";
+        c.style.left=Math.random()*100+"vw";
+        c.style.background=["#ffd54f","#38bdf8","#a7f3d0","#ec4899"][i%4];
+        c.style.animationDuration = (1.5 + Math.random() * 1.5) + "s";
+        document.body.appendChild(c);
+        setTimeout(()=>c.remove(),3000);
+    }
 }
 
-/* END */
+/* SCORE OVERLAY METRICS COMPILER */
 function endGame(){
-clearInterval(interval);
-document.getElementById("game").style.display="none";
-document.getElementById("endScreen").style.display="block";
+    clearInterval(interval);
+    document.getElementById("game").style.display="none";
+    document.getElementById("endScreen").style.display="flex";
 
-let percent=(score/15)*100;
+    let percent=(score/15)*100;
+    document.getElementById("scoreText").innerText=score+" / 15 Items";
 
-document.getElementById("scoreText").innerText="Score: "+score+"/15";
+    let remark="";
+    if(percent>80) remark="Excellent ⭐";
+    else if(percent>=60) remark="Good Job 👍";
+    else if(percent>=45) remark="Well Tried 🙂";
+    else remark="Let's Revise 📘";
 
-let remark="";
-if(percent>=80) remark="Excellent ⭐";
-else if(percent>=60) remark="Good Job 👍";
-else if(percent>=45) remark="Well Tried 🙂";
-else remark="Let's Revise 📘";
-
-document.getElementById("remark").innerText=remark;
-document.getElementById("timeTaken").innerText="Time: "+time+" sec";
-document.getElementById("wrongCount").innerText="Wrong Attempts: "+wrong;
+    document.getElementById("remark").innerText=remark;
+    document.getElementById("timeTaken").innerText=time+" seconds";
+    document.getElementById("wrongCount").innerText=wrong + " turns";
 }
 
-/* RESTART */
 function restart(){
-location.reload();
+    location.reload();
 }
-
 </script>
 
 </body>
