@@ -1,1 +1,237 @@
+import tkinter as tk
+from tkinter import messagebox
+import random
+import threading
+from pathlib import Path
 
+try:
+    from PIL import Image, ImageTk
+except ImportError:
+    Image = None
+    ImageTk = None
+
+try:
+    from playsound import playsound
+except ImportError:
+    playsound = None
+
+BASE_DIR = Path(__file__).resolve().parent
+ASSET_DIR = BASE_DIR / "Middle-ELA" / "G5" / "chp10" / "adjectives_degreesofcomparison" / "assets"
+
+WORDS = [
+    "tallest",
+    "better",
+    "worse",
+    "farther",
+    "most",
+    "more expensive",
+    "noisier",
+    "kinder",
+    "prettiest",
+    "more careful",
+    "best",
+    "warmer",
+    "smaller",
+]
+
+DEGREES = {
+    "tallest": "Superlative",
+    "better": "Comparative",
+    "worse": "Comparative",
+    "farther": "Comparative",
+    "most": "Superlative",
+    "more expensive": "Comparative",
+    "noisier": "Comparative",
+    "kinder": "Comparative",
+    "prettiest": "Superlative",
+    "more careful": "Comparative",
+    "best": "Superlative",
+    "warmer": "Comparative",
+    "smaller": "Comparative",
+}
+
+def play_sound(filename):
+    if playsound is None:
+        return
+    path = ASSET_DIR / filename
+    if path.exists():
+        threading.Thread(target=lambda: playsound(str(path)), daemon=True).start()
+
+class IceCreamGame:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Degrees of Comparison - Ice Cream Scoop Game")
+        self.root.geometry("1280x720")
+        self.root.resizable(False, False)
+        self.root.configure(bg="#f7f3ff")
+
+        self.score = 0
+        self.attempts = 2
+        self.current_word = None
+        self.current_degree = None
+        self.drag_widget = None
+
+        self.words_left = WORDS[:]
+        random.shuffle(self.words_left)
+
+        self.canvas = tk.Canvas(self.root, width=1280, height=720, bg="#f7f3ff", highlightthickness=0)
+        self.canvas.pack(fill="both", expand=True)
+
+        self.logo_img = None
+        self.load_logo()
+        self.draw_ui()
+
+        self.root.after(300, self.next_word)
+
+    def load_logo(self):
+        if Image and ImageTk:
+            logo_path = ASSET_DIR / "logo.png"
+            if logo_path.exists():
+                img = Image.open(logo_path).convert("RGBA")
+                img = img.resize((170, 170))
+                self.logo_img = ImageTk.PhotoImage(img)
+                self.canvas.create_image(60, 40, image=self.logo_img, anchor="nw")
+
+    def draw_ui(self):
+        self.canvas.create_text(
+            640, 35,
+            text="Degrees of Comparison",
+            font=("Arial", 30, "bold"),
+            fill="#4b2e83"
+        )
+        self.canvas.create_text(
+            640, 75,
+            text="Drag the scoop to the correct cone",
+            font=("Arial", 18),
+            fill="#6b5b95"
+        )
+
+        self.status = self.canvas.create_text(
+            1060, 40,
+            text="Score: 0   Attempts: 2",
+            font=("Arial", 18, "bold"),
+            fill="#2f4f4f"
+        )
+
+        self.word_label = self.canvas.create_text(
+            640, 150,
+            text="",
+            font=("Arial", 28, "bold"),
+            fill="#222"
+        )
+
+        self.feedback = self.canvas.create_text(
+            640, 205,
+            text="",
+            font=("Arial", 18),
+            fill="#b22222"
+        )
+
+        self.draw_cones()
+
+    def draw_cones(self):
+        self.canvas.create_polygon(
+            220, 590, 380, 590, 350, 330, 250, 330,
+            fill="#ffd166", outline="#9c6b00", width=3
+        )
+        self.canvas.create_polygon(
+            470, 590, 630, 590, 600, 330, 500, 330,
+            fill="#a8dadc", outline="#2f6f77", width=3
+        )
+        self.canvas.create_polygon(
+            820, 590, 980, 590, 950, 330, 850, 330,
+            fill="#ffafcc", outline="#8a3b60", width=3
+        )
+
+        self.canvas.create_text(300, 620, text="Positive", font=("Arial", 22, "bold"), fill="#7a4f00")
+        self.canvas.create_text(550, 620, text="Comparative", font=("Arial", 22, "bold"), fill="#20565c")
+        self.canvas.create_text(900, 620, text="Superlative", font=("Arial", 22, "bold"), fill="#7a2f4f")
+
+    def update_status(self):
+        self.canvas.itemconfig(self.status, text=f"Score: {self.score}   Attempts: {self.attempts}")
+
+    def next_word(self):
+        if self.drag_widget:
+            self.drag_widget.destroy()
+            self.drag_widget = None
+
+        if not self.words_left:
+            self.canvas.itemconfig(self.word_label, text="Game Complete!")
+            self.canvas.itemconfig(self.feedback, text=f"Final Score: {self.score}/{len(WORDS)}", fill="#1b5e20")
+            play_sound("freesound_community-claps-44774.mp3")
+            return
+
+        self.current_word = self.words_left.pop(0)
+        self.current_degree = DEGREES[self.current_word]
+
+        self.canvas.itemconfig(self.word_label, text=self.current_word.upper())
+        self.canvas.itemconfig(self.feedback, text="", fill="#b22222")
+
+        self.drag_widget = tk.Button(
+            self.root,
+            text=self.current_word,
+            font=("Arial", 18, "bold"),
+            bg="#ffffff",
+            fg="#222",
+            relief="raised",
+            bd=4
+        )
+        self.drag_widget.place(x=520, y=250, width=240, height=60)
+        self.drag_widget.bind("<ButtonPress-1>", self.start_drag)
+        self.drag_widget.bind("<B1-Motion>", self.do_drag)
+        self.drag_widget.bind("<ButtonRelease-1>", self.drop)
+
+        self.update_status()
+
+    def start_drag(self, event):
+        self.drag_widget.lift()
+        self.drag_widget._drag_x = event.x
+        self.drag_widget._drag_y = event.y
+
+    def do_drag(self, event):
+        x = self.drag_widget.winfo_x() + event.x - self.drag_widget._drag_x
+        y = self.drag_widget.winfo_y() + event.y - self.drag_widget._drag_y
+        self.drag_widget.place(x=x, y=y)
+
+    def cone_hit(self, x, y):
+        if 220 <= x <= 380 and 330 <= y <= 590:
+            return "Positive"
+        if 470 <= x <= 630 and 330 <= y <= 590:
+            return "Comparative"
+        if 820 <= x <= 980 and 330 <= y <= 590:
+            return "Superlative"
+        return None
+
+    def drop(self, event):
+        if not self.drag_widget:
+            return
+
+        x = self.drag_widget.winfo_x() + self.drag_widget.winfo_width() // 2
+        y = self.drag_widget.winfo_y() + self.drag_widget.winfo_height() // 2
+        guess = self.cone_hit(x, y)
+
+        if guess == self.current_degree:
+            self.score += 1
+            play_sound("correct.mp3")
+            self.canvas.itemconfig(self.feedback, text="Correct!", fill="#1b5e20")
+            self.drag_widget.destroy()
+            self.drag_widget = None
+            self.update_status()
+            self.root.after(700, self.next_word)
+        else:
+            self.attempts -= 1
+            play_sound("wrong.mp3")
+            self.canvas.itemconfig(self.feedback, text="Wrong try!", fill="#b22222")
+            self.update_status()
+
+            if self.attempts <= 0:
+                play_sound("freesound_community-claps-44774.mp3")
+                messagebox.showinfo("Game Over", f"No attempts left. Final score: {self.score}/{len(WORDS)}")
+                self.root.destroy()
+            else:
+                self.drag_widget.place(x=520, y=250)
+
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = IceCreamGame(root)
+    root.mainloop()
