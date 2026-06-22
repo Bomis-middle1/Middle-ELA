@@ -1,402 +1,360 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
-<title>🏰 Grammar Castle Adventure</title>
-
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-select=none">
+<title>Conjunction Detective Quiz</title>
 <style>
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:Arial;
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', sans-serif;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
 }
 
-body{
-overflow:hidden;
-background:linear-gradient(135deg,#0b1220,#111c2e,#0ea5e9);
-color:white;
+body, html {
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    background: #060414;
+    color: #fff;
 }
 
-/* BACKGROUND */
-body::before,body::after{
-content:"";
-position:fixed;
-border-radius:50%;
-background:rgba(255,255,255,0.05);
-animation:float 10s infinite alternate;
+/* SCREEN MANAGEMENT */
+.screen {
+    display: none;
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 10;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
-body::before{width:280px;height:280px;left:-120px;top:-120px;}
-body::after{width:220px;height:220px;right:-100px;bottom:-100px;}
+.screen.active { display: flex; }
 
-@keyframes float{
-from{transform:translateY(0);}
-to{transform:translateY(60px);}
-}
+/* LOGO INTRO SCREEN (STRICT 5s) */
+#logoScreen { background: #ffffff; z-index: 9999; }
+.logo-container { width: 280px; max-width: 80%; }
+.logo-container img { width: 100%; height: auto; display: block; }
 
-/* SCREEN SYSTEM */
-.screen{
-position:fixed;
-inset:0;
-display:none;
-justify-content:center;
-align-items:center;
-flex-direction:column;
-text-align:center;
-padding:20px;
+/* INSTRUCTIONS SCREEN */
+#instructionScreen { background: #0c0728; }
+.panel-card {
+    background: rgba(20, 15, 61, 0.95);
+    border: 2px solid #00ffcc;
+    border-radius: 24px;
+    padding: 35px 24px;
+    max-width: 480px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 0 30px rgba(0, 255, 204, 0.3);
 }
-.active{display:flex;}
+.panel-card h1 { color: #ffd60a; margin-bottom: 15px; font-size: 26px; }
+.panel-card p { color: #a49fc4; line-height: 1.6; margin-bottom: 25px; }
 
-/* SPLASH */
-#splash{
-background:white;
-z-index:999;
-}
-#splash img{
-width:220px;
-}
-
-/* TOPIC */
-#topic{
-background:linear-gradient(135deg,#6d28d9,#2563eb);
-}
-#topic h1{
-font-size:42px;
+/* GAME PLAYGROUND LAYOUT */
+#gameScreen { 
+    background: radial-gradient(circle at center, #0f0b36 0%, #050312 100%);
+    justify-content: flex-start;
+    padding-top: 90px;
 }
 
-/* CARD */
-.card{
-background:rgba(255,255,255,0.08);
-backdrop-filter:blur(10px);
-padding:20px;
-border-radius:18px;
-width:92%;
-max-width:700px;
+/* HUD HEADER LAYOUT BAR */
+.hud-bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 70px;
+    background: rgba(20, 15, 61, 0.85);
+    border-bottom: 2px solid #00ffcc;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 25px;
+    font-weight: bold;
+    font-size: 15px;
+    z-index: 20;
 }
 
-/* BUTTON */
-button{
-padding:14px 20px;
-border:none;
-border-radius:14px;
-background:#fbbf24;
-font-weight:bold;
-cursor:pointer;
+/* QUESTION DISPLAY BANNER */
+.question-banner {
+    background: rgba(10, 5, 36, 0.95);
+    border: 3px solid #ffca3a;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 750px;
+    padding: 20px;
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 50px;
+    z-index: 20;
 }
 
-/* GAME WRAP */
-#hud{
-display:flex;
-justify-content:space-between;
-width:100%;
-max-width:900px;
-font-weight:bold;
-margin-bottom:10px;
+/* OPTIONS GRID HOUSING */
+.options-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 40px;
+    width: 95%;
+    max-width: 1000px;
+    flex-wrap: wrap;
+    margin-top: 20px;
+    z-index: 20;
 }
 
-.barOuter{
-width:100%;
-max-width:900px;
-height:10px;
-background:#1f2937;
-border-radius:20px;
-overflow:hidden;
-margin-bottom:10px;
+/* THE FLOATING DIAMOND NATIVE BUTTONS */
+.diamond-option {
+    position: relative;
+    width: 140px;
+    height: 140px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.2s, filter 0.2s;
 }
 
-.barInner{
-height:100%;
-width:0%;
-background:linear-gradient(90deg,#22c55e,#facc15);
-transition:0.3s;
+.diamond-shape {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    transform: rotate(45deg);
+    border-radius: 8px;
+    box-shadow: 0 0 20px var(--glow-color);
+    background-color: var(--glow-color);
+    z-index: 1;
 }
 
-#roomCard{
-width:92%;
-max-width:700px;
-background:rgba(255,255,255,0.10);
-padding:18px;
-border-radius:18px;
+.diamond-text {
+    position: relative;
+    z-index: 2;
+    color: #000000;
+    font-weight: bold;
+    font-size: 15px;
+    text-align: center;
+    padding: 10px;
+    word-break: break-word;
 }
 
-#roomName{
-color:#facc15;
-margin-bottom:10px;
+.diamond-option:active {
+    transform: scale(0.92);
 }
 
-#question{
-font-size:20px;
-margin-bottom:15px;
-line-height:1.4;
+.diamond-option.disabled {
+    pointer-events: none;
+    filter: grayscale(1) brightness(0.4);
 }
 
-.options{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:10px;
+/* DYNAMIC FEEDBACK BANNER */
+.feedback-banner {
+    margin-top: 50px;
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+    min-height: 30px;
+    z-index: 20;
 }
 
-.option{
-background:white;
-color:black;
-padding:12px;
-border-radius:12px;
-cursor:pointer;
-transition:0.2s;
-font-weight:bold;
+/* OVERLAY ACTION INTERFACES */
+.action-btn {
+    padding: 14px 28px;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #ffb703, #fb8500);
+    color: #fff;
+    font-weight: bold;
+    font-size: 16px;
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(251, 133, 0, 0.4);
+    transition: transform 0.1s;
 }
+.action-btn:active { transform: scale(0.95); }
 
-.option:hover{transform:scale(1.03);}
-
-.correct{background:#22c55e!important;color:white;}
-.wrong{background:#ef4444!important;color:white;}
-
-/* MOBILE */
-@media(max-width:768px){
-.options{grid-template-columns:1fr;}
-#topic h1{font-size:30px;}
-}
-
-/* CONFETTI */
-canvas{
-position:fixed;
-inset:0;
-pointer-events:none;
-}
+#endScreen { background: rgba(5, 3, 18, 0.95); }
 </style>
 </head>
-
 <body>
 
-<canvas id="confetti"></canvas>
+<audio id="correctSound" src="Middle-ELA/G7/chp9/conjunctions/assets/correct.mp3" preload="auto"></audio>
+<audio id="wrongSound" src="Middle-ELA/G7/chp9/conjunctions/assets/wrong.mp3" preload="auto"></audio>
+<audio id="clapSound" src="Middle-ELA/G7/chp9/conjunctions/assets/clapping.mp3" preload="auto"></audio>
 
-<!-- SPLASH -->
-<div id="splash" class="screen active">
-<img src="assets/innovine-logo.png" />
+<div id="logoScreen" class="screen active">
+    <div class="logo-container">
+        <img src="Middle-ELA/G7/chp9/conjunctions/assets/innovine-logo.png" alt="Logo">
+    </div>
 </div>
 
-<!-- TOPIC -->
-<div id="topic" class="screen">
-<h1>🏰 Grammar Castle Adventure</h1>
+<div id="instructionScreen" class="screen">
+    <div class="panel-card">
+        <h1>🔍 Conjunction Detective Quiz</h1>
+        <p>Read the sentence in the top panel box, then tap or click directly on any matching color diamond choice to record your answer instantly!</p>
+        <button class="action-btn" onclick="startGameArena()">Begin Mission</button>
+    </div>
 </div>
 
-<!-- MISSION -->
-<div id="mission" class="screen">
-<div class="card">
-<h2>📜 Mission</h2>
-<p>Answer all grammar challenges</p>
-<button onclick="startGame()">START</button>
-<br><br>
-Volume <input id="vol" type="range" min="0" max="1" step="0.1" value="1">
-</div>
-</div>
-
-<!-- GAME -->
-<div id="game" class="screen">
-
-<div id="hud">
-<div id="room">Room 1/10</div>
-<div id="score">Score: 0</div>
+<div id="gameScreen" class="screen" onclick="handleScreenAdvance()">
+    <div class="hud-bar">
+        <div id="hudStage">STAGE: 1 / 10</div>
+        <div id="hudScore">SCORE: 0</div>
+        <div id="hudShield">SHIELD: ❤️ ❤️</div>
+    </div>
+    
+    <div id="questionText" class="question-banner">Loading clues...</div>
+    
+    <div id="optionsContainer" class="options-container">
+        </div>
+    
+    <div id="feedbackMessage" class="feedback-banner"></div>
 </div>
 
-<div class="barOuter">
-<div class="barInner" id="bar"></div>
+<div id="endScreen" class="screen">
+    <div class="panel-card">
+        <h1 style="font-size: 40px;">🏆</h1>
+        <h1>Mission Cleared</h1>
+        <p id="finalScoreDisplay" style="font-size: 18px; margin: 15px 0; font-weight: bold;"></p>
+        <button class="action-btn" onclick="restartEntireGame()">Play Again</button>
+    </div>
 </div>
-
-<div id="roomCard">
-<div id="roomName"></div>
-<div id="question"></div>
-<div class="options" id="options"></div>
-</div>
-
-</div>
-
-<!-- END -->
-<div id="end" class="screen">
-<div class="card">
-<h1>🏆 Completed!</h1>
-<h2 id="final"></h2>
-<button onclick="location.reload()">Play Again</button>
-</div>
-</div>
-
-<audio id="correctSound" src="assets/correct.mp3"></audio>
-<audio id="wrongSound" src="assets/wrong.mp3"></audio>
-<audio id="clapSound" src="assets/clapping.mp3"></audio>
 
 <script>
-
-/* ================= QUESTIONS (UNCHANGED CONTENT) ================= */
-const questions=[
-{
-q:"Find the participle: The broken skateboard lay beside the ramp.",
-opts:["lay","beside","broken","ramp"],
-ans:2
-},
-{
-q:"Which sentence contains a Conditional Conjunction?",
-opts:["I stayed home because it rained.","If you find the key, open the chest.","The player was tired but won.","The bike is faster than the scooter."],
-ans:1
-},
-{
-q:"A robot made a grammar mistake. Which sentence is WRONG?",
-opts:["The tiger is stronger than the fox.","She studied so that she could pass.","Although he was hungry, he ate lunch.","If it rains, we will stay inside."],
-ans:2
-},
-{
-q:"The knight purpose sentence?",
-opts:["The knight trained so that he could defeat the dragon.","The knight trained because he was bored.","The knight trained although he was tired.","The knight trained and became stronger."],
-ans:0
-},
-{
-q:"What does because do?",
-opts:["Shows comparison","Shows condition","Gives a reason","Extra info"],
-ans:2
-},
-{
-q:"Type of that in sentence",
-opts:["Relative","Comparative","Coordinating","Conditional"],
-ans:0
-},
-{
-q:"Coordinating conjunction",
-opts:["because she wanted","although she was tired","and improved speed","so that she could"],
-ans:2
-},
-{
-q:"Odd one out",
-opts:["Although","Even though","Though","Because"],
-ans:3
-},
-{
-q:"Same type pair",
-opts:["if, unless","and, although","because, than","that, but"],
-ans:0
-},
-{
-q:"How many conjunction types?",
-opts:["One","Two","Three","Four"],
-ans:1
-}
+const mcqs = [
+    {q:'Find the participle: "The broken skateboard lay beside the ramp."',opts:["lay","beside","broken","ramp"],ans:"broken"},
+    {q:'Which sentence contains a Conditional Conjunction?',opts:["I stayed home because it rained.","If you find the key, open the chest.","The player was tired but won.","The bike is faster than the scooter."],ans:"If you find the key, open the chest."},
+    {q:'A robot made a grammar mistake. Which sentence is WRONG?',opts:["The tiger is stronger than the fox.","She studied so that she could pass.","Although he was hungry, he ate lunch.","If it rains, we will stay inside."],ans:"Although he was hungry, he ate lunch."},
+    {q:'The door opens only if you choose the sentence with a Purpose Conjunction.',opts:["The knight trained so that he could defeat the dragon.","The knight trained because he was bored.","The knight trained although he was tired.","The knight trained and became stronger."],ans:"The knight trained so that he could defeat the dragon."},
+    {q:'What does the conjunction because do?',opts:["Shows comparison","Shows condition","Gives a reason","Gives extra information"],ans:"Gives a reason"},
+    {q:'The alien says: "The spaceship that landed here is invisible." What type of conjunction is that?',opts:["Relative","Comparative","Coordinating","Conditional"],ans:"Relative"},
+    {q:'Which sentence uses a Coordinating Conjunction?',opts:["The runner trained because she wanted to win.","The runner trained although she was tired.","The runner trained and improved her speed.","The runner trained so that she could compete."],ans:"The runner trained and improved her speed."},
+    {q:'Which conjunction belongs to a DIFFERENT category?',opts:["Although","Even though","Though","Because"],ans:"Because"},
+    {q:'Which pair belongs to the same conjunction type?',opts:["if, unless","and, although","because, than","that, but"],ans:"if, unless"},
+    {q:'Read the sentence: "The wizard carried a map so that he could find the treasure, although the journey was dangerous." How many conjunction types are used?',opts:["One","Two","Three","Four"],ans:"Two"}
 ];
 
-/* ================= STATE ================= */
-let index=0;
-let score=0;
-let attempts=2;
-let order=[...Array(questions.length).keys()].sort(()=>Math.random()-0.5);
+let activeQuizList = [];
+let currentIndex = 0;
+let totalScore = 0;
+let lives = 2;
+let showContinuePrompt = false;
 
-/* ================= FLOW ================= */
-setTimeout(()=>{
-splash.classList.remove("active");
-topic.classList.add("active");
-},5000);
+window.onload = () => {
+    setTimeout(() => {
+        document.getElementById('logoScreen').classList.remove('active');
+        document.getElementById('instructionScreen').classList.add('active');
+    }, 5000);
+};
 
-setTimeout(()=>{
-topic.classList.remove("active");
-mission.classList.add("active");
-},8000);
-
-/* ================= START ================= */
-function startGame(){
-mission.classList.remove("active");
-game.classList.add("active");
-index=0;
-score=0;
-loadQ();
+function startGameArena() {
+    document.getElementById('instructionScreen').classList.remove('active');
+    document.getElementById('gameScreen').classList.add('active');
+    
+    activeQuizList = [...mcqs];
+    currentIndex = 0;
+    totalScore = 0;
+    
+    setupQuestionFloor();
 }
 
-/* ================= LOAD ================= */
-function loadQ(){
-attempts=2;
-
-let q=questions[order[index]];
-
-room.innerText=`Room ${index+1}/10`;
-score.innerText=`Score: ${score}`;
-
-roomName.innerText="🏰 Castle Challenge";
-question.innerHTML=q.q;
-
-options.innerHTML="";
-
-q.opts.forEach((o,i)=>{
-let b=document.createElement("div");
-b.className="option";
-b.innerText=o;
-b.onclick=()=>check(i,b,q.ans);
-options.appendChild(b);
-});
-
-bar.style.width=(index/questions.length)*100+"%";
+function setupQuestionFloor() {
+    lives = 2;
+    showContinuePrompt = false;
+    
+    const activeData = activeQuizList[currentIndex];
+    
+    // Update HUD display labels
+    document.getElementById("hudStage").innerText = `STAGE: ${currentIndex + 1} / ${activeQuizList.length}`;
+    document.getElementById("hudScore").innerText = `SCORE: ${totalScore}`;
+    document.getElementById("hudShield").innerText = `SHIELD: ${"❤️ ".repeat(lives)}`;
+    document.getElementById("questionText").innerText = activeData.q;
+    document.getElementById("feedbackMessage").innerText = "";
+    
+    // Setup and render Native HTML Diamond option buttons
+    const container = document.getElementById("optionsContainer");
+    container.innerHTML = "";
+    
+    const itemColors = ["#ff595e", "#ffca3a", "#8ac926", "#1982c4"];
+    
+    activeData.opts.forEach((text, idx) => {
+        const optionColor = itemColors[idx % itemColors.length];
+        
+        const optElement = document.createElement("div");
+        optElement.className = "diamond-option";
+        optElement.style.setProperty("--glow-color", optionColor);
+        
+        optElement.innerHTML = `
+            <div class="diamond-shape"></div>
+            <div class="diamond-text">${text}</div>
+        `;
+        
+        // Native independent event handler context
+        optElement.addEventListener("click", (e) => {
+            e.stopPropagation(); // Avoid triggering global screen advance click
+            if (!showContinuePrompt) {
+                evaluateSelection(text, optElement);
+            }
+        });
+        
+        container.appendChild(optElement);
+    });
 }
 
-/* ================= CHECK ================= */
-function check(i,b,ans){
-
-let all=document.querySelectorAll(".option");
-all.forEach(x=>x.style.pointerEvents="none");
-
-let v=vol.value;
-correctSound.volume=v;
-wrongSound.volume=v;
-clapSound.volume=v;
-
-if(i===ans){
-b.classList.add("correct");
-correctSound.play();
-score++;
-launch();
-setTimeout(next,1000);
-}else{
-b.classList.add("wrong");
-wrongSound.play();
-all[ans].classList.add("correct");
-
-attempts--;
-
-if(attempts<=0){
-setTimeout(next,1000);
-}else{
-setTimeout(()=>all.forEach(x=>x.style.pointerEvents="auto"),500);
-}
-}
-
-score.innerText=`Score: ${score}`;
-}
-
-/* ================= NEXT ================= */
-function next(){
-index++;
-if(index<questions.length){
-loadQ();
-}else endGame();
+function evaluateSelection(selectedText, element) {
+    const activeData = activeQuizList[currentIndex];
+    const feedbackEl = document.getElementById("feedbackMessage");
+    
+    if (selectedText === activeData.ans) {
+        totalScore++;
+        document.getElementById("hudScore").innerText = `SCORE: ${totalScore}`;
+        feedbackEl.style.color = "#00ffcc";
+        feedbackEl.innerText = "✨ OUTSTANDING WORK! (Tap anywhere to continue)";
+        
+        document.getElementById("correctSound").play().catch(()=>{});
+        document.getElementById("clapSound").play().catch(()=>{});
+        
+        // Highlight chosen option container green 
+        element.style.setProperty("--glow-color", "#00ffcc");
+        showContinuePrompt = true;
+    } else {
+        lives--;
+        document.getElementById("hudShield").innerText = `SHIELD: ${"❤️ ".repeat(lives)}`;
+        element.classList.add("disabled"); // Disable visual styling
+        document.getElementById("wrongSound").play().catch(()=>{});
+        
+        if (lives <= 0) {
+            feedbackEl.style.color = "#ff595e";
+            feedbackEl.innerText = `❌ CASE CLOSED! Solution was: ${activeData.ans} (Tap anywhere)`;
+            showContinuePrompt = true;
+        } else {
+            feedbackEl.style.color = "#ffca3a";
+            feedbackEl.innerText = "❌ FALSE LEAD! Try your final life attempt!";
+        }
+    }
 }
 
-/* ================= CONFETTI ================= */
-function launch(){
-let c=document.getElementById("confetti");
-let ctx=c.getContext("2d");
-c.width=innerWidth;
-c.height=innerHeight;
-
-for(let i=0;i<100;i++){
-ctx.fillStyle=`hsl(${Math.random()*360},100%,60%)`;
-ctx.fillRect(Math.random()*c.width,Math.random()*c.height,6,6);
-}
-}
-
-/* ================= END ================= */
-function endGame(){
-game.classList.remove("active");
-end.classList.add("active");
-
-final.innerText=`⭐ ${score}/${questions.length}`;
-clapSound.play();
+function handleScreenAdvance() {
+    if (!showContinuePrompt) return;
+    
+    currentIndex++;
+    if (currentIndex >= activeQuizList.length) {
+        document.getElementById("gameScreen").classList.remove("active");
+        document.getElementById("endScreen").classList.add("active");
+        document.getElementById("finalScoreDisplay").innerText = `Final Score: ${totalScore} / ${activeQuizList.length}`;
+    } else {
+        setupQuestionFloor();
+    }
 }
 
+function restartEntireGame() {
+    document.getElementById("endScreen").classList.remove("active");
+    startGameArena();
+}
 </script>
-
 </body>
 </html>
