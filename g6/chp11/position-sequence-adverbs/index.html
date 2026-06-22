@@ -57,6 +57,7 @@ body {
 #instructionScreen {
     background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
     z-index: 9000;
+    display: none; /* Controlled explicitly by script now */
 }
 #instructionScreen h1 {
     font-size: 32px;
@@ -87,6 +88,7 @@ body {
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     z-index: 8000;
+    display: none;
 }
 
 /* INTERACTIVE ENGINE CONTROLS */
@@ -257,17 +259,6 @@ button:active {
 }
 .stats-row:last-child { border: none; }
 
-/* AUDIO FALLBACK STATUS LOGS */
-#audioStatusLog {
-    position: fixed;
-    bottom: 5px;
-    left: 5px;
-    font-size: 10px;
-    color: rgba(255,255,255,0.2);
-    pointer-events: none;
-    z-index: 99999;
-}
-
 /* MEDIA ADAPTATIONS FOR BIGGER CONTROL SCREENS */
 @media (min-width: 601px) {
     #titleBox { font-size: 18px; padding: 14px; }
@@ -346,8 +337,6 @@ button:active {
     <div id="feedbackPrompt" style="font-size:16px; color:#94a3b8; max-width:450px; white-space: pre-line;"></div>
 </div>
 
-<div id="audioStatusLog"></div>
-
 <script>
 /* GLOBAL GAMEPLAY ENGINE COUNTERS */
 let i = 0, c = 0, w = 0;
@@ -376,4 +365,258 @@ Options:<br>
 a:1
 },
 {
-q:
+q:`Q2. Choose the BEST sentence.<br>
+Options:<br>
+• The car carefully turned the corner.  <br>
+• The car turned carefully the corner. <br>
+• Carefully the corner turned the car. <br>
+• The carefully car turned the corner.`,
+a:0
+},
+{
+q:`Q3. The bus reached the stop.Which sentence uses the sequence words correctly?<br>
+Options:<br>
+• First the bus arrived. Next, the doors opened. Finally, the passengers entered.  <br>
+• Finally the bus arrived. Next the passengers entered. First the doors opened. <br>
+• Next the passengers entered. First the bus arrived. Finally the doors opened. <br>
+• The passengers entered first because finally the bus arrived.`,
+a:0
+},
+{
+q:`Q4. Which sentence has the WORST adverb placement?<br>
+Options:<br>
+• The traffic lights suddenly turned red. <br>
+• Suddenly, the traffic lights turned red. <br>
+• The traffic suddenly lights turned red.  <br>
+• The traffic lights turned red suddenly.`,
+a:2
+},
+{
+q:`Q5. Fill in the blank: "First the driver picked up the tourists. ______, he loaded their bags."<br>
+Options:<br>
+• Loudly <br>
+• Next  <br>
+• Yesterday <br>
+• Carefully`,
+a:1
+},
+{
+q:`Q6. Which sentence sounds MOST natural?<br>
+Options:<br>
+• The biker quickly avoided the pothole.  <br>
+• The biker avoided quickly the pothole. <br>
+• Quickly the pothole avoided the biker. <br>
+• The quickly biker avoided the pothole.`,
+a:0
+},
+{
+q:`Q7.  Which sentence shows the events in the correct order?<br>
+Options:<br>
+• First workers placed warning signs. Next, they repaired the road. Finally, traffic started moving again.  <br>
+• Finally workers placed warning signs. Next they repaired the road. First traffic started moving again. <br>
+• Next traffic started moving again. First workers repaired the road. Finally they placed warning signs. <br>
+• First traffic started moving again. Finally workers repaired the road.`,
+a:0
+},
+{
+q:`Q8. Which sentence uses the adverb BEST?<br>
+Options:<br>
+• The police officer calmly guided traffic.  <br>
+• The police officer guided calmly traffic. <br>
+• Calmly traffic guided the officer. <br>
+• The calmly officer guided traffic.`,
+a:0
+},
+{
+q:`Q9. Which sentence uses the sequence words correctly?<br>
+Options:<br>
+• First the traffic stopped. Next, the bridge opened. Finally, the vehicles crossed.  <br>
+• Finally the traffic stopped. First the bridge opened. Next the vehicles crossed. <br>
+• Next the vehicles crossed. Finally the traffic stopped. First the bridge opened. <br>
+• First the bridge crossed the vehicles. Finally the traffic stopped.`,
+a:0
+},
+{
+q:`Q10. Choose the sentence with the correct sequence word and adverb placement.<br>
+Options:<br>
+• First the ambulance carefully crossed the busy road.  <br>
+• Carefully first crossed the ambulance the road. <br>
+• The ambulance crossed carefully first the road. <br>
+• First carefully the busy road crossed the ambulance.`,
+a:0
+},
+{
+q:`Q11. Choose the BEST sentence.<br>
+Options:<br>
+• The driver always checks the mirrors before driving.  <br>
+• The driver checks always the mirrors before driving. <br>
+• Always the mirrors checks the driver. <br>
+• The always driver checks the mirrors.`,
+a:0
+},
+{
+q:`Q12. Which sentence is correctly written?<br>
+Options:<br>
+• The traffic lights blinked suddenly. <br>
+• Suddenly, the traffic lights blinked. <br>
+• Both A and B are correct.  <br>
+• Suddenly the traffic lights blinked redly.`,
+a:2
+},
+{
+q:`Q13.Fill in the blank:<br>
+"The school bus arrived. ______, the students got off safely."<br>
+Options:<br>
+• Carefully <br>
+• Yesterday <br>
+• Next  <br>
+• Loudly`,
+a:2
+},
+{
+q:`Q14. Choose the BEST sentence.<br>
+Options:<br>
+• The traffic officer politely spoke to the drivers. <br>
+• The traffic officer spoke politely to the drivers. <br>
+• Both A and B are correct.  <br>
+• The politely traffic officer spoke to the drivers.`,
+a:2
+},
+{
+q:`Q15 – A police officer stopped traffic to let a fire engine pass.Which sentence is written correctly?<br>
+Options:<br>
+• First the police officer quickly stopped traffic. Then the fire engine safely passed.  <br>
+• Quickly first stopped the police officer traffic. <br>
+• First traffic stopped quickly the police officer. <br>
+• Then the fire engine first safely passed quickly.`,
+a:0
+}
+];
+
+function startGame() {
+    document.getElementById("startScreen").style.display = "none";
+    document.getElementById("gameStage").style.display = "flex";
+    
+    // Attempt audio unlock safely
+    tryUnlockAudio();
+    load();
+}
+
+/* INITIAL SAFELOCK FOR AUDIO CONTEXTS */
+function tryUnlockAudio() {
+    const audioIds = ["correctSound", "wrongSound", "clapSound"];
+    audioIds.forEach(id => {
+        const a = document.getElementById(id);
+        if (a) {
+            a.play().then(() => {
+                a.pause();
+                a.currentTime = 0;
+            }).catch(() => {
+                // Ignore background blocker restrictions safely
+            });
+        }
+    });
+}
+
+/* ERROR-PROOF PLAYBACK EXECUTION WRAPPER */
+function safeAudioPlayback(elementId) {
+    const audioElement = document.getElementById(elementId);
+    if (!audioElement) return;
+
+    audioElement.currentTime = 0;
+    audioElement.play().catch(error => {
+        // Fallback catch parameters to prevent code crash if files are absent
+        console.log("Audio skipped safely: " + elementId);
+    });
+}
+
+/* PARSER CONTROLLER GENERATING EXPLICIT OPTION NODES */
+function load() {
+    isProcessingAnswer = false;
+    
+    if(i >= 15) {
+        document.getElementById("gameStage").style.display = "none";
+        document.getElementById("endScreen").style.display = "flex";
+        document.getElementById("final").innerText = `Score: ${c} / 15`;
+        return;
+    }
+
+    document.getElementById("qno").innerText = `${i + 1} / 15`;
+    
+    let qObj = questions[i];
+    
+    let questionText = qObj.q.split("Options:")[0] || "";
+    document.getElementById("question").innerHTML = questionText;
+
+    let optionsText = qObj.q.split("Options:")[1] || "";
+    let opts = optionsText.split("•").filter(x => x.trim() !== "");
+
+    let gridHtml = "";
+    opts.forEach((op, idx) => {
+        let cleanedOp = op.replace(/<br\s*\/?>/gi, "").trim();
+        gridHtml += `<div class="option" onclick="processSelection(${idx})">${cleanedOp}</div>`;
+    });
+
+    document.getElementById("optionsGrid").innerHTML = gridHtml;
+}
+
+/* FEEDBACK OVERLAY HANDLER MATRIX */
+function processSelection(x) {
+    if (isProcessingAnswer) return;
+    isProcessingAnswer = true;
+
+    const overlay = document.getElementById("feedbackOverlay");
+    const statusText = document.getElementById("feedbackStatus");
+    const promptText = document.getElementById("feedbackPrompt");
+    
+    const options = document.querySelectorAll(".option");
+    options.forEach(o => o.style.pointerEvents = "none");
+
+    let qObj = questions[i];
+    let isCorrect = (x === qObj.a);
+    
+    let optionsText = qObj.q.split("Options:")[1] || "";
+    let opts = optionsText.split("•").filter(x => x.trim() !== "");
+    let correctOptionText = opts[qObj.a].replace(/<br\s*\/?>/gi, "").trim();
+
+    overlay.style.display = "flex";
+
+    if (isCorrect) {
+        c++;
+        statusText.innerText = "🟢 ROUTE SECURED";
+        statusText.style.color = "#4caf50";
+        promptText.innerText = "The structural sequence successfully safely coordinates traffic lines.";
+        safeAudioPlayback("correctSound");
+        safeAudioPlayback("clapSound");
+    } else {
+        w++;
+        statusText.innerText = "🔴 ROUTE COLLISION";
+        statusText.style.color = "#ef4444";
+        promptText.innerText = `Optimal configuration was:\n"${correctOptionText}"`;
+        safeAudioPlayback("wrongSound");
+    }
+
+    document.getElementById("c").innerText = c;
+    document.getElementById("w").innerText = w;
+
+    setTimeout(() => {
+        overlay.style.display = "none";
+        i++;
+        load();
+    }, 2800);
+}
+
+function restartGame() {
+    i = 0;
+    c = 0;
+    w = 0;
+    document.getElementById("c").innerText = "0";
+    document.getElementById("w").innerText = "0";
+    document.getElementById("endScreen").style.display = "none";
+    document.getElementById("gameStage").style.display = "flex";
+    load();
+}
+</script>
+
+</body>
+</html>
