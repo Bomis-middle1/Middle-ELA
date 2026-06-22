@@ -347,7 +347,7 @@
   }
   .controls{
     display:grid;
-    grid-template-columns:1fr 1fr;
+    grid-template-columns:1fr;
     gap:10px;
   }
   button{
@@ -362,10 +362,6 @@
   button:active{transform:scale(.98)}
   .start{
     background:linear-gradient(135deg,#22c55e,#16a34a);
-    color:#fff;
-  }
-  .next{
-    background:linear-gradient(135deg,#f97316,#ea580c);
     color:#fff;
   }
   .again{
@@ -474,9 +470,6 @@
     .stats{
       justify-content:flex-start;
     }
-    .controls{
-      grid-template-columns:1fr;
-    }
     .board{
       min-width:90%;
     }
@@ -505,7 +498,7 @@
     <div class="topbar">
       <div class="title-wrap">
         <div class="title">Preposition Simon Says</div>
-        <div class="sub">Grade 5 • Classroom + Cartoon Fun</div>
+        <div class="sub">Grade 5 • Easy actions and easy rules</div>
       </div>
       <div class="stats">
         <div class="pill">Score: <span id="score">0</span></div>
@@ -522,7 +515,7 @@
           <div class="window"></div>
           <div class="board">
             <div class="cmd" id="command">Wait for the game to start...</div>
-            <div class="hint" id="rulehint">Listen carefully. Follow only commands that begin with Simon says.</div>
+            <div class="hint" id="rulehint">Listen carefully. Do the action only when Simon says.</div>
           </div>
           <div class="desk d1"></div>
           <div class="desk d2"></div>
@@ -552,16 +545,14 @@
           <h3>How to play</h3>
           <ul>
             <li>Listen carefully.</li>
-            <li>If the command starts with <strong>Simon says</strong>, do the action.</li>
-            <li>If it does not start with <strong>Simon says</strong>, do nothing.</li>
-            <li>Tap <strong>Do it</strong> when you should act.</li>
-            <li>Tap <strong>Don’t do it</strong> when you should not act.</li>
+            <li>Do the action only when the command starts with <strong>Simon says</strong>.</li>
+            <li>If Simon does not say it, stay still.</li>
+            <li>Easy actions: touch your nose, clap, stand up, sit down, turn around, freeze.</li>
+            <li>Try to follow fast and get a high score.</li>
           </ul>
         </div>
         <div class="controls">
           <button class="start" id="startBtn">Start Game</button>
-          <button class="next hidden" id="yesBtn">Do it</button>
-          <button class="next hidden" id="noBtn">Don’t do it</button>
         </div>
         <div class="feedback neutral" id="feedback">Press Start Game to begin.</div>
         <div class="center">
@@ -579,22 +570,24 @@
 
 <script>
 const commands = [
-  {text:'Simon says stand ABOVE your chair', pose:'pose-up', truth:true},
-  {text:'Simon says stand BEHIND the desk', pose:'pose-behind', truth:true},
-  {text:'Simon says stand BETWEEN the desks', pose:'pose-between', truth:true},
-  {text:'Simon says jump OVER the book', pose:'pose-over', truth:true},
-  {text:'Simon says crouch UNDER the table', pose:'pose-under', truth:true},
-  {text:'Simon says stand NEXT TO your friend', pose:'pose-nextto', truth:true},
-  {text:'Touch the ceiling', pose:'pose-up', truth:false},
-  {text:'Walk to the board', pose:'pose-front', truth:false},
-  {text:'Put your hands on your head', pose:'pose-on', truth:false},
-  {text:'Stand in front of the desk', pose:'pose-front', truth:false}
+  {text:'Simon says touch your nose', pose:'pose-front', truth:true},
+  {text:'Simon says clap your hands', pose:'pose-front', truth:true},
+  {text:'Simon says stand up', pose:'pose-up', truth:true},
+  {text:'Simon says sit down', pose:'pose-under', truth:true},
+  {text:'Simon says turn around', pose:'pose-between', truth:true},
+  {text:'Simon says freeze like a statue', pose:'pose-front', truth:true},
+  {text:'Simon says jump once', pose:'pose-over', truth:true},
+  {text:'Simon says smile', pose:'pose-front', truth:true},
+  {text:'Touch your nose', pose:'pose-front', truth:false},
+  {text:'Clap your hands', pose:'pose-front', truth:false},
+  {text:'Stand up', pose:'pose-up', truth:false},
+  {text:'Freeze like a statue', pose:'pose-front', truth:false}
 ];
 
 const el = id => document.getElementById(id);
 const student = el('student'), commandEl = el('command'), hintEl = el('rulehint');
 const scoreEl = el('score'), roundEl = el('round'), timeEl = el('time'), feedback = el('feedback');
-const startBtn = el('startBtn'), yesBtn = el('yesBtn'), noBtn = el('noBtn'), replayBtn = el('replayBtn');
+const startBtn = el('startBtn'), replayBtn = el('replayBtn');
 const splash = el('splash'), finalMsg = el('finalMsg');
 
 let score=0, round=0, time=15, timer=null, current=null, playing=false, answered=false;
@@ -602,10 +595,6 @@ let score=0, round=0, time=15, timer=null, current=null, playing=false, answered
 function setFeedback(text, cls='neutral'){
   feedback.className = 'feedback '+cls;
   feedback.innerHTML = text;
-}
-function showButtons(show){
-  yesBtn.classList.toggle('hidden', !show);
-  noBtn.classList.toggle('hidden', !show);
 }
 function updateStats(){
   scoreEl.textContent = score;
@@ -626,9 +615,9 @@ function nextRound(){
   answered=false;
   current = pickCommand();
   commandEl.innerHTML = current.text.replace('Simon says','<span style="color:#7c3aed">Simon says</span>');
-  hintEl.textContent = current.truth ? 'This one starts with Simon says.' : 'Careful! This command does not start with Simon says.';
+  hintEl.textContent = current.truth ? 'This command starts with Simon says. Do the action!' : 'This command does not start with Simon says. Stay still!';
   setPose(current.pose);
-  setFeedback('Choose the correct button before time runs out.', 'neutral');
+  setFeedback('Watch the board and act fast!', 'neutral');
   round++;
   updateStats();
 }
@@ -653,9 +642,9 @@ function handleChoice(choice, timeout=false){
   const correct = (choice === current.truth);
   if(correct){
     score++;
-    setFeedback(timeout ? 'Time up, but your logic was correct. Great job!' : 'Correct! Nice listening and movement!', 'good');
+    setFeedback(timeout ? 'Time up, but your answer was correct. Great job!' : 'Correct! Nice listening!', 'good');
   } else {
-    setFeedback(timeout ? 'Time ran out. The correct answer was the other choice.' : 'Oops! That was the wrong choice.', 'bad');
+    setFeedback(timeout ? 'Time ran out. The correct answer was the other one.' : 'Oops! That was the wrong answer.', 'bad');
   }
   updateStats();
   setTimeout(()=>{
@@ -664,7 +653,7 @@ function handleChoice(choice, timeout=false){
       startTimer();
       nextRound();
     }
-  },1100);
+  },1000);
 }
 function startGame(){
   playing=true;
@@ -674,16 +663,14 @@ function startGame(){
   updateStats();
   finalMsg.classList.add('hidden');
   replayBtn.classList.add('hidden');
-  showButtons(true);
   startBtn.textContent='Restart Game';
-  setFeedback('Game started! Listen carefully and choose fast.', 'neutral');
+  setFeedback('Game started! Watch the command and do the action when Simon says.', 'neutral');
   nextRound();
   startTimer();
 }
 function endGame(){
   playing=false;
   clearInterval(timer);
-  showButtons(false);
   finalMsg.classList.remove('hidden');
   replayBtn.classList.remove('hidden');
   finalMsg.textContent = score >= 8 ? `Amazing! You scored ${score}/10 and won the classroom challenge!` : `You finished with ${score}/10. Try again to beat your score!`;
@@ -691,15 +678,11 @@ function endGame(){
   hintEl.textContent = 'Tap Play Again to try another round.';
   setFeedback('Tap Play Again to start a new game.', 'neutral');
 }
-
-startBtn.onclick = ()=>{ if(!playing){ startGame(); } else { startGame(); } };
-yesBtn.onclick = ()=> handleChoice(true);
-noBtn.onclick = ()=> handleChoice(false);
+startBtn.onclick = ()=> startGame();
 replayBtn.onclick = ()=> startGame();
 
 setTimeout(()=> splash.classList.add('hidden'), 3000);
 updateStats();
-showButtons(false);
 </script>
 </body>
 </html>
