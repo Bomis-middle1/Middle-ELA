@@ -2,913 +2,704 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-select=none">
 <title>🏁 Robot Racing Championship</title>
 
 <style>
-
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:Arial,sans-serif;
+/* ==========================================================================
+   RESET & PLATFORM BASICS
+   ========================================================================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+    -webkit-tap-highlight-color: transparent;
 }
 
-body{
-overflow:hidden;
-background:black;
+body {
+    overflow: hidden;
+    background: #0f2027;
+    height: 100vh;
+    height: -webkit-fill-available;
+    color: white;
 }
 
-#gameArea{
-position:relative;
-width:100vw;
-height:100vh;
-overflow:hidden;
-background:
-linear-gradient(to bottom,#0f2027,#203a43,#2c5364);
+/* ==========================================================================
+   ANTI-COLLISION FLEXBOX RUNWAY LAYOUT
+   ========================================================================== */
+#gameArea {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    height: -webkit-fill-available;
+    overflow: hidden;
+    background: linear-gradient(to bottom, #0f2027, #203a43, #2c5364);
+    
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
 }
 
 /* LIGHTS */
+.light {
+    position: absolute;
+    width: 300px;
+    height: 300px;
+    background: rgba(255, 255, 255, 0.04);
+    border-radius: 50%;
+    filter: blur(50px);
+    pointer-events: none;
+    z-index: 1;
+    animation: moveLight 10s infinite alternate ease-in-out;
+}
+.light2 { animation-duration: 15s; }
 
-.light{
-position:absolute;
-width:350px;
-height:350px;
-background:rgba(255,255,255,0.05);
-border-radius:50%;
-filter:blur(60px);
-animation:moveLight 12s infinite alternate;
+@keyframes moveLight {
+    from { transform: translate(-100px, -50px); }
+    to { transform: translate(150px, 100px); }
 }
 
-.light2{
-animation-duration:18s;
+/* ==========================================================================
+   SCREENS & OVERLAYS
+   ========================================================================== */
+#logoScreen, #startScreen, #endScreen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    z-index: 9999;
+    padding: 20px;
+    text-align: center;
 }
 
-@keyframes moveLight{
-from{
-transform:translate(-120px,-60px);
-}
-to{
-transform:translate(250px,150px);
-}
-}
+#logoScreen { background: #ffffff; }
+#logoScreen img { width: 220px; max-width: 80%; }
+#logoText { margin-top: 15px; font-size: 24px; font-weight: bold; color: #333; }
 
-/* LOGO */
-
-#logoScreen{
-position:absolute;
-width:100%;
-height:100%;
-background:white;
-display:flex;
-justify-content:center;
-align-items:center;
-flex-direction:column;
-z-index:9999;
+#startScreen, #endScreen {
+    background: rgba(10, 20, 30, 0.95);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 5000;
 }
 
-#logoScreen img{
-width:260px;
-max-width:80%;
+.mainBtn {
+    padding: 14px 36px;
+    font-size: 18px;
+    font-weight: bold;
+    border: none;
+    border-radius: 25px;
+    background: linear-gradient(135deg, #ff9800, #f57c00);
+    color: white;
+    cursor: pointer;
+    margin-top: 20px;
+    box-shadow: 0 4px 15px rgba(255, 152, 0, 0.4);
+    transition: transform 0.2s;
+}
+.mainBtn:active { transform: scale(0.95); }
+
+/* ==========================================================================
+   HEADER STRUCTURAL CONTROLLER HUB
+   ========================================================================== */
+#headerGroup {
+    width: 100%;
+    max-width: 600px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    z-index: 100;
 }
 
-#logoText{
-margin-top:20px;
-font-size:32px;
-font-weight:bold;
-color:#333;
+#arenaTitle {
+    width: 100%;
+    background: white;
+    border: 4px solid #00e5ff;
+    border-radius: 16px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #006064;
+    padding: 10px;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0,229,255,0.2);
 }
 
-/* START + END */
-
-#startScreen,
-#endScreen{
-position:absolute;
-width:100%;
-height:100%;
-background:rgba(0,0,0,0.85);
-display:flex;
-justify-content:center;
-align-items:center;
-flex-direction:column;
-text-align:center;
-padding:20px;
-color:white;
-z-index:5000;
+.hud-panel {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
 }
 
-.mainBtn{
-padding:16px 34px;
-font-size:22px;
-border:none;
-border-radius:18px;
-background:#ff9800;
-color:white;
-cursor:pointer;
-margin-top:25px;
-transition:0.3s;
+#scoreBoard, #volumeBox {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 6px 12px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: bold;
+    color: #333;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+#volumeSlider { width: 60px; accent-color: #ff9800; cursor: pointer; }
+
+#challengeBox {
+    background: #fff9c4;
+    border: 1px solid #ffe082;
+    padding: 8px 16px;
+    border-radius: 14px;
+    font-size: 15px;
+    font-weight: bold;
+    color: #e65100;
+    text-align: center;
+    width: 100%;
 }
 
-.mainBtn:hover{
-transform:scale(1.05);
-background:#f57c00;
+/* ==========================================================================
+   DYNAMIC FAIR TRACK STAGE
+   ========================================================================== */
+#trackStageWrapper {
+    flex: 1;
+    width: 100%;
+    max-width: 600px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 160px;
+    z-index: 10;
 }
 
-/* TITLE */
-
-#arenaTitle{
-position:absolute;
-top:15px;
-left:50%;
-transform:translateX(-50%);
-width:88%;
-min-height:90px;
-background:white;
-border:8px solid #00e5ff;
-border-radius:20px;
-display:flex;
-justify-content:center;
-align-items:center;
-font-size:28px;
-font-weight:bold;
-color:#006064;
-box-shadow:0 0 25px rgba(255,255,255,0.6);
-z-index:50;
-padding:15px;
-text-align:center;
-line-height:1.3;
+#track {
+    width: 100%;
+    height: 100%;
+    max-height: 220px;
+    background: #333333;
+    border-radius: 16px;
+    position: relative;
+    overflow: hidden;
+    border: 4px solid #111;
+    display: flex;
+    flex-direction: column;
 }
 
-/* CHALLENGE BOX */
+.lane {
+    flex: 1;
+    position: relative;
+    border-bottom: 2px dashed rgba(255,255,255,0.3);
+    display: flex;
+    align-items: center;
+    padding-left: 10px;
+}
+.lane:last-child { border-bottom: none; }
 
-#challengeBox{
-position:absolute;
-top:135px;
-left:50%;
-transform:translateX(-50%);
-background:#fff9c4;
-padding:18px 30px;
-border-radius:18px;
-font-size:26px;
-font-weight:bold;
-color:#e65100;
-z-index:200;
-text-align:center;
-box-shadow:0 0 20px rgba(0,0,0,0.3);
-max-width:88%;
-line-height:1.4;
+#finishLine {
+    position: absolute;
+    right: 40px;
+    top: 0;
+    width: 16px;
+    height: 100%;
+    background: repeating-linear-gradient(white 0px, white 10px, black 10px, black 20px);
+    opacity: 0.7;
 }
 
-/* TRACK */
-
-#track{
-position:absolute;
-top:290px;
-left:50%;
-transform:translateX(-50%);
-width:90%;
-height:300px;
-background:#424242;
-border-radius:25px;
-overflow:hidden;
-border:8px solid #212121;
+.robot {
+    font-size: 44px;
+    position: absolute;
+    left: 10px;
+    transition: left 0.05s linear;
+    filter: drop-shadow(0 0 8px #00e5ff);
+    line-height: 1;
 }
 
-.lane{
-position:absolute;
-width:100%;
-height:33.33%;
-border-bottom:4px dashed white;
+/* ==========================================================================
+   CONTROLS INTERACTION BASEBAR
+   ========================================================================== */
+#actionArea {
+    width: 100%;
+    max-width: 600px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    z-index: 100;
 }
 
-#finishLine{
-position:absolute;
-right:40px;
-top:0;
-width:20px;
-height:100%;
-background:
-repeating-linear-gradient(
-white 0px,
-white 20px,
-black 20px,
-black 40px
-);
+#raceControlBtn {
+    width: 100%;
+    padding: 14px;
+    font-size: 18px;
+    font-weight: bold;
+    background: linear-gradient(135deg, #00e5ff, #00b0ff);
+    color: #004d40;
+    border: none;
+    border-radius: 14px;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,229,255,0.3);
+}
+#raceControlBtn:disabled {
+    background: #546e7a;
+    color: #cfd8dc;
+    cursor: not-allowed;
+    box-shadow: none;
 }
 
-/* ROBOTS */
-
-.robot{
-position:absolute;
-font-size:70px;
-left:20px;
-transition:left 0.15s linear;
-filter:drop-shadow(0 0 12px cyan);
+#robotChoices {
+    display: flex;
+    gap: 12px;
+    width: 100%;
+    justify-content: center;
 }
 
-#robot1{top:20px;}
-#robot2{top:110px;}
-#robot3{top:205px;}
-
-/* ROBOT CHOICES */
-
-#robotChoices{
-position:absolute;
-bottom:45px;
-left:50%;
-transform:translateX(-50%);
-display:flex;
-gap:25px;
-z-index:300;
-flex-wrap:wrap;
-justify-content:center;
+.choiceBtn {
+    flex: 1;
+    max-width: 90px;
+    height: 60px;
+    border: 3px solid transparent;
+    border-radius: 12px;
+    font-size: 28px;
+    cursor: pointer;
+    background: white;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.2s;
+}
+.choiceBtn.selected-predict {
+    border-color: #ff9800;
+    background: #fff3e0;
+    transform: scale(0.95);
+    box-shadow: 0 0 12px rgba(255,152,0,0.5);
 }
 
-.choiceBtn{
-width:110px;
-height:110px;
-border:none;
-border-radius:22px;
-font-size:60px;
-cursor:pointer;
-background:white;
-transition:0.3s;
-box-shadow:0 0 15px rgba(0,0,0,0.3);
+/* ==========================================================================
+   ISOLATED INTERACTIVE MODAL CHALLENGE BOX
+   ========================================================================== */
+#questionBox {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(10, 20, 30, 0.9);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    padding: 16px;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 6000;
 }
 
-.choiceBtn:hover{
-transform:scale(1.12);
-background:#b2ebf2;
+.modal-content {
+    background: #fff8e1;
+    width: 100%;
+    max-width: 500px;
+    max-height: 90vh;
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
 }
 
-/* SCORE */
+#questionTitle { font-size: 22px; color: #e65100; margin-bottom: 12px; font-weight: bold; text-align: center;}
+#questionText { font-size: 16px; line-height: 1.5; margin-bottom: 15px; color: #333; background: rgba(255,255,255,0.6); padding: 12px; border-radius: 10px; }
 
-#scoreBoard{
-position:absolute;
-top:15px;
-left:15px;
-background:white;
-padding:12px 18px;
-border-radius:15px;
-font-size:20px;
-font-weight:bold;
-z-index:300;
+.optionBtnQuestion {
+    width: 100%;
+    padding: 12px 16px;
+    margin: 5px 0;
+    border: none;
+    border-radius: 10px;
+    background: #4caf50;
+    color: white;
+    font-size: 15px;
+    font-weight: bold;
+    text-align: left;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-/* VOLUME */
+#feedback { text-align: center; font-size: 20px; font-weight: bold; margin-top: 10px; min-height: 26px; }
+.correct { color: green; }
+.wrong { color: red; }
 
-#volumeBox{
-position:absolute;
-top:15px;
-right:15px;
-background:white;
-padding:12px;
-border-radius:15px;
-z-index:300;
+#winMessage {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 32px;
+    font-weight: bold;
+    color: #ffee58;
+    text-shadow: 0 0 15px gold;
+    display: none;
+    z-index: 5500;
+    text-align: center;
+    width: 90%;
 }
 
-/* WIN MESSAGE */
-
-#winMessage{
-position:absolute;
-top:50%;
-left:50%;
-transform:translate(-50%,-50%);
-font-size:58px;
-font-weight:bold;
-color:#ffee58;
-text-shadow:0 0 20px gold;
-display:none;
-z-index:4000;
-animation:pop 0.8s;
+.confetti {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    pointer-events: none;
+    animation: fall 2.5s linear forwards;
+    z-index: 7000;
 }
 
-/* QUESTIONS */
-
-#questionBox{
-position:absolute;
-top:50%;
-left:50%;
-transform:translate(-50%,-50%);
-width:92%;
-max-width:680px;
-background:#fff8e1;
-padding:28px;
-border-radius:25px;
-display:none;
-z-index:4500;
-box-shadow:0 0 25px rgba(0,0,0,0.5);
-animation:popup 0.5s;
+@keyframes fall {
+    from { transform: translateY(-20px) rotate(0deg); }
+    to { transform: translateY(105vh) rotate(360deg); opacity: 0; }
 }
 
-#questionTitle{
-font-size:30px;
-color:#e65100;
-margin-bottom:18px;
-text-align:center;
+/* RESPONSIVE SCALING */
+@media (min-width: 601px) {
+    .robot { font-size: 54px; }
+    .choiceBtn { height: 75px; font-size: 36px; }
+    #arenaTitle { font-size: 22px; }
+    #questionText { font-size: 18px; }
 }
-
-#questionText{
-font-size:23px;
-line-height:1.6;
-margin-bottom:20px;
-color:#333;
-}
-
-.optionBtnQuestion{
-width:100%;
-padding:16px;
-margin:10px 0;
-border:none;
-border-radius:15px;
-background:#4caf50;
-color:white;
-font-size:18px;
-cursor:pointer;
-transition:0.3s;
-}
-
-.optionBtnQuestion:hover{
-background:#388e3c;
-transform:scale(1.03);
-}
-
-/* FEEDBACK */
-
-#feedback{
-text-align:center;
-font-size:30px;
-font-weight:bold;
-margin-top:15px;
-}
-
-.correct{
-color:green;
-}
-
-.wrong{
-color:red;
-}
-
-/* CONFETTI */
-
-.confetti{
-position:absolute;
-width:12px;
-height:12px;
-animation:fall 3s linear forwards;
-}
-
-@keyframes fall{
-from{
-transform:translateY(-100px) rotate(0deg);
-}
-to{
-transform:translateY(100vh) rotate(720deg);
-opacity:0;
-}
-}
-
-@keyframes pop{
-0%{
-transform:translate(-50%,-50%) scale(0.5);
-}
-100%{
-transform:translate(-50%,-50%) scale(1.15);
-}
-}
-
-@keyframes popup{
-from{
-transform:translate(-50%,-50%) scale(0.5);
-opacity:0;
-}
-to{
-transform:translate(-50%,-50%) scale(1);
-opacity:1;
-}
-}
-
-/* MOBILE */
-
-@media(max-width:768px){
-
-#arenaTitle{
-font-size:20px;
-padding:12px;
-min-height:80px;
-}
-
-#challengeBox{
-font-size:18px;
-width:90%;
-top:120px;
-padding:14px 18px;
-}
-
-#track{
-height:240px;
-top:300px;
-}
-
-.robot{
-font-size:48px;
-}
-
-#robot1{top:15px;}
-#robot2{top:85px;}
-#robot3{top:160px;}
-
-.choiceBtn{
-width:80px;
-height:80px;
-font-size:42px;
-}
-
-#questionText{
-font-size:18px;
-}
-
-.optionBtnQuestion{
-font-size:16px;
-}
-
-#winMessage{
-font-size:34px;
-}
-
-}
-
 </style>
 </head>
 
 <body>
 
 <div id="gameArea">
+    <div class="light"></div>
+    <div class="light light2"></div>
 
-<div class="light"></div>
-<div class="light light2"></div>
-
-<!-- LOGO -->
-
-<div id="logoScreen">
-<img src="assets/innovine-logo.png">
-<div id="logoText">Innovine Learning Adventures</div>
+  <div id="logoScreen">
+    <img src="assets/innovine-logo.png" alt="Innovine Logo">
 </div>
 
-<!-- START SCREEN -->
+    <div id="startScreen" style="display:none;">
+        <h1 style="font-size:36px;">🏁 Robot Racing Championship</h1>
+        <p style="margin-top:15px; font-size:18px; max-width:500px; padding:0 10px;">
+            Predict your winner, watch the dynamic fair race, and master adjective comparisons!
+        </p>
+        <button class="mainBtn" onclick="startGame()">Start Racing</button>
+    </div>
 
-<div id="startScreen" style="display:none;">
+    <div id="endScreen" style="display:none;">
+        <h1>🏆 Championship Complete! 🏆</h1>
+        <h2 id="finalText" style="margin-top:15px; font-size: 18px;"></h2>
+        <button class="mainBtn" onclick="restartGame()">Race Again</button>
+    </div>
 
-<h1 style="font-size:52px;">🏁 Robot Racing Championship</h1>
+    <div id="headerGroup">
+        <div id="arenaTitle">🤖 Predict the Winner & Launch the Engines!</div>
+        <div class="hud-panel">
+            <div id="scoreBoard">Wins: <span id="raceCount">0</span> | Q: <span id="questionCount">0</span>/10</div>
+            <div id="volumeBox">
+                🔊 <input type="range" id="volumeSlider" min="0" max="1" step="0.1" value="0.7">
+            </div>
+        </div>
+        <div id="challengeBox">Select a robot below to predict your winner, then click Launch!</div>
+    </div>
 
-<p style="margin-top:20px;font-size:24px;max-width:700px;">
-Win robot races and master adjective comparisons!
-</p>
+    <div id="trackStageWrapper">
+        <div id="track">
+            <div class="lane"><div class="robot" id="robot1">🤖</div></div>
+            <div class="lane"><div class="robot" id="robot2">🦾</div></div>
+            <div class="lane"><div class="robot" id="robot3">⚙️</div></div>
+            <div id="finishLine"></div>
+        </div>
+    </div>
 
-<button class="mainBtn" onclick="startGame()">
-Start Racing
-</button>
+    <div id="actionArea">
+        <div id="robotChoices">
+            <button class="choiceBtn" onclick="selectPrediction(1)">🤖</button>
+            <button class="choiceBtn" onclick="selectPrediction(2)">🦾</button>
+            <button class="choiceBtn" onclick="selectPrediction(3)">⚙️</button>
+        </div>
+        <button id="raceControlBtn" onclick="launchFairRace()" disabled>Choose a Robot to Predict Winner</button>
+    </div>
 
-</div>
+    <div id="winMessage">🏆 RACE COMPLETE!</div>
 
-<!-- END SCREEN -->
-
-<div id="endScreen" style="display:none;">
-
-<h1>🏆 Championship Complete! 🏆</h1>
-
-<h2 id="finalText" style="margin-top:20px;"></h2>
-
-<button class="mainBtn" onclick="restartGame()">
-Race Again
-</button>
-
-</div>
-
-<!-- TITLE -->
-
-<div id="arenaTitle">
-🤖 Choose the Best Robot and Win the Race!
-</div>
-
-<!-- SCORE -->
-
-<div id="scoreBoard">
-Wins: <span id="raceCount">0</span> |
-Questions: <span id="questionCount">0</span>/10
-</div>
-
-<!-- VOLUME -->
-
-<div id="volumeBox">
-Volume
-<input type="range" id="volumeSlider" min="0" max="1" step="0.1" value="1">
-</div>
-
-<!-- CHALLENGE -->
-
-<div id="challengeBox">
-Choose the FASTEST robot!
-</div>
-
-<!-- TRACK -->
-
-<div id="track">
-
-<div class="lane" style="top:0;"></div>
-<div class="lane" style="top:33%;"></div>
-
-<div id="finishLine"></div>
-
-<div class="robot" id="robot1">🤖</div>
-<div class="robot" id="robot2">🦾</div>
-<div class="robot" id="robot3">⚙️</div>
-
-</div>
-
-<!-- ROBOT CHOICES -->
-
-<div id="robotChoices">
-
-<button class="choiceBtn" onclick="startRace(1)">🤖</button>
-<button class="choiceBtn" onclick="startRace(2)">🦾</button>
-<button class="choiceBtn" onclick="startRace(3)">⚙️</button>
-
-</div>
-
-<!-- WIN -->
-
-<div id="winMessage">
-🏆 RACE WON!
-</div>
-
-<!-- QUESTION BOX -->
-
-<div id="questionBox">
-
-<div id="questionTitle">
-📚 Race Challenge
-</div>
-
-<div id="questionText"></div>
-
-<div id="options"></div>
-
-<div id="feedback"></div>
-
-</div>
-
+    <div id="questionBox">
+        <div class="modal-content">
+            <div id="questionTitle">📚 Race Challenge</div>
+            <div id="questionText"></div>
+            <div id="options"></div>
+            <div id="feedback"></div>
+        </div>
+    </div>
 </div>
 
 <script>
+/* INTRO SPLASH TRANSITION TIMER */
+setTimeout(() => {
+    document.getElementById("logoScreen").style.display = "none";
+    document.getElementById("startScreen").style.display = "flex";
+}, 5000);
 
-/* LOGO SCREEN */
-
-setTimeout(()=>{
-
-document.getElementById("logoScreen").style.display="none";
-document.getElementById("startScreen").style.display="flex";
-
-},5000);
-
-/* AUDIO */
-
+/* AUDIO MANAGEMENT PANEL SYSTEM HOOKS */
 const correctSound = new Audio("assets/correct.mp3");
 const wrongSound = new Audio("assets/wrong.mp3");
 const clapSound = new Audio("assets/clapping.mp3");
-
 const volumeSlider = document.getElementById("volumeSlider");
 
-function updateVolume(){
-
-correctSound.volume = volumeSlider.value;
-wrongSound.volume = volumeSlider.value;
-clapSound.volume = volumeSlider.value;
-
+function updateVolume() {
+    correctSound.volume = volumeSlider.value;
+    wrongSound.volume = volumeSlider.value;
+    clapSound.volume = volumeSlider.value;
 }
-
-volumeSlider.addEventListener("input",updateVolume);
-
+volumeSlider.addEventListener("input", updateVolume);
 updateVolume();
 
-/* VARIABLES */
-
+/* ENGINE DESKTOP STATES */
 let racesWon = 0;
 let currentQuestion = 0;
+let predictedRobotIndex = null;
+let isRaceRunning = false;
 
-/* QUESTIONS */
-
+/* ADJECTIVE REPOSITORY TRACK ENGINE */
 const questions = [
-
-{
-q:`🏁 During the semifinal race, Robo-X moved faster than Bolt-7, but Turbo Max moved the fastest of all.<br><br>
-Which robot was the fastest?`,
-o:["Robo-X","Bolt-7","Turbo Max","all tied"],
-a:2
-},
-
-{
-q:`🤖 Mia built a strong robot for the competition.<br><br>
-Her brother upgraded his robot to make it even ___.`,
-o:["strongest","stronger","strong","more strongest"],
-a:1
-},
-
-{
-q:`🎤 The announcer shouted:<br><br>
-"This is the most exciting race our city has ever seen!"<br><br>
-What kind of comparison is "most exciting"?`,
-o:["positive","comparative","superlative","none"],
-a:2
-},
-
-{
-q:`⚡ Three racing robots crossed the river obstacle.<br><br>
-The blue robot was fast.<br>
-The red robot was faster.<br>
-The silver robot was the fastest.<br><br>
-Which robot came second in speed?`,
-o:["blue","red","silver","none"],
-a:1
-},
-
-{
-q:`🏆 Coach Lina told her team:<br><br>
-"We need the safest robot for the night race."<br><br>
-Which word shows the highest level of comparison?`,
-o:["need","robot","safest","night"],
-a:2
-},
-
-{
-q:`🚀 Aryan tested two rocket engines after school.<br><br>
-The first engine was powerful, but the second one was more powerful.<br><br>
-What does "more powerful" compare?`,
-o:["one engine","two engines","all engines","none"],
-a:1
-},
-
-{
-q:`🤖 Zoya's robot was smaller than Ethan's robot, but it was quicker during turns.<br><br>
-Which robot was bigger?`,
-o:["Zoya's","Ethan's","same size","unknown"],
-a:1
-},
-
-{
-q:`🏁 The crowd became louder as the final race began.<br><br>
-Later, during the championship round, the crowd became the loudest it had been all day.<br><br>
-Which sentence uses a superlative adjective?`,
-o:[
-"louder as the race began",
-"crowd became the loudest",
-"final race began",
-"all day"
-],
-a:1
-},
-
-{
-q:`🛠️ Three students designed robots for science class.<br><br>
-Leo's robot was smart.<br>
-Noah's robot was smarter.<br>
-Ava's robot was the smartest.<br><br>
-Who built the best robot?`,
-o:["Leo","Noah","Ava","all equal"],
-a:2
-},
-
-{
-q:`🎮 During practice, Team Falcon's robot moved quickly through the maze.<br><br>
-In the final match, it moved even ___.`,
-o:["quickest","quickly","quicker","more quickly"],
-a:3
-}
-
+    {
+        q: `🏁 During the semifinal race, Robo-X moved faster than Bolt-7, but Turbo Max moved the fastest of all.<br><br>Which robot was the fastest?`,
+        o: ["Robo-X","Bolt-7","Turbo Max","all tied"],
+        a: 2
+    },
+    {
+        q: `🤖 Mia built a strong robot for the competition.<br><br>Her brother upgraded his robot to make it even ___.`,
+        o: ["strongest","stronger","strong","more strongest"],
+        a: 1
+    },
+    {
+        q: `🎤 The announcer shouted:<br><br>"This is the most exciting race our city has ever seen!"<br><br>What kind of comparison is "most exciting"?`,
+        o: ["positive","comparative","superlative","none"],
+        a: 2
+    },
+    {
+        q: `⚡ Three racing robots crossed the river obstacle.<br><br>The blue robot was fast.<br>The red robot was faster.<br>The silver robot was the fastest.<br><br>Which robot came second in speed?`,
+        o: ["blue","red","silver","none"],
+        a: 1
+    },
+    {
+        q: `🏆 Coach Lina told her team:<br><br>"We need the safest robot for the night race."<br><br>Which word shows the highest level of comparison?`,
+        o: ["need","robot","safest","night"],
+        a: 2
+    },
+    {
+        q: `🚀 Aryan tested two rocket engines after school.<br><br>The first engine was powerful, but the second one was more powerful.<br><br>What does "more powerful" compare?`,
+        o: ["one engine","two engines","all engines","none"],
+        a: 1
+    },
+    {
+        q: `🤖 Zoya's robot was smaller than Ethan's robot, but it was quicker during turns.<br><br>Which robot was bigger?`,
+        o: ["Zoya's","Ethan's","same size","unknown"],
+        a: 1
+    },
+    {
+        q: `🏁 The crowd became louder as the final race began.<br><br>Later, during the championship round, the crowd became the loudest it had been all day.<br><br>Which sentence uses a superlative adjective?`,
+        o: ["louder as the race began", "crowd became the loudest", "final race began", "all day"],
+        a: 1
+    },
+    {
+        q: `🛠️ Three students designed robots for science class.<br><br>Leo's robot was smart.<br>Noah's robot was smarter.<br>Ava's robot was the smartest.<br><br>Who built the best robot?`,
+        o: ["Leo","Noah","Ava","all equal"],
+        a: 2
+    },
+    {
+        q: `🎮 During practice, Team Falcon's robot moved quickly through the maze.<br><br>In the final match, it moved even ___.`,
+        o: ["quickest","quickly","quicker","more quickly"],
+        a: 3
+    }
 ];
 
-questions.sort(()=>Math.random()-0.5);
+questions.sort(() => Math.random() - 0.5);
 
-/* START GAME */
-
-function startGame(){
-
-document.getElementById("startScreen").style.display="none";
-
+function startGame() {
+    document.getElementById("startScreen").style.display = "none";
 }
 
-/* RACE */
-
-function startRace(choice){
-
-const robots = [
-document.getElementById("robot1"),
-document.getElementById("robot2"),
-document.getElementById("robot3")
-];
-
-robots.forEach(robot=>{
-
-robot.style.left = "20px";
-
-});
-
-let speeds = [
-2 + Math.random()*2,
-2 + Math.random()*2,
-2 + Math.random()*2
-];
-
-speeds[choice-1] += 2;
-
-let positions = [20,20,20];
-
-let race = setInterval(()=>{
-
-for(let i=0;i<3;i++){
-
-positions[i] += speeds[i];
-
-robots[i].style.left = positions[i]+"px";
-
-if(positions[i] >= window.innerWidth*0.72){
-
-clearInterval(race);
-
-if(i === choice-1){
-
-raceWon();
-
-}else{
-
-wrongSound.play();
-
+/* PREDICTION LOGIC SYSTEM CONTROLLER */
+function selectPrediction(index) {
+    if (isRaceRunning) return;
+    predictedRobotIndex = index;
+    
+    const choiceBtns = document.querySelectorAll(".choiceBtn");
+    choiceBtns.forEach((btn, i) => {
+        if (i === index - 1) {
+            btn.classList.add("selected-predict");
+        } else {
+            btn.classList.remove("selected-predict");
+        }
+    });
+    
+    const launchBtn = document.getElementById("raceControlBtn");
+    launchBtn.removeAttribute("disabled");
+    launchBtn.innerText = "⚡ Launch Race Engines!";
 }
 
+/* TRUE COMPETITIVE UNBIASED RANDOMIZED RACE LOOP ENGINE */
+function launchFairRace() {
+    if (predictedRobotIndex === null || isRaceRunning) return;
+    isRaceRunning = true;
+    
+    document.getElementById("raceControlBtn").setAttribute("disabled", "true");
+    const choiceBtns = document.querySelectorAll(".choiceBtn");
+    choiceBtns.forEach(b => b.style.pointerEvents = "none");
+
+    const robots = [
+        document.getElementById("robot1"),
+        document.getElementById("robot2"),
+        document.getElementById("robot3")
+    ];
+
+    robots.forEach(r => r.style.left = "10px");
+
+    // All robots share an completely identical base dynamic range speed profile!
+    let baseSpeeds = [
+        1.5 + Math.random() * 2,
+        1.5 + Math.random() * 2,
+        1.5 + Math.random() * 2
+    ];
+
+    let positions = [10, 10, 10];
+    const trackWidth = document.getElementById("track").clientWidth;
+    const finishLineTarget = trackWidth - 65; 
+
+    let raceInterval = setInterval(() => {
+        for (let i = 0; i < 3; i++) {
+            // Live micro-burst variations create real, changing leads mid-race
+            positions[i] += baseSpeeds[i] + (Math.random() * 0.9);
+            robots[i].style.left = positions[i] + "px";
+
+            if (positions[i] >= finishLineTarget) {
+                clearInterval(raceInterval);
+                concludeRace(i + 1); 
+                break;
+            }
+        }
+    }, 30);
 }
 
+function concludeRace(winningRobotIndex) {
+    const winMessage = document.getElementById("winMessage");
+    winMessage.style.display = "block";
+    
+    const robotIcons = ["🤖", "🦾", "⚙️"];
+    const winningIcon = robotIcons[winningRobotIndex - 1];
+
+    if (winningRobotIndex === predictedRobotIndex) {
+        winMessage.innerHTML = `🏆 PREDICTION CORRECT!<br>${winningIcon} WON THE RACE!`;
+        racesWon++;
+        document.getElementById("raceCount").innerText = racesWon;
+        clapSound.play();
+        createConfetti();
+    } else {
+        winMessage.innerHTML = `🏁 RACE FINISHED!<br>${winningIcon} Won (You guessed ${robotIcons[predictedRobotIndex - 1]})`;
+        wrongSound.play();
+    }
+
+    setTimeout(() => {
+        winMessage.style.display = "none";
+        showQuestion();
+    }, 2500);
 }
 
-},40);
+/* CHALLENGE OVERLAY GENERATION POPUPS */
+function showQuestion() {
+    document.getElementById("questionBox").style.display = "flex";
 
+    const q = questions[currentQuestion];
+    document.getElementById("questionText").innerHTML = q.q;
+
+    const optionsDiv = document.getElementById("options");
+    optionsDiv.innerHTML = "";
+    document.getElementById("feedback").innerHTML = "";
+
+    q.o.forEach((option, index) => {
+        const btn = document.createElement("button");
+        btn.classList.add("optionBtnQuestion");
+        btn.innerHTML = option;
+        btn.onclick = () => checkAnswer(btn, index, q.a);
+        optionsDiv.appendChild(btn);
+    });
 }
 
-/* WIN */
+function checkAnswer(chosenBtn, selected, correct) {
+    const feedback = document.getElementById("feedback");
+    const optionBtns = document.querySelectorAll(".optionBtnQuestion");
+    optionBtns.forEach(b => b.disabled = true);
 
-function raceWon(){
+    if (selected === correct) {
+        feedback.innerHTML = "🎉 Excellent Comparison!";
+        feedback.className = "correct";
+        chosenBtn.style.background = "#2e7d32";
+        correctSound.play();
+        createConfetti();
+    } else {
+        feedback.innerHTML = "❌ Out of Sync!";
+        feedback.className = "wrong";
+        chosenBtn.style.background = "#c62828";
+        optionBtns[correct].style.background = "#2e7d32";
+        wrongSound.play();
+    }
 
-racesWon++;
+    currentQuestion++;
+    document.getElementById("questionCount").innerText = currentQuestion;
 
-document.getElementById("raceCount").innerText =
-racesWon;
+    setTimeout(() => {
+        document.getElementById("questionBox").style.display = "none";
+        
+        // Reset interactive pipeline state variables
+        isRaceRunning = false;
+        predictedRobotIndex = null;
+        
+        const choiceBtns = document.querySelectorAll(".choiceBtn");
+        choiceBtns.forEach(b => {
+            b.classList.remove("selected-predict");
+            b.style.pointerEvents = "auto";
+        });
+        
+        const controlBtn = document.getElementById("raceControlBtn");
+        controlBtn.innerText = "Choose a Robot to Predict Winner";
+        controlBtn.setAttribute("disabled", "true");
 
-document.getElementById("winMessage").style.display =
-"block";
-
-clapSound.play();
-
-createConfetti();
-
-setTimeout(()=>{
-
-document.getElementById("winMessage").style.display =
-"none";
-
-showQuestion();
-
-},1500);
-
+        if (currentQuestion >= 10) {
+            endGame();
+        }
+    }, 2200);
 }
 
-/* SHOW QUESTION */
-
-function showQuestion(){
-
-document.getElementById("questionBox").style.display =
-"block";
-
-const q = questions[currentQuestion];
-
-document.getElementById("questionText").innerHTML = q.q;
-
-const optionsDiv = document.getElementById("options");
-
-optionsDiv.innerHTML = "";
-
-document.getElementById("feedback").innerHTML = "";
-
-q.o.forEach((option,index)=>{
-
-const btn = document.createElement("button");
-
-btn.classList.add("optionBtnQuestion");
-
-btn.innerHTML = option;
-
-btn.onclick = ()=>checkAnswer(index,q.a);
-
-optionsDiv.appendChild(btn);
-
-});
-
+/* CONFETTI GRAPHIC ENGINE SPARK MATRICES */
+function createConfetti() {
+    for (let i = 0; i < 35; i++) {
+        const conf = document.createElement("div");
+        conf.classList.add("confetti");
+        conf.style.left = Math.random() * 100 + "%";
+        conf.style.background = `hsl(${Math.random() * 360}, 100%, 50%)`;
+        conf.style.animationDuration = (1.5 + Math.random() * 1.5) + "s";
+        document.body.appendChild(conf);
+        setTimeout(() => conf.remove(), 3000);
+    }
 }
 
-/* CHECK ANSWER */
-
-function checkAnswer(selected,correct){
-
-const feedback = document.getElementById("feedback");
-
-if(selected === correct){
-
-feedback.innerHTML = "🎉 Correct!";
-feedback.className = "correct";
-
-correctSound.play();
-
-createConfetti();
-
-}else{
-
-feedback.innerHTML = "❌ Wrong!";
-feedback.className = "wrong";
-
-wrongSound.play();
-
+function endGame() {
+    document.getElementById("endScreen").style.display = "flex";
+    document.getElementById("finalText").innerHTML =
+        "Fantastic Work!<br>You parsed all grammar obstacles and successfully predicted <b>" + racesWon + "</b> dynamic racing wins!";
 }
 
-currentQuestion++;
-
-document.getElementById("questionCount").innerText =
-currentQuestion;
-
-setTimeout(()=>{
-
-document.getElementById("questionBox").style.display =
-"none";
-
-if(currentQuestion >= 10){
-
-endGame();
-
+function restartGame() {
+    location.reload();
 }
-
-},1800);
-
-}
-
-/* CONFETTI */
-
-function createConfetti(){
-
-for(let i=0;i<45;i++){
-
-const conf = document.createElement("div");
-
-conf.classList.add("confetti");
-
-conf.style.left = Math.random()*100 + "%";
-
-conf.style.background =
-`hsl(${Math.random()*360},100%,50%)`;
-
-conf.style.animationDuration =
-(2 + Math.random()*2) + "s";
-
-document.body.appendChild(conf);
-
-setTimeout(()=>{
-
-conf.remove();
-
-},4000);
-
-}
-
-}
-
-/* END */
-
-function endGame(){
-
-document.getElementById("endScreen").style.display =
-"flex";
-
-document.getElementById("finalText").innerHTML =
-"You won <b>" + racesWon +
-"</b> robot races and completed all comparison challenges!";
-
-}
-
-/* RESTART */
-
-function restartGame(){
-
-location.reload();
-
-}
-
 </script>
 
 </body>
