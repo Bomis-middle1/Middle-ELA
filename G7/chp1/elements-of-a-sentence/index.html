@@ -213,7 +213,6 @@ input[type=range] { accent-color: #10b981; cursor: pointer; width: 120px; }
 <!-- SCREEN 1: SPLASH -->
 <div id="splash" class="screen">
     <img src="assets/innovine-logo.png" id="logo" alt="Innovine Logo">
-    <h2>Innovine Learning Games</h2>
 </div>
 
 <!-- SCREEN 2: TOPIC HEADER TRAILER -->
@@ -298,57 +297,61 @@ document.getElementById("volume").oninput = function() {
     Object.values(audioTracks).forEach(t => { if(t) t.volume = this.value; });
 };
 
-/* RE-ENGINEERED QUESTION SCHEMAS USING INDEX WORD ARRAYS */
+/* 
+   ==========================================================================
+   AUDITED SCHEMA MATRIX WITH EXPLICIT ZERO-BASED INDEX TARGETS
+   ==========================================================================
+*/
 rawQuestions = [
     {
         sentence: "The students completed the science project on time.",
         target: "Subject",
-        answerWords: ["The", "students"]
+        targetIndices: [0, 1] // "The students"
     },
     {
         sentence: "The little puppy barked loudly all night.",
         target: "Predicate",
-        answerWords: ["barked", "loudly", "all", "night."]
+        targetIndices: [3, 4, 5, 6] // "barked loudly all night."
     },
     {
         sentence: "Maria baked a delicious cake yesterday.",
         target: "Direct Object",
-        answerWords: ["a", "delicious", "cake"]
+        targetIndices: [2, 3, 4] // "a delicious cake"
     },
     {
         sentence: "The sky became dark before the storm.",
         target: "Complement",
-        answerWords: ["dark"]
+        targetIndices: [3] // "dark" (Subject Complement following linking verb 'became')
     },
     {
         sentence: "My brother plays basketball every Saturday.",
         target: "Predicate",
-        answerWords: ["plays", "basketball", "every", "Saturday."]
+        targetIndices: [2, 3, 4, 5] // "plays basketball every Saturday."
     },
     {
         sentence: "After school, the children visited the library.",
         target: "Subject",
-        answerWords: ["the", "children"]
+        targetIndices: [2, 3] // "the children" ('After school,' is an introductory adverbial phrase)
     },
     {
         sentence: "The teacher explained the lesson clearly.",
         target: "Direct Object",
-        answerWords: ["the", "lesson"]
+        targetIndices: [2, 3] // "the lesson"
     },
     {
         sentence: "Our classroom looks beautiful after the decorations.",
         target: "Complement",
-        answerWords: ["beautiful"]
+        targetIndices: [2] // "beautiful" (Subject Complement following linking verb 'looks')
     },
     {
         sentence: "Several colorful birds flew across the lake.",
         target: "Subject",
-        answerWords: ["Several", "colorful", "birds"]
+        targetIndices: [0, 1, 2] // "Several colorful birds"
     },
     {
         sentence: "The firefighters rescued the family safely.",
         target: "Predicate",
-        answerWords: ["rescued", "the", "family", "safely."]
+        targetIndices: [2, 3, 4, 5] // "rescued the family safely."
     }
 ];
 
@@ -375,21 +378,10 @@ document.getElementById("startBtn").onclick = function() {
     activeIndex = 0;
     currentScore = 0;
     
-    // Process map arrays to parse structural punctuation cleanly
+    // Parse structural components dynamically
     parsedQuestions = rawQuestions.map(item => {
         const wordsArray = item.sentence.split(" ");
-        // Map elements matching the exact text targets cleanly
-        const indices = [];
-        wordsArray.forEach((w, i) => {
-            let clearedWord = w.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,"").toLowerCase();
-            item.answerWords.forEach(ans => {
-                let clearedAns = ans.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,"").toLowerCase();
-                if (clearedWord === clearedAns) {
-                    if(!indices.includes(i)) indices.push(i);
-                }
-            });
-        });
-        return { ...item, wordTokens: wordsArray, targetIndices: indices };
+        return { ...item, wordTokens: wordsArray };
     });
 
     parsedQuestions.sort(() => Math.random() - 0.5);
@@ -438,10 +430,9 @@ ui.submitBtn.onclick = function() {
 
     blocks.forEach(b => b.classList.add("locked"));
 
-    // Check array accuracy alignments
     let errorsFound = false;
     
-    // 1. Did they select something they shouldn't have?
+    // 1. Validate if choices have incorrect structural targets
     userSelectionIndices.forEach(idx => {
         if (targetSet.includes(idx)) {
             blocks[idx].classList.remove("selected");
@@ -453,7 +444,7 @@ ui.submitBtn.onclick = function() {
         }
     });
 
-    // 2. Did they miss elements?
+    // 2. Map structural elements missed out by player selection
     targetSet.forEach(idx => {
         if (!userSelectionIndices.includes(idx)) {
             blocks[idx].classList.add("missed-flash");
