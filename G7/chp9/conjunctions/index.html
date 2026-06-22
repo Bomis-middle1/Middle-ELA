@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-select=none">
-<title>Conjunction Detective Arcade</title>
+<title>Conjunction Detective Quiz</title>
 <style>
 * {
     box-sizing: border-box;
@@ -57,36 +57,14 @@ body, html {
 .panel-card p { color: #a49fc4; line-height: 1.6; margin-bottom: 25px; }
 
 /* GAME APP ENGINE INTERFACE */
-#gameScreen { background: #060414; position: relative; }
+#gameScreen { background: #060414; }
 #gameCanvas {
     display: block;
     width: 100vw;
     height: 100vh;
     background: radial-gradient(circle at center, #0f0b36 0%, #050312 100%);
-}
-
-/* TOUCH ACCESSIBILITY FALLBACK OVERLAY BUTTONS */
-.nav-btn {
-    position: absolute;
-    bottom: 25px;
-    width: 75px;
-    height: 75px;
-    background: rgba(0, 180, 216, 0.3);
-    border: 2px solid #00ffcc;
-    color: #ffd60a;
-    border-radius: 50%;
-    font-size: 28px;
-    font-weight: bold;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 100;
     cursor: pointer;
-    backdrop-filter: blur(4px);
 }
-#btnLeft { left: 20px; }
-#btnRight { right: 20px; }
-.nav-btn:active { background: rgba(0, 255, 204, 0.6); transform: scale(0.95); }
 
 /* OVERLAY ACTION INTERFACES */
 .action-btn {
@@ -108,37 +86,28 @@ body, html {
 </head>
 <body>
 
-<!-- COMPLIANCE AUDIO PATH CHANNELS -->
 <audio id="correctSound" src="Middle-ELA/G7/chp9/conjunctions/assets/correct.mp3" preload="auto"></audio>
 <audio id="wrongSound" src="Middle-ELA/G7/chp9/conjunctions/assets/wrong.mp3" preload="auto"></audio>
 <audio id="clapSound" src="Middle-ELA/G7/chp9/conjunctions/assets/clapping.mp3" preload="auto"></audio>
 
-<!-- STAGE 1: LOGO INTRO SCREEN -->
 <div id="logoScreen" class="screen active">
     <div class="logo-container">
         <img src="Middle-ELA/G7/chp9/conjunctions/assets/innovine-logo.png" alt="Logo">
     </div>
 </div>
 
-<!-- STAGE 2: INSTRUCTIONS -->
 <div id="instructionScreen" class="screen">
     <div class="panel-card">
-        <h1>🚀 Conjunction Space Arcade</h1>
-        <p>1. <b>Move Left/Right:</b> Drag your finger/mouse anywhere, tap the onscreen <b>◀ / ▶ arrows</b>, or use keyboard keys.<br>
-           2. <b>Select:</b> Tap the middle of the screen to lock in your choice!</p>
-        <button class="action-btn" onclick="startGameArena()">Launch Mission</button>
+        <h1>🔍 Conjunction Detective Quiz</h1>
+        <p>Read the mystery question sentence in the banner, then tap or click directly on any matching color diamond to test your answers!</p>
+        <button class="action-btn" onclick="startGameArena()">Begin Mission</button>
     </div>
 </div>
 
-<!-- STAGE 3: GAME RUNTIME CORE -->
 <div id="gameScreen" class="screen">
     <canvas id="gameCanvas"></canvas>
-    <!-- Fallback Manual Click Navigation Pads -->
-    <div id="btnLeft" class="nav-btn">◀</div>
-    <div id="btnRight" class="nav-btn">▶</div>
 </div>
 
-<!-- STAGE 4: CAPSTONE GAME OVER OVERLAY -->
 <div id="endScreen" class="screen">
     <div class="panel-card">
         <h1 style="font-size: 40px;">🏆</h1>
@@ -173,19 +142,6 @@ let lives = 2;
 let feedbackMessage = "";
 let showContinuePrompt = false;
 
-let laserBeamActive = false;
-let laserX = 0;
-let laserAlpha = 0;
-
-const player = {
-    x: 0,
-    y: 0,
-    width: 70,
-    height: 45,
-    speed: 15
-};
-
-const inputs = { Left: false, Right: false };
 let targetOptionDiamonds = [];
 let backgroundStars = [];
 
@@ -207,83 +163,53 @@ function buildStarsBackground() {
 function resizeViewports() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
-    player.y = canvas.height - player.height - 45;
-    if(!gameActive && player.x === 0) {
-        player.x = canvas.width / 2 - player.width / 2;
-    }
 }
 window.addEventListener("resize", resizeViewports);
 
 /* ==========================================================================
-   HEAVY-DUTY INPUT FIXES (GLOBAL LISTENING & BUTTON FALLBACKS)
+   DIRECT CLICKS AND TOUCHES INTERACTION MECHANISM
    ========================================================================== */
-window.addEventListener("keydown", (e) => {
-    if (e.key === "ArrowLeft" || e.code === "ArrowLeft" || e.key === "a" || e.key === "A") inputs.Left = true;
-    if (e.key === "ArrowRight" || e.code === "ArrowRight" || e.key === "d" || e.key === "D") inputs.Right = true;
-    if (e.key === " " || e.key === "Enter" || e.code === "Space") {
-        e.preventDefault();
-        triggerIntentionalSelection();
+canvas.addEventListener("click", handleCanvasInteraction);
+canvas.addEventListener("touchstart", function(e) {
+    if (e.touches.length > 0) {
+        // Prevent simultaneous emulated mouse clicks
+        e.preventDefault(); 
+        const rect = canvas.getBoundingClientRect();
+        const touchX = e.touches[0].clientX - rect.left;
+        const touchY = e.touches[0].clientY - rect.top;
+        processCoordinatesHit(touchX, touchY);
     }
-});
+}, { passive: false });
 
-window.addEventListener("keyup", (e) => {
-    if (e.key === "ArrowLeft" || e.code === "ArrowLeft" || e.key === "a" || e.key === "A") inputs.Left = false;
-    if (e.key === "ArrowRight" || e.code === "ArrowRight" || e.key === "d" || e.key === "D") inputs.Right = false;
-});
-
-// Snap Directly to Mouse/Touch ClientX coordinate instantly
-function forceTrackPointer(clientX) {
-    if(!gameActive || showContinuePrompt) return;
-    player.x = clientX - player.width / 2;
-    if(player.x < 0) player.x = 0;
-    if(player.x > canvas.width - player.width) player.x = canvas.width - player.width;
+function handleCanvasInteraction(e) {
+    const rect = canvas.getBoundingClientRect();
+    const clickX = e.clientX - rect.left;
+    const clickY = e.clientY - rect.top;
+    processCoordinatesHit(clickX, clickY);
 }
 
-window.addEventListener("mousemove", (e) => forceTrackPointer(e.clientX));
-window.addEventListener("touchmove", (e) => {
-    if(e.touches.length > 0) forceTrackPointer(e.touches[0].clientX);
-}, { passive: true });
-
-// Tap screen to shoot/advance (unless clicking native arrow helpers)
-window.addEventListener("click", (e) => {
-    if(e.target.classList.contains('nav-btn')) return;
-    triggerIntentionalSelection();
-});
-window.addEventListener("touchstart", (e) => {
-    if(e.target.classList.contains('nav-btn')) return;
-    triggerIntentionalSelection();
-});
-
-// Fallback button controls implementation
-const btnLeft = document.getElementById("btnLeft");
-const btnRight = document.getElementById("btnRight");
-
-btnLeft.addEventListener("mousedown", () => inputs.Left = true);
-btnLeft.addEventListener("mouseup", () => inputs.Left = false);
-btnLeft.addEventListener("touchstart", (e) => { e.preventDefault(); inputs.Left = true; });
-btnLeft.addEventListener("touchend", () => inputs.Left = false);
-
-btnRight.addEventListener("mousedown", () => inputs.Right = true);
-btnRight.addEventListener("mouseup", () => inputs.Right = false);
-btnRight.addEventListener("touchstart", (e) => { e.preventDefault(); inputs.Right = true; });
-btnRight.addEventListener("touchend", () => inputs.Right = false);
-
-
-function triggerIntentionalSelection() {
+function processCoordinatesHit(x, y) {
     if (!gameActive) return;
-    
-    if(showContinuePrompt) {
+
+    if (showContinuePrompt) {
         nextStageFloor();
         return;
     }
-    
-    laserX = player.x + player.width / 2;
-    laserBeamActive = true;
-    laserAlpha = 1.0;
-    
+
+    // Check if the coordinate falls inside any option diamond boundary
     targetOptionDiamonds.forEach(diamond => {
-        if(diamond.disabled) return;
-        if(laserX >= (diamond.x - diamond.width/2) && laserX <= (diamond.x + diamond.width/2)) {
+        if (diamond.disabled) return;
+
+        // Diamond area polygon path mapping calculation
+        const halfW = diamond.width / 2;
+        const halfH = diamond.height / 2;
+
+        // Translate points relative to diamond center
+        const dx = Math.abs(x - diamond.x);
+        const dy = Math.abs(y - diamond.y);
+
+        // Standard bounding diamond equation checking inside range
+        if ((dx / halfW) + (dy / halfH) <= 1) {
             evaluateSelection(diamond);
         }
     });
@@ -296,13 +222,12 @@ function startGameArena() {
     document.getElementById('instructionScreen').classList.remove('active');
     document.getElementById('gameScreen').classList.add('active');
     
-    activeQuizList = [...mcqs]; // Maintained static structure
+    activeQuizList = [...mcqs];
     currentIndex = 0;
     totalScore = 0;
     gameActive = true;
     
     resizeViewports();
-    player.x = canvas.width / 2 - player.width / 2;
     setupQuestionFloor();
     animateEngineLoop();
 }
@@ -311,7 +236,6 @@ function setupQuestionFloor() {
     lives = 2;
     showContinuePrompt = false;
     feedbackMessage = "";
-    laserBeamActive = false;
     
     const activeData = activeQuizList[currentIndex];
     const optionCount = activeData.opts.length;
@@ -324,9 +248,9 @@ function setupQuestionFloor() {
         targetOptionDiamonds.push({
             text: text,
             x: (segmentWidth * idx) + (segmentWidth / 2),
-            y: canvas.height * 0.42, 
-            width: 140,
-            height: 75,
+            y: canvas.height * 0.55, // Positioned symmetrically in the viewport center
+            width: 145,
+            height: 80,
             color: itemColors[idx % itemColors.length],
             isCorrect: text === activeData.ans,
             disabled: false
@@ -336,15 +260,6 @@ function setupQuestionFloor() {
 
 function animateEngineLoop() {
     if(!gameActive) return;
-    
-    if(inputs.Left && player.x > 0) player.x -= player.speed;
-    if(inputs.Right && player.x < canvas.width - player.width) player.x += player.speed;
-    
-    if (laserBeamActive) {
-        laserAlpha -= 0.05;
-        if (laserAlpha <= 0) laserBeamActive = false;
-    }
-    
     renderGraphicsWorkspace();
     requestAnimationFrame(animateEngineLoop);
 }
@@ -352,7 +267,7 @@ function animateEngineLoop() {
 function evaluateSelection(diamond) {
     if(diamond.isCorrect) {
         totalScore++;
-        feedbackMessage = "✨ OUTSTANDING WORK, DETECTIVE! (Tap Screen to Advance)";
+        feedbackMessage = "✨ OUTSTANDING WORK! (Tap anywhere to continue)";
         document.getElementById("correctSound").play().catch(()=>{});
         document.getElementById("clapSound").play().catch(()=>{});
         diamond.color = "#00ffcc";
@@ -364,10 +279,10 @@ function evaluateSelection(diamond) {
         document.getElementById("wrongSound").play().catch(()=>{});
         
         if(lives <= 0) {
-            feedbackMessage = `❌ CASE CLOSED! Solution was: ${activeQuizList[currentIndex].ans} (Tap Screen)`;
+            feedbackMessage = `❌ CASE FILE CLOSED! Answer: ${activeQuizList[currentIndex].ans} (Tap anywhere)`;
             showContinuePrompt = true;
         } else {
-            feedbackMessage = "❌ FALSE LEAD! Try your last check scan!";
+            feedbackMessage = "❌ FALSE LEAD! Try your final attempt!";
         }
     }
 }
@@ -390,12 +305,12 @@ function restartEntireGame() {
 }
 
 /* ==========================================================================
-   RENDER CORE
+   WORKSPACE UI RENDER ENGINE
    ========================================================================== */
 function renderGraphicsWorkspace() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
-    // Stars Background
+    // 1. Stars Background
     ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
     backgroundStars.forEach(s => {
         ctx.beginPath();
@@ -403,21 +318,7 @@ function renderGraphicsWorkspace() {
         ctx.fill();
     });
     
-    // Laser Beam
-    if (laserBeamActive) {
-        ctx.save();
-        ctx.strokeStyle = `rgba(0, 255, 204, ${laserAlpha})`;
-        ctx.lineWidth = 6;
-        ctx.shadowBlur = 15;
-        ctx.shadowColor = "#00ffcc";
-        ctx.beginPath();
-        ctx.moveTo(laserX, player.y);
-        ctx.lineTo(laserX, 0);
-        ctx.stroke();
-        ctx.restore();
-    }
-    
-    // HUD setup
+    // 2. HUD Header Layout Bar
     ctx.fillStyle = "rgba(20, 15, 61, 0.85)";
     ctx.fillRect(0, 0, canvas.width, 70);
     ctx.strokeStyle = "#00ffcc";
@@ -437,7 +338,7 @@ function renderGraphicsWorkspace() {
     ctx.textAlign = "right";
     ctx.fillText(`SHIELD: ${hearts}`, canvas.width - 25, 42);
     
-    // Question Banner
+    // 3. Question Banner Box
     const activeData = activeQuizList[currentIndex];
     ctx.fillStyle = "rgba(10, 5, 36, 0.95)";
     ctx.strokeStyle = "#ffca3a";
@@ -453,7 +354,7 @@ function renderGraphicsWorkspace() {
     ctx.textAlign = "center";
     ctx.fillText(activeData.q, canvas.width / 2, 146, qw - 40);
     
-    // Diamonds
+    // 4. Render Floating Diamonds Option Buttons
     targetOptionDiamonds.forEach(diamond => {
         ctx.save();
         ctx.translate(diamond.x, diamond.y);
@@ -478,25 +379,13 @@ function renderGraphicsWorkspace() {
         ctx.fillText(diamond.text, diamond.x, diamond.y + 5, diamond.width - 25);
     });
     
-    // Notifications Action Display Text
+    // 5. Action Alerts Status Message Banner
     if(feedbackMessage !== "") {
         ctx.fillStyle = feedbackMessage.startsWith("✨") ? "#00ffcc" : "#ff595e";
-        ctx.font = "bold 17px sans-serif";
+        ctx.font = "bold 18px sans-serif";
         ctx.textAlign = "center";
-        ctx.fillText(feedbackMessage, canvas.width / 2, canvas.height - 130);
+        ctx.fillText(feedbackMessage, canvas.width / 2, canvas.height - 120);
     }
-    
-    // Render Blue Player Box
-    ctx.save();
-    ctx.shadowBlur = 12;
-    ctx.shadowColor = "#00b4d8";
-    
-    ctx.fillStyle = "#00b4d8";
-    ctx.fillRect(player.x, player.y, player.width, player.height);
-    
-    ctx.fillStyle = "#ffffff";
-    ctx.fillRect(player.x + (player.width / 2) - 10, player.y + 8, 20, 15);
-    ctx.restore();
 }
 </script>
 </body>
