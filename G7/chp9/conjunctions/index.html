@@ -3,280 +3,87 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-select=none">
-<title>Conjunction Detective Game</title>
+<title>Conjunction Detective Arcade</title>
 <style>
-/* ==========================================================================
-   GLOBAL DESIGN SYSTEM & RESETS
-   ========================================================================== */
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Arial, sans-serif;
-    -webkit-tap-highlight-color: transparent;
+    font-family: 'Segoe UI', sans-serif;
     user-select: none;
+    -webkit-tap-highlight-color: transparent;
 }
 
-body {
+body, html {
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
     background: #060414;
     color: #fff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-    height: -webkit-fill-available;
-    width: 100vw;
-    overflow: hidden;
 }
 
-html {
-    height: -webkit-fill-available;
-}
-
-/* DETECTIVE BACKGROUND CANVAS MATRIX (FIXED LAYER INTERACTION Z-INDEX) */
-#detectiveMatrixCanvas {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    z-index: 1;
-    pointer-events: none; /* Allows click-through instantly */
-    opacity: 0.35;
-}
-
-/* SCREEN MANAGEMENT FLUID GRID */
+/* SCREEN MANAGEMENT */
 .screen {
     display: none;
-    width: 100vw;
-    height: 100vh;
-    height: -webkit-fill-available;
     position: fixed;
     inset: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 10;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    flex-direction: column;
-    text-align: center;
-    padding: 20px;
-    box-sizing: border-box;
-    overflow: hidden;
-    z-index: 5; /* Places the interactive cards safely over the matrix */
 }
-.screen.active {
-    display: flex;
-}
+.screen.active { display: flex; }
 
-/* STAGE 1: LOGO SCREEN */
-#logoScreen {
-    background: #ffffff;
-    z-index: 9999;
-}
-.logo-container {
-    width: 280px;
-    max-width: 80%;
-}
-.logo-container img {
-    width: 100%;
-    height: auto;
-    display: block;
-}
+/* LOGO INTRO SCREEN (STRICT 5s) */
+#logoScreen { background: #ffffff; z-index: 9999; }
+.logo-container { width: 280px; max-width: 80%; }
+.logo-container img { width: 100%; height: auto; display: block; }
 
-/* STAGE 2: INSTRUCTIONS SCREEN */
-#instructionScreen {
-    background: transparent;
-}
+/* INSTRUCTIONS SCREEN */
+#instructionScreen { background: #0c0728; }
 .panel-card {
-    background: rgba(20, 15, 61, 0.9);
-    color: #ffffff;
-    border-radius: 24px;
-    padding: 30px 24px;
-    box-shadow: 0 0 30px rgba(255, 214, 10, 0.2), inset 0 0 20px rgba(0, 255, 204, 0.1);
-    border: 2px solid #00ffcc;
-    max-width: 480px;
-    width: 100%;
-    text-align: center;
-    box-sizing: border-box;
-}
-.panel-card h1 {
-    font-size: 28px;
-    color: #ffd60a;
-    margin-bottom: 12px;
-    text-shadow: 0 0 10px rgba(255, 214, 10, 0.5);
-}
-.panel-card p {
-    color: #a49fc4;
-    line-height: 1.6;
-    margin-bottom: 24px;
-    font-size: 15px;
-}
-
-/* STAGE 3: GAME RUNTIME HUD & ARENA */
-.game-layout {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-    max-width: 520px;
-    height: 92%;
-    box-sizing: border-box;
-}
-
-.hud-panel {
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 20px;
-    background: rgba(20, 15, 61, 0.85);
-    border-radius: 16px;
-    border: 1px solid #00ffcc;
-    font-weight: bold;
-    font-size: 15px;
-    letter-spacing: 0.5px;
-    box-shadow: 0 0 15px rgba(0, 255, 204, 0.2);
-    box-sizing: border-box;
-}
-
-.score-counter {
-    color: #ffd60a;
-}
-
-.health-track {
-    background: rgba(0, 0, 0, 0.5);
-    width: 120px;
-    height: 12px;
-    border-radius: 6px;
-    overflow: hidden;
-    border: 1px solid rgba(0, 255, 204, 0.3);
-}
-.health-fill {
-    background: linear-gradient(90deg, #ffd60a, #00ffcc);
-    width: 0%;
-    height: 100%;
-    transition: width 0.3s ease;
-}
-
-.boss-arena {
-    font-size: 56px;
-    margin: 10px 0;
-    filter: drop-shadow(0 0 15px rgba(0, 255, 204, 0.6));
-    animation: floating 3s ease-in-out infinite;
-}
-
-.question-card {
-    background: rgba(255, 244, 214, 0.95);
-    color: #2d2340;
-    border-radius: 24px;
-    padding: 22px;
-    width: 100%;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.6);
-    border-bottom: 6px solid #ffb703;
-    box-sizing: border-box;
-}
-
-.question-text {
-    font-size: 17px;
-    font-weight: 700;
-    line-height: 1.45;
-    margin-bottom: 18px;
-    text-align: left;
-}
-
-.options-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-/* INTERACTIVE ACTION BUTTONS */
-button.game-btn {
-    width: 100%;
-    padding: 12px 18px;
-    border: none;
-    border-radius: 14px;
-    background: #d8f3dc;
-    color: #2d2340;
-    font-weight: bold;
-    font-size: 15px;
-    cursor: pointer;
-    transition: transform 0.1s, background 0.2s;
-    text-align: left;
-    box-sizing: border-box;
-}
-button.game-btn:active { transform: scale(0.98); }
-button.game-btn:disabled { pointer-events: none; }
-
-button.game-btn.correct {
-    background: #b7efc5 !important;
-    color: #1b4332;
-    box-shadow: 0 0 15px rgba(183, 239, 197, 0.6);
-}
-button.game-btn.wrong {
-    background: #ffccd5 !important;
-    color: #5c0d12;
-}
-
-.action-trigger {
-    background: linear-gradient(135deg, #ffb703, #fb8500) !important;
-    color: #fff !important;
-    text-align: center !important;
-    box-shadow: 0 5px 15px rgba(251, 133, 0, 0.4);
-}
-
-.banner-action {
-    margin-top: 12px;
-    font-weight: bold;
-    font-size: 14px;
-    min-height: 20px;
-    text-align: center;
-}
-.banner-action.text-correct { color: #1b4332; }
-.banner-action.text-wrong { color: #e63946; }
-
-/* STAGE 4: EVALUATION SUMMARY CARD */
-.summary-box {
     background: rgba(20, 15, 61, 0.95);
-    color: #fff;
-    border-radius: 28px;
-    padding: 35px 25px;
-    max-width: 440px;
-    width: 100%;
-    box-shadow: 0 0 30px rgba(0, 255, 204, 0.3);
     border: 2px solid #00ffcc;
-    box-sizing: border-box;
+    border-radius: 24px;
+    padding: 35px 24px;
+    max-width: 480px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 0 30px rgba(0, 255, 204, 0.3);
 }
+.panel-card h1 { color: #ffd60a; margin-bottom: 15px; font-size: 26px; }
+.panel-card p { color: #a49fc4; line-height: 1.6; margin-bottom: 25px; }
 
-/* RENDER EFFECTS FOREGROUND LAYER */
-canvas#visualFX {
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: 99999;
+/* GAME APP ENGINE INTERFACE */
+#gameScreen { background: #060414; }
+#gameCanvas {
+    display: block;
     width: 100vw;
     height: 100vh;
+    background: radial-gradient(circle at center, #0f0b36 0%, #050312 100%);
 }
 
-/* ANIMATION TRACKS */
-@keyframes floating {
-    0% { transform: translateY(0px) rotate(0deg); }
-    50% { transform: translateY(-8px) rotate(3deg); }
-    100% { transform: translateY(0px) rotate(0deg); }
+/* OVERLAY ACTION INTERFACES */
+.action-btn {
+    padding: 14px 28px;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #ffb703, #fb8500);
+    color: #fff;
+    font-weight: bold;
+    font-size: 16px;
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(251, 133, 0, 0.4);
+    transition: transform 0.1s;
 }
+.action-btn:active { transform: scale(0.95); }
 
-/* RESPONSIBILITY SCALE & ADAPTIVE VIEWPORTS */
-@media (max-width: 480px) {
-    .question-text { font-size: 15px; }
-    button.game-btn { padding: 10px 14px; font-size: 14px; }
-    .boss-arena { font-size: 44px; margin: 5px 0; }
-    .hud-panel { padding: 10px 14px; font-size: 13px; }
-}
+#endScreen { background: rgba(5, 3, 18, 0.95); }
 </style>
 </head>
 <body>
-
-<canvas id="detectiveMatrixCanvas"></canvas>
-<canvas id="visualFX"></canvas>
 
 <audio id="correctSound" src="Middle-ELA/G7/chp9/conjunctions/assets/correct.mp3" preload="auto"></audio>
 <audio id="wrongSound" src="Middle-ELA/G7/chp9/conjunctions/assets/wrong.mp3" preload="auto"></audio>
@@ -284,47 +91,28 @@ canvas#visualFX {
 
 <div id="logoScreen" class="screen active">
     <div class="logo-container">
-        <img src="Middle-ELA/G7/chp9/conjunctions/assets/innovine-logo.png" alt="Innovine Logo">
+        <img src="Middle-ELA/G7/chp9/conjunctions/assets/innovine-logo.png" alt="Logo">
     </div>
 </div>
 
 <div id="instructionScreen" class="screen">
     <div class="panel-card">
-        <h1>✨ Conjunction Detective ✨</h1>
-        <p>Analyze the clues left at the crime scene to catch the grammatical rule anomalies! You have 2 attempts per stage before the local grid safety system bypasses.</p>
-        <button class="game-btn action-trigger" onclick="launchGamePipeline()">Begin Analysis</button>
+        <h1>🚀 Conjunction Space Arcade</h1>
+        <p>Move your Blue Launcher block Left/Right using your <b>Mouse/Touch Dragging</b> or <b>Arrow Keys (A/D)</b>. Line up under the correct answer target to claim points!</p>
+        <button class="action-btn" onclick="startGameArena()">Launch Mission</button>
     </div>
 </div>
 
-<div id="quizScreen" class="screen">
-    <div class="game-layout">
-        
-        <div class="hud-panel">
-            <div id="scoreText">Question 1 of 10</div>
-            <div style="color: #00ffcc;">SCORE: <span id="pointsHUD" class="score-counter">0 / 10</span></div>
-            <div class="health-track">
-                <div id="healthBar" class="health-fill"></div>
-            </div>
-        </div>
-
-        <div class="boss-arena">🕵️‍♂️</div>
-
-        <div class="question-card">
-            <div id="questionText" class="question-text">Loading case file details...</div>
-            <div id="optionsBox" class="options-grid"></div>
-            <div id="feedback" class="banner-action"></div>
-            <button id="continueBtn" class="game-btn action-trigger" style="display: none; margin-top: 12px;" onclick="advancePipelineFloor()">Continue</button>
-        </div>
-
-    </div>
+<div id="gameScreen" class="screen">
+    <canvas id="gameCanvas"></canvas>
 </div>
 
 <div id="endScreen" class="screen">
-    <div class="summary-box">
-        <div style="font-size: 64px; margin-bottom: 12px;">🏆</div>
-        <h1 style="color: #ffd60a; font-size: 26px; margin-bottom: 10px;">Mission Complete!</h1>
-        <p id="finalScore" style="font-size: 17px; margin-bottom: 25px; font-weight: 600; color: #a49fc4;"></p>
-        <button class="game-btn action-trigger" onclick="restartFullPipeline()">Analyze New Case</button>
+    <div class="panel-card">
+        <h1 style="font-size: 40px;">🏆</h1>
+        <h1>Mission Cleared</h1>
+        <p id="finalScoreDisplay" style="font-size: 18px; margin: 15px 0; font-weight: bold;"></p>
+        <button class="action-btn" onclick="restartEntireGame()">Play Again</button>
     </div>
 </div>
 
@@ -342,246 +130,305 @@ const mcqs = [
     {q:'Read the sentence: "The wizard carried a map so that he could find the treasure, although the journey was dangerous." How many conjunction types are used?',opts:["One","Two","Three","Four"],ans:"Two"}
 ];
 
-let activePlayList = [];
-let currentFloorIndex = 0;
-let pointsScore = 0;
-let currentQuestionAttempts = 0;
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
 
-const audioChannels = {
-    correct: document.getElementById('correctSound'),
-    wrong: document.getElementById('wrongSound'),
-    clap: document.getElementById('clapSound')
+let gameActive = false;
+let activeQuizList = [];
+let currentIndex = 0;
+let totalScore = 0;
+let lives = 2;
+let feedbackMessage = "";
+let feedbackTimer = 0;
+let showContinuePrompt = false;
+
+// PLAYER SHIP CONFIGURATION
+const player = {
+    x: 0,
+    y: 0,
+    width: 70,
+    height: 45,
+    speed: 12
 };
 
-function fireAudioChannel(key) {
-    const channel = audioChannels[key];
-    if (!channel) return;
-    try {
-        channel.currentTime = 0;
-        channel.play().catch(() => {});
-    } catch(err) {}
-}
+// INPUT CONTROLS REGISTER
+const inputs = { Left: false, Right: false };
+let targetOptionDiamonds = [];
+let backgroundStars = [];
 
-/* ==========================================================================
-   TIMING COORDINATION PIPELINE
-   ========================================================================== */
+// TIMEOUT TIMER FOR INITIAL LOGO
 window.onload = () => {
-    initDetectiveBackgroundMatrix();
+    buildStarsBackground();
     setTimeout(() => {
         document.getElementById('logoScreen').classList.remove('active');
         document.getElementById('instructionScreen').classList.add('active');
     }, 5000);
 };
 
-function launchGamePipeline() {
+function buildStarsBackground() {
+    backgroundStars = [];
+    for(let i=0; i<60; i++) {
+        backgroundStars.push({ x: Math.random(), y: Math.random(), r: Math.random() * 1.5 });
+    }
+}
+
+function resizeViewports() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    player.y = canvas.height - player.height - 30;
+    if(!gameActive && player.x === 0) {
+        player.x = canvas.width / 2 - player.width / 2;
+    }
+}
+window.addEventListener("resize", resizeViewports);
+
+/* ==========================================================================
+   INPUT EVENT LISTENERS (FIX FOR THE STUCK BLUE BOX)
+   ========================================================================== */
+window.addEventListener("keydown", (e) => {
+    if(e.key === "ArrowLeft" || e.key === "a" || e.key === "A") inputs.Left = true;
+    if(e.key === "ArrowRight" || e.key === "d" || e.key === "D") inputs.Right = true;
+    if(e.key === "Enter" || e.key === " ") {
+        if(showContinuePrompt) nextStageFloor();
+    }
+});
+
+window.addEventListener("keyup", (e) => {
+    if(e.key === "ArrowLeft" || e.key === "a" || e.key === "A") inputs.Left = false;
+    if(e.key === "ArrowRight" || e.key === "d" || e.key === "D") inputs.Right = false;
+});
+
+// TOUCH & MOUSE DRAGGING CAPABILITY FOR DESKTOP AND SMART DEVICES
+function handlePointerMovement(clientX) {
+    if(!gameActive || showContinuePrompt) return;
+    player.x = clientX - player.width / 2;
+    // Bound Constraints
+    if(player.x < 0) player.x = 0;
+    if(player.x > canvas.width - player.width) player.x = canvas.width - player.width;
+}
+
+canvas.addEventListener("mousemove", (e) => handlePointerMovement(e.clientX));
+canvas.addEventListener("touchmove", (e) => {
+    if(e.touches.length > 0) handlePointerMovement(e.touches[0].clientX);
+}, { passive: true });
+
+// Tap screen to progress when matching answers are locked
+canvas.addEventListener("click", () => {
+    if(showContinuePrompt) nextStageFloor();
+});
+canvas.addEventListener("touchstart", () => {
+    if(showContinuePrompt) nextStageFloor();
+});
+
+/* ==========================================================================
+   GAME LOGIC LOOP ENGINE
+   ========================================================================== */
+function startGameArena() {
     document.getElementById('instructionScreen').classList.remove('active');
-    document.getElementById('quizScreen').classList.add('active');
+    document.getElementById('gameScreen').classList.add('active');
     
-    Object.values(audioChannels).forEach(node => {
-        if (node) { node.play().then(() => node.pause()).catch(() => {}); }
-    });
+    activeQuizList = [...mcqs].sort(() => Math.random() - 0.5);
+    currentIndex = 0;
+    totalScore = 0;
+    gameActive = true;
     
-    resetAndGenerateGameArray();
+    resizeViewports();
+    player.x = canvas.width / 2 - player.width / 2;
+    setupQuestionFloor();
+    animateEngineLoop();
 }
 
-function resetAndGenerateGameArray() {
-    activePlayList = [...mcqs].sort(() => Math.random() - 0.5);
-    currentFloorIndex = 0;
-    pointsScore = 0;
-    renderActiveQuestionCard();
-}
-
-function renderActiveQuestionCard() {
-    currentQuestionAttempts = 0;
+function setupQuestionFloor() {
+    lives = 2;
+    showContinuePrompt = false;
+    feedbackMessage = "";
     
-    document.getElementById('continueBtn').style.display = "none";
-    const feedbackNode = document.getElementById('feedback');
-    feedbackNode.innerText = "";
-    feedbackNode.className = "banner-action";
+    const activeData = activeQuizList[currentIndex];
+    const optionCount = activeData.opts.length;
     
-    const activeTarget = activePlayList[currentFloorIndex];
-    document.getElementById('questionText').innerText = activeTarget.q;
+    targetOptionDiamonds = [];
+    const segmentWidth = canvas.width / optionCount;
+    const itemColors = ["#ff595e", "#ffca3a", "#8ac926", "#1982c4"];
     
-    document.getElementById('pointsHUD').innerText = `${pointsScore} / ${activePlayList.length}`;
-    document.getElementById('scoreText').innerText = `Question ${currentFloorIndex + 1} of ${activePlayList.length}`;
-    document.getElementById('healthBar').style.width = `${((currentFloorIndex) / activePlayList.length) * 100}%`;
-    
-    const optionsContainer = document.getElementById('optionsBox');
-    optionsContainer.innerHTML = '';
-    
-    activeTarget.opts.forEach(optionText => {
-        const btn = document.createElement('button');
-        btn.className = "game-btn";
-        btn.innerText = optionText;
-        btn.onclick = () => validateUserSelection(optionText, btn);
-        optionsContainer.appendChild(btn);
+    activeData.opts.forEach((text, idx) => {
+        targetOptionDiamonds.push({
+            text: text,
+            x: (segmentWidth * idx) + (segmentWidth / 2),
+            y: canvas.height * 0.45 + (Math.random() * 40 - 20), // Floating placement align
+            width: 130,
+            height: 70,
+            color: itemColors[idx % itemColors.length],
+            isCorrect: text === activeData.ans,
+            disabled: false
+        });
     });
 }
 
-function validateUserSelection(selectedText, clickedButton) {
-    const activeTarget = activePlayList[currentFloorIndex];
-    const optionButtons = document.querySelectorAll('#optionsBox button');
+function animateEngineLoop() {
+    if(!gameActive) return;
     
-    if (selectedText === activeTarget.ans) {
-        clickedButton.classList.add('correct');
-        optionButtons.forEach(b => b.disabled = true);
+    updateStateCalculations();
+    renderGraphicsWorkspace();
+    
+    requestAnimationFrame(animateEngineLoop);
+}
+
+function updateStateCalculations() {
+    // Smooth Keyboard translation physics logic
+    if(inputs.Left && player.x > 0) player.x -= player.speed;
+    if(inputs.Right && player.x < canvas.width - player.width) player.x += player.speed;
+    
+    if(showContinuePrompt) return; // Freeze check collision once an answer is chosen
+    
+    // Check intersection hit bounds
+    targetOptionDiamonds.forEach(diamond => {
+        if(diamond.disabled) return;
         
-        pointsScore++;
-        document.getElementById('pointsHUD').innerText = `${pointsScore} / ${activePlayList.length}`;
-        
-        const feedbackNode = document.getElementById('feedback');
-        feedbackNode.innerText = "✨ Outstanding work, Detective!";
-        feedbackNode.className = "banner-action text-correct";
-        
-        fireAudioChannel('correct');
-        fireAudioChannel('clap');
-        renderConfettiBlast();
-        
-        document.getElementById('continueBtn').style.display = "block";
+        // Accurate bounding range overlap calculations
+        const pxCenter = player.x + player.width / 2;
+        if(pxCenter >= (diamond.x - diamond.width/2) && pxCenter <= (diamond.x + diamond.width/2)) {
+            // Hit recorded!
+            evaluateSelection(diamond);
+        }
+    });
+}
+
+function evaluateSelection(diamond) {
+    if(diamond.isCorrect) {
+        totalScore++;
+        feedbackMessage = "✨ OUTSTANDING WORK, DETECTIVE! (Tap to Continue)";
+        document.getElementById("correctSound").play().catch(()=>{});
+        document.getElementById("clapSound").play().catch(()=>{});
+        diamond.color = "#00ffcc";
+        showContinuePrompt = true;
     } else {
-        currentQuestionAttempts++;
-        clickedButton.classList.add('wrong');
-        clickedButton.disabled = true;
-        fireAudioChannel('wrong');
+        lives--;
+        diamond.disabled = true;
+        diamond.color = "#331122"; // Darken option out
+        document.getElementById("wrongSound").play().catch(()=>{});
         
-        if (currentQuestionAttempts >= 2) {
-            optionButtons.forEach(b => {
-                b.disabled = true;
-                if (b.innerText === activeTarget.ans) b.classList.add('correct');
-            });
-            
-            const feedbackNode = document.getElementById('feedback');
-            feedbackNode.innerText = `Case File Solution: ${activeTarget.ans}`;
-            feedbackNode.className = "banner-action text-wrong";
-            
-            document.getElementById('continueBtn').style.display = "block";
+        if(lives <= 0) {
+            feedbackMessage = `❌ CASE CLOSED! Solution was: ${activeQuizList[currentIndex].ans} (Tap to Continue)`;
+            showContinuePrompt = true;
         } else {
-            const feedbackNode = document.getElementById('feedback');
-            feedbackNode.innerText = "❌ False lead. Try your final attempt!";
-            feedbackNode.className = "banner-action text-wrong";
+            feedbackMessage = "❌ FALSE LEAD! Try your final life attempt!";
         }
     }
 }
 
-function advancePipelineFloor() {
-    currentFloorIndex++;
-    if (currentFloorIndex >= activePlayList.length) {
-        document.getElementById('healthBar').style.width = "100%";
-        document.getElementById('quizScreen').classList.remove('active');
-        document.getElementById('endScreen').classList.add('active');
-        document.getElementById('finalScore').innerText = `You scored ${pointsScore} / ${activePlayList.length}`;
-        fireAudioChannel('clap');
+function nextStageFloor() {
+    currentIndex++;
+    if(currentIndex >= activeQuizList.length) {
+        gameActive = false;
+        document.getElementById("gameScreen").classList.remove("active");
+        document.getElementById("endScreen").classList.add("active");
+        document.getElementById("finalScoreDisplay").innerText = `Final Score: ${totalScore} / ${activeQuizList.length}`;
     } else {
-        renderActiveQuestionCard();
+        setupQuestionFloor();
     }
 }
 
-function restartFullPipeline() {
-    document.getElementById('endScreen').classList.remove('active');
-    document.getElementById('quizScreen').classList.add('active');
-    resetAndGenerateGameArray();
+function restartEntireGame() {
+    document.getElementById("endScreen").classList.remove("active");
+    startGameArena();
 }
 
 /* ==========================================================================
-   LIVE INTERACTIVE BACKGROUND DETECTIVE GRAPHICS CANVASES
+   WORKSPACE UI GRAPHICS RENDER ENGINE
    ========================================================================== */
-function initDetectiveBackgroundMatrix() {
-    const bgCanvas = document.getElementById("detectiveMatrixCanvas");
-    const bgCtx = bgCanvas.getContext("2d");
+function renderGraphicsWorkspace() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
     
-    function resizeBg() {
-        bgCanvas.width = window.innerWidth;
-        bgCanvas.height = window.innerHeight;
-    }
-    window.addEventListener("resize", resizeBg);
-    resizeBg();
+    // 1. Draw Starfield
+    ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
+    backgroundStars.forEach(s => {
+        ctx.beginPath();
+        ctx.arc(s.x * canvas.width, s.y * canvas.height, s.r, 0, Math.PI*2);
+        ctx.fill();
+    });
     
-    let clues = [];
-    const elementsList = ["🔍", "👣", "📜", "💼", "🔑", "📌", "0", "1"];
+    // 2. Draw HUD Header Layout Bar
+    ctx.fillStyle = "rgba(20, 15, 61, 0.8)";
+    ctx.fillRect(0, 0, canvas.width, 70);
+    ctx.strokeStyle = "#00ffcc";
+    ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(0, 70); ctx.lineTo(canvas.width, 70); ctx.stroke();
     
-    for(let k=0; k<25; k++) {
-        clues.push({
-            x: Math.random() * window.innerWidth,
-            y: Math.random() * window.innerHeight,
-            glyph: elementsList[Math.floor(Math.random() * elementsList.length)],
-            size: Math.random() * 16 + 14,
-            speed: Math.random() * 0.4 + 0.2
-        });
-    }
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "bold 15px sans-serif";
+    ctx.fillText(`STAGE: ${currentIndex + 1} / ${activeQuizList.length}`, 25, 42);
+    ctx.fillText(`SCORE: ${totalScore}`, canvas.width / 2 - 40, 42);
     
-    function animateBackground() {
-        bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
+    let hearts = "";
+    for(let l=0; l<lives; l++) hearts += "❤️ ";
+    ctx.fillText(`SHIELD: ${hearts}`, canvas.width - 150, 42);
+    
+    // 3. Render Question Display Banner
+    const activeData = activeQuizList[currentIndex];
+    ctx.fillStyle = "rgba(10, 5, 36, 0.9)";
+    ctx.strokeStyle = "#8ac926";
+    ctx.lineWidth = 3;
+    
+    const qw = Math.min(canvas.width * 0.85, 750);
+    const qx = canvas.width / 2 - qw / 2;
+    ctx.fillRect(qx, 100, qw, 70);
+    ctx.strokeRect(qx, 100, qw, 70);
+    
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "16px sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText(activeData.q, canvas.width / 2, 142, qw - 40);
+    
+    // 4. Render Floating Options (The Diamonds from image_800143)
+    targetOptionDiamonds.forEach(diamond => {
+        ctx.save();
+        ctx.translate(diamond.x, diamond.y);
         
-        bgCtx.strokeStyle = "rgba(0, 255, 204, 0.05)";
-        bgCtx.lineWidth = 1;
-        for(let x=0; x<bgCanvas.width; x+=50) {
-            bgCtx.beginPath(); bgCtx.moveTo(x, 0); bgCtx.lineTo(x, bgCanvas.height); bgCtx.stroke();
-        }
+        // Draw glow paths effect
+        ctx.shadowBlur = 15;
+        ctx.shadowColor = diamond.color;
         
-        bgCtx.fillStyle = "rgba(0, 255, 204, 0.35)";
-        clues.forEach(clue => {
-            bgCtx.font = `${clue.size}px monospace`;
-            bgCtx.fillText(clue.glyph, clue.x, clue.y);
-            clue.y -= clue.speed;
-            if(clue.y < -30) {
-                clue.y = bgCanvas.height + 30;
-                clue.x = Math.random() * bgCanvas.width;
-            }
-        });
+        ctx.fillStyle = diamond.color;
+        ctx.beginPath();
+        ctx.moveTo(0, -diamond.height / 2);
+        ctx.lineTo(diamond.width / 2, 0);
+        ctx.lineTo(0, diamond.height / 2);
+        ctx.lineTo(-diamond.width / 2, 0);
+        ctx.closePath();
+        ctx.fill();
         
-        requestAnimationFrame(animateBackground);
-    }
-    animateBackground();
-}
-
-/* FOREGROUND CANVAS WINNERS CONFETTI GENERATOR */
-const canvas = document.getElementById("visualFX");
-const ctx = canvas.getContext("2d");
-let pieces = [], animationRef = null;
-
-function syncCanvasLayout() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-}
-window.addEventListener("resize", syncCanvasLayout);
-syncCanvasLayout();
-
-function renderConfettiBlast() {
-    pieces = [];
-    cancelAnimationFrame(animationRef);
-    const pallet = ["#ffb703", "#fb8500", "#ffd60a", "#00ffcc", "#4cc9f0"];
+        ctx.restore();
+        
+        // Draw option text inside
+        ctx.fillStyle = "#000000";
+        ctx.font = "bold 15px sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText(diamond.text, diamond.x, diamond.y + 5, diamond.width - 20);
+    });
     
-    for (let i = 0; i < 45; i++) {
-        pieces.push({
-            x: canvas.width / 2,
-            y: canvas.height * 0.4,
-            w: Math.random() * 6 + 6,
-            h: Math.random() * 6 + 6,
-            vy: Math.random() * -5 - 2,
-            vx: Math.random() * 8 - 4,
-            rot: Math.random() * 360,
-            color: pallet[Math.floor(Math.random() * pallet.length)]
-        });
+    // 5. Draw Dynamic Action Notification Banners
+    if(feedbackMessage !== "") {
+        ctx.fillStyle = feedbackMessage.startsWith("✨") ? "#00ffcc" : "#ff595e";
+        ctx.font = "bold 18px sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText(feedbackMessage, canvas.width / 2, canvas.height - 120);
     }
     
-    let runtimeTicks = 0;
-    function loop() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        pieces.forEach(p => {
-            ctx.save();
-            ctx.translate(p.x, p.y);
-            ctx.rotate(p.rot * Math.PI / 180);
-            ctx.fillStyle = p.color;
-            ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
-            ctx.restore();
-            p.y += p.vy; p.vy += 0.15;
-            p.x += p.vx;
-            p.rot += 2;
-        });
-        if (++runtimeTicks < 75) animationRef = requestAnimationFrame(loop);
-        else ctx.clearRect(0, 0, canvas.width, canvas.height);
-    }
-    loop();
+    // 6. Draw Player Asset Avatar (The Interactive Blue Box with white square inside)
+    ctx.save();
+    ctx.shadowBlur = 10;
+    ctx.shadowColor = "#00ffff";
+    
+    // Base blue ship container block
+    ctx.fillStyle = "#00b4d8";
+    ctx.fillRect(player.x, player.y, player.width, player.height);
+    
+    // Accent white inner display signal light window box
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(player.x + (player.width / 2) - 10, player.y + 8, 20, 15);
+    
+    ctx.restore();
+    ctx.textAlign = "left"; // Reset defaults alignment
 }
 </script>
 </body>
