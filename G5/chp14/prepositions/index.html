@@ -53,27 +53,6 @@
     justify-content:space-between;
     gap:12px;
   }
-  .brand{
-    display:flex;
-    align-items:center;
-    gap:12px;
-    min-width:0;
-  }
-  .logo-badge{
-    width:48px;
-    height:48px;
-    border-radius:14px;
-    background:linear-gradient(135deg,#fde68a,#fb7185);
-    display:grid;
-    place-items:center;
-    overflow:hidden;
-    flex:0 0 auto;
-  }
-  .logo-badge img{
-    width:100%;
-    height:100%;
-    object-fit:cover;
-  }
   .title-wrap{min-width:0}
   .title{
     font-weight:900;
@@ -399,7 +378,7 @@
     border-radius:16px;
     background:#f8fafc;
     border:2px dashed #cbd5e1;
-    min-height:92px;
+    min-height:104px;
     font-weight:800;
     line-height:1.4;
   }
@@ -524,12 +503,9 @@
 <div class="app">
   <div class="shell">
     <div class="topbar">
-      <div class="brand">
-        <div class="logo-badge"><img src="assets/logo.png" alt="Logo"></div>
-        <div class="title-wrap">
-          <div class="title">Preposition Simon Says</div>
-          <div class="sub">Grade 5 • Classroom + Cartoon Fun</div>
-        </div>
+      <div class="title-wrap">
+        <div class="title">Preposition Simon Says</div>
+        <div class="sub">Grade 5 • Classroom + Cartoon Fun</div>
       </div>
       <div class="stats">
         <div class="pill">Score: <span id="score">0</span></div>
@@ -575,10 +551,11 @@
         <div class="instruction">
           <h3>How to play</h3>
           <ul>
-            <li>Only move when the command starts with <strong>Simon says</strong>.</li>
-            <li>Tap <strong>Do it</strong> if Simon says the action.</li>
-            <li>Tap <strong>Don’t do it</strong> if it does not start with Simon says.</li>
-            <li>Try to get the highest score before 10 rounds end.</li>
+            <li>Listen carefully.</li>
+            <li>If the command starts with <strong>Simon says</strong>, do the action.</li>
+            <li>If it does not start with <strong>Simon says</strong>, do nothing.</li>
+            <li>Tap <strong>Do it</strong> when you should act.</li>
+            <li>Tap <strong>Don’t do it</strong> when you should not act.</li>
           </ul>
         </div>
         <div class="controls">
