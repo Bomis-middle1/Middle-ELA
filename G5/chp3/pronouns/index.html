@@ -146,21 +146,8 @@
     .opt:hover { transform: translateY(-1px) scale(1.01); }
     .opt:disabled { opacity: .55; cursor: not-allowed; transform: none; }
 
-    .msg {
-      min-height: 78px;
-      text-align: center;
-      font-size: clamp(18px, 3.7vw, 28px);
-      font-weight: 800;
-      margin: 8px 0 4px;
-      white-space: pre-line;
-    }
-
-    .explain {
-      min-height: 34px;
-      text-align: center;
-      font-size: clamp(16px, 3vw, 22px);
-      color: #8ffcff;
-      margin-bottom: 10px;
+    .msg, .explain {
+      min-height: 10px;
     }
 
     .next, .restart {
@@ -261,21 +248,21 @@
 
   <script>
     const tricks = [
-      { name: "Trick 1: Personal Pronoun", question: "Mary goes to school every day. ___ is a good student.", options: ["She", "He", "It", "They"], correct: "She", explain: "'Mary' is a girl, so the correct pronoun is 'She'." },
-      { name: "Trick 2: Personal Pronoun", question: "The boys are playing football. ___ are having fun.", options: ["They", "We", "You", "He"], correct: "They", explain: "More than one boy = 'They'." },
-      { name: "Trick 3: Personal Pronoun", question: "Tom and his friend walk to the park. ___ play together.", options: ["They", "She", "He", "It"], correct: "They", explain: "Two people = 'They'." },
-      { name: "Trick 4: Possessive Pronoun", question: "John has a ball. It is ___ ball.", options: ["my", "his", "her", "their"], correct: "his", explain: "'John' is male, so the possessive pronoun is 'his'." },
-      { name: "Trick 5: Possessive Pronoun", question: "The students brought their books. ___ books are on the table.", options: ["My", "His", "Their", "Her"], correct: "Their", explain: "More than one student = 'Their'." },
-      { name: "Trick 6: Possessive Pronoun", question: "We have a house. It is ___ house.", options: ["our", "my", "his", "her"], correct: "our", explain: "'We' shows ownership with 'our'." },
-      { name: "Trick 7: Demonstrative Pronoun", question: "I like these shoes. ___ are beautiful!", options: ["This", "These", "That", "Those"], correct: "These", explain: "Plural near objects use 'These'." },
-      { name: "Trick 8: Demonstrative Pronoun", question: "The house on the hill is old. ___ is very old.", options: ["This", "These", "That", "Those"], correct: "That", explain: "Single far object uses 'That'." },
-      { name: "Trick 9: Demonstrative Pronoun", question: "I see these birds on the tree. ___ are singing.", options: ["This", "These", "That", "Those"], correct: "These", explain: "Plural near objects use 'These'." },
-      { name: "Trick 10: Interrogative Pronoun", question: "___ is your name?", options: ["What", "Which", "Who", "Whose"], correct: "What", explain: "We ask about a name with 'What'." },
-      { name: "Trick 11: Interrogative Pronoun", question: "___ performance should win the first prize?", options: ["Who", "Whom", "What", "Which"], correct: "Which", explain: "Use 'Which' when choosing from a set of things." },
-      { name: "Trick 12: Interrogative Pronoun", question: "___ did you call yesterday?", options: ["Who", "Whom", "Which", "What"], correct: "Whom", explain: "Use 'Whom' as the object of the verb." },
-      { name: "Trick 13: Personal Pronoun", question: "She is reading a book. ___ is very interesting.", options: ["She", "He", "It", "They"], correct: "She", explain: "The subject is female, so use 'She'." },
-      { name: "Trick 14: Personal Pronoun", question: "We are ready for class. ___ are early today.", options: ["They", "We", "You", "He"], correct: "We", explain: "The speaker includes themselves, so use 'We'." },
-      { name: "Trick 15: Interrogative Pronoun", question: "___ jewelry was stolen?", options: ["What", "Which", "Who", "Whose"], correct: "Whose", explain: "Use 'Whose' to ask about ownership." }
+      { name: "Trick 1: Personal Pronoun", question: "Mary goes to school every day. ___ is a good student.", options: ["She", "He", "It", "They"], correct: "She" },
+      { name: "Trick 2: Personal Pronoun", question: "The boys are playing football. ___ are having fun.", options: ["They", "We", "You", "He"], correct: "They" },
+      { name: "Trick 3: Personal Pronoun", question: "Tom and his friend walk to the park. ___ play together.", options: ["They", "She", "He", "It"], correct: "They" },
+      { name: "Trick 4: Possessive Pronoun", question: "John has a ball. It is ___ ball.", options: ["my", "his", "her", "their"], correct: "his" },
+      { name: "Trick 5: Possessive Pronoun", question: "The students brought their books. ___ books are on the table.", options: ["My", "His", "Their", "Her"], correct: "Their" },
+      { name: "Trick 6: Possessive Pronoun", question: "We have a house. It is ___ house.", options: ["our", "my", "his", "her"], correct: "our" },
+      { name: "Trick 7: Demonstrative Pronoun", question: "I like these shoes. ___ are beautiful!", options: ["This", "These", "That", "Those"], correct: "These" },
+      { name: "Trick 8: Demonstrative Pronoun", question: "The house on the hill is old. ___ is very old.", options: ["This", "These", "That", "Those"], correct: "That" },
+      { name: "Trick 9: Demonstrative Pronoun", question: "I see these birds on the tree. ___ are singing.", options: ["This", "These", "That", "Those"], correct: "These" },
+      { name: "Trick 10: Interrogative Pronoun", question: "___ is your name?", options: ["What", "Which", "Who", "Whose"], correct: "What" },
+      { name: "Trick 11: Interrogative Pronoun", question: "___ performance should win the first prize?", options: ["Who", "Whom", "What", "Which"], correct: "Which" },
+      { name: "Trick 12: Interrogative Pronoun", question: "___ did you call yesterday?", options: ["Who", "Whom", "Which", "What"], correct: "Whom" },
+      { name: "Trick 13: Personal Pronoun", question: "She is reading a book. ___ is very interesting.", options: ["She", "He", "It", "They"], correct: "She" },
+      { name: "Trick 14: Personal Pronoun", question: "We are ready for class. ___ are early today.", options: ["They", "We", "You", "He"], correct: "We" },
+      { name: "Trick 15: Interrogative Pronoun", question: "___ jewelry was stolen?", options: ["What", "Which", "Who", "Whose"], correct: "Whose" }
     ];
 
     let current = 0;
@@ -383,15 +370,15 @@
         locked = true;
         score += 10;
         magician.textContent = "🧙‍♂️✨";
-        message.textContent = "✨ MAGIC SPARKLES! 🎉 CONFETTI!";
-        explain.textContent = t.explain;
         playSound(correctAudio);
-        setTimeout(() => playSound(clapAudio), 250);
+        setTimeout(() => playSound(clapAudio), 900);
         showConfetti();
         showSparkles();
         disableOptions();
         nextBtn.disabled = false;
         scoreText.textContent = `Score: ${score}`;
+        message.textContent = "";
+        explain.textContent = "";
       } else {
         playSound(wrongAudio);
         attempts += 1;
@@ -399,15 +386,14 @@
         btn.disabled = true;
         btn.style.opacity = "0.4";
         if (attempts < 2) {
-          message.textContent = "❌ Magic failed! Try again.";
           attemptText.textContent = `Attempt ${attempts + 1} / 2`;
         } else {
           locked = true;
-          message.textContent = "❌ Magic failed! Moving to next question.";
-          explain.textContent = t.explain;
           disableOptions();
           nextBtn.disabled = false;
         }
+        message.textContent = "";
+        explain.textContent = "";
       }
     }
 
