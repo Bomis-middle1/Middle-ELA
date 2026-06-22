@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>🏰 Grammar Castle Adventure</title>
 
 <style>
@@ -62,7 +62,7 @@ from{transform:scale(1);}
 to{transform:scale(1.08);}
 }
 
-/* TOP SCREEN */
+/* TOPIC */
 #topic{
 background:linear-gradient(135deg,#6d28d9,#2563eb);
 }
@@ -75,7 +75,7 @@ from{text-shadow:0 0 10px white;}
 to{text-shadow:0 0 25px gold;}
 }
 
-/* CARD */
+/* MISSION */
 .card{
 background:rgba(255,255,255,0.08);
 backdrop-filter:blur(10px);
@@ -85,7 +85,7 @@ width:92%;
 max-width:720px;
 }
 
-/* BUTTONS */
+/* BUTTON */
 button{
 padding:14px 24px;
 border:none;
@@ -96,23 +96,33 @@ transition:0.3s;
 }
 button:hover{transform:scale(1.05);}
 
-/* GAME HUD */
+/* GAME WRAPPER FIX (THIS WAS MISSING) */
+.gameWrapper{
+width:100%;
+display:flex;
+flex-direction:column;
+align-items:center;
+gap:10px;
+}
+
+/* HUD FIX */
 #hud{
 display:flex;
 justify-content:space-between;
 width:100%;
 max-width:900px;
-margin-bottom:10px;
 font-weight:bold;
+padding:0 10px;
 }
 
+/* PROGRESS */
 .barOuter{
 width:100%;
+max-width:900px;
 height:10px;
 background:#334155;
 border-radius:20px;
 overflow:hidden;
-margin-bottom:12px;
 }
 .barInner{
 height:100%;
@@ -121,22 +131,40 @@ background:linear-gradient(90deg,#22c55e,#facc15);
 transition:0.4s;
 }
 
-/* QUESTION */
+/* GAME CARD FIX (IMPORTANT) */
+#roomCard{
+background:rgba(255,255,255,0.08);
+backdrop-filter:blur(10px);
+padding:20px;
+border-radius:18px;
+width:92%;
+max-width:720px;
+
+display:flex;
+flex-direction:column;
+align-items:center;
+}
+
+/* ROOM NAME */
 #roomName{
 font-size:20px;
 color:#facc15;
 margin-bottom:8px;
 }
 
+/* QUESTION FIX */
 #question{
 font-size:22px;
 margin:14px 0;
+line-height:1.4;
 }
 
-.options{
+/* OPTIONS FIX (THIS FIXES YOUR SCREEN ISSUE) */
+#options{
 display:grid;
 grid-template-columns:1fr 1fr;
 gap:10px;
+width:100%;
 }
 
 .option{
@@ -146,7 +174,7 @@ padding:14px;
 border-radius:12px;
 cursor:pointer;
 transition:0.2s;
-user-select:none;
+text-align:center;
 }
 
 .option:hover{transform:scale(1.03);}
@@ -154,10 +182,9 @@ user-select:none;
 .correct{background:#22c55e!important;color:white;}
 .wrong{background:#ef4444!important;color:white;}
 
-/* MOBILE */
+/* MOBILE FIX */
 @media(max-width:768px){
-.options{grid-template-columns:1fr;}
-#topic h1{font-size:32px;}
+#options{grid-template-columns:1fr;}
 }
 
 /* CONFETTI */
@@ -175,7 +202,7 @@ pointer-events:none;
 
 <!-- SPLASH -->
 <div id="splash" class="screen active">
-<img src="assets/innovine-logo.png" />
+<img src="assets/innovine-logo.png">
 </div>
 
 <!-- TOPIC -->
@@ -190,18 +217,17 @@ pointer-events:none;
 <h2>📜 Mission</h2>
 <p>Welcome, Grammar Knight!</p>
 <p>10 enchanted rooms await you.</p>
-<p>Answer carefully to unlock the castle.</p>
-<br/>
+<p>Answer correctly to unlock the castle.</p>
+
+<br>
 <button onclick="startGame()">START ADVENTURE</button>
-<br/><br/>
-Volume
-<br/>
-<input id="vol" type="range" min="0" max="1" step="0.1" value="1"/>
 </div>
 </div>
 
 <!-- GAME -->
 <div id="game" class="screen">
+
+<div class="gameWrapper">
 
 <div id="hud">
 <div id="roomText">🏰 Room 1/10</div>
@@ -212,10 +238,12 @@ Volume
 <div class="barInner" id="bar"></div>
 </div>
 
-<div class="card">
+<div id="roomCard">
 <div id="roomName"></div>
 <div id="question"></div>
 <div id="options"></div>
+</div>
+
 </div>
 
 </div>
@@ -235,53 +263,35 @@ Volume
 
 <script>
 
-/*************************************************
- SAFETY CHECK (NO CRASH IF QUESTIONS NOT LOADED)
-*************************************************/
-if(!window.questions){
-window.questions=[];
-}
-
-/*************************************************
- STATE
-*************************************************/
+/* STATE */
 let index=0;
 let score=0;
 let attempts=0;
 let order=[];
 
-/*************************************************
- SHUFFLE
-*************************************************/
-function shuffle(arr){
-return arr.sort(()=>Math.random()-0.5);
+/* QUESTIONS PLACEHOLDER (YOU KEEP YOUR ORIGINAL) */
+let questions=window.questions||[];
+
+/* SHUFFLE */
+function shuffle(a){
+return a.sort(()=>Math.random()-0.5);
 }
 
-/*************************************************
- SPLASH → TOPIC → MISSION FLOW (FIXED TIMING)
-*************************************************/
+/* FLOW */
 setTimeout(()=>{
-document.getElementById("splash").classList.remove("active");
-document.getElementById("topic").classList.add("active");
+splash.classList.remove("active");
+topic.classList.add("active");
 },5000);
 
 setTimeout(()=>{
-document.getElementById("topic").classList.remove("active");
-document.getElementById("mission").classList.add("active");
+topic.classList.remove("active");
+mission.classList.add("active");
 },8000);
 
-/*************************************************
- START GAME
-*************************************************/
+/* START */
 function startGame(){
-
-if(questions.length===0){
-alert("Questions not loaded!");
-return;
-}
-
-document.getElementById("mission").classList.remove("active");
-document.getElementById("game").classList.add("active");
+mission.classList.remove("active");
+game.classList.add("active");
 
 index=0;
 score=0;
@@ -293,148 +303,100 @@ shuffle(order);
 loadQ();
 }
 
-/*************************************************
- LOAD QUESTION
-*************************************************/
+/* LOAD */
 function loadQ(){
 
 attempts=0;
 
 let q=questions[order[index]];
 
-document.getElementById("roomText").innerText=`🏰 Room ${index+1}/10`;
-document.getElementById("scoreText").innerText=`⭐ ${score}`;
-document.getElementById("roomName").innerText=`🏰 Castle Room`;
-document.getElementById("question").innerHTML=q.question;
+roomText.innerText=`🏰 Room ${index+1}/10`;
+scoreText.innerText=`⭐ ${score}`;
+roomName.innerText="🏰 Castle Challenge";
+question.innerHTML=q.question;
 
-let opt=document.getElementById("options");
-opt.innerHTML="";
+options.innerHTML="";
 
 q.options.forEach((o,i)=>{
 let b=document.createElement("div");
 b.className="option";
 b.innerText=o;
-
 b.onclick=()=>check(i,b,q.answer);
-opt.appendChild(b);
+options.appendChild(b);
 });
 
 updateBar();
 }
 
-/*************************************************
- CHECK ANSWER (2 ATTEMPTS SYSTEM)
-*************************************************/
-function check(i,btn,ans){
+/* CHECK */
+function check(i,b,ans){
 
-let q=questions[order[index]];
-let options=document.querySelectorAll(".option");
+let all=document.querySelectorAll(".option");
+all.forEach(x=>x.style.pointerEvents="none");
 
-options.forEach(x=>x.style.pointerEvents="none");
-
-let vol=document.getElementById("vol").value;
-correctSound.volume=vol;
-wrongSound.volume=vol;
-clapSound.volume=vol;
+correctSound.volume=wrongSound.volume=clapSound.volume=1;
 
 if(i===ans){
-
-btn.classList.add("correct");
+b.classList.add("correct");
 correctSound.play();
 score++;
-launchConfetti();
-
+launch();
 setTimeout(next,1200);
-
 }else{
-
-btn.classList.add("wrong");
+b.classList.add("wrong");
 wrongSound.play();
+all[ans].classList.add("correct");
 
 attempts++;
 
-options[ans].classList.add("correct");
-
-/* AFTER 2 WRONG ATTEMPTS → AUTO NEXT */
 if(attempts>=2){
 setTimeout(next,1200);
 }else{
-setTimeout(()=>{
-options.forEach(x=>x.style.pointerEvents="auto");
-},800);
+setTimeout(()=>all.forEach(x=>x.style.pointerEvents="auto"),600);
 }
 }
-
-document.getElementById("scoreText").innerText=`⭐ ${score}`;
+scoreText.innerText=`⭐ ${score}`;
 }
 
-/*************************************************
- NEXT QUESTION
-*************************************************/
+/* NEXT */
 function next(){
 index++;
-if(index<questions.length){
-loadQ();
-}else{
-endGame();
-}
+if(index<questions.length) loadQ();
+else endGame();
 }
 
-/*************************************************
- PROGRESS BAR
-*************************************************/
+/* BAR */
 function updateBar(){
-let p=(index/questions.length)*100;
-document.getElementById("bar").style.width=p+"%";
+bar.style.width=((index/questions.length)*100)+"%";
 }
 
-/*************************************************
- CONFETTI
-*************************************************/
-function launchConfetti(){
+/* CONFETTI */
+function launch(){
 let c=document.getElementById("confetti");
 let ctx=c.getContext("2d");
 c.width=innerWidth;
 c.height=innerHeight;
 
-for(let i=0;i<140;i++){
+for(let i=0;i<120;i++){
 ctx.fillStyle=`hsl(${Math.random()*360},100%,60%)`;
 ctx.fillRect(Math.random()*c.width,Math.random()*c.height,6,6);
 }
 }
 
-/*************************************************
- END GAME
-*************************************************/
+/* END */
 function endGame(){
-document.getElementById("game").classList.remove("active");
-document.getElementById("result").classList.add("active");
-
-document.getElementById("finalScore").innerText=
-`⭐ ${score}/${questions.length}`;
-
+game.classList.remove("active");
+result.classList.add("active");
+finalScore.innerText=`⭐ ${score}/${questions.length}`;
 clapSound.play();
 }
 
-/*************************************************
- ENTER KEY SUPPORT
-*************************************************/
-document.addEventListener("keydown",(e)=>{
-if(e.key==="Enter"){
-if(document.getElementById("mission").classList.contains("active")){
+/* ENTER KEY */
+document.addEventListener("keydown",e=>{
+if(e.key==="Enter" && mission.classList.contains("active")){
 startGame();
 }
-}
 });
-
-/*************************************************
- AUDIO INIT FIX
-*************************************************/
-window.onload=function(){
-correctSound.volume=1;
-wrongSound.volume=1;
-clapSound.volume=1;
-};
 
 </script>
 
