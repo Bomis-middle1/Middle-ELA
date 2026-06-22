@@ -209,6 +209,10 @@ button:active {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
     transition: all 0.2s ease;
 }
+.option:hover {
+    background: linear-gradient(135deg, #273549, #111a2e);
+    border-color: rgba(56, 189, 248, 0.3);
+}
 .option:active {
     transform: scale(0.98);
 }
@@ -253,6 +257,17 @@ button:active {
 }
 .stats-row:last-child { border: none; }
 
+/* AUDIO FALLBACK STATUS LOGS */
+#audioStatusLog {
+    position: fixed;
+    bottom: 5px;
+    left: 5px;
+    font-size: 10px;
+    color: rgba(255,255,255,0.2);
+    pointer-events: none;
+    z-index: 99999;
+}
+
 /* MEDIA ADAPTATIONS FOR BIGGER CONTROL SCREENS */
 @media (min-width: 601px) {
     #titleBox { font-size: 18px; padding: 14px; }
@@ -266,8 +281,13 @@ button:active {
 
 <body>
 
+<audio id="correctSound" src="assets/correct.mp3" preload="auto"></audio>
+<audio id="wrongSound" src="assets/wrong.mp3" preload="auto"></audio>
+<audio id="clapSound" src="assets/clapping.mp3" preload="auto"></audio>
+
 <div id="logoScreen" class="screen">
-      <img src="assets/innovine-logo.png" alt="Innovine Logo">
+    <img src="assets/innovine-logo.png" alt="Innovine Logo">
+    <div id="logoText">Innovine Learning Adventures</div>
 </div>
 
 <div id="instructionScreen" class="screen">
@@ -293,7 +313,7 @@ button:active {
     <div class="stats-badge">
         <div class="stats-row"><span>Final Status:</span> <span id="final" style="font-weight:bold; color:#ff9800;"></span></div>
     </div>
-    <button onclick="location.reload()">Reinitialize Command</button>
+    <button onclick="restartGame()">Reinitialize Command</button>
 </div>
 
 <div id="gameStage">
@@ -323,23 +343,29 @@ button:active {
 
 <div id="feedbackOverlay">
     <div id="feedbackStatus"></div>
-    <div id="feedbackPrompt" style="font-size:16px; color:#94a3b8; max-width:450px;"></div>
+    <div id="feedbackPrompt" style="font-size:16px; color:#94a3b8; max-width:450px; white-space: pre-line;"></div>
 </div>
 
-<script>
-/* SCENE ROUTERS */
-setTimeout(()=>{
-    document.getElementById("logoScreen").style.display="none";
-    document.getElementById("instructionScreen").style.display="flex";
-},5000);
+<div id="audioStatusLog"></div>
 
-function showStart(){
-    document.getElementById("instructionScreen").style.display="none";
-    document.getElementById("startScreen").style.display="flex";
+<script>
+/* GLOBAL GAMEPLAY ENGINE COUNTERS */
+let i = 0, c = 0, w = 0;
+let isProcessingAnswer = false;
+
+/* FLOW TRANSITION LAYOUT CONTROL */
+setTimeout(() => {
+    document.getElementById("logoScreen").style.display = "none";
+    document.getElementById("instructionScreen").style.display = "flex";
+}, 5000);
+
+function showStart() {
+    document.getElementById("instructionScreen").style.display = "none";
+    document.getElementById("startScreen").style.display = "flex";
 }
 
-/* DATA STORAGE BACKUP ARCHIVE MATRIX (UNTOUCHED CORE TEXT VALUES) */
-const questions=[
+/* DATA STORAGE BACKUP ARCHIVE MATRIX (UNTOUCHED CORE QUESTIONS) */
+const questions = [
 {
 q:`Q1.An ambulance reached a busy traffic signal.Which sequence sounds BEST?<br>
 Options:<br>
@@ -350,104 +376,4 @@ Options:<br>
 a:1
 },
 {
-q:`Q2. Choose the BEST sentence.<br>
-Options:<br>
-• The car carefully turned the corner.  <br>
-• The car turned carefully the corner. <br>
-• Carefully the corner turned the car. <br>
-• The carefully car turned the corner.`,
-a:0
-},
-{
-q:`Q3. The bus reached the stop.Which sentence uses the sequence words correctly?<br>
-Options:<br>
-• First the bus arrived. Next, the doors opened. Finally, the passengers entered.  <br>
-• Finally the bus arrived. Next the passengers entered. First the doors opened. <br>
-• Next the passengers entered. First the bus arrived. Finally the doors opened. <br>
-• The passengers entered first because finally the bus arrived.`,
-a:0
-},
-{
-q:`Q4. Which sentence has the WORST adverb placement?<br>
-Options:<br>
-• The traffic lights suddenly turned red. <br>
-• Suddenly, the traffic lights turned red. <br>
-• The traffic suddenly lights turned red.  <br>
-• The traffic lights turned red suddenly.`,
-a:2
-},
-{
-q:`Q5. Fill in the blank: "First the driver picked up the tourists. ______, he loaded their bags."<br>
-Options:<br>
-• Loudly <br>
-• Next  <br>
-• Yesterday <br>
-• Carefully`,
-a:1
-},
-{
-q:`Q6. Which sentence sounds MOST natural?<br>
-Options:<br>
-• The biker quickly avoided the pothole.  <br>
-• The biker avoided quickly the pothole. <br>
-• Quickly the pothole avoided the biker. <br>
-• The quickly biker avoided the pothole.`,
-a:0
-},
-{
-q:`Q7.  Which sentence shows the events in the correct order?<br>
-Options:<br>
-• First workers placed warning signs. Next, they repaired the road. Finally, traffic started moving again.  <br>
-• Finally workers placed warning signs. Next they repaired the road. First traffic started moving again. <br>
-• Next traffic started moving again. First workers repaired the road. Finally they placed warning signs. <br>
-• First traffic started moving again. Finally workers repaired the road.`,
-a:0
-},
-{
-q:`Q8. Which sentence uses the adverb BEST?<br>
-Options:<br>
-• The police officer calmly guided traffic.  <br>
-• The police officer guided calmly traffic. <br>
-• Calmly traffic guided the officer. <br>
-• The calmly officer guided traffic.`,
-a:0
-},
-{
-q:`Q9. Which sentence uses the sequence words correctly?<br>
-Options:<br>
-• First the traffic stopped. Next, the bridge opened. Finally, the vehicles crossed.  <br>
-• Finally the traffic stopped. First the bridge opened. Next the vehicles crossed. <br>
-• Next the vehicles crossed. Finally the traffic stopped. First the bridge opened. <br>
-• First the bridge crossed the vehicles. Finally the traffic stopped.`,
-a:0
-},
-{
-q:`Q10. Choose the sentence with the correct sequence word and adverb placement.<br>
-Options:<br>
-• First the ambulance carefully crossed the busy road.  <br>
-• Carefully first crossed the ambulance the road. <br>
-• The ambulance crossed carefully first the road. <br>
-• First carefully the busy road crossed the ambulance.`,
-a:0
-},
-{
-q:`Q11. Choose the BEST sentence.<br>
-Options:<br>
-• The driver always checks the mirrors before driving.  <br>
-• The driver checks always the mirrors before driving. <br>
-• Always the mirrors checks the driver. <br>
-• The always driver checks the mirrors.`,
-a:0
-},
-{
-q:`Q12. Which sentence is correctly written?<br>
-Options:<br>
-• The traffic lights blinked suddenly. <br>
-• Suddenly, the traffic lights blinked. <br>
-• Both A and B are correct.  <br>
-• Suddenly the traffic lights blinked redly.`,
-a:2
-},
-{
-q:`Q13.Fill in the blank:<br>
-"The school bus arrived. ______, the
+q:
