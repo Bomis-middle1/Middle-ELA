@@ -2,307 +2,645 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-select=none">
 <title>Modals Card Flip Game</title>
 
 <style>
-body{
-margin:0;
-font-family:Arial,sans-serif;
-background:#140f3d;
-color:#fff;
-display:flex;
-align-items:center;
-justify-content:center;
-flex-direction:column;
-height:100vh;
+/* ==========================================================================
+   GLOBAL STYLES & CORE LAYOUT
+   ========================================================================== */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
 }
 
-/* SCREEN CONTROL */
-.screen{
-display:none;
-width:100%;
-height:100%;
-align-items:center;
-justify-content:center;
-flex-direction:column;
-text-align:center;
+body {
+    margin: 0;
+    background: #140f3d;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    height: -webkit-fill-available;
+    width: 100vw;
+    overflow: hidden;
 }
 
-.active{display:flex;}
-
-.logo{
-width:260px;
+html {
+    height: -webkit-fill-available;
 }
 
-.topic{
-font-size:38px;
-color:#ffd60a;
-text-shadow:2px 2px 4px #000;
+/* SCREEN TOGGLE ENGINE */
+.screen {
+    display: none;
+    width: 100vw;
+    height: 100vh;
+    height: -webkit-fill-available;
+    position: fixed;
+    inset: 0;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+    padding: 20px;
+    box-sizing: border-box;
+}
+.screen.active {
+    display: flex;
 }
 
-/* GAME */
-.card-container{
-display:grid;
-grid-template-columns:repeat(4,100px);
-gap:15px;
-margin:20px;
+/* STAGE 1: LOGO SCREEN (STRICTLY LOGO ONLY) */
+#logoScreen {
+    background: #ffffff;
+    z-index: 9999;
+}
+.logo-container {
+    width: 280px;
+    max-width: 80%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+.logo-container img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+.fallback-logo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-weight: 900;
+    font-size: 32px;
+    color: #4a148c;
+    letter-spacing: 2px;
 }
 
-.card{
-width:100px;
-height:140px;
-background:#fff4d6;
-color:#2d2340;
-border-radius:12px;
-display:flex;
-align-items:center;
-justify-content:center;
-cursor:pointer;
-font-weight:bold;
-transition:0.4s;
+/* STAGE 2: TITLE SCREEN */
+#titleScreen {
+    background: radial-gradient(circle at center, #2e1065 0%, #0f052d 100%);
+    z-index: 9000;
+}
+.topic {
+    font-size: 38px;
+    font-weight: 900;
+    color: #ffd60a;
+    text-shadow: 0 4px 15px rgba(255, 214, 10, 0.4);
+    line-height: 1.3;
 }
 
-.card.flipped{transform:rotateY(180deg);}
-.card.matched{visibility:hidden;}
-
-#mcqBox{
-background:#fff4d6;
-color:#2d2340;
-padding:15px;
-border-radius:15px;
-max-width:400px;
-display:none;
-margin-top:15px;
+/* STAGE 3: INSTRUCTIONS SCREEN */
+#startScreen {
+    background: #140f3d;
+}
+.card-panel {
+    background: rgba(255, 255, 255, 0.96);
+    color: #2d2340;
+    border-radius: 24px;
+    padding: 30px 24px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    max-width: 480px;
+    width: 100%;
+    text-align: center;
+    box-sizing: border-box;
+}
+.card-panel h1 {
+    font-size: 28px;
+    color: #140f3d;
+    margin-bottom: 12px;
 }
 
-button{
-padding:8px 12px;
-margin:5px;
-border:none;
-border-radius:12px;
-background:#ffb703;
-font-weight:bold;
-cursor:pointer;
+/* STAGE 4: MAIN GAME RUNTIME */
+.game-layout {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 600px;
+    height: 92%;
+    box-sizing: border-box;
 }
 
-.correct{background:#b7efc5;}
-.wrong{background:#ffccd5;}
-
-/* CONFETTI */
-.confetti{
-position:fixed;
-width:8px;
-height:8px;
-top:-10px;
-animation:fall 2s linear forwards;
+.hud-panel {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 20px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 12px;
+    font-weight: bold;
+    font-size: 16px;
+    letter-spacing: 0.5px;
+    box-sizing: border-box;
+    margin-bottom: 10px;
 }
 
-@keyframes fall{
-to{
-transform:translateY(100vh) rotate(360deg);
-opacity:0;
-}
+.card-container {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+    width: 100%;
+    margin: auto 0;
 }
 
+.game-card {
+    aspect-ratio: 2/3;
+    background: #fff4d6;
+    color: #2d2340;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-weight: 800;
+    font-size: 16px;
+    border: none;
+    border-bottom: 4px solid #e0a912;
+    transition: transform 0.2s, background 0.2s;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    box-sizing: border-box;
+}
+.game-card.active-target {
+    background: #ffb703;
+    color: #fff;
+    border-bottom-color: #ba8400;
+}
+.game-card.matched {
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* MCQ MODAL BOX OVERLAY */
+#mcqBox {
+    background: #ffffff;
+    color: #2d2340;
+    padding: 24px;
+    border-radius: 20px;
+    width: 100%;
+    box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+    margin-top: 15px;
+    display: none;
+    box-sizing: border-box;
+}
+
+#questionText {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 15px;
+    line-height: 1.45;
+}
+
+.options-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+button {
+    padding: 14px 20px;
+    border: none;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #ffb703, #fb8500);
+    color: #fff;
+    font-weight: bold;
+    font-size: 16px;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(251, 133, 0, 0.3);
+    transition: transform 0.1s, filter 0.1s;
+}
+button:hover { filter: brightness(1.1); }
+button:active { transform: scale(0.98); }
+button:disabled { opacity: 0.5; pointer-events: none; }
+
+.option-btn {
+    background: #f0ecfa;
+    color: #2d2340;
+    border-bottom: 3px solid #cfc7e8;
+    box-shadow: none;
+}
+.option-btn.correct { background: #b7efc5 !important; border-bottom-color: #74c69d !important; color: #1b4332; }
+.option-btn.wrong { background: #ffccd5 !important; border-bottom-color: #ff85a1 !important; color: #5c0d12; }
+
+.hint-banner {
+    font-size: 14px;
+    font-weight: bold;
+    color: #d90429;
+    min-height: 20px;
+    margin-bottom: 10px;
+}
+
+/* CONFETTI CANVAS */
+canvas {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 99999;
+    width: 100vw;
+    height: 100vh;
+}
+
+/* RESPONSIVE SCALE ADAPTERS */
+@media (max-width: 480px) {
+    .card-container { grid-template-columns: repeat(4, 1fr); gap: 8px; }
+    #questionText { font-size: 15px; }
+    .game-card { font-size: 13px; }
+    .hud-panel { font-size: 14px; padding: 10px 15px; }
+}
+
+@media (max-height: 600px) and (orientation: landscape) {
+    .game-layout { height: 95%; max-width: 100%; flex-direction: row; gap: 20px; justify-content: center; }
+    .hud-panel { width: auto; flex-direction: column; gap: 10px; height: fit-content; justify-content: center; }
+    .card-container { grid-template-columns: repeat(5, 70px); gap: 8px; width: auto; }
+    #mcqBox { max-width: 320px; margin-top: 0; padding: 15px; overflow-y: auto; max-height: 90vh; }
+    .option-btn { padding: 10px; font-size: 14px; }
+}
 </style>
 </head>
 
 <body>
 
-<!-- 🔵 LOGO SCREEN -->
+<canvas id="confettiCanvas"></canvas>
+
+<!-- WEB AUDIO ASSET TRACE NODES -->
+<audio id="correctSound" src="Middle-ELA/G7/chp7/modals/assets/correct.mp3" preload="auto"></audio>
+<audio id="wrongSound" src="Middle-ELA/G7/chp7/modals/assets/wrong.mp3" preload="auto"></audio>
+<audio id="clapSound" src="Middle-ELA/G7/chp7/modals/assets/clapping.mp3" preload="auto"></audio>
+
+<!-- STAGE 1: LOGO SCREEN (STRICTLY 5 SECONDS) -->
 <div id="logoScreen" class="screen active">
-  <img class="logo" src="Middle-ELA/G7/chp7/modals/assets/innovine-logo.png">
+    <div class="logo-container">
+        <img id="brandLogo" src="Middle-ELA/G7/chp7/modals/assets/innovine-logo.png" onerror="handleLogoFallback()" alt="Innovine Logo">
+        <div id="fallbackLogoUI" class="fallback-logo" style="display: none;">
+            <svg width="120" height="120" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <polygon points="50,15 15,80 85,80" fill="#ffd60a" stroke="#4a148c" stroke-width="8" stroke-linejoin="miter"/>
+            </svg>
+            <span style="margin-top: 15px; font-family: 'Arial Black', sans-serif;">INNOVINE</span>
+        </div>
+    </div>
 </div>
 
-<!-- 🟡 TITLE SCREEN -->
+<!-- STAGE 2: TITLE SCREEN (STRICTLY 3 SECONDS) -->
 <div id="titleScreen" class="screen">
-  <div class="topic">✨ Modals Master Challenge ✨</div>
+    <div class="topic">✨ Modals Master Challenge ✨</div>
 </div>
 
-<!-- 🟢 GAME SCREEN -->
+<!-- STAGE 3: INSTRUCTIONS SCREEN -->
+<div id="startScreen" class="screen">
+    <div class="card-panel">
+        <h1>Welcome Competitor!</h1>
+        <p style="color: #5c5470; line-height: 1.5; margin-bottom: 20px; font-size: 15px; margin-top: 10px;">
+            Flip the modal trace cards sequentially to unlock active grammar challenges. Choose the correct option to clear each card from the matrix!
+        </p>
+        <button onclick="transitionToGameRuntime()">Launch Challenge</button>
+    </div>
+</div>
+
+<!-- STAGE 4: MAIN RUNTIME CHALLENGE -->
 <div id="gameScreen" class="screen">
+    <div class="game-layout">
+        
+        <div class="hud-panel">
+            <div>PROGRESS: <span id="progressHUD">1 / 10</span></div>
+            <div>SCORE: <span id="scoreHUD">0</span></div>
+        </div>
 
-<h1>Modals Card Flip Game</h1>
+        <div class="card-container" id="cardContainer"></div>
 
-<div class="card-container" id="cardContainer"></div>
+        <div id="mcqBox">
+            <div id="questionText">Probing system...</div>
+            <div class="options-grid" id="optionsBox"></div>
+            <div class="hint-banner" id="hintBanner"></div>
+            <button id="continueBtn" style="width:100%; display:none;" onclick="closeMCQEngine()">Continue</button>
+        </div>
 
-<div id="mcqBox">
-  <div id="questionText"></div>
-  <div id="optionsBox"></div>
-  <div id="feedback"></div>
-  <button onclick="closeMCQ()">Continue</button>
+    </div>
 </div>
 
-<div id="endScreen"></div>
-
+<!-- STAGE 5: GAME OVER WRAPPER -->
+<div id="endScreen" class="screen">
+    <div class="card-panel">
+        <div style="font-size: 72px; margin-bottom: 10px;">🏆</div>
+        <h1 style="color: #2a9d8f;">Challenge Resolved!</h1>
+        <p id="finalScore" style="font-size: 20px; font-weight: 700; margin: 15px 0; color: #2d2340;"></p>
+        <button onclick="restartFullGamePipeline()">Play Again</button>
+    </div>
 </div>
-
-<!-- AUDIO -->
-<audio id="correctSound" src="Middle-ELA/G7/ch7/modals/assets/correct.mp3"></audio>
-<audio id="wrongSound" src="Middle-ELA/G7/ch7/modals/assets/wrong.mp3"></audio>
-<audio id="clapSound" src="Middle-ELA/G7/ch7/modals/assets/clapping.mp3"></audio>
 
 <script>
-
-/* =========================
-   SPLASH FLOW (FIXED)
-========================= */
-window.onload = () => {
-
-  setTimeout(() => {
-    document.getElementById("logoScreen").classList.remove("active");
-    document.getElementById("titleScreen").classList.add("active");
-  }, 5000);
-
-  setTimeout(() => {
-    document.getElementById("titleScreen").classList.remove("active");
-    document.getElementById("gameScreen").classList.add("active");
-    initGame();
-  }, 8000);
+/* ==========================================================================
+   AUDIO SYNTHETIC BACKUPS & ASSET FALLBACK TRACKING
+   ========================================================================== */
+const audioSyntheticFailsafes = {
+    correct: "data:audio/wav;base64,UklGRjIAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQYAAAAAe3vLew==",
+    wrong: "data:audio/wav;base64,UklGRjIAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQYAAAAAhH94fA==",
+    clap: "data:audio/wav;base64,UklGRjIAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQYAAAAAnp6Xng=="
 };
 
-/* =========================
-   QUESTIONS (MODALS)
-========================= */
+let logoAttempts = 0;
+function handleLogoFallback() {
+    logoAttempts++;
+    const imgEl = document.getElementById("brandLogo");
+    if (logoAttempts === 1) {
+        imgEl.src = "Middle-ELA/G7/ch7/modals/assets/innovine-logo.png";
+    } else {
+        imgEl.style.display = "none";
+        document.getElementById("fallbackLogoUI").style.display = "flex";
+    }
+}
+
+/* ==========================================================================
+   GRADE 7 COMPLEX QUESTION MATRIX DATA
+   ========================================================================== */
 const mcqs = [
-  {q:"You ___ complete homework.",opts:["must","might","may"],ans:"must"},
-  {q:"She ___ help us.",opts:["can","could","shall"],ans:"could"},
-  {q:"It ___ rain.",opts:["may","would","must"],ans:"may"},
-  {q:"We ___ finish on time.",opts:["shall","will","might"],ans:"will"},
-  {q:"He ___ be late.",opts:["might","should","must"],ans:"might"},
-  {q:"You ___ practice more.",opts:["should","can","would"],ans:"should"},
-  {q:"She said I ___ go.",opts:["might","needn’t","ought to"],ans:"might"},
-  {q:"We ___ leave now.",opts:["must","can","may"],ans:"must"},
-  {q:"They ___ come.",opts:["might","will","must"],ans:"might"},
-  {q:"You ___ be careful.",opts:["must","can","may"],ans:"must"}
+    {q:"Despite the heavy downpour, the rescue team ___ reach the stranded hikers before nightfall.", opts:["could","was able to","should"], ans:"was able to"},
+    {q:"To maintain your academic standing, you ___ submit the final research portfolio by Friday noon.", opts:["must","might","could"], ans:"must"},
+    {q:"If the laboratory results are inconclusive, the scientists ___ have to run the molecular sequence again.", opts:["might","ought to","shall"], ans:"might"},
+    {q:"According to the school charter, students ___ not access the main server room without explicit faculty supervision.", opts:["shall","would","could"], ans:"shall"},
+    {q:"You ___ review the grading rubric thoroughly before finalizing your argumentative essay.", opts:["should","must","may"], ans:"should"},
+    {q:"Human resource parameters dictate that employees ___ report any hardware anomalies immediately.", opts:["ought to","can","might"], ans:"ought to"},
+    {q:"Given his extensive training in cryptography, he ___ decode this encrypted message with ease.", opts:["should","may","must"], ans:"should"},
+    {q:"In retrospect, we ___ have chosen a more sustainable material for our engineering prototype.", opts:["should","might","will"], ans:"should"},
+    {q:"___ we proceed with the scheduled presentation, or should we wait for the principal's arrival?", opts:["Shall","Would","Must"], ans:"Shall"},
+    {q:"Without the necessary permits, the construction crew ___ proceed with the excavation phase.", opts:["cannot","might not","shouldn't"], ans:"cannot"}
 ];
 
-/* RANDOMISE */
-function shuffle(arr){
-  return arr.sort(()=>Math.random()-0.5);
+let gameData = [];
+let currentIndex = 0;
+let score = 0;
+let userAttemptsThisQuestion = 0;
+let selectedCardElement = null;
+let isCardSelectionLocked = false;
+
+const audioChannels = {
+    correct: document.getElementById("correctSound"),
+    wrong: document.getElementById("wrongSound"),
+    clap: document.getElementById("clapSound")
+};
+
+// Error routing recovery engine for secondary asset structures
+Object.keys(audioChannels).forEach(key => {
+    let fallbackCount = 0;
+    audioChannels[key].addEventListener('error', function() {
+        fallbackCount++;
+        if (fallbackCount === 1) {
+            audioChannels[key].src = "Middle-ELA/G7/ch7/modals/assets/" + (key === "clap" ? "clapping" : key) + ".mp3";
+            audioChannels[key].load();
+        } else {
+            audioChannels[key].src = audioSyntheticFailsafes[key];
+            audioChannels[key].load();
+        }
+    });
+});
+
+/* ==========================================================================
+   FLOW CONTROLLER TIMINGS
+   ========================================================================== */
+window.onload = () => {
+    const imgEl = document.getElementById("brandLogo");
+    if (!imgEl.complete || imgEl.naturalWidth === 0) {
+        handleLogoFallback();
+    }
+
+    // Logo screen strict visibility context - 5 Seconds
+    setTimeout(() => {
+        document.getElementById("logoScreen").classList.remove("active");
+        document.getElementById("titleScreen").classList.add("active");
+    }, 5000);
+
+    // Title screen splash context - 3 Seconds
+    setTimeout(() => {
+        document.getElementById("titleScreen").classList.remove("active");
+        document.getElementById("startScreen").classList.add("active");
+    }, 8000);
+};
+
+function dispatchAudio(key) {
+    const track = audioChannels[key];
+    if (!track) return;
+    try {
+        track.currentTime = 0;
+        track.play().catch(() => {
+            let backupTrack = new Audio(audioSyntheticFailsafes[key]);
+            backupTrack.play().catch(() => {});
+        });
+    } catch(e) {}
 }
 
-let gameData = shuffle([...mcqs]);
-let current=0;
-let score=0;
-let flipped=[];
+function transitionToGameRuntime() {
+    document.getElementById("startScreen").classList.remove("active");
+    document.getElementById("gameScreen").classList.add("active");
+    
+    // Warm up standard context audio structures for broad mobile browser compatibility
+    Object.values(audioChannels).forEach(t => { if(t){ t.play().then(()=>t.pause()).catch(()=>{}); } });
 
-/* =========================
-   INIT GAME
-========================= */
-function initGame(){
-  const container=document.getElementById("cardContainer");
-  container.innerHTML="";
-
-  let order=[...Array(gameData.length).keys()].sort(()=>Math.random()-0.5);
-
-  order.forEach(i=>{
-    let card=document.createElement("div");
-    card.className="card";
-    card.innerText="Tap";
-    card.onclick=()=>flip(card,i);
-    container.appendChild(card);
-  });
+    setupFreshGameSession();
 }
 
-/* =========================
-   FLIP CARD
-========================= */
-function flip(card){
-  if(card.classList.contains("flipped")) return;
-  card.classList.add("flipped");
-  flipped.push(card);
-  showMCQ();
+function setupFreshGameSession() {
+    gameData = [...mcqs].sort(() => Math.random() - 0.5);
+    currentIndex = 0;
+    score = 0;
+    isCardSelectionLocked = false;
+    selectedCardElement = null;
+    
+    document.getElementById("mcqBox").style.display = "none";
+    
+    buildGraphicalCardGrid();
+    updateHUDDisplays();
 }
 
-/* =========================
-   SHOW MCQ
-========================= */
-function showMCQ(){
-  let q=gameData[current];
-
-  document.getElementById("mcqBox").style.display="block";
-  document.getElementById("questionText").innerText=q.q;
-
-  let box=document.getElementById("optionsBox");
-  box.innerHTML="";
-
-  q.opts.forEach(o=>{
-    let btn=document.createElement("button");
-    btn.innerText=o;
-    btn.onclick=()=>check(o,btn);
-    box.appendChild(btn);
-  });
+function buildGraphicalCardGrid() {
+    const container = document.getElementById("cardContainer");
+    container.innerHTML = "";
+    
+    for (let i = 0; i < gameData.length; i++) {
+        let card = document.createElement("button");
+        card.className = "game-card";
+        card.innerText = `Card ${i + 1}`;
+        card.setAttribute("data-index", i);
+        card.onclick = () => handleCardActivation(card, i);
+        container.appendChild(card);
+    }
 }
 
-/* =========================
-   CHECK ANSWER
-========================= */
-function check(ans,btn){
-
-  let q=gameData[current];
-  let buttons=document.querySelectorAll("#optionsBox button");
-
-  buttons.forEach(b=>b.disabled=true);
-
-  if(ans===q.ans){
-    btn.classList.add("correct");
-    document.getElementById("correctSound").play().catch(()=>{});
-    score++;
-    confetti();
-    flipped.forEach(c=>c.classList.add("matched"));
-  } else {
-    btn.classList.add("wrong");
-    document.getElementById("wrongSound").play().catch(()=>{});
-  }
+function updateHUDDisplays() {
+    document.getElementById("progressHUD").innerText = `${currentIndex + 1} / ${gameData.length}`;
+    document.getElementById("scoreHUD").innerText = score;
 }
 
-/* =========================
-   CONFETTI
-========================= */
-function confetti(){
-  for(let i=0;i<40;i++){
-    let d=document.createElement("div");
-    d.className="confetti";
-    d.style.left=Math.random()*100+"vw";
-    d.style.background=["#ff0","#0ff","#f0f","#0f0","#f60"][Math.floor(Math.random()*5)];
-    document.body.appendChild(d);
-    setTimeout(()=>d.remove(),2000);
-  }
+/* ==========================================================================
+   GAMEPLAY & INTERACTION ENGINE
+   ========================================================================== */
+function handleCardActivation(cardElement, index) {
+    if (isCardSelectionLocked || cardElement.classList.contains("matched") || index !== currentIndex) {
+        return; 
+    }
+    
+    isCardSelectionLocked = true;
+    selectedCardElement = cardElement;
+    
+    cardElement.classList.add("active-target");
+    cardElement.innerText = "🔍";
+    
+    userAttemptsThisQuestion = 0;
+    document.getElementById("hintBanner").innerText = "";
+    document.getElementById("continueBtn").style.display = "none";
+    
+    loadQuestionToOverlay();
 }
 
-/* =========================
-   CLOSE MCQ
-========================= */
-function closeMCQ(){
-  document.getElementById("mcqBox").style.display="none";
-  flipped=[];
-  current++;
-
-  if(current>=gameData.length){
-    endGame();
-  }
+function loadQuestionToOverlay() {
+    let currentProbe = gameData[currentIndex];
+    document.getElementById("questionText").innerText = currentProbe.q;
+    
+    const optionsBox = document.getElementById("optionsBox");
+    optionsBox.innerHTML = "";
+    
+    currentProbe.opts.forEach(optionText => {
+        let btn = document.createElement("button");
+        btn.className = "option-btn";
+        btn.innerText = optionText;
+        btn.onclick = () => evaluateUserChoice(optionText, btn);
+        optionsBox.appendChild(btn);
+    });
+    
+    document.getElementById("mcqBox").style.display = "block";
+    document.getElementById("mcqBox").scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
-/* =========================
-   END SCREEN
-========================= */
-function endGame(){
-  document.getElementById("gameScreen").innerHTML=`
-    <div>
-      <h1>🏆 Game Complete</h1>
-      <h2>Score: ${score} / ${mcqs.length}</h2>
-      <button onclick="location.reload()">Play Again</button>
-    </div>
-  `;
-
-  document.getElementById("clapSound").play().catch(()=>{});
+function evaluateUserChoice(chosenOption, clickedButton) {
+    let currentProbe = gameData[currentIndex];
+    const optionButtons = document.querySelectorAll("#optionsBox .option-btn");
+    
+    if (chosenOption === currentProbe.ans) {
+        clickedButton.classList.add("correct");
+        optionButtons.forEach(b => b.disabled = true);
+        
+        score++;
+        updateHUDDisplays();
+        dispatchAudio("correct");
+        dispatchAudio("clap");
+        triggerConfettiBurst();
+        
+        document.getElementById("continueBtn").style.display = "block";
+    } else {
+        userAttemptsThisQuestion++;
+        clickedButton.classList.add("wrong");
+        clickedButton.disabled = true;
+        dispatchAudio("wrong");
+        
+        if (userAttemptsThisQuestion >= 2) {
+            optionButtons.forEach(b => {
+                b.disabled = true;
+                if (b.innerText === currentProbe.ans) {
+                    b.classList.add("correct");
+                }
+            });
+            document.getElementById("hintBanner").innerText = `Moving forward. Correct answer: ${currentProbe.ans}`;
+            document.getElementById("continueBtn").style.display = "block";
+        } else {
+            document.getElementById("hintBanner").innerText = "❌ Incorrect option. Try your final attempt!";
+        }
+    }
 }
 
-/* INIT */
-initGame();
+function closeMCQEngine() {
+    document.getElementById("mcqBox").style.display = "none";
+    
+    if (selectedCardElement) {
+        selectedCardElement.classList.remove("active-target");
+        selectedCardElement.classList.add("matched");
+    }
+    
+    currentIndex++;
+    isCardSelectionLocked = false;
+    selectedCardElement = null;
+    
+    if (currentIndex >= gameData.length) {
+        terminateGameSession();
+    } else {
+        updateHUDDisplays();
+    }
+}
 
+function terminateGameSession() {
+    document.getElementById("gameScreen").classList.remove("active");
+    document.getElementById("endScreen").classList.add("active");
+    document.getElementById("finalScore").innerText = `Final Computed Score: ${score} / ${gameData.length}`;
+}
+
+function restartFullGamePipeline() {
+    document.getElementById("endScreen").classList.remove("active");
+    document.getElementById("startScreen").classList.add("active");
+}
+
+/* ==========================================================================
+   CONFETTI PERFORMANCE VECTOR REPRODUCTION ENGINE
+   ========================================================================== */
+const canvas = document.getElementById("confettiCanvas");
+const ctx = canvas.getContext("2d");
+let confettiPieces = [], animationFrameRef = null;
+
+function scaleCanvasToWindow() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+}
+window.addEventListener("resize", scaleCanvasToWindow);
+scaleCanvasToWindow();
+
+function triggerConfettiBurst() {
+    confettiPieces = [];
+    cancelAnimationFrame(animationFrameRef);
+    const colorSwatches = ["#ffb703", "#fb8500", "#ffd60a", "#2196f3", "#e91e63"];
+    
+    for (let i = 0; i < 60; i++) {
+        confettiPieces.push({
+            x: Math.random() * canvas.width,
+            y: -20,
+            w: Math.random() * 5 + 5,
+            h: Math.random() * 5 + 5,
+            ySpeed: Math.random() * 4 + 3,
+            xSpeed: Math.random() * 4 - 2,
+            rotation: Math.random() * 360,
+            rotationSpeed: Math.random() * 6 - 3,
+            color: colorSwatches[Math.floor(Math.random() * colorSwatches.length)]
+        });
+    }
+    
+    let frameTicks = 0;
+    function renderLoop() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        confettiPieces.forEach(p => {
+            ctx.save();
+            ctx.translate(p.x, p.y);
+            ctx.rotate(p.rotation * Math.PI / 180);
+            ctx.fillStyle = p.color;
+            ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+            ctx.restore();
+            
+            p.y += p.ySpeed;
+            p.x += p.xSpeed;
+            p.rotation += p.rotationSpeed;
+        });
+        
+        frameTicks++;
+        if (frameTicks < 90) {
+            animationFrameRef = requestAnimationFrame(renderLoop);
+        } else {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+    }
+    renderLoop();
+}
 </script>
 
 </body>
