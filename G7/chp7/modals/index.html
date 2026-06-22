@@ -72,20 +72,6 @@ html {
     height: auto;
     display: block;
 }
-.fallback-logo {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-}
-.fallback-logo span {
-    margin-top: 8px;
-    font-size: 34px;
-    font-weight: 800;
-    color: #121033;
-    letter-spacing: 3px;
-    font-family: 'Montserrat', 'Arial Black', sans-serif;
-}
 
 /* STAGE 2: TITLE SCREEN */
 #titleScreen {
@@ -275,37 +261,24 @@ canvas {
 
 <canvas id="confettiCanvas"></canvas>
 
+<!-- WEB AUDIO ASSET TRACE NODES VERIFIED FROM image_7f2b0b.png -->
 <audio id="correctSound" src="Middle-ELA/G7/chp7/modals/assets/correct.mp3" preload="auto"></audio>
 <audio id="wrongSound" src="Middle-ELA/G7/chp7/modals/assets/wrong.mp3" preload="auto"></audio>
 <audio id="clapSound" src="Middle-ELA/G7/chp7/modals/assets/clapping.mp3" preload="auto"></audio>
 
+<!-- STAGE 1: LOGO SCREEN (STRICTLY 5 SECONDS USING VERIFIED PATH FROM image_7f2b0b.png) -->
 <div id="logoScreen" class="screen active">
     <div class="logo-container">
-        <img id="brandLogo" src="Middle-ELA/G7/chp7/modals/assets/innovine-logo.png" onerror="handleLogoFallback()" alt="Innovine Logo">
-        <div id="fallbackLogoUI" class="fallback-logo" style="display: none;">
-            <svg width="100" height="110" viewBox="0 0 100 110" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M50 15C32 35 15 50 15 72C15 90 28 102 46 104C40 94 38 82 44 70C49 58 60 48 68 35C62 27 56 20 50 15Z" fill="url(#innovine_green)"/>
-                <path d="M52 15C58 24 65 32 72 42C81 54 86 68 83 82C80 94 71 103 54 105C64 96 68 83 64 70C60 56 49 42 45 25C47 21 50 18 52 15Z" fill="url(#innovine_blue)"/>
-                <defs>
-                    <linearGradient id="innovine_green" x1="15" y1="60" x2="68" y2="60" gradientUnits="userSpaceOnUse">
-                        <stop offset="0%" stop-color="#4ade80"/>
-                        <stop offset="100%" stop-color="#22c55e"/>
-                    </linearGradient>
-                    <linearGradient id="innovine_blue" x1="45" y1="60" x2="85" y2="60" gradientUnits="userSpaceOnUse">
-                        <stop offset="0%" stop-color="#06b6d4"/>
-                        <stop offset="100%" stop-color="#3b82f6"/>
-                    </linearGradient>
-                </defs>
-            </svg>
-            <span>INNOVINE</span>
-        </div>
+        <img id="brandLogo" src="Middle-ELA/G7/chp7/modals/assets/innovine-logo.png" alt="Innovine Logo">
     </div>
 </div>
 
+<!-- STAGE 2: TITLE SCREEN (STRICTLY 3 SECONDS) -->
 <div id="titleScreen" class="screen">
     <div class="topic">✨ Modals Master Challenge ✨</div>
 </div>
 
+<!-- STAGE 3: INSTRUCTIONS SCREEN -->
 <div id="startScreen" class="screen">
     <div class="card-panel">
         <h1>Welcome Competitor!</h1>
@@ -316,6 +289,7 @@ canvas {
     </div>
 </div>
 
+<!-- STAGE 4: MAIN PLAYGROUND SCREEN -->
 <div id="gameScreen" class="screen">
     <div class="game-layout">
         
@@ -336,6 +310,7 @@ canvas {
     </div>
 </div>
 
+<!-- STAGE 5: SUMMARY REPORT OVERLAY -->
 <div id="endScreen" class="screen">
     <div class="card-panel">
         <div style="font-size: 72px; margin-bottom: 10px;">🏆</div>
@@ -347,25 +322,13 @@ canvas {
 
 <script>
 /* ==========================================================================
-   AUDIO SYNTHETIC BACKUPS & ASSET FALLBACK TRACKING
+   AUDIO SYNTHETIC BACKUPS
    ========================================================================== */
 const audioSyntheticFailsafes = {
     correct: "data:audio/wav;base64,UklGRjIAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQYAAAAAe3vLew==",
     wrong: "data:audio/wav;base64,UklGRjIAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQYAAAAAhH94fA==",
     clap: "data:audio/wav;base64,UklGRjIAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQYAAAAAnp6Xng=="
 };
-
-let logoAttempts = 0;
-function handleLogoFallback() {
-    logoAttempts++;
-    const imgEl = document.getElementById("brandLogo");
-    if (logoAttempts === 1) {
-        imgEl.src = "Middle-ELA/G7/ch7/modals/assets/innovine-logo.png";
-    } else {
-        imgEl.style.display = "none";
-        document.getElementById("fallbackLogoUI").style.display = "flex";
-    }
-}
 
 /* ==========================================================================
    GRADE 7 MODALS TASK MATRICES
@@ -397,16 +360,9 @@ const audioChannels = {
 };
 
 Object.keys(audioChannels).forEach(key => {
-    let fallbackCount = 0;
     audioChannels[key].addEventListener('error', function() {
-        fallbackCount++;
-        if (fallbackCount === 1) {
-            audioChannels[key].src = "Middle-ELA/G7/ch7/modals/assets/" + (key === "clap" ? "clapping" : key) + ".mp3";
-            audioChannels[key].load();
-        } else {
-            audioChannels[key].src = audioSyntheticFailsafes[key];
-            audioChannels[key].load();
-        }
+        audioChannels[key].src = audioSyntheticFailsafes[key];
+        audioChannels[key].load();
     });
 });
 
@@ -414,11 +370,6 @@ Object.keys(audioChannels).forEach(key => {
    TIMING CORRECTIONS PIPELINE
    ========================================================================== */
 window.onload = () => {
-    const imgEl = document.getElementById("brandLogo");
-    if (!imgEl.complete || imgEl.naturalWidth === 0) {
-        handleLogoFallback();
-    }
-
     setTimeout(() => {
         document.getElementById("logoScreen").classList.remove("active");
         document.getElementById("titleScreen").classList.add("active");
