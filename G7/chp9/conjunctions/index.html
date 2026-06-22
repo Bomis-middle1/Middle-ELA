@@ -16,96 +16,61 @@
     --wrong-red: #ef476f;
 }
 
-* {
-    box-sizing: border-box;
-    -webkit-tap-highlight-color: transparent;
-    user-select: none;
-}
+* { box-sizing: border-box; }
 
 body {
     margin: 0;
-    padding: 0;
-    font-family: 'Courier New', Courier, monospace;
+    font-family: Arial;
     background: var(--bg-dark);
     color: var(--text-light);
     display: flex;
-    align-items: center;
     justify-content: center;
-    min-height: 100vh;
-    overflow-x: hidden;
-}
-
-.screen {
-    display: none;
-    width: 100%;
-    max-width: 600px;
-    min-height: 100vh;
     align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    text-align: center;
-    padding: 20px;
+    min-height: 100vh;
 }
 
-.active { display: flex; }
+.screen { display: none; width: 100%; max-width: 600px; padding: 20px; }
+.active { display: block; text-align: center; }
 
-#logoScreen img {
-    width: 70%;
-    max-width: 220px;
-    animation: pulse 1.5s infinite alternate;
-}
-
-@keyframes pulse {
-    from { transform: scale(0.95); opacity: 0.8; }
-    to { transform: scale(1.05); opacity: 1; }
-}
-
-.title {
-    font-size: 1.8rem;
-    color: var(--accent-gold);
-    text-transform: uppercase;
-    margin-bottom: 15px;
-    font-weight: bold;
-}
+.title { color: var(--accent-gold); font-size: 22px; font-weight: bold; }
 
 .instructions-box {
     background: var(--board-bg);
-    border-radius: 12px;
-    padding: 20px;
-    margin: 20px 0;
+    padding: 15px;
+    border-radius: 10px;
+    margin: 15px 0;
     text-align: left;
 }
 
 .game-container {
     background: var(--board-bg);
-    border-radius: 16px;
-    width: 100%;
     padding: 20px;
+    border-radius: 12px;
 }
 
 .options-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
+    gap: 10px;
 }
 
 .evidence-card {
     background: var(--evidence-card);
-    padding: 15px;
-    border-radius: 12px;
+    padding: 12px;
+    border-radius: 10px;
     cursor: pointer;
 }
 
 .correct { background: var(--correct-green) !important; }
 .wrong { background: var(--wrong-red) !important; }
 
-.action-btn {
-    background: var(--accent-gold);
-    padding: 15px 30px;
-    border: none;
-    border-radius: 30px;
-    font-weight: bold;
+button {
     margin-top: 15px;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 25px;
+    background: var(--accent-gold);
+    font-weight: bold;
 }
 </style>
 </head>
@@ -114,16 +79,17 @@ body {
 
 <!-- LOGO -->
 <div id="logoScreen" class="screen active">
-    <img src="assets/innovine-logo.png">
+    <img src="assets/innovine-logo.png" style="width:180px;">
 </div>
 
 <!-- INSTRUCTIONS -->
 <div id="titleScreen" class="screen">
-    <div class="title">🕵️ Conjunction Detective</div>
+    <div class="title">🕵️ CONJUNCTION DETECTIVE</div>
     <div class="instructions-box">
-        Identify the correct conjunction type. You have 2 attempts per question.
+        Identify the correct conjunction type.<br>
+        You have 2 attempts per question.
     </div>
-    <button class="action-btn" onclick="startGame()">Start</button>
+    <button onclick="startGame()">START</button>
 </div>
 
 <!-- GAME -->
@@ -137,21 +103,91 @@ body {
 
 <!-- END -->
 <div id="endScreen" class="screen">
-    <h2 class="title">Completed</h2>
+    <h2 class="title">CASE CLOSED</h2>
     <p id="finalScore"></p>
-    <button class="action-btn" onclick="restartGame()">Play Again</button>
+    <button onclick="restartGame()">PLAY AGAIN</button>
 </div>
 
-<!-- AUDIO (FIXED PATHS ✅) -->
-<audio id="correctSound" src="assets/correct.mp3" preload="auto"></audio>
-<audio id="wrongSound" src="assets/wrong.mp3" preload="auto"></audio>
-<audio id="clapSound" src="assets/clapping.mp3" preload="auto"></audio>
+<!-- AUDIO -->
+<audio id="correctSound" src="assets/correct.mp3"></audio>
+<audio id="wrongSound" src="assets/wrong.mp3"></audio>
+<audio id="clapSound" src="assets/clapping.mp3"></audio>
 
 <script>
+
+/* ✅ FINAL AUDITED QUESTION BANK */
 const masterMCQs = [
-    {q:"Although it was midnight, the thief escaped. Type?",opts:["Coordinating","Relative","Concessive","Comparative"],ans:"Concessive"},
-    {q:"Identify conditional sentence",opts:["I stayed because it rained.","If you find the key, open the chest.","He was tired but won.","Bike is faster."],ans:"If you find the key, open the chest."},
-    {q:"Which is correct?",opts:["Tiger is stronger.","She studied so that she could pass.","Although hungry, he ate.","If it rains, we stay."],ans:"She studied so that she could pass."}
+{
+q:`"Although it was midnight, the thief escaped." What type of conjunction is although?`,
+opts:["Coordinating","Relative","Concessive","Comparative"],
+ans:"Concessive"
+},
+{
+q:`Identify the sentence containing a Conditional Conjunction.`,
+opts:[
+"I stayed home because it rained.",
+"If you find the key, open the chest.",
+"The player was tired but won.",
+"The bike is faster than the scooter."
+],
+ans:"If you find the key, open the chest."
+},
+{
+q:`A corrupt database script created a grammatical error. Which sentence uses the wrong conjunction?`,
+opts:[
+"The tiger is stronger than the fox.",
+"She studied so that she could pass.",
+"Almost he was hungry, he ate lunch.",
+"If it rains, we will stay inside."
+],
+ans:"Almost he was hungry, he ate lunch."
+},
+{
+q:`The high-security vault opens only with a Purpose Conjunction. Which sentence uses one?`,
+opts:[
+"The knight trained so that he could defeat the dragon.",
+"The knight trained because he was bored.",
+"The knight trained although he was tired.",
+"The knight trained and became stronger."
+],
+ans:"The knight trained so that he could defeat the dragon."
+},
+{
+q:`What does the conjunction because do?`,
+opts:["Shows comparison","Shows condition","Gives a reason","Gives extra information"],
+ans:"Gives a reason"
+},
+{
+q:`The spaceship that landed here is invisible. What type of conjunction is that?`,
+opts:["Relative","Comparative","Coordinating","Conditional"],
+ans:"Relative"
+},
+{
+q:`Which sentence contains a Coordinating Conjunction?`,
+opts:[
+"The runner trained because she wanted to win.",
+"The runner trained although she was tired.",
+"The runner trained and improved her speed.",
+"The runner trained so that she could compete."
+],
+ans:"The runner trained and improved her speed."
+},
+{
+q:`Which conjunction belongs to a different category?`,
+opts:["Although","Even though","Though","Because"],
+ans:"Because"
+},
+{
+q:`Which pair belongs to the same type of conjunction?`,
+opts:["if, unless","and, although","because, than","that, but"],
+ans:"if, unless"
+},
+{
+q:`How many different conjunction types are used in: "The wizard carried a map so that he could find the treasure, although the journey was dangerous."`,
+opts:["One","Two","Three","Four"],
+ans:"Two"
+}
+
 ];
 
 let questions=[],idx=0,score=0,attempts=0;
@@ -164,8 +200,9 @@ window.onload=()=>{
 };
 
 function startGame(){
- document.getElementById("titleScreen").classList.remove("active");
- document.getElementById("quizScreen").classList.add("active");
+ titleScreen.classList.remove("active");
+ quizScreen.classList.add("active");
+
  questions=[...masterMCQs].sort(()=>Math.random()-0.5);
  idx=0;score=0;
  loadQ();
@@ -174,20 +211,24 @@ function startGame(){
 function loadQ(){
  attempts=0;
  let q=questions[idx];
+
  questionText.innerText=q.q;
  optionsBox.innerHTML="";
+
  q.opts.sort(()=>Math.random()-0.5).forEach(o=>{
-   let d=document.createElement("div");
-   d.className="evidence-card";
-   d.innerText=o;
-   d.onclick=()=>check(o,d);
-   optionsBox.appendChild(d);
+   let div=document.createElement("div");
+   div.className="evidence-card";
+   div.innerText=o;
+   div.onclick=()=>check(o,div);
+   optionsBox.appendChild(div);
  });
 }
 
 function check(opt,el){
  let q=questions[idx];
- if(el.classList.contains("correct")||el.classList.contains("wrong"))return;
+
+ if(el.classList.contains("correct")||el.classList.contains("wrong")) return;
+
  attempts++;
 
  if(opt===q.ans){
@@ -198,9 +239,10 @@ function check(opt,el){
  } else {
    el.classList.add("wrong");
    play("wrongSound");
+
    if(attempts>=2){
      document.querySelectorAll(".evidence-card").forEach(x=>{
-       if(x.innerText===q.ans)x.classList.add("correct");
+       if(x.innerText===q.ans) x.classList.add("correct");
      });
      setTimeout(next,1500);
    }
@@ -217,17 +259,20 @@ function next(){
 function endGame(){
  quizScreen.classList.remove("active");
  endScreen.classList.add("active");
- finalScore.innerText=`Score: ${score}/${questions.length}`;
+ finalScore.innerText = `Score: ${score}/${questions.length}`;
  play("clapSound");
 }
 
-function restartGame(){location.reload();}
+function restartGame(){
+ location.reload();
+}
 
 function play(id){
  let a=document.getElementById(id);
  a.currentTime=0;
  a.play().catch(()=>{});
 }
+
 </script>
 
 </body>
