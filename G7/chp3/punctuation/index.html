@@ -2,54 +2,32 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<title>Punctuation Masters - Grade 7</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-select=none">
-<title>Sentence Shredder — Grade 7 Grammar Engine</title>
 
 <style>
 /* ==========================================================================
-   GAME ENGINE CORE RESET & COSMETICS
+   GLOBAL CONFIGURATION & RESET MATRIX
    ========================================================================== */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
     -webkit-tap-highlight-color: transparent;
+    user-select: none;
 }
 
 body {
-    background: #090d16;
-    color: #f8fafc;
+    background: #0b1528;
+    color: #f1f5f9;
     overflow: hidden;
     height: 100vh;
+    width: 100vw;
     position: relative;
 }
 
-/* GLOBAL SPACE-STATION GRADIENTS */
-body::before {
-    content: "";
-    position: absolute;
-    width: 400px;
-    height: 400px;
-    background: radial-gradient(circle, rgba(16, 185, 129, 0.12) 0%, transparent 70%);
-    border-radius: 50%;
-    left: -150px;
-    top: -150px;
-    pointer-events: none;
-}
-
-body::after {
-    content: "";
-    position: absolute;
-    width: 350px;
-    height: 350px;
-    background: radial-gradient(circle, rgba(249, 115, 22, 0.12) 0%, transparent 70%);
-    border-radius: 50%;
-    right: -100px;
-    bottom: -100px;
-    pointer-events: none;
-}
-
+/* ================= SCREEN CONTAINER MANAGER ================= */
 .screen {
     position: fixed;
     inset: 0;
@@ -62,141 +40,271 @@ body::after {
     z-index: 100;
 }
 
-/* TIMED INTRO ANIMATIONS */
-#splash { background: #ffffff; z-index: 9999; }
-#logo { width: 220px; max-width: 80%; animation: pulseLogo 2s infinite alternate ease-in-out; }
-@keyframes pulseLogo {
-    from { transform: scale(1); filter: drop-shadow(0 0 0px rgba(16,185,129,0)); }
-    to { transform: scale(1.04); filter: drop-shadow(0 4px 15px rgba(16,185,129,0.2)); }
+/* --- LOGO SCREEN STAGE (FIRST SCREEN ONLY) --- */
+#logoScreen {
+    background: #ffffff;
+    z-index: 9999;
+    display: flex;
 }
-#splash h2 { margin-top: 16px; font-size: 22px; color: #334155; }
+#logoScreen img {
+    width: 240px;
+    max-width: 80%;
+    height: auto;
+    animation: pulseLogo 1.8s infinite alternate ease-in-out;
+}
+@keyframes pulseLogo {
+    from { transform: scale(1); filter: drop-shadow(0 0 0px rgba(0,0,0,0)); }
+    to { transform: scale(1.05); filter: drop-shadow(0 4px 20px rgba(0,0,0,0.15)); }
+}
 
-#topic { background: radial-gradient(circle at center, #020617 0%, #090d16 100%); z-index: 9000; display: none; }
-#topic h1 { font-size: 46px; font-weight: 900; color: #10b981; text-shadow: 0 0 20px rgba(16,185,129,0.4); margin-bottom: 12px; }
-#topic h2 { font-size: 22px; color: #f59e0b; letter-spacing: 1px; }
+/* --- TITLE SPLASH SCREEN STAGE --- */
+#titleScreen {
+    background: radial-gradient(circle at center, #1e3a8a 0%, #0f172a 100%);
+    z-index: 9000;
+    display: none;
+}
+#titleScreen h1 {
+    font-size: 52px;
+    font-weight: 900;
+    color: #38bdf8;
+    text-shadow: 0 0 30px rgba(56, 189, 248, 0.4);
+    margin-bottom: 12px;
+    letter-spacing: 1px;
+}
+#titleScreen p {
+    font-size: 20px;
+    color: #a78bfa;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+}
 
-/* LAYOUT CONTAINER INTERFACES */
+/* --- DASHBOARD WRAPPER CARDS --- */
 .dashboard-card {
-    background: rgba(15, 23, 42, 0.6);
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: rgba(15, 23, 42, 0.75);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    padding: 36px;
-    border-radius: 28px;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-    max-width: 650px;
+    padding: 40px;
+    border-radius: 32px;
+    box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.6);
+    max-width: 580px;
     width: 100%;
+    animation: cardEntrance 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+@keyframes cardEntrance {
+    from { transform: translateY(24px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
 }
 
 #startScreen, #resultScreen { display: none; z-index: 8000; }
-.dashboard-card h1 { font-size: 38px; font-weight: 800; color: #f97316; margin-bottom: 12px; }
-.dashboard-card p { font-size: 17px; color: #94a3b8; line-height: 1.6; margin-bottom: 24px; }
+.dashboard-card h2 { font-size: 36px; font-weight: 800; color: #f97316; margin-bottom: 8px; }
+.dashboard-card h3 { font-size: 18px; color: #38bdf8; margin-bottom: 24px; text-transform: uppercase; letter-spacing: 1px; }
+.dashboard-card p { font-size: 16px; color: #94a3b8; line-height: 1.6; margin-bottom: 24px; }
 
-/* THE INTERACTIVE HUD WORKBENCH */
-#gameScreen { display: none; flex-direction: column; justify-content: center; }
-.workbench-layout { width: 100%; max-width: 800px; display: flex; flex-direction: column; gap: 20px; }
-
-.hud-row { display: flex; justify-content: space-between; align-items: center; width: 100%; }
-#progressBadge { font-size: 14px; font-weight: 700; color: #10b981; background: rgba(16, 185, 129, 0.1); padding: 8px 16px; border-radius: 20px; border: 1px solid rgba(16, 185, 129, 0.2); }
-#scoreBadge { font-size: 14px; font-weight: 700; color: #f59e0b; background: rgba(245, 158, 11, 0.1); padding: 8px 16px; border-radius: 20px; border: 1px solid rgba(245, 158, 11, 0.2); }
-
-/* TARGET PROMPT CARD */
-.mission-control {
-    background: #1e293b;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 20px;
-    border-radius: 16px;
-    box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
-}
-#missionDirective { font-size: 22px; font-weight: 800; color: #38bdf8; text-transform: uppercase; letter-spacing: 0.5px; }
-
-/* ==========================================================================
-   THE TEXT INTERACTION SHREDDER BLOCKS (THE LIVE SENTENCE)
-   ========================================================================= */
-.sentence-shredder-box {
-    background: rgba(15, 23, 42, 0.8);
-    border: 2px dashed rgba(255, 255, 255, 0.15);
-    padding: 32px 24px;
-    border-radius: 20px;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 10px;
-    min-height: 120px;
-    align-items: center;
-}
-
-.word-block {
-    font-size: 24px;
-    font-weight: 600;
-    padding: 6px 14px;
-    background: #1e293b;
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 10px;
-    cursor: pointer;
-    color: #e2e8f0;
-    user-select: none;
-    transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-}
-.word-block:hover:not(.locked) {
-    background: #334155;
-    transform: scale(1.05) translateY(-2px);
-    border-color: #38bdf8;
-    box-shadow: 0 4px 12px rgba(56, 189, 248, 0.2);
-}
-.word-block.selected {
-    background: #38bdf8;
-    color: #0f172a;
-    border-color: #7dd3fc;
-    transform: scale(1.03);
-    box-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
-}
-
-/* FEEDBACK GRAPHICS STATE STYLES */
-.word-block.success-flash { background: #10b981 !important; color: white !important; border-color: #34d399 !important; }
-.word-block.error-flash { background: #ef4444 !important; color: white !important; border-color: #f87171 !important; }
-.word-block.missed-flash { background: rgba(16, 185, 129, 0.25) !important; border: 2px dashed #10b981 !important; color: #4ade80 !important; }
-
-/* ACTION ENGINE TRIGGER INJECTORS */
-.action-button {
-    padding: 16px 44px;
-    font-size: 18px;
-    font-weight: bold;
+/* --- BRAND ACTION BUTTONS --- */
+.prime-action-btn {
+    padding: 16px 48px;
+    font-size: 20px;
+    font-weight: 800;
     border: none;
     border-radius: 50px;
     color: white;
     cursor: pointer;
     transition: all 0.2s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    min-height: 54px;
 }
-#submitBtn {
-    background: linear-gradient(135deg, #f59e0b, #ea580c);
-    box-shadow: 0 4px 14px rgba(234, 88, 12, 0.4);
-    margin: 10px auto 0 auto;
-    display: block;
+#startBtn { background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 6px 20px rgba(16, 185, 129, 0.35); }
+#restartBtn { background: linear-gradient(135deg, #0ea5e9, #2563eb); box-shadow: 0 6px 20px rgba(14, 165, 233, 0.35); }
+.prime-action-btn:hover { transform: translateY(-3px); filter: brightness(1.1); }
+.prime-action-btn:active { transform: translateY(-1px); }
+
+/* ================= GAMEPLAY RUNTIME MATRIX STAGE ================= */
+#game {
+    display: none;
+    width: 100%;
+    height: 100vh;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(to bottom, #0c1938 0%, #1e1b4b 60%, #311042 100%);
 }
-#submitBtn:disabled {
-    background: #334155;
-    color: #64748b;
-    box-shadow: none;
-    cursor: not-allowed;
+
+#game::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 90px;
+    background: repeat-x bottom;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none"><path d="M0,120 L0,90 L40,75 L70,85 L110,60 L150,80 L210,45 L270,85 L320,55 L380,75 L450,40 L520,80 L590,50 L660,90 L720,60 L790,75 L850,40 L910,80 L980,55 L1040,70 L1110,45 L1160,80 L1200,65 L1200,120 Z" fill="%23070b19"/></svg>');
+    opacity: 0.7;
+    pointer-events: none;
+    z-index: 5;
 }
-#startBtn { background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4); }
-#restartBtn { background: linear-gradient(135deg, #38bdf8, #2563eb); box-shadow: 0 4px 14px rgba(56, 189, 248, 0.4); }
 
-.action-button:hover:not(:disabled) { transform: translateY(-3px); filter: brightness(1.1); }
-.action-button:active:not(:disabled) { transform: translateY(0); }
+.hud-panel {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    right: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 50;
+    pointer-events: none;
+}
+#score, #progress {
+    font-size: 16px;
+    font-weight: 800;
+    padding: 10px 20px;
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+#score {
+    color: #eab308;
+    background: rgba(234, 179, 8, 0.1);
+    border: 1px solid rgba(234, 179, 8, 0.25);
+}
+#progress {
+    color: #38bdf8;
+    background: rgba(56, 189, 248, 0.1);
+    border: 1px solid rgba(56, 189, 248, 0.25);
+}
 
-.volume-rack { display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 24px; color: #64748b; font-size: 14px; }
-input[type=range] { accent-color: #10b981; cursor: pointer; width: 120px; }
+#questionBox {
+    position: absolute;
+    top: 95px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 740px;
+    background: rgba(15, 23, 42, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border-radius: 24px;
+    padding: 24px 30px;
+    text-align: center;
+    box-shadow: 0 15px 35px -5px rgba(0,0,0,0.5);
+    z-index: 40;
+}
+#question {
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1.5;
+    color: #e2e8f0;
+}
+#hintText {
+    font-size: 14px;
+    color: #ef4444;
+    margin-top: 8px;
+    font-weight: 700;
+    display: none;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
 
-#confetti { position: fixed; inset: 0; pointer-events: none; z-index: 999; width: 100vw; height: 100vh; }
+/* ================= BALLOON ELEMENT NODES ================= */
+.balloon {
+    position: absolute;
+    width: 80px;
+    height: 98px;
+    border-radius: 50% 50% 42% 42%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    animation: floatUp 6.5s linear forwards;
+    box-shadow: inset -6px -10px rgba(0,0,0,0.22), 0 10px 25px rgba(0,0,0,0.35);
+    z-index: 10;
+    will-change: transform;
+}
 
-/* MOBILE BREAKPOINT CORRECTIONS */
-@media (max-width: 640px) {
-    #topic h1 { font-size: 32px; }
-    .dashboard-card h1 { font-size: 28px; }
-    #missionDirective { font-size: 18px; }
-    .word-block { font-size: 18px; padding: 4px 10px; }
+.balloon::before {
+    content: "";
+    position: absolute;
+    bottom: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-bottom: 7px solid currentColor;
+    filter: brightness(0.8);
+}
+
+.balloon::after {
+    content: "";
+    position: absolute;
+    bottom: -25px;
+    left: 50%;
+    width: 2px;
+    height: 20px;
+    background: rgba(255,255,255,0.4);
+}
+
+@keyframes floatUp {
+    0% { transform: translateY(105vh); }
+    100% { transform: translateY(-20vh); }
+}
+
+/* PALETTE ASSIGNMENTS */
+.red { background: #ff4757; color: #ff4757; }
+.blue-bright { background: #1e90ff; color: #1e90ff; }
+.green { background: #2ed573; color: #2ed573; }
+.orange { background: #ffa502; color: #ffa502; }
+.purple { background: #9b59b6; color: #9b59b6; }
+
+.balloon-text {
+    color: #ffffff;
+    position: relative;
+    z-index: 2;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.4);
+    font-weight: 900;
+    font-size: 28px;
+}
+.balloon-text.caps {
+    font-size: 30px;
+    color: #fffb00;
+}
+
+/* ================= POP EXPLOSIVE PARTICLES ================= */
+.particle {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 15;
+    animation: burstOut 0.5s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+}
+@keyframes burstOut {
+    0% { transform: translate(0, 0) scale(1); opacity: 1; }
+    100% { transform: translate(var(--mx), var(--my)) scale(0); opacity: 0; }
+}
+
+canvas { position: fixed; inset: 0; pointer-events: none; z-index: 99999; width: 100vw; height: 100vh; }
+
+/* ================= DEVICE VIEWPORT RESPONSIVENESS ================= */
+@media (max-width: 768px) {
+    #titleScreen h1 { font-size: 36px; }
+    .dashboard-card h2 { font-size: 28px; }
+    #question { font-size: 18px; }
+    #questionBox { top: 80px; padding: 16px; }
+    .balloon { width: 68px; height: 84px; }
+    .balloon-text { font-size: 22px; }
+    .balloon-text.caps { font-size: 24px; }
+}
+
+@media (orientation: landscape) and (max-height: 500px) {
+    #questionBox { top: 65px; padding: 10px 20px; }
+    #question { font-size: 16px; }
+    .hud-panel { top: 10px; }
+    .balloon { width: 55px; height: 68px; }
+    .balloon-text { font-size: 18px; }
 }
 </style>
 </head>
@@ -205,326 +313,337 @@ input[type=range] { accent-color: #10b981; cursor: pointer; width: 120px; }
 
 <canvas id="confetti"></canvas>
 
-<!-- AUDIO LOG CHANNELS -->
+<!-- COMPILER SYSTEM SOUND SKELETON NODES -->
 <audio id="correctSound" src="assets/correct.mp3" preload="auto"></audio>
 <audio id="wrongSound" src="assets/wrong.mp3" preload="auto"></audio>
 <audio id="clapSound" src="assets/clapping.mp3" preload="auto"></audio>
 
-<!-- SCREEN 1: SPLASH -->
-<div id="splash" class="screen">
-    <img src="assets/innovine-logo.png" id="logo" alt="Innovine Logo">
-    <h2>Innovine Learning Games</h2>
+<!-- STAGE 1: INTRO LOGO BANNER SPLASH -->
+<div id="logoScreen" class="screen">
+   <img src="assets/innovine-logo.png" id="logo" alt="Innovine Logo">
 </div>
 
-<!-- SCREEN 2: TOPIC HEADER TRAILER -->
-<div id="topic" class="screen">
-    <h1>SENTENCE SHREDDER</h1>
-    <h2>Isolate and Parse Grammatical Syntax Elements</h2>
+<!-- STAGE 2: FLASH CARD TOPIC CARD TITLE OVERLAY -->
+<div id="titleScreen" class="screen">
+    <h1>PUNCTUATION MASTERS 🎯</h1>
+    <p>Grammar Engine Matrix</p>
 </div>
 
-<!-- SCREEN 3: MENU LOBBY BOARD -->
+<!-- STAGE 3: CONFIGURATION SETUP MATRIX GATE -->
 <div id="startScreen" class="screen">
     <div class="dashboard-card">
-        <h1>🎯 Sentence Shredder</h1>
-        <p>Don't just tap options—destroy the sentence structure directly! Tap the actual words inside each sequence line to highlight the exact target element required.</p>
-        
-        <button id="startBtn" class="action-button">LAUNCH COMPILER</button>
-
-        <div class="volume-rack">
-            <span>🔊 Audio Volume</span>
-            <input type="range" id="volume" min="0" max="1" value="0.8" step="0.1">
-        </div>
+        <h2>🎯 Precision Strike</h2>
+        <h3>Syntax Calibration</h3>
+        <p>Analyze the sentence framework delivered to the control array board. Identify the missing punctuation mark, quotation style, apostrophe link, or correct capitalization node and pop it before it escapes!</p>
+        <button id="startBtn" class="prime-action-btn" onclick="startGame()">Engage Engine</button>
     </div>
 </div>
 
-<!-- SCREEN 4: RUNTIME RECONSTRUCTION ENVIRONMENT -->
-<div id="gameScreen" class="screen">
-    <div class="workbench-layout">
-        <div class="hud-row">
-            <div id="progressBadge">ANALYZING: 0 / 10</div>
-            <div id="scoreBadge">ACCURACY: 0%</div>
-        </div>
-
-        <div class="mission-control">
-            <div id="missionDirective">Locate target token array</div>
-        </div>
-
-        <!-- CLICKABLE WORD INTERACTION CANVAS -->
-        <div class="sentence-shredder-box" id="shredderBox"></div>
-
-        <button id="submitBtn" class="action-button" disabled>SUBMIT HIGHLIGHT</button>
+<!-- STAGE 4: MAIN ACTIVE CHALLENGE SIMULATOR RUNTIME -->
+<div id="game">
+    <div class="hud-panel">
+        <div id="score">SCORE: 0</div>
+        <div id="progress">RECORDS: 1 / 10</div>
+    </div>
+    <div id="questionBox">
+        <div id="question">Parsing syntax string channels...</div>
+        <div id="hintText">ATTEMPT FAILED: Look closely at the grammatical structure!</div>
     </div>
 </div>
 
-<!-- SCREEN 5: FINAL EVALUATION SCORECARD -->
+<!-- STAGE 5: SYSTEM TERMINATION DIAGNOSTIC CARD SUMMARY -->
 <div id="resultScreen" class="screen">
     <div class="dashboard-card">
-        <h1 style="color: #10b981;">🚀 Evaluation Finished</h1>
-        <p>Your diagnostic processing performance output score:</p>
-        <div id="finalScore" style="font-size: 54px; font-weight: 900; color: #f59e0b; margin: 16px 0;">0 / 10</div>
-        <button id="restartBtn" class="action-button">RELOAD DATASTREAMS</button>
+        <h2 style="color: #10b981;">🚀 Verification Terminated</h2>
+        <div id="finalScoreDisplay" style="margin: 24px 0;"></div>
+        <button id="restartBtn" class="prime-action-btn" onclick="restartGame()">Reset Database</button>
     </div>
 </div>
 
 <script>
 /* ==========================================================================
-   COMPILER RUNTIME CONTROLLER ENGINE
+   SYSTEM RUNTIME EXECUTION ARCHITECTURE
    ========================================================================== */
 
-const ui = {
-    splash: document.getElementById("splash"),
-    topic: document.getElementById("topic"),
+const screens = {
+    logo: document.getElementById("logoScreen"),
+    title: document.getElementById("titleScreen"),
     start: document.getElementById("startScreen"),
-    game: document.getElementById("gameScreen"),
-    result: document.getElementById("resultScreen"),
-    shredderBox: document.getElementById("shredderBox"),
-    submitBtn: document.getElementById("submitBtn"),
-    directive: document.getElementById("missionDirective"),
-    progress: document.getElementById("progressBadge"),
-    score: document.getElementById("scoreBadge")
+    game: document.getElementById("game"),
+    result: document.getElementById("resultScreen")
 };
 
-const audioTracks = {
+const audioChannels = {
     correct: document.getElementById("correctSound"),
     wrong: document.getElementById("wrongSound"),
     clap: document.getElementById("clapSound")
 };
 
-let rawQuestions = [], parsedQuestions = [], activeIndex = 0, currentScore = 0;
-let userSelectionIndices = [];
-
-// Static Volume Synchronization
-document.getElementById("volume").oninput = function() {
-    Object.values(audioTracks).forEach(t => { if(t) t.volume = this.value; });
-};
-
-/* 
-   ==========================================================================
-   AUDITED SCHEMA MATRIX WITH EXPLICIT ZERO-BASED INDEX TARGETS
-   ==========================================================================
-*/
-rawQuestions = [
-    {
-        sentence: "The students completed the science project on time.",
-        target: "Subject",
-        targetIndices: [0, 1] // "The students"
-    },
-    {
-        sentence: "The little puppy barked loudly all night.",
-        target: "Predicate",
-        targetIndices: [3, 4, 5, 6] // "barked loudly all night."
-    },
-    {
-        sentence: "Maria baked a delicious cake yesterday.",
-        target: "Direct Object",
-        targetIndices: [2, 3, 4] // "a delicious cake"
-    },
-    {
-        sentence: "The sky became dark before the storm.",
-        target: "Complement",
-        targetIndices: [3] // "dark" (Subject Complement following linking verb 'became')
-    },
-    {
-        sentence: "My brother plays basketball every Saturday.",
-        target: "Predicate",
-        targetIndices: [2, 3, 4, 5] // "plays basketball every Saturday."
-    },
-    {
-        sentence: "After school, the children visited the library.",
-        target: "Subject",
-        targetIndices: [2, 3] // "the children" ('After school,' is an introductory adverbial phrase)
-    },
-    {
-        sentence: "The teacher explained the lesson clearly.",
-        target: "Direct Object",
-        targetIndices: [2, 3] // "the lesson"
-    },
-    {
-        sentence: "Our classroom looks beautiful after the decorations.",
-        target: "Complement",
-        targetIndices: [2] // "beautiful" (Subject Complement following linking verb 'looks')
-    },
-    {
-        sentence: "Several colorful birds flew across the lake.",
-        target: "Subject",
-        targetIndices: [0, 1, 2] // "Several colorful birds"
-    },
-    {
-        sentence: "The firefighters rescued the family safely.",
-        target: "Predicate",
-        targetIndices: [2, 3, 4, 5] // "rescued the family safely."
-    }
+// BALANCED MATRIX TARGETING ONLY REQUESTED MANDATORY CONTENT RULES
+const questions = [
+    {q: "I can’t believe we finally finished the assignment ___", a: [".", "!", "?"], c: "!"},
+    {q: "Are we going to the museum after lunch ___", a: [".", "!", "?"], c: "?"},
+    {q: "The weather was cold ___ yet we decided to go for a walk.", a: [";", ",", "!"], c: ","},
+    {q: "You need to bring the following items ___ a sleeping bag and a flashlight.", a: [";", ",", ":"], c: ":"},
+    {q: "___What a beautiful morning!___ shouted Sarah.", a: ["' '", '“ ”', ', ,'], c: '“ ”'},
+    {q: "The student___s desk was loaded with heavy textbooks.", a: ["’", "’s", "s’"], c: "’"},
+    {q: "___we visited the Grand Canyon during our summer vacation.", a: ["we", "We", "WE"], c: "We"},
+    {q: "The train arrived exactly on time ___", a: [".", ",", "?"], c: "."},
+    {q: "He is looking for his sister___s missing laptop computer.", a: ["s", "’s", "s’"], c: "’s"},
+    {q: "___paris is one of the most visited cities in Europe.", a: ["paris", "Paris", "pAris"], c: "Paris"}
 ];
 
-// Linear Cinematic Timeline Gates
-setTimeout(() => { ui.splash.style.display = "none"; ui.topic.style.display = "flex"; }, 3500);
-setTimeout(() => { ui.topic.style.display = "none"; ui.start.style.display = "flex"; }, 6500);
+let activeIdx = 0;
+let runtimeScore = 0;
+let attemptsCount = 0;
+let expectedAnswer = "";
+let engineLoopRef = null;
+let dynamicBalloonPool = [];
+
+// TIME TRANSITION PIPELINE ACCORDING TO SPECIFICATIONS (5 SECONDS TOTAL LOGO HOLD)
+setTimeout(() => { 
+    screens.logo.style.opacity = "0"; 
+    screens.logo.style.visibility = "hidden";
+    setTimeout(() => { screens.logo.style.display = "none"; }, 400);
+    screens.title.style.display = "flex"; 
+    
+    setTimeout(() => { 
+        screens.title.style.display = "none"; 
+        screens.start.style.display = "flex"; 
+    }, 2000);
+}, 5000);
 
 function triggerAudio(key) {
-    const track = audioTracks[key];
-    if(!track) return;
-    try {
-        track.currentTime = 0;
-        track.play().catch(() => {});
-    } catch(err) {}
+    const track = audioChannels[key];
+    if (!track) return;
+    try { track.currentTime = 0; track.play().catch(() => {}); } catch(e) {}
 }
 
-document.getElementById("startBtn").onclick = function() {
-    ui.start.style.display = "none";
-    ui.game.style.display = "flex";
-
-    // Unblock sandboxed mobile audio instantly
-    Object.values(audioTracks).forEach(t => { if(t) { t.play().then(() => t.pause()).catch(() => {}); } });
-
-    activeIndex = 0;
-    currentScore = 0;
-    
-    // Parse structural components dynamically
-    parsedQuestions = rawQuestions.map(item => {
-        const wordsArray = item.sentence.split(" ");
-        return { ...item, wordTokens: wordsArray };
-    });
-
-    parsedQuestions.sort(() => Math.random() - 0.5);
-    loadQuestionStage();
-};
-
-function loadQuestionStage() {
-    userSelectionIndices = [];
-    ui.submitBtn.disabled = true;
-    
-    ui.progress.innerText = `ANALYZING: ${activeIndex + 1} / ${parsedQuestions.length}`;
-    ui.score.innerText = `ACCURACY: ${Math.round((currentScore / (activeIndex || 1)) * 100)}%`;
-
-    const q = parsedQuestions[activeIndex];
-    ui.directive.innerText = `Find the: ${q.target}`;
-
-    ui.shredderBox.innerHTML = "";
-    q.wordTokens.forEach((word, idx) => {
-        const block = document.createElement("div");
-        block.className = "word-block";
-        block.innerText = word;
-        block.onclick = () => toggleWordBlock(idx, block);
-        ui.shredderBox.appendChild(block);
-    });
+function matrixShuffle(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
 }
 
-function toggleWordBlock(index, element) {
-    if (element.classList.contains("locked")) return;
+function startGame() {
+    screens.start.style.display = "none";
+    screens.game.style.display = "block";
+    
+    // Unblock web audio policies across target platform contexts
+    Object.values(audioChannels).forEach(track => { if(track) { track.play().then(() => track.pause()).catch(() => {}); } });
 
-    if (userSelectionIndices.includes(index)) {
-        userSelectionIndices = userSelectionIndices.filter(i => i !== index);
-        element.classList.remove("selected");
-    } else {
-        userSelectionIndices.push(index);
-        element.classList.add("selected");
+    runtimeScore = 0;
+    activeIdx = 0;
+    attemptsCount = 0;
+    clearActivePool();
+    matrixShuffle(questions);
+    
+    loadQuestion();
+    
+    if(engineLoopRef) clearInterval(engineLoopRef);
+    engineLoopRef = setInterval(spawnBalloonNode, 1400);
+}
+
+function loadQuestion() {
+    if (activeIdx >= questions.length) {
+        terminateMatrixRun();
+        return;
     }
 
-    ui.submitBtn.disabled = (userSelectionIndices.length === 0);
+    attemptsCount = 0;
+    document.getElementById("hintText").style.display = "none";
+    expectedAnswer = questions[activeIdx].c;
+    document.getElementById("question").innerText = questions[activeIdx].q;
+    document.getElementById("score").innerText = "SCORE: " + runtimeScore;
+    document.getElementById("progress").innerText = `RECORDS: ${activeIdx + 1} / ${questions.length}`;
 }
 
-ui.submitBtn.onclick = function() {
-    ui.submitBtn.disabled = true;
-    const q = parsedQuestions[activeIndex];
-    const targetSet = q.targetIndices;
-    const blocks = ui.shredderBox.querySelectorAll(".word-block");
+const colorPalette = ["red", "blue-bright", "green", "orange", "purple"];
 
-    blocks.forEach(b => b.classList.add("locked"));
+function spawnBalloonNode() {
+    let currentData = questions[activeIdx];
+    if (!currentData) return;
 
-    let errorsFound = false;
+    let optionsSource = currentData.a;
+    let chosenSymbol = optionsSource[Math.floor(Math.random() * optionsSource.length)];
+
+    let node = document.createElement("div");
+    node.className = "balloon " + colorPalette[Math.floor(Math.random() * colorPalette.length)];
     
-    // 1. Validate if choices have incorrect structural targets
-    userSelectionIndices.forEach(idx => {
-        if (targetSet.includes(idx)) {
-            blocks[idx].classList.remove("selected");
-            blocks[idx].classList.add("success-flash");
-        } else {
-            blocks[idx].classList.remove("selected");
-            blocks[idx].classList.add("error-flash");
-            errorsFound = true;
-        }
-    });
-
-    // 2. Map structural elements missed out by player selection
-    targetSet.forEach(idx => {
-        if (!userSelectionIndices.includes(idx)) {
-            blocks[idx].classList.add("missed-flash");
-            errorsFound = true;
-        }
-    });
-
-    if (!errorsFound) {
-        currentScore++;
-        triggerAudio("correct");
-        launchCelebrationConfetti();
-    } else {
-        triggerAudio("wrong");
+    let textWrapper = document.createElement("span");
+    textWrapper.className = "balloon-text";
+    
+    if(chosenSymbol.length > 1 && !chosenSymbol.includes('’')) {
+        textWrapper.className += " caps";
     }
+    textWrapper.innerText = chosenSymbol;
+    node.appendChild(textWrapper);
+
+    let cleanLeftEdge = Math.random() * 80;
+    node.style.left = `calc(${cleanLeftEdge}vw + 10px)`;
+
+    node.onclick = (e) => {
+        e.stopPropagation();
+        executeNodeBurst(node, chosenSymbol);
+    };
+
+    screens.game.appendChild(node);
+    dynamicBalloonPool.push(node);
 
     setTimeout(() => {
-        activeIndex++;
-        if(activeIndex < parsedQuestions.length) {
-            loadQuestionStage();
-        } else {
-            showEvaluationSummary();
+        if(node && node.parentNode) {
+            node.remove();
+            dynamicBalloonPool = dynamicBalloonPool.filter(n => n !== node);
         }
-    }, 2400);
-};
-
-function showEvaluationSummary() {
-    ui.game.style.display = "none";
-    ui.result.style.display = "flex";
-    document.getElementById("finalScore").innerText = `${currentScore} / ${parsedQuestions.length}`;
-    triggerAudio("clap");
+    }, 6600);
 }
 
-document.getElementById("restartBtn").onclick = function() {
-    ui.result.style.display = "none";
-    ui.game.style.display = "flex";
-    activeIndex = 0;
-    currentScore = 0;
-    parsedQuestions.sort(() => Math.random() - 0.5);
-    loadQuestionStage();
-};
+function executeNodeBurst(targetNode, clickedSymbol) {
+    const coordinates = targetNode.getBoundingClientRect();
+    const coreX = coordinates.left + (coordinates.width / 2);
+    const coreY = coordinates.top + (coordinates.height / 2);
+    const ambientColor = window.getComputedStyle(targetNode).backgroundColor;
+
+    createExplosionCloud(coreX, coreY, ambientColor);
+    
+    targetNode.remove();
+    dynamicBalloonPool = dynamicBalloonPool.filter(n => n !== targetNode);
+
+    if (clickedSymbol === expectedAnswer) {
+        runtimeScore += 10;
+        activeIdx++;
+        triggerAudio("correct");
+        triggerAudio("clap");
+        
+        clearActivePool();
+        loadQuestion();
+    } else {
+        attemptsCount++;
+        if(runtimeScore > 0) runtimeScore -= 5;
+        triggerAudio("wrong");
+        document.getElementById("score").innerText = "SCORE: " + runtimeScore;
+        
+        if (attemptsCount >= 2) {
+            document.getElementById("hintText").innerText = `Hint: The expected answer is "${expectedAnswer}"`;
+            document.getElementById("hintText").style.display = "block";
+        } else {
+            document.getElementById("hintText").innerText = "ATTEMPT FAILED: Try searching for another option!";
+            document.getElementById("hintText").style.display = "block";
+        }
+    }
+}
+
+function createExplosionCloud(x, y, tint) {
+    for (let idx = 0; idx < 12; idx++) {
+        const atom = document.createElement("div");
+        atom.className = "particle";
+        atom.style.left = x + "px";
+        atom.style.top = y + "px";
+        atom.style.background = tint;
+        
+        const polarAngle = Math.random() * Math.PI * 2;
+        const amplitude = Math.random() * 80 + 40;
+        
+        atom.style.setProperty('--mx', Math.cos(polarAngle) * amplitude + "px");
+        atom.style.setProperty('--my', Math.sin(polarAngle) * amplitude + "px");
+        
+        screens.game.appendChild(atom);
+        setTimeout(() => atom.remove(), 500);
+    }
+}
+
+function clearActivePool() {
+    dynamicBalloonPool.forEach(element => { if(element && element.parentNode) element.remove(); });
+    dynamicBalloonPool = [];
+}
+
+function terminateMatrixRun() {
+    clearInterval(engineLoopRef);
+    clearActivePool();
+    
+    screens.game.style.display = "none";
+    screens.result.style.display = "flex";
+
+    let maxPossibleScore = questions.length * 10;
+    let efficiencyRating = Math.round((runtimeScore / maxPossibleScore) * 100);
+    if(efficiencyRating > 100) efficiencyRating = 100;
+    if(efficiencyRating < 0) efficiencyRating = 0;
+
+    let tierDescriptor = efficiencyRating >= 80 ? "⭐⭐⭐⭐⭐ <br><span style='color: #10b981; font-size:20px;'>SYNTAX CHIEF COMMANDER</span>" : "⭐⭐⭐☆☆ <br><span style='color: #eab308; font-size:20px;'>LOGISTICS CADET</span>";
+
+    document.getElementById("finalScoreDisplay").innerHTML = `
+        <div style="font-size:75px; margin-bottom:12px;">🏆</div>
+        <div style="font-size:42px; font-weight:900; color:#0ea5e9; margin:8px;">${runtimeScore} Pts Generated</div>
+        <div style="font-size:22px; color:#cbd5e1; margin-bottom:24px;">${efficiencyRating}% Operations Matrix Rating</div>
+        <div style="margin-top:20px; line-height:1.8;">${tierDescriptor}</div>
+    `;
+
+    triggerAudio("clap");
+    runConfettiBurst();
+}
+
+function restartGame() {
+    screens.result.style.display = "none";
+    startGame();
+}
 
 /* ==========================================================================
-   CONFETTI ENGINE ANIMATION BLOCKS
+   CONFETTI FLUID CELEBRATION DISPATCHER
    ========================================================================== */
 const canvas = document.getElementById("confetti");
 const ctx = canvas.getContext("2d");
-let confettiData = [], animFrameRef = null;
+let points = [], loopRef = null;
 
-function scaleCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-window.addEventListener("resize", scaleCanvas);
-scaleCanvas();
+function fitScreen() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+window.addEventListener("resize", fitScreen);
+fitScreen();
 
-function launchCelebrationConfetti() {
-    confettiData = [];
-    cancelAnimationFrame(animFrameRef);
-    for (let i = 0; i < 110; i++) {
-        confettiData.push({
+function runConfettiBurst() {
+    points = [];
+    cancelAnimationFrame(loopRef);
+    const options = ["#0ea5e9", "#a855f7", "#10b981", "#eab308", "#f43f5e"];
+    
+    for (let i = 0; i < 120; i++) {
+        points.push({
             x: Math.random() * canvas.width,
             y: -20,
-            size: Math.random() * 6 + 5,
-            speedY: Math.random() * 5 + 3,
-            speedX: Math.random() * 4 - 2,
-            color: `hsl(${Math.random() * 360}, 95%, 55%)`
+            w: Math.random() * 6 + 6,
+            h: Math.random() * 6 + 6,
+            dy: Math.random() * 4 + 4,
+            dx: Math.random() * 4 - 2,
+            deg: Math.random() * 360,
+            spin: Math.random() * 8 - 4,
+            tint: options[Math.floor(Math.random() * options.length)]
         });
     }
-    let lifespan = 0;
-    function cycle() {
+    
+    let ticks = 0;
+    function pulse() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        confettiData.forEach(p => {
-            ctx.fillStyle = p.color;
-            ctx.fillRect(p.x, p.y, p.size, p.size);
-            p.y += p.speedY; p.x += p.speedX;
+        points.forEach(p => {
+            ctx.save();
+            ctx.translate(p.x, p.y);
+            ctx.rotate(p.deg * Math.PI / 180);
+            ctx.fillStyle = p.tint;
+            ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+            ctx.restore();
+            p.y += p.dy; p.x += p.dx; p.deg += p.spin;
         });
-        lifespan++;
-        if (lifespan < 130) { animFrameRef = requestAnimationFrame(cycle); }
+        ticks++;
+        if (ticks < 140) { loopRef = requestAnimationFrame(pulse); }
         else { ctx.clearRect(0, 0, canvas.width, canvas.height); }
     }
-    cycle();
+    pulse();
 }
+
+// Keyboards Accessibility Listener Configuration
+document.addEventListener("keydown", function(e) {
+    if (e.key === "Enter") {
+        if (screens.start.style.display === "flex") startGame();
+        else if (screens.result.style.display === "flex") restartGame();
+    }
+});
 </script>
 </body>
 </html>
