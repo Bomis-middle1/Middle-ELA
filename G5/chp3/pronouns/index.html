@@ -1,1 +1,740 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎪 PRONOUN MAGIC SHOW</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Comic Sans MS', 'Arial', sans-serif;
+            background: linear-gradient(135deg, #2c003e 0%, #4a005c 50%, #2c003e 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+            padding: 10px;
+        }
+        
+        /* Splash Screen */
+        .splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #2c003e 0%, #4a005c 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+        }
+        
+        .splash-logo {
+            text-align: center;
+            animation: logoSplash 3s ease-in-out;
+        }
+        
+        .splash-logo img {
+            max-width: 300px;
+            width: 80%;
+            height: auto;
+            animation: logoGlow 2s ease-in-out infinite;
+            filter: drop-shadow(0 0 30px #ff66cc, 0 0 60px #9933ff);
+        }
+        
+        @keyframes logoGlow {
+            0%, 100% { filter: drop-shadow(0 0 30px #ff66cc, 0 0 60px #9933ff); }
+            50% { filter: drop-shadow(0 0 50px #ff99dd, 0 0 100px #cc66ff); }
+        }
+        
+        .splash-text {
+            font-size: 28px;
+            color: #ff66cc;
+            margin-top: 30px;
+            text-shadow: 0 0 20px #ff66cc;
+            animation: textFade 3s ease-in-out;
+        }
+        
+        @keyframes textFade {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        /* Game Container */
+        .game-container {
+            background: linear-gradient(180deg, #3d004d 0%, #2c003e 100%);
+            border-radius: 25px;
+            padding: 30px;
+            max-width: 800px;
+            width: 100%;
+            box-shadow: 0 0 50px #ff66cc, 0 0 100px #9933ff;
+            border: 3px solid #ff66cc;
+            position: relative;
+            display: none;
+        }
+        
+        .title {
+            text-align: center;
+            font-size: clamp(24px, 5vw, 36px);
+            color: #ff66cc;
+            margin-bottom: 15px;
+            text-shadow: 0 0 20px #ff66cc, 0 0 40px #9933ff;
+            font-weight: bold;
+        }
+        
+        .magician {
+            text-align: center;
+            font-size: clamp(60px, 10vw, 100px);
+            margin: 15px 0;
+            animation: magicFloat 3s ease-in-out infinite;
+        }
+        
+        @keyframes magicFloat {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+        }
+        
+        .score-display {
+            text-align: center;
+            font-size: clamp(18px, 4vw, 24px);
+            color: #ffff00;
+            margin: 10px 0;
+            text-shadow: 0 0 10px #ffff00;
+        }
+        
+        .wand {
+            text-align: center;
+            font-size: clamp(35px, 6vw, 50px);
+            margin: 10px 0;
+        }
+        
+        .trick-name {
+            text-align: center;
+            font-size: clamp(20px, 4vw, 26px);
+            color: #00ff00;
+            margin: 15px 0;
+            font-weight: bold;
+            text-shadow: 0 0 15px #00ff00;
+        }
+        
+        .question {
+            text-align: center;
+            font-size: clamp(20px, 4vw, 28px);
+            color: #ffffff;
+            margin: 20px 0;
+            line-height: 1.5;
+            text-shadow: 0 0 10px #ffffff;
+            padding: 0 10px;
+        }
+        
+        .options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin: 20px 0;
+        }
+        
+        .option-btn {
+            padding: clamp(15px, 3vw, 20px) clamp(20px, 4vw, 30px);
+            font-size: clamp(20px, 4vw, 26px);
+            font-weight: bold;
+            background: linear-gradient(135deg, #663399 0%, #4a247a 100%);
+            color: #ffffff;
+            border: 3px solid #9966cc;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px #ff66cc;
+        }
+        
+        .option-btn:hover {
+            background: linear-gradient(135deg, #9966cc 0%, #7a44aa 100%);
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px #ff99dd;
+        }
+        
+        .option-btn:active {
+            transform: scale(0.98);
+        }
+        
+        .option-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .attempts {
+            text-align: center;
+            font-size: clamp(18px, 4vw, 22px);
+            color: #ff6600;
+            margin: 10px 0;
+            text-shadow: 0 0 10px #ff6600;
+        }
+        
+        .magic-effect {
+            text-align: center;
+            font-size: clamp(22px, 5vw, 30px);
+            margin: 15px 0;
+            min-height: 70px;
+            text-shadow: 0 0 15px;
+            padding: 0 10px;
+        }
+        
+        .explanation {
+            text-align: center;
+            font-size: clamp(18px, 4vw, 22px);
+            color: #00ffff;
+            margin: 15px 0;
+            line-height: 1.4;
+            text-shadow: 0 0 10px #00ffff;
+            padding: 0 10px;
+        }
+        
+        .next-btn {
+            display: block;
+            width: 100%;
+            padding: clamp(15px, 3vw, 20px);
+            font-size: clamp(20px, 4vw, 24px);
+            font-weight: bold;
+            background: linear-gradient(135deg, #ff66cc 0%, #cc4499 100%);
+            color: #ffffff;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            margin: 20px 0;
+            transition: all 0.3s;
+            box-shadow: 0 5px 20px #ff99dd;
+            text-align: center;
+        }
+        
+        .next-btn:hover {
+            background: linear-gradient(135deg, #ff99dd 0%, #ff66cc 100%);
+            transform: scale(1.02);
+            box-shadow: 0 8px 30px #ffccff;
+        }
+        
+        .next-btn:disabled {
+            background: linear-gradient(135deg, #996699 0%, #664466 100%);
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        /* Confetti */
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            animation: confettiFall 3s ease-out forwards;
+            z-index: 10000;
+        }
+        
+        @keyframes confettiFall {
+            0% {
+                transform: translateY(-100px) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+        
+        /* Sparkles */
+        .sparkles {
+            position: fixed;
+            font-size: 30px;
+            animation: sparkle 1s ease-out forwards;
+            z-index: 10001;
+        }
+        
+        @keyframes sparkle {
+            0% {
+                transform: scale(0) rotate(0deg);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.5) rotate(180deg);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(0) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        /* Final Screen */
+        .final-screen {
+            text-align: center;
+            display: none;
+        }
+        
+        .final-title {
+            font-size: clamp(28px, 6vw, 42px);
+            color: #ff66cc;
+            margin: 30px 0;
+            text-shadow: 0 0 25px #ff66cc;
+            font-weight: bold;
+        }
+        
+        .final-magician {
+            font-size: clamp(80px, 12vw, 120px);
+            margin: 30px 0;
+            animation: magicFloat 2s ease-in-out infinite;
+        }
+        
+        .final-score {
+            font-size: clamp(26px, 5vw, 36px);
+            color: #ffff00;
+            margin: 25px 0;
+            text-shadow: 0 0 20px #ffff00;
+            font-weight: bold;
+        }
+        
+        .final-message {
+            font-size: clamp(22px, 5vw, 28px);
+            color: #00ff00;
+            margin: 25px 0;
+            line-height: 1.5;
+            text-shadow: 0 0 15px #00ff00;
+            padding: 0 10px;
+        }
+        
+        .restart-btn {
+            padding: clamp(20px, 4vw, 25px) clamp(40px, 6vw, 50px);
+            font-size: clamp(22px, 5vw, 26px);
+            font-weight: bold;
+            background: linear-gradient(135deg, #ff66cc 0%, #cc4499 100%);
+            color: #ffffff;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            margin: 30px 0;
+            transition: all 0.3s;
+            box-shadow: 0 8px 25px #ff99dd;
+        }
+        
+        .restart-btn:hover {
+            background: linear-gradient(135deg, #ff99dd 0%, #ff66cc 100%);
+            transform: scale(1.05);
+            box-shadow: 0 12px 40px #ffccff;
+        }
+        
+        /* Progress bar */
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #4a247a;
+            border-radius: 10px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff66cc, #9933ff);
+            transition: width 0.5s ease;
+        }
+        
+        /* Mobile optimization */
+        @media (max-width: 768px) {
+            .options {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            
+            .game-container {
+                padding: 20px;
+            }
+            
+            .title {
+                margin-bottom: 10px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            body {
+                padding: 5px;
+            }
+            
+            .game-container {
+                padding: 15px;
+                border-radius: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Splash Screen -->
+    <div class="splash-screen" id="splashScreen">
+        <div class="splash-logo">
+            <img src="assets/logo.png" alt="Innovine Logo" id="logoImage">
+            <div class="splash-text">🎪 PRONOUN MAGIC SHOW 🎪</div>
+        </div>
+    </div>
 
+    <!-- Game Container -->
+    <div class="game-container" id="gameContainer">
+        <div class="title">🎪 PRONOUN MAGIC SHOW 🎪</div>
+        
+        <div class="magician" id="magician">🧙‍♂️</div>
+        
+        <div class="score-display" id="scoreDisplay">⭐ Score: 0 | Trick: 1/15</div>
+        
+        <!-- Progress Bar -->
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+        </div>
+        
+        <div class="wand">🪄</div>
+        
+        <div class="trick-name" id="trickName"></div>
+        
+        <div class="question" id="question"></div>
+        
+        <div class="options" id="options"></div>
+        
+        <div class="attempts" id="attempts">Attempts: 1/2</div>
+        
+        <div class="magic-effect" id="magicEffect"></div>
+        
+        <div class="explanation" id="explanation"></div>
+        
+        <button class="next-btn" id="nextBtn" disabled>Next Trick 🪄</button>
+    </div>
+
+    <!-- Final Screen -->
+    <div class="game-container final-screen" id="finalScreen">
+        <div class="final-title">🎉 MAGIC SHOW COMPLETE! 🎉</div>
+        <div class="final-magician">🧙‍♂️✨🎪✨🧙‍♂️</div>
+        <div class="final-score" id="finalScore">Your Final Score: 0 / 150</div>
+        <div class="final-message" id="finalMessage"></div>
+        <button class="restart-btn" onclick="restartGame()">🪄 Play Again 🪄</button>
+    </div>
+
+    <script>
+        // 15 Tricks with D as correct in tricks 11 & 15
+        const tricks = [
+            {
+                name: "Trick 1: Personal Pronoun",
+                question: "Mary goes to school every day. ___ is a good student.",
+                options: ["She", "He", "It", "They"],
+                correct: "She",
+                explanation: "'Mary' is female, so we use 'She'"
+            },
+            {
+                name: "Trick 2: Plural Pronoun",
+                question: "The boys are playing football. ___ are having fun.",
+                options: ["They", "We", "You", "He"],
+                correct: "We",
+                explanation: "Use 'We' when including yourself with others"
+            },
+            {
+                name: "Trick 3: Personal Pronoun",
+                question: "Tom and his friend walk to park. ___ play together.",
+                options: ["They", "She", "He", "It"],
+                correct: "She",
+                explanation: "When referring to a female, use 'She'"
+            },
+            {
+                name: "Trick 4: Possessive Pronoun",
+                question: "John has a ball. It is ___ ball.",
+                options: ["my", "his", "her", "their"],
+                correct: "his",
+                explanation: "'John' is male, so we use 'his'"
+            },
+            {
+                name: "Trick 5: Possessive Pronoun",
+                question: "The students brought their books. ___ books are on the table.",
+                options: ["My", "His", "their", "Her"],
+                correct: "their",
+                explanation: "Multiple people use 'their' for ownership"
+            },
+            {
+                name: "Trick 6: Possessive Pronoun",
+                question: "We have a house. It is ___ house.",
+                options: ["our", "my", "his", "her"],
+                correct: "our",
+                explanation: "'We' uses 'our' for ownership"
+            },
+            {
+                name: "Trick 7: Demonstrative Pronoun",
+                question: "I like these shoes. ___ are beautiful!",
+                options: ["This", "These", "That", "Those"],
+                correct: "These",
+                explanation: "Multiple near objects use 'These'"
+            },
+            {
+                name: "Trick 8: Demonstrative Pronoun",
+                question: "The house on the hill is old. ___ is very old.",
+                options: ["This", "These", "That", "Those"],
+                correct: "That",
+                explanation: "Single far object uses 'That'"
+            },
+            {
+                name: "Trick 9: Demonstrative Pronoun",
+                question: "I see these birds on the tree. ___ are singing.",
+                options: ["This", "These", "That", "Those"],
+                correct: "These",
+                explanation: "Multiple near objects use 'These'"
+            },
+            {
+                name: "Trick 10: Interrogative Pronoun",
+                question: "___ is your name?",
+                options: ["What", "Which", "Who", "Whose"],
+                correct: "Who",
+                explanation: "We use 'Who' to ask about people"
+            },
+            {
+                name: "Trick 11: Interrogative Pronoun (D✓)",
+                question: "During the school talent show, the judges were impressed by many performances, but they needed to decide which performance should win the first prize. After discussing for an hour, they finally made their decision. Which word fits: '___ should win the first prize?'",
+                options: ["Who", "Whom", "What", "Which"],
+                correct: "Which",
+                explanation: "'Which' is used to choose from specific options"
+            },
+            {
+                name: "Trick 12: Interrogative Pronoun",
+                question: "___ did you call yesterday?",
+                options: ["Who", "Whom", "Which", "What"],
+                correct: "Whom",
+                explanation: "'Whom' is used as the object of a verb"
+            },
+            {
+                name: "Trick 13: Compound Answer",
+                question: "___ is coming and ___ will help us.",
+                options: ["she, she", "he, he", "I, I", "we, we"],
+                correct: "she, she",
+                explanation: "Female person uses 'she' consistently"
+            },
+            {
+                name: "Trick 14: Plural Pronoun",
+                question: "The children and I go to school. ___ are happy.",
+                options: ["They", "We", "You", "He"],
+                correct: "We",
+                explanation: "Including yourself uses 'We'"
+            },
+            {
+                name: "Trick 15: Interrogative Pronoun (D✓)",
+                question: "The detective asked the witnesses about the stolen jewelry, and he wanted to know whose jewelry was stolen. He checked the records carefully to find the owner. Choose the interrogative pronoun: '___ jewelry was stolen?'",
+                options: ["What", "Which", "Who", "Whose"],
+                correct: "Whose",
+                explanation: "'Whose' asks about ownership"
+            }
+        ];
+
+        let currentTrick = 0;
+        let attempts = 0;
+        const maxAttempts = 2;
+        let score = 0;
+        const totalTricks = 15;
+
+        // Audio elements
+        let correctAudio, wrongAudio, clapsAudio;
+
+        // Elements
+        const splashScreen = document.getElementById('splashScreen');
+        const gameContainer = document.getElementById('gameContainer');
+        const finalScreen = document.getElementById('finalScreen');
+        const magician = document.getElementById('magician');
+        const scoreDisplay = document.getElementById('scoreDisplay');
+        const progressFill = document.getElementById('progressFill');
+        const trickName = document.getElementById('trickName');
+        const question = document.getElementById('question');
+        const options = document.getElementById('options');
+        const attemptsDisplay = document.getElementById('attempts');
+        const magicEffect = document.getElementById('magicEffect');
+        const explanation = document.getElementById('explanation');
+        const nextBtn = document.getElementById('nextBtn');
+        const finalScore = document.getElementById('finalScore');
+        const finalMessage = document.getElementById('finalMessage');
+
+        // Initialize audio
+        function initAudio() {
+            correctAudio = new Audio('assets/correct.mp3');
+            wrongAudio = new Audio('assets/wrong.mp3');
+            clapsAudio = new Audio('assets/freesound_community-claps-44774.mp3');
+        }
+
+        // Splash screen timeout
+        setTimeout(() => {
+            splashScreen.style.display = 'none';
+            gameContainer.style.display = 'block';
+            initAudio();
+            showTrick();
+        }, 3000);
+
+        function showTrick() {
+            if (currentTrick >= totalTricks) {
+                showFinalScore();
+                return;
+            }
+
+            const trick = tricks[currentTrick];
+
+            trickName.textContent = trick.name;
+            question.textContent = trick.question;
+            scoreDisplay.textContent = `⭐ Score: ${score} | Trick: ${currentTrick + 1}/${totalTricks}`;
+            attemptsDisplay.textContent = `Attempts: ${attempts + 1}/${maxAttempts}`;
+            magicEffect.textContent = '';
+            magicEffect.style.color = '';
+            explanation.textContent = '';
+            nextBtn.disabled = true;
+
+            // Update progress bar
+            progressFill.style.width = `${((currentTrick) / totalTricks) * 100}%`;
+
+            options.innerHTML = '';
+            trick.options.forEach((option, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.textContent = option;
+                btn.onclick = () => checkAnswer(option, btn);
+                options.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(selectedOption, btnElement) {
+            const trick = tricks[currentTrick];
+
+            if (selectedOption === trick.correct) {
+                // Correct!
+                score += 10;
+                magicEffect.textContent = '✨✨✨ MAGIC SPARKLES! ✨✨✨\n🎉 CONFETTI! Magic Works! 🎉';
+                magicEffect.style.color = '#00ff00';
+                explanation.textContent = trick.explanation;
+                attemptsDisplay.textContent = '✓ CORRECT!';
+                attemptsDisplay.style.color = '#00ff00';
+                nextBtn.disabled = false;
+                scoreDisplay.textContent = `⭐ Score: ${score} | Trick: ${currentTrick + 1}/${totalTricks}`;
+                magician.textContent = '🧙‍♂️✨';
+                
+                // Play correct audio and claps
+                correctAudio.play();
+                setTimeout(() => clapsAudio.play(), 300);
+
+                // Create confetti and sparkles
+                createConfetti();
+                createSparkles();
+                
+                // Disable all buttons
+                disableAllButtons();
+            } else {
+                // Wrong
+                attempts++;
+                
+                // Play wrong audio
+                wrongAudio.play();
+                btnElement.style.background = 'linear-gradient(135deg, #cc4444 0%, #882222 100%)';
+                btnElement.disabled = true;
+
+                if (attempts >= maxAttempts) {
+                    // Failed the trick
+                    magicEffect.textContent = '❌ Magic Fails! ❌\nTry again next time!';
+                    magicEffect.style.color = '#ff0000';
+                    explanation.textContent = trick.explanation;
+                    attemptsDisplay.textContent = `✗ WRONG! Attempts: ${attempts}/${maxAttempts} - TRICK FAILED`;
+                    attemptsDisplay.style.color = '#ff0000';
+                    nextBtn.disabled = false;
+                    magician.textContent = '🧙‍♂️❌';
+                } else {
+                    // One attempt left
+                    magicEffect.textContent = '❌ Magic Fails! ❌\nTry again!';
+                    magicEffect.style.color = '#ff6600';
+                    attemptsDisplay.textContent = `✗ WRONG! Attempts: ${attempts}/${maxAttempts}`;
+                    attemptsDisplay.style.color = '#ff6600';
+                    magician.textContent = '🧙‍♂️❓';
+                }
+            }
+        }
+
+        function disableAllButtons() {
+            const buttons = options.querySelectorAll('.option-btn');
+            buttons.forEach(btn => btn.disabled = true);
+        }
+
+        function nextTrick() {
+            currentTrick++;
+            attempts = 0;
+            magician.textContent = '🧙‍♂️';
+            showTrick();
+        }
+
+        nextBtn.onclick = nextTrick;
+
+        function createConfetti() {
+            const colors = ['#ff66cc', '#9933ff', '#00ff00', '#ffff00', '#ff0000', '#00ffff'];
+            
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + '%';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.animationDelay = Math.random() * 0.5 + 's';
+                document.body.appendChild(confetti);
+
+                setTimeout(() => {
+                    confetti.remove();
+                }, 3000);
+            }
+        }
+
+        function createSparkles() {
+            const sparkles = ['✨', '⭐', '💫', '⚡'];
+            
+            for (let i = 0; i < 15; i++) {
+                const sparkle = document.createElement('div');
+                sparkle.className = 'sparkles';
+                sparkle.textContent = sparkles[Math.floor(Math.random() * sparkles.length)];
+                sparkle.style.left = Math.random() * 100 + '%';
+                sparkle.style.top = Math.random() * 100 + '%';
+                sparkle.style.animationDelay = Math.random() * 0.3 + 's';
+                document.body.appendChild(sparkle);
+
+                setTimeout(() => {
+                    sparkle.remove();
+                }, 1000);
+            }
+        }
+
+        function showFinalScore() {
+            gameContainer.style.display = 'none';
+            finalScreen.style.display = 'block';
+
+            finalScore.textContent = `Your Final Score: ${score} / ${totalTricks * 10}`;
+            finalMessage.textContent = getFinalMessage();
+            
+            // Play claps on completion
+            clapsAudio.play();
+        }
+
+        function getFinalMessage() {
+            if (score === totalTricks * 10) {
+                return '✨ PERFECT! You\'re a PRONOUN MAGIC MASTER! ✨';
+            } else if (score >= totalTricks * 8) {
+                return '🎉 Amazing! You\'re a great pronoun magician!';
+            } else if (score >= totalTricks * 6) {
+                return '😊 Good job! Keep practicing your magic!';
+            } else {
+                return '🪄 Try again to become a magic master!';
+            }
+        }
+
+        function restartGame() {
+            currentTrick = 0;
+            attempts = 0;
+            score = 0;
+
+            finalScreen.style.display = 'none';
+            gameContainer.style.display = 'block';
+            
+            showTrick();
+        }
+    </script>
+</body>
+</html>
