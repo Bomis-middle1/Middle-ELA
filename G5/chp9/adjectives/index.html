@@ -1,1 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Magic Wardrobe</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { width: 100%; min-height: 100%; }
+    body {
+      font-family: Arial, sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      color: #2f2740;
+      background:
+        radial-gradient(circle at top, rgba(255,246,255,0.95) 0%, rgba(234,242,255,0.95) 34%, rgba(224,249,244,0.98) 100%);
+    }
+    .screen {
+      min-height: 100vh;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .screen.show { display: flex; }
+    .card {
+      width: min(1100px, 100%);
+      background: rgba(255,255,255,0.74);
+      border: 1px solid rgba(120, 90, 160, 0.12);
+      border-radius: 28px;
+      padding: 18px;
+      box-shadow: 0 20px 45px rgba(112, 86, 150, 0.14);
+      backdrop-filter: blur(10px);
+    }
+    .splash {
+      text-align: center;
+      background: linear-gradient(180deg, rgba(255,255,255,0.92), rgba(247,242,255,0.82));
+    }
+    .splash img {
+      width: min(330px, 74vw);
+      height: auto;
+      filter: drop-shadow(0 12px 18px rgba(120, 80, 170, 0.18));
+      animation: logoPulse 3s ease-in-out forwards;
+    }
+    .splash h1 {
+      margin-top: 14px;
+      font-size: clamp(24px, 4vw, 44px);
+      color: #6d3fc2;
+      font-weight: 900;
+    }
+    .splash p {
+      margin-top: 8px;
+      font-size: clamp(16px, 2.6vw, 22px);
+      color: #665d75;
+    }
+    @keyframes logoPulse {
+      0% { transform: scale(0.8); opacity: 0; }
+      15% { transform: scale(1.04); opacity: 1; }
+      70% { transform: scale(1); opacity: 1; }
+      100% { transform: scale(1); opacity: 0.98; }
+    }
+    .title {
+      text-align: center;
+      font-size: clamp(28px, 5vw, 48px);
+      color: #6d3fc2;
+      font-weight: 900;
+      margin-bottom: 6px;
+    }
+    .subtitle {
+      text-align: center;
+      color: #82758f;
+      font-size: clamp(15px, 2.5vw, 20px);
+      margin-bottom: 12px;
+    }
+    .top {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      margin: 8px 0 12px;
+    }
+    .badge {
+      background: linear-gradient(180deg, #fff, #f4efff);
+      border: 1px solid rgba(109,63,194,0.12);
+      border-radius: 16px;
+      padding: 10px 14px;
+      font-weight: 800;
+      flex: 1 1 120px;
+      text-align: center;
+      color: #4f4160;
+    }
+    .progress {
+      width: 100%;
+      height: 12px;
+      background: rgba(109,63,194,0.10);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-bottom: 16px;
+    }
+    .bar {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, #ff7ac3, #9c6bff, #6ad7ff);
+      transition: width .35s ease;
+    }
+    .layout {
+      display: grid;
+      grid-template-columns: 1fr 0.95fr;
+      gap: 16px;
+      align-items: stretch;
+    }
+    .scene {
+      min-height: 450px;
+      border-radius: 26px;
+      overflow: hidden;
+      position: relative;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(255,255,255,0.85), rgba(255,255,255,0) 25%),
+        linear-gradient(180deg, #f9eaff 0%, #eff7ff 52%, #e6fff8 100%);
+      border: 1px solid rgba(109,63,194,0.10);
+    }
+    .stage {
+      position: absolute;
+      inset: 16px;
+      border-radius: 22px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.32), rgba(255,255,255,0.08)),
+        linear-gradient(180deg, #b6dfff 0%, #eef9ff 40%, #dfffee 100%);
+      overflow: hidden;
+    }
+    .mirror {
+      position: absolute;
+      left: 50%;
+      top: 16px;
+      transform: translateX(-50%);
+      width: min(250px, 58vw);
+      height: 68px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, #fff, #f8f2ff);
+      border: 2px solid rgba(109,63,194,0.12);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.06);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: clamp(20px, 3vw, 30px);
+      color: #8a67c8;
+      font-weight: 800;
+    }
+    .wardrobe {
+      position: absolute;
+      left: 50%;
+      top: 96px;
+      transform: translateX(-50%);
+      width: min(360px, 78vw);
+      height: 280px;
+      border-radius: 24px;
+      background: linear-gradient(180deg, #9159e5 0%, #6a36c9 100%);
+      box-shadow: inset 0 0 0 2px rgba(255,255,255,0.18), 0 14px 30px rgba(105, 57, 171, 0.20);
+    }
+    .door {
+      position: absolute;
+      top: 16px;
+      bottom: 16px;
+      width: 47%;
+      border-radius: 18px;
+      background: linear-gradient(180deg, #eddcff, #d2b5ff);
+      border: 2px solid rgba(255,255,255,0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: clamp(44px, 8vw, 90px);
+      color: rgba(111,57,212,0.8);
+    }
+    .left-door { left: 14px; }
+    .right-door { right: 14px; }
+    .hanger {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: clamp(40px, 7vw, 72px);
+      opacity: 0.18;
+    }
+    .model {
+      position: absolute;
+      left: 50%;
+      bottom: 6px;
+      transform: translateX(-50%);
+      font-size: clamp(74px, 12vw, 136px);
+      filter: drop-shadow(0 10px 14px rgba(0,0,0,0.08));
+      transition: transform .3s ease;
+    }
+    .reward {
+      position: absolute;
+      right: 18px;
+      top: 18px;
+      width: 120px;
+      height: 120px;
+      border-radius: 22px;
+      background: rgba(255,255,255,0.28);
+      border: 1px dashed rgba(255,255,255,0.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 64px;
+      opacity: 0;
+      transform: scale(0.85);
+      transition: all .45s ease;
+    }
+    .reward.show {
+      opacity: 1;
+      transform: scale(1);
+    }
+    .question-side {
+      border-radius: 26px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.94), rgba(247,242,255,0.92));
+      border: 1px solid rgba(109,63,194,0.10);
+      padding: 18px;
+      min-height: 450px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .question {
+      text-align: center;
+      font-size: clamp(22px, 3.8vw, 34px);
+      line-height: 1.5;
+      color: #2d2435;
+      margin: 10px auto 18px;
+      max-width: 560px;
+      font-weight: 700;
+    }
+    .options {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin: 10px 0 14px;
+    }
+    .opt {
+      appearance: none;
+      border: 0;
+      background: linear-gradient(180deg, #8458ff, #6a35d0);
+      color: #fff;
+      border-radius: 18px;
+      min-height: 66px;
+      padding: 14px 12px;
+      font-size: clamp(17px, 3vw, 24px);
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform .15s ease, opacity .15s ease, filter .15s ease;
+      box-shadow: 0 10px 16px rgba(106,53,208,0.14);
+      text-transform: capitalize;
+    }
+    .opt:hover { transform: translateY(-1px) scale(1.01); filter: brightness(1.04); }
+    .opt:disabled { opacity: .55; cursor: not-allowed; transform: none; }
+    .msg {
+      min-height: 34px;
+      text-align: center;
+      font-size: clamp(16px, 3vw, 22px);
+      color: #6d3fc2;
+      font-weight: 800;
+      margin-top: 6px;
+    }
+    .explain {
+      min-height: 24px;
+      text-align: center;
+      color: #6e647b;
+      font-size: clamp(14px, 2.4vw, 18px);
+      margin-bottom: 8px;
+    }
+    .next, .restart {
+      width: 100%;
+      border: none;
+      border-radius: 18px;
+      padding: 16px 18px;
+      font-size: clamp(18px, 3.6vw, 24px);
+      font-weight: 800;
+      cursor: pointer;
+      color: white;
+      background: linear-gradient(180deg, #ff6fb8, #d24f9b);
+      box-shadow: 0 10px 24px rgba(210,79,155, .22);
+    }
+    .next:disabled { opacity: .45; cursor: not-allowed; box-shadow: none; }
+    .final { text-align: center; }
+    .final h2 {
+      font-size: clamp(28px, 5vw, 44px);
+      color: #6d3fc2;
+      margin-bottom: 12px;
+    }
+    .final p {
+      font-size: clamp(20px, 4vw, 28px);
+      margin: 10px 0 18px;
+      color: #5e4a6a;
+    }
+    .confetti {
+      position: fixed;
+      top: -14px;
+      width: 10px;
+      height: 14px;
+      border-radius: 3px;
+      animation: fall 2.8s linear forwards;
+      z-index: 9999;
+    }
+    @keyframes fall {
+      to { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+    }
+    .sparkle {
+      position: fixed;
+      font-size: 28px;
+      animation: sparkle 1s ease-out forwards;
+      z-index: 9999;
+      pointer-events: none;
+    }
+    @keyframes sparkle {
+      0% { transform: scale(.2); opacity: 0; }
+      25% { transform: scale(1.2); opacity: 1; }
+      100% { transform: scale(0); opacity: 0; }
+    }
+    @media (max-width: 860px) {
+      .layout { grid-template-columns: 1fr; }
+      .scene, .question-side { min-height: auto; }
+      .scene { min-height: 400px; }
+    }
+    @media (max-width: 700px) {
+      .options { grid-template-columns: 1fr; }
+      .card { padding: 14px; border-radius: 20px; }
+      .badge { flex: 1 1 100%; }
+      .wardrobe { width: min(320px, 80vw); }
+    }
+  </style>
+</head>
+<body>
+  <div class="screen show" id="splashScreen">
+    <div class="card splash">
+      <img src="assets/logo.png" alt="Innovine logo">
+      <h1>Magic Wardrobe</h1>
+      <p>Choose the best adjective for each picture.</p>
+    </div>
+  </div>
 
+  <div class="screen" id="gameScreen">
+    <div class="card">
+      <div class="title">👗 Magic Wardrobe 👗</div>
+      <div class="subtitle">Pick the adjective that best matches the outfit or object.</div>
+      <div class="top">
+        <div class="badge" id="scoreText">Score: 0</div>
+        <div class="badge" id="trickText">Question 1 / 15</div>
+        <div class="badge" id="attemptText">Attempt 1 / 2</div>
+      </div>
+      <div class="progress"><div class="bar" id="bar"></div></div>
+
+      <div class="layout">
+        <div class="scene">
+          <div class="stage">
+            <div class="mirror">Style Mirror</div>
+            <div class="wardrobe">
+              <div class="door left-door">✨</div>
+              <div class="door right-door">✨</div>
+              <div class="hanger">👚</div>
+              <div class="reward" id="reward">🎀</div>
+              <div class="model" id="model">🧍‍♀️</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="question-side">
+          <div>
+            <div class="question" id="question"></div>
+            <div class="options" id="options"></div>
+            <div class="msg" id="message"></div>
+            <div class="explain" id="explain"></div>
+          </div>
+          <button class="next" id="nextBtn" disabled>Unlock Next Look ✨</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="screen" id="finalScreen">
+    <div class="card final">
+      <h2>🎉 Wardrobe Complete! 🎉</h2>
+      <div style="font-size:clamp(72px,12vw,120px);margin:10px 0;">🧍‍♀️👗👒💎</div>
+      <p id="finalScore"></p>
+      <p id="finalMsg"></p>
+      <button class="restart" id="restartBtn">Play Again ✨</button>
+    </div>
+  </div>
+
+  <script>
+    const tricks = [
+      { q: "Which word best describes a gown that looks elegant and expensive?", options: ["heavy", "beautiful", "few", "my"], correct: "beautiful", explain: "‘Beautiful’ is the best describing word for the gown." },
+      { q: "Which word best describes a scarf that feels gentle and comfortable?", options: ["soft", "three", "these", "our"], correct: "soft", explain: "‘Soft’ matches the scarf." },
+      { q: "Which word best describes shoes that shine under bright lights?", options: ["dirty", "shiny", "many", "your"], correct: "shiny", explain: "‘Shiny’ fits the shoes." },
+      { q: "Which word best describes a hat made for a royal party?", options: ["plain", "grand", "little", "this"], correct: "grand", explain: "‘Grand’ suits a royal party hat." },
+      { q: "Which word best describes a jacket that feels warm in winter?", options: ["warm", "two", "those", "their"], correct: "warm", explain: "‘Warm’ describes the jacket." },
+      { q: "Which word best describes a dress that looks pretty on stage?", options: ["pretty", "one", "my", "many"], correct: "pretty", explain: "‘Pretty’ fits the dress." },
+      { q: "Which word best describes a bag that can hold many books?", options: ["tiny", "spacious", "these", "his"], correct: "spacious", explain: "‘Spacious’ tells us the bag can hold a lot." },
+      { q: "Which word best describes a belt that looks modern and stylish?", options: ["old", "stylish", "several", "our"], correct: "stylish", explain: "‘Stylish’ is the best choice." },
+      { q: "Which word best describes a coat that is very thick and cozy?", options: ["thick", "that", "four", "her"], correct: "thick", explain: "‘Thick’ describes the coat." },
+      { q: "Which word best describes earrings that sparkle beautifully?", options: ["sparkling", "little", "this", "my"], correct: "sparkling", explain: "‘Sparkling’ is the best describing word." },
+      { q: "Which word best describes a bracelet that looks delicate and light?", options: ["delicate", "many", "those", "his"], correct: "delicate", explain: "‘Delicate’ fits the bracelet." },
+      { q: "Which word best describes a shirt that feels smooth to touch?", options: ["smooth", "five", "our", "these"], correct: "smooth", explain: "‘Smooth’ best describes the shirt." },
+      { q: "Which word best describes a pair of gloves that look fancy?", options: ["fancy", "some", "my", "that"], correct: "fancy", explain: "‘Fancy’ matches the gloves." },
+      { q: "Which word best describes a dress that seems bright and cheerful?", options: ["cheerful", "three", "your", "this"], correct: "cheerful", explain: "‘Cheerful’ suits the dress." },
+      { q: "Which word best describes a necklace that looks lovely and special?", options: ["lovely", "several", "our", "those"], correct: "lovely", explain: "‘Lovely’ is the best adjective here." }
+    ];
+
+    let current = 0;
+    let attempts = 0;
+    let score = 0;
+    let locked = false;
+    let audioReady = false;
+
+    const splashScreen = document.getElementById("splashScreen");
+    const gameScreen = document.getElementById("gameScreen");
+    const finalScreen = document.getElementById("finalScreen");
+    const scoreText = document.getElementById("scoreText");
+    const trickText = document.getElementById("trickText");
+    const attemptText = document.getElementById("attemptText");
+    const bar = document.getElementById("bar");
+    const model = document.getElementById("model");
+    const reward = document.getElementById("reward");
+    const question = document.getElementById("question");
+    const optionsBox = document.getElementById("options");
+    const message = document.getElementById("message");
+    const explain = document.getElementById("explain");
+    const nextBtn = document.getElementById("nextBtn");
+    const finalScore = document.getElementById("finalScore");
+    const finalMsg = document.getElementById("finalMsg");
+    const restartBtn = document.getElementById("restartBtn");
+
+    const correctAudio = new Audio("assets/correct.mp3");
+    const wrongAudio = new Audio("assets/wrong.mp3");
+    const clapAudio = new Audio("assets/freesound_community-claps-44774.mp3");
+
+    function prepareAudio() {
+      if (audioReady) return;
+      [correctAudio, wrongAudio, clapAudio].forEach(a => {
+        a.preload = "auto";
+        a.volume = 1;
+      });
+      audioReady = true;
+    }
+
+    function playSound(aud) {
+      try {
+        aud.currentTime = 0;
+        aud.play().catch(() => {});
+      } catch (e) {}
+    }
+
+    function showConfetti() {
+      const colors = ["#ff7ac3", "#ffd166", "#6ad7ff", "#9c6bff", "#55efc4"];
+      for (let i = 0; i < 34; i++) {
+        const d = document.createElement("div");
+        d.className = "confetti";
+        d.style.left = Math.random() * 100 + "vw";
+        d.style.background = colors[Math.floor(Math.random() * colors.length)];
+        d.style.animationDelay = (Math.random() * 0.4) + "s";
+        d.style.transform = `rotate(${Math.random() * 180}deg)`;
+        document.body.appendChild(d);
+        setTimeout(() => d.remove(), 3200);
+      }
+    }
+
+    function showSparkles() {
+      const items = ["✨", "⭐", "💫"];
+      for (let i = 0; i < 16; i++) {
+        const s = document.createElement("div");
+        s.className = "sparkle";
+        s.textContent = items[Math.floor(Math.random() * items.length)];
+        s.style.left = Math.random() * 100 + "vw";
+        s.style.top = Math.random() * 100 + "vh";
+        document.body.appendChild(s);
+        setTimeout(() => s.remove(), 1200);
+      }
+    }
+
+    function render() {
+      if (current >= tricks.length) return showFinal();
+      const t = tricks[current];
+      trickText.textContent = `Question ${current + 1} / ${tricks.length}`;
+      attemptText.textContent = `Attempt ${attempts + 1} / 2`;
+      scoreText.textContent = `Score: ${score}`;
+      bar.style.width = `${(current / tricks.length) * 100}%`;
+      question.textContent = t.q;
+      message.textContent = "";
+      explain.textContent = "";
+      nextBtn.disabled = true;
+      locked = false;
+      reward.classList.remove("show");
+      reward.textContent = "🎀";
+      optionsBox.innerHTML = "";
+      t.options.forEach(opt => {
+        const b = document.createElement("button");
+        b.className = "opt";
+        b.textContent = opt;
+        b.onclick = () => answer(opt, b);
+        optionsBox.appendChild(b);
+      });
+    }
+
+    function disableOptions() {
+      optionsBox.querySelectorAll("button").forEach(b => b.disabled = true);
+    }
+
+    function answer(opt, btn) {
+      if (locked) return;
+      const t = tricks[current];
+      if (opt === t.correct) {
+        locked = true;
+        score += 10;
+        model.textContent = "👗🧍‍♀️";
+        reward.textContent = "👑";
+        reward.classList.add("show");
+        playSound(correctAudio);
+        setTimeout(() => playSound(clapAudio), 850);
+        showConfetti();
+        showSparkles();
+        disableOptions();
+        nextBtn.disabled = false;
+        scoreText.textContent = `Score: ${score}`;
+        message.textContent = "";
+        explain.textContent = "";
+      } else {
+        playSound(wrongAudio);
+        attempts += 1;
+        btn.disabled = true;
+        btn.style.opacity = "0.4";
+        if (attempts < 2) {
+          attemptText.textContent = `Attempt ${attempts + 1} / 2`;
+        } else {
+          locked = true;
+          disableOptions();
+          nextBtn.disabled = false;
+        }
+      }
+    }
+
+    function next() {
+      current += 1;
+      attempts = 0;
+      model.textContent = "🧍‍♀️";
+      reward.classList.remove("show");
+      reward.textContent = "🎀";
+      if (current >= tricks.length) showFinal();
+      else render();
+    }
+
+    function showFinal() {
+      gameScreen.classList.remove("show");
+      finalScreen.classList.add("show");
+      finalScore.textContent = `Your Final Score: ${score} / ${tricks.length * 10}`;
+      finalMsg.textContent =
+        score === 150 ? "✨ Perfect! You are a style superstar!" :
+        score >= 120 ? "🎉 Amazing! Your adjective choices are excellent!" :
+        score >= 90 ? "😊 Great job! Keep practicing your describing words!" :
+        "👗 Keep playing and your style will get even better!";
+      playSound(clapAudio);
+      bar.style.width = "100%";
+    }
+
+    function restartGame() {
+      current = 0;
+      attempts = 0;
+      score = 0;
+      locked = false;
+      finalScreen.classList.remove("show");
+      gameScreen.classList.add("show");
+      model.textContent = "🧍‍♀️";
+      reward.classList.remove("show");
+      reward.textContent = "🎀";
+      render();
+    }
+
+    nextBtn.addEventListener("click", next);
+    restartBtn.addEventListener("click", restartGame);
+
+    setTimeout(() => {
+      splashScreen.classList.remove("show");
+      gameScreen.classList.add("show");
+      prepareAudio();
+      render();
+    }, 3000);
+
+    document.addEventListener("click", prepareAudio, { once: true });
+    document.addEventListener("touchstart", prepareAudio, { once: true });
+  </script>
+</body>
+</html>
