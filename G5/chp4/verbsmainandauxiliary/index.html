@@ -1,1 +1,792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>🚀 Verb Rocket Space Mission</title>
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Arial', sans-serif;
+}
 
+body {
+  background: linear-gradient(180deg, #0f0c29, #302b63, #24243e);
+  min-height: 100vh;
+  overflow: hidden;
+  position: relative;
+}
+
+/* SPLASH SCREEN */
+#splash {
+  position: fixed;
+  inset: 0;
+  background: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  transition: opacity 1s ease;
+}
+
+#splash img {
+  max-width: 320px;
+  width: 80%;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-20px); }
+}
+
+/* MOVING STARS BACKGROUND */
+#stars {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+}
+
+.star {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background: white;
+  border-radius: 50%;
+  animation: moveStar 3s linear infinite;
+}
+
+@keyframes moveStar {
+  from { transform: translateY(-100px); }
+  to { transform: translateY(100vh); }
+}
+
+/* INTRO SCREEN */
+#intro {
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(180deg, #0f0c29, #302b63);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 5000;
+  flex-direction: column;
+  text-align: center;
+  color: white;
+  padding: 20px;
+}
+
+#intro h1 {
+  font-size: 42px;
+  margin-bottom: 15px;
+  color: #00d4ff;
+  text-shadow: 0 0 20px #00d4ff;
+}
+
+#intro p {
+  font-size: 20px;
+  max-width: 700px;
+  margin-bottom: 10px;
+  line-height: 1.5;
+}
+
+.startBtn {
+  padding: 16px 40px;
+  font-size: 22px;
+  background: linear-gradient(135deg, #00d4ff, #0099ff);
+  color: white;
+  border: none;
+  border-radius: 15px;
+  cursor: pointer;
+  margin-top: 20px;
+  font-weight: bold;
+  box-shadow: 0 4px 20px rgba(0, 212, 255, 0.5);
+  transition: 0.3s;
+}
+
+.startBtn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 30px rgba(0, 212, 255, 0.7);
+}
+
+/* GAME AREA */
+#gameArea {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  z-index: 1;
+}
+
+/* ROCKET */
+#rocket {
+  position: absolute;
+  bottom: 150px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 100px;
+  filter: drop-shadow(0 0 30px #00d4ff);
+  transition: left 0.1s ease, transform 0.2s;
+  z-index: 100;
+}
+
+#rocket.boost {
+  filter: drop-shadow(0 0 50px #00ff88);
+  transform: translateX(-50%) scale(1.1);
+}
+
+#rocket.crash {
+  filter: drop-shadow(0 0 50px #ff4444);
+  animation: crashAnim 0.5s;
+}
+
+@keyframes crashAnim {
+  0%, 100% { transform: translateX(-50%) rotate(0deg); }
+  25% { transform: translateX(-50%) rotate(-20deg); }
+  75% { transform: translateX(-50%) rotate(20deg); }
+}
+
+/* OBSTACLES */
+.obstacle {
+  position: absolute;
+  font-size: 50px;
+  animation: fall 4s linear infinite;
+  z-index: 50;
+}
+
+@keyframes fall {
+  from { transform: translateY(-100px); }
+  to { transform: translateY(100vh); }
+}
+
+/* QUESTION MODAL */
+#questionModal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.9);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.questionBox {
+  background: linear-gradient(135deg, #1a1a2e, #16213e);
+  border-radius: 25px;
+  padding: 30px;
+  max-width: 750px;
+  width: 95%;
+  box-shadow: 0 0 50px rgba(0, 212, 255, 0.5);
+  border: 2px solid #00d4ff;
+}
+
+.questionBox h2 {
+  color: #00d4ff;
+  font-size: 24px;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.questionText {
+  font-size: 18px;
+  color: #fff;
+  line-height: 1.7;
+  margin-bottom: 20px;
+  background: rgba(0, 212, 255, 0.1);
+  padding: 15px;
+  border-radius: 12px;
+  border-left: 4px solid #00d4ff;
+}
+
+.underline {
+  text-decoration: underline;
+  color: #00ff88;
+  font-weight: bold;
+}
+
+.options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.optionBtn {
+  padding: 14px 18px;
+  font-size: 16px;
+  background: linear-gradient(135deg, #0099ff, #0066cc);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.3s;
+}
+
+.optionBtn:hover {
+  transform: scale(1.05);
+  background: linear-gradient(135deg, #0066cc, #004499);
+}
+
+.optionBtn.correct {
+  background: linear-gradient(135deg, #00ff88, #00cc66);
+  animation: correctPulse 0.5s;
+}
+
+.optionBtn.wrong {
+  background: linear-gradient(135deg, #ff4444, #cc0000);
+  animation: wrongShake 0.5s;
+}
+
+@keyframes correctPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+@keyframes wrongShake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-10px); }
+  75% { transform: translateX(10px); }
+}
+
+.feedback {
+  margin-top: 15px;
+  padding: 12px;
+  border-radius: 12px;
+  text-align: center;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.feedback.good {
+  background: rgba(0, 255, 136, 0.2);
+  color: #00ff88;
+}
+
+.feedback.bad {
+  background: rgba(255, 68, 68, 0.2);
+  color: #ff4444;
+}
+
+/* SCORE BOARD */
+#scoreBoard {
+  position: fixed;
+  top: 15px;
+  left: 15px;
+  background: rgba(0, 212, 255, 0.2);
+  padding: 12px 18px;
+  border-radius: 12px;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  z-index: 200;
+  border: 2px solid #00d4ff;
+}
+
+/* PROGRESS BAR */
+#progressBar {
+  position: fixed;
+  top: 15px;
+  right: 15px;
+  width: 200px;
+  height: 20px;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 10px;
+  z-index: 200;
+  border: 2px solid #00d4ff;
+}
+
+#progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, #00d4ff, #00ff88);
+  width: 0%;
+  transition: width 0.5s ease;
+  border-radius: 10px;
+}
+
+/* SPEED METER */
+#speedMeter {
+  position: fixed;
+  bottom: 15px;
+  left: 15px;
+  background: rgba(0, 212, 255, 0.2);
+  padding: 10px 15px;
+  border-radius: 12px;
+  color: white;
+  font-size: 14px;
+  font-weight: bold;
+  z-index: 200;
+  border: 2px solid #00d4ff;
+}
+
+/* LEVEL COUNTER */
+#levelCounter {
+  position: fixed;
+  bottom: 15px;
+  right: 15px;
+  background: rgba(0, 212, 255, 0.2);
+  padding: 10px 15px;
+  border-radius: 12px;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  z-index: 200;
+  border: 2px solid #00d4ff;
+}
+
+/* RESULT SCREEN */
+#result {
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(180deg, #0f0c29, #302b63);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 5000;
+  flex-direction: column;
+  text-align: center;
+  color: white;
+  padding: 20px;
+}
+
+#result h1 {
+  font-size: 48px;
+  margin-bottom: 15px;
+  color: #00ff88;
+  text-shadow: 0 0 30px #00ff88;
+}
+
+#result h2 {
+  font-size: 36px;
+  color: #00d4ff;
+  margin-bottom: 10px;
+}
+
+#result h3 {
+  font-size: 52px;
+  color: #ffd700;
+  margin: 20px 0;
+  text-shadow: 0 0 40px #ffd700;
+}
+
+#result p {
+  font-size: 22px;
+  margin-bottom: 20px;
+}
+
+.restartBtn {
+  padding: 16px 40px;
+  font-size: 22px;
+  background: linear-gradient(135deg, #ff6b6b, #ee5a5a);
+  color: white;
+  border: none;
+  border-radius: 15px;
+  cursor: pointer;
+  font-weight: bold;
+  box-shadow: 0 4px 20px rgba(255, 107, 107, 0.5);
+  transition: 0.3s;
+}
+
+.restartBtn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 30px rgba(255, 107, 107, 0.7);
+}
+
+/* CONFETTI */
+.confetti {
+  position: fixed;
+  width: 12px;
+  height: 12px;
+  animation: fallConfetti 3s linear forwards;
+  z-index: 2000;
+}
+
+@keyframes fallConfetti {
+  from { transform: translateY(-100px) rotate(0deg); }
+  to { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+}
+
+/* PLANET */
+#planet {
+  position: fixed;
+  bottom: -150px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 200px;
+  z-index: 1;
+  animation: approach 10s linear;
+}
+
+@keyframes approach {
+  from { bottom: -150px; }
+  to { bottom: 30%; }
+}
+
+/* MOBILE */
+@media (max-width: 768px) {
+  #intro h1 { font-size: 32px; }
+  #intro p { font-size: 16px; }
+  .questionText { font-size: 15px; }
+  .optionBtn { font-size: 14px; padding: 12px; }
+  #rocket { font-size: 70px; }
+  .obstacle { font-size: 40px; }
+}
+</style>
+</head>
+<body>
+
+<!-- SPLASH SCREEN -->
+<div id="splash">
+  <img src="assets/logo.png" onerror="this.style.display='none'">
+</div>
+
+<!-- MOVING STARS -->
+<div id="stars"></div>
+
+<!-- ROCKET -->
+<div id="rocket">🚀</div>
+
+<!-- PLANET -->
+<div id="planet">🪐</div>
+
+<!-- INTRO SCREEN -->
+<div id="intro">
+  <h1>🚀 Verb Rocket Space Mission</h1>
+  <p>Pilot your rocket through space and answer challenging Main & Auxiliary Verb questions!</p>
+  <p>✅ Correct = Speed Boost + Pass Obstacles</p>
+  <p>❌ Wrong = Slow Down + Hit Obstacle (1 more try!)</p>
+  <p>🎯 Complete all 10 levels to reach the Verb Planet!</p>
+  <button class="startBtn" onclick="startGame()">🚀 LAUNCH ROCKET</button>
+</div>
+
+<!-- GAME AREA -->
+<div id="gameArea"></div>
+
+<!-- SCORE BOARD -->
+<div id="scoreBoard">
+  Score: <span id="score">0</span> | 
+  Level: <span id="level">0</span>/10
+</div>
+
+<!-- PROGRESS BAR -->
+<div id="progressBar">
+  <div id="progressFill"></div>
+</div>
+
+<!-- SPEED METER -->
+<div id="speedMeter">
+  Speed: <span id="speed">Normal</span>
+</div>
+
+<!-- LEVEL COUNTER -->
+<div id="levelCounter">
+  Level <span id="currentLevel">1</span>/10
+</div>
+
+<!-- QUESTION MODAL -->
+<div id="questionModal">
+  <div class="questionBox">
+    <h2>Level <span id="questionLevel">1</span></h2>
+    <div class="questionText" id="questionText"></div>
+    <div class="options" id="options"></div>
+    <div class="feedback" id="feedback"></div>
+  </div>
+</div>
+
+<!-- RESULT SCREEN -->
+<div id="result">
+  <h1>🪐 MISSION COMPLETE!</h1>
+  <h2>You reached the Verb Planet!</h2>
+  <h3 id="rank"></h3>
+  <p id="finalScore"></p>
+  <button class="restartBtn" onclick="location.reload()">🚀 PLAY AGAIN</button>
+</div>
+
+<!-- AUDIO -->
+<audio id="correctSound" src="assets/correct.mp3"></audio>
+<audio id="wrongSound" src="assets/wrong.mp3"></audio>
+<audio id="clapSound" src="assets/freesound_community-claps-44774.mp3"></audio>
+
+<script>
+// SPLASH LOGO - FIXED
+window.addEventListener('DOMContentLoaded', function() {
+  createStars();
+  setTimeout(hideSplash, 5000);
+});
+
+function hideSplash() {
+  const splash = document.getElementById('splash');
+  const intro = document.getElementById('intro');
+  
+  splash.style.opacity = '0';
+  setTimeout(() => {
+    splash.style.display = 'none';
+    intro.style.display = 'flex';
+  }, 1000);
+}
+
+function createStars() {
+  const stars = document.getElementById('stars');
+  for(let i=0; i<50; i++) {
+    const star = document.createElement('div');
+    star.className = 'star';
+    star.style.left = Math.random() * 100 + '%';
+    star.style.animationDelay = Math.random() * 3 + 's';
+    star.style.animationDuration = (2 + Math.random() * 2) + 's';
+    stars.appendChild(star);
+  }
+}
+
+// AUDIO
+const correctSound = document.getElementById('correctSound');
+const wrongSound = document.getElementById('wrongSound');
+const clapSound = document.getElementById('clapSound');
+correctSound.volume = 0.8;
+wrongSound.volume = 0.8;
+clapSound.volume = 0.8;
+
+// QUESTIONS - LONGER & HARDER
+const questions = [
+  {
+    q: "Although Maria was extremely nervous before her final dance performance, her teacher told her that she <span class='underline'>is dancing</span> beautifully and <span class='underline'>has practiced</span> for many hours, so she <span class='underline'>will definitely win</span> the competition. What is the AUXILIARY verb in the underlined phrase 'has practiced'?",
+    options: ["has", "practiced", "is", "will"],
+    correct: 0
+  },
+  {
+    q: "The students who <span class='underline'>had been studying</span> for the entire week were finally able to complete their difficult project, and they <span class='underline'>have submitted</span> it to the principal before the deadline yesterday. Identify the MAIN verb in the underlined phrase 'have submitted'.",
+    options: ["have", "submitted", "had", "been"],
+    correct: 1
+  },
+  {
+    q: "When the teacher asked the class if anyone <span class='underline'>could solve</span> the complex mathematics problem, only three students <span class='underline'>were able to</span> provide the correct answer, while the rest <span class='underline'>were struggling</span> with it. Which word is a MODAL auxiliary verb in this sentence?",
+    options: ["could", "were", "to", "with"],
+    correct: 0
+  },
+  {
+    q: "Although the team <span class='underline'>was working</span> on the project for months, they <span class='underline'>had not finished</span> it by the deadline because unexpected complications <span class='underline'>arose</span> during the final week. What is the PRIMARY auxiliary verb in 'had not finished'?",
+    options: ["had", "not", "finished", "was"],
+    correct: 0
+  },
+  {
+    q: "The scientist explained that if the experiment <span class='underline'>is conducted</span> properly, the results <span class='underline'>will be published</span> in the renowned journal, and other researchers <span class='underline'>might replicate</span> the findings. Identify the AUXILIARY verb indicating future tense in 'will be published'.",
+    options: ["will", "be", "published", "is"],
+    correct: 0
+  },
+  {
+    q: "My sister <span class='underline'>has been teaching</span> at the same school for over fifteen years, and she <span class='underline'>loves</span> her job because the children <span class='underline'>are very enthusiastic</span> about learning. What type of auxiliary verb is 'has' in 'has been teaching'?",
+    options: ["Modal auxiliary", "Primary auxiliary", "Main verb", "Conjunction"],
+    correct: 1
+  },
+  {
+    q: "The manager announced that all employees <span class='underline'>must attend</span> the mandatory training session tomorrow, and anyone who <span class='underline'>cannot participate</span> <span class='underline'>should request</span> an alternative date in advance. Which word is a MODAL auxiliary expressing obligation?",
+    options: ["must", "can", "should", "attend"],
+    correct: 0
+  },
+  {
+    q: "While the children <span class='underline'>were playing</span> in the garden, their mother <span class='underline'>was reading</span> a book, and their father <span class='underline'>has just returned</span> from work. Identify the MAIN verb in the phrase 'were playing'.",
+    options: ["were", "playing", "in", "the"],
+    correct: 1
+  },
+  {
+    q: "The professor stated that students <span class='underline'>should have completed</span> the assignment before the class, but many <span class='underline'>did not finish</span> it because they <span class='underline'>were confused</span> about the requirements. What is the AUXILIARY verb expressing past perfect in 'should have completed'?",
+    options: ["should", "have", "completed", "did"],
+    correct: 1
+  },
+  {
+    q: "Although the weather <span class='underline'>was terrible</span> during our trip, we <span class='underline'>still managed</span> to visit all the museums, and we <span class='underline'>will remember</span> the experience forever. Which auxiliary verb indicates PAST CONTINUOUS tense in the sentence?",
+    options: ["was", "still", "will", "managed"],
+    correct: 0
+  }
+];
+
+// GAME VARIABLES
+let currentLevel = 0;
+let score = 0;
+let attempts = 0;
+let gameSpeed = 'Normal';
+let speedValue = 1;
+
+// ELEMENTS
+const rocket = document.getElementById('rocket');
+const questionModal = document.getElementById('questionModal');
+const questionText = document.getElementById('questionText');
+const optionsDiv = document.getElementById('options');
+const feedback = document.getElementById('feedback');
+const scoreEl = document.getElementById('score');
+const levelEl = document.getElementById('level');
+const currentLevelEl = document.getElementById('currentLevel');
+const questionLevelEl = document.getElementById('questionLevel');
+const progressFill = document.getElementById('progressFill');
+const speedEl = document.getElementById('speed');
+const result = document.getElementById('result');
+
+// START GAME
+function startGame() {
+  document.getElementById('intro').style.display = 'none';
+  score = 0;
+  currentLevel = 0;
+  updateScore();
+  startGameLoop();
+}
+
+// GAME LOOP
+function startGameLoop() {
+  const obstacles = [];
+  
+  // Create obstacles
+  for(let i=0; i<5; i++) {
+    const obs = document.createElement('div');
+    obs.className = 'obstacle';
+    obs.innerHTML = '❌';
+    obs.style.left = Math.random() * 80 + '%';
+    obs.style.top = '-100px';
+    obs.style.animationDelay = i * 0.8 + 's';
+    document.getElementById('gameArea').appendChild(obs);
+    obstacles.push(obs);
+  }
+  
+  // Show question after 1 second
+  setTimeout(() => {
+    showQuestion();
+  }, 1000);
+}
+
+// SHOW QUESTION
+function showQuestion() {
+  attempts = 0;
+  feedback.innerHTML = '';
+  feedback.className = 'feedback';
+  
+  const q = questions[currentLevel];
+  questionLevelEl.textContent = currentLevel + 1;
+  questionText.innerHTML = q.q;
+  optionsDiv.innerHTML = '';
+  
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'optionBtn';
+    btn.textContent = opt;
+    btn.onclick = () => checkAnswer(i, btn);
+    optionsDiv.appendChild(btn);
+  });
+  
+  questionModal.style.display = 'flex';
+}
+
+// CHECK ANSWER
+function checkAnswer(selected, btn) {
+  const q = questions[currentLevel];
+  const allBtns = optionsDiv.querySelectorAll('.optionBtn');
+  
+  allBtns.forEach(b => b.disabled = true);
+  
+  if(selected === q.correct) {
+    // CORRECT!
+    btn.classList.add('correct');
+    feedback.innerHTML = '🎉 CORRECT! Speed Boost Activated!';
+    feedback.className = 'feedback good';
+    correctSound.play();
+    clapSound.play();
+    createConfetti();
+    
+    score++;
+    gameSpeed = 'FAST';
+    speedValue = 1.5;
+    speedEl.textContent = 'FAST ⚡';
+    rocket.classList.add('boost');
+    
+    setTimeout(() => {
+      rocket.classList.remove('boost');
+      gameSpeed = 'Normal';
+      speedValue = 1;
+      speedEl.textContent = 'Normal';
+    }, 3000);
+  } else {
+    // WRONG!
+    btn.classList.add('wrong');
+    allBtns[q.correct].classList.add('correct');
+    
+    if(attempts === 0) {
+      attempts = 1;
+      feedback.innerHTML = '❌ Wrong! One more attempt remains!';
+      feedback.className = 'feedback bad';
+      wrongSound.play();
+      
+      setTimeout(() => {
+        feedback.innerHTML = '';
+        allBtns.forEach(b => b.disabled = false);
+      }, 1500);
+    } else {
+      feedback.innerHTML = '❌ Wrong! Correct: ' + q.options[q.correct];
+      feedback.className = 'feedback bad';
+      wrongSound.play();
+      rocket.classList.add('crash');
+      setTimeout(() => rocket.classList.remove('crash'), 500);
+    }
+  }
+  
+  updateScore();
+  
+  setTimeout(() => {
+    questionModal.style.display = 'none';
+    currentLevel++;
+    
+    if(currentLevel < questions.length) {
+      updateScore();
+      setTimeout(startGameLoop, 500);
+    } else {
+      finishGame();
+    }
+  }, 2000);
+}
+
+// UPDATE SCORE
+function updateScore() {
+  scoreEl.textContent = score;
+  levelEl.textContent = currentLevel;
+  currentLevelEl.textContent = currentLevel + 1;
+  progressFill.style.width = ((currentLevel) / questions.length * 100) + '%';
+}
+
+// CONFETTI
+function createConfetti() {
+  for(let i=0; i<30; i++) {
+    const conf = document.createElement('div');
+    conf.className = 'confetti';
+    conf.style.left = Math.random() * 100 + '%';
+    conf.style.background = `hsl(${Math.random()*360}, 100%, 50%)`;
+    conf.style.animationDuration = (2 + Math.random() * 2) + 's';
+    document.body.appendChild(conf);
+    setTimeout(() => conf.remove(), 3000);
+  }
+}
+
+// FINISH GAME
+function finishGame() {
+  rocket.style.bottom = '30%';
+  
+  setTimeout(() => {
+    result.style.display = 'flex';
+    
+    const rankEl = document.getElementById('rank');
+    const finalEl = document.getElementById('finalScore');
+    
+    finalEl.textContent = `You scored ${score} out of 10!`;
+    
+    if(score >= 9) {
+      rankEl.textContent = '🏅 MASTER SPACE PILOT';
+      createConfetti();
+      clapSound.play();
+    } else if(score >= 6) {
+      rankEl.textContent = '⭐ CADET VERB EXPLORER';
+    } else {
+      rankEl.textContent = '🌙 MOON LEARNER';
+    }
+  }, 3000);
+}
+</script>
+
+</body>
+</html>
