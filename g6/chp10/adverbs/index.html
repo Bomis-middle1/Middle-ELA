@@ -124,7 +124,7 @@ button.action-btn:active {
     border: 1px solid rgba(255,213,79,0.2);
 }
 
-/* CRYStAL COLLECTOR VAULT DISPLAY */
+/* CRYSTAL COLLECTOR VAULT DISPLAY */
 #crystalVault {
     display: flex;
     justify-content: center;
@@ -154,6 +154,7 @@ button.action-btn:active {
     border-style: solid;
     border-color: #ffd54f;
     transform: scale(1.1);
+    background: rgba(255, 213, 79, 0.1);
 }
 
 /* SCENARIO TEXT ARENA BOARD */
@@ -210,13 +211,15 @@ button.action-btn:active {
 #feedbackOverlay {
     position: fixed;
     inset: 0;
-    background: rgba(11, 19, 43, 0.85);
+    background: rgba(11, 19, 43, 0.9);
     backdrop-filter: blur(8px);
     display: none;
     align-items: center;
     justify-content: center;
     flex-direction: column;
     z-index: 5000;
+    padding: 20px;
+    text-align: center;
 }
 #feedbackText {
     font-size: 28px;
@@ -226,6 +229,7 @@ button.action-btn:active {
 #feedbackSub {
     font-size: 16px;
     color: #cbd5e1;
+    max-width: 500px;
 }
 
 /* ==========================================================================
@@ -309,7 +313,7 @@ button.action-btn:active {
 
 <div id="game">
     <div class="hud-panel">
-        <div class="hud-item" id="qCount">1/15</div>
+        <div class="hud-item" id="qCount">Challenge: 1/15</div>
         <div class="hud-item" style="color:#ffd54f;">⏳ <span id="timer">80</span>s</div>
     </div>
 
@@ -342,15 +346,15 @@ button.action-btn:active {
         <div class="stats-line"><span>Performance:</span> <span id="remark" style="font-weight:bold; color:#ffd54f;"></span></div>
         <div class="stats-line"><span>Total Score:</span> <span id="scoreText" style="font-weight:bold;"></span></div>
         <div class="stats-line"><span>Exploration Time:</span> <span id="timeTaken"></span></div>
-        <div class="stats-line"><span>Wrong Coordinates:</span> <span id="wrongCount" style="color:#f87171;"></span></div>
+        <div class="stats-line"><span>Wrong Attempts:</span> <span id="wrongCount" style="color:#f87171;"></span></div>
     </div>
 
     <button class="action-btn" onclick="restart()">Restart</button>
 </div>
 
-<audio id="correctSound" src="assets/correct.mp3"></audio>
-<audio id="wrongSound" src="assets/wrong.mp3"></audio>
-<audio id="clapSound" src="assets/clapping.mp3"></audio>
+<audio id="correctSound" src="assets/correct.mp3" preload="auto"></audio>
+<audio id="wrongSound" src="assets/wrong.mp3" preload="auto"></audio>
+<audio id="clapSound" src="assets/clapping.mp3" preload="auto"></audio>
 
 <script>
 /* FULL UNMODIFIED SYSTEM DATABASE MATRIX */
@@ -503,8 +507,8 @@ function check(ans){
     feedbackOverlay.style.display = "flex";
 
     if(isCorrect){
-        document.getElementById("correctSound").play();
-        document.getElementById("clapSound").play();
+        safePlay("correctSound");
+        safePlay("clapSound");
         score++;
         
         feedbackText.innerText = "✨ CRYSTAL DETECTED! ✨";
@@ -515,7 +519,7 @@ function check(ans){
         updateCrystalVault();
         confetti();
     } else {
-        document.getElementById("wrongSound").play();
+        safePlay("wrongSound");
         wrong++;
         feedbackText.innerText = "💥 ENERGY SHIELD ACTIVATED 💥";
         feedbackText.style.color = "#fca5a5";
@@ -530,10 +534,20 @@ function check(ans){
 
 function updateCrystalVault() {
     let slots = document.querySelectorAll(".vault-slot");
-    // Distribute up to 7 visual upgrades over the 15 question slots proportionally
-    let unlockedSlotsCount = Math.min(7, Math.floor((score / 15) * 7) || 1);
-    for(let i=0; i<unlockedSlotsCount; i++) {
-        if(slots[i]) slots[i].classList.add("active");
+    // Dynamic progressive calculation ensuring flawless crystal distribution up to exactly 7 items
+    let unlockedSlotsCount = Math.min(7, Math.floor((score / 15) * 7));
+    
+    // Edge safety configuration block
+    if(score > 0 && unlockedSlotsCount === 0) unlockedSlotsCount = 1;
+    
+    for(let i=0; i<7; i++) {
+        if(slots[i]) {
+            if(i < unlockedSlotsCount) {
+                slots[i].classList.add("active");
+            } else {
+                slots[i].classList.remove("active");
+            }
+        }
     }
 }
 
@@ -550,7 +564,10 @@ function startTimer(){
         time++;
         document.getElementById("timer").innerText=timer;
 
-        if(timer<=0) next();
+        if(timer<=0) {
+            wrong++; // Count timeout as a wrong turn
+            next();
+        }
     },1000);
 }
 
@@ -577,7 +594,7 @@ function endGame(){
     document.getElementById("scoreText").innerText=score+" / 15 Items";
 
     let remark="";
-    if(percent>80) remark="Excellent ⭐";
+    if(percent>=80) remark="Excellent ⭐";
     else if(percent>=60) remark="Good Job 👍";
     else if(percent>=45) remark="Well Tried 🙂";
     else remark="Let's Revise 📘";
@@ -585,6 +602,15 @@ function endGame(){
     document.getElementById("remark").innerText=remark;
     document.getElementById("timeTaken").innerText=time+" seconds";
     document.getElementById("wrongCount").innerText=wrong + " turns";
+}
+
+/* SAFE AUDIO WRAPPER FOR SIMULTANEOUS PLAYBACKS WITHOUT CRASHES */
+function safePlay(id) {
+    const sound = document.getElementById(id);
+    if (sound) {
+        sound.currentTime = 0;
+        sound.play().catch(e => console.log("Audio play blocked until user interaction"));
+    }
 }
 
 function restart(){
