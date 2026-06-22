@@ -18,7 +18,7 @@
 }
 
 body {
-    background: radial-gradient(circle at center, #1e1154 0%, #0c0728 100%);
+    background: #060414;
     color: #fff;
     display: flex;
     align-items: center;
@@ -31,6 +31,18 @@ body {
 
 html {
     height: -webkit-fill-available;
+}
+
+/* DETECTIVE BACKGROUND CANVAS MATRIX */
+#detectiveMatrixCanvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0.35;
 }
 
 /* SCREEN MANAGEMENT FLUID GRID */
@@ -48,6 +60,7 @@ html {
     padding: 20px;
     box-sizing: border-box;
     overflow: hidden;
+    z-index: 5;
 }
 .screen.active {
     display: flex;
@@ -70,28 +83,29 @@ html {
 
 /* STAGE 2: INSTRUCTIONS SCREEN */
 #instructionScreen {
-    background: #140f3d;
+    background: transparent;
 }
 .panel-card {
-    background: rgba(255, 255, 255, 0.96);
-    color: #2d2340;
+    background: rgba(20, 15, 61, 0.9);
+    color: #ffffff;
     border-radius: 24px;
     padding: 30px 24px;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 0 30px rgba(255, 214, 10, 0.2), inset 0 0 20px rgba(0, 255, 204, 0.1);
+    border: 2px solid #00ffcc;
     max-width: 480px;
     width: 100%;
     text-align: center;
     box-sizing: border-box;
-    border-bottom: 6px solid #cfc7e8;
 }
 .panel-card h1 {
-    font-size: 26px;
-    color: #140f3d;
+    font-size: 28px;
+    color: #ffd60a;
     margin-bottom: 12px;
+    text-shadow: 0 0 10px rgba(255, 214, 10, 0.5);
 }
 .panel-card p {
-    color: #5c5470;
-    line-height: 1.5;
+    color: #a49fc4;
+    line-height: 1.6;
     margin-bottom: 24px;
     font-size: 15px;
 }
@@ -114,14 +128,13 @@ html {
     justify-content: space-between;
     align-items: center;
     padding: 12px 20px;
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(20, 15, 61, 0.85);
     border-radius: 16px;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid #00ffcc;
     font-weight: bold;
     font-size: 15px;
     letter-spacing: 0.5px;
+    box-shadow: 0 0 15px rgba(0, 255, 204, 0.2);
     box-sizing: border-box;
 }
 
@@ -130,15 +143,15 @@ html {
 }
 
 .health-track {
-    background: rgba(0, 0, 0, 0.3);
+    background: rgba(0, 0, 0, 0.5);
     width: 120px;
     height: 12px;
     border-radius: 6px;
     overflow: hidden;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(0, 255, 204, 0.3);
 }
 .health-fill {
-    background: linear-gradient(90deg, #ffb703, #fb8500);
+    background: linear-gradient(90deg, #ffd60a, #00ffcc);
     width: 0%;
     height: 100%;
     transition: width 0.3s ease;
@@ -147,17 +160,18 @@ html {
 .boss-arena {
     font-size: 56px;
     margin: 10px 0;
+    filter: drop-shadow(0 0 15px rgba(0, 255, 204, 0.6));
     animation: floating 3s ease-in-out infinite;
 }
 
 .question-card {
-    background: rgba(255, 255, 255, 0.96);
-    color: #1a153b;
+    background: rgba(255, 244, 214, 0.95);
+    color: #2d2340;
     border-radius: 24px;
     padding: 22px;
     width: 100%;
-    box-shadow: 0 15px 35px rgba(0,0,0,0.4);
-    border-bottom: 6px solid #cfc7e8;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+    border-bottom: 6px solid #ffb703;
     box-sizing: border-box;
 }
 
@@ -181,12 +195,11 @@ button.game-btn {
     padding: 12px 18px;
     border: none;
     border-radius: 14px;
-    background: #f0ecfa;
+    background: #d8f3dc;
     color: #2d2340;
     font-weight: bold;
     font-size: 15px;
     cursor: pointer;
-    border-bottom: 4px solid #cfc7e8;
     transition: transform 0.1s, background 0.2s;
     text-align: left;
     box-sizing: border-box;
@@ -196,20 +209,19 @@ button.game-btn:disabled { pointer-events: none; }
 
 button.game-btn.correct {
     background: #b7efc5 !important;
-    border-bottom-color: #74c69d !important;
     color: #1b4332;
+    box-shadow: 0 0 15px rgba(183, 239, 197, 0.6);
 }
 button.game-btn.wrong {
     background: #ffccd5 !important;
-    border-bottom-color: #ff85a1 !important;
     color: #5c0d12;
 }
 
 .action-trigger {
     background: linear-gradient(135deg, #ffb703, #fb8500) !important;
     color: #fff !important;
-    border-bottom: 4px solid #b86200 !important;
     text-align: center !important;
+    box-shadow: 0 5px 15px rgba(251, 133, 0, 0.4);
 }
 
 .banner-action {
@@ -219,20 +231,20 @@ button.game-btn.wrong {
     min-height: 20px;
     text-align: center;
 }
-.banner-action.text-correct { color: #2a9d8f; }
+.banner-action.text-correct { color: #1b4332; }
 .banner-action.text-wrong { color: #e63946; }
 
 /* STAGE 4: VISUAL CAPSTONE SUMMARY CARD */
 .summary-box {
-    background: rgba(255, 255, 255, 0.96);
-    color: #2d2340;
+    background: rgba(20, 15, 61, 0.95);
+    color: #fff;
     border-radius: 28px;
     padding: 35px 25px;
     max-width: 440px;
     width: 100%;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    box-shadow: 0 0 30px rgba(0, 255, 204, 0.3);
+    border: 2px solid #00ffcc;
     box-sizing: border-box;
-    border-bottom: 6px solid #cfc7e8;
 }
 
 /* RENDER EFFECTS FOREGROUND LAYER */
@@ -247,9 +259,9 @@ canvas#visualFX {
 
 /* ANIMATION TRACKS */
 @keyframes floating {
-    0% { transform: translateY(0px); }
-    50% { transform: translateY(-8px); }
-    100% { transform: translateY(0px); }
+    0% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-8px) rotate(3deg); }
+    100% { transform: translateY(0px) rotate(0deg); }
 }
 
 /* RESPONSIBILITY SCALE & ADAPTIVE VIEWPORTS */
@@ -259,20 +271,11 @@ canvas#visualFX {
     .boss-arena { font-size: 44px; margin: 5px 0; }
     .hud-panel { padding: 10px 14px; font-size: 13px; }
 }
-
-@media (max-height: 600px) and (orientation: landscape) {
-    .game-layout { height: 95%; max-width: 100%; flex-direction: row; gap: 15px; justify-content: center; }
-    .hud-panel { width: auto; flex-direction: column; gap: 8px; height: fit-content; padding: 10px; }
-    .boss-arena { display: none; }
-    .question-card { max-width: 420px; padding: 14px; max-height: 92vh; overflow-y: auto; }
-    .question-text { margin-bottom: 10px; font-size: 14px; }
-    button.game-btn { padding: 8px 12px; font-size: 13px; margin-bottom: 2px; }
-    .banner-action { margin-top: 6px; }
-}
 </style>
 </head>
 <body>
 
+<canvas id="detectiveMatrixCanvas"></canvas>
 <canvas id="visualFX"></canvas>
 
 <audio id="correctSound" src="Middle-ELA/G7/chp9/conjunctions/assets/correct.mp3" preload="auto"></audio>
@@ -288,8 +291,8 @@ canvas#visualFX {
 <div id="instructionScreen" class="screen">
     <div class="panel-card">
         <h1>✨ Conjunction Detective ✨</h1>
-        <p>Analyze clues and spot the correct conjunction parameters! You have 2 attempts per stage before the system bypasses and shows the correct configuration.</p>
-        <button class="game-btn action-trigger" onclick="launchGamePipeline()">Begin Quest</button>
+        <p>Analyze the clues left at the crime scene to catch the grammatical rule anomalies! You have 2 attempts per stage before the local grid safety system bypasses.</p>
+        <button class="game-btn action-trigger" onclick="launchGamePipeline()">Begin Analysis</button>
     </div>
 </div>
 
@@ -297,14 +300,14 @@ canvas#visualFX {
     <div class="game-layout">
         
         <div class="hud-panel">
-            <div id="scoreText">STAGE 1 / 10</div>
-            <div>SCORE: <span id="pointsHUD" class="score-counter">0</span></div>
+            <div id="scoreText">Question 1 of 10</div>
+            <div style="color: #00ffcc;">SCORE: <span id="pointsHUD" class="score-counter">0 / 10</span></div>
             <div class="health-track">
                 <div id="healthBar" class="health-fill"></div>
             </div>
         </div>
 
-        <div class="boss-arena">🔍</div>
+        <div class="boss-arena">🕵️‍♂️</div>
 
         <div class="question-card">
             <div id="questionText" class="question-text">Loading case file details...</div>
@@ -319,9 +322,9 @@ canvas#visualFX {
 <div id="endScreen" class="screen">
     <div class="summary-box">
         <div style="font-size: 64px; margin-bottom: 12px;">🏆</div>
-        <h1 style="color: #2d2340; font-size: 26px; margin-bottom: 10px;">Mission Complete!</h1>
-        <p id="finalScore" style="font-size: 17px; margin-bottom: 25px; font-weight: 600; color: #5c5470;"></p>
-        <button class="game-btn action-trigger" onclick="restartFullPipeline()">Play Again</button>
+        <h1 style="color: #ffd60a; font-size: 26px; margin-bottom: 10px;">Mission Complete!</h1>
+        <p id="finalScore" style="font-size: 17px; margin-bottom: 25px; font-weight: 600; color: #a49fc4;"></p>
+        <button class="game-btn action-trigger" onclick="restartFullPipeline()">Analyze New Case</button>
     </div>
 </div>
 
@@ -360,9 +363,10 @@ function fireAudioChannel(key) {
 }
 
 /* ==========================================================================
-   TIMING COORDINATION ENGINE
+   TIMING COORDINATION PIPELINE
    ========================================================================== */
 window.onload = () => {
+    initDetectiveBackgroundMatrix();
     setTimeout(() => {
         document.getElementById('logoScreen').classList.remove('active');
         document.getElementById('instructionScreen').classList.add('active');
@@ -398,7 +402,7 @@ function renderActiveQuestionCard() {
     const activeTarget = activePlayList[currentFloorIndex];
     document.getElementById('questionText').innerText = activeTarget.q;
     
-    document.getElementById('pointsHUD').innerText = pointsScore;
+    document.getElementById('pointsHUD').innerText = `${pointsScore} / ${activePlayList.length}`;
     document.getElementById('scoreText').innerText = `Question ${currentFloorIndex + 1} of ${activePlayList.length}`;
     document.getElementById('healthBar').style.width = `${((currentFloorIndex) / activePlayList.length) * 100}%`;
     
@@ -423,7 +427,7 @@ function validateUserSelection(selectedText, clickedButton) {
         optionButtons.forEach(b => b.disabled = true);
         
         pointsScore++;
-        document.getElementById('pointsHUD').innerText = pointsScore;
+        document.getElementById('pointsHUD').innerText = `${pointsScore} / ${activePlayList.length}`;
         
         const feedbackNode = document.getElementById('feedback');
         feedbackNode.innerText = "✨ Outstanding work, Detective!";
@@ -447,7 +451,7 @@ function validateUserSelection(selectedText, clickedButton) {
             });
             
             const feedbackNode = document.getElementById('feedback');
-            feedbackNode.innerText = `Hint: The correct parameter was: ${activeTarget.ans}`;
+            feedbackNode.innerText = `Case File Solution: ${activeTarget.ans}`;
             feedbackNode.className = "banner-action text-wrong";
             
             document.getElementById('continueBtn').style.display = "block";
@@ -479,8 +483,61 @@ function restartFullPipeline() {
 }
 
 /* ==========================================================================
-   PARTICLE RENDER VISUAL CONTEXT ENGINE
+   LIVE INTERACTIVE BACKGROUND DETECTIVE GRAPHICS CANVASES
    ========================================================================== */
+function initDetectiveBackgroundMatrix() {
+    const bgCanvas = document.getElementById("detectiveMatrixCanvas");
+    const bgCtx = bgCanvas.getContext("2d");
+    
+    function resizeBg() {
+        bgCanvas.width = window.innerWidth;
+        bgCanvas.height = window.innerHeight;
+    }
+    window.addEventListener("resize", resizeBg);
+    resizeBg();
+    
+    // Grid coordinates items definition arrays
+    let clues = [];
+    const elementsList = ["🔍", "👣", "📜", "💼", "🔑", "📌", "0", "1"];
+    
+    for(let k=0; k<25; k++) {
+        clues.push({
+            x: Math.random() * window.innerWidth,
+            y: Math.random() * window.innerHeight,
+            glyph: elementsList[Math.floor(Math.random() * elementsList.length)],
+            size: Math.random() * 16 + 14,
+            speed: Math.random() * 0.4 + 0.2
+        });
+    }
+    
+    function animateBackground() {
+        bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
+        
+        // Render cyber grid lines
+        bgCtx.strokeStyle = "rgba(0, 255, 204, 0.05)";
+        bgCtx.lineWidth = 1;
+        for(let x=0; x<bgCanvas.width; x+=50) {
+            bgCtx.beginPath(); bgCtx.moveTo(x, 0); bgCtx.lineTo(x, bgCanvas.height); bgCtx.stroke();
+        }
+        
+        // Draw detective icon nodes floating slowly up
+        bgCtx.fillStyle = "rgba(0, 255, 204, 0.35)";
+        clues.forEach(clue => {
+            bgCtx.font = `${clue.size}px monospace`;
+            bgCtx.fillText(clue.glyph, clue.x, clue.y);
+            clue.y -= clue.speed;
+            if(clue.y < -30) {
+                clue.y = bgCanvas.height + 30;
+                clue.x = Math.random() * bgCanvas.width;
+            }
+        });
+        
+        requestAnimationFrame(animateBackground);
+    }
+    animateBackground();
+}
+
+/* FOREGROUND CANVAS WINNERS CONFETTI GENERATOR */
 const canvas = document.getElementById("visualFX");
 const ctx = canvas.getContext("2d");
 let pieces = [], animationRef = null;
@@ -495,9 +552,9 @@ syncCanvasLayout();
 function renderConfettiBlast() {
     pieces = [];
     cancelAnimationFrame(animationRef);
-    const pallet = ["#ffb703", "#fb8500", "#ffd60a", "#4cc9f0", "#f72585"];
+    const pallet = ["#ffb703", "#fb8500", "#ffd60a", "#00ffcc", "#4cc9f0"];
     
-    for (let i = 0; i < 50; i++) {
+    for (let i = 0; i < 45; i++) {
         pieces.push({
             x: canvas.width / 2,
             y: canvas.height * 0.4,
