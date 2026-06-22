@@ -60,8 +60,8 @@ html {
     z-index: 9999;
 }
 .logo-container {
-    width: 280px;
-    max-width: 80%;
+    width: 320px;
+    max-width: 85%;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -76,10 +76,15 @@ html {
     display: flex;
     flex-direction: column;
     align-items: center;
-    font-weight: 900;
-    font-size: 32px;
-    color: #4a148c;
-    letter-spacing: 2px;
+    justify-content: center;
+}
+.fallback-logo span {
+    margin-top: 8px;
+    font-size: 34px;
+    font-weight: 800;
+    color: #121033;
+    letter-spacing: 3px;
+    font-family: 'Montserrat', 'Arial Black', sans-serif;
 }
 
 /* STAGE 2: TITLE SCREEN */
@@ -270,30 +275,37 @@ canvas {
 
 <canvas id="confettiCanvas"></canvas>
 
-<!-- WEB AUDIO ASSET TRACE NODES -->
 <audio id="correctSound" src="Middle-ELA/G7/chp7/modals/assets/correct.mp3" preload="auto"></audio>
 <audio id="wrongSound" src="Middle-ELA/G7/chp7/modals/assets/wrong.mp3" preload="auto"></audio>
 <audio id="clapSound" src="Middle-ELA/G7/chp7/modals/assets/clapping.mp3" preload="auto"></audio>
 
-<!-- STAGE 1: LOGO SCREEN (STRICTLY 5 SECONDS) -->
 <div id="logoScreen" class="screen active">
     <div class="logo-container">
         <img id="brandLogo" src="Middle-ELA/G7/chp7/modals/assets/innovine-logo.png" onerror="handleLogoFallback()" alt="Innovine Logo">
         <div id="fallbackLogoUI" class="fallback-logo" style="display: none;">
-            <svg width="120" height="120" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <polygon points="50,15 15,80 85,80" fill="#ffd60a" stroke="#4a148c" stroke-width="8" stroke-linejoin="miter"/>
+            <svg width="100" height="110" viewBox="0 0 100 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M50 15C32 35 15 50 15 72C15 90 28 102 46 104C40 94 38 82 44 70C49 58 60 48 68 35C62 27 56 20 50 15Z" fill="url(#innovine_green)"/>
+                <path d="M52 15C58 24 65 32 72 42C81 54 86 68 83 82C80 94 71 103 54 105C64 96 68 83 64 70C60 56 49 42 45 25C47 21 50 18 52 15Z" fill="url(#innovine_blue)"/>
+                <defs>
+                    <linearGradient id="innovine_green" x1="15" y1="60" x2="68" y2="60" gradientUnits="userSpaceOnUse">
+                        <stop offset="0%" stop-color="#4ade80"/>
+                        <stop offset="100%" stop-color="#22c55e"/>
+                    </linearGradient>
+                    <linearGradient id="innovine_blue" x1="45" y1="60" x2="85" y2="60" gradientUnits="userSpaceOnUse">
+                        <stop offset="0%" stop-color="#06b6d4"/>
+                        <stop offset="100%" stop-color="#3b82f6"/>
+                    </linearGradient>
+                </defs>
             </svg>
-            <span style="margin-top: 15px; font-family: 'Arial Black', sans-serif;">INNOVINE</span>
+            <span>INNOVINE</span>
         </div>
     </div>
 </div>
 
-<!-- STAGE 2: TITLE SCREEN (STRICTLY 3 SECONDS) -->
 <div id="titleScreen" class="screen">
     <div class="topic">✨ Modals Master Challenge ✨</div>
 </div>
 
-<!-- STAGE 3: INSTRUCTIONS SCREEN -->
 <div id="startScreen" class="screen">
     <div class="card-panel">
         <h1>Welcome Competitor!</h1>
@@ -304,7 +316,6 @@ canvas {
     </div>
 </div>
 
-<!-- STAGE 4: MAIN RUNTIME CHALLENGE -->
 <div id="gameScreen" class="screen">
     <div class="game-layout">
         
@@ -325,7 +336,6 @@ canvas {
     </div>
 </div>
 
-<!-- STAGE 5: GAME OVER WRAPPER -->
 <div id="endScreen" class="screen">
     <div class="card-panel">
         <div style="font-size: 72px; margin-bottom: 10px;">🏆</div>
@@ -358,7 +368,7 @@ function handleLogoFallback() {
 }
 
 /* ==========================================================================
-   GRADE 7 COMPLEX QUESTION MATRIX DATA
+   GRADE 7 MODALS TASK MATRICES
    ========================================================================== */
 const mcqs = [
     {q:"Despite the heavy downpour, the rescue team ___ reach the stranded hikers before nightfall.", opts:["could","was able to","should"], ans:"was able to"},
@@ -386,7 +396,6 @@ const audioChannels = {
     clap: document.getElementById("clapSound")
 };
 
-// Error routing recovery engine for secondary asset structures
 Object.keys(audioChannels).forEach(key => {
     let fallbackCount = 0;
     audioChannels[key].addEventListener('error', function() {
@@ -402,7 +411,7 @@ Object.keys(audioChannels).forEach(key => {
 });
 
 /* ==========================================================================
-   FLOW CONTROLLER TIMINGS
+   TIMING CORRECTIONS PIPELINE
    ========================================================================== */
 window.onload = () => {
     const imgEl = document.getElementById("brandLogo");
@@ -410,13 +419,11 @@ window.onload = () => {
         handleLogoFallback();
     }
 
-    // Logo screen strict visibility context - 5 Seconds
     setTimeout(() => {
         document.getElementById("logoScreen").classList.remove("active");
         document.getElementById("titleScreen").classList.add("active");
     }, 5000);
 
-    // Title screen splash context - 3 Seconds
     setTimeout(() => {
         document.getElementById("titleScreen").classList.remove("active");
         document.getElementById("startScreen").classList.add("active");
@@ -439,9 +446,7 @@ function transitionToGameRuntime() {
     document.getElementById("startScreen").classList.remove("active");
     document.getElementById("gameScreen").classList.add("active");
     
-    // Warm up standard context audio structures for broad mobile browser compatibility
     Object.values(audioChannels).forEach(t => { if(t){ t.play().then(()=>t.pause()).catch(()=>{}); } });
-
     setupFreshGameSession();
 }
 
@@ -453,7 +458,6 @@ function setupFreshGameSession() {
     selectedCardElement = null;
     
     document.getElementById("mcqBox").style.display = "none";
-    
     buildGraphicalCardGrid();
     updateHUDDisplays();
 }
@@ -477,9 +481,6 @@ function updateHUDDisplays() {
     document.getElementById("scoreHUD").innerText = score;
 }
 
-/* ==========================================================================
-   GAMEPLAY & INTERACTION ENGINE
-   ========================================================================== */
 function handleCardActivation(cardElement, index) {
     if (isCardSelectionLocked || cardElement.classList.contains("matched") || index !== currentIndex) {
         return; 
@@ -487,7 +488,6 @@ function handleCardActivation(cardElement, index) {
     
     isCardSelectionLocked = true;
     selectedCardElement = cardElement;
-    
     cardElement.classList.add("active-target");
     cardElement.innerText = "🔍";
     
@@ -584,7 +584,7 @@ function restartFullGamePipeline() {
 }
 
 /* ==========================================================================
-   CONFETTI PERFORMANCE VECTOR REPRODUCTION ENGINE
+   CONFETTI PERFORMANCE VISUAL RENDERING PIPELINE
    ========================================================================== */
 const canvas = document.getElementById("confettiCanvas");
 const ctx = canvas.getContext("2d");
