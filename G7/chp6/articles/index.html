@@ -52,15 +52,33 @@ body {
     background: #ffffff;
     z-index: 9999;
 }
-#logoScreen img {
+.logo-container {
     width: 250px;
     max-width: 80%;
     height: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     animation: smoothScale 1.8s infinite alternate ease-in-out;
 }
+#logoScreen img {
+    width: 100%;
+    height: auto;
+}
+.fallback-logo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-weight: 900;
+    font-size: 28px;
+    color: #4c1d95;
+    letter-spacing: 1px;
+}
+
 @keyframes smoothScale {
     from { transform: scale(1); filter: drop-shadow(0 0 0 rgba(0,0,0,0)); }
-    to { transform: scale(1.05); filter: drop-shadow(0 6px 15px rgba(0,0,0,0.1)); }
+    to { transform: scale(1.05); filter: drop-shadow(0 6px 15px rgba(0,0,0,0.15)); }
 }
 
 /* STAGE 2: FLASH CARD TOPIC SCREEN */
@@ -146,7 +164,6 @@ button:active {
     will-change: transform;
 }
 
-/* Spinner Inner Segment Typography Anchors */
 .segmentText {
     position: absolute;
     width: 100px;
@@ -290,7 +307,16 @@ canvas { position: fixed; inset: 0; pointer-events: none; z-index: 99999; width:
 <audio id="clapSound" src="Middle-ELA/G7/chp6/articles/assets/clapping.mp3" preload="auto"></audio>
 
 <div id="logoScreen" class="screen active">
-    <img src="Middle-ELA/G7/chp6/articles/assets/innovine-logo.png" alt="Innovine Logo">
+    <div class="logo-container">
+        <img id="brandLogo" src="Middle-ELA/G7/chp6/articles/assets/innovine-logo.png" onerror="handleLogoFallback()" alt="Innovine Logo">
+        <div id="fallbackLogoUI" class="fallback-logo" style="display: none;">
+            <svg width="80" height="80" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2L2 22H22L12 2Z" fill="#4c1d95"/>
+                <path d="M12 6L4 20H20L12 6Z" fill="#ffd60a"/>
+            </svg>
+            <span style="margin-top: 10px;">INNOVINE</span>
+        </div>
+    </div>
 </div>
 
 <div id="titleScreen" class="screen">
@@ -353,10 +379,26 @@ canvas { position: fixed; inset: 0; pointer-events: none; z-index: 99999; width:
 
 <script>
 /* ==========================================================================
+   SYSTEM LOGO & WEB AUDIO BACKUP GRAPH MATRIX DATA STREAMS
+   ========================================================================== */
+
+// Embedded synthesizers if physical assets are completely absent on deployment local targets
+const audioSyntheticFailsafes = {
+    correct: "data:audio/wav;base64,UklGRjIAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQYAAAAAe3vLew==",
+    wrong: "data:audio/wav;base64,UklGRjIAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQYAAAAAhH94fA==",
+    clap: "data:audio/wav;base64,UklGRjIAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQYAAAAAnp6Xng=="
+};
+
+function handleLogoFallback() {
+    document.getElementById("brandLogo").style.display = "none";
+    document.getElementById("fallbackLogoUI").style.display = "flex";
+}
+
+/* ==========================================================================
    ROULETTE ARCHITECTURE MAIN JAVASCRIPT CONTROLLER
    ========================================================================== */
 
-const questions = [
+const baseQuestions = [
     {sentence:"I saw [___] elephant at the zoo.", answer:"An"},
     {sentence:"She wants to buy [___] apple.", answer:"An"},
     {sentence:"He is [___] honest person.", answer:"An"},
@@ -369,6 +411,7 @@ const questions = [
     {sentence:"She wore [___] dress to the party.", answer:"A"}
 ];
 
+let questions = [];
 let activeIndex = 0;
 let score = 0;
 let currentAttempts = 0;
@@ -384,8 +427,22 @@ const audioChannels = {
     clap: document.getElementById("clapSound")
 };
 
-// MANDATORY FIXED ACCELERATION TIMELINE DISPATCH (5 SEC HOLD LOGO, 3 SEC SPLASH)
+// Setup failsafe listeners for broken physical audio asset chains
+Object.keys(audioChannels).forEach(key => {
+    audioChannels[key].addEventListener('error', function() {
+        audioChannels[key].src = audioSyntheticFailsafes[key];
+        audioChannels[key].load();
+    });
+});
+
+// MANDATORY STABLE SPEED PIPELINE FLOW MATRIX (5s Logo Screen, 3s Sub-splash Display)
 window.onload = () => {
+    // If logo path triggers immediate image layout failure, force fallback UI activation
+    const imgEl = document.getElementById("brandLogo");
+    if (!imgEl.complete || imgEl.naturalWidth === 0) {
+        handleLogoFallback();
+    }
+
     setTimeout(() => {
         document.getElementById("logoScreen").classList.remove("active");
         document.getElementById("titleScreen").classList.add("active");
@@ -400,16 +457,30 @@ window.onload = () => {
 function dispatchAudio(key) {
     const track = audioChannels[key];
     if (!track) return;
-    try { track.currentTime = 0; track.play().catch(() => {}); } catch(e) {}
+    try { 
+        track.currentTime = 0; 
+        track.play().catch(() => {
+            // Context audio safety recovery
+            let ctxAudioFallback = new Audio(audioSyntheticFailsafes[key]);
+            ctxAudioFallback.play().catch(() => {});
+        }); 
+    } catch(e) {}
+}
+
+function randomizeQuestions() {
+    questions = [...baseQuestions].sort(() => Math.random() - 0.5);
 }
 
 function transitionToGame() {
     document.getElementById("startScreen").classList.remove("active");
     document.getElementById("gameScreen").classList.add("active");
     
-    // Unlock native sound nodes for cross-device web safety protocols
+    // Unlock and register media context vectors for mobile safari/webview contexts
     Object.values(audioChannels).forEach(track => { if(track) { track.play().then(() => track.pause()).catch(() => {}); } });
     
+    randomizeQuestions();
+    activeIndex = 0;
+    score = 0;
     prepareQuizRound();
 }
 
@@ -426,7 +497,6 @@ function prepareQuizRound() {
     document.getElementById("scoreText").innerText = score;
     document.getElementById("hintBanner").innerText = "";
     
-    // Hide sentence text and prompt a mandatory wheel spin
     document.getElementById("sentenceText").innerHTML = "🎲 Please spin the roulette to receive a candidate!";
     
     document.getElementById("spinBtn").disabled = false;
@@ -441,26 +511,20 @@ function triggerSpinCycle() {
     document.getElementById("spinBtn").disabled = true;
     document.getElementById("hintBanner").innerText = "";
     
-    // Pick a random target article from the index pool
     const randomIndex = Math.floor(Math.random() * articlesPool.length);
     selectedWheelArticle = articlesPool[randomIndex];
     
-    // Determine rotation value to center pointer inside sector boundaries.
-    // Sectors: 0-120 = A (center: 60), 120-240 = An (center: 180), 240-360 = The (center: 300)
-    // Pointer is at the top (0deg). The wheel shifts clockwise, meaning offset is inverted.
     let baseOffset = 0;
     if (selectedWheelArticle === "A") baseOffset = 60;
     else if (selectedWheelArticle === "An") baseOffset = 180;
     else if (selectedWheelArticle === "The") baseOffset = 300;
     
     const extraSpins = 4 + Math.floor(Math.random() * 3);
-    // Formula guarantees the pointer lands squarely inside the target color sector zone
     currentRotation += (extraSpins * 360) + (360 - baseOffset) - (currentRotation % 360);
     
     const spinner = document.getElementById("spinner");
     spinner.style.transform = `rotate(${currentRotation}deg)`;
     
-    // Wait for native animation curve to finish execution
     setTimeout(() => {
         revealSentenceContext();
     }, 3500);
@@ -468,7 +532,6 @@ function triggerSpinCycle() {
 
 function revealSentenceContext() {
     const rawPhrase = questions[activeIndex].sentence;
-    // Replace slot marker with styled component carrying the wheel's chosen article candidate
     const stylizedPhrase = rawPhrase.replace("[___]", `<span class="slotted-article">${selectedWheelArticle}</span>`);
     
     document.getElementById("sentenceText").innerHTML = stylizedPhrase;
@@ -480,8 +543,6 @@ function revealSentenceContext() {
 function evaluateSelection(userGuessedValid) {
     const actualAnswer = questions[activeIndex].answer;
     const isActuallyValid = (selectedWheelArticle === actualAnswer);
-    
-    // User chose correctly if their claim matches reality
     const isUserCorrect = (userGuessedValid === isActuallyValid);
     
     if (isUserCorrect) {
@@ -501,10 +562,9 @@ function evaluateSelection(userGuessedValid) {
         if (currentAttempts < 2) {
             document.getElementById("hintBanner").innerText = "❌ Incorrect analysis! Try 1 more time.";
         } else {
-            // Out of attempts: Flash systemic corrective parameters, then pass forward
             document.getElementById("btnValid").disabled = true;
             document.getElementById("btnInvalid").disabled = true;
-            document.getElementById("hintBanner").innerText = `Moving forward. Correct option was: ${isActuallyValid ? 'VALID' : 'INVALID'}`;
+            document.getElementById("hintBanner").innerText = `Moving forward. Correct choice was: ${isActuallyValid ? 'VALID' : 'INVALID'}`;
             
             activeIndex++;
             setTimeout(prepareQuizRound, 2000);
@@ -521,8 +581,6 @@ function terminateGameMatrix() {
 }
 
 function restartGameEngine() {
-    activeIndex = 0;
-    score = 0;
     document.getElementById("endScreen").classList.remove("active");
     document.getElementById("startScreen").classList.add("active");
 }
