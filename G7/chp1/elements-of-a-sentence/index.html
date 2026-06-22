@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>🏰 Grammar Castle Adventure</title>
 
 <style>
@@ -19,7 +19,7 @@ background:linear-gradient(135deg,#0b1220,#1e293b,#0ea5e9);
 color:white;
 }
 
-/* FLOATING BACKGROUND */
+/* BACKGROUND */
 body::before,body::after{
 content:"";
 position:fixed;
@@ -96,7 +96,7 @@ transition:0.3s;
 }
 button:hover{transform:scale(1.05);}
 
-/* GAME WRAPPER FIX (THIS WAS MISSING) */
+/* GAME */
 .gameWrapper{
 width:100%;
 display:flex;
@@ -105,17 +105,14 @@ align-items:center;
 gap:10px;
 }
 
-/* HUD FIX */
 #hud{
 display:flex;
 justify-content:space-between;
 width:100%;
 max-width:900px;
 font-weight:bold;
-padding:0 10px;
 }
 
-/* PROGRESS */
 .barOuter{
 width:100%;
 max-width:900px;
@@ -131,7 +128,6 @@ background:linear-gradient(90deg,#22c55e,#facc15);
 transition:0.4s;
 }
 
-/* GAME CARD FIX (IMPORTANT) */
 #roomCard{
 background:rgba(255,255,255,0.08);
 backdrop-filter:blur(10px);
@@ -139,27 +135,20 @@ padding:20px;
 border-radius:18px;
 width:92%;
 max-width:720px;
-
-display:flex;
-flex-direction:column;
-align-items:center;
 }
 
-/* ROOM NAME */
 #roomName{
 font-size:20px;
 color:#facc15;
 margin-bottom:8px;
 }
 
-/* QUESTION FIX */
 #question{
 font-size:22px;
 margin:14px 0;
 line-height:1.4;
 }
 
-/* OPTIONS FIX (THIS FIXES YOUR SCREEN ISSUE) */
 #options{
 display:grid;
 grid-template-columns:1fr 1fr;
@@ -178,11 +167,9 @@ text-align:center;
 }
 
 .option:hover{transform:scale(1.03);}
-
 .correct{background:#22c55e!important;color:white;}
 .wrong{background:#ef4444!important;color:white;}
 
-/* MOBILE FIX */
 @media(max-width:768px){
 #options{grid-template-columns:1fr;}
 }
@@ -216,17 +203,17 @@ pointer-events:none;
 <div class="card">
 <h2>📜 Mission</h2>
 <p>Welcome, Grammar Knight!</p>
-<p>10 enchanted rooms await you.</p>
-<p>Answer correctly to unlock the castle.</p>
+<p>Unlock all 10 castle rooms.</p>
 
-<br>
 <button onclick="startGame()">START ADVENTURE</button>
+<br><br>
+Volume:
+<input id="vol" type="range" min="0" max="1" step="0.1" value="1">
 </div>
 </div>
 
 <!-- GAME -->
 <div id="game" class="screen">
-
 <div class="gameWrapper">
 
 <div id="hud">
@@ -245,7 +232,6 @@ pointer-events:none;
 </div>
 
 </div>
-
 </div>
 
 <!-- RESULT -->
@@ -263,21 +249,130 @@ pointer-events:none;
 
 <script>
 
-/* STATE */
+/* =========================
+ROOMS
+========================= */
+const rooms=[
+"📚 Library","🛡 Knight Hall","🔥 Dragon Chamber","🌲 Forest","💎 Vault",
+"🕯 Tower","🏹 Archer Hall","⚔ Arena","👑 Chamber","🏰 Throne"
+];
+
+/* =========================
+QUESTIONS (EXACT - DO NOT MODIFY)
+========================= */
+let questions=[
+{
+question:"Identify the subject in the sentence.<br><br><b>The students completed the science project on time.</b>",
+options:[
+"completed the science project",
+"the science project",
+"The students",
+"on time"
+],
+answer:2
+},
+{
+question:"Identify the predicate in the sentence.<br><br><b>The little puppy barked loudly all night.</b>",
+options:[
+"The little puppy",
+"loudly",
+"barked loudly all night",
+"all night"
+],
+answer:2
+},
+{
+question:"Which words form the direct object in the sentence?<br><br><b>Maria baked a delicious cake yesterday.</b>",
+options:[
+"Maria",
+"baked",
+"a delicious cake",
+"yesterday"
+],
+answer:2
+},
+{
+question:"Identify the complement in the sentence.<br><br><b>The sky became dark before the storm.</b>",
+options:[
+"The sky",
+"became",
+"dark",
+"before the storm"
+],
+answer:2
+},
+{
+question:"Which part of the sentence is the predicate?<br><br><b>My brother plays basketball every Saturday.</b>",
+options:[
+"My brother",
+"plays basketball every Saturday",
+"basketball",
+"every Saturday"
+],
+answer:1
+},
+{
+question:"Identify the subject in the sentence.<br><br><b>After school, the children visited the library.</b>",
+options:[
+"visited",
+"the library",
+"After school",
+"the children"
+],
+answer:3
+},
+{
+question:"Which words are the direct object in the sentence?<br><br><b>The teacher explained the lesson clearly.</b>",
+options:[
+"The teacher",
+"explained",
+"the lesson",
+"clearly"
+],
+answer:2
+},
+{
+question:"Identify the complement in the sentence.<br><br><b>Our classroom looks beautiful after the decorations.</b>",
+options:[
+"Our classroom",
+"looks",
+"beautiful",
+"after the decorations"
+],
+answer:2
+},
+{
+question:"Which part of the sentence is the subject?<br><br><b>Several colorful birds flew across the lake.</b>",
+options:[
+"Several colorful birds",
+"flew",
+"across the lake",
+"the lake"
+],
+answer:0
+},
+{
+question:"Identify the predicate in the sentence.<br><br><b>The firefighters rescued the family safely.</b>",
+options:[
+"The firefighters",
+"rescued the family safely",
+"the family",
+"safely"
+],
+answer:1
+}
+];
+
+/* =========================
+STATE
+========================= */
 let index=0;
 let score=0;
-let attempts=0;
-let order=[];
+let order=[...Array(questions.length).keys()].sort(()=>Math.random()-0.5);
 
-/* QUESTIONS PLACEHOLDER (YOU KEEP YOUR ORIGINAL) */
-let questions=window.questions||[];
-
-/* SHUFFLE */
-function shuffle(a){
-return a.sort(()=>Math.random()-0.5);
-}
-
-/* FLOW */
+/* =========================
+FLOW
+========================= */
 setTimeout(()=>{
 splash.classList.remove("active");
 topic.classList.add("active");
@@ -288,31 +383,27 @@ topic.classList.remove("active");
 mission.classList.add("active");
 },8000);
 
-/* START */
+/* =========================
+START
+========================= */
 function startGame(){
 mission.classList.remove("active");
 game.classList.add("active");
-
 index=0;
 score=0;
-attempts=0;
-
-order=[...Array(questions.length).keys()];
-shuffle(order);
-
 loadQ();
 }
 
-/* LOAD */
+/* =========================
+LOAD
+========================= */
 function loadQ(){
-
-attempts=0;
 
 let q=questions[order[index]];
 
 roomText.innerText=`🏰 Room ${index+1}/10`;
 scoreText.innerText=`⭐ ${score}`;
-roomName.innerText="🏰 Castle Challenge";
+roomName.innerText=rooms[index];
 question.innerHTML=q.question;
 
 options.innerHTML="";
@@ -325,52 +416,43 @@ b.onclick=()=>check(i,b,q.answer);
 options.appendChild(b);
 });
 
-updateBar();
+bar.style.width=(index/questions.length)*100+"%";
 }
 
-/* CHECK */
+/* =========================
+CHECK
+========================= */
 function check(i,b,ans){
 
 let all=document.querySelectorAll(".option");
 all.forEach(x=>x.style.pointerEvents="none");
 
-correctSound.volume=wrongSound.volume=clapSound.volume=1;
+let v=document.getElementById("vol").value;
+correctSound.volume=v;
+wrongSound.volume=v;
+clapSound.volume=v;
 
 if(i===ans){
 b.classList.add("correct");
 correctSound.play();
 score++;
 launch();
-setTimeout(next,1200);
 }else{
 b.classList.add("wrong");
 wrongSound.play();
 all[ans].classList.add("correct");
-
-attempts++;
-
-if(attempts>=2){
-setTimeout(next,1200);
-}else{
-setTimeout(()=>all.forEach(x=>x.style.pointerEvents="auto"),600);
-}
-}
-scoreText.innerText=`⭐ ${score}`;
 }
 
-/* NEXT */
-function next(){
+setTimeout(()=>{
 index++;
 if(index<questions.length) loadQ();
 else endGame();
+},1200);
 }
 
-/* BAR */
-function updateBar(){
-bar.style.width=((index/questions.length)*100)+"%";
-}
-
-/* CONFETTI */
+/* =========================
+CONFETTI
+========================= */
 function launch(){
 let c=document.getElementById("confetti");
 let ctx=c.getContext("2d");
@@ -383,20 +465,15 @@ ctx.fillRect(Math.random()*c.width,Math.random()*c.height,6,6);
 }
 }
 
-/* END */
+/* =========================
+END
+========================= */
 function endGame(){
 game.classList.remove("active");
 result.classList.add("active");
 finalScore.innerText=`⭐ ${score}/${questions.length}`;
 clapSound.play();
 }
-
-/* ENTER KEY */
-document.addEventListener("keydown",e=>{
-if(e.key==="Enter" && mission.classList.contains("active")){
-startGame();
-}
-});
 
 </script>
 
