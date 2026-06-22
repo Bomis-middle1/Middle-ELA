@@ -8,7 +8,7 @@
 *{margin:0;padding:0;box-sizing:border-box;font-family:Trebuchet MS,sans-serif}
 body{background:linear-gradient(180deg,#0f172a,#1e3a8a);min-height:100vh;color:#fff;overflow-x:hidden}
 .hidden{display:none!important}
-#splash{position:fixed;inset:0;background:#fff;display:flex;justify-content:center;align-items:center;z-index:9999}
+#splash{position:fixed;inset:0;background:#fff;display:flex;justify-content:center;align-items:center;z-index:9999;transition:opacity 1s;}
 #splash img{max-width:320px;width:80%}
 .container{max-width:1100px;margin:auto;padding:20px}
 .topbar{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:15px}
@@ -30,7 +30,7 @@ button{padding:12px 20px;border:none;border-radius:10px;background:#22c55e;color
 </head>
 <body>
 
-<div id="splash"><img src="assets/logo.png"></div>
+<div id="splash"><img src="assets/logo.png" onerror="this.style.display='none'"></div>
 
 <audio id="correctSound" src="assets/correct.mp3"></audio>
 <audio id="wrongSound" src="assets/wrong.mp3"></audio>
@@ -73,7 +73,21 @@ button{padding:12px 20px;border:none;border-radius:10px;background:#22c55e;color
 </div>
 
 <script>
-setTimeout(()=>{splash.style.display='none';intro.classList.remove('hidden');},5000);
+// FIX: Use proper DOMContentLoaded and fixed splash logic
+window.addEventListener('DOMContentLoaded', function() {
+  setTimeout(hideSplash, 5000);
+});
+
+function hideSplash() {
+  const splash = document.getElementById('splash');
+  const intro = document.getElementById('intro');
+  
+  splash.style.opacity = '0';
+  setTimeout(() => {
+    splash.style.display = 'none';
+    intro.classList.remove('hidden');
+  }, 1000);
+}
 
 const rooms=[
 {
@@ -96,4 +110,114 @@ a:2
 },
 {
 t:"Room 4",
-q:"You can ______ complete your worksheet at home or submit it unfinished 
+q:"You can ______ complete your worksheet at home or submit it unfinished and lose marks.",
+o:["both…and","neither…nor","either…or","not only…but also"],
+a:2
+},
+{
+t:"Room 5",
+q:"______ the students who were absent yesterday nor those who came late understood the explanation.",
+o:["Either","Both","Neither","So"],
+a:2
+},
+{
+t:"Room 6",
+q:"The principal announced a holiday due to heavy rainfall, ______ all students happily went home early.",
+o:["but","so","or","yet"],
+a:1
+},
+{
+t:"Room 7",
+q:"The athlete trained daily before sunrise, ______ she still lost the final race against stronger opponents.",
+o:["and","so","yet","or"],
+a:2
+},
+{
+t:"Room 8",
+q:"______ did the science exhibition help students understand experiments, but it also made them more curious.",
+o:["Either","Not only","Neither","So"],
+a:1
+},
+{
+t:"Room 9",
+q:"The school sports day was postponed because the ground was flooded after continuous rainfall for three days.",
+o:["so","because","but","yet"],
+a:1
+},
+{
+t:"Room 10",
+q:"The teacher explained everything clearly in class, ______ many students were still confused about identifying conjunctions in complex sentences.",
+o:["or","and","so","yet"],
+a:3
+}
+];
+
+let current=0,score=0,keysCollected=0,retry=0;
+
+function startGame(){intro.classList.add('hidden');game.classList.remove('hidden');loadRoom();}
+
+function loadRoom(){
+retry=0;
+roomNum.textContent=current+1;
+title.textContent=rooms[current].t;
+question.textContent=rooms[current].q;
+bar.style.width=(current/rooms.length*100)+'%';
+doors.innerHTML='';
+feedback.innerHTML='';
+nextBtn.classList.add('hidden');
+
+rooms[current].o.forEach((txt,i)=>{
+const d=document.createElement('div');
+d.className='door';
+d.innerHTML='<div class="door-inner"><div class="panel">🚪 '+txt+'</div></div>';
+d.onclick=()=>choose(i,d);
+doors.appendChild(d);
+});
+}
+
+function choose(i,door){
+if(i===rooms[current].a){
+door.classList.add('open');
+score++; keysCollected++;
+scoreEl();
+correctSound.play().catch(()=>{});
+clapSound.play().catch(()=>{});
+feedback.innerHTML='<div class="feedback good">🔑 Correct! The castle door swings open.</div>';
+disableDoors();
+nextBtn.classList.remove('hidden');
+}else if(retry===0){
+retry=1;
+wrongSound.play().catch(()=>{});
+feedback.innerHTML='<div class="feedback bad">🚫 Wrong door. One final attempt remains.</div>';
+}else{
+wrongSound.play().catch(()=>{});
+feedback.innerHTML='<div class="feedback bad">The correct door was: '+rooms[current].o[rooms[current].a]+'</div>';
+disableDoors();
+nextBtn.classList.remove('hidden');
+}
+}
+
+function disableDoors(){document.querySelectorAll('.door').forEach(x=>x.onclick=null);}
+
+function scoreEl(){
+score.textContent=score;
+keys.textContent=keysCollected;
+}
+
+function nextRoom(){
+current++;
+if(current<rooms.length) loadRoom();
+else finish();
+}
+
+function finish(){
+game.classList.add('hidden');
+result.classList.remove('hidden');
+if(score>=9) rank.textContent='🏆 MASTER CONJUNCTION EXPERT';
+else if(score>=6) rank.textContent='📚 SMART GRAMMAR LEARNER';
+else rank.textContent='🌱 YOUNG GRAMMAR STRIVER';
+final.textContent='You escaped all 10 rooms with '+score+' keys collected!';
+}
+</script>
+</body>
+</html>
