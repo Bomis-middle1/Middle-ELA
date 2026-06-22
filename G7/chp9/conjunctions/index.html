@@ -57,13 +57,36 @@ body, html {
 .panel-card p { color: #a49fc4; line-height: 1.6; margin-bottom: 25px; }
 
 /* GAME APP ENGINE INTERFACE */
-#gameScreen { background: #060414; }
+#gameScreen { background: #060414; position: relative; }
 #gameCanvas {
     display: block;
     width: 100vw;
     height: 100vh;
     background: radial-gradient(circle at center, #0f0b36 0%, #050312 100%);
 }
+
+/* TOUCH ACCESSIBILITY FALLBACK OVERLAY BUTTONS */
+.nav-btn {
+    position: absolute;
+    bottom: 25px;
+    width: 75px;
+    height: 75px;
+    background: rgba(0, 180, 216, 0.3);
+    border: 2px solid #00ffcc;
+    color: #ffd60a;
+    border-radius: 50%;
+    font-size: 28px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    cursor: pointer;
+    backdrop-filter: blur(4px);
+}
+#btnLeft { left: 20px; }
+#btnRight { right: 20px; }
+.nav-btn:active { background: rgba(0, 255, 204, 0.6); transform: scale(0.95); }
 
 /* OVERLAY ACTION INTERFACES */
 .action-btn {
@@ -101,8 +124,8 @@ body, html {
 <div id="instructionScreen" class="screen">
     <div class="panel-card">
         <h1>🚀 Conjunction Space Arcade</h1>
-        <p>1. Move Left/Right using <b>Arrow Keys (A/D)</b> or <b>Dragging your finger/mouse</b>.<br>
-           2. Line up under an answer, then <b>Press Space / Tap Screen</b> to Scan & Select it!</p>
+        <p>1. <b>Move Left/Right:</b> Drag your finger/mouse anywhere, tap the onscreen <b>◀ / ▶ arrows</b>, or use keyboard keys.<br>
+           2. <b>Select:</b> Tap the middle of the screen to lock in your choice!</p>
         <button class="action-btn" onclick="startGameArena()">Launch Mission</button>
     </div>
 </div>
@@ -110,6 +133,9 @@ body, html {
 <!-- STAGE 3: GAME RUNTIME CORE -->
 <div id="gameScreen" class="screen">
     <canvas id="gameCanvas"></canvas>
+    <!-- Fallback Manual Click Navigation Pads -->
+    <div id="btnLeft" class="nav-btn">◀</div>
+    <div id="btnRight" class="nav-btn">▶</div>
 </div>
 
 <!-- STAGE 4: CAPSTONE GAME OVER OVERLAY -->
@@ -124,7 +150,7 @@ body, html {
 
 <script>
 const mcqs = [
-    {q:'A detective finds this clue: "Although it was midnight, the thief escaped." What type of conjunction is although?',opts:["Coordinating","Relative","Concessive","Comparative"],ans:"Concessive"},
+    {q:'Find the participle: "The broken skateboard lay beside the ramp."',opts:["lay","beside","broken","ramp"],ans:"broken"},
     {q:'Which sentence contains a Conditional Conjunction?',opts:["I stayed home because it rained.","If you find the key, open the chest.","The player was tired but won.","The bike is faster than the scooter."],ans:"If you find the key, open the chest."},
     {q:'A robot made a grammar mistake. Which sentence is WRONG?',opts:["The tiger is stronger than the fox.","She studied so that she could pass.","Although he was hungry, he ate lunch.","If it rains, we will stay inside."],ans:"Although he was hungry, he ate lunch."},
     {q:'The door opens only if you choose the sentence with a Purpose Conjunction.',opts:["The knight trained so that he could defeat the dragon.","The knight trained because he was bored.","The knight trained although he was tired.","The knight trained and became stronger."],ans:"The knight trained so that he could defeat the dragon."},
@@ -147,7 +173,6 @@ let lives = 2;
 let feedbackMessage = "";
 let showContinuePrompt = false;
 
-// TRACTOR BEAM ANIMATION EFFECT CONTROL
 let laserBeamActive = false;
 let laserX = 0;
 let laserAlpha = 0;
@@ -157,7 +182,7 @@ const player = {
     y: 0,
     width: 70,
     height: 45,
-    speed: 14
+    speed: 15
 };
 
 const inputs = { Left: false, Right: false };
@@ -182,7 +207,7 @@ function buildStarsBackground() {
 function resizeViewports() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
-    player.y = canvas.height - player.height - 40;
+    player.y = canvas.height - player.height - 45;
     if(!gameActive && player.x === 0) {
         player.x = canvas.width / 2 - player.width / 2;
     }
@@ -190,39 +215,59 @@ function resizeViewports() {
 window.addEventListener("resize", resizeViewports);
 
 /* ==========================================================================
-   INPUT EVENT LISTENERS (FREEMOVE FIX + INTENTIONAL CLICK SELECTION)
+   HEAVY-DUTY INPUT FIXES (GLOBAL LISTENING & BUTTON FALLBACKS)
    ========================================================================== */
 window.addEventListener("keydown", (e) => {
-    if(e.key === "ArrowLeft" || e.key === "a" || e.key === "A") inputs.Left = true;
-    if(e.key === "ArrowRight" || e.key === "d" || e.key === "D") inputs.Right = true;
-    
-    if(e.key === " " || e.key === "Enter") {
+    if (e.key === "ArrowLeft" || e.code === "ArrowLeft" || e.key === "a" || e.key === "A") inputs.Left = true;
+    if (e.key === "ArrowRight" || e.code === "ArrowRight" || e.key === "d" || e.key === "D") inputs.Right = true;
+    if (e.key === " " || e.key === "Enter" || e.code === "Space") {
         e.preventDefault();
         triggerIntentionalSelection();
     }
 });
 
 window.addEventListener("keyup", (e) => {
-    if(e.key === "ArrowLeft" || e.key === "a" || e.key === "A") inputs.Left = false;
-    if(e.key === "ArrowRight" || e.key === "d" || e.key === "D") inputs.Right = false;
+    if (e.key === "ArrowLeft" || e.code === "ArrowLeft" || e.key === "a" || e.key === "A") inputs.Left = false;
+    if (e.key === "ArrowRight" || e.code === "ArrowRight" || e.key === "d" || e.key === "D") inputs.Right = false;
 });
 
-function handlePointerMovement(clientX) {
+// Snap Directly to Mouse/Touch ClientX coordinate instantly
+function forceTrackPointer(clientX) {
     if(!gameActive || showContinuePrompt) return;
     player.x = clientX - player.width / 2;
     if(player.x < 0) player.x = 0;
     if(player.x > canvas.width - player.width) player.x = canvas.width - player.width;
 }
 
-canvas.addEventListener("mousemove", (e) => handlePointerMovement(e.clientX));
-canvas.addEventListener("touchmove", (e) => {
-    if(e.touches.length > 0) handlePointerMovement(e.touches[0].clientX);
+window.addEventListener("mousemove", (e) => forceTrackPointer(e.clientX));
+window.addEventListener("touchmove", (e) => {
+    if(e.touches.length > 0) forceTrackPointer(e.touches[0].clientX);
 }, { passive: true });
 
-// TAP OR CLICK TRIGGERS ACTION
-canvas.addEventListener("click", (e) => {
+// Tap screen to shoot/advance (unless clicking native arrow helpers)
+window.addEventListener("click", (e) => {
+    if(e.target.classList.contains('nav-btn')) return;
     triggerIntentionalSelection();
 });
+window.addEventListener("touchstart", (e) => {
+    if(e.target.classList.contains('nav-btn')) return;
+    triggerIntentionalSelection();
+});
+
+// Fallback button controls implementation
+const btnLeft = document.getElementById("btnLeft");
+const btnRight = document.getElementById("btnRight");
+
+btnLeft.addEventListener("mousedown", () => inputs.Left = true);
+btnLeft.addEventListener("mouseup", () => inputs.Left = false);
+btnLeft.addEventListener("touchstart", (e) => { e.preventDefault(); inputs.Left = true; });
+btnLeft.addEventListener("touchend", () => inputs.Left = false);
+
+btnRight.addEventListener("mousedown", () => inputs.Right = true);
+btnRight.addEventListener("mouseup", () => inputs.Right = false);
+btnRight.addEventListener("touchstart", (e) => { e.preventDefault(); inputs.Right = true; });
+btnRight.addEventListener("touchend", () => inputs.Right = false);
+
 
 function triggerIntentionalSelection() {
     if (!gameActive) return;
@@ -232,15 +277,12 @@ function triggerIntentionalSelection() {
         return;
     }
     
-    // Fire tractor beam alignment check
     laserX = player.x + player.width / 2;
     laserBeamActive = true;
     laserAlpha = 1.0;
     
-    // Check which diamond is lined up perfectly with our X axis center point
     targetOptionDiamonds.forEach(diamond => {
         if(diamond.disabled) return;
-        
         if(laserX >= (diamond.x - diamond.width/2) && laserX <= (diamond.x + diamond.width/2)) {
             evaluateSelection(diamond);
         }
@@ -254,7 +296,7 @@ function startGameArena() {
     document.getElementById('instructionScreen').classList.remove('active');
     document.getElementById('gameScreen').classList.add('active');
     
-    activeQuizList = [...mcqs].sort(() => Math.random() - 0.5);
+    activeQuizList = [...mcqs]; // Maintained static structure
     currentIndex = 0;
     totalScore = 0;
     gameActive = true;
@@ -348,12 +390,12 @@ function restartEntireGame() {
 }
 
 /* ==========================================================================
-   RENDER MATRIX Engine
+   RENDER CORE
    ========================================================================== */
 function renderGraphicsWorkspace() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
-    // 1. Draw Background Stars
+    // Stars Background
     ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
     backgroundStars.forEach(s => {
         ctx.beginPath();
@@ -361,7 +403,7 @@ function renderGraphicsWorkspace() {
         ctx.fill();
     });
     
-    // 2. Laser beam display calculation
+    // Laser Beam
     if (laserBeamActive) {
         ctx.save();
         ctx.strokeStyle = `rgba(0, 255, 204, ${laserAlpha})`;
@@ -375,7 +417,7 @@ function renderGraphicsWorkspace() {
         ctx.restore();
     }
     
-    // 3. Header HUD setup
+    // HUD setup
     ctx.fillStyle = "rgba(20, 15, 61, 0.85)";
     ctx.fillRect(0, 0, canvas.width, 70);
     ctx.strokeStyle = "#00ffcc";
@@ -395,7 +437,7 @@ function renderGraphicsWorkspace() {
     ctx.textAlign = "right";
     ctx.fillText(`SHIELD: ${hearts}`, canvas.width - 25, 42);
     
-    // 4. Render Question Banner Box
+    // Question Banner
     const activeData = activeQuizList[currentIndex];
     ctx.fillStyle = "rgba(10, 5, 36, 0.95)";
     ctx.strokeStyle = "#ffca3a";
@@ -411,7 +453,7 @@ function renderGraphicsWorkspace() {
     ctx.textAlign = "center";
     ctx.fillText(activeData.q, canvas.width / 2, 146, qw - 40);
     
-    // 5. Render Question Diamonds
+    // Diamonds
     targetOptionDiamonds.forEach(diamond => {
         ctx.save();
         ctx.translate(diamond.x, diamond.y);
@@ -436,15 +478,15 @@ function renderGraphicsWorkspace() {
         ctx.fillText(diamond.text, diamond.x, diamond.y + 5, diamond.width - 25);
     });
     
-    // 6. Notifications Action Display Text
+    // Notifications Action Display Text
     if(feedbackMessage !== "") {
         ctx.fillStyle = feedbackMessage.startsWith("✨") ? "#00ffcc" : "#ff595e";
         ctx.font = "bold 17px sans-serif";
         ctx.textAlign = "center";
-        ctx.fillText(feedbackMessage, canvas.width / 2, canvas.height - 110);
+        ctx.fillText(feedbackMessage, canvas.width / 2, canvas.height - 130);
     }
     
-    // 7. Render Blue Player Block
+    // Render Blue Player Box
     ctx.save();
     ctx.shadowBlur = 12;
     ctx.shadowColor = "#00b4d8";
