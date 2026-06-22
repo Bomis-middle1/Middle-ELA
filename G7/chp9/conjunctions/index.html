@@ -202,10 +202,12 @@ body {
 </head>
 <body>
 
+<!-- 🔵 SCREEN 1: LOGO ONLY (Strict 5s) -->
 <div id="logoScreen" class="screen active">
     <img src="Middle-ELA/G7/chp9/conjunctions/assets/innovine-logo.png" alt="Innovine Logo">
 </div>
 
+<!-- 🟡 SCREEN 2: INSTRUCTIONS -->
 <div id="titleScreen" class="screen">
     <div class="title">🕵️‍♂️ Conjunction Detective</div>
     <div class="instructions-box">
@@ -218,6 +220,7 @@ body {
     <button class="action-btn" onclick="startGame()">Start Investigation</button>
 </div>
 
+<!-- 🟢 SCREEN 3: GAMEPLAY -->
 <div id="quizScreen" class="screen">
     <div class="game-container">
         <div id="scoreBoard">CASE PROGRESS: 1/10 | SOLVED: 0</div>
@@ -232,6 +235,7 @@ body {
     </div>
 </div>
 
+<!-- 🏆 SCREEN 4: END EVALUATION -->
 <div id="endScreen" class="screen">
     <div class="trophy">💼</div>
     <h2 class="title">Investigation Closed</h2>
@@ -239,16 +243,16 @@ body {
     <button class="action-btn" onclick="restartGame()">Next Case File</button>
 </div>
 
+<!-- AUDIO SYSTEMS -->
 <audio id="correctSound" src="Middle-ELA/G7/chp9/conjunctions/assets/correct.mp3" preload="auto"></audio>
 <audio id="wrongSound" src="Middle-ELA/G7/chp9/conjunctions/assets/wrong.mp3" preload="auto"></audio>
 <audio id="clapSound" src="Middle-ELA/G7/chp9/conjunctions/assets/clapping.mp3" preload="auto"></audio>
 
 <script>
-// Raw Pool Content
 const masterMCQs = [
     {q:'"Although it was midnight, the thief escaped." What type of conjunction is "although"?',opts:["Coordinating","Relative","Concessive","Comparative"],ans:"Concessive"},
     {q:'Identify the suspect profile containing a Conditional Conjunction:',opts:["I stayed home because it rained.","If you find the key, open the chest.","The player was tired but won.","The bike is faster than the scooter."],ans:"If you find the key, open the chest."},
-    {q:'A corrupt database script created a grammatical error. Which item is WRONG?',opts:["The tiger is stronger than the fox.","She studied so that she could pass.","Although he was hungry, he ate lunch.","If it rains, we will stay inside."],ans:"Although he was hungry, he ate lunch."},
+    {q:'A corrupt database script created a grammatical error. Which item is WRONG?',opts:["The tiger is stronger than the fox.","She studied so that she could pass.","Although he was hungry, he ate lunch.","If it rains, we will stay inside."],ans:"Almost he was hungry, he ate lunch."},
     {q:'The high-security vault opens only via a Purpose Conjunction:',opts:["The knight trained so that he could defeat the dragon.","The knight trained because he was bored.","The knight trained although he was tired.","The knight trained and became stronger."],ans:"The knight trained so that he could defeat the dragon."},
     {q:'What operational role does the conjunction "because" serve?',opts:["Shows comparison","Shows condition","Gives a reason","Gives extra information"],ans:"Gives a reason"},
     {q:'An alien audio log says: "The spaceship that landed here is invisible." What type of conjunction is "that"?',opts:["Relative","Comparative","Coordinating","Conditional"],ans:"Relative"},
@@ -265,7 +269,7 @@ let matchAttempts = 0;
 
 /* ================= INITIALIZATION & TIMING FLOW ================= */
 window.onload = () => {
-    // Rigidly show logo screen for exactly 5000 milliseconds
+    // Show logo screen for exactly 5000 milliseconds
     setTimeout(() => {
         document.getElementById("logoScreen").classList.remove("active");
         document.getElementById("titleScreen").classList.add("active");
@@ -273,10 +277,16 @@ window.onload = () => {
 };
 
 function startGame() {
+    // Unlock browser audio context via user click interaction
+    ["correctSound", "wrongSound", "clapSound"].forEach(id => {
+        let aud = document.getElementById(id);
+        if (aud) { aud.play().then(() => { aud.pause(); aud.currentTime = 0; }).catch(() => {}); }
+    });
+
     document.getElementById("titleScreen").classList.remove("active");
     document.getElementById("quizScreen").classList.add("active");
     
-    // Randomize entire question array on new run session
+    // Dynamic run setup
     activeQuestions = [...masterMCQs].sort(() => Math.random() - 0.5);
     currentIdx = 0;
     scoreCount = 0;
@@ -295,7 +305,6 @@ function loadCaseFile() {
     let box = document.getElementById("optionsBox");
     box.innerHTML = "";
     
-    // Options randomized internally per card display
     let balancedOpts = [...activeData.opts].sort(() => Math.random() - 0.5);
     
     balancedOpts.forEach(opt => {
@@ -318,7 +327,6 @@ function refreshIndicators() {
 function parseAnalysis(chosenVal, cardElement) {
     let currentCase = activeQuestions[currentIdx];
     
-    // Block double evaluating on matched nodes
     if (cardElement.classList.contains("wrong") || cardElement.classList.contains("correct")) return;
     
     matchAttempts++;
@@ -329,11 +337,7 @@ function parseAnalysis(chosenVal, cardElement) {
         playSound("correctSound");
         triggerConfettiFX();
         
-        if(matchAttempts === 1) {
-            document.getElementById("statusMsg").innerText = "Flawless deduction!";
-        } else {
-            document.getElementById("statusMsg").innerText = "Correct! Case updated.";
-        }
+        document.getElementById("statusMsg").innerText = matchAttempts === 1 ? "Flawless deduction!" : "Correct! Case updated.";
         
         lockAllInteractions();
         setTimeout(advanceTimeline, 1500);
@@ -347,7 +351,6 @@ function parseAnalysis(chosenVal, cardElement) {
             document.getElementById("statusMsg").innerText = "File locked. Revealing accurate source...";
             lockAllInteractions();
             
-            // Auto reveal correct element matching index data
             let elements = document.querySelectorAll(".evidence-card");
             elements.forEach(el => {
                 if (el.innerText === currentCase.ans) {
@@ -390,7 +393,6 @@ function restartGame() {
     startGame();
 }
 
-/* ================= SYSTEM AUDIO COMPATIBILITY CAP ================= */
 function playSound(audioId) {
     let targetAudio = document.getElementById(audioId);
     if (targetAudio) {
