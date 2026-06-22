@@ -25,7 +25,6 @@ body {
     position: relative;
 }
 
-/* NEON ATMOSPHERE RADIANCE generators */
 body::before {
     content: "";
     position: absolute;
@@ -62,7 +61,7 @@ body::after {
     z-index: 100;
 }
 
-/* TIMED INTRO KINETICS */
+/* TIMED INTRO KINETICS & Z-INDEX ISOLATION */
 #logoScreen { 
     background: #ffffff; 
     z-index: 9999; 
@@ -103,7 +102,7 @@ body::after {
 input[type=range] { accent-color: #10b981; cursor: pointer; width: 140px; }
 
 /* THE ACTIVE RUNTIME GAME MATRIX */
-#gameScreen { display: none; }
+#gameScreen { display: none; z-index: 7000; }
 .workbench-layout { width: 100%; max-width: 840px; display: flex; flex-direction: column; gap: 24px; }
 
 /* TRACKING PROGRESS METERS */
@@ -169,6 +168,7 @@ input[type=range] { accent-color: #10b981; cursor: pointer; width: 140px; }
     gap: 16px;
     flex-wrap: wrap;
     margin-top: 10px;
+    min-height: 70px;
 }
 
 .verb-cell-node {
@@ -240,7 +240,7 @@ input[type=range] { accent-color: #10b981; cursor: pointer; width: 140px; }
 #feedbackTray {
     font-size: 20px;
     font-weight: 700;
-    min-height: 30px;
+    min-height: 32px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     margin-top: -6px;
@@ -261,9 +261,8 @@ input[type=range] { accent-color: #10b981; cursor: pointer; width: 140px; }
 #restartBtn { background: linear-gradient(135deg, #0ea5e9, #2563eb); box-shadow: 0 4px 14px rgba(14, 165, 233, 0.4); }
 .action-prime-btn:hover { transform: translateY(-3px); filter: brightness(1.1); }
 
-canvas { position: fixed; inset: 0; pointer-events: none; z-index: 999; width: 100vw; height: 100vh; }
+canvas { position: fixed; inset: 0; pointer-events: none; z-index: 99999; width: 100vw; height: 100vh; }
 
-/* PHONE DISPLAY CALIBRATIONS */
 @media (max-width: 768px) {
     #topicScreen h1 { font-size: 32px; }
     .dashboard-card h1 { font-size: 28px; }
@@ -352,4 +351,237 @@ const screens = {
 };
 
 const audioChannels = {
-    correct: document
+    correct: document.getElementById("correctSound"),
+    wrong: document.getElementById("wrongSound"),
+    clap: document.getElementById("clapSound")
+};
+
+const ui = {
+    sentenceCanvas: document.getElementById("sentenceCanvas"),
+    verbPool: document.getElementById("verbPool"),
+    launchLeverBtn: document.getElementById("launchLeverBtn"),
+    progressFill: document.getElementById("progressFill"),
+    progressBadge: document.getElementById("progressBadge"),
+    scoreBadge: document.getElementById("scoreBadge"),
+    feedbackTray: document.getElementById("feedbackTray"),
+    finalScoreDisplay: document.getElementById("finalScoreDisplay")
+};
+
+let questionSet = [], currentStageIdx = 0, runtimeScore = 0, targetedSelection = "";
+
+document.getElementById("volume").oninput = function() {
+    Object.values(audioChannels).forEach(track => { if(track) track.volume = this.value; });
+};
+
+questionSet = [
+    { sentence: "The cat [GAP] on the wall every morning.", options: ["is", "are", "were"], answer: "is" },
+    { sentence: "My friends [GAP] going to the park after school.", options: ["is", "are", "was"], answer: "are" },
+    { sentence: "The teacher [GAP] very strict but kind.", options: ["is", "are", "were"], answer: "is" },
+    { sentence: "The dogs [GAP] barking loudly at the strangers.", options: ["is", "are", "was"], answer: "are" },
+    { sentence: "Neither of the boys [GAP] ready for the test.", options: ["is", "are", "were"], answer: "is" },
+    { sentence: "Each of the players [GAP] a medal after the match.", options: ["has", "have", "had"], answer: "has" },
+    { sentence: "The flowers in the garden [GAP] beautiful during spring.", options: ["is", "are", "was"], answer: "are" },
+    { sentence: "One of my sisters [GAP] coming tomorrow.", options: ["is", "are", "were"], answer: "is" },
+    { sentence: "The news [GAP] shocking yesterday.", options: ["was", "were", "is"], answer: "was" },
+    { sentence: "Ten dollars [GAP] enough to buy this book.", options: ["is", "are", "was"], answer: "is" }
+];
+
+// CRITICAL TIMING PIPELINE FIXES (Guarantees logo is fully destroyed after screen slide out)
+setTimeout(() => { 
+    screens.logo.style.opacity = "0"; 
+    screens.logo.style.visibility = "hidden";
+    setTimeout(() => { screens.logo.style.display = "none"; }, 400);
+    screens.topic.style.display = "flex"; 
+}, 2500);
+
+setTimeout(() => { 
+    screens.topic.style.display = "none"; 
+    screens.start.style.display = "flex"; 
+}, 5000);
+
+function triggerAudio(key) {
+    const track = audioChannels[key];
+    if (!track) return;
+    try { track.currentTime = 0; track.play().catch(() => {}); } catch(e) {}
+}
+
+function matrixShuffle(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+}
+
+document.getElementById("startBtn").onclick = function() {
+    screens.start.style.display = "none";
+    screens.game.style.display = "flex";
+    
+    Object.values(audioChannels).forEach(track => { if(track) { track.play().then(() => track.pause()).catch(() => {}); } });
+
+    runtimeScore = 0;
+    currentStageIdx = 0;
+    matrixShuffle(questionSet);
+    renderSequenceStage();
+};
+
+function renderSequenceStage() {
+    targetedSelection = "";
+    ui.launchLeverBtn.disabled = true;
+    ui.feedbackTray.innerHTML = "";
+    
+    ui.progressBadge.innerText = `CORE SLOT: ${currentStageIdx + 1} / ${questionSet.length}`;
+    ui.scoreBadge.innerText = `STABILITY STREAK: ${runtimeScore}`;
+    ui.progressFill.style.width = `${(currentStageIdx / questionSet.length) * 100}%`;
+
+    const q = questionSet[currentStageIdx];
+    const processedSentenceStr = q.sentence.replace("[GAP]", `<span id="gapTarget" class="syntax-gap-core">_ _</span>`);
+    ui.sentenceCanvas.innerHTML = processedSentenceStr;
+
+    ui.verbPool.innerHTML = "";
+    let optionsCopy = [...q.options];
+    matrixShuffle(optionsCopy);
+
+    optionsCopy.forEach(optionText => {
+        const cell = document.createElement("button");
+        cell.className = "verb-cell-node";
+        cell.innerText = optionText;
+        cell.onclick = () => injectVerbToGap(optionText, cell);
+        ui.verbPool.appendChild(cell);
+    });
+}
+
+function injectVerbToGap(val, element) {
+    if (element.classList.contains("locked")) return;
+    
+    targetedSelection = val;
+    document.querySelectorAll(".verb-cell-node").forEach(n => n.classList.remove("active-load"));
+    element.classList.add("active-load");
+
+    const gapTarget = document.getElementById("gapTarget");
+    if (gapTarget) {
+        gapTarget.innerText = val;
+        gapTarget.classList.add("occupied");
+    }
+    ui.launchLeverBtn.disabled = false;
+}
+
+ui.launchLeverBtn.onclick = function() {
+    ui.launchLeverBtn.disabled = true;
+    const q = questionSet[currentStageIdx];
+    const gapTarget = document.getElementById("gapTarget");
+    const cells = document.querySelectorAll(".verb-cell-node");
+
+    cells.forEach(c => c.classList.add("locked"));
+
+    if (targetedSelection === q.answer) {
+        runtimeScore++;
+        if (gapTarget) gapTarget.className = "syntax-gap-core occupied correct-payload";
+        ui.feedbackTray.innerHTML = "<span style='color: #10b981;'>⚡ Core Stabilized — Perfect Alignment!</span>";
+        triggerAudio("correct");
+        runConfettiBurst();
+    } else {
+        if (gapTarget) gapTarget.className = "syntax-gap-core occupied wrong-payload";
+        ui.feedbackTray.innerHTML = `<span style='color: #ef4444;'>❌ Overload — Required Syntax: "${q.answer}"</span>`;
+        triggerAudio("wrong");
+        
+        cells.forEach(c => {
+            if (c.innerText === q.answer) { c.style.background = "#10b981"; c.style.color = "white"; }
+        });
+    }
+
+    setTimeout(() => {
+        currentStageIdx++;
+        if (currentStageIdx < questionSet.length) {
+            renderSequenceStage();
+        } else {
+            renderDiagnosticsSummary();
+        }
+    }, 2500);
+};
+
+function renderDiagnosticsSummary() {
+    screens.game.style.display = "none";
+    screens.result.style.display = "flex";
+    ui.progressFill.style.width = "100%";
+
+    let percentage = Math.round((runtimeScore / questionSet.length) * 100);
+    let rankBadge = percentage >= 80 ? "⭐⭐⭐⭐⭐ <br><span style='color: #10b981; font-size:20px;'>GRAND MASTER TECH</span>" : "⭐⭐⭐☆☆ <br><span style='color: #eab308; font-size:20px;'>REPAIR OPERATIVE</span>";
+
+    ui.finalScoreDisplay.innerHTML = `
+        <div style="font-size:70px; margin-bottom:10px;">🏆</div>
+        <div style="font-size:48px; font-weight:900; color:#0ea5e9; margin:10px;">${runtimeScore} / ${questionSet.length}</div>
+        <div style="font-size:24px; color:#cbd5e1; margin-bottom:20px;">${percentage}% Accuracy Integrity</div>
+        <div style="margin-top:20px; line-height:1.8;">${rankBadge}</div>
+    `;
+
+    triggerAudio("clap");
+    runConfettiBurst();
+}
+
+document.getElementById("restartBtn").onclick = function() {
+    screens.result.style.display = "none";
+    screens.game.style.display = "flex";
+    runtimeScore = 0;
+    currentStageIdx = 0;
+    matrixShuffle(questionSet);
+    renderSequenceStage();
+};
+
+/* ==========================================================================
+   PARTICLE CONFETTI JET SPRAY CONTROLLER
+   ========================================================================== */
+const canvas = document.getElementById("confetti");
+const ctx = canvas.getContext("2d");
+let points = [], loopRef = null;
+
+function fitScreen() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+window.addEventListener("resize", fitScreen);
+fitScreen();
+
+function runConfettiBurst() {
+    points = [];
+    cancelAnimationFrame(loopRef);
+    const options = ["#0ea5e9", "#a855f7", "#10b981", "#eab308", "#f43f5e"];
+    
+    for (let i = 0; i < 140; i++) {
+        points.push({
+            x: Math.random() * canvas.width,
+            y: -20,
+            w: Math.random() * 7 + 6,
+            h: Math.random() * 7 + 6,
+            dy: Math.random() * 4 + 4,
+            dx: Math.random() * 4 - 2,
+            deg: Math.random() * 360,
+            spin: Math.random() * 8 - 4,
+            tint: options[Math.floor(Math.random() * options.length)]
+        });
+    }
+    
+    let ticks = 0;
+    function pulse() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        points.forEach(p => {
+            ctx.save();
+            ctx.translate(p.x, p.y);
+            ctx.rotate(p.deg * Math.PI / 180);
+            ctx.fillStyle = p.tint;
+            ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+            ctx.restore();
+            p.y += p.dy; p.x += p.dx; p.deg += p.spin;
+        });
+        ticks++;
+        if (ticks < 120) { loopRef = requestAnimationFrame(pulse); }
+        else { ctx.clearRect(0, 0, canvas.width, canvas.height); }
+    }
+    palse = pulse();
+}
+
+document.addEventListener("keydown", function(e) {
+    if (e.key === "Enter") {
+        if (screens.start.style.display === "flex") document.getElementById("startBtn").click();
+        else if (screens.result.style.display === "flex") document.getElementById("restartBtn").click();
+    }
+});
+</script>
+</body>
+</html>
