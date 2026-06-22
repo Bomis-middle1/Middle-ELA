@@ -1,1 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🍿 Popcorn Catch Cinema</title>
 
+<style>
+/* Keep all your existing CSS as is */
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
+body{
+overflow:hidden;
+background:black;
+}
+
+/* GAME AREA */
+#gameArea{
+position:relative;
+width:100vw;
+height:100vh;
+overflow:hidden;
+background:
+linear-gradient(to bottom,#0d1b2a,#1b263b,#415a77);
+}
+
+/* MOVING LIGHTS */
+.light{
+position:absolute;
+width:300px;
+height:300px;
+background:rgba(255,255,255,0.06);
+border-radius:50%;
+filter:blur(40px);
+animation:moveLight 10s infinite alternate;
+}
+
+.light2{
+animation-duration:14s;
+}
+
+@keyframes moveLight{
+from{
+transform:translate(-100px,-50px);
+}
+to{
+transform:translate(200px,100px);
+}
+}
+
+/* LOGO */
+#logoScreen{
+position:absolute;
+width:100%;
+height:100%;
+background:white;
+display:flex;
+justify-content:center;
+align-items:center;
+flex-direction:column;
+z-index:9999;
+}
+
+#logoScreen img{
+width:260px;
+max-width:80%;
+}
+
+/* START & END */
+#startScreen,
+#endScreen{
+position:absolute;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.85);
+display:flex;
+justify-content:center;
+align-items:center;
+flex-direction:column;
+text-align:center;
+color:white;
+padding:20px;
+z-index:5000;
+}
+
+.mainBtn{
+padding:16px 34px;
+font-size:22px;
+border:none;
+border-radius:18px;
+background:#ff9800;
+color:white;
+cursor:pointer;
+margin-top:25px;
+transition:0.3s;
+}
+
+.mainBtn:hover{
+transform:scale(1.05);
+background:#f57c00;
+}
+
+/* CINEMA SCREEN */
+#screen{
+position:absolute;
+top:25px;
+left:50%;
+transform:translateX(-50%);
+width:82%;
+height:110px;
+background:#eeeeee;
+border:10px solid #333;
+border-radius:20px;
+display:flex;
+justify-content:center;
+align-items:center;
+font-size:34px;
+font-weight:bold;
+color:#222;
+box-shadow:
+0 0 25px rgba(255,255,255,0.5),
+0 0 60px rgba(255,255,255,0.2);
+z-index:50;
+}
+
+/* PLAYER */
+#bucket{
+position:absolute;
+bottom:30px;
+left:50%;
+transform:translateX(-50%);
+font-size:95px;
+filter:drop-shadow(0 0 15px gold);
+transition:left 0.06s linear;
+z-index:100;
+}
+
+/* FALLING ITEMS */
+.item{
+position:absolute;
+font-size:48px;
+animation:spin 3s linear infinite;
+filter:drop-shadow(0 0 10px white);
+}
+
+@keyframes spin{
+from{
+transform:rotate(0deg);
+}
+to{
+transform:rotate(360deg);
+}
+}
+
+/* SCORE */
+#scoreBoard{
+position:absolute;
+top:15px;
+left:15px;
+background:white;
+padding:12px 18px;
+border-radius:15px;
+font-size:20px;
+font-weight:bold;
+z-index:200;
+}
+
+/* VOLUME */
+#volumeBox{
+position:absolute;
+top:15px;
+right:15px;
+background:white;
+padding:12px;
+border-radius:15px;
+z-index:200;
+}
+
+/* UNLOCK MESSAGE */
+#unlockMessage{
+position:absolute;
+top:45%;
+left:50%;
+transform:translate(-50%,-50%);
+font-size:58px;
+font-weight:bold;
+color:#ffe082;
+text-shadow:0 0 20px gold;
+display:none;
+z-index:3000;
+animation:pop 0.8s;
+}
+
+/* QUESTIONS */
+#questionBox{
+position:absolute;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+width:92%;
+max-width:650px;
+background:#fff8e1;
+padding:28px;
+border-radius:25px;
+display:none;
+z-index:4000;
+box-shadow:0 0 30px rgba(0,0,0,0.5);
+animation:popup 0.5s;
+}
+
+#questionTitle{
+font-size:30px;
+color:#e65100;
+margin-bottom:20px;
+text-align:center;
+}
+
+#questionText{
+font-size:24px;
+line-height:1.5;
+margin-bottom:20px;
+color:#333;
+}
+
+.optionBtn{
+width:100%;
+padding:16px;
+margin:10px 0;
+border:none;
+border-radius:15px;
+background:#4caf50;
+color:white;
+font-size:18px;
+cursor:pointer;
+transition:0.3s;
+}
+
+.optionBtn:hover{
+transform:scale(1.03);
+background:#388e3c;
+}
+
+/* FEEDBACK */
+#feedback{
+text-align:center;
+font-size:30px;
+font-weight:bold;
+margin-top:15px;
+}
+
+.correct{
+color:green;
+animation:pop 0.5s;
+}
+
+.wrong{
+color:red;
+animation:shake 0.5s;
+}
+
+/* CONFETTI */
+.confetti{
+position:absolute;
+width:12px;
+height:12px;
+animation:fall 3s linear forwards;
+}
+
+@keyframes fall{
+from{
+transform:translateY(-100px) rotate(0deg);
+}
+to{
+transform:translateY(100vh) rotate(720deg);
+opacity:0;
+}
+}
+
+@keyframes pop{
+0%{
+transform:translate(-50%,-50%) scale(0.5);
+}
+100%{
+transform:translate(-50%,-50%) scale(1.2);
+}
+}
+
+@keyframes shake{
+0%{transform:translateX(0);}
+25%{transform:translateX(-10px);}
+50%{transform:translateX(10px);}
+75%{transform:translateX(-10px);}
+100%{transform:translateX(0);}
+}
+
+@keyframes popup{
+from{
+transform:translate(-50%,-50%) scale(0.5);
+opacity:0;
+}
+to{
+transform:translate(-50%,-50%) scale(1);
+opacity:1;
+}
+}
+
+/* HOW TO CATCH BOX */
+#howToCatch{
+margin-top:25px;
+background:rgba(255,255,255,0.15);
+padding:20px;
+border-radius:15px;
+max-width:600px;
+}
+
+#howToCatch h3{
+color:#ff9800;
+margin-bottom:15px;
+font-size:24px;
+}
+
+#howToCatch p{
+margin:8px 0;
+font-size:17px;
+line-height:1.5;
+}
+
+#howToCatch .icon{
+font-size:28px;
+margin-right:8px;
+}
+
+/* MOBILE */
+@media(max-width:768px){
+
+#bucket{
+font-size:72px;
+}
+
+.item{
+font-size:38px;
+}
+
+#questionText{
+font-size:19px;
+}
+
+.optionBtn{
+font-size:16px;
+}
+
+#screen{
+font-size:24px;
+height:90px;
+}
+
+#unlockMessage{
+font-size:36px;
+}
+
+#howToCatch h3{
+font-size:20px;
+}
+
+#howToCatch p{
+font-size:15px;
+}
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="gameArea">
+
+<div class="light"></div>
+<div class="light light2"></div>
+
+<!-- LOGO -->
+<div id="logoScreen">
+<img src="assets/logo.png" onerror="this.style.display='none'">
+</div>
+
+<!-- START -->
+<div id="startScreen" style="display:none;">
+<h1 style="font-size:52px;">🍿 Popcorn Catch Cinema</h1>
+<p style="margin-top:20px;font-size:24px;max-width:700px;">
+Catch movie snacks and unlock hilarious article challenges!
+</p>
+
+<!-- HOW TO CATCH -->
+<div id="howToCatch">
+<h3>🎮 How to Catch Popcorns</h3>
+<p><span class="icon">⬅️➡️</span> Use <strong>LEFT/RIGHT Arrow Keys</strong> to move bucket</p>
+<p><span class="icon">👆</span> On mobile: Tap <strong>LEFT</strong> or <strong>RIGHT</strong> side of screen</p>
+<p><span class="icon">🍿</span> Catch falling snacks: <strong>popcorn, chocolate, drinks, candy</strong></p>
+<p><span class="icon">⭐</span> Collect <strong>8 snacks</strong> to unlock 1 article question</p>
+<p><span class="icon">✅</span> Answer correctly → Get points & continue catching!</p>
+<p><span class="icon">🏆</span> Complete all <strong>10 questions</strong> to win!</p>
+</div>
+
+<button class="mainBtn" onclick="startGame()">
+Start Movie Night
+</button>
+</div>
+
+<!-- END -->
+<div id="endScreen" style="display:none;">
+<h1>🏆 Movie Night Complete! 🏆</h1>
+<h2 id="finalText" style="margin-top:20px;"></h2>
+<button class="mainBtn" onclick="restartGame()">
+Play Again
+</button>
+</div>
+
+<!-- SCREEN -->
+<div id="screen">
+🍿 Catch Snacks to Unlock Movie Scenes!
+</div>
+
+<!-- SCORE -->
+<div id="scoreBoard">
+Snacks: <span id="snackCount">0</span> |
+Questions: <span id="questionCount">0</span>/10
+</div>
+
+<!-- VOLUME -->
+<div id="volumeBox">
+Volume
+<input type="range" id="volumeSlider" min="0" max="1" step="0.1" value="1">
+</div>
+
+<!-- PLAYER -->
+<div id="bucket">🪣</div>
+
+<!-- UNLOCK -->
+<div id="unlockMessage">
+🎬 SCENE UNLOCKED!
+</div>
+
+<!-- QUESTION BOX -->
+<div id="questionBox">
+<div id="questionTitle">
+🎬 Movie Scene Challenge
+</div>
+<div id="questionText"></div>
+<div id="options"></div>
+<div id="feedback"></div>
+</div>
+
+</div>
+
+<script>
+
+/* LOGO */
+setTimeout(()=>{
+document.getElementById("logoScreen").style.display="none";
+document.getElementById("startScreen").style.display="flex";
+},5000);
+
+/* AUDIO - FIXED PATHS */
+const correctSound = new Audio("assets/correct.mp3");
+const wrongSound = new Audio("assets/wrong.mp3");
+const clapSound = new Audio("assets/freesound_community-claps-44774.mp3");
+
+const volumeSlider = document.getElementById("volumeSlider");
+
+function updateVolume(){
+correctSound.volume = volumeSlider.value;
+wrongSound.volume = volumeSlider.value;
+clapSound.volume = volumeSlider.value;
+}
+volumeSlider.addEventListener("input",updateVolume);
+updateVolume();
+
+/* VARIABLES */
+const bucket = document.getElementById("bucket");
+let bucketX = window.innerWidth/2;
+let gameRunning = false;
+let snacks = 0;
+let currentQuestion = 0;
+
+/* QUESTIONS - Articles */
+const questions = [
+{
+q:`🍏 "___ apple a day keeps the doctor away."<br><br>
+Which article correctly fills the blank?`,
+o:["a","an","the","no article"],
+a:1
+},
+{
+q:`🦋 "I saw ___ butterfly in the garden."<br><br>
+Which article correctly fills the blank?`,
+o:["a","an","the","no article"],
+a:1
+},
+{
+q:`🐶 "She adopted ___ dog from the shelter."<br><br>
+Which article correctly fills the blank?`,
+o:["a","an","the","no article"],
+a:0
+},
+{
+q:`🏰 "We visited ___ castle during our trip."<br><br>
+Which article correctly fills the blank?`,
+o:["a","an","the","no article"],
+a:2
+},
+{
+q:`✈️ "He will take ___ airplane to New York."<br><br>
+Which article correctly fills the blank?`,
+o:["a","an","the","no article"],
+a:1
+},
+{
+q:`🌞 "___ sun rises in the east."<br><br>
+Which article correctly fills the blank?`,
+o:["a","an","the","no article"],
+a:2
+},
+{
+q:`🎩 "She bought ___ elegant hat for the party."<br><br>
+Which article correctly fills the blank?`,
+o:["a","an","the","no article"],
+a:1
+},
+{
+q:`📚 "I need ___ book from the shelf."<br><br>
+Which article correctly fills the blank?`,
+o:["a","an","the","no article"],
+a:2
+},
+{
+q:`🦄 "He saw ___ unicorn in his dream."<br><br>
+Which article correctly fills the blank?`,
+o:["a","an","the","no article"],
+a:1
+},
+{
+q:`🍕 "Would you like ___ slice of pizza?"<br><br>
+Which article correctly fills the blank?`,
+o:["a","an","the","no article"],
+a:0
+}
+];
+
+questions.sort(()=>Math.random()-0.5);
+
+/* START */
+function startGame(){
+document.getElementById("startScreen").style.display="none";
+gameRunning = true;
+spawnItems();
+}
+
+/* MOVEMENT */
+document.addEventListener("keydown",(e)=>{
+if(e.key==="ArrowLeft"){ bucketX -= 45; }
+if(e.key==="ArrowRight"){ bucketX += 45; }
+moveBucket();
+});
+
+document.addEventListener("touchstart",(e)=>{
+if(e.touches[0].clientX < window.innerWidth/2){ bucketX -= 55; }
+else{ bucketX += 55; }
+moveBucket();
+});
+
+function moveBucket(){
+if(bucketX < 50) bucketX = 50;
+if(bucketX > window.innerWidth-50) bucketX = window.innerWidth-50;
+bucket.style.left = bucketX + "px";
+}
+
+/* ITEMS */
+const itemList = ["🍿","🍫","🥤","🍬"];
+function spawnItems(){ if(!gameRunning) return; for(let i=0;i<3;i++){ createItem(); } setTimeout(spawnItems,900); }
+function createItem(){
+if(!gameRunning) return;
+const item = document.createElement("div");
+item.classList.add("item");
+item.innerHTML = itemList[Math.floor(Math.random()*itemList.length)];
+item.style.left = Math.random()*(window.innerWidth-60)+"px";
+item.style.top = "-60px";
+document.getElementById("gameArea").appendChild(item);
+let speed = 3 + Math.random()*2;
+let fall = setInterval(()=>{
+let top = parseFloat(item.style.top);
+top += speed;
+item.style.top = top + "px";
+const i = item.getBoundingClientRect();
+const b = bucket.getBoundingClientRect();
+if(i.left < b.right && i.right > b.left && i.top < b.bottom && i.bottom > b.top){
+snacks++;
+document.getElementById("snackCount").innerText = snacks;
+item.remove();
+clearInterval(fall);
+flashScreen();
+if(snacks % 8 === 0 && currentQuestion < 10){ unlockScene(); }
+}
+if(top > window.innerHeight){ item.remove(); clearInterval(fall); }
+},20);
+}
+
+/* FLASH */
+function flashScreen(){
+const screen = document.getElementById("screen");
+screen.style.transform = "translateX(-50%) scale(1.08)";
+setTimeout(()=>{ screen.style.transform = "translateX(-50%) scale(1)"; },150);
+}
+
+/* UNLOCK */
+function unlockScene(){
+gameRunning = false;
+document.getElementById("unlockMessage").style.display = "block";
+setTimeout(()=>{
+document.getElementById("unlockMessage").style.display = "none";
+showQuestion();
+},1500);
+}
+
+/* QUESTIONS */
+function showQuestion(){
+document.getElementById("questionBox").style.display = "block";
+const q = questions[currentQuestion];
+document.getElementById("questionText").innerHTML = q.q;
+const optionsDiv = document.getElementById("options");
+optionsDiv.innerHTML = "";
+document.getElementById("feedback").innerHTML = "";
+q.o.forEach((option,index)=>{
+const btn = document.createElement("button");
+btn.classList.add("optionBtn");
+btn.innerHTML = option;
+btn.onclick = ()=>checkAnswer(index,q.a);
+optionsDiv.appendChild(btn);
+});
+}
+
+/* ANSWERS */
+function checkAnswer(selected,correct){
+const feedback = document.getElementById("feedback");
+if(selected === correct){
+feedback.innerHTML = "🎉 Correct!";
+feedback.className = "correct";
+correctSound.play();
+clapSound.play();
+createConfetti();
+}else{
+feedback.innerHTML = "❌ Wrong!";
+feedback.className = "wrong";
+wrongSound.play();
+}
+currentQuestion++;
+document.getElementById("questionCount").innerText = currentQuestion;
+setTimeout(()=>{
+document.getElementById("questionBox").style.display = "none";
+if(currentQuestion >= 10){ endGame(); }else{ gameRunning = true; spawnItems(); }
+},1800);
+}
+
+/* CONFETTI */
+function createConfetti(){
+for(let i=0;i<45;i++){
+const conf = document.createElement("div");
+conf.classList.add("confetti");
+conf.style.left = Math.random()*100 + "%";
+conf.style.background = `hsl(${Math.random()*360},100%,50%)`;
+conf.style.animationDuration = (2 + Math.random()*2) + "s";
+document.body.appendChild(conf);
+setTimeout(()=>{ conf.remove(); },4000);
+}
+}
+
+/* END */
+function endGame(){
+gameRunning = false;
+document.getElementById("endScreen").style.display = "flex";
+document.getElementById("finalText").innerHTML =
+"You collected <b>" + snacks + "</b> movie snacks and completed all 10 article challenges!";
+}
+
+/* RESTART */
+function restartGame(){ location.reload(); }
+
+</script>
+
+</body>
+</html>
