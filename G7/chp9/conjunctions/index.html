@@ -1,288 +1,291 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-<title>Conjunction Space Arcade</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Conjunction Detective Game</title>
 
 <style>
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:Segoe UI, sans-serif;
-    user-select:none;
-    -webkit-tap-highlight-color:transparent;
+body{
+margin:0;
+font-family:Arial,sans-serif;
+background:#140f3d;
+color:#fff;
+display:flex;
+align-items:center;
+justify-content:center;
+flex-direction:column;
+height:100vh;
 }
 
-html,body{
-    width:100%;
-    height:100%;
-    overflow:hidden;
-    background:#050414;
-    color:#fff;
-}
-
-/* SCREEN SYSTEM */
 .screen{
-    position:fixed;
-    inset:0;
-    display:none;
-    align-items:center;
-    justify-content:center;
-    flex-direction:column;
+display:none;
+width:100%;
+height:100%;
+align-items:center;
+justify-content:center;
+flex-direction:column;
+text-align:center;
+padding:15px;
+box-sizing:border-box;
 }
-.screen.active{display:flex;}
+
+.active{display:flex;}
 
 /* LOGO */
-#logoScreen{
-    background:#fff;
-    z-index:9999;
-}
 #logoScreen img{
-    width:260px;
-    max-width:80%;
+width:220px;
+animation:pop 1s ease;
 }
 
-/* INSTRUCTIONS */
-#instructionScreen{
-    background:#0c0728;
+@keyframes pop{
+from{transform:scale(0.6);opacity:0;}
+to{transform:scale(1);opacity:1;}
 }
-.card{
-    width:90%;
-    max-width:520px;
-    background:rgba(20,15,61,0.95);
-    border:2px solid #00ffcc;
-    border-radius:20px;
-    padding:24px;
-    text-align:center;
+
+/* TITLE */
+.title{
+font-size:34px;
+color:#ffd60a;
+text-shadow:2px 2px 4px #000;
+margin:10px 0;
 }
-.card h1{
-    color:#ffd60a;
-    margin-bottom:10px;
+
+/* GAME BOX */
+#questionBox{
+background:#fff4d6;
+color:#2d2340;
+padding:15px;
+border-radius:12px;
+width:95%;
+max-width:500px;
+text-align:left;
 }
-.card p{
-    color:#cfc7ff;
-    margin-bottom:20px;
-    line-height:1.5;
-}
+
 button{
-    padding:12px 20px;
-    border:none;
-    border-radius:10px;
-    background:#ffb703;
-    font-weight:bold;
-    cursor:pointer;
+padding:12px;
+margin:8px 0;
+border-radius:12px;
+border:none;
+background:#ffb703;
+font-weight:bold;
+cursor:pointer;
+width:100%;
+font-size:15px;
 }
 
-/* GAME */
-#gameScreen{
-    background:radial-gradient(circle,#0f0b36,#050312);
-}
-canvas{
-    width:100%;
-    height:100%;
-    display:block;
+.option{
+background:#d8f3dc;
+padding:10px;
+margin:8px 0;
+border-radius:10px;
+cursor:pointer;
+font-weight:bold;
 }
 
-/* OVERLAY */
-#overlay{
-    position:absolute;
-    inset:0;
-    pointer-events:none;
+.correct{background:#b7efc5;}
+.wrong{background:#ffccd5;}
+
+#feedback{
+margin-top:10px;
+font-weight:bold;
+min-height:20px;
 }
-.hitbox{
-    position:absolute;
-    pointer-events:auto;
+
+/* SCORE */
+#scoreBoard{
+margin:10px 0;
+font-weight:bold;
 }
 
 /* END */
 #endScreen{
-    background:rgba(0,0,0,0.85);
+text-align:center;
+}
+
+.trophy{
+font-size:70px;
+}
+
+/* CONFETTI */
+.confetti{
+position:fixed;
+width:8px;
+height:8px;
+top:-10px;
+animation:fall 2s linear forwards;
+}
+
+@keyframes fall{
+to{
+transform:translateY(100vh) rotate(360deg);
+opacity:0;
+}
 }
 </style>
 </head>
 
 <body>
 
-<!-- AUDIO -->
-<audio id="correctSound" src="./assets/correct.mp3"></audio>
-<audio id="wrongSound" src="./assets/wrong.mp3"></audio>
-<audio id="clapSound" src="./assets/clapping.mp3"></audio>
-
-<!-- LOGO -->
+<!-- 🔵 LOGO (5 sec) -->
 <div id="logoScreen" class="screen active">
-    <img src="./assets/innovine-logo.png" />
+  <img src="Middle-ELA/G7/chp9/conjunctions/assets/innovine-logo.png">
 </div>
 
-<!-- INSTRUCTIONS -->
-<div id="instructionScreen" class="screen">
-    <div class="card">
-        <h1>Conjunction Space Arcade</h1>
-        <p>Move the ship and choose the correct answer. You get 2 attempts per question.</p>
-        <button onclick="startGame()">Start</button>
-    </div>
+<!-- 🟡 TITLE (3 sec) -->
+<div id="titleScreen" class="screen">
+  <div class="title">✨ Conjunction Detective Game ✨</div>
 </div>
 
-<!-- GAME -->
-<div id="gameScreen" class="screen">
-    <canvas id="canvas"></canvas>
-    <div id="overlay"></div>
+<!-- 🟢 GAME -->
+<div id="quizScreen" class="screen">
+
+<div class="title">Conjunction Detective</div>
+
+<div id="scoreBoard">Question 1 of 10 | Score: 0 / 10</div>
+
+<div id="questionBox">
+  <div id="questionText"></div>
+  <div id="optionsBox"></div>
+  <div id="feedback"></div>
 </div>
 
-<!-- END -->
+</div>
+
+<!-- 🏆 END -->
 <div id="endScreen" class="screen">
-    <div class="card">
-        <h1>Mission Complete</h1>
-        <p id="scoreText"></p>
-        <button onclick="restartGame()">Play Again</button>
-    </div>
+  <div class="trophy">🏆</div>
+  <h2>Mission Complete!</h2>
+  <p id="finalScore"></p>
+  <button onclick="restartGame()">Play Again</button>
 </div>
+
+<!-- AUDIO (FIXED PATHS) -->
+<audio id="correctSound" src="Middle-ELA/G7/chp9/conjunctions/assets/correct.mp3"></audio>
+<audio id="wrongSound" src="Middle-ELA/G7/chp9/conjunctions/assets/wrong.mp3"></audio>
+<audio id="clapSound" src="Middle-ELA/G7/chp9/conjunctions/assets/clapping.mp3"></audio>
 
 <script>
-/* ---------------- DATA ---------------- */
-const originalMCQ = [
-{q:"Find the participle: The broken skateboard lay beside the ramp.",opts:["lay","beside","broken","ramp"],ans:"broken"},
-{q:"Which sentence contains a conditional conjunction?",opts:["I stayed home because it rained.","If you find the key, open the chest.","The player was tired but won.","The bike is faster than the scooter."],ans:"If you find the key, open the chest."},
-{q:"A robot made a grammar mistake. Which sentence is WRONG?",opts:["The tiger is stronger than the fox.","She studied so that she could pass.","Although he was hungry, he ate lunch.","If it rains, we will stay inside."],ans:"Although he was hungry, he ate lunch."},
-{q:"What does because show?",opts:["comparison","condition","reason","extra info"],ans:"reason"},
-{q:"Which is coordinating conjunction?",opts:["and","because","although","if"],ans:"and"},
-{q:"Which is different?",opts:["although","but","though","because"],ans:"because"},
-{q:"Choose correct sentence",opts:["He run fast","He runs fast","He running fast","He runned fast"],ans:"He runs fast"},
-{q:"Identify conjunction",opts:["and","run","blue","fast"],ans:"and"}
-];
 
-function shuffle(arr){
-    return [...arr].sort(()=>Math.random()-0.5);
-}
-
-/* ---------------- STATE ---------------- */
-let mcq = [];
-let index = 0;
-let score = 0;
-let attempts = 2;
-let gameActive = false;
-
-const canvas = document.getElementById("canvas");
-const ctx = canvas.getContext("2d");
-const overlay = document.getElementById("overlay");
-
-let w,h;
-
-/* ship */
-let ship = {x:100,y:100,targetX:100,speed:18};
-
-/* options */
-let options = [];
-
-/* ---------------- INIT ---------------- */
+/* ================= SPLASH FLOW ================= */
 window.onload = () => {
-    mcq = shuffle(originalMCQ);   // random each play
-    resize();
 
-    setTimeout(()=>{
-        document.getElementById("logoScreen").classList.remove("active");
-        document.getElementById("instructionScreen").classList.add("active");
-    },5000);
+setTimeout(() => {
+document.getElementById("logoScreen").classList.remove("active");
+document.getElementById("titleScreen").classList.add("active");
+}, 5000);
+
+setTimeout(() => {
+document.getElementById("titleScreen").classList.remove("active");
+document.getElementById("quizScreen").classList.add("active");
+showQuestion();
+}, 8000);
+
 };
 
-window.addEventListener("resize",resize);
+/* ================= QUESTIONS (UNCHANGED) ================= */
+const mcqs=[
+{q:'A detective finds this clue: "Although it was midnight, the thief escaped." What type of conjunction is although?',opts:["Coordinating","Relative","Concessive","Comparative"],ans:"Concessive"},
+{q:'Which sentence contains a Conditional Conjunction?',opts:["I stayed home because it rained.","If you find the key, open the chest.","The player was tired but won.","The bike is faster than the scooter."],ans:"If you find the key, open the chest."},
+{q:'A robot made a grammar mistake. Which sentence is WRONG?',opts:["The tiger is stronger than the fox.","She studied so that she could pass.","Although he was hungry, he ate lunch.","If it rains, we will stay inside."],ans:"Although he was hungry, he ate lunch."},
+{q:'The door opens only if you choose the sentence with a Purpose Conjunction.',opts:["The knight trained so that he could defeat the dragon.","The knight trained because he was bored.","The knight trained although he was tired.","The knight trained and became stronger."],ans:"The knight trained so that he could defeat the dragon."},
+{q:'What does the conjunction because do?',opts:["Shows comparison","Shows condition","Gives a reason","Gives extra information"],ans:"Gives a reason"},
+{q:'The alien says: "The spaceship that landed here is invisible." What type of conjunction is that?',opts:["Relative","Comparative","Coordinating","Conditional"],ans:"Relative"},
+{q:'Which sentence uses a Coordinating Conjunction?',opts:["The runner trained because she wanted to win.","The runner trained although she was tired.","The runner trained and improved her speed.","The runner trained so that she could compete."],ans:"The runner trained and improved her speed."},
+{q:'Which conjunction belongs to a DIFFERENT category?',opts:["Although","Even though","Though","Because"],ans:"Because"},
+{q:'Which pair belongs to the same conjunction type?',opts:["if, unless","and, although","because, than","that, but"],ans:"if, unless"},
+{q:'Read the sentence: "The wizard carried a map so that he could find the treasure, although the journey was dangerous." How many conjunction types are used?',opts:["One","Two","Three","Four"],ans:"Two"}
+];
 
-function resize(){
-    w = canvas.width = window.innerWidth;
-    h = canvas.height = window.innerHeight;
-    ship.y = h - 80;
+let i=0;
+let score=0;
+
+/* ================= SHOW ================= */
+function showQuestion(){
+
+let q = mcqs[i];
+
+document.getElementById("questionText").innerText = q.q;
+
+let box = document.getElementById("optionsBox");
+box.innerHTML = "";
+
+q.opts.forEach(opt=>{
+let div=document.createElement("div");
+div.className="option";
+div.innerText=opt;
+div.onclick=()=>check(opt,div);
+box.appendChild(div);
+});
+
+document.getElementById("scoreBoard").innerText =
+`Question ${i+1} of ${mcqs.length} | Score: ${score} / 10`;
+
 }
 
-/* ---------------- START ---------------- */
-function startGame(){
-    document.getElementById("instructionScreen").classList.remove("active");
-    document.getElementById("gameScreen").classList.add("active");
-    gameActive = true;
-    index = 0;
-    score = 0;
-    loadQ();
-    loop();
+/* ================= CHECK ================= */
+function check(opt,el){
+
+let q = mcqs[i];
+let options=document.querySelectorAll(".option");
+
+options.forEach(o=>o.onclick=null);
+
+if(opt===q.ans){
+el.classList.add("correct");
+score++;
+document.getElementById("correctSound").play().catch(()=>{});
+confetti();
+}
+else{
+el.classList.add("wrong");
+document.getElementById("wrongSound").play().catch(()=>{});
 }
 
-/* ---------------- LOAD QUESTION ---------------- */
-function loadQ(){
-    overlay.innerHTML = "";
-    attempts = 2;
-
-    if(index >= mcq.length){
-        endGame();
-        return;
-    }
-
-    let q = mcq[index];
-    options = shuffle(q.opts);
-
-    let gap = w / options.length;
-
-    options.forEach((t,i)=>{
-        let div = document.createElement("div");
-        div.className="hitbox";
-        div.style.left = (gap*i + gap/2 - 60)+"px";
-        div.style.top = (h/2)+"px";
-        div.style.width="120px";
-        div.style.height="70px";
-
-        div.onclick = () => select(t, q.ans);
-
-        overlay.appendChild(div);
-    });
+setTimeout(next,1200);
 }
 
-/* ---------------- SELECT ---------------- */
-function select(choice, answer){
-    if(!gameActive) return;
+/* ================= NEXT ================= */
+function next(){
+i++;
 
-    if(choice === answer){
-        score++;
-        document.getElementById("correctSound").play().catch(()=>{});
-        document.getElementById("clapSound").play().catch(()=>{});
-        index++;
-        loadQ();
-    }else{
-        attempts--;
-        document.getElementById("wrongSound").play().catch(()=>{});
-        if(attempts<=0){
-            index++;
-            loadQ();
-        }
-    }
+if(i>=mcqs.length){
+endGame();
+return;
 }
 
-/* ---------------- LOOP ---------------- */
-function loop(){
-    if(!gameActive) return;
-
-    ctx.clearRect(0,0,w,h);
-
-    // ship follow
-    ship.x += (ship.targetX - ship.x)*0.1;
-
-    ctx.fillStyle="#00b4d8";
-    ctx.fillRect(ship.x, ship.y, 60, 40);
-
-    requestAnimationFrame(loop);
+showQuestion();
 }
 
-/* ---------------- END ---------------- */
+/* ================= END ================= */
 function endGame(){
-    gameActive=false;
-    document.getElementById("gameScreen").classList.remove("active");
-    document.getElementById("endScreen").classList.add("active");
-    document.getElementById("scoreText").innerText = `Score: ${score} / ${mcq.length}`;
+
+document.getElementById("quizScreen").classList.remove("active");
+document.getElementById("endScreen").classList.add("active");
+
+document.getElementById("finalScore").innerText =
+`You scored ${score} / ${mcqs.length}`;
+
+document.getElementById("clapSound").play().catch(()=>{});
 }
 
-/* ---------------- RESTART ---------------- */
+/* ================= RESTART ================= */
 function restartGame(){
-    document.getElementById("endScreen").classList.remove("active");
-    mcq = shuffle(originalMCQ);
-    startGame();
+location.reload();
 }
+
+/* ================= CONFETTI ================= */
+function confetti(){
+for(let j=0;j<40;j++){
+let c=document.createElement("div");
+c.className="confetti";
+c.style.left=Math.random()*100+"vw";
+c.style.background=["#ff0","#0ff","#f0f","#0f0","#f60"][Math.floor(Math.random()*5)];
+document.body.appendChild(c);
+setTimeout(()=>c.remove(),2000);
+}
+}
+
 </script>
 
 </body>
