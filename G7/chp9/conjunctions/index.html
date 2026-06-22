@@ -2,290 +2,414 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Conjunction Detective Game</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Conjunction Detective Case File</title>
 
 <style>
-body{
-margin:0;
-font-family:Arial,sans-serif;
-background:#140f3d;
-color:#fff;
-display:flex;
-align-items:center;
-justify-content:center;
-flex-direction:column;
-height:100vh;
+:root {
+    --bg-dark: #0f1016;
+    --board-bg: #1e1e2f;
+    --accent-gold: #ffd166;
+    --evidence-card: #2b2b40;
+    --text-light: #f4f4f9;
+    --correct-green: #06d6a0;
+    --wrong-red: #ef476f;
 }
 
-.screen{
-display:none;
-width:100%;
-height:100%;
-align-items:center;
-justify-content:center;
-flex-direction:column;
-text-align:center;
-padding:15px;
-box-sizing:border-box;
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
 }
 
-.active{display:flex;}
-
-/* LOGO */
-#logoScreen img{
-width:220px;
-animation:pop 1s ease;
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Courier New', Courier, monospace;
+    background: var(--bg-dark);
+    color: var(--text-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    overflow-x: hidden;
 }
 
-@keyframes pop{
-from{transform:scale(0.6);opacity:0;}
-to{transform:scale(1);opacity:1;}
+.screen {
+    display: none;
+    width: 100%;
+    max-width: 600px;
+    min-height: 100vh;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+    padding: 20px;
 }
 
-/* TITLE */
-.title{
-font-size:34px;
-color:#ffd60a;
-text-shadow:2px 2px 4px #000;
-margin:10px 0;
+.active { display: flex; }
+
+/* LOGO SCREEN */
+#logoScreen img {
+    width: 70%;
+    max-width: 220px;
+    height: auto;
+    animation: pulse 1.5s infinite alternate;
 }
 
-/* GAME BOX */
-#questionBox{
-background:#fff4d6;
-color:#2d2340;
-padding:15px;
-border-radius:12px;
-width:95%;
-max-width:500px;
-text-align:left;
+@keyframes pulse {
+    from { transform: scale(0.95); opacity: 0.8; }
+    to { transform: scale(1.05); opacity: 1; }
 }
 
-button{
-padding:12px;
-margin:8px 0;
-border-radius:12px;
-border:none;
-background:#ffb703;
-font-weight:bold;
-cursor:pointer;
-width:100%;
-font-size:15px;
+/* TITLE / INSTRUCTION SCREEN */
+.title {
+    font-size: 1.8rem;
+    color: var(--accent-gold);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 15px;
+    font-weight: bold;
 }
 
-.option{
-background:#d8f3dc;
-padding:10px;
-margin:8px 0;
-border-radius:10px;
-cursor:pointer;
-font-weight:bold;
+.instructions-box {
+    background: var(--board-bg);
+    border: 2px solid #3d3d5c;
+    border-radius: 12px;
+    padding: 20px;
+    margin: 20px 0;
+    text-align: left;
+    font-size: 1rem;
+    line-height: 1.6;
 }
 
-.correct{background:#b7efc5;}
-.wrong{background:#ffccd5;}
-
-#feedback{
-margin-top:10px;
-font-weight:bold;
-min-height:20px;
+/* GAME CONTAINER */
+.game-container {
+    background: var(--board-bg);
+    border: 3px solid #3d3d5c;
+    border-radius: 16px;
+    width: 100%;
+    padding: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
 }
 
-/* SCORE */
-#scoreBoard{
-margin:10px 0;
-font-weight:bold;
+#scoreBoard {
+    font-size: 0.85rem;
+    color: #8b8baf;
+    margin-bottom: 15px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: bold;
 }
 
-/* END */
-#endScreen{
-text-align:center;
+.clue-box {
+    background: #2a2a3e;
+    border-left: 5px solid var(--accent-gold);
+    padding: 15px;
+    border-radius: 8px;
+    font-size: 1.05rem;
+    line-height: 1.5;
+    margin-bottom: 20px;
+    text-align: left;
 }
 
-.trophy{
-font-size:70px;
+/* CARDS GRID */
+.options-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
 }
 
-/* CONFETTI */
-.confetti{
-position:fixed;
-width:8px;
-height:8px;
-top:-10px;
-animation:fall 2s linear forwards;
+@media (max-width: 400px) {
+    .options-grid {
+        grid-template-columns: 1fr;
+    }
+    .title { font-size: 1.5rem; }
 }
 
-@keyframes fall{
-to{
-transform:translateY(100vh) rotate(360deg);
-opacity:0;
+.evidence-card {
+    background: var(--evidence-card);
+    border: 2px solid #3d3d5c;
+    color: var(--text-light);
+    padding: 15px 10px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 55px;
 }
+
+.evidence-card:hover {
+    border-color: var(--accent-gold);
+    background: #373754;
 }
+
+/* FEEDBACK STATES */
+.correct {
+    background: var(--correct-green) !important;
+    border-color: var(--correct-green) !important;
+    color: #0f1016 !important;
+}
+
+.wrong {
+    background: var(--wrong-red) !important;
+    border-color: var(--wrong-red) !important;
+    color: #fff !important;
+}
+
+/* ATTEMPT / STATUS SYSTEM */
+#statusMsg {
+    margin-top: 15px;
+    font-weight: bold;
+    font-size: 0.95rem;
+    min-height: 22px;
+    color: var(--accent-gold);
+}
+
+/* END SCREEN */
+.trophy { font-size: 70px; margin-bottom: 10px; }
+.action-btn {
+    background: var(--accent-gold);
+    color: #0f1016;
+    padding: 15px 30px;
+    border: none;
+    border-radius: 30px;
+    font-weight: bold;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: transform 0.2s;
+    margin-top: 15px;
+    width: 100%;
+    max-width: 250px;
+}
+.action-btn:hover { transform: scale(1.03); }
+
+/* CONFETTI LAYER */
+.confetti {
+    position: fixed;
+    width: 6px;
+    height: 6px;
+    top: -10px;
+    z-index: 999;
+    animation: fall 2s linear forwards;
+}
+@keyframes fall { to { transform: translateY(100vh) rotate(360deg); opacity: 0; } }
 </style>
 </head>
-
 <body>
 
-<!-- 🔵 LOGO (5 sec) -->
 <div id="logoScreen" class="screen active">
-  <img src="Middle-ELA/G7/chp9/conjunctions/assets/innovine-logo.png">
+    <img src="Middle-ELA/G7/chp9/conjunctions/assets/innovine-logo.png" alt="Innovine Logo">
 </div>
 
-<!-- 🟡 TITLE (3 sec) -->
 <div id="titleScreen" class="screen">
-  <div class="title">✨ Conjunction Detective Game ✨</div>
+    <div class="title">🕵️‍♂️ Conjunction Detective</div>
+    <div class="instructions-box">
+        <strong>CASE BRIEFING:</strong><br>
+        1. Examine intercepted text fragments carefully.<br>
+        2. Identify the missing link or type of conjunction.<br>
+        3. Tap an Evidence Card to analyze.<br>
+        4. You have <strong>2 attempts</strong> per file before the module locks!
+    </div>
+    <button class="action-btn" onclick="startGame()">Start Investigation</button>
 </div>
 
-<!-- 🟢 GAME -->
 <div id="quizScreen" class="screen">
-
-<div class="title">Conjunction Detective</div>
-
-<div id="scoreBoard">Question 1 of 10 | Score: 0 / 10</div>
-
-<div id="questionBox">
-  <div id="questionText"></div>
-  <div id="optionsBox"></div>
-  <div id="feedback"></div>
+    <div class="game-container">
+        <div id="scoreBoard">CASE PROGRESS: 1/10 | SOLVED: 0</div>
+        
+        <div class="clue-box">
+            <strong style="color: var(--accent-gold); display:block; margin-bottom: 5px;">📜 INTERCEPTED CLUE:</strong>
+            <span id="questionText">Loading encrypted files...</span>
+        </div>
+        
+        <div class="options-grid" id="optionsBox"></div>
+        <div id="statusMsg"></div>
+    </div>
 </div>
 
-</div>
-
-<!-- 🏆 END -->
 <div id="endScreen" class="screen">
-  <div class="trophy">🏆</div>
-  <h2>Mission Complete!</h2>
-  <p id="finalScore"></p>
-  <button onclick="restartGame()">Play Again</button>
+    <div class="trophy">💼</div>
+    <h2 class="title">Investigation Closed</h2>
+    <p id="finalScore" style="font-size: 1.2rem; margin: 10px 0;"></p>
+    <button class="action-btn" onclick="restartGame()">Next Case File</button>
 </div>
 
-<!-- AUDIO (FIXED PATHS) -->
-<audio id="correctSound" src="Middle-ELA/G7/chp9/conjunctions/assets/correct.mp3"></audio>
-<audio id="wrongSound" src="Middle-ELA/G7/chp9/conjunctions/assets/wrong.mp3"></audio>
-<audio id="clapSound" src="Middle-ELA/G7/chp9/conjunctions/assets/clapping.mp3"></audio>
+<audio id="correctSound" src="Middle-ELA/G7/chp9/conjunctions/assets/correct.mp3" preload="auto"></audio>
+<audio id="wrongSound" src="Middle-ELA/G7/chp9/conjunctions/assets/wrong.mp3" preload="auto"></audio>
+<audio id="clapSound" src="Middle-ELA/G7/chp9/conjunctions/assets/clapping.mp3" preload="auto"></audio>
 
 <script>
-
-/* ================= SPLASH FLOW ================= */
-window.onload = () => {
-
-setTimeout(() => {
-document.getElementById("logoScreen").classList.remove("active");
-document.getElementById("titleScreen").classList.add("active");
-}, 5000);
-
-setTimeout(() => {
-document.getElementById("titleScreen").classList.remove("active");
-document.getElementById("quizScreen").classList.add("active");
-showQuestion();
-}, 8000);
-
-};
-
-/* ================= QUESTIONS (UNCHANGED) ================= */
-const mcqs=[
-{q:'A detective finds this clue: "Although it was midnight, the thief escaped." What type of conjunction is although?',opts:["Coordinating","Relative","Concessive","Comparative"],ans:"Concessive"},
-{q:'Which sentence contains a Conditional Conjunction?',opts:["I stayed home because it rained.","If you find the key, open the chest.","The player was tired but won.","The bike is faster than the scooter."],ans:"If you find the key, open the chest."},
-{q:'A robot made a grammar mistake. Which sentence is WRONG?',opts:["The tiger is stronger than the fox.","She studied so that she could pass.","Although he was hungry, he ate lunch.","If it rains, we will stay inside."],ans:"Although he was hungry, he ate lunch."},
-{q:'The door opens only if you choose the sentence with a Purpose Conjunction.',opts:["The knight trained so that he could defeat the dragon.","The knight trained because he was bored.","The knight trained although he was tired.","The knight trained and became stronger."],ans:"The knight trained so that he could defeat the dragon."},
-{q:'What does the conjunction because do?',opts:["Shows comparison","Shows condition","Gives a reason","Gives extra information"],ans:"Gives a reason"},
-{q:'The alien says: "The spaceship that landed here is invisible." What type of conjunction is that?',opts:["Relative","Comparative","Coordinating","Conditional"],ans:"Relative"},
-{q:'Which sentence uses a Coordinating Conjunction?',opts:["The runner trained because she wanted to win.","The runner trained although she was tired.","The runner trained and improved her speed.","The runner trained so that she could compete."],ans:"The runner trained and improved her speed."},
-{q:'Which conjunction belongs to a DIFFERENT category?',opts:["Although","Even though","Though","Because"],ans:"Because"},
-{q:'Which pair belongs to the same conjunction type?',opts:["if, unless","and, although","because, than","that, but"],ans:"if, unless"},
-{q:'Read the sentence: "The wizard carried a map so that he could find the treasure, although the journey was dangerous." How many conjunction types are used?',opts:["One","Two","Three","Four"],ans:"Two"}
+// Raw Pool Content
+const masterMCQs = [
+    {q:'"Although it was midnight, the thief escaped." What type of conjunction is "although"?',opts:["Coordinating","Relative","Concessive","Comparative"],ans:"Concessive"},
+    {q:'Identify the suspect profile containing a Conditional Conjunction:',opts:["I stayed home because it rained.","If you find the key, open the chest.","The player was tired but won.","The bike is faster than the scooter."],ans:"If you find the key, open the chest."},
+    {q:'A corrupt database script created a grammatical error. Which item is WRONG?',opts:["The tiger is stronger than the fox.","She studied so that she could pass.","Although he was hungry, he ate lunch.","If it rains, we will stay inside."],ans:"Although he was hungry, he ate lunch."},
+    {q:'The high-security vault opens only via a Purpose Conjunction:',opts:["The knight trained so that he could defeat the dragon.","The knight trained because he was bored.","The knight trained although he was tired.","The knight trained and became stronger."],ans:"The knight trained so that he could defeat the dragon."},
+    {q:'What operational role does the conjunction "because" serve?',opts:["Shows comparison","Shows condition","Gives a reason","Gives extra information"],ans:"Gives a reason"},
+    {q:'An alien audio log says: "The spaceship that landed here is invisible." What type of conjunction is "that"?',opts:["Relative","Comparative","Coordinating","Conditional"],ans:"Relative"},
+    {q:'Which profile relies on a structural Coordinating Conjunction?',opts:["The runner trained because she wanted to win.","The runner trained although she was tired.","The runner trained and improved her speed.","The runner trained so that she could compete."],ans:"The runner trained and improved her speed."},
+    {q:'Which connective indicator belongs to a completely DIFFERENT category?',opts:["Although","Even though","Though","Because"],ans:"Because"},
+    {q:'Which logical pair shares the exact same conjunction classification?',opts:["if, unless","and, although","because, than","that, but"],ans:"if, unless"},
+    {q:'Analyze: "The wizard carried a map so that he could find the treasure, although the journey was dangerous." How many conjunction types are used?',opts:["One","Two","Three","Four"],ans:"Two"}
 ];
 
-let i=0;
-let score=0;
+let activeQuestions = [];
+let currentIdx = 0;
+let scoreCount = 0;
+let matchAttempts = 0;
 
-/* ================= SHOW ================= */
-function showQuestion(){
+/* ================= INITIALIZATION & TIMING FLOW ================= */
+window.onload = () => {
+    // Rigidly show logo screen for exactly 5000 milliseconds
+    setTimeout(() => {
+        document.getElementById("logoScreen").classList.remove("active");
+        document.getElementById("titleScreen").classList.add("active");
+    }, 5000);
+};
 
-let q = mcqs[i];
-
-document.getElementById("questionText").innerText = q.q;
-
-let box = document.getElementById("optionsBox");
-box.innerHTML = "";
-
-q.opts.forEach(opt=>{
-let div=document.createElement("div");
-div.className="option";
-div.innerText=opt;
-div.onclick=()=>check(opt,div);
-box.appendChild(div);
-});
-
-document.getElementById("scoreBoard").innerText =
-`Question ${i+1} of ${mcqs.length} | Score: ${score} / 10`;
-
+function startGame() {
+    document.getElementById("titleScreen").classList.remove("active");
+    document.getElementById("quizScreen").classList.add("active");
+    
+    // Randomize entire question array on new run session
+    activeQuestions = [...masterMCQs].sort(() => Math.random() - 0.5);
+    currentIdx = 0;
+    scoreCount = 0;
+    
+    loadCaseFile();
 }
 
-/* ================= CHECK ================= */
-function check(opt,el){
+/* ================= PLAYGROUND RENDERING ================= */
+function loadCaseFile() {
+    matchAttempts = 0;
+    document.getElementById("statusMsg").innerText = "";
+    
+    let activeData = activeQuestions[currentIdx];
+    document.getElementById("questionText").innerText = activeData.q;
+    
+    let box = document.getElementById("optionsBox");
+    box.innerHTML = "";
+    
+    // Options randomized internally per card display
+    let balancedOpts = [...activeData.opts].sort(() => Math.random() - 0.5);
+    
+    balancedOpts.forEach(opt => {
+        let btn = document.createElement("div");
+        btn.className = "evidence-card";
+        btn.innerText = opt;
+        btn.onclick = () => parseAnalysis(opt, btn);
+        box.appendChild(btn);
+    });
 
-let q = mcqs[i];
-let options=document.querySelectorAll(".option");
-
-options.forEach(o=>o.onclick=null);
-
-if(opt===q.ans){
-el.classList.add("correct");
-score++;
-document.getElementById("correctSound").play().catch(()=>{});
-confetti();
-}
-else{
-el.classList.add("wrong");
-document.getElementById("wrongSound").play().catch(()=>{});
-}
-
-setTimeout(next,1200);
-}
-
-/* ================= NEXT ================= */
-function next(){
-i++;
-
-if(i>=mcqs.length){
-endGame();
-return;
+    refreshIndicators();
 }
 
-showQuestion();
+function refreshIndicators() {
+    document.getElementById("scoreBoard").innerText = 
+        `CASE PROGRESS: ${currentIdx + 1} / ${activeQuestions.length} | SOLVED: ${scoreCount}`;
 }
 
-/* ================= END ================= */
-function endGame(){
-
-document.getElementById("quizScreen").classList.remove("active");
-document.getElementById("endScreen").classList.add("active");
-
-document.getElementById("finalScore").innerText =
-`You scored ${score} / ${mcqs.length}`;
-
-document.getElementById("clapSound").play().catch(()=>{});
+/* ================= INTERACTION EVALUATION ENGINE ================= */
+function parseAnalysis(chosenVal, cardElement) {
+    let currentCase = activeQuestions[currentIdx];
+    
+    // Block double evaluating on matched nodes
+    if (cardElement.classList.contains("wrong") || cardElement.classList.contains("correct")) return;
+    
+    matchAttempts++;
+    
+    if (chosenVal === currentCase.ans) {
+        cardElement.classList.add("correct");
+        scoreCount++;
+        playSound("correctSound");
+        triggerConfettiFX();
+        
+        if(matchAttempts === 1) {
+            document.getElementById("statusMsg").innerText = "Flawless deduction!";
+        } else {
+            document.getElementById("statusMsg").innerText = "Correct! Case updated.";
+        }
+        
+        lockAllInteractions();
+        setTimeout(advanceTimeline, 1500);
+    } else {
+        cardElement.classList.add("wrong");
+        playSound("wrongSound");
+        
+        if (matchAttempts < 2) {
+            document.getElementById("statusMsg").innerText = "Evidence conflict! 1 attempt remaining.";
+        } else {
+            document.getElementById("statusMsg").innerText = "File locked. Revealing accurate source...";
+            lockAllInteractions();
+            
+            // Auto reveal correct element matching index data
+            let elements = document.querySelectorAll(".evidence-card");
+            elements.forEach(el => {
+                if (el.innerText === currentCase.ans) {
+                    el.classList.add("correct");
+                }
+            });
+            setTimeout(advanceTimeline, 2000);
+        }
+    }
 }
 
-/* ================= RESTART ================= */
-function restartGame(){
-location.reload();
+function lockAllInteractions() {
+    let elements = document.querySelectorAll(".evidence-card");
+    elements.forEach(el => el.onclick = null);
 }
 
-/* ================= CONFETTI ================= */
-function confetti(){
-for(let j=0;j<40;j++){
-let c=document.createElement("div");
-c.className="confetti";
-c.style.left=Math.random()*100+"vw";
-c.style.background=["#ff0","#0ff","#f0f","#0f0","#f60"][Math.floor(Math.random()*5)];
-document.body.appendChild(c);
-setTimeout(()=>c.remove(),2000);
-}
+function advanceTimeline() {
+    currentIdx++;
+    if (currentIdx >= activeQuestions.length) {
+        showEvaluationSummary();
+    } else {
+        loadCaseFile();
+    }
 }
 
+/* ================= OUTCOME SUMMARY FLOW ================= */
+function showEvaluationSummary() {
+    document.getElementById("quizScreen").classList.remove("active");
+    document.getElementById("endScreen").classList.add("active");
+    
+    let accuracyPct = Math.round((scoreCount / activeQuestions.length) * 100);
+    document.getElementById("finalScore").innerHTML = 
+        `Deduction Efficiency: <strong>${accuracyPct}%</strong><br>Resolved ${scoreCount} out of ${activeQuestions.length} anomalies.`;
+    
+    playSound("clapSound");
+}
+
+function restartGame() {
+    document.getElementById("endScreen").classList.remove("active");
+    startGame();
+}
+
+/* ================= SYSTEM AUDIO COMPATIBILITY CAP ================= */
+function playSound(audioId) {
+    let targetAudio = document.getElementById(audioId);
+    if (targetAudio) {
+        targetAudio.currentTime = 0;
+        targetAudio.play().catch(() => {});
+    }
+}
+
+/* ================= VISUAL EFFECTS ================= */
+function triggerConfettiFX() {
+    for(let k=0; k<35; k++) {
+        let flake = document.createElement("div");
+        flake.className = "confetti";
+        flake.style.left = Math.random() * 100 + "vw";
+        flake.style.background = ["#ffd166","#06d6a0","#118ab2","#ef476f"][Math.floor(Math.random() * 4)];
+        document.body.appendChild(flake);
+        setTimeout(() => flake.remove(), 2000);
+    }
+}
 </script>
 
 </body>
