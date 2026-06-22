@@ -1,197 +1,341 @@
-import tkinter as tk
-from tkinter import messagebox
-import random
-import threading
-from pathlib import Path
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Degrees of Comparison - Ice Cream Scoop Game</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(180deg, #f7f3ff 0%, #fff7fb 100%);
+      overflow: hidden;
+    }
+    #game {
+      position: relative;
+      width: 1280px;
+      height: 720px;
+      margin: 0 auto;
+      background: transparent;
+    }
+    #logo {
+      position: absolute;
+      left: 40px;
+      top: 25px;
+      width: 140px;
+      height: 140px;
+      object-fit: contain;
+    }
+    h1 {
+      position: absolute;
+      top: 20px;
+      left: 0;
+      width: 100%;
+      text-align: center;
+      margin: 0;
+      color: #4b2e83;
+      font-size: 34px;
+      font-weight: 700;
+    }
+    #subtitle {
+      position: absolute;
+      top: 68px;
+      left: 0;
+      width: 100%;
+      text-align: center;
+      color: #6b5b95;
+      font-size: 18px;
+    }
+    #status {
+      position: absolute;
+      top: 30px;
+      right: 50px;
+      color: #2f4f4f;
+      font-size: 20px;
+      font-weight: 700;
+    }
+    #wordBox {
+      position: absolute;
+      top: 150px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 30px;
+      font-weight: 700;
+      color: #222;
+      padding: 10px 24px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.75);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+    #feedback {
+      position: absolute;
+      top: 205px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 20px;
+      font-weight: 700;
+      color: #b22222;
+      height: 28px;
+    }
+    .cone {
+      position: absolute;
+      bottom: 60px;
+      width: 160px;
+      height: 260px;
+      clip-path: polygon(50% 100%, 0 0, 100% 0);
+      border: 3px solid rgba(0,0,0,0.15);
+    }
+    #conePos {
+      left: 220px;
+      background: #ffd166;
+      border-color: #9c6b00;
+    }
+    #coneComp {
+      left: 470px;
+      background: #a8dadc;
+      border-color: #2f6f77;
+    }
+    #coneSup {
+      left: 820px;
+      background: #ffafcc;
+      border-color: #8a3b60;
+    }
+    .coneLabel {
+      position: absolute;
+      bottom: 25px;
+      width: 160px;
+      text-align: center;
+      font-size: 22px;
+      font-weight: 700;
+    }
+    #labelPos { left: 220px; color: #7a4f00; }
+    #labelComp { left: 470px; color: #20565c; }
+    #labelSup { left: 820px; color: #7a2f4f; }
 
-try:
-    from PIL import Image, ImageTk
-except ImportError:
-    Image = None
-    ImageTk = None
+    #scoop {
+      position: absolute;
+      width: 240px;
+      height: 80px;
+      left: 520px;
+      top: 250px;
+      background: #fffdf7;
+      border: 4px solid #8b5a2b;
+      border-radius: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: grab;
+      user-select: none;
+      font-size: 16px;
+      font-weight: 700;
+      color: #222;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.08);
+    }
+    #scoop:active { cursor: grabbing; }
+    #restartBtn {
+      position: absolute;
+      top: 265px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: none;
+      padding: 12px 22px;
+      border: none;
+      border-radius: 12px;
+      background: #4b2e83;
+      color: white;
+      font-size: 18px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div id="game">
+    <img id="logo" src="Middle-ELA/G5/chp10/adjectives_degreesofcomparison/assets/logo.png" alt="logo" />
+    <h1>Degrees of Comparison</h1>
+    <div id="subtitle">Drag the scoop to the correct cone</div>
+    <div id="status">Score: 0   Attempts: 2</div>
+    <div id="wordBox"></div>
+    <div id="feedback"></div>
 
-try:
-    from playsound import playsound
-except ImportError:
-    playsound = None
+    <div id="conePos" class="cone"></div>
+    <div id="coneComp" class="cone"></div>
+    <div id="coneSup" class="cone"></div>
 
-BASE_DIR = Path(__file__).resolve().parent
-ASSET_DIR = BASE_DIR / "Middle-ELA" / "G5" / "chp10" / "adjectives_degreesofcomparison" / "assets"
+    <div id="labelPos" class="coneLabel">Positive</div>
+    <div id="labelComp" class="coneLabel">Comparative</div>
+    <div id="labelSup" class="coneLabel">Superlative</div>
 
-WORDS = [
-    "tallest",
-    "better",
-    "worse",
-    "farther",
-    "most",
-    "more expensive",
-    "noisier",
-    "kinder",
-    "prettiest",
-    "more careful",
-    "best",
-    "warmer",
-    "smaller",
-]
+    <div id="scoop"></div>
+    <button id="restartBtn">Restart</button>
+  </div>
 
-DEGREES = {
-    "tallest": "Superlative",
-    "better": "Comparative",
-    "worse": "Comparative",
-    "farther": "Comparative",
-    "most": "Superlative",
-    "more expensive": "Comparative",
-    "noisier": "Comparative",
-    "kinder": "Comparative",
-    "prettiest": "Superlative",
-    "more careful": "Comparative",
-    "best": "Superlative",
-    "warmer": "Comparative",
-    "smaller": "Comparative",
-}
+  <audio id="correctSound" src="Middle-ELA/G5/chp10/adjectives_degreesofcomparison/assets/correct.mp3"></audio>
+  <audio id="wrongSound" src="Middle-ELA/G5/chp10/adjectives_degreesofcomparison/assets/wrong.mp3"></audio>
+  <audio id="clapSound" src="Middle-ELA/G5/chp10/adjectives_degreesofcomparison/assets/freesound_community-claps-44774.mp3"></audio>
 
-def play_sound(filename):
-    if playsound is None:
-        return
-    p = ASSET_DIR / filename
-    if p.exists():
-        threading.Thread(target=lambda: playsound(str(p)), daemon=True).start()
+  <script>
+    const words = [
+      "tallest",
+      "better",
+      "worse",
+      "farther",
+      "most",
+      "more expensive",
+      "noisier",
+      "kinder",
+      "prettiest",
+      "more careful",
+      "best",
+      "warmer",
+      "smaller"
+    ];
 
-class IceCreamGame:
-    def __init__(self, root):
-        self.root = root
-        self.root.title("Degrees of Comparison")
-        self.root.geometry("1280x720")
-        self.root.resizable(False, False)
+    const degrees = {
+      tallest: "Superlative",
+      better: "Comparative",
+      worse: "Comparative",
+      farther: "Comparative",
+      most: "Superlative",
+      "more expensive": "Comparative",
+      noisier: "Comparative",
+      kinder: "Comparative",
+      prettiest: "Superlative",
+      "more careful": "Comparative",
+      best: "Superlative",
+      warmer: "Comparative",
+      smaller: "Comparative"
+    };
 
-        self.score = 0
-        self.attempts = 2
-        self.word_items = {}
-        self.current_word = None
-        self.current_degree = None
-        self.dragging = False
-        self.offset_x = 0
-        self.offset_y = 0
-        self.words_left = WORDS[:]
-        random.shuffle(self.words_left)
+    const wordBox = document.getElementById("wordBox");
+    const feedback = document.getElementById("feedback");
+    const status = document.getElementById("status");
+    const scoop = document.getElementById("scoop");
+    const restartBtn = document.getElementById("restartBtn");
 
-        self.canvas = tk.Canvas(root, width=1280, height=720, bg="#f7f3ff", highlightthickness=0)
-        self.canvas.pack(fill="both", expand=True)
+    const correctSound = document.getElementById("correctSound");
+    const wrongSound = document.getElementById("wrongSound");
+    const clapSound = document.getElementById("clapSound");
 
-        self.logo_img = None
-        self.load_logo()
-        self.draw_scene()
-        self.next_word()
+    let score = 0;
+    let attempts = 2;
+    let currentWord = "";
+    let currentDegree = "";
+    let wordList = [];
+    let dragging = false;
+    let offsetX = 0;
+    let offsetY = 0;
 
-    def load_logo(self):
-        if Image and ImageTk:
-            logo_path = ASSET_DIR / "logo.png"
-            if logo_path.exists():
-                img = Image.open(logo_path).convert("RGBA")
-                img = img.resize((150, 150))
-                self.logo_img = ImageTk.PhotoImage(img)
-                self.canvas.create_image(70, 70, image=self.logo_img, anchor="nw")
+    function updateStatus() {
+      status.textContent = `Score: ${score}   Attempts: ${attempts}`;
+    }
 
-    def draw_scene(self):
-        self.canvas.create_text(640, 35, text="Degrees of Comparison", font=("Arial", 30, "bold"), fill="#4b2e83")
-        self.canvas.create_text(640, 75, text="Drag the scoop to the correct cone", font=("Arial", 18), fill="#6b5b95")
+    function playSound(audio) {
+      try {
+        audio.currentTime = 0;
+        audio.play();
+      } catch (e) {}
+    }
 
-        self.status = self.canvas.create_text(1060, 40, text="Score: 0   Attempts: 2", font=("Arial", 18, "bold"), fill="#2f4f4f")
-        self.word_display = self.canvas.create_text(640, 140, text="", font=("Arial", 28, "bold"), fill="#222")
-        self.feedback = self.canvas.create_text(640, 190, text="", font=("Arial", 18), fill="#b22222")
+    function shuffle(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
 
-        self.canvas.create_polygon(220, 590, 380, 590, 350, 330, 250, 330, fill="#ffd166", outline="#9c6b00", width=3)
-        self.canvas.create_polygon(470, 590, 630, 590, 600, 330, 500, 330, fill="#a8dadc", outline="#2f6f77", width=3)
-        self.canvas.create_polygon(820, 590, 980, 590, 950, 330, 850, 330, fill="#ffafcc", outline="#8a3b60", width=3)
+    function startGame() {
+      score = 0;
+      attempts = 2;
+      wordList = shuffle([...words]);
+      restartBtn.style.display = "none";
+      feedback.textContent = "";
+      updateStatus();
+      nextWord();
+    }
 
-        self.canvas.create_text(300, 620, text="Positive", font=("Arial", 22, "bold"), fill="#7a4f00")
-        self.canvas.create_text(550, 620, text="Comparative", font=("Arial", 22, "bold"), fill="#20565c")
-        self.canvas.create_text(900, 620, text="Superlative", font=("Arial", 22, "bold"), fill="#7a2f4f")
+    function nextWord() {
+      if (wordList.length === 0) {
+        wordBox.textContent = "Game Complete!";
+        feedback.textContent = `Final Score: ${score}/13`;
+        feedback.style.color = "#1b5e20";
+        playSound(clapSound);
+        scoop.style.display = "none";
+        restartBtn.style.display = "block";
+        return;
+      }
 
-    def update_status(self):
-        self.canvas.itemconfig(self.status, text=f"Score: {self.score}   Attempts: {self.attempts}")
+      currentWord = wordList.shift();
+      currentDegree = degrees[currentWord];
+      wordBox.textContent = currentWord.toUpperCase();
+      feedback.textContent = "";
+      scoop.textContent = currentWord;
+      scoop.style.display = "flex";
+      scoop.style.left = "520px";
+      scoop.style.top = "250px";
+    }
 
-    def next_word(self):
-        if hasattr(self, "scoop"):
-            self.canvas.delete(self.scoop)
-            self.canvas.delete(self.scoop_text)
+    function getConeChoice(x, y) {
+      const conePos = document.getElementById("conePos").getBoundingClientRect();
+      const coneComp = document.getElementById("coneComp").getBoundingClientRect();
+      const coneSup = document.getElementById("coneSup").getBoundingClientRect();
 
-        if not self.words_left:
-            self.canvas.itemconfig(self.word_display, text="Game Complete!")
-            self.canvas.itemconfig(self.feedback, text=f"Final Score: {self.score}/{len(WORDS)}", fill="#1b5e20")
-            play_sound("freesound_community-claps-44774.mp3")
-            return
+      if (x >= conePos.left && x <= conePos.right && y >= conePos.top && y <= conePos.bottom) return "Positive";
+      if (x >= coneComp.left && x <= coneComp.right && y >= coneComp.top && y <= coneComp.bottom) return "Comparative";
+      if (x >= coneSup.left && x <= coneSup.right && y >= coneSup.top && y <= coneSup.bottom) return "Superlative";
+      return null;
+    }
 
-        self.current_word = self.words_left.pop(0)
-        self.current_degree = DEGREES[self.current_word]
-        self.canvas.itemconfig(self.word_display, text=self.current_word.upper())
-        self.canvas.itemconfig(self.feedback, text="", fill="#b22222")
+    scoop.addEventListener("mousedown", (e) => {
+      dragging = true;
+      const rect = scoop.getBoundingClientRect();
+      offsetX = e.clientX - rect.left;
+      offsetY = e.clientY - rect.top;
+    });
 
-        x1, y1, x2, y2 = 520, 250, 760, 330
-        self.scoop = self.canvas.create_oval(x1, y1, x2, y2, fill="#ffffff", outline="#8b5a2b", width=4)
-        self.scoop_text = self.canvas.create_text(640, 290, text=self.current_word, font=("Arial", 16, "bold"), fill="#222")
-        self.canvas.tag_bind(self.scoop, "<ButtonPress-1>", self.start_drag)
-        self.canvas.tag_bind(self.scoop_text, "<ButtonPress-1>", self.start_drag)
-        self.canvas.tag_bind(self.scoop, "<B1-Motion>", self.do_drag)
-        self.canvas.tag_bind(self.scoop_text, "<B1-Motion>", self.do_drag)
-        self.canvas.tag_bind(self.scoop, "<ButtonRelease-1>", self.drop)
-        self.canvas.tag_bind(self.scoop_text, "<ButtonRelease-1>", self.drop)
+    document.addEventListener("mousemove", (e) => {
+      if (!dragging) return;
+      scoop.style.left = (e.clientX - offsetX) + "px";
+      scoop.style.top = (e.clientY - offsetY) + "px";
+    });
 
-        self.update_status()
+    document.addEventListener("mouseup", (e) => {
+      if (!dragging) return;
+      dragging = false;
 
-    def start_drag(self, event):
-        self.dragging = True
-        self.offset_x = event.x
-        self.offset_y = event.y
+      const rect = scoop.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+      const choice = getConeChoice(centerX, centerY);
 
-    def do_drag(self, event):
-        if not self.dragging:
-            return
-        dx = event.x - self.offset_x
-        dy = event.y - self.offset_y
-        self.canvas.move(self.scoop, dx, dy)
-        self.canvas.move(self.scoop_text, dx, dy)
+      if (choice === currentDegree) {
+        score++;
+        feedback.textContent = "Correct!";
+        feedback.style.color = "#1b5e20";
+        playSound(correctSound);
+        setTimeout(nextWord, 650);
+      } else {
+        attempts--;
+        feedback.textContent = "Wrong try!";
+        feedback.style.color = "#b22222";
+        playSound(wrongSound);
+        if (attempts <= 0) {
+          wordBox.textContent = "Game Over!";
+          feedback.textContent = `Final Score: ${score}/13`;
+          scoop.style.display = "none";
+          playSound(clapSound);
+          restartBtn.style.display = "block";
+        }
+      }
 
-    def cone_hit(self, x, y):
-        if 220 <= x <= 380 and 330 <= y <= 590:
-            return "Positive"
-        if 470 <= x <= 630 and 330 <= y <= 590:
-            return "Comparative"
-        if 820 <= x <= 980 and 330 <= y <= 590:
-            return "Superlative"
-        return None
+      updateStatus();
+    });
 
-    def drop(self, event):
-        self.dragging = False
-        coords = self.canvas.coords(self.scoop)
-        if not coords:
-            return
-        x = (coords[0] + coords[2]) / 2
-        y = (coords[1] + coords[3]) / 2
-        guess = self.cone_hit(x, y)
+    restartBtn.addEventListener("click", startGame);
 
-        if guess == self.current_degree:
-            self.score += 1
-            play_sound("correct.mp3")
-            self.canvas.itemconfig(self.feedback, text="Correct!", fill="#1b5e20")
-            self.canvas.delete(self.scoop)
-            self.canvas.delete(self.scoop_text)
-            self.update_status()
-            self.root.after(700, self.next_word)
-        else:
-            self.attempts -= 1
-            play_sound("wrong.mp3")
-            self.canvas.itemconfig(self.feedback, text="Wrong try!", fill="#b22222")
-            self.update_status()
-
-            if self.attempts <= 0:
-                messagebox.showinfo("Game Over", f"No attempts left. Final score: {self.score}/{len(WORDS)}")
-                self.root.destroy()
-            else:
-                self.canvas.coords(self.scoop, 520, 250, 760, 330)
-                self.canvas.coords(self.scoop_text, 640, 290)
-
-if __name__ == "__main__":
-    root = tk.Tk()
-    app = IceCreamGame(root)
-    root.mainloop()
+    startGame();
+  </script>
+</body>
+</html>
