@@ -166,7 +166,7 @@ body {
 }
 
 /* ==========================================================================
-   DYNAMIC FAIR TRACK STAGE (EXPLICIT HEIGHT FIX)
+   DYNAMIC FAIR TRACK STAGE
    ========================================================================== */
 #trackStageWrapper {
     flex: 1;
@@ -381,9 +381,10 @@ body {
     <div class="light"></div>
     <div class="light light2"></div>
 
-   <div id="logoScreen">
-    <img src="assets/innovine-logo.png" alt="Innovine Logo">
-</div>
+    <div id="logoScreen">
+        <img src="assets/innovine-logo.png" alt="Innovine Logo">
+        <div id="logoText">Innovine Learning Adventures</div>
+    </div>
 
     <div id="startScreen" style="display:none;">
         <h1 style="font-size:36px;">🏁 Robot Racing Championship</h1>
@@ -461,13 +462,13 @@ function updateVolume() {
 volumeSlider.addEventListener("input", updateVolume);
 updateVolume();
 
-/* ENGINE DESKTOP STATES */
+/* ENGINE STATES */
 let racesWon = 0;
 let currentQuestion = 0;
 let predictedRobotIndex = null;
 let isRaceRunning = false;
 
-/* ADJECTIVE REPOSITORY TRACK ENGINE */
+/* ADJECTIVE QUESTIONS MATRIX */
 const questions = [
     {
         q: `🏁 During the semifinal race, Robo-X moved faster than Bolt-7, but Turbo Max moved the fastest of all.<br><br>Which robot was the fastest?`,
@@ -546,7 +547,7 @@ function selectPrediction(index) {
     launchBtn.innerText = "⚡ Launch Race Engines!";
 }
 
-/* TRUE COMPETITIVE UNBIASED RANDOMIZED RACE LOOP ENGINE */
+/* COMPETITIVE UNBIASED RACE ENGINE (WITH RESET CORRECTION FIX) */
 function launchFairRace() {
     if (predictedRobotIndex === null || isRaceRunning) return;
     isRaceRunning = true;
@@ -561,22 +562,26 @@ function launchFairRace() {
         document.getElementById("robot3")
     ];
 
-    robots.forEach(r => r.style.left = "10px");
+    // FIX: Force all track elements back to exactly 10px on the screen before updating variables
+    robots.forEach(r => {
+        r.style.left = "10px";
+    });
 
-    // All robots share a completely identical base dynamic range speed profile!
+    // FIX: Explicitly clear position memory tracking arrays back to baseline start lines
+    let positions = [10, 10, 10];
+
+    // Re-roll random engine values fairly
     let baseSpeeds = [
         1.5 + Math.random() * 2,
         1.5 + Math.random() * 2,
         1.5 + Math.random() * 2
     ];
 
-    let positions = [10, 10, 10];
     const trackWidth = document.getElementById("track").clientWidth;
     const finishLineTarget = trackWidth - 65; 
 
     let raceInterval = setInterval(() => {
         for (let i = 0; i < 3; i++) {
-            // Live micro-burst variations create real, changing leads mid-race
             positions[i] += baseSpeeds[i] + (Math.random() * 0.9);
             robots[i].style.left = positions[i] + "px";
 
@@ -658,7 +663,6 @@ function checkAnswer(chosenBtn, selected, correct) {
     setTimeout(() => {
         document.getElementById("questionBox").style.display = "none";
         
-        // Reset interactive pipeline state variables
         isRaceRunning = false;
         predictedRobotIndex = null;
         
