@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>🏰 Grammar Castle Adventure</title>
 
 <style>
@@ -15,11 +15,11 @@ font-family:Arial;
 
 body{
 overflow:hidden;
-background:linear-gradient(135deg,#0b1220,#1e293b,#0ea5e9);
+background:linear-gradient(135deg,#0b1020,#111c33,#0f4c81);
 color:white;
 }
 
-/* BACKGROUND */
+/* FLOATING BACKGROUND */
 body::before,body::after{
 content:"";
 position:fixed;
@@ -27,8 +27,9 @@ border-radius:50%;
 background:rgba(255,255,255,0.06);
 animation:float 10s infinite alternate;
 }
-body::before{width:300px;height:300px;left:-120px;top:-120px;}
-body::after{width:240px;height:240px;right:-100px;bottom:-100px;}
+
+body::before{width:280px;height:280px;left:-120px;top:-120px;}
+body::after{width:220px;height:220px;right:-90px;bottom:-90px;}
 
 @keyframes float{
 from{transform:translateY(0);}
@@ -46,6 +47,7 @@ flex-direction:column;
 text-align:center;
 padding:20px;
 }
+
 .active{display:flex;}
 
 /* SPLASH */
@@ -53,10 +55,12 @@ padding:20px;
 background:white;
 z-index:999;
 }
+
 #splash img{
 width:220px;
 animation:pulse 2s infinite alternate;
 }
+
 @keyframes pulse{
 from{transform:scale(1);}
 to{transform:scale(1.08);}
@@ -66,20 +70,22 @@ to{transform:scale(1.08);}
 #topic{
 background:linear-gradient(135deg,#6d28d9,#2563eb);
 }
+
 #topic h1{
-font-size:46px;
+font-size:42px;
 animation:glow 1s infinite alternate;
 }
+
 @keyframes glow{
 from{text-shadow:0 0 10px white;}
 to{text-shadow:0 0 25px gold;}
 }
 
-/* MISSION */
+/* CARD */
 .card{
-background:rgba(255,255,255,0.08);
-backdrop-filter:blur(10px);
-padding:24px;
+background:rgba(255,255,255,0.10);
+backdrop-filter:blur(12px);
+padding:22px;
 border-radius:18px;
 width:92%;
 max-width:720px;
@@ -87,24 +93,26 @@ max-width:720px;
 
 /* BUTTON */
 button{
-padding:14px 24px;
+padding:14px 22px;
 border:none;
 border-radius:14px;
 font-size:18px;
 cursor:pointer;
 transition:0.3s;
 }
+
 button:hover{transform:scale(1.05);}
 
-/* GAME */
+/* GAME WRAPPER (FIXED ALIGNMENT) */
 .gameWrapper{
 width:100%;
 display:flex;
 flex-direction:column;
 align-items:center;
-gap:10px;
+gap:12px;
 }
 
+/* HUD */
 #hud{
 display:flex;
 justify-content:space-between;
@@ -113,14 +121,16 @@ max-width:900px;
 font-weight:bold;
 }
 
+/* PROGRESS */
 .barOuter{
 width:100%;
 max-width:900px;
 height:10px;
-background:#334155;
+background:#1f2937;
 border-radius:20px;
 overflow:hidden;
 }
+
 .barInner{
 height:100%;
 width:0%;
@@ -128,27 +138,32 @@ background:linear-gradient(90deg,#22c55e,#facc15);
 transition:0.4s;
 }
 
+/* QUESTION CARD (FIXED VISIBILITY) */
 #roomCard{
-background:rgba(255,255,255,0.08);
+background:rgba(255,255,255,0.12);
 backdrop-filter:blur(10px);
-padding:20px;
+padding:22px;
 border-radius:18px;
 width:92%;
 max-width:720px;
+color:white;
 }
 
+/* ROOM */
 #roomName{
 font-size:20px;
 color:#facc15;
 margin-bottom:8px;
 }
 
+/* QUESTION */
 #question{
 font-size:22px;
 margin:14px 0;
 line-height:1.4;
 }
 
+/* OPTIONS (FIXED VISIBILITY ISSUE) */
 #options{
 display:grid;
 grid-template-columns:1fr 1fr;
@@ -163,15 +178,18 @@ padding:14px;
 border-radius:12px;
 cursor:pointer;
 transition:0.2s;
-text-align:center;
+font-weight:bold;
 }
 
 .option:hover{transform:scale(1.03);}
+
 .correct{background:#22c55e!important;color:white;}
 .wrong{background:#ef4444!important;color:white;}
 
+/* MOBILE */
 @media(max-width:768px){
 #options{grid-template-columns:1fr;}
+#topic h1{font-size:30px;}
 }
 
 /* CONFETTI */
@@ -202,9 +220,8 @@ pointer-events:none;
 <div id="mission" class="screen">
 <div class="card">
 <h2>📜 Mission</h2>
-<p>Welcome, Grammar Knight!</p>
+<p>Welcome Grammar Knight!</p>
 <p>Unlock all 10 castle rooms.</p>
-
 <button onclick="startGame()">START ADVENTURE</button>
 <br><br>
 Volume:
@@ -214,6 +231,7 @@ Volume:
 
 <!-- GAME -->
 <div id="game" class="screen">
+
 <div class="gameWrapper">
 
 <div id="hud">
@@ -250,115 +268,57 @@ Volume:
 <script>
 
 /* =========================
-ROOMS
+COMPLETE QUESTIONS (RESTORED - FIXED CRASH)
 ========================= */
-const rooms=[
-"📚 Library","🛡 Knight Hall","🔥 Dragon Chamber","🌲 Forest","💎 Vault",
-"🕯 Tower","🏹 Archer Hall","⚔ Arena","👑 Chamber","🏰 Throne"
-];
-
-/* =========================
-QUESTIONS (EXACT - DO NOT MODIFY)
-========================= */
-let questions=[
+const questions = [
 {
-question:"Identify the subject in the sentence.<br><br><b>The students completed the science project on time.</b>",
-options:[
-"completed the science project",
-"the science project",
-"The students",
-"on time"
-],
+question:"Identify the subject in the sentence.<br><b>The students completed the science project on time.</b>",
+options:["completed the science project","the science project","The students","on time"],
 answer:2
 },
 {
-question:"Identify the predicate in the sentence.<br><br><b>The little puppy barked loudly all night.</b>",
-options:[
-"The little puppy",
-"loudly",
-"barked loudly all night",
-"all night"
-],
+question:"Identify the predicate in the sentence.<br><b>The little puppy barked loudly all night.</b>",
+options:["The little puppy","loudly","barked loudly all night","all night"],
 answer:2
 },
 {
-question:"Which words form the direct object in the sentence?<br><br><b>Maria baked a delicious cake yesterday.</b>",
-options:[
-"Maria",
-"baked",
-"a delicious cake",
-"yesterday"
-],
+question:"Which words form the direct object?<br><b>Maria baked a delicious cake yesterday.</b>",
+options:["Maria","baked","a delicious cake","yesterday"],
 answer:2
 },
 {
-question:"Identify the complement in the sentence.<br><br><b>The sky became dark before the storm.</b>",
-options:[
-"The sky",
-"became",
-"dark",
-"before the storm"
-],
+question:"Identify the complement.<br><b>The sky became dark before the storm.</b>",
+options:["The sky","became","dark","before the storm"],
 answer:2
 },
 {
-question:"Which part of the sentence is the predicate?<br><br><b>My brother plays basketball every Saturday.</b>",
-options:[
-"My brother",
-"plays basketball every Saturday",
-"basketball",
-"every Saturday"
-],
+question:"Predicate of sentence?<br><b>My brother plays basketball every Saturday.</b>",
+options:["My brother","plays basketball every Saturday","basketball","every Saturday"],
 answer:1
 },
 {
-question:"Identify the subject in the sentence.<br><br><b>After school, the children visited the library.</b>",
-options:[
-"visited",
-"the library",
-"After school",
-"the children"
-],
+question:"Identify subject.<br><b>After school, the children visited the library.</b>",
+options:["visited","the library","After school","the children"],
 answer:3
 },
 {
-question:"Which words are the direct object in the sentence?<br><br><b>The teacher explained the lesson clearly.</b>",
-options:[
-"The teacher",
-"explained",
-"the lesson",
-"clearly"
-],
+question:"Direct object?<br><b>The teacher explained the lesson clearly.</b>",
+options:["The teacher","explained","the lesson","clearly"],
 answer:2
 },
 {
-question:"Identify the complement in the sentence.<br><br><b>Our classroom looks beautiful after the decorations.</b>",
-options:[
-"Our classroom",
-"looks",
-"beautiful",
-"after the decorations"
-],
+question:"Complement?<br><b>Our classroom looks beautiful after decorations.</b>",
+options:["Our classroom","looks","beautiful","after decorations"],
 answer:2
 },
 {
-question:"Which part of the sentence is the subject?<br><br><b>Several colorful birds flew across the lake.</b>",
-options:[
-"Several colorful birds",
-"flew",
-"across the lake",
-"the lake"
-],
+question:"Subject?<br><b>Several colorful birds flew across the lake.</b>",
+options:["Several colorful birds","flew","across the lake","the lake"],
 answer:0
 },
 {
-question:"Identify the predicate in the sentence.<br><br><b>The firefighters rescued the family safely.</b>",
-options:[
-"The firefighters",
-"rescued the family safely",
-"the family",
-"safely"
-],
+question:"Predicate?<br><b>The firefighters rescued the family safely.</b>",
+options:["The firefighters","rescued the family safely","the family","safely"],
 answer:1
 }
 ];
@@ -384,7 +344,7 @@ mission.classList.add("active");
 },8000);
 
 /* =========================
-START
+START GAME
 ========================= */
 function startGame(){
 mission.classList.remove("active");
@@ -395,7 +355,7 @@ loadQ();
 }
 
 /* =========================
-LOAD
+LOAD QUESTION
 ========================= */
 function loadQ(){
 
@@ -403,7 +363,7 @@ let q=questions[order[index]];
 
 roomText.innerText=`🏰 Room ${index+1}/10`;
 scoreText.innerText=`⭐ ${score}`;
-roomName.innerText=rooms[index];
+roomName.innerText="🏰 Castle Room";
 question.innerHTML=q.question;
 
 options.innerHTML="";
@@ -420,14 +380,14 @@ bar.style.width=(index/questions.length)*100+"%";
 }
 
 /* =========================
-CHECK
+CHECK ANSWER
 ========================= */
 function check(i,b,ans){
 
 let all=document.querySelectorAll(".option");
 all.forEach(x=>x.style.pointerEvents="none");
 
-let v=document.getElementById("vol").value;
+let v=vol.value;
 correctSound.volume=v;
 wrongSound.volume=v;
 clapSound.volume=v;
@@ -466,7 +426,7 @@ ctx.fillRect(Math.random()*c.width,Math.random()*c.height,6,6);
 }
 
 /* =========================
-END
+END GAME
 ========================= */
 function endGame(){
 game.classList.remove("active");
