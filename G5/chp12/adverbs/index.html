@@ -3,16 +3,24 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Adverb Magic Show</title>
+  <title>Animal Rescue Adverbs</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { width: 100%; min-height: 100%; }
     body {
       font-family: Arial, sans-serif;
-      background: radial-gradient(circle at top, #4d0070 0%, #21002f 55%, #0f0016 100%);
+      background:
+        radial-gradient(circle at top, rgba(77, 0, 112, 0.95) 0%, rgba(33, 0, 47, 0.96) 55%, rgba(15, 0, 22, 1) 100%),
+        url('assets/logo.png');
+      background-size: cover;
+      background-attachment: fixed;
       color: #fff;
       min-height: 100vh;
       overflow-x: hidden;
+    }
+    .overlay {
+      min-height: 100vh;
+      background: rgba(14, 0, 20, 0.72);
     }
     .screen {
       min-height: 100vh;
@@ -23,12 +31,12 @@
     }
     .screen.show { display: flex; }
     .card {
-      width: min(980px, 100%);
-      background: linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0.04));
+      width: min(1000px, 100%);
+      background: linear-gradient(180deg, rgba(255,255,255,0.11), rgba(255,255,255,0.05));
       border: 2px solid rgba(255,255,255,0.16);
       border-radius: 24px;
       padding: 18px;
-      box-shadow: 0 0 30px rgba(255, 105, 180, 0.22);
+      box-shadow: 0 0 34px rgba(255, 105, 180, 0.2);
       backdrop-filter: blur(8px);
     }
     .splash {
@@ -45,6 +53,11 @@
       font-size: clamp(22px, 4vw, 40px);
       color: #ffb5ea;
       text-shadow: 0 0 12px rgba(255,102,204,0.6);
+    }
+    .splash p {
+      margin-top: 8px;
+      font-size: clamp(16px, 2.6vw, 22px);
+      color: #d8ffef;
     }
     @keyframes logoPulse {
       0% { transform: scale(0.8); opacity: 0; }
@@ -89,24 +102,24 @@
       background: linear-gradient(90deg, #ff66cc, #7b7bff, #57f3ff);
       transition: width .35s ease;
     }
-    .magician {
+    .hero {
       text-align: center;
       font-size: clamp(72px, 12vw, 120px);
       margin: 6px 0 2px;
     }
-    .trick {
+    .rescue {
       text-align: center;
-      font-size: clamp(18px, 3.6vw, 28px);
+      font-size: clamp(18px, 3.4vw, 28px);
       color: #a8ffe9;
       font-weight: 800;
-      margin: 10px 0;
+      margin: 10px 0 12px;
     }
     .question {
       text-align: center;
       font-size: clamp(22px, 4vw, 32px);
-      line-height: 1.5;
+      line-height: 1.55;
       margin: 8px auto 18px;
-      max-width: 860px;
+      max-width: 900px;
       padding: 0 8px;
     }
     .options {
@@ -179,6 +192,14 @@
       25% { transform: scale(1.2); opacity: 1; }
       100% { transform: scale(0); opacity: 0; }
     }
+    .animal {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      margin: 8px 0 4px;
+      font-size: clamp(34px, 5vw, 54px);
+    }
     @media (max-width: 700px) {
       .options { grid-template-columns: 1fr; }
       .card { padding: 14px; border-radius: 20px; }
@@ -187,163 +208,136 @@
   </style>
 </head>
 <body>
-  <div class="screen show" id="splashScreen">
-    <div class="card splash">
-      <img src="assets/logo.png" alt="Innovine logo">
-      <h1>Adverb Magic Show</h1>
-    </div>
-  </div>
-
-  <div class="screen" id="gameScreen">
-    <div class="card">
-      <div class="title">🎪 Adverb Magic Show 🎪</div>
-      <div class="top">
-        <div class="badge" id="scoreText">Score: 0</div>
-        <div class="badge" id="trickText">Question 1 / 15</div>
-        <div class="badge" id="attemptText">Attempt 1 / 2</div>
+  <div class="overlay">
+    <div class="screen show" id="splashScreen">
+      <div class="card splash">
+        <img src="assets/logo.png" alt="Logo">
+        <h1>Animal Rescue Adverbs</h1>
+        <p>Help rescue the animals by identifying the type of adverb.</p>
       </div>
-      <div class="progress"><div class="bar" id="bar"></div></div>
-      <div class="magician" id="magician">🧙‍♂️</div>
-      <div class="trick" id="trickName"></div>
-      <div class="question" id="question"></div>
-      <div class="options" id="options"></div>
-      <div class="msg" id="message"></div>
-      <div class="explain" id="explain"></div>
-      <button class="next" id="nextBtn" disabled>Next Question 🪄</button>
     </div>
-  </div>
 
-  <div class="screen" id="finalScreen">
-    <div class="card final">
-      <h2>🎉 Game Complete! 🎉</h2>
-      <div class="magician">🧙‍♂️✨🎪✨</div>
-      <p id="finalScore"></p>
-      <p id="finalMsg"></p>
-      <button class="restart" id="restartBtn">Play Again 🪄</button>
+    <div class="screen" id="gameScreen">
+      <div class="card">
+        <div class="title">🐾 Animal Rescue Adverbs 🐾</div>
+        <div class="top">
+          <div class="badge" id="scoreText">Score: 0</div>
+          <div class="badge" id="trickText">Question 1 / 15</div>
+          <div class="badge" id="attemptText">Attempt 1 / 2</div>
+        </div>
+        <div class="progress"><div class="bar" id="bar"></div></div>
+        <div class="animal" id="animal">🐶</div>
+        <div class="rescue" id="rescueText">Rescue Mission 1</div>
+        <div class="question" id="question"></div>
+        <div class="options" id="options"></div>
+        <div class="msg" id="message"></div>
+        <div class="explain" id="explain"></div>
+        <button class="next" id="nextBtn" disabled>Save & Next 🛟</button>
+      </div>
+    </div>
+
+    <div class="screen" id="finalScreen">
+      <div class="card final">
+        <h2>🎉 All Animals Rescued! 🎉</h2>
+        <div class="hero">🐾🏆🐾</div>
+        <p id="finalScore"></p>
+        <p id="finalMsg"></p>
+        <button class="restart" id="restartBtn">Play Again 🛟</button>
+      </div>
     </div>
   </div>
 
   <script>
     const tricks = [
       {
-        type: "Adverb of Manner",
-        name: "Question 1",
-        question: "During the school performance, Riya spoke so ___ that everyone in the hall could understand her words clearly.",
-        options: ["quickly", "clearly", "here", "often"],
-        correct: "clearly",
-        explain: "This tells us how she spoke, so it is an adverb of manner."
+        question: "While cleaning the classroom after the picnic, the teacher noticed that the children had arranged the books neatly on the shelf.",
+        options: ["manner", "place", "frequency", "time"],
+        correct: "manner",
+        explain: "‘Neatly’ tells how the books were arranged."
       },
       {
-        type: "Adverb of Frequency",
-        name: "Question 2",
-        question: "My grandmother ___ waters the plants early in the morning, even before the birds begin to sing.",
-        options: ["always", "behind", "slowly", "yesterday"],
-        correct: "always",
-        explain: "This tells us how often she waters the plants."
+        question: "At the end of every week, the gardener usually waters the plants beside the school gate.",
+        options: ["time", "reason", "frequency", "degree"],
+        correct: "frequency",
+        explain: "‘Usually’ tells how often the gardener waters the plants."
       },
       {
-        type: "Adverb of Place",
-        name: "Question 3",
-        question: "The little puppy was hiding ___ the sofa when we searched the entire room.",
-        options: ["because", "nearby", "under", "very"],
-        correct: "under",
-        explain: "This tells us where the puppy was hiding."
+        question: "The kitten hid under the bed when the visitors entered the house.",
+        options: ["place", "manner", "time", "reason"],
+        correct: "place",
+        explain: "‘Under the bed’ tells where the kitten hid."
       },
       {
-        type: "Adverb of Degree",
-        name: "Question 4",
-        question: "The mango shake was ___ sweet, so my brother asked for another glass immediately.",
-        options: ["almost", "very", "tomorrow", "outside"],
-        correct: "very",
-        explain: "This tells us the intensity of sweetness."
+        question: "The old bridge was very narrow, so the bus driver slowed down carefully before crossing it.",
+        options: ["frequency", "reason", "degree", "manner"],
+        correct: "degree",
+        explain: "‘Very’ tells the degree of narrowness."
       },
       {
-        type: "Adverb of Reason",
-        name: "Question 5",
-        question: "The children stayed inside the classroom ___ it started raining heavily during the sports period.",
-        options: ["because", "quickly", "there", "soon"],
-        correct: "because",
-        explain: "This tells us the reason they stayed inside."
+        question: "The children stayed indoors because it started raining heavily before lunch.",
+        options: ["reason", "time", "place", "manner"],
+        correct: "reason",
+        explain: "‘Because’ gives the reason."
       },
       {
-        type: "Adverb of Time",
-        name: "Question 6",
-        question: "We will visit our cousins ___ after the examination is over and the holidays begin.",
-        options: ["yesterday", "above", "carefully", "soon"],
-        correct: "soon",
-        explain: "This tells us when the visit will happen."
+        question: "We will leave for the museum tomorrow after our morning assembly ends.",
+        options: ["degree", "time", "frequency", "place"],
+        correct: "time",
+        explain: "‘Tomorrow’ tells when the action will happen."
       },
       {
-        type: "Adverb of Manner",
-        name: "Question 7",
-        question: "The teacher asked us to write the answers ___ so that our notebooks look neat and organized.",
-        options: ["neatly", "often", "there", "later"],
-        correct: "neatly",
-        explain: "This tells us how to write the answers."
+        question: "The farmer worked quietly in the field so that the sleeping baby would not wake up.",
+        options: ["manner", "reason", "place", "time"],
+        correct: "manner",
+        explain: "‘Quietly’ tells how the farmer worked."
       },
       {
-        type: "Adverb of Frequency",
-        name: "Question 8",
-        question: "Although he is busy with homework, Arjun ___ reads a storybook before going to sleep.",
-        options: ["inside", "usually", "brightly", "tomorrow"],
-        correct: "usually",
-        explain: "This tells us how often Arjun reads a storybook."
+        question: "My father often checks the bicycle tyres before we go on a long ride.",
+        options: ["time", "frequency", "degree", "place"],
+        correct: "frequency",
+        explain: "‘Often’ tells how often he checks the tyres."
       },
       {
-        type: "Adverb of Place",
-        name: "Question 9",
-        question: "Please keep your shoes ___ the door before coming into the classroom.",
-        options: ["outside", "always", "very", "today"],
-        correct: "outside",
-        explain: "This tells us where to keep the shoes."
+        question: "The lost puppy was waiting outside the bakery when we found it.",
+        options: ["manner", "place", "reason", "time"],
+        correct: "place",
+        explain: "‘Outside the bakery’ tells where the puppy was waiting."
       },
       {
-        type: "Adverb of Degree",
-        name: "Question 10",
-        question: "The crowd was ___ excited when the school team scored the winning goal in the last minute.",
-        options: ["where", "soon", "extremely", "loudly"],
-        correct: "extremely",
-        explain: "This shows a very high degree of excitement."
+        question: "The magician’s trick was quite interesting, and all the children watched with wide eyes.",
+        options: ["degree", "reason", "frequency", "time"],
+        correct: "degree",
+        explain: "‘Quite’ tells the degree of interest."
       },
       {
-        type: "Adverb of Reason",
-        name: "Question 11",
-        question: "The road was blocked, ___ the bus had to take a longer route to reach the station.",
-        options: ["since", "neatly", "here", "often"],
-        correct: "since",
-        explain: "This tells us the reason for taking the longer route."
+        question: "Riya finished her homework early so that she could join the cricket practice.",
+        options: ["time", "reason", "place", "manner"],
+        correct: "reason",
+        explain: "‘So that’ gives the reason."
       },
       {
-        type: "Adverb of Time",
-        name: "Question 12",
-        question: "The school annual function will begin ___ after the chief guest arrives on the stage.",
-        options: ["later", "outside", "because", "carefully"],
-        correct: "later",
-        explain: "This tells us when the function will begin."
+        question: "The train arrived late at the station after the heavy fog cleared.",
+        options: ["place", "time", "frequency", "degree"],
+        correct: "time",
+        explain: "‘Late’ tells when the train arrived."
       },
       {
-        type: "Adverb of Manner",
-        name: "Question 13",
-        question: "The baby slept so ___ that even the loud thunder did not wake him up.",
-        options: ["quietly", "peacefully", "there", "often"],
-        correct: "peacefully",
-        explain: "This tells us how the baby slept."
+        question: "The baby bird chirped softly in its nest while the mother bird searched for food.",
+        options: ["manner", "place", "reason", "frequency"],
+        correct: "manner",
+        explain: "‘Softly’ tells how the bird chirped."
       },
       {
-        type: "Adverb of Frequency",
-        name: "Question 14",
-        question: "Our class goes to the library ___, especially when we need extra reading practice.",
-        options: ["sometimes", "very", "outside", "tomorrow"],
-        correct: "sometimes",
-        explain: "This tells us how often the class goes to the library."
+        question: "We sometimes visit our grandparents during the winter holidays.",
+        options: ["degree", "time", "frequency", "place"],
+        correct: "frequency",
+        explain: "‘Sometimes’ tells how often we visit."
       },
       {
-        type: "Adverb of Place",
-        name: "Question 15",
-        question: "The treasure map was hidden ___ in the old cupboard behind the school stage.",
-        options: ["inside", "slowly", "because", "yesterday"],
-        correct: "inside",
-        explain: "This tells us where the map was hidden."
+        question: "The treasure chest was hidden inside the old cave near the river bank.",
+        options: ["place", "reason", "time", "manner"],
+        correct: "place",
+        explain: "‘Inside the old cave’ tells where the chest was hidden."
       }
     ];
 
@@ -360,8 +354,8 @@
     const trickText = document.getElementById("trickText");
     const attemptText = document.getElementById("attemptText");
     const bar = document.getElementById("bar");
-    const magician = document.getElementById("magician");
-    const trickName = document.getElementById("trickName");
+    const animal = document.getElementById("animal");
+    const rescueText = document.getElementById("rescueText");
     const question = document.getElementById("question");
     const optionsBox = document.getElementById("options");
     const message = document.getElementById("message");
@@ -370,6 +364,8 @@
     const finalScore = document.getElementById("finalScore");
     const finalMsg = document.getElementById("finalMsg");
     const restartBtn = document.getElementById("restartBtn");
+
+    const animals = ["🐶", "🐱", "🐻", "🦊", "🐰", "🐼", "🐸", "🦁", "🐯", "🐵", "🐦", "🐘", "🦄", "🐥", "🐴"];
 
     const correctAudio = new Audio("assets/correct.mp3");
     const wrongAudio = new Audio("assets/wrong.mp3");
@@ -393,7 +389,7 @@
 
     function showConfetti() {
       const colors = ["#ff66cc", "#ffe066", "#66ffcc", "#8a7dff", "#ff7f50"];
-      for (let i = 0; i < 36; i++) {
+      for (let i = 0; i < 34; i++) {
         const d = document.createElement("div");
         d.className = "confetti";
         d.style.left = Math.random() * 100 + "vw";
@@ -425,7 +421,8 @@
       attemptText.textContent = `Attempt ${attempts + 1} / 2`;
       scoreText.textContent = `Score: ${score}`;
       bar.style.width = `${(current / tricks.length) * 100}%`;
-      trickName.textContent = t.type + " — " + t.name;
+      animal.textContent = animals[current % animals.length];
+      rescueText.textContent = `Rescue Mission ${current + 1}`;
       question.textContent = t.question;
       message.textContent = "";
       explain.textContent = "";
@@ -451,7 +448,7 @@
       if (opt === t.correct) {
         locked = true;
         score += 10;
-        magician.textContent = "🧙‍♂️✨";
+        animal.textContent = "🛟" + animal.textContent;
         playSound(correctAudio);
         setTimeout(() => playSound(clapAudio), 900);
         showConfetti();
@@ -459,12 +456,10 @@
         disableOptions();
         nextBtn.disabled = false;
         scoreText.textContent = `Score: ${score}`;
-        message.textContent = "";
-        explain.textContent = "";
       } else {
         playSound(wrongAudio);
         attempts += 1;
-        magician.textContent = "🧙‍♂️❌";
+        animal.textContent = "❌" + animal.textContent;
         btn.disabled = true;
         btn.style.opacity = "0.4";
         if (attempts < 2) {
@@ -474,15 +469,13 @@
           disableOptions();
           nextBtn.disabled = false;
         }
-        message.textContent = "";
-        explain.textContent = "";
       }
     }
 
     function next() {
       current += 1;
       attempts = 0;
-      magician.textContent = "🧙‍♂️";
+      animal.textContent = animals[current % animals.length];
       if (current >= tricks.length) showFinal();
       else render();
     }
@@ -492,10 +485,10 @@
       finalScreen.classList.add("show");
       finalScore.textContent = `Your Final Score: ${score} / ${tricks.length * 10}`;
       finalMsg.textContent =
-        score === 150 ? "✨ Perfect! You are an Adverb Magic Master!" :
-        score >= 120 ? "🎉 Amazing! You are a great adverb magician!" :
-        score >= 90 ? "😊 Good job! Keep practicing your grammar magic!" :
-        "🪄 Keep trying and you'll become a grammar master!";
+        score === 150 ? "✨ Perfect! You rescued every animal and mastered adverbs!" :
+        score >= 120 ? "🎉 Amazing! You are a strong adverb rescuer!" :
+        score >= 90 ? "😊 Good job! Keep practicing your grammar rescue skills!" :
+        "🛟 Keep trying and you’ll become a rescue champion!";
       playSound(clapAudio);
       bar.style.width = "100%";
     }
@@ -507,7 +500,6 @@
       locked = false;
       finalScreen.classList.remove("show");
       gameScreen.classList.add("show");
-      magician.textContent = "🧙‍♂️";
       render();
     }
 
