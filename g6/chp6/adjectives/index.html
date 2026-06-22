@@ -3,443 +3,1146 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🎨 Fashion Show Makeover Studio</title>
-
+<title>🏛️ Noun Museum Adventure</title>
 <style>
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:Arial,sans-serif;
+/* ==========================================================================
+   RESET & SYSTEM DEFINITIONS
+   ========================================================================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    user-select: none;
 }
 
-body{
-overflow:hidden;
-background:#ffd1dc;
+body {
+    overflow: hidden;
+    background: linear-gradient(135deg, #0f172a, #1e1b4b, #311042);
+    height: 100vh;
+    color: #f8fafc;
 }
 
-#gameArea{
-position:relative;
-width:100vw;
-height:100vh;
-overflow:hidden;
-background:linear-gradient(to bottom,#ffdde1,#ee9ca7,#ffd3b6);
+/* ==========================================================================
+   ANIMATED ENVIRONMENT (AMBIENT BACKDROP)
+   ========================================================================== */
+.ambient-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    pointer-events: none;
+    overflow: hidden;
 }
 
-/* LIGHT EFFECTS */
-.light{
-position:absolute;
-width:300px;
-height:300px;
-background:rgba(255,255,255,0.08);
-border-radius:50%;
-filter:blur(50px);
-animation:moveLight 10s infinite alternate;
+.museum-pillar {
+    position: absolute;
+    bottom: -10%;
+    width: 120px;
+    height: 120%;
+    background: linear-gradient(90deg, rgba(255,255,255,0.03), rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.01));
+    border-left: 1px solid rgba(255,255,255,0.05);
+    border-right: 1px solid rgba(255,255,255,0.05);
 }
-.light2{animation-duration:16s;}
+.pillar-left { left: 5%; }
+.pillar-right { right: 5%; }
 
-@keyframes moveLight{
-from{transform:translate(-100px,-50px);}
-to{transform:translate(220px,120px);}
-}
-
-/* LOGO */
-#logoScreen{
-position:absolute;
-width:100%;
-height:100%;
-background:white;
-display:flex;
-justify-content:center;
-align-items:center;
-z-index:9999;
+.cloud-particle {
+    position: absolute;
+    background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0) 70%);
+    border-radius: 50%;
+    animation: drift linear infinite;
 }
 
-#logoScreen img{
-width:260px;
-max-width:80%;
+.firefly {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    background: #fbbf24;
+    border-radius: 50%;
+    filter: blur(1px);
+    box-shadow: 0 0 10px #f59e0b, 0 0 20px #d97706;
+    animation: float-glow linear infinite;
 }
 
-/* START & END */
-#startScreen,#endScreen{
-position:absolute;
-width:100%;
-height:100%;
-background:rgba(0,0,0,0.82);
-display:flex;
-justify-content:center;
-align-items:center;
-flex-direction:column;
-color:white;
-text-align:center;
-z-index:5000;
-padding:20px;
+@keyframes drift {
+    0% { transform: translateX(-10vw) translateY(0px) scale(1); }
+    50% { transform: translateX(50vw) translateY(-40px) scale(1.2); }
+    100% { transform: translateX(110vw) translateY(0px) scale(1); }
 }
 
-.mainBtn{
-padding:16px 34px;
-font-size:22px;
-border:none;
-border-radius:18px;
-background:#ff4081;
-color:white;
-margin-top:20px;
-cursor:pointer;
+@keyframes float-glow {
+    0% { transform: translateY(110vh) translateX(0px); opacity: 0; }
+    10% { opacity: 0.8; }
+    90% { opacity: 0.8; }
+    100% { transform: translateY(-10vh) translateX(50px); opacity: 0; }
 }
 
-/* TITLE */
-#stageTitle{
-position:absolute;
-top:20px;
-left:50%;
-transform:translateX(-50%);
-width:82%;
-background:white;
-border:6px solid #ff4081;
-border-radius:18px;
-font-size:24px;
-font-weight:bold;
-color:#c2185b;
-padding:10px;
-text-align:center;
-z-index:50;
+/* ==========================================================================
+   SCREEN SYSTEM & GLASSMORPHISM UI
+   ========================================================================== */
+.screen {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    padding: 20px;
+    text-align: center;
+    z-index: 10;
 }
 
-/* CHARACTER */
-#character{
-position:absolute;
-bottom:110px;
-left:50%;
-transform:translateX(-50%);
-font-size:120px;
+.active {
+    display: flex;
 }
 
-/* GIRL CHARACTER ADDED */
-#character{
-content:"👩‍🎤";
+/* Glassmorphism Framework */
+.glass-card {
+    background: rgba(30, 41, 59, 0.7);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 32px;
+    padding: 40px;
+    width: 94%;
+    max-width: 800px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    transform: translateY(0);
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-/* ITEMS */
-#itemsArea{
-position:absolute;
-bottom:20px;
-left:50%;
-transform:translateX(-50%);
-width:95%;
-display:flex;
-justify-content:center;
-flex-wrap:wrap;
-gap:15px;
+/* Screen Shake Effect for Mistakes */
+.shake {
+    animation: screenShake 0.5s ease-in-out;
 }
 
-.item{
-width:85px;
-height:85px;
-background:white;
-border-radius:18px;
-display:flex;
-justify-content:center;
-align-items:center;
-font-size:42px;
-cursor:pointer;
-box-shadow:0 0 10px rgba(0,0,0,0.2);
-transition:0.2s;
+@keyframes screenShake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-12px); }
+    40%, 80% { transform: translateX(12px); }
 }
 
-/* SCORE */
-#scoreBoard{
-position:absolute;
-top:10px;
-left:10px;
-background:white;
-padding:10px 14px;
-border-radius:12px;
-font-weight:bold;
-z-index:200;
+/* ==========================================================================
+   SCENE SPECIFIC DESIGNS
+   ========================================================================== */
+/* Logo Screen */
+#logoScreen {
+    background: #ffffff;
+    z-index: 100;
+}
+#logoContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+#logo {
+    width: 220px;
+    animation: logoPop 1.5s cubic-bezier(0.34, 1.56, 0.64, 1) infinite alternate;
+}
+@keyframes logoPop {
+    from { transform: scale(0.95); filter: drop-shadow(0 5px 10px rgba(0,0,0,0.1)); }
+    to { transform: scale(1.05); filter: drop-shadow(0 15px 25px rgba(0,0,0,0.15)); }
 }
 
-/* CHALLENGE */
-#challengeBox{
-position:absolute;
-top:120px;
-left:50%;
-transform:translateX(-50%);
-background:#fff9c4;
-padding:14px 20px;
-border-radius:15px;
-font-weight:bold;
-color:#e65100;
-z-index:150;
+/* Title Screen */
+#titleScreen h1 {
+    font-size: 56px;
+    background: linear-gradient(to right, #fde047, #f97316, #f43f5e);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+    margin-bottom: 10px;
+    font-weight: 800;
+}
+#titleScreen h2 {
+    font-size: 26px;
+    color: #94a3b8;
+    margin-bottom: 30px;
 }
 
-/* QUESTION */
-#questionBox{
-position:absolute;
-top:50%;
-left:50%;
-transform:translate(-50%,-50%);
-width:90%;
-max-width:600px;
-background:#fff8e1;
-padding:20px;
-border-radius:20px;
-display:none;
-z-index:4000;
+/* Audio Controller Widget */
+.audio-widget {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: rgba(15, 23, 42, 0.8);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 10px 18px;
+    border-radius: 50px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    z-index: 150;
+    box-shadow: 0 10px 25px -5px rgba(0,0,0,0.3);
+}
+.audio-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 20px;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.audio-btn:hover { transform: scale(1.1); }
+.vol-slider {
+    width: 70px;
+    cursor: pointer;
+    accent-color: #3b82f6;
 }
 
-.optionBtn{
-width:100%;
-padding:12px;
-margin:8px 0;
-border:none;
-border-radius:12px;
-background:#4caf50;
-color:white;
-font-size:16px;
-cursor:pointer;
+/* ==========================================================================
+   THE ANIMATED EXPLORER & HUB MAP TRACK
+   ========================================================================== */
+.adventure-track {
+    width: 100%;
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 24px;
+    padding: 20px;
+    margin-bottom: 25px;
+    position: relative;
+    overflow: hidden;
+}
+.museum-path {
+    height: 8px;
+    background: #334155;
+    border-radius: 4px;
+    position: relative;
+    margin-top: 40px;
+    margin-bottom: 10px;
+}
+.museum-gate {
+    position: absolute;
+    top: -12px;
+    width: 32px;
+    height: 32px;
+    background: #1e293b;
+    border: 2px solid #475569;
+    border-radius: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    transition: all 0.4s ease;
+    z-index: 2;
+}
+.gate-passed {
+    border-color: #22c55e;
+    background: #14532d;
+    box-shadow: 0 0 12px #22c55e;
+}
+.gate-current {
+    border-color: #eab308;
+    background: #713f12;
+    box-shadow: 0 0 15px #eab308;
+    transform: translateX(-50%) scale(1.2);
+    z-index: 3;
+}
+#explorerAvatar {
+    position: absolute;
+    top: -24px;
+    left: 0%;
+    font-size: 38px;
+    transform: translateX(-50%);
+    transition: left 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+    z-index: 4;
+    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
+    animation: explorerBob 0.6s infinite alternate;
+}
+@keyframes explorerBob {
+    from { transform: translateX(-50%) translateY(0); }
+    to { transform: translateX(-50%) translateY(-6px); }
 }
 
-/* FEEDBACK */
-.correct{color:green;font-size:24px;text-align:center;}
-.wrong{color:red;font-size:24px;text-align:center;}
+/* ==========================================================================
+   GAMEPLAY UI & CARDS
+   ========================================================================== */
+#topBar {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    margin-bottom: 12px;
+}
+.stat-badge {
+    background: rgba(15, 23, 42, 0.6);
+    padding: 6px 16px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.05);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+#progressOuter {
+    width: 100%;
+    height: 12px;
+    background: #1e293b;
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 25px;
+    border: 1px solid rgba(255,255,255,0.05);
+}
+#progressBar {
+    width: 0%;
+    height: 100%;
+    background: linear-gradient(90deg, #3b82f6, #06b6d4, #10b981);
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 0 10px rgba(6, 182, 212, 0.5);
+}
 
+#questionCard {
+    text-align: left;
+}
+#gallery {
+    font-size: 22px;
+    color: #fbbf24;
+    font-weight: 700;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+#question {
+    font-size: 26px;
+    line-height: 1.6;
+    color: #f1f5f9;
+    margin-bottom: 30px;
+    background: rgba(15, 23, 42, 0.4);
+    padding: 20px;
+    border-radius: 18px;
+    border-left: 5px solid #3b82f6;
+}
+
+/* Question Token Highlights */
+.noun {
+    background: linear-gradient(135deg, #fef08a, #fde047);
+    color: #0f172a;
+    padding: 2px 10px;
+    border-radius: 6px;
+    font-weight: 800;
+    box-shadow: 0 0 12px rgba(253, 224, 71, 0.4);
+    display: inline-block;
+    border: 1px solid #eab308;
+}
+
+/* Interactive Choices Grid */
+#options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+button {
+    cursor: pointer;
+    font-weight: 700;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.option {
+    padding: 20px;
+    background: rgba(51, 65, 85, 0.5);
+    border: 2px solid rgba(255,255,255,0.08);
+    border-radius: 16px;
+    font-size: 20px;
+    color: #e2e8f0;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.option:hover:not(:disabled) {
+    background: rgba(59, 130, 246, 0.15);
+    border-color: #3b82f6;
+    color: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
+}
+.option:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+/* Feedback Layout System */
+.option.correct-choice {
+    background: linear-gradient(135deg, #065f46, #047857) !important;
+    border-color: #10b981 !important;
+    color: #ffffff !important;
+    box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
+}
+.option.wrong-choice {
+    background: linear-gradient(135deg, #991b1b, #b91c1c) !important;
+    border-color: #ef4444 !important;
+    color: #ffffff !important;
+    box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
+}
+
+/* Action Control Items */
+.action-btn {
+    padding: 16px 36px;
+    border: none;
+    border-radius: 50px;
+    font-size: 22px;
+    color: #ffffff;
+    box-shadow: 0 10px 20px -5px rgba(0,0,0,0.3);
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+}
+.startBtn {
+    background: linear-gradient(135deg, #10b981, #059669);
+}
+.startBtn:hover {
+    box-shadow: 0 12px 25px -4px rgba(16, 185, 129, 0.5);
+    transform: translateY(-3px);
+}
+.restartBtn {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+}
+.restartBtn:hover {
+    box-shadow: 0 12px 25px -4px rgba(59, 130, 246, 0.5);
+    transform: translateY(-3px);
+}
+
+/* ==========================================================================
+   EXPLANATION HUB / REVEAL SCREEN
+   ========================================================================== */
+#explanationOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(15, 23, 42, 0.85);
+    backdrop-filter: blur(8px);
+    z-index: 200;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+.explanation-card {
+    background: #1e293b;
+    border: 2px solid #334155;
+    border-radius: 24px;
+    max-width: 550px;
+    width: 100%;
+    padding: 30px;
+    text-align: center;
+    box-shadow: 0 25px 50px -12px rgba(0,0,0,0.6);
+    transform: scale(0.9);
+    transition: transform 0.3s ease;
+}
+#explanationOverlay.active-popup .explanation-card {
+    transform: scale(1);
+}
+.expl-status-icon {
+    font-size: 50px;
+    margin-bottom: 15px;
+}
+#explTitle {
+    font-size: 26px;
+    font-weight: 800;
+    margin-bottom: 10px;
+}
+#explText {
+    font-size: 18px;
+    color: #94a3b8;
+    line-height: 1.6;
+    margin-bottom: 25px;
+    background: rgba(15,23,42,0.5);
+    padding: 15px;
+    border-radius: 12px;
+}
+.expl-btn {
+    background: #f97316;
+    color: white;
+    padding: 12px 30px;
+    border-radius: 50px;
+    font-size: 18px;
+    border: none;
+}
+.expl-btn:hover { background: #ea580c; }
+
+/* ==========================================================================
+   VICTORY & REWARD SYSTEM PRESENTATION
+   ========================================================================== */
+#resultScreen h1 {
+    font-size: 48px;
+    background: linear-gradient(to right, #4ade80, #22c55e);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 5px;
+}
+.rank-badge {
+    font-size: 22px;
+    color: #fef08a;
+    background: rgba(234, 179, 8, 0.15);
+    border: 1px solid rgba(234, 179, 8, 0.3);
+    padding: 8px 24px;
+    border-radius: 50px;
+    display: inline-block;
+    margin: 15px 0;
+    font-weight: 700;
+}
+.metrics-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin: 20px 0;
+}
+.metric-box {
+    background: rgba(15, 23, 42, 0.5);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 16px;
+    padding: 15px;
+}
+.metric-box div:first-child {
+    font-size: 14px;
+    color: #64748b;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+}
+.metric-box div:last-child {
+    font-size: 24px;
+    font-weight: 800;
+    color: #f1f5f9;
+}
+
+/* ==========================================================================
+   CANVAS LAYER & RESPONSIVENESS
+   ========================================================================== */
+canvas {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 90;
+}
+
+@media(max-width: 768px) {
+    #titleScreen h1 { font-size: 36px; }
+    #titleScreen h2 { font-size: 18px; }
+    #question { font-size: 20px; padding: 15px; }
+    #options { grid-template-columns: 1fr; gap: 12px; }
+    .option { font-size: 18px; padding: 16px; }
+    .glass-card { padding: 25px 15px; }
+    .adventure-track { display: none; } /* Hide map path track layout on small phones for accessibility scaling */
+}
 </style>
 </head>
-
 <body>
 
-<div id="gameArea">
-
-<div id="logoScreen">
-<img src="assets/innovine-logo.png">
+<canvas id="confetti"></canvas>
+<div class="ambient-bg" id="ambientBg">
+    <div class="museum-pillar pillar-left"></div>
+    <div class="museum-pillar pillar-right"></div>
 </div>
 
-<div id="startScreen" style="display:none;">
-<h1>Fashion Show Makeover Studio</h1>
-<button class="mainBtn" onclick="startGame()">Start</button>
+<audio id="correctSound" src="assets/correct.mp3" preload="auto"></audio>
+<audio id="wrongSound" src="assets/wrong.mp3" preload="auto"></audio>
+<audio id="clapSound" src="assets/clapping.mp3" preload="auto"></audio>
+
+<div class="audio-widget">
+    <button class="audio-btn" id="muteToggleBtn" title="Toggle Mute">🔊</button>
+    <input type="range" class="vol-slider" id="volumeSlider" min="0" max="1" step="0.1" value="0.7">
 </div>
 
-<div id="endScreen" style="display:none;">
-<h1>Game Complete</h1>
-<h2 id="finalText"></h2>
-<button class="mainBtn" onclick="restartGame()">Play Again</button>
+<div id="logoScreen" class="screen active">
+    <div id="logoContainer">
+        <img src="assets/innovine-logo.png" id="logo" alt="Innovine Logo">
+    </div>
 </div>
 
-<div id="stageTitle">👗 Fashion Challenge</div>
-
-<div id="scoreBoard">
-Styles: <span id="styleCount">0</span> |
-Q: <span id="questionCount">0</span>/10
+<div id="titleScreen" class="screen">
+    <h1>🏛️ Noun Museum Adventure</h1>
+    <h2>Discover the Secret Galleries of Nouns!</h2>
 </div>
 
-<div id="challengeBox">Choose 3 items!</div>
-
-<div id="character">👩‍🎤</div>
-
-<div id="itemsArea"></div>
-
-<div id="questionBox">
-<div id="questionText"></div>
-<div id="options"></div>
-<div id="feedback"></div>
+<div id="instructionScreen" class="screen">
+    <div class="glass-card">
+        <h1 style="font-size: 36px; margin-bottom: 15px; color: #fbbf24;">🎯 Museum Guide Profile</h1>
+        <p style="font-size: 20px; line-height: 1.7; color: #cbd5e1; margin-bottom: 25px;">
+            Welcome, Lead Explorer! The Grand Artifact Museum houses historical secrets within its architecture. 
+            Each dynamic gallery hall displays a glowing, highlighted noun token. 
+            <br><br>
+            Identify the precise class of noun to unlock the secure chamber security gates. Collect rare keys, claim sparkling victory gems, and secure passage through all 10 restricted wings!
+        </p>
+        <button class="action-btn startBtn" id="startBtn">
+            ENTER THE MUSEUM ➔
+        </button>
+    </div>
 </div>
 
+<div id="gameScreen" class="screen">
+    <div class="glass-card" id="gameGlassCard">
+        
+        <div class="adventure-track">
+            <div class="museum-path" id="museumPath">
+                <div id="explorerAvatar">🤠</div>
+                </div>
+        </div>
+
+        <div id="topBar">
+            <div class="stat-badge" id="roomText">🏛️ Loading Room...</div>
+            <div style="display: flex; gap: 10px;">
+                <div class="stat-badge" id="scoreText">⭐ Score: 0</div>
+                <div class="stat-badge" id="gemsText">💎 Gems: 0</div>
+            </div>
+        </div>
+
+        <div id="progressOuter">
+            <div id="progressBar"></div>
+        </div>
+
+        <div id="questionCard">
+            <h2 id="gallery">🌿 Loading Gallery...</h2>
+            <div id="question">Loading Mystery Challenge...</div>
+            <div id="options"></div>
+        </div>
+    </div>
+</div>
+
+<div id="explanationOverlay">
+    <div class="explanation-card">
+        <div class="expl-status-icon" id="explIcon">🎉</div>
+        <h2 id="explTitle">Correct!</h2>
+        <div id="explText">Explanation text goes here.</div>
+        <button class="expl-btn" id="explContinueBtn">Continue Adventure</button>
+    </div>
+</div>
+
+<div id="resultScreen" class="screen">
+    <div class="glass-card">
+        <span style="font-size: 70px;">🏆</span>
+        <h1>Adventure Completed!</h1>
+        <div class="rank-badge" id="finalRank">Rank: Expert Explorer</div>
+        
+        <div class="metrics-container">
+            <div class="metric-box">
+                <div>Final Score</div>
+                <div id="finalScoreText">0 / 10</div>
+            </div>
+            <div class="metric-box">
+                <div>Accuracy</div>
+                <div id="finalPercentText">0%</div>
+            </div>
+            <div class="metric-box">
+                <div>Gems Accumulated</div>
+                <div id="finalGemsText">0</div>
+            </div>
+            <div class="metric-box">
+                <div>Fault Drops</div>
+                <div id="finalMistakesText">0</div>
+            </div>
+        </div>
+
+        <button class="action-btn restartBtn" id="restartBtn">
+            🔄 Replay Adventure
+        </button>
+    </div>
 </div>
 
 <script>
+/****************************************************************************
+ * ENVIRONMENT & PARTICLE SYSTEMS GENERATION ENGINE
+ ****************************************************************************/
+const ambientBg = document.getElementById("ambientBg");
 
-/* LOGO */
-setTimeout(()=>{
-document.getElementById("logoScreen").style.display="none";
-document.getElementById("startScreen").style.display="flex";
-},5000);
+// Spawn atmospheric fireflies
+for (let i = 0; i < 20; i++) {
+    let firefly = document.createElement("div");
+    firefly.className = "firefly";
+    firefly.style.left = Math.random() * 100 + "vw";
+    firefly.style.animationDuration = (6 + Math.random() * 8) + "s";
+    firefly.style.animationDelay = Math.random() * 6 + "s";
+    ambientBg.appendChild(firefly);
+}
 
-/* THEMES */
-const fashionThemes=[
-{emoji:"👑 Royal",items:["👑","💍","👜","👗","🕶️","👒"]},
-{emoji:"👕 Casual",items:["👕","👟","🧢","🧥","🎒","🧦"]},
-{emoji:"🎉 Party",items:["👗","👠","💄","🎩","✨","👜"]},
-{emoji:"❄️ Winter",items:["🧥","🧣","🧤","👢","☕","👒"]},
-{emoji:"🏃 Sport",items:["👟","🏀","🎽","🧢","🏅","🏈"]}
+// Spawn drifting background nebula clouds
+for (let i = 0; i < 6; i++) {
+    let cloud = document.createElement("div");
+    cloud.className = "cloud-particle";
+    cloud.style.width = (200 + Math.random() * 200) + "px";
+    cloud.style.height = cloud.style.width;
+    cloud.style.top = (Math.random() * 70) + "vh";
+    cloud.style.animationDuration = (25 + Math.random() * 25) + "s";
+    cloud.style.animationDelay = "-" + (Math.random() * 20) + "s";
+    ambientBg.appendChild(cloud);
+}
+
+/****************************************************************************
+ * IMMUTABLE PLATFORM CONFIGURATIONS & QUESTION DATA BANK
+ ****************************************************************************/
+const questions = [
+    {
+        gallery: "🌿 Nature Gallery",
+        question: 'The <span class="noun">garden</span> is full of colourful flowers and butterflies.',
+        options: ["Common Noun", "Proper Noun", "Collective Noun", "Material Noun"],
+        answer: "Common Noun",
+        explanation: "The word 'garden' is a common noun because it refers to a general, non-specific place where plants and flowers are grown."
+    },
+    {
+        gallery: "🏛 Famous Places Gallery",
+        question: '<span class="noun">India</span> is famous for its rich culture and festivals.',
+        options: ["Proper Noun", "Common Noun", "Collective Noun", "Abstract Noun"],
+        answer: "Proper Noun",
+        explanation: "The word 'India' is a proper noun because it represents a specific, named country and always starts with a capital letter."
+    },
+    {
+        gallery: "🏆 Team Gallery",
+        question: 'The <span class="noun">team</span> celebrated their victory after the match.',
+        options: ["Collective Noun", "Proper Noun", "Material Noun", "Common Noun"],
+        answer: "Collective Noun",
+        explanation: "The word 'team' is a collective noun because it refers to a collection or group of individuals working together as a single unit."
+    },
+    {
+        gallery: "💎 Treasure Gallery",
+        question: 'The necklace was made of pure <span class="noun">gold</span>.',
+        options: ["Material Noun", "Proper Noun", "Common Noun", "Abstract Noun"],
+        answer: "Material Noun",
+        explanation: "The word 'gold' is a material noun because it denotes a raw material, substance, or matter from which things are constructed."
+    },
+    {
+        gallery: "💖 Values Gallery",
+        question: '<span class="noun">Honesty</span> is always appreciated by everyone.',
+        options: ["Abstract Noun", "Proper Noun", "Material Noun", "Common Noun"],
+        answer: "Abstract Noun",
+        explanation: "The word 'Honesty' is an abstract noun because it signifies a quality, concept, or state of mind that cannot be perceived by the physical senses."
+    },
+    {
+        gallery: "🦁 Animal Gallery",
+        question: 'The <span class="noun">lion</span> rested under a shady tree.',
+        options: ["Common Noun", "Proper Noun", "Collective Noun", "Material Noun"],
+        answer: "Common Noun",
+        explanation: "The word 'lion' is a common noun because it specifies a general classification of animal rather than a uniquely named character."
+    },
+    {
+        gallery: "🏫 School Gallery",
+        question: '<span class="noun">Mrs. Gupta</span> teaches Mathematics in our school.',
+        options: ["Proper Noun", "Common Noun", "Material Noun", "Collective Noun"],
+        answer: "Proper Noun",
+        explanation: "The word 'Mrs. Gupta' is a proper noun because it represents the specific name of a particular person."
+    },
+    {
+        gallery: "🌊 Ocean Gallery",
+        question: 'A <span class="noun">shoal</span> of fish swam together near the coral reef.',
+        options: ["Collective Noun", "Material Noun", "Common Noun", "Abstract Noun"],
+        answer: "Collective Noun",
+        explanation: "The word 'shoal' is a collective noun specifically assigned to denote a group or large gathering of fish swimming together."
+    },
+    {
+        gallery: "🌳 Builders Gallery",
+        question: 'The table is made from strong <span class="noun">wood</span>.',
+        options: ["Material Noun", "Proper Noun", "Common Noun", "Collective Noun"],
+        answer: "Material Noun",
+        explanation: "The word 'wood' is categorized as a material noun because it points directly to the physical raw substance utilized to engineer furniture."
+    },
+    {
+        gallery: "🌎 Kindness Gallery",
+        question: '<span class="noun">Kindness</span> makes the world a happier place.',
+        options: ["Abstract Noun", "Material Noun", "Collective Noun", "Common Noun"],
+        answer: "Abstract Noun",
+        explanation: "The word 'Kindness' is an abstract noun representing an emotional attribute, virtue, or moral concept which lacks tangible structure."
+    }
 ];
 
-let themeIndex=0;
+/****************************************************************************
+ * DOM ELEMENT REFERENCES
+ ****************************************************************************/
+const logoScreen = document.getElementById("logoScreen");
+const titleScreen = document.getElementById("titleScreen");
+const instructionScreen = document.getElementById("instructionScreen");
+const gameScreen = document.getElementById("gameScreen");
+const resultScreen = document.getElementById("resultScreen");
+const explanationOverlay = document.getElementById("explanationOverlay");
 
-/* GAME STATE */
-let stylesCompleted=0;
-let currentQuestion=0;
-let selectedCount=0;
-let attempt=0;
+const gallery = document.getElementById("gallery");
+const question = document.getElementById("question");
+const options = document.getElementById("options");
 
-/* QUESTIONS (UNCHANGED) */
-const questions=[
-{
-q:`👗 Mia bought a beautiful dress for the school concert.<br><br>Which word is the adjective of quality?`,
-o:["Mia","beautiful","dress","concert"],
-a:1
-},
-{
-q:`🍎 The grocery cart had many apples inside it.<br><br>Which word is the adjective of quantity?`,
-o:["grocery","many","inside","apples"],
-a:1
-},
-{
-q:`🎈 Three balloons floated to the ceiling.<br><br>Which word is the adjective of number?`,
-o:["Three","balloons","floated","ceiling"],
-a:0
-},
-{
-q:`👟 Those shoes near the window are expensive.<br><br>Which word is the demonstrative adjective?`,
-o:["window","Those","expensive","shoes"],
-a:1
-},
-{
-q:`🍛 We ate delicious Indian food at the festival.<br><br>Which word is the proper adjective?`,
-o:["festival","delicious","Indian","food"],
-a:2
-},
-{
-q:`🎒 Her backpack is filled with art supplies.<br><br>Which word is the possessive adjective?`,
-o:["Her","filled","backpack","supplies"],
-a:0
-},
-{
-q:`🧥 Which jacket should we buy for winter?<br><br>Which word is the interrogative adjective?`,
-o:["buy","winter","Which","jacket"],
-a:2
-},
-{
-q:`🐶 The playful puppy chased the ball around the park.<br><br>Which word is the adjective of quality?`,
-o:["park","playful","ball","around"],
-a:1
-},
-{
-q:`🍪 Few cookies remained after the party ended.<br><br>Which word is the adjective of quantity?`,
-o:["Few","cookies","party","ended"],
-a:0
-},
-{
-q:`📚 These books belong to our classroom library.<br><br>Which word is the demonstrative adjective?`,
-o:["library","books","These","classroom"],
-a:2
-}
-];
+const roomText = document.getElementById("roomText");
+const scoreText = document.getElementById("scoreText");
+const gemsText = document.getElementById("gemsText");
+const progressBar = document.getElementById("progressBar");
+const museumPath = document.getElementById("museumPath");
+const explorerAvatar = document.getElementById("explorerAvatar");
+const gameGlassCard = document.getElementById("gameGlassCard");
 
-questions.sort(()=>Math.random()-0.5);
+// Popup Card Internal Fields
+const explIcon = document.getElementById("explIcon");
+const explTitle = document.getElementById("explTitle");
+const explText = document.getElementById("explText");
+const explContinueBtn = document.getElementById("explContinueBtn");
 
-/* START */
-function startGame(){
-document.getElementById("startScreen").style.display="none";
-loadItems();
+// Final Screen Elements
+const finalRank = document.getElementById("finalRank");
+const finalScoreText = document.getElementById("finalScoreText");
+const finalPercentText = document.getElementById("finalPercentText");
+const finalGemsText = document.getElementById("finalGemsText");
+const finalMistakesText = document.getElementById("finalMistakesText");
+
+// Audio Elements
+const correctSound = document.getElementById("correctSound");
+const wrongSound = document.getElementById("wrongSound");
+const clapSound = document.getElementById("clapSound");
+const volumeSlider = document.getElementById("volumeSlider");
+const muteToggleBtn = document.getElementById("muteToggleBtn");
+
+/****************************************************************************
+ * STATE ENGINE DATA MANAGEMENT
+ ****************************************************************************/
+let currentQuestionIndex = 0;
+let currentScore = 0;
+let accumulatedGems = 0;
+let totalMistakesCount = 0;
+let activeQuestionIndicesOrder = [];
+let isSystemMuted = false;
+let globalSystemVolume = 0.7;
+
+/****************************************************************************
+ * AUDIO MANAGEMENT INFRASTRUCTURE
+ ****************************************************************************/
+function updateSystemAudioEngine() {
+    const activeVolume = isSystemMuted ? 0 : globalSystemVolume;
+    correctSound.volume = activeVolume;
+    wrongSound.volume = activeVolume;
+    clapSound.volume = activeVolume;
+    muteToggleBtn.innerHTML = isSystemMuted ? "❌" : "🔊";
 }
 
-/* THEME */
-function setTheme(){
-let t=fashionThemes[themeIndex];
-themeIndex=(themeIndex+1)%fashionThemes.length;
-document.getElementById("stageTitle").innerText=t.emoji+" Fashion Challenge";
-return t;
+volumeSlider.oninput = function() {
+    globalSystemVolume = parseFloat(this.value);
+    if (globalSystemVolume > 0) isSystemMuted = false;
+    updateSystemAudioEngine();
+};
+
+muteToggleBtn.onclick = function() {
+    isSystemMuted = !isSystemMuted;
+    updateSystemAudioEngine();
+};
+
+function playSound(audioObject) {
+    try {
+        audioObject.currentTime = 0;
+        audioObject.play();
+    } catch(err) {
+        console.log("Audio device interaction pending:", err);
+    }
 }
 
-/* LOAD ITEMS */
-function loadItems(){
-itemsArea.innerHTML="";
-selectedCount=0;
-attempt=0;
+/****************************************************************************
+ * STEPPER FLOW & SEQUENCE TIMINGS
+ ****************************************************************************/
+window.onload = function() {
+    correctSound.load();
+    wrongSound.load();
+    clapSound.load();
+    updateSystemAudioEngine();
+    buildInteractiveMapNodes();
+    
+    // Transition Sequence Controller Timers
+    setTimeout(function() {
+        logoScreen.classList.remove("active");
+        titleScreen.classList.add("active");
+    }, 5000);
 
-let theme=setTheme();
+    setTimeout(function() {
+        titleScreen.classList.remove("active");
+        instructionScreen.classList.add("active");
+    }, 8000);
+};
 
-let shuffled=[...theme.items].sort(()=>Math.random()-0.5).slice(0,5);
+/****************************************************************************
+ * SEQUENTIAL MAP INTERACTIVE RENDERING
+ ****************************************************************************/
+function buildInteractiveMapNodes() {
+    const legacyGates = document.querySelectorAll('.museum-gate');
+    legacyGates.forEach(g => g.remove());
 
-shuffled.forEach(i=>{
-let div=document.createElement("div");
-div.className="item";
-div.innerText=i;
-div.onclick=()=>selectItem(div);
-itemsArea.appendChild(div);
+    const absoluteStepPercent = 100 / (questions.length - 1 || 1);
+    for (let idx = 0; idx < questions.length; idx++) {
+        let gateNode = document.createElement("div");
+        gateNode.className = "museum-gate";
+        gateNode.id = "mapGate_" + idx;
+        gateNode.style.left = (idx * absoluteStepPercent) + "%";
+        gateNode.innerHTML = (idx + 1);
+        museumPath.appendChild(gateNode);
+    }
+}
+
+function refreshMapPositionTracker() {
+    const absoluteStepPercent = 100 / (questions.length - 1 || 1);
+    const calculatedTargetPercent = currentQuestionIndex * absoluteStepPercent;
+    explorerAvatar.style.left = calculatedTargetPercent + "%";
+
+    for (let idx = 0; idx < questions.length; idx++) {
+        let gateElement = document.getElementById("mapGate_" + idx);
+        if (!gateElement) continue;
+        
+        gateElement.classList.remove("gate-passed", "gate-current");
+        if (idx < currentQuestionIndex) {
+            gateElement.classList.add("gate-passed");
+        } else if (idx === currentQuestionIndex) {
+            gateElement.classList.add("gate-current");
+        }
+    }
+}
+
+/****************************************************************************
+ * ARRAY SHUFFLE MATH ROUTINES
+ ****************************************************************************/
+function executeShuffleArray(targetArray) {
+    for (let elementIdx = targetArray.length - 1; elementIdx > 0; elementIdx--) {
+        const generatedRandomIndex = Math.floor(Math.random() * (elementIdx + 1));
+        [targetArray[elementIdx], targetArray[generatedRandomIndex]] = [targetArray[generatedRandomIndex], targetArray[elementIdx]];
+    }
+    return targetArray;
+}
+
+/****************************************************************************
+ * CORE GAME MECHANICS RUNTIME LOOP
+ ****************************************************************************/
+document.getElementById("startBtn").onclick = function() {
+    instructionScreen.classList.remove("active");
+    gameScreen.classList.add("active");
+    initializeAdventureGameplayState();
+};
+
+function initializeAdventureGameplayState() {
+    currentQuestionIndex = 0;
+    currentScore = 0;
+    accumulatedGems = 0;
+    totalMistakesCount = 0;
+    
+    activeQuestionIndicesOrder = [...Array(questions.length).keys()];
+    executeShuffleArray(activeQuestionIndicesOrder);
+    
+    renderCurrentRoomChallenge();
+}
+
+function renderCurrentRoomChallenge() {
+    refreshMapPositionTracker();
+    
+    let activeQuestionData = questions[activeQuestionIndicesOrder[currentQuestionIndex]];
+    
+    roomText.innerHTML = "🏛️ Museum Gallery " + (currentQuestionIndex + 1) + " of " + questions.length;
+    scoreText.innerHTML = "⭐ Score: " + currentScore;
+    gemsText.innerHTML = "💎 Gems: " + accumulatedGems;
+    
+    progressBar.style.width = ((currentQuestionIndex / questions.length) * 100) + "%";
+    
+    gallery.innerHTML = activeQuestionData.gallery;
+    question.innerHTML = activeQuestionData.question;
+    options.innerHTML = "";
+    
+    let optionsCopyList = [...activeQuestionData.options];
+    executeShuffleArray(optionsCopyList);
+    
+    optionsCopyList.forEach(function(optionString) {
+        let optionButton = document.createElement("button");
+        optionButton.className = "option";
+        optionButton.innerHTML = `<span>${optionString}</span> <span>👁️</span>`;
+        
+        optionButton.onclick = function() {
+            processSelectedChoiceAnswer(optionButton, optionString, activeQuestionData.answer, activeQuestionData.explanation);
+        };
+        options.appendChild(optionButton);
+    });
+}
+
+function processSelectedChoiceAnswer(selectedButton, chosenString, correctString, explanatoryString) {
+    let allRenderedOptions = document.querySelectorAll(".option");
+    allRenderedOptions.forEach(btn => btn.disabled = true);
+    
+    if (chosenString === correctString) {
+        selectedButton.classList.add("correct-choice");
+        playSound(correctSound);
+        
+        currentScore++;
+        accumulatedGems += 10;
+        triggerConfettiExplosionCascade();
+        
+        showExplanationPopup(true, explanatoryString);
+    } else {
+        selectedButton.classList.add("wrong-choice");
+        gameGlassCard.classList.add("shake");
+        playSound(wrongSound);
+        
+        totalMistakesCount++;
+        
+        allRenderedOptions.forEach(function(btn) {
+            if (btn.innerText.includes(correctString)) {
+                btn.classList.add("correct-choice");
+            }
+        });
+        
+        setTimeout(() => { gameGlassCard.classList.remove("shake"); }, 500);
+        showExplanationPopup(false, explanatoryString);
+    }
+}
+
+function showExplanationPopup(isAnswerCorrect, summaryExplanationText) {
+    if (isAnswerCorrect) {
+        explIcon.innerHTML = "🎉";
+        explTitle.innerHTML = "Gallery Gate Unlocked!";
+        explTitle.style.color = "#10b981";
+    } else {
+        explIcon.innerHTML = "⚠️";
+        explTitle.innerHTML = "Security Lock Activated!";
+        explTitle.style.color = "#ef4444";
+    }
+    
+    explText.innerHTML = summaryExplanationText;
+    explanationOverlay.style.display = "flex";
+    setTimeout(() => { explanationOverlay.classList.add("active-popup"); }, 10);
+}
+
+explContinueBtn.onclick = function() {
+    explanationOverlay.classList.remove("active-popup");
+    setTimeout(() => {
+        explanationOverlay.style.display = "none";
+        transitionToNextStep();
+    }, 200);
+};
+
+function transitionToNextStep() {
+    currentQuestionIndex++;
+    if (currentQuestionIndex >= questions.length) {
+        renderFinalSummaryScreen();
+    } else {
+        renderCurrentRoomChallenge();
+    }
+}
+
+/****************************************************************************
+ * SUMMARY EVALUATION GRAPHICS & SCORE CARD
+ ****************************************************************************/
+function renderFinalSummaryScreen() {
+    gameScreen.classList.remove("active");
+    resultScreen.classList.add("active");
+    progressBar.style.width = "100%";
+    
+    let performanceRatioPercentage = Math.round((currentScore / questions.length) * 100);
+    let assignedRankTitle = "";
+    
+    if (performanceRatioPercentage >= 90) {
+        assignedRankTitle = "👑 Museum Legend";
+    } else if (performanceRatioPercentage >= 75) {
+        assignedRankTitle = "🏆 Expert Explorer";
+    } else if (performanceRatioPercentage >= 60) {
+        assignedRankTitle = "🧭 Master Guide";
+    } else if (performanceRatioPercentage >= 40) {
+        assignedRankTitle = "🎒 Novice Trainee";
+    } else {
+        assignedRankTitle = "📘 Scholar Assistant";
+    }
+    
+    finalRank.innerHTML = "Rank: " + assignedRankTitle;
+    finalScoreText.innerHTML = currentScore + " / " + questions.length;
+    finalPercentText.innerHTML = performanceRatioPercentage + "%";
+    finalGemsText.innerHTML = accumulatedGems;
+    finalMistakesText.innerHTML = totalMistakesCount;
+    
+    playSound(clapSound);
+    triggerConfettiExplosionCascade();
+}
+
+document.getElementById("restartBtn").onclick = function() {
+    resultScreen.classList.remove("active");
+    gameScreen.classList.add("active");
+    initializeAdventureGameplayState();
+};
+
+/****************************************************************************
+ * CUSTOM PARTICLE CONFETTI ENGINE
+ ****************************************************************************/
+const canvasElement = document.getElementById("confetti");
+const canvasCtx = canvasElement.getContext("2d");
+
+canvasElement.width = window.innerWidth;
+canvasElement.height = window.innerHeight;
+
+window.addEventListener("resize", function() {
+    canvasElement.width = window.innerWidth;
+    canvasElement.height = window.innerHeight;
 });
+
+let activeConfettiCollection = [];
+let targetAnimationRequestFrameId = null;
+
+function triggerConfettiExplosionCascade() {
+    activeConfettiCollection = [];
+    for (let i = 0; i < 150; i++) {
+        activeConfettiCollection.push({
+            x: Math.random() * canvasElement.width,
+            y: -20,
+            r: Math.random() * 6 + 4,
+            speedY: Math.random() * 4 + 4,
+            speedX: Math.random() * 4 - 2,
+            rotationAngle: Math.random() * 360,
+            rotationSpeed: Math.random() * 0.1 - 0.05,
+            colorPalette: "hsl(" + Math.random() * 360 + ", 95%, 60%)"
+        });
+    }
+    if(!targetAnimationRequestFrameId) {
+        executeConfettiRenderAnimationCycle(0);
+    }
 }
 
-/* SELECT */
-function selectItem(div){
-div.style.background="#81c784";
-selectedCount++;
-if(selectedCount>=3){
-showQuestion();
+function executeConfettiRenderAnimationCycle(elapsedTicks) {
+    canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+    
+    activeConfettiCollection.forEach(function(particle) {
+        canvasCtx.save();
+        canvasCtx.translate(particle.x, particle.y);
+        canvasCtx.rotate(particle.rotationAngle);
+        canvasCtx.fillStyle = particle.colorPalette;
+        canvasCtx.fillRect(-particle.r / 2, -particle.r / 2, particle.r, particle.r);
+        canvasCtx.restore();
+        
+        particle.y += particle.speedY;
+        particle.x += particle.speedX;
+        particle.rotationAngle += particle.rotationSpeed;
+    });
+    
+    // Auto terminate canvas sweep loops after 140 operational cycles to preserve browser RAM
+    if (elapsedTicks < 140) {
+        targetAnimationRequestFrameId = requestAnimationFrame(() => {
+            executeConfettiRenderAnimationCycle(elapsedTicks + 1);
+        });
+    } else {
+        canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+        targetAnimationRequestFrameId = null;
+    }
 }
-}
 
-/* QUESTION */
-function showQuestion(){
-document.getElementById("questionBox").style.display="block";
-
-let q=questions[currentQuestion];
-document.getElementById("questionText").innerHTML=q.q;
-
-let options=document.getElementById("options");
-options.innerHTML="";
-document.getElementById("feedback").innerHTML="";
-
-q.o.forEach((op,i)=>{
-let btn=document.createElement("button");
-btn.className="optionBtn";
-btn.innerText=op;
-btn.onclick=()=>checkAnswer(i,q.a);
-options.appendChild(btn);
+/****************************************************************************
+ * ACCESSIBILITY KEYBOARD ROUTINES
+ ****************************************************************************/
+document.addEventListener("keydown", function(event) {
+    if (event.key === "Enter") {
+        if (instructionScreen.classList.contains("active")) {
+            document.getElementById("startBtn").click();
+        } else if (explanationOverlay.style.display === "flex") {
+            explContinueBtn.click();
+        } else if (resultScreen.classList.contains("active")) {
+            document.getElementById("restartBtn").click();
+        }
+    }
 });
-}
-
-/* ANSWER */
-function checkAnswer(sel,correct){
-let fb=document.getElementById("feedback");
-
-if(sel===correct){
-fb.innerHTML="Correct!";
-fb.className="correct";
-
-stylesCompleted++;
-currentQuestion++;
-
-document.getElementById("styleCount").innerText=stylesCompleted;
-document.getElementById("questionCount").innerText=currentQuestion;
-
-setTimeout(()=>{
-document.getElementById("questionBox").style.display="none";
-if(currentQuestion>=10){
-endGame();
-}else{
-loadItems();
-}
-},1000);
-
-}else{
-attempt++;
-fb.innerHTML = attempt<2 ? "Try Again!" : "Answer Revealed!";
-fb.className="wrong";
-
-if(attempt>=2){
-setTimeout(()=>{
-document.getElementById("questionBox").style.display="none";
-currentQuestion++;
-loadItems();
-},1200);
-}
-}
-}
-
-/* END */
-function endGame(){
-document.getElementById("endScreen").style.display="flex";
-document.getElementById("finalText").innerText=
-"You completed "+stylesCompleted+" fashion missions!";
-}
-
-/* RESTART */
-function restartGame(){
-location.reload();
-}
-
 </script>
-
 </body>
 </html>
