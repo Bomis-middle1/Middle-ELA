@@ -6,8 +6,16 @@
 <title>Preposition Simon Says</title>
 <style>
   :root{
-    --bg1:#7c3aed; --bg2:#22c55e; --bg3:#06b6d4; --card:#ffffff; --ink:#1f2937;
-    --accent:#f97316; --good:#16a34a; --bad:#dc2626; --soft:#f8fafc; --line:#dbeafe;
+    --bg1:#7c3aed;
+    --bg2:#22c55e;
+    --bg3:#06b6d4;
+    --card:#ffffff;
+    --ink:#1f2937;
+    --accent:#f97316;
+    --good:#16a34a;
+    --bad:#dc2626;
+    --soft:#f8fafc;
+    --line:#dbeafe;
   }
   *{box-sizing:border-box}
   html,body{
@@ -32,7 +40,7 @@
     grid-template-rows:auto 1fr auto;
     gap:12px;
   }
-  .topbar,.footer,.panel,.screen{
+  .topbar,.footer,.panel{
     border-radius:24px;
     background:rgba(255,255,255,.92);
     backdrop-filter:blur(8px);
@@ -198,16 +206,20 @@
   }
   .desk.d1{left:14%}
   .desk.d2{right:14%}
+
   .student{
     position:absolute;
-    bottom:38px;
+    bottom:52px;
     left:50%;
     transform:translateX(-50%);
-    width:190px;
-    height:210px;
-    display:grid;
-    place-items:end center;
+    width:180px;
+    height:220px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:flex-end;
     transition:transform .35s ease;
+    gap:8px;
   }
   .head{
     width:74px;
@@ -249,27 +261,26 @@
   }
   .body{
     width:96px;
-    height:84px;
+    height:86px;
     background:linear-gradient(180deg,#60a5fa,#2563eb);
     border:5px solid #333;
     border-radius:18px 18px 26px 26px;
     position:relative;
-    margin-top:-8px;
     z-index:1;
   }
   .arm{
     position:absolute;
-    top:16px;
-    width:60px;
+    top:18px;
+    width:52px;
     height:18px;
     border-top:7px solid #333;
     border-radius:12px;
   }
-  .arm.l{left:-54px;transform-origin:right center}
-  .arm.r{right:-54px;transform-origin:left center}
+  .arm.l{left:-46px;transform-origin:right center}
+  .arm.r{right:-46px;transform-origin:left center}
   .leg{
     position:absolute;
-    bottom:-52px;
+    bottom:-64px;
     width:20px;
     height:62px;
     background:#334155;
@@ -277,8 +288,9 @@
     border-top:none;
     border-radius:0 0 14px 14px;
   }
-  .leg.l{left:20px}
-  .leg.r{right:20px}
+  .leg.l{left:18px}
+  .leg.r{right:18px}
+
   .prop{
     position:absolute;
     background:#fff;
@@ -332,6 +344,7 @@
     inset:50% 0 0 0;
     border-top:4px solid #334155;
   }
+
   .rightcard{
     display:grid;
     grid-template-rows:auto auto 1fr;
@@ -380,10 +393,6 @@
     background:linear-gradient(135deg,#8b5cf6,#6366f1);
     color:#fff;
   }
-  .sound{
-    background:#e2e8f0;
-    color:#0f172a;
-  }
   .feedback{
     margin-top:6px;
     padding:12px 14px;
@@ -405,11 +414,32 @@
   .feedback.neutral{
     border-color:#cbd5e1;
   }
-  .mini{
-    font-size:13px;
-    font-weight:700;
-    opacity:.85;
+  .center{
+    display:grid;
+    place-items:center;
+    min-height:0;
   }
+  .message{
+    font-size:clamp(16px,2.4vw,22px);
+    font-weight:900;
+    text-align:center;
+    padding:10px 12px;
+    border-radius:16px;
+    background:#fff7ed;
+    border:2px solid #fed7aa;
+  }
+  .hidden{display:none !important}
+
+  .pose-up .arm.l,.pose-up .arm.r{transform:rotate(-90deg)}
+  .pose-behind .arm.l,.pose-behind .arm.r{transform:rotate(35deg)}
+  .pose-between{transform:translateX(-50%) scale(.98)}
+  .pose-over{transform:translateX(-50%) translateY(-12px) rotate(-6deg)}
+  .pose-under{transform:translateX(-50%) translateY(26px) scale(.92)}
+  .pose-nextto{transform:translateX(calc(-50% + 38px))}
+  .pose-front{transform:translateX(-50%) translateY(-4px)}
+  .pose-on .body{transform:translateY(-10px)}
+  .pose-on .arm.l,.pose-on .arm.r{transform:rotate(-70deg)}
+
   .overlay{
     position:fixed;
     inset:0;
@@ -445,29 +475,7 @@
     font-size:16px;
     line-height:1.45;
   }
-  .center{
-    display:grid;
-    place-items:center;
-    min-height:0;
-  }
-  .message{
-    font-size:clamp(16px,2.4vw,22px);
-    font-weight:900;
-    text-align:center;
-    padding:10px 12px;
-    border-radius:16px;
-    background:#fff7ed;
-    border:2px solid #fed7aa;
-  }
-  .hidden{display:none !important}
-  .pose-up .arm.l,.pose-up .arm.r{transform:rotate(-90deg)}
-  .pose-behind .arm.l,.pose-behind .arm.r{transform:rotate(35deg)}
-  .pose-between{transform:translateX(-50%) scale(.98)}
-  .pose-over{transform:translateX(-50%) translateY(-12px) rotate(-6deg)}
-  .pose-under{transform:translateX(-50%) translateY(26px) scale(.92)}
-  .pose-nextto{transform:translateX(calc(-50% + 38px))}
-  .pose-front{transform:translateX(-50%) translateY(-4px)}
-  .pose-on .student{transform:translateX(-50%) translateY(-54px) scale(.88)}
+
   @media (max-width:900px){
     .shell{
       height:auto;
@@ -495,7 +503,7 @@
     }
     .student{
       width:160px;
-      height:190px;
+      height:210px;
     }
     .head{
       transform:scale(.92);
@@ -575,7 +583,6 @@
         </div>
         <div class="controls">
           <button class="start" id="startBtn">Start Game</button>
-          <button class="sound" id="soundBtn">Sound: On</button>
           <button class="next hidden" id="yesBtn">Do it</button>
           <button class="next hidden" id="noBtn">Don’t do it</button>
         </div>
@@ -593,10 +600,6 @@
   </div>
 </div>
 
-<audio id="correctAudio" src="assets/correct.mp3" preload="auto"></audio>
-<audio id="wrongAudio" src="assets/wrong.mp3" preload="auto"></audio>
-<audio id="clapAudio" src="assets/freesound_community-claps-44774.mp3" preload="auto"></audio>
-
 <script>
 const commands = [
   {text:'Simon says stand ABOVE your chair', pose:'pose-up', truth:true},
@@ -612,23 +615,16 @@ const commands = [
 ];
 
 const el = id => document.getElementById(id);
-const scene = el('scene'), student = el('student'), commandEl = el('command'), hintEl = el('rulehint');
+const student = el('student'), commandEl = el('command'), hintEl = el('rulehint');
 const scoreEl = el('score'), roundEl = el('round'), timeEl = el('time'), feedback = el('feedback');
-const startBtn = el('startBtn'), yesBtn = el('yesBtn'), noBtn = el('noBtn'), replayBtn = el('replayBtn'), soundBtn = el('soundBtn');
+const startBtn = el('startBtn'), yesBtn = el('yesBtn'), noBtn = el('noBtn'), replayBtn = el('replayBtn');
 const splash = el('splash'), finalMsg = el('finalMsg');
-const correctAudio = el('correctAudio'), wrongAudio = el('wrongAudio'), clapAudio = el('clapAudio');
 
-let score=0, round=0, time=15, timer=null, current=null, playing=false, soundOn=true, answered=false;
+let score=0, round=0, time=15, timer=null, current=null, playing=false, answered=false;
 
 function setFeedback(text, cls='neutral'){
   feedback.className = 'feedback '+cls;
   feedback.innerHTML = text;
-}
-function playAudio(a){
-  if(soundOn){
-    a.currentTime=0;
-    a.play().catch(()=>{});
-  }
 }
 function showButtons(show){
   yesBtn.classList.toggle('hidden', !show);
@@ -680,10 +676,8 @@ function handleChoice(choice, timeout=false){
   const correct = (choice === current.truth);
   if(correct){
     score++;
-    playAudio(correctAudio);
     setFeedback(timeout ? 'Time up, but your logic was correct. Great job!' : 'Correct! Nice listening and movement!', 'good');
   } else {
-    playAudio(wrongAudio);
     setFeedback(timeout ? 'Time ran out. The correct answer was the other choice.' : 'Oops! That was the wrong choice.', 'bad');
   }
   updateStats();
@@ -713,7 +707,6 @@ function endGame(){
   playing=false;
   clearInterval(timer);
   showButtons(false);
-  playAudio(clapAudio);
   finalMsg.classList.remove('hidden');
   replayBtn.classList.remove('hidden');
   finalMsg.textContent = score >= 8 ? `Amazing! You scored ${score}/10 and won the classroom challenge!` : `You finished with ${score}/10. Try again to beat your score!`;
@@ -721,16 +714,12 @@ function endGame(){
   hintEl.textContent = 'Tap Play Again to try another round.';
   setFeedback('Tap Play Again to start a new game.', 'neutral');
 }
-startBtn.onclick = ()=>{
-  if(!playing){ startGame(); } else { startGame(); }
-};
+
+startBtn.onclick = ()=>{ if(!playing){ startGame(); } else { startGame(); } };
 yesBtn.onclick = ()=> handleChoice(true);
 noBtn.onclick = ()=> handleChoice(false);
 replayBtn.onclick = ()=> startGame();
-soundBtn.onclick = ()=>{
-  soundOn=!soundOn;
-  soundBtn.textContent = 'Sound: ' + (soundOn ? 'On' : 'Off');
-};
+
 setTimeout(()=> splash.classList.add('hidden'), 3000);
 updateStats();
 showButtons(false);
