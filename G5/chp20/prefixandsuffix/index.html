@@ -1,1 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Prefix & Suffix Factory</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
+body, html {
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+  background: linear-gradient(135deg, #f8fbff 0%, #ffe8e3 100%);
+}
 
+#splash {
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(135deg, #ffffff, #fff7ef);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+#splash .logoText {
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  font-weight: 900;
+  color: #ff8c42;
+  letter-spacing: 0.5px;
+}
+
+#game {
+  display: none;
+  min-height: 100vh;
+  padding: 20px;
+  position: relative;
+}
+
+#score, #progress {
+  position: absolute;
+  top: 10px;
+  background: rgba(255,255,255,0.92);
+  padding: 8px 16px;
+  border-radius: 999px;
+  font-size: 1.05rem;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+}
+
+#score { left: 10px; }
+#progress { right: 10px; }
+
+#question {
+  text-align: center;
+  font-size: clamp(1.5rem, 3vw, 2.1rem);
+  font-weight: 900;
+  margin-top: 78px;
+  padding: 0 12px;
+  color: #24324a;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.7);
+}
+
+#options {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-top: 28px;
+}
+
+.option {
+  background: linear-gradient(135deg, #ffb24d, #ff8c42);
+  border: none;
+  color: #fff;
+  padding: 16px 24px;
+  font-size: 1.15rem;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+  box-shadow: 0 8px 18px rgba(255,140,66,0.25);
+}
+
+.option:hover { transform: translateY(-2px) scale(1.03); }
+.option:disabled { opacity: 0.65; cursor: not-allowed; transform: none; }
+
+#belt-container {
+  position: relative;
+  width: 100%;
+  height: 190px;
+  margin-top: 52px;
+  overflow: hidden;
+  border-radius: 24px;
+  background:
+    linear-gradient(to bottom, rgba(255,255,255,0.0), rgba(255,255,255,0.15)),
+    repeating-linear-gradient(to right, #d0d6de 0 50px, #c3cad4 50px 100px);
+  border: 2px solid rgba(36,50,74,0.08);
+  box-shadow: inset 0 0 0 2px rgba(255,255,255,0.4);
+  animation: beltMove 6s linear infinite;
+}
+
+@keyframes beltMove {
+  from { background-position-x: 0; }
+  to { background-position-x: 100px; }
+}
+
+.trackLine {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 38px;
+  height: 7px;
+  background: linear-gradient(to right, #ffffff, #d9e1ea, #ffffff);
+  opacity: 0.95;
+}
+
+#character-container {
+  position: absolute;
+  bottom: 16px;
+  left: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: left 0.75s ease;
+  z-index: 10;
+}
+
+#character {
+  width: 96px;
+  height: 96px;
+  position: relative;
+  animation: bob 0.9s ease-in-out infinite;
+  filter: drop-shadow(0 8px 10px rgba(0,0,0,0.12));
+}
+
+@keyframes bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+#character .shadow {
+  position: absolute;
+  left: 50%;
+  bottom: 3px;
+  width: 54px;
+  height: 10px;
+  background: rgba(0,0,0,0.12);
+  border-radius: 50%;
+  transform: translateX(-50%);
+  filter: blur(2px);
+}
+
+#character .head {
+  position: absolute;
+  left: 50%;
+  top: 3px;
+  width: 30px;
+  height: 30px;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #ffe8c7 0%, #ffd8b0 60%, #f6c992 100%);
+  border: 2px solid #3a2f2f;
+}
+
+#character .hair {
+  position: absolute;
+  left: 50%;
+  top: 0px;
+  width: 34px;
+  height: 16px;
+  transform: translateX(-50%);
+  background: #4b2f23;
+  border-radius: 16px 16px 10px 10px;
+}
+
+#character .eyes {
+  position: absolute;
+  left: 50%;
+  top: 13px;
+  width: 18px;
+  height: 5px;
+  transform: translateX(-50%);
+  display: flex;
+  justify-content: space-between;
+}
+
+#character .eyes::before,
+#character .eyes::after {
+  content: "";
+  width: 4px;
+  height: 4px;
+  background: #2a2424;
+  border-radius: 50%;
+}
+
+#character .smile {
+  position: absolute;
+  left: 50%;
+  top: 20px;
+  width: 10px;
+  height: 6px;
+  transform: translateX(-50%);
+  border-bottom: 2px solid #2a2424;
+  border-radius: 0 0 10px 10px;
+}
+
+#character .body {
+  position: absolute;
+  left: 50%;
+  top: 35px;
+  width: 42px;
+  height: 34px;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, #66a3ff, #4f7cff);
+  border: 2px solid #3a2f2f;
+  border-radius: 14px;
+}
+
+#character .arms {
+  position: absolute;
+  left: 50%;
+  top: 42px;
+  width: 62px;
+  height: 10px;
+  transform: translateX(-50%);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#character .arms::before,
+#character .arms::after {
+  content: "";
+  width: 22px;
+  height: 8px;
+  background: #3a2f2f;
+  border-radius: 999px;
+}
+
+#character .legs {
+  position: absolute;
+  left: 50%;
+  top: 66px;
+  width: 44px;
+  height: 22px;
+  transform: translateX(-50%);
+  display: flex;
+  justify-content: space-between;
+}
+
+#character .legs::before,
+#character .legs::after {
+  content: "";
+  width: 9px;
+  height: 22px;
+  background: #3a2f2f;
+  border-radius: 999px;
+}
+
+#character .shoes {
+  position: absolute;
+  left: 50%;
+  top: 84px;
+  width: 52px;
+  height: 10px;
+  transform: translateX(-50%);
+  display: flex;
+  justify-content: space-between;
+}
+
+#character .shoes::before,
+#character .shoes::after {
+  content: "";
+  width: 16px;
+  height: 10px;
+  background: #2f6df5;
+  border-radius: 8px 8px 5px 5px;
+}
+
+#character.walk {
+  animation: bob 0.9s ease-in-out infinite, walkBounce 0.35s ease-in-out 2;
+}
+
+@keyframes walkBounce {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-8px) scale(1.02); }
+}
+
+#callout {
+  margin-top: 8px;
+  padding: 8px 12px;
+  background: rgba(255,255,255,0.95);
+  border-radius: 999px;
+  font-size: 1rem;
+  min-width: 140px;
+  text-align: center;
+  visibility: hidden;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+}
+
+#endScreen {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.72);
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+  padding: 20px;
+}
+
+#endCard {
+  background: #fff;
+  border-radius: 22px;
+  padding: 30px;
+  width: min(92%, 500px);
+  text-align: center;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.25);
+}
+
+#endCard h2 {
+  font-size: clamp(1.8rem, 4vw, 2.3rem);
+  margin-bottom: 12px;
+  color: #24324a;
+}
+
+#endCard p {
+  font-size: 1.15rem;
+  margin-bottom: 20px;
+  color: #4b5563;
+}
+
+#restartBtn {
+  border: none;
+  background: linear-gradient(135deg, #ff8c42, #ff6d2d);
+  color: white;
+  padding: 14px 22px;
+  font-size: 1.05rem;
+  border-radius: 14px;
+  cursor: pointer;
+  box-shadow: 0 8px 18px rgba(255,140,66,0.25);
+}
+
+#restartBtn:hover { transform: scale(1.03); }
+
+.correct { background: #a0ffa0 !important; }
+.wrong { background: #ffa0a0 !important; }
+
+@media (max-width: 600px) {
+  #question { margin-top: 84px; }
+  .option { font-size: 1.02rem; padding: 15px 18px; }
+  #belt-container { height: 180px; }
+  #character { transform: scale(0.92); transform-origin: bottom center; }
+}
+</style>
+</head>
+<body>
+
+<div id="splash">
+  <div class="logoText">Prefix & Suffix Factory</div>
+</div>
+
+<div id="game">
+  <div id="score">Score: 0</div>
+  <div id="progress">Question 1 / 12</div>
+
+  <div id="question">Question</div>
+  <div id="options"></div>
+
+  <div id="belt-container">
+    <div class="trackLine"></div>
+    <div id="character-container">
+      <div id="character" aria-label="game character">
+        <div class="shadow"></div>
+        <div class="hair"></div>
+        <div class="head">
+          <div class="eyes"></div>
+          <div class="smile"></div>
+        </div>
+        <div class="body"></div>
+        <div class="arms"></div>
+        <div class="legs"></div>
+        <div class="shoes"></div>
+      </div>
+      <div id="callout"></div>
+    </div>
+  </div>
+</div>
+
+<div id="endScreen">
+  <div id="endCard">
+    <h2>Great Job!</h2>
+    <p id="finalScoreText"></p>
+    <button id="restartBtn">Play Again</button>
+  </div>
+</div>
+
+<audio id="correctSound" src="assets/correct.mp3" preload="auto"></audio>
+<audio id="wrongSound" src="assets/wrong.mp3" preload="auto"></audio>
+<audio id="applause" src="assets/freesound_community-claps-44774.mp3" preload="auto"></audio>
+
+<script>
+const splash = document.getElementById('splash');
+const game = document.getElementById('game');
+const questionEl = document.getElementById('question');
+const optionsEl = document.getElementById('options');
+const callout = document.getElementById('callout');
+const scoreEl = document.getElementById('score');
+const progressEl = document.getElementById('progress');
+const endScreen = document.getElementById('endScreen');
+const finalScoreText = document.getElementById('finalScoreText');
+const restartBtn = document.getElementById('restartBtn');
+const characterContainer = document.getElementById('character-container');
+const character = document.getElementById('character');
+const correctSound = document.getElementById('correctSound');
+const wrongSound = document.getElementById('wrongSound');
+const applause = document.getElementById('applause');
+
+let score = 0;
+let usedIndices = [];
+let currentQ = -1;
+let attemptsLeft = 2;
+let currentLocked = false;
+let questionPositions = [];
+let correctCount = 0;
+
+const questions = [
+  { q: "Add a prefix to 'happy' to mean 'not happy'", options: ["un-", "re-", "dis-", "pre-"], answer: "un-" },
+  { q: "Add a prefix to 'place' to mean 'again'", options: ["re-", "un-", "dis-", "mis-"], answer: "re-" },
+  { q: "Add a prefix to 'appear' to mean 'not appear'", options: ["dis-", "re-", "un-", "pre-"], answer: "dis-" },
+  { q: "Add a prefix to 'legal' to mean 'not legal'", options: ["il-", "un-", "dis-", "in-"], answer: "il-" },
+  { q: "Add a prefix to 'correct' to mean 'wrong'", options: ["in-", "un-", "dis-", "re-"], answer: "in-" },
+  { q: "Add a suffix to 'help' to make a noun", options: ["-er", "-ful", "-less", "-ing"], answer: "-er" },
+  { q: "Add a suffix to 'joy' to make an adjective", options: ["-ful", "-less", "-er", "-ly"], answer: "-ful" },
+  { q: "Add a suffix to 'hope' to make a noun", options: ["-ful", "-less", "-ness", "-ly"], answer: "-ness" },
+  { q: "Add a suffix to 'quick' to make an adverb", options: ["-ly", "-ness", "-ful", "-er"], answer: "-ly" },
+  { q: "Add a suffix to 'teach' to mean 'one who teaches'", options: ["-er", "-ness", "-ly", "-ful"], answer: "-er" },
+  { q: "Add a suffix to 'care' to mean 'without care'", options: ["-ful", "-less", "-ly", "-ness"], answer: "-less" },
+  { q: "Add a suffix to 'friend' to make it 'friendly'", options: ["-ly", "-ness", "-er", "-ful"], answer: "-ly" }
+];
+
+function safePlay(audioEl) {
+  if (!audioEl) return;
+  audioEl.currentTime = 0;
+  const p = audioEl.play();
+  if (p && typeof p.catch === 'function') p.catch(() => {});
+}
+
+function setupPositions() {
+  const belt = document.getElementById('belt-container');
+  const maxX = Math.max(0, belt.clientWidth - 120);
+  const steps = Math.max(1, questions.length - 1);
+  questionPositions = [];
+  for (let i = 0; i < questions.length; i++) {
+    questionPositions.push(25 + (maxX * i / steps));
+  }
+  characterContainer.style.left = questionPositions[0] + 'px';
+}
+
+function startGame() {
+  score = 0;
+  usedIndices = [];
+  currentQ = -1;
+  attemptsLeft = 2;
+  currentLocked = false;
+  correctCount = 0;
+  endScreen.style.display = 'none';
+  scoreEl.textContent = 'Score: 0';
+  progressEl.textContent = 'Question 1 / ' + questions.length;
+  setTimeout(() => {
+    setupPositions();
+    showQuestion();
+  }, 50);
+}
+
+function showQuestion() {
+  if (usedIndices.length >= questions.length) {
+    finishGame();
+    return;
+  }
+
+  attemptsLeft = 2;
+  currentLocked = false;
+
+  const available = questions.map((_, i) => i).filter(i => !usedIndices.includes(i));
+  const selectedIndex = available[Math.floor(Math.random() * available.length)];
+  usedIndices.push(selectedIndex);
+  currentQ = selectedIndex;
+
+  const q = questions[selectedIndex];
+  questionEl.textContent = q.q;
+  optionsEl.innerHTML = '';
+  callout.style.visibility = 'hidden';
+  callout.textContent = '';
+
+  progressEl.textContent = `Question ${usedIndices.length} / ${questions.length}`;
+
+  q.options.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.textContent = opt;
+    btn.className = 'option';
+    btn.onclick = () => checkAnswer(opt, btn);
+    optionsEl.appendChild(btn);
+  });
+}
+
+function moveCharacterForward() {
+  const stepIndex = Math.min(correctCount, questionPositions.length - 1);
+  characterContainer.style.left = questionPositions[stepIndex] + 'px';
+  character.classList.remove('walk');
+  void character.offsetWidth;
+  character.classList.add('walk');
+}
+
+function checkAnswer(selected, btn) {
+  if (currentLocked) return;
+
+  const q = questions[currentQ];
+  const buttons = optionsEl.querySelectorAll('.option');
+  buttons.forEach(b => b.disabled = true);
+
+  if (selected === q.answer) {
+    score++;
+    correctCount++;
+    scoreEl.textContent = `Score: ${score}`;
+    callout.textContent = 'Right Answer!';
+    callout.className = '';
+    callout.style.background = '#a0ffa0';
+    callout.style.visibility = 'visible';
+
+    safePlay(correctSound);
+    safePlay(applause);
+
+    btn.classList.add('correct');
+    currentLocked = true;
+    moveCharacterForward();
+
+    setTimeout(() => {
+      callout.style.visibility = 'hidden';
+      showQuestion();
+    }, 1200);
+  } else {
+    attemptsLeft--;
+    safePlay(wrongSound);
+    btn.classList.add('wrong');
+
+    if (attemptsLeft > 0) {
+      callout.textContent = `Try Again! Attempts left: ${attemptsLeft}`;
+      callout.className = '';
+      callout.style.background = '#ffa0a0';
+      callout.style.visibility = 'visible';
+
+      setTimeout(() => {
+        callout.style.visibility = 'hidden';
+        buttons.forEach(b => b.disabled = false);
+      }, 1000);
+    } else {
+      callout.textContent = `Correct Answer: ${q.answer}`;
+      callout.className = '';
+      callout.style.background = '#ffa0a0';
+      callout.style.visibility = 'visible';
+      currentLocked = true;
+
+      setTimeout(() => {
+        callout.style.visibility = 'hidden';
+        showQuestion();
+      }, 1600);
+    }
+  }
+}
+
+function finishGame() {
+  game.style.display = 'none';
+  endScreen.style.display = 'flex';
+  finalScoreText.textContent = `You scored ${score} out of ${questions.length}.`;
+}
+
+restartBtn.onclick = () => {
+  game.style.display = 'block';
+  startGame();
+};
+
+window.addEventListener('resize', setupPositions);
+
+setTimeout(() => {
+  splash.style.display = 'none';
+  game.style.display = 'block';
+  startGame();
+}, 1800);
+</script>
+</body>
+</html>
