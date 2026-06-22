@@ -12,21 +12,18 @@
       background: radial-gradient(circle at top, #fff9fd 0%, #f7f3ff 45%, #fff4f8 100%);
       overflow: hidden;
     }
-
     #game {
       position: relative;
       width: 1280px;
       height: 720px;
       margin: 0 auto;
     }
-
     #splash, #instructionsScreen, #playArea {
       position: absolute;
       inset: 0;
       width: 1280px;
       height: 720px;
     }
-
     #splash {
       display: flex;
       align-items: center;
@@ -34,7 +31,6 @@
       background: radial-gradient(circle at center, #ffffff 0%, #fff0fb 45%, #f1ddff 100%);
       z-index: 30;
     }
-
     #splashCard {
       width: 360px;
       height: 360px;
@@ -46,21 +42,19 @@
       justify-content: center;
       flex-direction: column;
       gap: 18px;
+      overflow: hidden;
     }
-
     #splashLogo {
       width: 240px;
       height: 240px;
       object-fit: contain;
     }
-
     #splashText {
       font-size: 24px;
       font-weight: 900;
       color: #5b2b82;
       text-align: center;
     }
-
     #instructionsScreen {
       display: none;
       align-items: center;
@@ -69,7 +63,6 @@
       background: radial-gradient(circle at top, #fff9fd 0%, #f7f3ff 45%, #fff4f8 100%);
       z-index: 20;
     }
-
     #instructionCard {
       width: 760px;
       padding: 30px 34px;
@@ -78,20 +71,17 @@
       box-shadow: 0 10px 22px rgba(0,0,0,0.12);
       text-align: center;
     }
-
     #instructionCard h2 {
       margin: 0 0 12px;
       font-size: 34px;
       color: #5b2b82;
     }
-
     #instructionCard p {
       margin: 12px 0;
       font-size: 22px;
       color: #333;
       font-weight: 700;
     }
-
     #startBtn {
       margin-top: 18px;
       padding: 14px 28px;
@@ -103,12 +93,10 @@
       font-weight: 900;
       cursor: pointer;
     }
-
     #playArea {
       display: none;
       z-index: 10;
     }
-
     h1 {
       position: absolute;
       top: 10px;
@@ -120,7 +108,6 @@
       font-size: 40px;
       text-shadow: 0 2px 0 rgba(255,255,255,0.75);
     }
-
     #subtitle {
       position: absolute;
       top: 60px;
@@ -131,7 +118,6 @@
       font-size: 18px;
       font-weight: 700;
     }
-
     #instructions {
       position: absolute;
       top: 92px;
@@ -146,7 +132,6 @@
       box-shadow: 0 4px 12px rgba(0,0,0,0.08);
       border: 2px solid #e3c9ff;
     }
-
     #status {
       position: absolute;
       top: 20px;
@@ -158,7 +143,6 @@
       padding: 8px 14px;
       border-radius: 14px;
     }
-
     #wordBox {
       position: absolute;
       top: 165px;
@@ -174,7 +158,6 @@
       min-width: 280px;
       text-align: center;
     }
-
     #feedback {
       position: absolute;
       top: 218px;
@@ -186,17 +169,6 @@
       text-align: center;
       height: 30px;
     }
-
-    #soundHint {
-      position: absolute;
-      top: 252px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 14px;
-      color: #7a5ca5;
-      font-weight: 700;
-    }
-
     .cone {
       position: absolute;
       bottom: 48px;
@@ -204,7 +176,6 @@
       height: 280px;
       filter: drop-shadow(0 10px 10px rgba(0,0,0,0.12));
     }
-
     .coneTop {
       width: 190px;
       height: 115px;
@@ -214,7 +185,6 @@
       overflow: hidden;
       border: 3px solid rgba(120,70,20,0.35);
     }
-
     .coneBody {
       width: 140px;
       height: 190px;
@@ -225,45 +195,25 @@
       position: relative;
       z-index: 1;
     }
-
-    .cone::after {
-      content: "";
-      position: absolute;
-      left: 50%;
-      top: 20px;
-      transform: translateX(-50%);
-      width: 120px;
-      height: 8px;
-      border-radius: 99px;
-      background: rgba(255,255,255,0.32);
-      box-shadow: 0 18px 0 rgba(255,255,255,0.20), 0 36px 0 rgba(255,255,255,0.16);
-      z-index: 3;
-      pointer-events: none;
-    }
-
     #conePos { left: 210px; }
     #coneComp { left: 470px; }
     #coneSup { left: 830px; }
-
     #conePos .coneTop { background: linear-gradient(180deg, #fff1b8 0%, #f4c24f 100%); }
     #coneComp .coneTop { background: linear-gradient(180deg, #d7f5f8 0%, #8cdce4 100%); }
     #coneSup .coneTop { background: linear-gradient(180deg, #ffd2e4 0%, #ff9cc3 100%); }
-
     .coneLabel {
       position: absolute;
-      bottom: 10px;
+      bottom: 8px;
       width: 190px;
       text-align: center;
-      font-size: 28px;
+      font-size: 30px;
       font-weight: 1000;
       text-shadow: 0 2px 0 rgba(255,255,255,0.8);
       letter-spacing: 0.5px;
     }
-
     #labelPos { left: 210px; color: #875400; }
     #labelComp { left: 470px; color: #1e676e; }
     #labelSup { left: 830px; color: #9b295b; }
-
     #scoop {
       position: absolute;
       width: 235px;
@@ -276,9 +226,6 @@
       z-index: 10;
       filter: drop-shadow(0 10px 10px rgba(0,0,0,0.15));
     }
-
-    #scoop:active { cursor: grabbing; }
-
     #scoopBall {
       position: absolute;
       width: 235px;
@@ -288,52 +235,6 @@
       border: 4px solid #8b5a2b;
       overflow: hidden;
     }
-
-    #scoopBall::before {
-      content: "";
-      position: absolute;
-      left: 28px;
-      top: 22px;
-      width: 178px;
-      height: 106px;
-      border-radius: 50%;
-      background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.65) 0%, rgba(255,255,255,0) 70%);
-      opacity: 0.85;
-    }
-
-    .sprinkle {
-      position: absolute;
-      width: 13px;
-      height: 4px;
-      border-radius: 999px;
-      transform: rotate(var(--r));
-      top: var(--t);
-      left: var(--l);
-      background: var(--c);
-    }
-
-    #cherry {
-      position: absolute;
-      top: -6px;
-      left: 104px;
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      background: radial-gradient(circle at 30% 30%, #ffb6b6 0%, #e0002a 60%, #8e0015 100%);
-      box-shadow: 0 3px 5px rgba(0,0,0,0.22);
-    }
-
-    #stem {
-      position: absolute;
-      top: -24px;
-      left: 114px;
-      width: 4px;
-      height: 22px;
-      background: #6e4b1f;
-      transform: rotate(-18deg);
-      border-radius: 3px;
-    }
-
     #scoopText {
       position: absolute;
       top: 58px;
@@ -348,7 +249,6 @@
       z-index: 5;
       text-shadow: 0 1px 0 rgba(255,255,255,0.7);
     }
-
     #restartBtn {
       position: absolute;
       top: 270px;
@@ -363,7 +263,6 @@
       font-size: 18px;
       font-weight: 900;
       cursor: pointer;
-      box-shadow: 0 6px 12px rgba(0,0,0,0.15);
     }
   </style>
 </head>
@@ -371,7 +270,7 @@
   <div id="game">
     <div id="splash">
       <div id="splashCard">
-        <img id="splashLogo" src="assets/logo.png" alt="Innovine logo" />
+        <img id="splashLogo" src="assets/logo.png" alt="Innovine logo">
         <div id="splashText">Innovine</div>
       </div>
     </div>
@@ -393,7 +292,6 @@
       <div id="status">Score: 0   Attempts: 2</div>
       <div id="wordBox"></div>
       <div id="feedback"></div>
-      <div id="soundHint">Sound starts after your first drag</div>
 
       <div id="conePos" class="cone"><div class="coneTop"></div><div class="coneBody"></div></div>
       <div id="coneComp" class="cone"><div class="coneTop"></div><div class="coneBody"></div></div>
@@ -405,25 +303,12 @@
 
       <div id="scoop">
         <div id="scoopBall">
-          <div class="sprinkle" style="--l:34px; --t:28px; --r:18deg; --c:#ff6b6b;"></div>
-          <div class="sprinkle" style="--l:68px; --t:52px; --r:-22deg; --c:#3ec8ff;"></div>
-          <div class="sprinkle" style="--l:104px; --t:36px; --r:35deg; --c:#ffb703;"></div>
-          <div class="sprinkle" style="--l:142px; --t:58px; --r:-15deg; --c:#7bd389;"></div>
-          <div class="sprinkle" style="--l:168px; --t:26px; --r:28deg; --c:#b38bff;"></div>
-          <div class="sprinkle" style="--l:48px; --t:82px; --r:8deg; --c:#ff8fab;"></div>
-          <div class="sprinkle" style="--l:130px; --t:88px; --r:-10deg; --c:#00bbf9;"></div>
+          <div id="scoopText"></div>
         </div>
-        <div id="stem"></div>
-        <div id="cherry"></div>
-        <div id="scoopText"></div>
       </div>
 
       <button id="restartBtn">Play Again</button>
     </div>
-
-    <audio id="correctSound" src="assets/correct.mp3"></audio>
-    <audio id="wrongSound" src="assets/wrong.mp3"></audio>
-    <audio id="clapSound" src="assets/freesound_community-claps-44774.mp3"></audio>
   </div>
 
   <script>
@@ -456,30 +341,11 @@
     const scoopText = document.getElementById("scoopText");
     const restartBtn = document.getElementById("restartBtn");
 
-    const correctSound = document.getElementById("correctSound");
-    const wrongSound = document.getElementById("wrongSound");
-    const clapSound = document.getElementById("clapSound");
-
     let score = 0, attempts = 2, currentWord = "", currentDegree = "";
-    let wordList = [], dragging = false, offsetX = 0, offsetY = 0, audioUnlocked = false;
+    let wordList = [], dragging = false, offsetX = 0, offsetY = 0;
 
     function updateStatus() {
       status.textContent = `Score: ${score}   Attempts: ${attempts}`;
-    }
-
-    function unlockAudio() {
-      if (audioUnlocked) return;
-      audioUnlocked = true;
-      [correctSound, wrongSound, clapSound].forEach(a => {
-        a.play().then(() => { a.pause(); a.currentTime = 0; }).catch(() => {});
-      });
-    }
-
-    function playSound(audio) {
-      try {
-        audio.currentTime = 0;
-        audio.play().catch(() => {});
-      } catch (e) {}
     }
 
     function shuffle(arr) {
@@ -503,7 +369,6 @@
       wordList = shuffle([...words]);
       restartBtn.style.display = "none";
       feedback.textContent = "";
-      feedback.style.color = "#b22222";
       wordBox.textContent = "";
       scoop.style.display = "block";
       updateStatus();
@@ -514,8 +379,6 @@
       if (wordList.length === 0) {
         wordBox.textContent = "Game Complete!";
         feedback.textContent = `Final Score: ${score}/13`;
-        feedback.style.color = "#1b5e20";
-        playSound(clapSound);
         scoop.style.display = "none";
         restartBtn.style.display = "block";
         return;
@@ -524,7 +387,6 @@
       currentDegree = degrees[currentWord];
       wordBox.textContent = currentWord.toUpperCase();
       feedback.textContent = "Drag the scoop!";
-      feedback.style.color = "#6b5b95";
       scoopText.textContent = currentWord;
       scoop.style.left = "522px";
       scoop.style.top = "248px";
@@ -540,15 +402,10 @@
       return null;
     }
 
-    startBtn.addEventListener("click", () => {
-      unlockAudio();
-      startGame();
-    });
-
+    startBtn.addEventListener("click", startGame);
     setTimeout(showInstructions, 3000);
 
     scoop.addEventListener("pointerdown", (e) => {
-      unlockAudio();
       dragging = true;
       scoop.setPointerCapture(e.pointerId);
       const rect = scoop.getBoundingClientRect();
@@ -571,19 +428,14 @@
       if (choice === currentDegree) {
         score++;
         feedback.textContent = "Yay! Correct!";
-        feedback.style.color = "#1b5e20";
-        playSound(correctSound);
         setTimeout(nextWord, 700);
       } else {
         attempts--;
         feedback.textContent = "Oops! Try again!";
-        feedback.style.color = "#b22222";
-        playSound(wrongSound);
         if (attempts <= 0) {
           wordBox.textContent = "Game Over!";
           feedback.textContent = `Final Score: ${score}/13`;
           scoop.style.display = "none";
-          playSound(clapSound);
           restartBtn.style.display = "block";
         }
       }
