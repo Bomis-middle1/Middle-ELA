@@ -20,8 +20,8 @@
     }
     #logo {
       position: absolute;
-      left: 24px;
-      top: 18px;
+      left: 18px;
+      top: 14px;
       width: 155px;
       height: 155px;
       object-fit: contain;
@@ -29,13 +29,13 @@
     }
     h1 {
       position: absolute;
-      top: 12px;
+      top: 10px;
       left: 0;
       width: 100%;
       text-align: center;
       margin: 0;
       color: #5b2b82;
-      font-size: 38px;
+      font-size: 40px;
       text-shadow: 0 2px 0 rgba(255,255,255,0.75);
     }
     #subtitle {
@@ -53,7 +53,7 @@
       top: 92px;
       left: 50%;
       transform: translateX(-50%);
-      background: rgba(255,255,255,0.82);
+      background: rgba(255,255,255,0.84);
       color: #333;
       padding: 10px 18px;
       border-radius: 18px;
@@ -63,12 +63,12 @@
     }
     #status {
       position: absolute;
-      top: 25px;
-      right: 40px;
+      top: 20px;
+      right: 35px;
       color: #2f4f4f;
       font-size: 20px;
       font-weight: 700;
-      background: rgba(255,255,255,0.7);
+      background: rgba(255,255,255,0.74);
       padding: 8px 14px;
       border-radius: 14px;
     }
@@ -82,9 +82,9 @@
       color: #222;
       padding: 12px 26px;
       border-radius: 18px;
-      background: rgba(255,255,255,0.92);
+      background: rgba(255,255,255,0.95);
       box-shadow: 0 6px 14px rgba(0,0,0,0.08);
-      min-width: 260px;
+      min-width: 280px;
       text-align: center;
     }
     #feedback {
@@ -94,9 +94,18 @@
       transform: translateX(-50%);
       font-size: 22px;
       font-weight: 900;
-      min-width: 200px;
+      min-width: 220px;
       text-align: center;
       height: 30px;
+    }
+    #soundHint {
+      position: absolute;
+      top: 252px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 14px;
+      color: #7a5ca5;
+      font-weight: 700;
     }
     .cone {
       position: absolute;
@@ -156,12 +165,13 @@
     #labelPos { left: 210px; color: #875400; }
     #labelComp { left: 470px; color: #1e676e; }
     #labelSup { left: 830px; color: #9b295b; }
+
     #scoop {
       position: absolute;
-      width: 210px;
-      height: 165px;
-      left: 535px;
-      top: 265px;
+      width: 235px;
+      height: 184px;
+      left: 522px;
+      top: 248px;
       cursor: grab;
       user-select: none;
       touch-action: none;
@@ -171,27 +181,27 @@
     #scoop:active { cursor: grabbing; }
     #scoopBall {
       position: absolute;
-      width: 210px;
-      height: 140px;
-      border-radius: 50% 50% 45% 45%;
-      background: radial-gradient(circle at 30% 25%, #ffffff 0%, #fffef8 28%, #ffe6f1 62%, #f6b8da 100%);
+      width: 235px;
+      height: 158px;
+      border-radius: 50% 50% 46% 46%;
+      background: radial-gradient(circle at 30% 25%, #ffffff 0%, #fffdf7 28%, #ffe6f1 62%, #f6b8da 100%);
       border: 4px solid #8b5a2b;
       overflow: hidden;
     }
     #scoopBall::before {
       content: "";
       position: absolute;
-      left: 25px;
+      left: 28px;
       top: 22px;
-      width: 155px;
-      height: 92px;
+      width: 178px;
+      height: 106px;
       border-radius: 50%;
-      background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0) 70%);
-      opacity: 0.8;
+      background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.65) 0%, rgba(255,255,255,0) 70%);
+      opacity: 0.85;
     }
     .sprinkle {
       position: absolute;
-      width: 12px;
+      width: 13px;
       height: 4px;
       border-radius: 999px;
       transform: rotate(var(--r));
@@ -202,35 +212,36 @@
     #cherry {
       position: absolute;
       top: -6px;
-      left: 94px;
-      width: 26px;
-      height: 26px;
+      left: 104px;
+      width: 28px;
+      height: 28px;
       border-radius: 50%;
       background: radial-gradient(circle at 30% 30%, #ffb6b6 0%, #e0002a 60%, #8e0015 100%);
       box-shadow: 0 3px 5px rgba(0,0,0,0.22);
     }
     #stem {
       position: absolute;
-      top: -22px;
-      left: 103px;
+      top: -24px;
+      left: 114px;
       width: 4px;
-      height: 20px;
+      height: 22px;
       background: #6e4b1f;
-      transform: rotate(-22deg);
+      transform: rotate(-18deg);
       border-radius: 3px;
     }
     #scoopText {
       position: absolute;
-      top: 52px;
+      top: 58px;
       left: 0;
-      width: 210px;
+      width: 235px;
       text-align: center;
-      font-size: 16px;
+      font-size: 18px;
       font-weight: 900;
       color: #222;
-      padding: 0 14px;
-      line-height: 1.15;
+      padding: 0 16px;
+      line-height: 1.12;
       z-index: 5;
+      text-shadow: 0 1px 0 rgba(255,255,255,0.7);
     }
     #restartBtn {
       position: absolute;
@@ -248,17 +259,19 @@
       cursor: pointer;
       box-shadow: 0 6px 12px rgba(0,0,0,0.15);
     }
+    #restartBtn:hover { transform: translateX(-50%) scale(1.03); }
   </style>
 </head>
 <body>
   <div id="game">
-    <img id="logo" src="./Middle-ELA/G5/chp10/adjectives_degreesofcomparison/assets/logo.png" alt="logo" onerror="this.style.display='none'">
+    <img id="logo" src="assets/logo.png" alt="logo" onerror="this.style.display='none'">
     <h1>Degrees of Comparison</h1>
     <div id="subtitle">Ice Cream Scoop Sorting Game</div>
     <div id="instructions">Drag the scoop to the correct cone. You have 2 chances.</div>
     <div id="status">Score: 0   Attempts: 2</div>
     <div id="wordBox"></div>
     <div id="feedback"></div>
+    <div id="soundHint">Sound starts after your first drag</div>
 
     <div id="conePos" class="cone"><div class="coneTop"></div><div class="coneBody"></div></div>
     <div id="coneComp" class="cone"><div class="coneTop"></div><div class="coneBody"></div></div>
@@ -271,10 +284,12 @@
     <div id="scoop">
       <div id="scoopBall">
         <div class="sprinkle" style="--l:34px; --t:28px; --r:18deg; --c:#ff6b6b;"></div>
-        <div class="sprinkle" style="--l:62px; --t:50px; --r:-22deg; --c:#3ec8ff;"></div>
-        <div class="sprinkle" style="--l:96px; --t:34px; --r:35deg; --c:#ffb703;"></div>
-        <div class="sprinkle" style="--l:130px; --t:56px; --r:-15deg; --c:#7bd389;"></div>
-        <div class="sprinkle" style="--l:152px; --t:24px; --r:28deg; --c:#b38bff;"></div>
+        <div class="sprinkle" style="--l:68px; --t:52px; --r:-22deg; --c:#3ec8ff;"></div>
+        <div class="sprinkle" style="--l:104px; --t:36px; --r:35deg; --c:#ffb703;"></div>
+        <div class="sprinkle" style="--l:142px; --t:58px; --r:-15deg; --c:#7bd389;"></div>
+        <div class="sprinkle" style="--l:168px; --t:26px; --r:28deg; --c:#b38bff;"></div>
+        <div class="sprinkle" style="--l:48px; --t:82px; --r:8deg; --c:#ff8fab;"></div>
+        <div class="sprinkle" style="--l:130px; --t:88px; --r:-10deg; --c:#00bbf9;"></div>
       </div>
       <div id="stem"></div>
       <div id="cherry"></div>
@@ -284,9 +299,9 @@
     <button id="restartBtn">Play Again</button>
   </div>
 
-  <audio id="correctSound" src="./Middle-ELA/G5/chp10/adjectives_degreesofcomparison/assets/correct.mp3"></audio>
-  <audio id="wrongSound" src="./Middle-ELA/G5/chp10/adjectives_degreesofcomparison/assets/wrong.mp3"></audio>
-  <audio id="clapSound" src="./Middle-ELA/G5/chp10/adjectives_degreesofcomparison/assets/freesound_community-claps-44774.mp3"></audio>
+  <audio id="correctSound" src="assets/correct.mp3"></audio>
+  <audio id="wrongSound" src="assets/wrong.mp3"></audio>
+  <audio id="clapSound" src="assets/freesound_community-claps-44774.mp3"></audio>
 
   <script>
     const words = ["tallest","better","worse","farther","most","more expensive","noisier","kinder","prettiest","more careful","best","warmer","smaller"];
@@ -370,15 +385,14 @@
         restartBtn.style.display = "block";
         return;
       }
-
       currentWord = wordList.shift();
       currentDegree = degrees[currentWord];
       wordBox.textContent = currentWord.toUpperCase();
       feedback.textContent = "Drag the scoop!";
       feedback.style.color = "#6b5b95";
       scoopText.textContent = currentWord;
-      scoop.style.left = "535px";
-      scoop.style.top = "265px";
+      scoop.style.left = "522px";
+      scoop.style.top = "248px";
     }
 
     function getConeChoice(x, y) {
@@ -431,7 +445,6 @@
           restartBtn.style.display = "block";
         }
       }
-
       updateStatus();
     });
 
