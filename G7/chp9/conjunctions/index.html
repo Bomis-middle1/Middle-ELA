@@ -86,13 +86,13 @@ body, html {
 </head>
 <body>
 
-<audio id="correctSound" src="Middle-ELA/G7/chp7/modals/assets/correct.mp3" preload="auto"></audio>
-<audio id="wrongSound" src="Middle-ELA/G7/chp7/modals/assets/wrong.mp3" preload="auto"></audio>
-<audio id="clapSound" src="Middle-ELA/G7/chp7/modals/assets/clapping.mp3" preload="auto"></audio>
+<audio id="correctSound" src="Middle-ELA/G7/chp9/conjunctions/assets/correct.mp3" preload="auto"></audio>
+<audio id="wrongSound" src="Middle-ELA/G7/chp9/conjunctions/assets/wrong.mp3" preload="auto"></audio>
+<audio id="clapSound" src="Middle-ELA/G7/chp9/conjunctions/assets/clapping.mp3" preload="auto"></audio>
 
 <div id="logoScreen" class="screen active">
     <div class="logo-container">
-        <img src="Middle-ELA/G7/chp7/modals/assets/innovine-logo.png" alt="Logo">
+        <img src="Middle-ELA/G7/chp9/conjunctions/assets/innovine-logo.png" alt="Logo">
     </div>
 </div>
 
@@ -118,6 +118,7 @@ body, html {
 </div>
 
 <script>
+// Content Matrix
 const mcqs = [
     {q:'Find the participle: "The broken skateboard lay beside the ramp."',opts:["lay","beside","broken","ramp"],ans:"broken"},
     {q:'Which sentence contains a Conditional Conjunction?',opts:["I stayed home because it rained.","If you find the key, open the chest.","The player was tired but won.","The bike is faster than the scooter."],ans:"If you find the key, open the chest."},
@@ -155,7 +156,7 @@ const player = {
     targetX: 0,
     width: 70,
     height: 45,
-    speed: 25 
+    speed: 25 // Snappy slide transitions
 };
 
 let targetOptionDiamonds = [];
@@ -188,7 +189,7 @@ function resizeViewports() {
 window.addEventListener("resize", resizeViewports);
 
 /* ==========================================================================
-   INPUT HANDLING (CLICK DETECTION)
+   ROBUST INTERACTION HANDLING (CLICK DETECTION)
    ========================================================================== */
 canvas.addEventListener("click", handleInputTouch);
 canvas.addEventListener("touchstart", function(e) {
@@ -210,12 +211,14 @@ function handleInputTouch(e) {
         return;
     }
 
+    // Don't register clicks if laser is currently firing
     if (laserBeamActive) return;
 
     const rect = canvas.getBoundingClientRect();
     const clickX = e.clientX - rect.left;
     const clickY = e.clientY - rect.top;
 
+    // Check which diamond shape was clicked directly
     targetOptionDiamonds.forEach(diamond => {
         if (diamond.disabled) return;
 
@@ -224,7 +227,9 @@ function handleInputTouch(e) {
         const dx = Math.abs(clickX - diamond.x);
         const dy = Math.abs(clickY - diamond.y);
 
+        // Precision geometry validation range mapping
         if ((dx / halfW) + (dy / halfH) <= 1) {
+            // Command the ship to navigate right under this diamond option
             player.targetX = diamond.x - player.width / 2;
             targetedDiamond = diamond;
         }
@@ -232,7 +237,7 @@ function handleInputTouch(e) {
 }
 
 /* ==========================================================================
-   GAME ENGINE CYCLES
+   GAME GAME ENGINE CYCLES
    ========================================================================== */
 function startGameArena() {
     document.getElementById('instructionScreen').classList.remove('active');
@@ -279,12 +284,14 @@ function setupQuestionFloor() {
 function animateEngineLoop() {
     if(!gameActive) return;
     
+    // Smooth Interpolation Ship Horizontal Slide Math
     const diffX = player.targetX - player.x;
     if (Math.abs(diffX) > 4) {
         player.x += Math.sign(diffX) * player.speed;
     } else {
         player.x = player.targetX;
         
+        // If arrived under target option, engage laser fire!
         if (targetedDiamond && !laserBeamActive && !showContinuePrompt) {
             laserX = player.x + player.width / 2;
             laserBeamActive = true;
@@ -351,7 +358,7 @@ function restartEntireGame() {
 function renderGraphicsWorkspace() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
-    // Starfield Background
+    // 1. Starfield Background
     ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
     backgroundStars.forEach(s => {
         ctx.beginPath();
@@ -359,7 +366,7 @@ function renderGraphicsWorkspace() {
         ctx.fill();
     });
     
-    // Tractor Beam Laser
+    // 2. Tractor Beam Scanner Laser Light
     if (laserBeamActive) {
         ctx.save();
         ctx.strokeStyle = `rgba(0, 255, 204, ${laserAlpha})`;
@@ -373,7 +380,7 @@ function renderGraphicsWorkspace() {
         ctx.restore();
     }
     
-    // HUD Display Banner
+    // 3. HUD Display Banner
     ctx.fillStyle = "rgba(20, 15, 61, 0.85)";
     ctx.fillRect(0, 0, canvas.width, 70);
     ctx.strokeStyle = "#00ffcc";
@@ -393,7 +400,7 @@ function renderGraphicsWorkspace() {
     ctx.textAlign = "right";
     ctx.fillText(`SHIELD: ${hearts}`, canvas.width - 25, 42);
     
-    // Question Banner
+    // 4. Question Container Frame Banner
     const activeData = activeQuizList[currentIndex];
     ctx.fillStyle = "rgba(10, 5, 36, 0.95)";
     ctx.strokeStyle = "#ffca3a";
@@ -409,7 +416,7 @@ function renderGraphicsWorkspace() {
     ctx.textAlign = "center";
     ctx.fillText(activeData.q, canvas.width / 2, 146, qw - 40);
     
-    // Diamonds
+    // 5. Render Floating Option Diamonds
     targetOptionDiamonds.forEach(diamond => {
         ctx.save();
         ctx.translate(diamond.x, diamond.y);
@@ -434,7 +441,7 @@ function renderGraphicsWorkspace() {
         ctx.fillText(diamond.text, diamond.x, diamond.y + 5, diamond.width - 25);
     });
     
-    // Notifications Banner
+    // 6. Action Alerts Status Message Banner
     if(feedbackMessage !== "") {
         ctx.fillStyle = feedbackMessage.startsWith("✨") ? "#00ffcc" : "#ff595e";
         ctx.font = "bold 17px sans-serif";
@@ -442,7 +449,7 @@ function renderGraphicsWorkspace() {
         ctx.fillText(feedbackMessage, canvas.width / 2, canvas.height - 120);
     }
     
-    // Render Blue Space Ship
+    // 7. Render Blue Space Ship
     ctx.save();
     ctx.shadowBlur = 12;
     ctx.shadowColor = "#00b4d8";
