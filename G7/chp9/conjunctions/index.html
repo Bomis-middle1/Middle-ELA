@@ -2,391 +2,302 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-select=none">
-<title>Conjunction Detective Quiz</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Conjunction Detective Quiz (Fixed)</title>
+
 <style>
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    font-family: 'Segoe UI', sans-serif;
-    user-select: none;
-    -webkit-tap-highlight-color: transparent;
+*{
+box-sizing:border-box;
+margin:0;
+padding:0;
+font-family:'Segoe UI',sans-serif;
+user-select:none;
 }
 
-body, html {
-    width: 100vw;
-    height: 100vh;
-    overflow: hidden;
-    background: #060414;
-    color: #fff;
+body,html{
+width:100%;
+height:100%;
+overflow:hidden;
+background:#060414;
+color:#fff;
 }
 
-/* SCREEN MANAGEMENT */
-.screen {
-    display: none;
-    position: fixed;
-    inset: 0;
-    width: 100vw;
-    height: 100vh;
-    z-index: 10;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+/* SCREENS */
+.screen{
+display:none;
+position:fixed;
+inset:0;
+justify-content:center;
+align-items:center;
+flex-direction:column;
+text-align:center;
 }
-.screen.active { display: flex; }
+.screen.active{display:flex;}
 
-/* LOGO INTRO SCREEN (STRICT 5s) */
-#logoScreen { background: #ffffff; z-index: 9999; }
-.logo-container { width: 280px; max-width: 80%; }
-.logo-container img { width: 100%; height: auto; display: block; }
-
-/* INSTRUCTIONS SCREEN */
-#instructionScreen { background: #0c0728; }
-.panel-card {
-    background: rgba(20, 15, 61, 0.95);
-    border: 2px solid #00ffcc;
-    border-radius: 24px;
-    padding: 35px 24px;
-    max-width: 480px;
-    width: 90%;
-    text-align: center;
-    box-shadow: 0 0 30px rgba(0, 255, 204, 0.3);
+/* LOGO */
+#logoScreen{
+background:#fff;
+z-index:9999;
 }
-.panel-card h1 { color: #ffd60a; margin-bottom: 15px; font-size: 26px; }
-.panel-card p { color: #a49fc4; line-height: 1.6; margin-bottom: 25px; }
-
-/* GAME APP ENGINE INTERFACE */
-#gameScreen { background: #060414; }
-#gameCanvas {
-    display: block;
-    width: 100vw;
-    height: 100vh;
-    background: radial-gradient(circle at center, #0f0b36 0%, #050312 100%);
-    cursor: pointer;
+#logoScreen img{
+width:220px;
 }
 
-/* OVERLAY ACTION INTERFACES */
-.action-btn {
-    padding: 14px 28px;
-    border: none;
-    border-radius: 12px;
-    background: linear-gradient(135deg, #ffb703, #fb8500);
-    color: #fff;
-    font-weight: bold;
-    font-size: 16px;
-    cursor: pointer;
-    box-shadow: 0 5px 15px rgba(251, 133, 0, 0.4);
-    transition: transform 0.1s;
+/* INSTRUCTION */
+#instructionScreen{
+background:#0c0728;
 }
-.action-btn:active { transform: scale(0.95); }
+.card{
+background:rgba(20,15,61,0.95);
+border:2px solid #00ffcc;
+border-radius:20px;
+padding:25px;
+width:90%;
+max-width:500px;
+}
 
-#endScreen { background: rgba(5, 3, 18, 0.95); }
+/* BUTTON */
+button{
+padding:14px 22px;
+border:none;
+border-radius:12px;
+background:#ffb703;
+font-weight:bold;
+cursor:pointer;
+}
+
+/* CANVAS */
+#gameCanvas{
+width:100vw;
+height:100vh;
+display:block;
+background:radial-gradient(circle,#0f0b36,#050312);
+}
+
+/* END */
+#endScreen{
+background:#0b0618;
+}
+
 </style>
 </head>
+
 <body>
 
-<audio id="correctSound" src="Middle-ELA/G7/chp9/conjunctions/assets/correct.mp3" preload="auto"></audio>
-<audio id="wrongSound" src="Middle-ELA/G7/chp9/conjunctions/assets/wrong.mp3" preload="auto"></audio>
-<audio id="clapSound" src="Middle-ELA/G7/chp9/conjunctions/assets/clapping.mp3" preload="auto"></audio>
+<audio id="correctSound" src="assets/correct.mp3"></audio>
+<audio id="wrongSound" src="assets/wrong.mp3"></audio>
+<audio id="clapSound" src="assets/clapping.mp3"></audio>
 
+<!-- LOGO -->
 <div id="logoScreen" class="screen active">
-    <div class="logo-container">
-        <img src="Middle-ELA/G7/chp9/conjunctions/assets/innovine-logo.png" alt="Logo">
-    </div>
+<img src="assets/innovine-logo.png">
 </div>
 
+<!-- INSTRUCTION -->
 <div id="instructionScreen" class="screen">
-    <div class="panel-card">
-        <h1>🔍 Conjunction Detective Quiz</h1>
-        <p>Read the mystery question sentence in the banner, then tap or click directly on any matching color diamond to test your answers!</p>
-        <button class="action-btn" onclick="startGameArena()">Begin Mission</button>
-    </div>
+<div class="card">
+<h2>Conjunction Detective Quiz</h2>
+<p>Tap correct answers. 10 questions. 2 chances per question.</p>
+<button onclick="startGame()">START</button>
+</div>
 </div>
 
+<!-- GAME -->
 <div id="gameScreen" class="screen">
-    <canvas id="gameCanvas"></canvas>
+<canvas id="gameCanvas"></canvas>
 </div>
 
+<!-- END -->
 <div id="endScreen" class="screen">
-    <div class="panel-card">
-        <h1 style="font-size: 40px;">🏆</h1>
-        <h1>Mission Cleared</h1>
-        <p id="finalScoreDisplay" style="font-size: 18px; margin: 15px 0; font-weight: bold;"></p>
-        <button class="action-btn" onclick="restartEntireGame()">Play Again</button>
-    </div>
+<div class="card">
+<h1>🏆 Mission Complete</h1>
+<p id="finalScore"></p>
+<button onclick="location.reload()">Play Again</button>
+</div>
 </div>
 
 <script>
+
+/* =========================
+QUESTIONS (FIXED SAFE FORMAT)
+========================= */
 const mcqs = [
-    {q:'Find the participle: "The broken skateboard lay beside the ramp."',opts:["lay","beside","broken","ramp"],ans:"broken"},
-    {q:'Which sentence contains a Conditional Conjunction?',opts:["I stayed home because it rained.","If you find the key, open the chest.","The player was tired but won.","The bike is faster than the scooter."],ans:"If you find the key, open the chest."},
-    {q:'A robot made a grammar mistake. Which sentence is WRONG?',opts:["The tiger is stronger than the fox.","She studied so that she could pass.","Although he was hungry, he ate lunch.","If it rains, we will stay inside."],ans:"Although he was hungry, he ate lunch."},
-    {q:'The door opens only if you choose the sentence with a Purpose Conjunction.',opts:["The knight trained so that he could defeat the dragon.","The knight trained because he was bored.","The knight trained although he was tired.","The knight trained and became stronger."],ans:"The knight trained so that he could defeat the dragon."},
-    {q:'What does the conjunction because do?',opts:["Shows comparison","Shows condition","Gives a reason","Gives extra information"],ans:"Gives a reason"},
-    {q:'The alien says: "The spaceship that landed here is invisible." What type of conjunction is that?',opts:["Relative","Comparative","Coordinating","Conditional"],ans:"Relative"},
-    {q:'Which sentence uses a Coordinating Conjunction?',opts:["The runner trained because she wanted to win.","The runner trained although she was tired.","The runner trained and improved her speed.","The runner trained so that she could compete."],ans:"The runner trained and improved her speed."},
-    {q:'Which conjunction belongs to a DIFFERENT category?',opts:["Although","Even though","Though","Because"],ans:"Because"},
-    {q:'Which pair belongs to the same conjunction type?',opts:["if, unless","and, although","because, than","that, but"],ans:"if, unless"},
-    {q:'Read the sentence: "The wizard carried a map so that he could find the treasure, although the journey was dangerous." How many conjunction types are used?',opts:["One","Two","Three","Four"],ans:"Two"}
+{q:"Find the participle: The broken skateboard lay beside the ramp.",opts:["lay","beside","broken","ramp"],ans:2},
+{q:"Which sentence contains a Conditional Conjunction?",opts:["I stayed home because it rained.","If you find the key, open the chest.","The player was tired but won.","The bike is faster than the scooter."],ans:1},
+{q:"A robot made a grammar mistake. Which sentence is WRONG?",opts:["The tiger is stronger than the fox.","She studied so that she could pass.","Although he was hungry, he ate lunch.","If it rains, we will stay inside."],ans:2},
+{q:"Purpose conjunction question",opts:["The knight trained so that he could defeat the dragon.","The knight trained because he was bored.","The knight trained although he was tired.","The knight trained and became stronger."],ans:0},
+{q:"What does because do?",opts:["Shows comparison","Shows condition","Gives a reason","Extra info"],ans:2},
+{q:"Type of that in sentence",opts:["Relative","Comparative","Coordinating","Conditional"],ans:0},
+{q:"Coordinating conjunction",opts:["because she wanted","although she was tired","and improved speed","so that she could"],ans:2},
+{q:"Odd one out",opts:["Although","Even though","Though","Because"],ans:3},
+{q:"Same type pair",opts:["if, unless","and, although","because, than","that, but"],ans:0},
+{q:"How many conjunction types?",opts:["One","Two","Three","Four"],ans:1}
 ];
 
-const canvas = document.getElementById("gameCanvas");
-const ctx = canvas.getContext("2d");
+/* =========================
+CANVAS SETUP
+========================= */
+const canvas=document.getElementById("gameCanvas");
+const ctx=canvas.getContext("2d");
 
-let gameActive = false;
-let activeQuizList = [];
-let currentIndex = 0;
-let totalScore = 0;
-let lives = 2;
-let feedbackMessage = "";
-let showContinuePrompt = false;
+function resize(){
+canvas.width=window.innerWidth;
+canvas.height=window.innerHeight;
+}
+window.addEventListener("resize",resize);
 
-let targetOptionDiamonds = [];
-let backgroundStars = [];
+/* =========================
+STATE (FIXED)
+========================= */
+let index=0;
+let score=0;
+let lives=2;
+let locked=false;
+let order=[];
 
-window.onload = () => {
-    buildStarsBackground();
-    setTimeout(() => {
-        document.getElementById('logoScreen').classList.remove('active');
-        document.getElementById('instructionScreen').classList.add('active');
-    }, 5000);
-};
+/* shuffle */
+function shuffle(a){return a.sort(()=>Math.random()-0.5);}
 
-function buildStarsBackground() {
-    backgroundStars = [];
-    for(let i=0; i<60; i++) {
-        backgroundStars.push({ x: Math.random(), y: Math.random(), r: Math.random() * 1.5 });
-    }
+/* =========================
+FLOW
+========================= */
+setTimeout(()=>{
+logoScreen.classList.remove("active");
+instructionScreen.classList.add("active");
+},5000);
+
+/* =========================
+START GAME
+========================= */
+function startGame(){
+instructionScreen.classList.remove("active");
+gameScreen.classList.add("active");
+
+resize();
+
+index=0;
+score=0;
+
+order=[...Array(mcqs.length).keys()];
+shuffle(order);
+
+loadQ();
+loop();
 }
 
-function resizeViewports() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-}
-window.addEventListener("resize", resizeViewports);
-
-/* ==========================================================================
-   DIRECT CLICKS AND TOUCHES INTERACTION MECHANISM
-   ========================================================================== */
-canvas.addEventListener("click", handleCanvasInteraction);
-canvas.addEventListener("touchstart", function(e) {
-    if (e.touches.length > 0) {
-        // Prevent simultaneous emulated mouse clicks
-        e.preventDefault(); 
-        const rect = canvas.getBoundingClientRect();
-        const touchX = e.touches[0].clientX - rect.left;
-        const touchY = e.touches[0].clientY - rect.top;
-        processCoordinatesHit(touchX, touchY);
-    }
-}, { passive: false });
-
-function handleCanvasInteraction(e) {
-    const rect = canvas.getBoundingClientRect();
-    const clickX = e.clientX - rect.left;
-    const clickY = e.clientY - rect.top;
-    processCoordinatesHit(clickX, clickY);
+/* =========================
+LOAD QUESTION
+========================= */
+function loadQ(){
+lives=2;
+locked=false;
 }
 
-function processCoordinatesHit(x, y) {
-    if (!gameActive) return;
+/* =========================
+CLICK HANDLER (FIXED HITBOX)
+========================= */
+canvas.addEventListener("click",(e)=>{
+if(locked) return;
 
-    if (showContinuePrompt) {
-        nextStageFloor();
-        return;
-    }
+const rect=canvas.getBoundingClientRect();
+const x=e.clientX-rect.left;
+const y=e.clientY-rect.top;
 
-    // Check if the coordinate falls inside any option diamond boundary
-    targetOptionDiamonds.forEach(diamond => {
-        if (diamond.disabled) return;
+const q=mcqs[order[index]];
+const w=canvas.width/2;
+const h=70;
 
-        // Diamond area polygon path mapping calculation
-        const halfW = diamond.width / 2;
-        const halfH = diamond.height / 2;
+for(let i=0;i<q.opts.length;i++){
+let ox=(i%2)*w + w/2;
+let oy=canvas.height/2 + Math.floor(i/2)*120;
 
-        // Translate points relative to diamond center
-        const dx = Math.abs(x - diamond.x);
-        const dy = Math.abs(y - diamond.y);
+if(Math.abs(x-ox)<120 && Math.abs(y-oy)<40){
+check(i);
+}
+}
+});
 
-        // Standard bounding diamond equation checking inside range
-        if ((dx / halfW) + (dy / halfH) <= 1) {
-            evaluateSelection(diamond);
-        }
-    });
+/* =========================
+CHECK ANSWER (FIXED LOGIC)
+========================= */
+function check(i){
+
+if(locked) return;
+
+const q=mcqs[order[index]];
+
+const correct=q.ans;
+
+if(i===correct){
+score++;
+correctSound.play();
+locked=true;
+setTimeout(next,900);
+}else{
+lives--;
+wrongSound.play();
+
+if(lives<=0){
+locked=true;
+setTimeout(next,900);
+}
+}
 }
 
-/* ==========================================================================
-   GAME MECHANICS
-   ========================================================================== */
-function startGameArena() {
-    document.getElementById('instructionScreen').classList.remove('active');
-    document.getElementById('gameScreen').classList.add('active');
-    
-    activeQuizList = [...mcqs];
-    currentIndex = 0;
-    totalScore = 0;
-    gameActive = true;
-    
-    resizeViewports();
-    setupQuestionFloor();
-    animateEngineLoop();
+/* =========================
+NEXT
+========================= */
+function next(){
+index++;
+if(index>=mcqs.length){
+end();
+}else{
+loadQ();
+}
 }
 
-function setupQuestionFloor() {
-    lives = 2;
-    showContinuePrompt = false;
-    feedbackMessage = "";
-    
-    const activeData = activeQuizList[currentIndex];
-    const optionCount = activeData.opts.length;
-    
-    targetOptionDiamonds = [];
-    const segmentWidth = canvas.width / optionCount;
-    const itemColors = ["#ff595e", "#ffca3a", "#8ac926", "#1982c4"];
-    
-    activeData.opts.forEach((text, idx) => {
-        targetOptionDiamonds.push({
-            text: text,
-            x: (segmentWidth * idx) + (segmentWidth / 2),
-            y: canvas.height * 0.55, // Positioned symmetrically in the viewport center
-            width: 145,
-            height: 80,
-            color: itemColors[idx % itemColors.length],
-            isCorrect: text === activeData.ans,
-            disabled: false
-        });
-    });
+/* =========================
+RENDER LOOP
+========================= */
+function loop(){
+ctx.clearRect(0,0,canvas.width,canvas.height);
+
+const q=mcqs[order[index]];
+
+/* question */
+ctx.fillStyle="#fff";
+ctx.font="20px Arial";
+ctx.textAlign="center";
+ctx.fillText(q.q,canvas.width/2,120);
+
+/* options */
+for(let i=0;i<q.opts.length;i++){
+let x=(i%2)*(canvas.width/2)+canvas.width/4;
+let y=canvas.height/2 + Math.floor(i/2)*120;
+
+ctx.fillStyle="#1f2937";
+ctx.fillRect(x-120,y-30,240,60);
+
+ctx.fillStyle="#fff";
+ctx.fillText(q.opts[i],x,y);
 }
 
-function animateEngineLoop() {
-    if(!gameActive) return;
-    renderGraphicsWorkspace();
-    requestAnimationFrame(animateEngineLoop);
+requestAnimationFrame(loop);
 }
 
-function evaluateSelection(diamond) {
-    if(diamond.isCorrect) {
-        totalScore++;
-        feedbackMessage = "✨ OUTSTANDING WORK! (Tap anywhere to continue)";
-        document.getElementById("correctSound").play().catch(()=>{});
-        document.getElementById("clapSound").play().catch(()=>{});
-        diamond.color = "#00ffcc";
-        showContinuePrompt = true;
-    } else {
-        lives--;
-        diamond.disabled = true;
-        diamond.color = "#241623"; 
-        document.getElementById("wrongSound").play().catch(()=>{});
-        
-        if(lives <= 0) {
-            feedbackMessage = `❌ CASE FILE CLOSED! Answer: ${activeQuizList[currentIndex].ans} (Tap anywhere)`;
-            showContinuePrompt = true;
-        } else {
-            feedbackMessage = "❌ FALSE LEAD! Try your final attempt!";
-        }
-    }
+/* =========================
+END
+========================= */
+function end(){
+gameScreen.classList.remove("active");
+endScreen.classList.add("active");
+
+finalScore.innerText=`Score: ${score}/${mcqs.length}`;
+
+clapSound.play();
 }
 
-function nextStageFloor() {
-    currentIndex++;
-    if(currentIndex >= activeQuizList.length) {
-        gameActive = false;
-        document.getElementById("gameScreen").classList.remove("active");
-        document.getElementById("endScreen").classList.add("active");
-        document.getElementById("finalScoreDisplay").innerText = `Final Score: ${totalScore} / ${activeQuizList.length}`;
-    } else {
-        setupQuestionFloor();
-    }
-}
-
-function restartEntireGame() {
-    document.getElementById("endScreen").classList.remove("active");
-    startGameArena();
-}
-
-/* ==========================================================================
-   WORKSPACE UI RENDER ENGINE
-   ========================================================================== */
-function renderGraphicsWorkspace() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
-    // 1. Stars Background
-    ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
-    backgroundStars.forEach(s => {
-        ctx.beginPath();
-        ctx.arc(s.x * canvas.width, s.y * canvas.height, s.r, 0, Math.PI*2);
-        ctx.fill();
-    });
-    
-    // 2. HUD Header Layout Bar
-    ctx.fillStyle = "rgba(20, 15, 61, 0.85)";
-    ctx.fillRect(0, 0, canvas.width, 70);
-    ctx.strokeStyle = "#00ffcc";
-    ctx.lineWidth = 2;
-    ctx.beginPath(); ctx.moveTo(0, 70); ctx.lineTo(canvas.width, 70); ctx.stroke();
-    
-    ctx.fillStyle = "#ffffff";
-    ctx.font = "bold 15px sans-serif";
-    ctx.textAlign = "left";
-    ctx.fillText(`STAGE: ${currentIndex + 1} / ${activeQuizList.length}`, 25, 42);
-    
-    ctx.textAlign = "center";
-    ctx.fillText(`SCORE: ${totalScore}`, canvas.width / 2, 42);
-    
-    let hearts = "";
-    for(let l=0; l<lives; l++) hearts += "❤️ ";
-    ctx.textAlign = "right";
-    ctx.fillText(`SHIELD: ${hearts}`, canvas.width - 25, 42);
-    
-    // 3. Question Banner Box
-    const activeData = activeQuizList[currentIndex];
-    ctx.fillStyle = "rgba(10, 5, 36, 0.95)";
-    ctx.strokeStyle = "#ffca3a";
-    ctx.lineWidth = 3;
-    
-    const qw = Math.min(canvas.width * 0.9, 750);
-    const qx = canvas.width / 2 - qw / 2;
-    ctx.fillRect(qx, 100, qw, 80);
-    ctx.strokeRect(qx, 100, qw, 80);
-    
-    ctx.fillStyle = "#ffffff";
-    ctx.font = "bold 16px sans-serif";
-    ctx.textAlign = "center";
-    ctx.fillText(activeData.q, canvas.width / 2, 146, qw - 40);
-    
-    // 4. Render Floating Diamonds Option Buttons
-    targetOptionDiamonds.forEach(diamond => {
-        ctx.save();
-        ctx.translate(diamond.x, diamond.y);
-        
-        ctx.shadowBlur = diamond.disabled ? 0 : 15;
-        ctx.shadowColor = diamond.color;
-        
-        ctx.fillStyle = diamond.color;
-        ctx.beginPath();
-        ctx.moveTo(0, -diamond.height / 2);
-        ctx.lineTo(diamond.width / 2, 0);
-        ctx.lineTo(0, diamond.height / 2);
-        ctx.lineTo(-diamond.width / 2, 0);
-        ctx.closePath();
-        ctx.fill();
-        
-        ctx.restore();
-        
-        ctx.fillStyle = diamond.disabled ? "#555555" : "#000000";
-        ctx.font = "bold 14px sans-serif";
-        ctx.textAlign = "center";
-        ctx.fillText(diamond.text, diamond.x, diamond.y + 5, diamond.width - 25);
-    });
-    
-    // 5. Action Alerts Status Message Banner
-    if(feedbackMessage !== "") {
-        ctx.fillStyle = feedbackMessage.startsWith("✨") ? "#00ffcc" : "#ff595e";
-        ctx.font = "bold 18px sans-serif";
-        ctx.textAlign = "center";
-        ctx.fillText(feedbackMessage, canvas.width / 2, canvas.height - 120);
-    }
-}
 </script>
+
 </body>
 </html>
