@@ -71,9 +71,9 @@ body {
     flex-direction: column;
     align-items: center;
     font-weight: 900;
-    font-size: 28px;
-    color: #4c1d95;
-    letter-spacing: 1px;
+    font-size: 32px;
+    color: #4a148c;
+    letter-spacing: 2px;
 }
 
 @keyframes smoothScale {
@@ -302,33 +302,28 @@ canvas { position: fixed; inset: 0; pointer-events: none; z-index: 99999; width:
 
 <canvas id="confetti"></canvas>
 
-<!-- COMPILER HOOK SOUND TRACKS WITH DUAL RESTFUL PATH CONFIGURATIONS -->
 <audio id="correctSound" src="assets/correct.mp3" preload="auto"></audio>
 <audio id="wrongSound" src="assets/wrong.mp3" preload="auto"></audio>
 <audio id="clapSound" src="assets/clapping.mp3" preload="auto"></audio>
 
-<!-- STAGE 1: INTRO LOGO PRESENTATION (MANDATORY 5 SECONDS HELD ONLY FOR LOGO) -->
 <div id="logoScreen" class="screen active">
     <div class="logo-container">
         <img id="brandLogo" src="assets/innovine-logo.png" onerror="handleLogoFallback()" alt="Innovine Logo">
         <div id="fallbackLogoUI" class="fallback-logo" style="display: none;">
-            <svg width="80" height="80" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 2L2 22H22L12 2Z" fill="#4c1d95"/>
-                <path d="M12 6L4 20H20L12 6Z" fill="#ffd60a"/>
+            <svg width="120" height="120" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <polygon points="50,15 15,80 85,80" fill="#ffd60a" stroke="#4a148c" stroke-width="8" stroke-linejoin="miter"/>
             </svg>
-            <span style="margin-top: 10px;">INNOVINE</span>
+            <span style="margin-top: 15px; font-family: 'Arial Black', Gadget, sans-serif;">INNOVINE</span>
         </div>
     </div>
 </div>
 
-<!-- STAGE 2: SUB-TOPIC SPLASH IDENTITY -->
 <div id="titleScreen" class="screen">
     <div class="topicTitle">
         ✨ Master the Articles:<br>The Roulette Matrix Challenge! ✨
     </div>
 </div>
 
-<!-- STAGE 3: RUNTIME CONFIGURATION DASHBOARD ENTRY -->
 <div id="startScreen" class="screen">
     <div class="card">
         <h1>Articles Spinner Game</h1>
@@ -339,7 +334,6 @@ canvas { position: fixed; inset: 0; pointer-events: none; z-index: 99999; width:
     </div>
 </div>
 
-<!-- STAGE 4: MAIN RUNTIME CHALLENGE WORKSPACE -->
 <div id="gameScreen" class="screen">
     <div class="card">
         
@@ -373,7 +367,6 @@ canvas { position: fixed; inset: 0; pointer-events: none; z-index: 99999; width:
     </div>
 </div>
 
-<!-- STAGE 5: EVALUATION SCORE VERIFICATION OVERLAY -->
 <div id="endScreen" class="screen">
     <div class="card">
         <div class="trophy">🏆</div>
@@ -403,7 +396,7 @@ function handleLogoFallback() {
         // Short relative failed, try deep folder structure option
         imgEl.src = "Middle-ELA/G7/chp6/articles/assets/innovine-logo.png";
     } else {
-        // Both directory architectures failed, trigger flawless SVG Vector backup mode
+        // Both directory architectures failed, trigger layout matching image_7f1467.png
         imgEl.style.display = "none";
         document.getElementById("fallbackLogoUI").style.display = "flex";
     }
