@@ -457,7 +457,7 @@ body {
   <p>Pilot your rocket through space and answer challenging Main & Auxiliary Verb questions!</p>
   <p>✅ Correct = Speed Boost + Pass Obstacles</p>
   <p>❌ Wrong = Slow Down + Hit Obstacle (1 more try!)</p>
-  <p>🎯 Complete all 10 levels to reach the Verb Planet!</p>
+  <p>🎯 Complete all 15 levels to reach the Verb Planet!</p>
   <button class="startBtn" onclick="startGame()">🚀 LAUNCH ROCKET</button>
 </div>
 
@@ -467,7 +467,7 @@ body {
 <!-- SCORE BOARD -->
 <div id="scoreBoard">
   Score: <span id="score">0</span> | 
-  Level: <span id="level">0</span>/10
+  Level: <span id="level">0</span>/15
 </div>
 
 <!-- PROGRESS BAR -->
@@ -482,7 +482,7 @@ body {
 
 <!-- LEVEL COUNTER -->
 <div id="levelCounter">
-  Level <span id="currentLevel">1</span>/10
+  Level <span id="currentLevel">1</span>/15
 </div>
 
 <!-- QUESTION MODAL -->
@@ -547,59 +547,87 @@ correctSound.volume = 0.8;
 wrongSound.volume = 0.8;
 clapSound.volume = 0.8;
 
-// QUESTIONS - LONGER & HARDER
+// QUESTIONS - 15 TOTAL WITH VARIED CORRECT ANSWERS (A=0, B=1, C=2, D=3)
 const questions = [
   {
     q: "Although Maria was extremely nervous before her final dance performance, her teacher told her that she <span class='underline'>is dancing</span> beautifully and <span class='underline'>has practiced</span> for many hours, so she <span class='underline'>will definitely win</span> the competition. What is the AUXILIARY verb in the underlined phrase 'has practiced'?",
-    options: ["has", "practiced", "is", "will"],
-    correct: 0
+    options: ["practiced", "has", "is", "will"],
+    correct: 1
   },
   {
     q: "The students who <span class='underline'>had been studying</span> for the entire week were finally able to complete their difficult project, and they <span class='underline'>have submitted</span> it to the principal before the deadline yesterday. Identify the MAIN verb in the underlined phrase 'have submitted'.",
-    options: ["have", "submitted", "had", "been"],
+    options: ["have", "submitted", "been", "had"],
     correct: 1
   },
   {
     q: "When the teacher asked the class if anyone <span class='underline'>could solve</span> the complex mathematics problem, only three students <span class='underline'>were able to</span> provide the correct answer, while the rest <span class='underline'>were struggling</span> with it. Which word is a MODAL auxiliary verb in this sentence?",
-    options: ["could", "were", "to", "with"],
-    correct: 0
+    options: ["were", "to", "could", "with"],
+    correct: 2
   },
   {
     q: "Although the team <span class='underline'>was working</span> on the project for months, they <span class='underline'>had not finished</span> it by the deadline because unexpected complications <span class='underline'>arose</span> during the final week. What is the PRIMARY auxiliary verb in 'had not finished'?",
-    options: ["had", "not", "finished", "was"],
-    correct: 0
+    options: ["not", "finished", "was", "had"],
+    correct: 3
   },
   {
     q: "The scientist explained that if the experiment <span class='underline'>is conducted</span> properly, the results <span class='underline'>will be published</span> in the renowned journal, and other researchers <span class='underline'>might replicate</span> the findings. Identify the AUXILIARY verb indicating future tense in 'will be published'.",
-    options: ["will", "be", "published", "is"],
-    correct: 0
+    options: ["be", "published", "is", "will"],
+    correct: 3
   },
   {
     q: "My sister <span class='underline'>has been teaching</span> at the same school for over fifteen years, and she <span class='underline'>loves</span> her job because the children <span class='underline'>are very enthusiastic</span> about learning. What type of auxiliary verb is 'has' in 'has been teaching'?",
-    options: ["Modal auxiliary", "Primary auxiliary", "Main verb", "Conjunction"],
-    correct: 1
+    options: ["Main verb", "Modal auxiliary", "Conjunction", "Primary auxiliary"],
+    correct: 3
   },
   {
     q: "The manager announced that all employees <span class='underline'>must attend</span> the mandatory training session tomorrow, and anyone who <span class='underline'>cannot participate</span> <span class='underline'>should request</span> an alternative date in advance. Which word is a MODAL auxiliary expressing obligation?",
-    options: ["must", "can", "should", "attend"],
-    correct: 0
+    options: ["should", "attend", "can", "must"],
+    correct: 3
   },
   {
     q: "While the children <span class='underline'>were playing</span> in the garden, their mother <span class='underline'>was reading</span> a book, and their father <span class='underline'>has just returned</span> from work. Identify the MAIN verb in the phrase 'were playing'.",
-    options: ["were", "playing", "in", "the"],
-    correct: 1
+    options: ["the", "were", "playing", "in"],
+    correct: 2
   },
   {
     q: "The professor stated that students <span class='underline'>should have completed</span> the assignment before the class, but many <span class='underline'>did not finish</span> it because they <span class='underline'>were confused</span> about the requirements. What is the AUXILIARY verb expressing past perfect in 'should have completed'?",
-    options: ["should", "have", "completed", "did"],
-    correct: 1
+    options: ["should", "did", "completed", "have"],
+    correct: 3
   },
   {
     q: "Although the weather <span class='underline'>was terrible</span> during our trip, we <span class='underline'>still managed</span> to visit all the museums, and we <span class='underline'>will remember</span> the experience forever. Which auxiliary verb indicates PAST CONTINUOUS tense in the sentence?",
-    options: ["was", "still", "will", "managed"],
+    options: ["managed", "will", "still", "was"],
+    correct: 3
+  },
+  {
+    q: "The coach explained that if the players <span class='underline'>train diligently</span> every day, they <span class='underline'>will be able to</span> win the championship, but they <span class='underline'>must practice</span> more consistently. Identify the MODAL auxiliary verb that shows necessity in this sentence.",
+    options: ["will", "be", "must", "able"],
+    correct: 2
+  },
+  {
+    q: "Yesterday, when I <span class='underline'>was walking</span> to the store, I <span class='underline'>saw</span> my friend who <span class='underline'>has been living</span> in this city for ten years. What is the MAIN verb in the underlined phrase 'was walking'?",
+    options: ["walking", "was", "to", "the"],
     correct: 0
+  },
+  {
+    q: "The teacher mentioned that the students <span class='underline'>might receive</span> extra homework if they <span class='underline'>do not complete</span> their current assignments, and they <span class='underline'>should submit</span> everything by Friday. Which auxiliary verb expresses possibility?",
+    options: ["do", "should", "might", "not"],
+    correct: 2
+  },
+  {
+    q: "Even though she <span class='underline'>had studied</span> extensively for the examination, she <span class='underline'>was feeling</span> anxious because she <span class='underline'>has never taken</span> such a difficult test before. Identify the AUXILIARY verb in the past perfect tense 'had studied'.",
+    options: ["studied", "feeling", "has", "had"],
+    correct: 3
+  },
+  {
+    q: "The artist explained that the painting <span class='underline'>was created</span> using traditional techniques, and it <span class='underline'>has been displayed</span> in multiple galleries, so it <span class='underline'>will be auctioned</span> next month. What type of verb form is 'created' in 'was created'?",
+    options: ["Present participle", "Past participle", "Infinitive", "Gerund"],
+    correct: 1
   }
 ];
+
+// Shuffle questions randomly
+questions.sort(() => Math.random() - 0.5);
 
 // GAME VARIABLES
 let currentLevel = 0;
@@ -773,13 +801,13 @@ function finishGame() {
     const rankEl = document.getElementById('rank');
     const finalEl = document.getElementById('finalScore');
     
-    finalEl.textContent = `You scored ${score} out of 10!`;
+    finalEl.textContent = `You scored ${score} out of 15!`;
     
-    if(score >= 9) {
+    if(score >= 13) {
       rankEl.textContent = '🏅 MASTER SPACE PILOT';
       createConfetti();
       clapSound.play();
-    } else if(score >= 6) {
+    } else if(score >= 9) {
       rankEl.textContent = '⭐ CADET VERB EXPLORER';
     } else {
       rankEl.textContent = '🌙 MOON LEARNER';
