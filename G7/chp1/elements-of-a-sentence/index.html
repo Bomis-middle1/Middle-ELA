@@ -1,1030 +1,677 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Elements of a Sentence</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-select=none">
+<title>Elements of a Sentence — Analyzer Terminal</title>
 
 <style>
-
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:Arial,Helvetica,sans-serif;
+/* ==========================================================================
+   SYSTEM CORE RESET & GEOMETRY
+   ========================================================================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    -webkit-tap-highlight-color: transparent;
 }
 
-body{
-
-background:linear-gradient(135deg,#7dd3fc,#fde68a,#bbf7d0);
-overflow:hidden;
-height:100vh;
-
+body {
+    background: #0f172a;
+    color: #f8fafc;
+    overflow: hidden;
+    height: 100vh;
+    position: relative;
 }
 
-/******** Floating Background ********/
-
-body::before{
-
-content:"";
-position:absolute;
-width:250px;
-height:250px;
-background:rgba(255,255,255,.3);
-border-radius:50%;
-left:-80px;
-top:-80px;
-animation=float1 9s infinite alternate;
-
+/* FLOATING BACKGROUND AMBIENT ORBS */
+body::before {
+    content: "";
+    position: absolute;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(14, 165, 233, 0.15) 0%, transparent 70%);
+    border-radius: 50%;
+    left: -100px;
+    top: -100px;
+    animation: float1 12s infinite alternate ease-in-out;
+    pointer-events: none;
 }
 
-body::after{
-
-content:"";
-position:absolute;
-width:220px;
-height:220px;
-background:rgba(255,255,255,.25);
-border-radius:50%;
-right:-80px;
-bottom:-80px;
-animation=float2 10s infinite alternate;
-
+body::after {
+    content: "";
+    position: absolute;
+    width: 250px;
+    height: 250px;
+    background: radial-gradient(circle, rgba(147, 51, 234, 0.15) 0%, transparent 70%);
+    border-radius: 50%;
+    right: -80px;
+    bottom: -80px;
+    animation: float2 15s infinite alternate ease-in-out;
+    pointer-events: none;
 }
 
-@keyframes float1{
-
-from{transform:translateY(0);}
-to{transform:translateY(45px);}
-
+@keyframes float1 {
+    from { transform: translate(0, 0); }
+    to { transform: translate(40px, 60px); }
+}
+@keyframes float2 {
+    from { transform: translate(0, 0); }
+    to { transform: translate(-30px, -50px); }
 }
 
-@keyframes float2{
-
-from{transform:translateY(0);}
-to{transform:translateY(-35px);}
-
+/* SCREEN LAYOUT ABSTRACTIONS */
+.screen {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 24px;
+    text-align: center;
+    z-index: 100;
 }
 
-.screen{
-
-position:absolute;
-width:100%;
-height:100%;
-display:flex;
-justify-content:center;
-align-items:center;
-flex-direction:column;
-padding:20px;
-
+/* TIMED TIMELINE SPLASH SCREENS */
+#splash {
+    background: #ffffff;
+    z-index: 9999;
+}
+#logo {
+    width: 220px;
+    max-width: 80%;
+    animation: pulseLogo 2s infinite alternate ease-in-out;
+}
+@keyframes pulseLogo {
+    from { transform: scale(1); filter: drop-shadow(0 0 0px rgba(14,165,233,0)); }
+    to { transform: scale(1.05); filter: drop-shadow(0 4px 12px rgba(14,165,233,0.15)); }
+}
+#splash h2 {
+    margin-top: 16px;
+    font-size: 22px;
+    font-weight: bold;
+    color: #334155;
 }
 
-/******** Splash ********/
-
-#splash{
-
-background:white;
-z-index:10;
-
+#topic {
+    background: radial-gradient(circle at center, #1e1b4b 0%, #0f172a 100%);
+    z-index: 9000;
+    display: none;
+}
+#topic h1 {
+    font-size: 42px;
+    font-weight: 900;
+    color: #38bdf8;
+    letter-spacing: 2px;
+    text-shadow: 0 4px 12px rgba(56, 189, 248, 0.3);
+    margin-bottom: 12px;
+}
+#topic h2 {
+    font-size: 20px;
+    color: #c084fc;
+    font-weight: 500;
+    letter-spacing: 1px;
 }
 
-#logo{
-
-width:220px;
-animation:zoom 2s infinite alternate;
-
+/* CARD LAYOUT AND MENU CONTAINERS */
+.panel-card {
+    background: rgba(30, 41, 59, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    padding: 32px;
+    border-radius: 24px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    max-width: 550px;
+    width: 100%;
 }
 
-@keyframes zoom{
-
-from{transform:scale(1);}
-to{transform:scale(1.08);}
-
+#startScreen, #resultScreen {
+    display: none;
+    z-index: 8000;
 }
 
-#splash h2{
-
-margin-top:20px;
-font-size:34px;
-color:#0ea5e9;
-
+.panel-card h1 {
+    font-size: 36px;
+    font-weight: 800;
+    color: #f97316;
+    margin-bottom: 8px;
+}
+.panel-card h2 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #38bdf8;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 16px;
+}
+.panel-card p {
+    font-size: 16px;
+    color: #94a3b8;
+    line-height: 1.5;
+    margin-bottom: 20px;
 }
 
-/******** Topic ********/
-
-#topic{
-
-display:none;
-background:linear-gradient(135deg,#06b6d4,#9333ea);
-color:white;
-text-align:center;
-
+/* INTERACTIVE INPUT CONTROLS & CONTROLLERS */
+.volume-control {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 10px 16px;
+    border-radius: 14px;
+    margin: 24px auto 0 auto;
+    width: fit-content;
+}
+.volume-control label {
+    font-size: 14px;
+    font-weight: bold;
+    color: #cbd5e1;
+}
+input[type=range] {
+    accent-color: #38bdf8;
+    cursor: pointer;
+    width: 140px;
 }
 
-#topic h1{
-
-font-size:54px;
-animation:flash .8s infinite;
-text-shadow:3px 3px 10px black;
-
+.action-btn {
+    padding: 14px 40px;
+    font-size: 18px;
+    font-weight: bold;
+    border: none;
+    border-radius: 30px;
+    color: #ffffff;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.2);
+}
+#startBtn {
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    box-shadow: 0 4px 14px rgba(22, 163, 74, 0.3);
+}
+#restartBtn {
+    background: linear-gradient(135deg, #0ea5e9, #2563eb);
+    box-shadow: 0 4px 14px rgba(14, 165, 233, 0.3);
+}
+.action-btn:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.1);
+}
+.action-btn:active {
+    transform: translateY(0);
 }
 
-#topic h2{
-
-margin-top:15px;
-font-size:28px;
-
+/* ==========================================================================
+   GAME HUD STAGE PLATFORM
+   ========================================================================== */
+#gameScreen {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
 }
 
-@keyframes flash{
-
-0%{transform:scale(1);}
-50%{transform:scale(1.08);}
-100%{transform:scale(1);}
-
+.dashboard-container {
+    width: 100%;
+    max-width: 720px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
 }
 
-/******** Start ********/
-
-#startScreen{
-
-display:none;
-
+/* RUNTIME RUN MATRIX HEADERS */
+.hud-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+#progressInfo {
+    font-size: 14px;
+    font-weight: 700;
+    color: #38bdf8;
+    background: rgba(56, 189, 248, 0.1);
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1px solid rgba(56, 189, 248, 0.2);
+}
+#scoreTracker {
+    font-size: 14px;
+    font-weight: 700;
+    color: #f59e0b;
+    background: rgba(245, 158, 11, 0.1);
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1px solid rgba(245, 158, 11, 0.2);
 }
 
-.card{
-
-background:white;
-padding:35px;
-border-radius:25px;
-box-shadow:0 10px 25px rgba(0,0,0,.25);
-max-width:800px;
-width:95%;
-text-align:center;
-
+/* RADAR DATA TERMINAL (QUESTION EXPOSURE) */
+.question-terminal {
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-left: 4px solid #38bdf8;
+    padding: 24px;
+    border-radius: 16px;
+    text-align: left;
+    box-shadow: inset 0 2px 8px rgba(0,0,0,0.2);
+}
+#questionText {
+    font-size: 20px;
+    line-height: 1.5;
+    color: #f1f5f9;
+}
+#questionText b {
+    color: #fde68a;
+    display: block;
+    margin-top: 12px;
+    font-size: 22px;
+    letter-spacing: 0.5px;
 }
 
-.card h1{
-
-color:#f97316;
-font-size:45px;
-margin-bottom:15px;
-
+/* INTERACTIVE MCQ BUTTON SELECTION GRID */
+#answersGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    width: 100%;
+}
+.answerBtn {
+    background: rgba(30, 41, 59, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: #cbd5e1;
+    padding: 18px 20px;
+    font-size: 16px;
+    font-weight: 500;
+    border-radius: 14px;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+.answerBtn:hover:not(:disabled) {
+    background: #334155;
+    border-color: #38bdf8;
+    color: #ffffff;
+    transform: translateY(-2px);
 }
 
-.card h2{
-
-color:#0ea5e9;
-margin-bottom:15px;
-
+/* DYNAMIC EVALUATION GRAPHIC CLASSES */
+.correct {
+    background: linear-gradient(135deg, #15803d, #166534) !important;
+    border-color: #4ade80 !important;
+    color: #ffffff !important;
+    animation: popEffect 0.4s ease-out forwards;
+}
+.wrong {
+    background: linear-gradient(135deg, #991b1b, #7f1d1d) !important;
+    border-color: #f87171 !important;
+    color: #ffffff !important;
+    animation: shakeEffect 0.4s ease-out forwards;
 }
 
-.card p{
-
-font-size:22px;
-margin:10px 0;
-
+@keyframes popEffect {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.04); }
+    100% { transform: scale(1); }
+}
+@keyframes shakeEffect {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-8px); }
+    75% { transform: translateX(8px); }
 }
 
-#startBtn{
-
-margin-top:25px;
-padding:18px 55px;
-font-size:28px;
-border:none;
-border-radius:50px;
-background:#22c55e;
-color:white;
-cursor:pointer;
-transition:.3s;
-
+/* RENDERING BACKGROUND MATRIX CANVAS */
+#confetti {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 999;
+    width: 100vw;
+    height: 100vh;
 }
 
-#startBtn:hover{
-
-transform:scale(1.05);
-
+/* MEDIA TARGET SCREENS FOR MOBILE DEVICES */
+@media (max-width: 640px) {
+    #topic h1 { font-size: 28px; }
+    #topic h2 { font-size: 15px; }
+    .panel-card h1 { font-size: 28px; }
+    #questionText { font-size: 17px; }
+    #questionText b { font-size: 18px; }
+    #answersGrid { grid-template-columns: 1fr; gap: 10px; }
+    .answerBtn { padding: 14px 16px; font-size: 15px; }
 }
-
-/******** Volume ********/
-
-.volume{
-
-margin-top:25px;
-display:flex;
-justify-content:center;
-align-items:center;
-gap:15px;
-font-size:22px;
-
-}
-
-input[type=range]{
-
-width:220px;
-
-}
-
-/******** Game ********/
-
-#gameScreen{
-
-display:none;
-
-}
-
-.gameCard{
-
-background:white;
-width:95%;
-max-width:900px;
-padding:30px;
-border-radius:25px;
-box-shadow:0 10px 25px rgba(0,0,0,.25);
-
-}
-
-#progress{
-
-font-size:22px;
-font-weight:bold;
-color:#0284c7;
-margin-bottom:15px;
-
-}
-
-#question{
-
-font-size:32px;
-font-weight:bold;
-margin-bottom:30px;
-line-height:1.4;
-
-}
-
-#answers{
-
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:15px;
-
-}
-
-.answerBtn{
-
-padding:18px;
-font-size:22px;
-border:none;
-border-radius:15px;
-background:#f1f5f9;
-cursor:pointer;
-transition:.3s;
-
-}
-
-.answerBtn:hover{
-
-background:#dbeafe;
-transform:scale(1.02);
-
-}
-
-.correct{
-
-background:#4ade80!important;
-color:white;
-
-}
-
-.wrong{
-
-background:#f87171!important;
-color:white;
-
-}
-
-#score{
-
-margin-top:20px;
-font-size:24px;
-font-weight:bold;
-color:#ea580c;
-
-}
-
-/******** Result ********/
-
-#resultScreen{
-
-display:none;
-
-}
-
-#restartBtn{
-
-margin-top:25px;
-padding:18px 50px;
-font-size:26px;
-background:#0ea5e9;
-color:white;
-border:none;
-border-radius:50px;
-cursor:pointer;
-
-}
-
-/******** Confetti ********/
-
-canvas{
-
-position:absolute;
-top:0;
-left:0;
-pointer-events:none;
-
-}
-
-/******** Mobile ********/
-
-@media(max-width:768px){
-
-#logo{
-
-width:170px;
-
-}
-
-#topic h1{
-
-font-size:38px;
-
-}
-
-.card h1{
-
-font-size:34px;
-
-}
-
-.card p{
-
-font-size:20px;
-
-}
-
-#question{
-
-font-size:24px;
-
-}
-
-#answers{
-
-grid-template-columns:1fr;
-
-}
-
-.answerBtn{
-
-font-size:18px;
-
-}
-
-}
-
 </style>
-
 </head>
 
 <body>
 
+<!-- THE RENDERING CANVAS FRAME -->
 <canvas id="confetti"></canvas>
 
-<audio id="correctSound" src="assets/correct.mp3"></audio>
-<audio id="wrongSound" src="assets/wrong.mp3"></audio>
-<audio id="clapSound" src="assets/clapping.mp3"></audio>
+<!-- AUDIO BASE CHANNELS -->
+<audio id="correctSound" src="assets/correct.mp3" preload="auto"></audio>
+<audio id="wrongSound" src="assets/wrong.mp3" preload="auto"></audio>
+<audio id="clapSound" src="assets/clapping.mp3" preload="auto"></audio>
 
-<!-- Splash -->
-
+<!-- STAGE 1: SPLASH LOGO SCREEN -->
 <div id="splash" class="screen">
-
-<img src="assets/innovine-logo.png" id="logo">
-
-<h2>Innovine Learning Games</h2>
-
+    <img src="assets/innovine-logo.png" id="logo" alt="Innovine Logo">
 </div>
 
-<!-- Topic -->
-
+<!-- STAGE 2: TOPIC HEADER TRAILER -->
 <div id="topic" class="screen">
-
-<h1>✨ ELEMENTS OF A SENTENCE ✨</h1>
-
-<h2>Subject • Predicate • Object • Complement</h2>
-
+    <h1>ELEMENTS OF A SENTENCE</h1>
+    <h2>Subject • Predicate • Object • Complement</h2>
 </div>
 
-<!-- Start -->
-
+<!-- STAGE 3: INTERACTIVE LOBBY START -->
 <div id="startScreen" class="screen">
+    <div class="panel-card">
+        <h1>🎯 Ready to Play?</h1>
+        <h2>Grade 7 English</h2>
+        <p>Analyze structural configurations. Isolate Subjects, Predicates, Objects, and Complements across variations.</p>
+        
+        <button id="startBtn" class="action-btn">START EMULATOR</button>
 
-<div class="card">
-
-<h1>🎯 Ready to Play?</h1>
-
-<h2>Grade 7 English</h2>
-
-<p>Identify the Subject, Predicate, Object, and Complement.</p>
-
-<p><strong>10 Questions</strong></p>
-
-<div class="volume">
-
-🔊 Volume
-
-<input type="range" id="volume" min="0" max="1" value="1" step=".1">
-
+        <div class="volume-control">
+            <label for="volume">🔊 Volume</label>
+            <input type="range" id="volume" min="0" max="1" value="0.8" step="0.1">
+        </div>
+    </div>
 </div>
 
-<button id="startBtn">
-
-START GAME
-
-</button>
-
-</div>
-
-</div>
-
-<!-- Game -->
-
+<!-- STAGE 4: MAIN RUNTIME MATRIX STAGE -->
 <div id="gameScreen" class="screen">
+    <div class="dashboard-container">
+        <div class="hud-bar">
+            <div id="progressInfo">QUESTION: 0 / 10</div>
+            <div id="scoreTracker">SCORE: 00</div>
+        </div>
 
-<div class="gameCard">
+        <div class="question-terminal">
+            <div id="questionText">Initializing array parsing sequence...</div>
+        </div>
 
-<div id="progress"></div>
-
-<div id="question"></div>
-
-<div id="answers"></div>
-
-<div id="score"></div>
-
+        <div id="answersGrid"></div>
+    </div>
 </div>
 
-</div>
-
-<!-- Result -->
-
+<!-- STAGE 5: RESULT LOG BOARD SUMMARY -->
 <div id="resultScreen" class="screen">
-
-<div class="card">
-
-<h1>🎉 Great Job!</h1>
-
-<h2 id="finalScore"></h2>
-
-<button id="restartBtn">
-
-Play Again
-
-</button>
-
-</div>
-
+    <div class="panel-card">
+        <h1 style="color: #4ade80;">🎉 Sequence Complete</h1>
+        <p style="font-size: 18px; margin-top: 8px;">Operational matrix parsing completed.</p>
+        
+        <div id="finalScore" style="font-size: 48px; font-weight: 800; color: #f97316; margin: 24px 0;">0 / 10</div>
+        
+        <button id="restartBtn" class="action-btn">RELOAD COMPILER</button>
+    </div>
 </div>
 
 <script>
+/* ==========================================================================
+   GAMEPLAY LOGIC CONTROLLER
+   ========================================================================== */
 
-const splash=document.getElementById("splash");
-const topic=document.getElementById("topic");
-const startScreen=document.getElementById("startScreen");
-const gameScreen=document.getElementById("gameScreen");
-const resultScreen=document.getElementById("resultScreen");
-
-const correctSound=document.getElementById("correctSound");
-const wrongSound=document.getElementById("wrongSound");
-const clapSound=document.getElementById("clapSound");
-
-const volume=document.getElementById("volume");
-
-volume.oninput=function(){
-
-correctSound.volume=this.value;
-wrongSound.volume=this.value;
-clapSound.volume=this.value;
-
+const screens = {
+    splash: document.getElementById("splash"),
+    topic: document.getElementById("topic"),
+    start: document.getElementById("startScreen"),
+    game: document.getElementById("gameScreen"),
+    result: document.getElementById("resultScreen")
 };
 
-setTimeout(()=>{
+const audio = {
+    correct: document.getElementById("correctSound"),
+    wrong: document.getElementById("wrongSound"),
+    clap: document.getElementById("clapSound")
+};
 
-splash.style.display="none";
-topic.style.display="flex";
+const volumeSlider = document.getElementById("volume");
+let questions = [];
+let currentQuestion = 0;
+let score = 0;
+let canClick = true;
 
-},5000);
+// Synchronize audio tracks runtime values safely
+volumeSlider.oninput = function() {
+    Object.values(audio).forEach(track => {
+        if(track) track.volume = this.value;
+    });
+};
 
-setTimeout(()=>{
-
-topic.style.display="none";
-startScreen.style.display="flex";
-
-},8000);
-
-let questions=[];
-let currentQuestion=0;
-let score=0;
-/*************************************************
-                QUESTIONS
-*************************************************/
-
-questions=[
-
-{
-question:"Identify the subject in the sentence.<br><br><b>The students completed the science project on time.</b>",
-options:[
-"completed the science project",
-"the science project",
-"The students",
-"on time"
-],
-answer:2
-},
-
-{
-question:"Identify the predicate in the sentence.<br><br><b>The little puppy barked loudly all night.</b>",
-options:[
-"The little puppy",
-"loudly",
-"barked loudly all night",
-"all night"
-],
-answer:2
-},
-
-{
-question:"Which words form the direct object in the sentence?<br><br><b>Maria baked a delicious cake yesterday.</b>",
-options:[
-"Maria",
-"baked",
-"a delicious cake",
-"yesterday"
-],
-answer:2
-},
-
-{
-question:"Identify the complement in the sentence.<br><br><b>The sky became dark before the storm.</b>",
-options:[
-"The sky",
-"became",
-"dark",
-"before the storm"
-],
-answer:2
-},
-
-{
-question:"Which part of the sentence is the predicate?<br><br><b>My brother plays basketball every Saturday.</b>",
-options:[
-"My brother",
-"plays basketball every Saturday",
-"basketball",
-"every Saturday"
-],
-answer:1
-},
-
-{
-question:"Identify the subject in the sentence.<br><br><b>After school, the children visited the library.</b>",
-options:[
-"visited",
-"the library",
-"After school",
-"the children"
-],
-answer:3
-},
-
-{
-question:"Which words are the direct object in the sentence?<br><br><b>The teacher explained the lesson clearly.</b>",
-options:[
-"The teacher",
-"explained",
-"the lesson",
-"clearly"
-],
-answer:2
-},
-
-{
-question:"Identify the complement in the sentence.<br><br><b>Our classroom looks beautiful after the decorations.</b>",
-options:[
-"Our classroom",
-"looks",
-"beautiful",
-"after the decorations"
-],
-answer:2
-},
-
-{
-question:"Which part of the sentence is the subject?<br><br><b>Several colorful birds flew across the lake.</b>",
-options:[
-"Several colorful birds",
-"flew",
-"across the lake",
-"the lake"
-],
-answer:0
-},
-
-{
-question:"Identify the predicate in the sentence.<br><br><b>The firefighters rescued the family safely.</b>",
-options:[
-"The firefighters",
-"rescued the family safely",
-"the family",
-"safely"
-],
-answer:1
-}
-
+/* MASTER SCENARIOS ARCHIVE RAW ARRAYS */
+questions = [
+    {
+        question: "Identify the subject in the sentence.",
+        sentence: "The students completed the science project on time.",
+        options: ["completed the science project", "the science project", "The students", "on time"],
+        answer: 2
+    },
+    {
+        question: "Identify the predicate in the sentence.",
+        sentence: "The little puppy barked loudly all night.",
+        options: ["The little puppy", "loudly", "barked loudly all night", "all night"],
+        answer: 2
+    },
+    {
+        question: "Which words form the direct object in the sentence?",
+        sentence: "Maria baked a delicious cake yesterday.",
+        options: ["Maria", "baked", "a delicious cake", "yesterday"],
+        answer: 2
+    },
+    {
+        question: "Identify the complement in the sentence.",
+        sentence: "The sky became dark before the storm.",
+        options: ["The sky", "became", "dark", "before the storm"],
+        answer: 2
+    },
+    {
+        question: "Which part of the sentence is the predicate?",
+        sentence: "My brother plays basketball every Saturday.",
+        options: ["My brother", "plays basketball every Saturday", "basketball", "every Saturday"],
+        answer: 1
+    },
+    {
+        question: "Identify the subject in the sentence.",
+        sentence: "After school, the children visited the library.",
+        options: ["visited", "the library", "After school", "the children"],
+        answer: 3
+    },
+    {
+        question: "Which words are the direct object in the sentence?",
+        sentence: "The teacher explained the lesson clearly.",
+        options: ["The teacher", "explained", "the lesson", "clearly"],
+        answer: 2
+    },
+    {
+        question: "Identify the complement in the sentence.",
+        sentence: "Our classroom looks beautiful after the decorations.",
+        options: ["Our classroom", "looks", "beautiful", "after the decorations"],
+        answer: 2
+    },
+    {
+        question: "Which part of the sentence is the subject?",
+        sentence: "Several colorful birds flew across the lake.",
+        options: ["Several colorful birds", "flew", "across the lake", "the lake"],
+        answer: 0
+    },
+    {
+        question: "Identify the predicate in the sentence.",
+        sentence: "The firefighters rescued the family safely.",
+        options: ["The firefighters", "rescued the family safely", "the family", "safely"],
+        answer: 1
+    }
 ];
 
-/*************************************************
-            RANDOMIZE QUESTIONS
-*************************************************/
+/* SETUP DISPLAY TRANSITIONS AUTOMATIC PIPELINES */
+setTimeout(() => {
+    screens.splash.style.display = "none";
+    screens.topic.style.display = "flex";
+}, 3500);
 
-questions.sort(()=>Math.random()-0.5);
+setTimeout(() => {
+    screens.topic.style.display = "none";
+    screens.start.style.display = "flex";
+}, 6500);
 
-/*************************************************
-              START GAME
-*************************************************/
+/* SAFE ERROR-FREE PLAYBACK HANDLER */
+function playAudio(trackKey) {
+    const track = audio[trackKey];
+    if (!track) return;
+    try {
+        track.currentTime = 0;
+        track.play().catch(() => { /* Silence passive blockers safely */ });
+    } catch(e) {
+        console.log("Audio asset bypassed safely.");
+    }
+}
 
-document.getElementById("startBtn").onclick=function(){
+// Interaction Unlock Trigger
+document.getElementById("startBtn").onclick = function() {
+    screens.start.style.display = "none";
+    screens.game.style.display = "flex";
+    
+    // Unlock channels instantly inside event scope
+    Object.values(audio).forEach(track => {
+        if(track) { track.play().then(() => { track.pause(); }).catch(() => {}); }
+    });
 
-startScreen.style.display="none";
-gameScreen.style.display="flex";
-
-currentQuestion=0;
-score=0;
-
-showQuestion();
-
+    currentQuestion = 0;
+    score = 0;
+    questions.sort(() => Math.random() - 0.5);
+    showQuestion();
 };
 
-/*************************************************
-            SHOW QUESTION
-*************************************************/
+function showQuestion() {
+    canClick = true;
+    const activeQ = questions[currentQuestion];
+    
+    document.getElementById("progressInfo").innerText = `QUESTION: ${currentQuestion + 1} / ${questions.length}`;
+    document.getElementById("scoreTracker").innerText = `SCORE: ${score * 10}`;
+    
+    document.getElementById("questionText").innerHTML = `${activeQ.question}<b>"${activeQ.sentence}"</b>`;
+    
+    const grid = document.getElementById("answersGrid");
+    grid.innerHTML = "";
+    
+    activeQ.options.forEach((opt, index) => {
+        const btn = document.createElement("button");
+        btn.className = "answerBtn";
+        btn.innerText = opt;
+        btn.onclick = () => checkAnswer(index, btn);
+        grid.appendChild(btn);
+    });
+}
 
-function showQuestion(){
+function checkAnswer(selectedIndex, selectedBtn) {
+    if (!canClick) return;
+    canClick = false;
 
-document.getElementById("progress").innerHTML=
-"Question "+(currentQuestion+1)+" of "+questions.length;
+    const activeQ = questions[currentQuestion];
+    const targetCorrectIndex = activeQ.answer;
+    const allButtons = document.querySelectorAll(".answerBtn");
 
-document.getElementById("score").innerHTML=
-"Score : "+score;
+    // Lock immediate interaction matrix
+    allButtons.forEach(b => b.disabled = true);
 
-document.getElementById("question").innerHTML=
-questions[currentQuestion].question;
+    if (selectedIndex === targetCorrectIndex) {
+        selectedBtn.classList.add("correct");
+        score++;
+        playAudio("correct");
+        launchConfetti();
+    } else {
+        selectedBtn.classList.add("wrong");
+        allButtons[targetCorrectIndex].classList.add("correct");
+        playAudio("wrong");
+    }
 
-const answers=document.getElementById("answers");
+    setTimeout(() => {
+        currentQuestion++;
+        if (currentQuestion < questions.length) {
+            showQuestion();
+        } else {
+            showResults();
+        }
+    }, 1500);
+}
 
-answers.innerHTML="";
+function showResults() {
+    screens.game.style.display = "none";
+    screens.result.style.display = "flex";
+    document.getElementById("finalScore").innerText = `${score} / ${questions.length}`;
+    playAudio("clap");
+}
 
-questions[currentQuestion].options.forEach(function(option,index){
-
-const btn=document.createElement("button");
-
-btn.className="answerBtn";
-
-btn.innerHTML=option;
-
-btn.onclick=function(){
-
-checkAnswer(index,btn);
-
+document.getElementById("restartBtn").onclick = function() {
+    screens.result.style.display = "none";
+    screens.game.style.display = "flex";
+    currentQuestion = 0;
+    score = 0;
+    questions.sort(() => Math.random() - 0.5);
+    showQuestion();
 };
 
-answers.appendChild(btn);
-
-});
-
-}
-
-/*************************************************
-            CHECK ANSWER
-*************************************************/
-
-function checkAnswer(choice,button){
-
-let correct=questions[currentQuestion].answer;
-
-let buttons=document.querySelectorAll(".answerBtn");
-
-buttons.forEach(btn=>btn.disabled=true);
-
-if(choice===correct){
-
-button.classList.add("correct");
-
-correctSound.currentTime=0;
-correctSound.play();
-
-score++;
-
-launchConfetti();
-
-}else{
-
-button.classList.add("wrong");
-
-buttons[correct].classList.add("correct");
-
-wrongSound.currentTime=0;
-wrongSound.play();
-
-}
-
-document.getElementById("score").innerHTML=
-"Score : "+score;
-
-setTimeout(function(){
-
-currentQuestion++;
-
-if(currentQuestion<questions.length){
-
-showQuestion();
-
-}else{
-
-showResults();
-
-}
-
-},1200);
-
-}
-/*************************************************
-            CONFETTI ANIMATION
-*************************************************/
-
+/* ==========================================================================
+   CONFETTI FX ENGINE MAPPED TO INSTANCED ARRAYS
+   ========================================================================== */
 const canvas = document.getElementById("confetti");
 const ctx = canvas.getContext("2d");
+let confetti = [];
+let animId = null;
 
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
-
-window.addEventListener("resize",function(){
-
-canvas.width=window.innerWidth;
-canvas.height=window.innerHeight;
-
-});
-
-let confetti=[];
-
-function launchConfetti(){
-
-confetti=[];
-
-for(let i=0;i<180;i++){
-
-confetti.push({
-
-x:Math.random()*canvas.width,
-
-y:-20,
-
-r:Math.random()*8+4,
-
-d:Math.random()*180,
-
-speed:Math.random()*5+3,
-
-tilt:Math.random()*10-5,
-
-color:
-
-"hsl("+Math.random()*360+",100%,60%)"
-
-});
-
+function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
 }
+window.addEventListener("resize", resizeCanvas);
+resizeCanvas();
 
-animateConfetti();
-
+function launchConfetti() {
+    confetti = [];
+    cancelAnimationFrame(animId);
+    
+    for (let i = 0; i < 100; i++) {
+        confetti.push({
+            x: Math.random() * canvas.width,
+            y: -20,
+            size: Math.random() * 6 + 4,
+            speedY: Math.random() * 4 + 3,
+            speedX: Math.random() * 2 - 1,
+            color: `hsl(${Math.random() * 360}, 90%, 60%)`,
+            rotation: Math.random() * 360,
+            rotationSpeed: Math.random() * 4 - 2
+        });
+    }
+    
+    let frames = 0;
+    function render() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        confetti.forEach(p => {
+            ctx.save();
+            ctx.translate(p.x, p.y);
+            ctx.rotate((p.rotation * Math.PI) / 180);
+            ctx.fillStyle = p.color;
+            ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+            ctx.restore();
+            
+            p.y += p.speedY;
+            p.x += p.speedX;
+            p.rotation += p.rotationSpeed;
+        });
+        
+        frames++;
+        if (frames < 120) {
+            animId = requestAnimationFrame(render);
+        } else {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+    }
+    render();
 }
-
-function animateConfetti(){
-
-let frame=0;
-
-function draw(){
-
-ctx.clearRect(0,0,canvas.width,canvas.height);
-
-confetti.forEach(function(c){
-
-ctx.beginPath();
-
-ctx.fillStyle=c.color;
-
-ctx.fillRect(c.x,c.y,c.r,c.r);
-
-c.y+=c.speed;
-
-c.x+=Math.sin(c.d);
-
-c.d+=0.1;
-
-});
-
-frame++;
-
-if(frame<90){
-
-requestAnimationFrame(draw);
-
-}else{
-
-ctx.clearRect(0,0,canvas.width,canvas.height);
-
-}
-
-}
-
-draw();
-
-}
-
-/*************************************************
-        BUTTON FEEDBACK ANIMATION
-*************************************************/
-
-const style=document.createElement("style");
-
-style.innerHTML=`
-
-.answerBtn{
-
-transition:.25s;
-
-}
-
-.answerBtn:hover{
-
-transform:scale(1.05);
-
-}
-
-.correct{
-
-animation:pop .5s;
-
-}
-
-.wrong{
-
-animation:shake .5s;
-
-}
-
-@keyframes pop{
-
-0%{transform:scale(1);}
-
-50%{transform:scale(1.18);}
-
-100%{transform:scale(1);}
-
-}
-
-@keyframes shake{
-
-0%{transform:translateX(0);}
-
-20%{transform:translateX(-10px);}
-
-40%{transform:translateX(10px);}
-
-60%{transform:translateX(-8px);}
-
-80%{transform:translateX(8px);}
-
-100%{transform:translateX(0);}
-
-}
-
-`;
-
-document.head.appendChild(style);
-
-/*************************************************
-      SHOW RESULT SCREEN
-*************************************************/
-
-function showResults(){
-
-gameScreen.style.display="none";
-
-resultScreen.style.display="flex";
-
-document.getElementById("finalScore").innerHTML=
-
-"You scored <br><br><span style='font-size:60px;color:#16a34a;'>"
-
-+score+
-
-" / "
-
-+questions.length+
-
-"</span>";
-
-clapSound.currentTime=0;
-
-clapSound.play();
-
-}
-/*************************************************
-            RESTART GAME
-*************************************************/
-
-document.getElementById("restartBtn").onclick=function(){
-
-// Hide result screen
-resultScreen.style.display="none";
-
-// Show game screen
-gameScreen.style.display="flex";
-
-// Reset values
-score=0;
-currentQuestion=0;
-
-// Shuffle questions again
-questions.sort(()=>Math.random()-0.5);
-
-// Show first question
-showQuestion();
-
-};
-
-/*************************************************
-      OPTIONAL: ENTER KEY SUPPORT
-*************************************************/
-
-document.addEventListener("keydown",function(e){
-
-if(e.key==="Enter"){
-
-const startVisible=
-startScreen.style.display==="flex";
-
-const resultVisible=
-resultScreen.style.display==="flex";
-
-if(startVisible){
-
-document.getElementById("startBtn").click();
-
-}
-
-if(resultVisible){
-
-document.getElementById("restartBtn").click();
-
-}
-
-}
-
-});
-
-/*************************************************
-      PRELOAD SOUNDS
-*************************************************/
-
-window.onload=function(){
-
-correctSound.load();
-wrongSound.load();
-clapSound.load();
-
-correctSound.volume=1;
-wrongSound.volume=1;
-clapSound.volume=1;
-
-};
-
-/*************************************************
-      END OF SCRIPT
-*************************************************/
-
 </script>
-
 </body>
 </html>
