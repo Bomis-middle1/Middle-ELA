@@ -21,10 +21,18 @@ body, html {
   justify-content: center;
   align-items: center;
   z-index: 1000;
+  flex-direction: column;
+}
+
+#splash img {
+  width: min(72vw, 240px);
+  max-width: 240px;
+  display: block;
+  margin-bottom: 14px;
 }
 
 #splash .logoText {
-  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  font-size: clamp(1.5rem, 4vw, 2.3rem);
   font-weight: 900;
   color: #ff8c42;
   letter-spacing: 0.5px;
@@ -46,18 +54,16 @@ body, html {
   font-size: 1.05rem;
   box-shadow: 0 2px 10px rgba(0,0,0,0.08);
 }
-
 #score { left: 10px; }
 #progress { right: 10px; }
 
 #question {
   text-align: center;
-  font-size: clamp(1.5rem, 3vw, 2.1rem);
+  font-size: clamp(1.45rem, 3vw, 2.1rem);
   font-weight: 900;
   margin-top: 78px;
   padding: 0 12px;
   color: #24324a;
-  text-shadow: 0 1px 0 rgba(255,255,255,0.7);
 }
 
 #options {
@@ -76,17 +82,16 @@ body, html {
   font-size: 1.15rem;
   border-radius: 16px;
   cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+  transition: transform 0.2s ease, opacity 0.2s ease;
   box-shadow: 0 8px 18px rgba(255,140,66,0.25);
 }
-
 .option:hover { transform: translateY(-2px) scale(1.03); }
 .option:disabled { opacity: 0.65; cursor: not-allowed; transform: none; }
 
 #belt-container {
   position: relative;
   width: 100%;
-  height: 190px;
+  height: 195px;
   margin-top: 52px;
   overflow: hidden;
   border-radius: 24px;
@@ -97,7 +102,6 @@ body, html {
   box-shadow: inset 0 0 0 2px rgba(255,255,255,0.4);
   animation: beltMove 6s linear infinite;
 }
-
 @keyframes beltMove {
   from { background-position-x: 0; }
   to { background-position-x: 100px; }
@@ -107,7 +111,7 @@ body, html {
   position: absolute;
   left: 0;
   right: 0;
-  bottom: 38px;
+  bottom: 40px;
   height: 7px;
   background: linear-gradient(to right, #ffffff, #d9e1ea, #ffffff);
   opacity: 0.95;
@@ -115,74 +119,130 @@ body, html {
 
 #character-container {
   position: absolute;
-  bottom: 16px;
+  bottom: 14px;
   left: 24px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
   transition: left 0.75s ease;
   z-index: 10;
 }
 
 #character {
-  width: 96px;
-  height: 96px;
+  width: 112px;
+  height: 112px;
   position: relative;
-  animation: bob 0.9s ease-in-out infinite;
-  filter: drop-shadow(0 8px 10px rgba(0,0,0,0.12));
+  filter: drop-shadow(0 10px 12px rgba(0,0,0,0.12));
+}
+
+#character.walk {
+  animation: bob 0.9s ease-in-out infinite, walkPop 0.35s ease-in-out 2;
 }
 
 @keyframes bob {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-4px); }
 }
+@keyframes walkPop {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-8px) scale(1.03); }
+}
 
 #character .shadow {
   position: absolute;
   left: 50%;
-  bottom: 3px;
-  width: 54px;
-  height: 10px;
+  bottom: 4px;
+  width: 66px;
+  height: 12px;
+  transform: translateX(-50%);
   background: rgba(0,0,0,0.12);
   border-radius: 50%;
-  transform: translateX(-50%);
-  filter: blur(2px);
+  filter: blur(3px);
+}
+
+#character .backpack {
+  position: absolute;
+  left: 13px;
+  top: 44px;
+  width: 20px;
+  height: 28px;
+  background: linear-gradient(135deg, #ff6f61, #ff8f6b);
+  border: 2px solid #3a2f2f;
+  border-radius: 8px;
+  z-index: 1;
+}
+
+#character .strap {
+  position: absolute;
+  left: 24px;
+  top: 48px;
+  width: 48px;
+  height: 8px;
+  border-left: 3px solid #3a2f2f;
+  border-right: 3px solid #3a2f2f;
+  border-radius: 999px;
+  opacity: 0.85;
 }
 
 #character .head {
   position: absolute;
   left: 50%;
-  top: 3px;
-  width: 30px;
-  height: 30px;
+  top: 5px;
+  width: 34px;
+  height: 34px;
   transform: translateX(-50%);
   border-radius: 50%;
   background: radial-gradient(circle at 35% 35%, #ffe8c7 0%, #ffd8b0 60%, #f6c992 100%);
   border: 2px solid #3a2f2f;
+  z-index: 3;
 }
 
 #character .hair {
   position: absolute;
   left: 50%;
   top: 0px;
-  width: 34px;
-  height: 16px;
+  width: 38px;
+  height: 18px;
   transform: translateX(-50%);
   background: #4b2f23;
-  border-radius: 16px 16px 10px 10px;
+  border-radius: 18px 18px 10px 10px;
+  z-index: 4;
+}
+
+#character .cap {
+  position: absolute;
+  left: 50%;
+  top: -1px;
+  width: 44px;
+  height: 18px;
+  transform: translateX(-50%);
+  background: #2563eb;
+  border: 2px solid #1f2f44;
+  border-radius: 16px 16px 8px 8px;
+  z-index: 5;
+}
+#character .cap::after {
+  content: "";
+  position: absolute;
+  right: -10px;
+  top: 8px;
+  width: 16px;
+  height: 6px;
+  background: #2563eb;
+  border: 2px solid #1f2f44;
+  border-left: none;
+  border-radius: 0 999px 999px 0;
+  transform: rotate(8deg);
 }
 
 #character .eyes {
   position: absolute;
   left: 50%;
-  top: 13px;
-  width: 18px;
+  top: 16px;
+  width: 20px;
   height: 5px;
   transform: translateX(-50%);
   display: flex;
   justify-content: space-between;
+  z-index: 6;
 }
-
 #character .eyes::before,
 #character .eyes::after {
   content: "";
@@ -195,42 +255,55 @@ body, html {
 #character .smile {
   position: absolute;
   left: 50%;
-  top: 20px;
-  width: 10px;
+  top: 23px;
+  width: 11px;
   height: 6px;
   transform: translateX(-50%);
   border-bottom: 2px solid #2a2424;
   border-radius: 0 0 10px 10px;
+  z-index: 6;
 }
 
 #character .body {
   position: absolute;
   left: 50%;
-  top: 35px;
-  width: 42px;
-  height: 34px;
+  top: 38px;
+  width: 48px;
+  height: 38px;
   transform: translateX(-50%);
   background: linear-gradient(135deg, #66a3ff, #4f7cff);
   border: 2px solid #3a2f2f;
-  border-radius: 14px;
+  border-radius: 16px;
+  z-index: 2;
+}
+
+#character .shirt {
+  position: absolute;
+  left: 50%;
+  top: 42px;
+  width: 28px;
+  height: 18px;
+  transform: translateX(-50%);
+  background: rgba(255,255,255,0.35);
+  border-radius: 12px;
+  z-index: 3;
 }
 
 #character .arms {
   position: absolute;
   left: 50%;
-  top: 42px;
-  width: 62px;
+  top: 46px;
+  width: 72px;
   height: 10px;
   transform: translateX(-50%);
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  z-index: 2;
 }
-
 #character .arms::before,
 #character .arms::after {
   content: "";
-  width: 22px;
+  width: 24px;
   height: 8px;
   background: #3a2f2f;
   border-radius: 999px;
@@ -239,19 +312,19 @@ body, html {
 #character .legs {
   position: absolute;
   left: 50%;
-  top: 66px;
-  width: 44px;
+  top: 74px;
+  width: 52px;
   height: 22px;
   transform: translateX(-50%);
   display: flex;
   justify-content: space-between;
+  z-index: 1;
 }
-
 #character .legs::before,
 #character .legs::after {
   content: "";
-  width: 9px;
-  height: 22px;
+  width: 10px;
+  height: 24px;
   background: #3a2f2f;
   border-radius: 999px;
 }
@@ -259,30 +332,22 @@ body, html {
 #character .shoes {
   position: absolute;
   left: 50%;
-  top: 84px;
-  width: 52px;
-  height: 10px;
+  top: 92px;
+  width: 60px;
+  height: 12px;
   transform: translateX(-50%);
   display: flex;
   justify-content: space-between;
+  z-index: 2;
 }
-
 #character .shoes::before,
 #character .shoes::after {
   content: "";
-  width: 16px;
-  height: 10px;
-  background: #2f6df5;
+  width: 18px;
+  height: 12px;
+  background: #1f6feb;
   border-radius: 8px 8px 5px 5px;
-}
-
-#character.walk {
-  animation: bob 0.9s ease-in-out infinite, walkBounce 0.35s ease-in-out 2;
-}
-
-@keyframes walkBounce {
-  0%, 100% { transform: translateY(0) scale(1); }
-  50% { transform: translateY(-8px) scale(1.02); }
+  border: 2px solid #163f7a;
 }
 
 #callout {
@@ -349,13 +414,14 @@ body, html {
   #question { margin-top: 84px; }
   .option { font-size: 1.02rem; padding: 15px 18px; }
   #belt-container { height: 180px; }
-  #character { transform: scale(0.92); transform-origin: bottom center; }
+  #character { transform: scale(0.9); transform-origin: bottom center; }
 }
 </style>
 </head>
 <body>
 
 <div id="splash">
+  <img src="assets/logo.png" alt="Innovine logo">
   <div class="logoText">Prefix & Suffix Factory</div>
 </div>
 
@@ -371,12 +437,16 @@ body, html {
     <div id="character-container">
       <div id="character" aria-label="game character">
         <div class="shadow"></div>
+        <div class="backpack"></div>
+        <div class="strap"></div>
+        <div class="cap"></div>
         <div class="hair"></div>
         <div class="head">
           <div class="eyes"></div>
           <div class="smile"></div>
         </div>
         <div class="body"></div>
+        <div class="shirt"></div>
         <div class="arms"></div>
         <div class="legs"></div>
         <div class="shoes"></div>
@@ -447,7 +517,7 @@ function safePlay(audioEl) {
 
 function setupPositions() {
   const belt = document.getElementById('belt-container');
-  const maxX = Math.max(0, belt.clientWidth - 120);
+  const maxX = Math.max(0, belt.clientWidth - 140);
   const steps = Math.max(1, questions.length - 1);
   questionPositions = [];
   for (let i = 0; i < questions.length; i++) {
