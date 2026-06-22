@@ -57,13 +57,29 @@ body, html {
 .panel-card p { color: #a49fc4; line-height: 1.6; margin-bottom: 25px; }
 
 /* GAME APP ENGINE INTERFACE */
-#gameScreen { background: #060414; }
+#gameScreen { background: #060414; position: relative; }
 #gameCanvas {
     display: block;
     width: 100vw;
     height: 100vh;
     background: radial-gradient(circle at center, #0f0b36 0%, #050312 100%);
+}
+
+/* HIGH-PRECISION NATIVE INPUT OVERLAYS */
+#inputOverlayContainer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 25;
+    pointer-events: none; /* Let background clicks through when needed */
+}
+.clickable-target {
+    position: absolute;
     cursor: pointer;
+    pointer-events: auto; /* Re-enable for the zones specifically */
+    /* background: rgba(255, 0, 0, 0.2); // Uncomment to debug position zones */
 }
 
 /* OVERLAY ACTION INTERFACES */
@@ -86,16 +102,19 @@ body, html {
 </head>
 <body>
 
+<!-- FIXED PATH PATHWAYS DIRECTLY LINKED FROM image_8075a5.png -->
 <audio id="correctSound" src="Middle-ELA/G7/chp9/conjunctions/assets/correct.mp3" preload="auto"></audio>
 <audio id="wrongSound" src="Middle-ELA/G7/chp9/conjunctions/assets/wrong.mp3" preload="auto"></audio>
 <audio id="clapSound" src="Middle-ELA/G7/chp9/conjunctions/assets/clapping.mp3" preload="auto"></audio>
 
+<!-- STAGE 1: LOGO INTRO SCREEN -->
 <div id="logoScreen" class="screen active">
     <div class="logo-container">
         <img src="Middle-ELA/G7/chp9/conjunctions/assets/innovine-logo.png" alt="Logo">
     </div>
 </div>
 
+<!-- STAGE 2: INSTRUCTIONS -->
 <div id="instructionScreen" class="screen">
     <div class="panel-card">
         <h1>🚀 Conjunction Space Arcade</h1>
@@ -104,10 +123,14 @@ body, html {
     </div>
 </div>
 
+<!-- STAGE 3: GAME RUNTIME CORE -->
 <div id="gameScreen" class="screen">
     <canvas id="gameCanvas"></canvas>
+    <!-- Native DOM layer mapping overlaying coordinates precisely over the canvas items -->
+    <div id="inputOverlayContainer"></div>
 </div>
 
+<!-- STAGE 4: CAPSTONE GAME OVER OVERLAY -->
 <div id="endScreen" class="screen">
     <div class="panel-card">
         <h1 style="font-size: 40px;">🏆</h1>
@@ -118,7 +141,6 @@ body, html {
 </div>
 
 <script>
-// Content Matrix
 const mcqs = [
     {q:'Find the participle: "The broken skateboard lay beside the ramp."',opts:["lay","beside","broken","ramp"],ans:"broken"},
     {q:'Which sentence contains a Conditional Conjunction?',opts:["I stayed home because it rained.","If you find the key, open the chest.","The player was tired but won.","The bike is faster than the scooter."],ans:"If you find the key, open the chest."},
@@ -134,6 +156,7 @@ const mcqs = [
 
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
+const overlayContainer = document.getElementById("inputOverlayContainer");
 
 let gameActive = false;
 let activeQuizList = [];
@@ -156,7 +179,7 @@ const player = {
     targetX: 0,
     width: 70,
     height: 45,
-    speed: 25 // Snappy slide transitions
+    speed: 25 
 };
 
 let targetOptionDiamonds = [];
@@ -185,54 +208,54 @@ function resizeViewports() {
         player.x = canvas.width / 2 - player.width / 2;
         player.targetX = player.x;
     }
+    if(gameActive) {
+        rebuildInteractiveZones();
+    }
 }
 window.addEventListener("resize", resizeViewports);
 
 /* ==========================================================================
-   ROBUST INTERACTION HANDLING (CLICK DETECTION)
+   ROBUST DYNAMIC INTERACTION INJECTIONS
    ========================================================================== */
-canvas.addEventListener("click", handleInputTouch);
-canvas.addEventListener("touchstart", function(e) {
-    if (e.touches.length > 0) {
-        e.preventDefault();
-        const rect = canvas.getBoundingClientRect();
-        handleInputTouch({
-            clientX: e.touches[0].clientX,
-            clientY: e.touches[0].clientY
-        });
-    }
-}, { passive: false });
-
-function handleInputTouch(e) {
-    if (!gameActive) return;
-
+function rebuildInteractiveZones() {
+    overlayContainer.innerHTML = "";
+    
+    // Global screen advance context target element (covers entire display screen area when prompt is active)
     if (showContinuePrompt) {
-        nextStageFloor();
+        const globalNextBtn = document.createElement("div");
+        globalNextBtn.className = "clickable-target";
+        globalNextBtn.style.width = "100%";
+        globalNextBtn.style.height = "100%";
+        globalNextBtn.style.left = "0";
+        globalNextBtn.style.top = "0";
+        globalNextBtn.addEventListener("click", nextStageFloor);
+        overlayContainer.appendChild(globalNextBtn);
         return;
     }
 
-    // Don't register clicks if laser is currently firing
-    if (laserBeamActive) return;
-
-    const rect = canvas.getBoundingClientRect();
-    const clickX = e.clientX - rect.left;
-    const clickY = e.clientY - rect.top;
-
-    // Check which diamond shape was clicked directly
-    targetOptionDiamonds.forEach(diamond => {
+    // Individual diamond target mapping context zones
+    targetOptionDiamonds.forEach((diamond, index) => {
         if (diamond.disabled) return;
-
-        const halfW = diamond.width / 2;
-        const halfH = diamond.height / 2;
-        const dx = Math.abs(clickX - diamond.x);
-        const dy = Math.abs(clickY - diamond.y);
-
-        // Precision geometry validation range mapping
-        if ((dx / halfW) + (dy / halfH) <= 1) {
-            // Command the ship to navigate right under this diamond option
+        
+        const zoneBtn = document.createElement("div");
+        zoneBtn.className = "clickable-target";
+        
+        // Pad dimensions slightly to ensure effortless child hit detection margins
+        const paddingW = diamond.width + 20;
+        const paddingH = diamond.height + 20;
+        
+        zoneBtn.style.width = `${paddingW}px`;
+        zoneBtn.style.height = `${paddingH}px`;
+        zoneBtn.style.left = `${diamond.x - paddingW / 2}px`;
+        zoneBtn.style.top = `${diamond.y - paddingH / 2}px`;
+        
+        zoneBtn.addEventListener("click", () => {
+            if (laserBeamActive || showContinuePrompt) return;
             player.targetX = diamond.x - player.width / 2;
             targetedDiamond = diamond;
-        }
+        });
+        
+        overlayContainer.appendChild(zoneBtn);
     });
 }
 
@@ -279,19 +302,19 @@ function setupQuestionFloor() {
             disabled: false
         });
     });
+    
+    rebuildInteractiveZones();
 }
 
 function animateEngineLoop() {
     if(!gameActive) return;
     
-    // Smooth Interpolation Ship Horizontal Slide Math
     const diffX = player.targetX - player.x;
     if (Math.abs(diffX) > 4) {
         player.x += Math.sign(diffX) * player.speed;
     } else {
         player.x = player.targetX;
         
-        // If arrived under target option, engage laser fire!
         if (targetedDiamond && !laserBeamActive && !showContinuePrompt) {
             laserX = player.x + player.width / 2;
             laserBeamActive = true;
@@ -333,12 +356,14 @@ function evaluateSelection(diamond) {
             feedbackMessage = "❌ FALSE LEAD! Try another remaining choice!";
         }
     }
+    rebuildInteractiveZones();
 }
 
 function nextStageFloor() {
     currentIndex++;
     if(currentIndex >= activeQuizList.length) {
         gameActive = false;
+        overlayContainer.innerHTML = "";
         document.getElementById("gameScreen").classList.remove("active");
         document.getElementById("endScreen").classList.add("active");
         document.getElementById("finalScoreDisplay").innerText = `Final Score: ${totalScore} / ${activeQuizList.length}`;
@@ -358,7 +383,7 @@ function restartEntireGame() {
 function renderGraphicsWorkspace() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
-    // 1. Starfield Background
+    // Starfield Background
     ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
     backgroundStars.forEach(s => {
         ctx.beginPath();
@@ -366,7 +391,7 @@ function renderGraphicsWorkspace() {
         ctx.fill();
     });
     
-    // 2. Tractor Beam Scanner Laser Light
+    // Tractor Beam Laser
     if (laserBeamActive) {
         ctx.save();
         ctx.strokeStyle = `rgba(0, 255, 204, ${laserAlpha})`;
@@ -380,7 +405,7 @@ function renderGraphicsWorkspace() {
         ctx.restore();
     }
     
-    // 3. HUD Display Banner
+    // HUD Display Banner
     ctx.fillStyle = "rgba(20, 15, 61, 0.85)";
     ctx.fillRect(0, 0, canvas.width, 70);
     ctx.strokeStyle = "#00ffcc";
@@ -400,7 +425,7 @@ function renderGraphicsWorkspace() {
     ctx.textAlign = "right";
     ctx.fillText(`SHIELD: ${hearts}`, canvas.width - 25, 42);
     
-    // 4. Question Container Frame Banner
+    // Question Banner
     const activeData = activeQuizList[currentIndex];
     ctx.fillStyle = "rgba(10, 5, 36, 0.95)";
     ctx.strokeStyle = "#ffca3a";
@@ -416,7 +441,7 @@ function renderGraphicsWorkspace() {
     ctx.textAlign = "center";
     ctx.fillText(activeData.q, canvas.width / 2, 146, qw - 40);
     
-    // 5. Render Floating Option Diamonds
+    // Diamonds Layout Drawing Layer
     targetOptionDiamonds.forEach(diamond => {
         ctx.save();
         ctx.translate(diamond.x, diamond.y);
@@ -441,7 +466,7 @@ function renderGraphicsWorkspace() {
         ctx.fillText(diamond.text, diamond.x, diamond.y + 5, diamond.width - 25);
     });
     
-    // 6. Action Alerts Status Message Banner
+    // Notifications Banner
     if(feedbackMessage !== "") {
         ctx.fillStyle = feedbackMessage.startsWith("✨") ? "#00ffcc" : "#ff595e";
         ctx.font = "bold 17px sans-serif";
@@ -449,7 +474,7 @@ function renderGraphicsWorkspace() {
         ctx.fillText(feedbackMessage, canvas.width / 2, canvas.height - 120);
     }
     
-    // 7. Render Blue Space Ship
+    // Render Blue Space Ship
     ctx.save();
     ctx.shadowBlur = 12;
     ctx.shadowColor = "#00b4d8";
