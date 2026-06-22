@@ -19,7 +19,6 @@ body {
   position: relative;
 }
 
-/* SPLASH SCREEN */
 #splash {
   position: fixed;
   inset: 0;
@@ -42,7 +41,6 @@ body {
   50% { transform: translateY(-20px); }
 }
 
-/* MOVING STARS BACKGROUND */
 #stars {
   position: fixed;
   inset: 0;
@@ -63,7 +61,6 @@ body {
   to { transform: translateY(100vh); }
 }
 
-/* INTRO SCREEN */
 #intro {
   position: fixed;
   inset: 0;
@@ -111,7 +108,6 @@ body {
   box-shadow: 0 6px 30px rgba(0, 212, 255, 0.7);
 }
 
-/* GAME AREA */
 #gameArea {
   position: relative;
   width: 100vw;
@@ -120,7 +116,6 @@ body {
   z-index: 1;
 }
 
-/* ROCKET */
 #rocket {
   position: absolute;
   bottom: 150px;
@@ -148,7 +143,6 @@ body {
   75% { transform: translateX(-50%) rotate(20deg); }
 }
 
-/* OBSTACLES */
 .obstacle {
   position: absolute;
   font-size: 50px;
@@ -161,7 +155,6 @@ body {
   to { transform: translateY(100vh); }
 }
 
-/* QUESTION MODAL */
 #questionModal {
   position: fixed;
   inset: 0;
@@ -270,7 +263,6 @@ body {
   color: #ff4444;
 }
 
-/* SCORE BOARD */
 #scoreBoard {
   position: fixed;
   top: 15px;
@@ -285,7 +277,6 @@ body {
   border: 2px solid #00d4ff;
 }
 
-/* PROGRESS BAR */
 #progressBar {
   position: fixed;
   top: 15px;
@@ -306,7 +297,6 @@ body {
   border-radius: 10px;
 }
 
-/* SPEED METER */
 #speedMeter {
   position: fixed;
   bottom: 15px;
@@ -321,7 +311,6 @@ body {
   border: 2px solid #00d4ff;
 }
 
-/* LEVEL COUNTER */
 #levelCounter {
   position: fixed;
   bottom: 15px;
@@ -336,7 +325,6 @@ body {
   border: 2px solid #00d4ff;
 }
 
-/* RESULT SCREEN */
 #result {
   position: fixed;
   inset: 0;
@@ -373,448 +361,7 @@ body {
 
 #result p {
   font-size: 22px;
-  margin-bottom: 20px;
-}
-
-.restartBtn {
-  padding: 16px 40px;
-  font-size: 22px;
-  background: linear-gradient(135deg, #ff6b6b, #ee5a5a);
-  color: white;
-  border: none;
-  border-radius: 15px;
-  cursor: pointer;
-  font-weight: bold;
-  box-shadow: 0 4px 20px rgba(255, 107, 107, 0.5);
-  transition: 0.3s;
-}
-
-.restartBtn:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 30px rgba(255, 107, 107, 0.7);
-}
-
-/* CONFETTI */
-.confetti {
-  position: fixed;
-  width: 12px;
-  height: 12px;
-  animation: fallConfetti 3s linear forwards;
-  z-index: 2000;
-}
-
-@keyframes fallConfetti {
-  from { transform: translateY(-100px) rotate(0deg); }
-  to { transform: translateY(100vh) rotate(720deg); opacity: 0; }
-}
-
-/* PLANET */
-#planet {
-  position: fixed;
-  bottom: -150px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 200px;
-  z-index: 1;
-  animation: approach 10s linear;
-}
-
-@keyframes approach {
-  from { bottom: -150px; }
-  to { bottom: 30%; }
-}
-
-/* MOBILE */
-@media (max-width: 768px) {
-  #intro h1 { font-size: 32px; }
-  #intro p { font-size: 16px; }
-  .questionText { font-size: 15px; }
-  .optionBtn { font-size: 14px; padding: 12px; }
-  #rocket { font-size: 70px; }
-  .obstacle { font-size: 40px; }
-}
-</style>
-</head>
-<body>
-
-<!-- SPLASH SCREEN -->
-<div id="splash">
-  <img src="assets/logo.png" onerror="this.style.display='none'">
-</div>
-
-<!-- MOVING STARS -->
-<div id="stars"></div>
-
-<!-- ROCKET -->
-<div id="rocket">🚀</div>
-
-<!-- PLANET -->
-<div id="planet">🪐</div>
-
-<!-- INTRO SCREEN -->
-<div id="intro">
-  <h1>🚀 Verb Rocket Space Mission</h1>
-  <p>Pilot your rocket through space and answer challenging Main & Auxiliary Verb questions!</p>
-  <p>✅ Correct = Speed Boost + Pass Obstacles</p>
-  <p>❌ Wrong = Slow Down + Hit Obstacle (1 more try!)</p>
-  <p>🎯 Complete all 15 levels to reach the Verb Planet!</p>
-  <button class="startBtn" onclick="startGame()">🚀 LAUNCH ROCKET</button>
-</div>
-
-<!-- GAME AREA -->
-<div id="gameArea"></div>
-
-<!-- SCORE BOARD -->
-<div id="scoreBoard">
-  Score: <span id="score">0</span> | 
-  Level: <span id="level">0</span>/15
-</div>
-
-<!-- PROGRESS BAR -->
-<div id="progressBar">
-  <div id="progressFill"></div>
-</div>
-
-<!-- SPEED METER -->
-<div id="speedMeter">
-  Speed: <span id="speed">Normal</span>
-</div>
-
-<!-- LEVEL COUNTER -->
-<div id="levelCounter">
-  Level <span id="currentLevel">1</span>/15
-</div>
-
-<!-- QUESTION MODAL -->
-<div id="questionModal">
-  <div class="questionBox">
-    <h2>Level <span id="questionLevel">1</span></h2>
-    <div class="questionText" id="questionText"></div>
-    <div class="options" id="options"></div>
-    <div class="feedback" id="feedback"></div>
-  </div>
-</div>
-
-<!-- RESULT SCREEN -->
-<div id="result">
-  <h1>🪐 MISSION COMPLETE!</h1>
-  <h2>You reached the Verb Planet!</h2>
-  <h3 id="rank"></h3>
-  <p id="finalScore"></p>
-  <button class="restartBtn" onclick="location.reload()">🚀 PLAY AGAIN</button>
-</div>
-
-<!-- AUDIO -->
-<audio id="correctSound" src="assets/correct.mp3"></audio>
-<audio id="wrongSound" src="assets/wrong.mp3"></audio>
-<audio id="clapSound" src="assets/freesound_community-claps-44774.mp3"></audio>
-
-<script>
-// SPLASH LOGO - FIXED
-window.addEventListener('DOMContentLoaded', function() {
-  createStars();
-  setTimeout(hideSplash, 5000);
-});
-
-function hideSplash() {
-  const splash = document.getElementById('splash');
-  const intro = document.getElementById('intro');
-  
-  splash.style.opacity = '0';
-  setTimeout(() => {
-    splash.style.display = 'none';
-    intro.style.display = 'flex';
-  }, 1000);
-}
-
-function createStars() {
-  const stars = document.getElementById('stars');
-  for(let i=0; i<50; i++) {
-    const star = document.createElement('div');
-    star.className = 'star';
-    star.style.left = Math.random() * 100 + '%';
-    star.style.animationDelay = Math.random() * 3 + 's';
-    star.style.animationDuration = (2 + Math.random() * 2) + 's';
-    stars.appendChild(star);
-  }
-}
-
-// AUDIO
-const correctSound = document.getElementById('correctSound');
-const wrongSound = document.getElementById('wrongSound');
-const clapSound = document.getElementById('clapSound');
-correctSound.volume = 0.8;
-wrongSound.volume = 0.8;
-clapSound.volume = 0.8;
-
-// QUESTIONS - 15 TOTAL WITH VARIED CORRECT ANSWERS (A=0, B=1, C=2, D=3)
-const questions = [
-  {
-    q: "Although Maria was extremely nervous before her final dance performance, her teacher told her that she <span class='underline'>is dancing</span> beautifully and <span class='underline'>has practiced</span> for many hours, so she <span class='underline'>will definitely win</span> the competition. What is the AUXILIARY verb in the underlined phrase 'has practiced'?",
-    options: ["practiced", "has", "is", "will"],
-    correct: 1
-  },
-  {
-    q: "The students who <span class='underline'>had been studying</span> for the entire week were finally able to complete their difficult project, and they <span class='underline'>have submitted</span> it to the principal before the deadline yesterday. Identify the MAIN verb in the underlined phrase 'have submitted'.",
-    options: ["have", "submitted", "been", "had"],
-    correct: 1
-  },
-  {
-    q: "When the teacher asked the class if anyone <span class='underline'>could solve</span> the complex mathematics problem, only three students <span class='underline'>were able to</span> provide the correct answer, while the rest <span class='underline'>were struggling</span> with it. Which word is a MODAL auxiliary verb in this sentence?",
-    options: ["were", "to", "could", "with"],
-    correct: 2
-  },
-  {
-    q: "Although the team <span class='underline'>was working</span> on the project for months, they <span class='underline'>had not finished</span> it by the deadline because unexpected complications <span class='underline'>arose</span> during the final week. What is the PRIMARY auxiliary verb in 'had not finished'?",
-    options: ["not", "finished", "was", "had"],
-    correct: 3
-  },
-  {
-    q: "The scientist explained that if the experiment <span class='underline'>is conducted</span> properly, the results <span class='underline'>will be published</span> in the renowned journal, and other researchers <span class='underline'>might replicate</span> the findings. Identify the AUXILIARY verb indicating future tense in 'will be published'.",
-    options: ["be", "published", "is", "will"],
-    correct: 3
-  },
-  {
-    q: "My sister <span class='underline'>has been teaching</span> at the same school for over fifteen years, and she <span class='underline'>loves</span> her job because the children <span class='underline'>are very enthusiastic</span> about learning. What type of auxiliary verb is 'has' in 'has been teaching'?",
-    options: ["Main verb", "Modal auxiliary", "Conjunction", "Primary auxiliary"],
-    correct: 3
-  },
-  {
-    q: "The manager announced that all employees <span class='underline'>must attend</span> the mandatory training session tomorrow, and anyone who <span class='underline'>cannot participate</span> <span class='underline'>should request</span> an alternative date in advance. Which word is a MODAL auxiliary expressing obligation?",
-    options: ["should", "attend", "can", "must"],
-    correct: 3
-  },
-  {
-    q: "While the children <span class='underline'>were playing</span> in the garden, their mother <span class='underline'>was reading</span> a book, and their father <span class='underline'>has just returned</span> from work. Identify the MAIN verb in the phrase 'were playing'.",
-    options: ["the", "were", "playing", "in"],
-    correct: 2
-  },
-  {
-    q: "The professor stated that students <span class='underline'>should have completed</span> the assignment before the class, but many <span class='underline'>did not finish</span> it because they <span class='underline'>were confused</span> about the requirements. What is the AUXILIARY verb expressing past perfect in 'should have completed'?",
-    options: ["should", "did", "completed", "have"],
-    correct: 3
-  },
-  {
-    q: "Although the weather <span class='underline'>was terrible</span> during our trip, we <span class='underline'>still managed</span> to visit all the museums, and we <span class='underline'>will remember</span> the experience forever. Which auxiliary verb indicates PAST CONTINUOUS tense in the sentence?",
-    options: ["managed", "will", "still", "was"],
-    correct: 3
-  },
-  {
-    q: "The coach explained that if the players <span class='underline'>train diligently</span> every day, they <span class='underline'>will be able to</span> win the championship, but they <span class='underline'>must practice</span> more consistently. Identify the MODAL auxiliary verb that shows necessity in this sentence.",
-    options: ["will", "be", "must", "able"],
-    correct: 2
-  },
-  {
-    q: "Yesterday, when I <span class='underline'>was walking</span> to the store, I <span class='underline'>saw</span> my friend who <span class='underline'>has been living</span> in this city for ten years. What is the MAIN verb in the underlined phrase 'was walking'?",
-    options: ["walking", "was", "to", "the"],
-    correct: 0
-  },
-  {
-    q: "The teacher mentioned that the students <span class='underline'>might receive</span> extra homework if they <span class='underline'>do not complete</span> their current assignments, and they <span class='underline'>should submit</span> everything by Friday. Which auxiliary verb expresses possibility?",
-    options: ["do", "should", "might", "not"],
-    correct: 2
-  },
-  {
-    q: "Even though she <span class='underline'>had studied</span> extensively for the examination, she <span class='underline'>was feeling</span> anxious because she <span class='underline'>has never taken</span> such a difficult test before. Identify the AUXILIARY verb in the past perfect tense 'had studied'.",
-    options: ["studied", "feeling", "has", "had"],
-    correct: 3
-  },
-  {
-    q: "The artist explained that the painting <span class='underline'>was created</span> using traditional techniques, and it <span class='underline'>has been displayed</span> in multiple galleries, so it <span class='underline'>will be auctioned</span> next month. What type of verb form is 'created' in 'was created'?",
-    options: ["Present participle", "Past participle", "Infinitive", "Gerund"],
-    correct: 1
-  }
-];
-
-// Shuffle questions randomly
-questions.sort(() => Math.random() - 0.5);
-
-// GAME VARIABLES
-let currentLevel = 0;
-let score = 0;
-let attempts = 0;
-let gameSpeed = 'Normal';
-let speedValue = 1;
-
-// ELEMENTS
-const rocket = document.getElementById('rocket');
-const questionModal = document.getElementById('questionModal');
-const questionText = document.getElementById('questionText');
-const optionsDiv = document.getElementById('options');
-const feedback = document.getElementById('feedback');
-const scoreEl = document.getElementById('score');
-const levelEl = document.getElementById('level');
-const currentLevelEl = document.getElementById('currentLevel');
-const questionLevelEl = document.getElementById('questionLevel');
-const progressFill = document.getElementById('progressFill');
-const speedEl = document.getElementById('speed');
-const result = document.getElementById('result');
-
-// START GAME
-function startGame() {
-  document.getElementById('intro').style.display = 'none';
-  score = 0;
-  currentLevel = 0;
-  updateScore();
-  startGameLoop();
-}
-
-// GAME LOOP
-function startGameLoop() {
-  const obstacles = [];
-  
-  // Create obstacles
-  for(let i=0; i<5; i++) {
-    const obs = document.createElement('div');
-    obs.className = 'obstacle';
-    obs.innerHTML = '❌';
-    obs.style.left = Math.random() * 80 + '%';
-    obs.style.top = '-100px';
-    obs.style.animationDelay = i * 0.8 + 's';
-    document.getElementById('gameArea').appendChild(obs);
-    obstacles.push(obs);
-  }
-  
-  // Show question after 1 second
-  setTimeout(() => {
-    showQuestion();
-  }, 1000);
-}
-
-// SHOW QUESTION
-function showQuestion() {
-  attempts = 0;
-  feedback.innerHTML = '';
-  feedback.className = 'feedback';
-  
-  const q = questions[currentLevel];
-  questionLevelEl.textContent = currentLevel + 1;
-  questionText.innerHTML = q.q;
-  optionsDiv.innerHTML = '';
-  
-  q.options.forEach((opt, i) => {
-    const btn = document.createElement('button');
-    btn.className = 'optionBtn';
-    btn.textContent = opt;
-    btn.onclick = () => checkAnswer(i, btn);
-    optionsDiv.appendChild(btn);
-  });
-  
-  questionModal.style.display = 'flex';
-}
-
-// CHECK ANSWER
-function checkAnswer(selected, btn) {
-  const q = questions[currentLevel];
-  const allBtns = optionsDiv.querySelectorAll('.optionBtn');
-  
-  allBtns.forEach(b => b.disabled = true);
-  
-  if(selected === q.correct) {
-    // CORRECT!
-    btn.classList.add('correct');
-    feedback.innerHTML = '🎉 CORRECT! Speed Boost Activated!';
-    feedback.className = 'feedback good';
-    correctSound.play();
-    clapSound.play();
-    createConfetti();
-    
-    score++;
-    gameSpeed = 'FAST';
-    speedValue = 1.5;
-    speedEl.textContent = 'FAST ⚡';
-    rocket.classList.add('boost');
-    
-    setTimeout(() => {
-      rocket.classList.remove('boost');
-      gameSpeed = 'Normal';
-      speedValue = 1;
-      speedEl.textContent = 'Normal';
-    }, 3000);
-  } else {
-    // WRONG!
-    btn.classList.add('wrong');
-    allBtns[q.correct].classList.add('correct');
-    
-    if(attempts === 0) {
-      attempts = 1;
-      feedback.innerHTML = '❌ Wrong! One more attempt remains!';
-      feedback.className = 'feedback bad';
-      wrongSound.play();
-      
-      setTimeout(() => {
-        feedback.innerHTML = '';
-        allBtns.forEach(b => b.disabled = false);
-      }, 1500);
-    } else {
-      feedback.innerHTML = '❌ Wrong! Correct: ' + q.options[q.correct];
-      feedback.className = 'feedback bad';
-      wrongSound.play();
-      rocket.classList.add('crash');
-      setTimeout(() => rocket.classList.remove('crash'), 500);
-    }
-  }
-  
-  updateScore();
-  
-  setTimeout(() => {
-    questionModal.style.display = 'none';
-    currentLevel++;
-    
-    if(currentLevel < questions.length) {
-      updateScore();
-      setTimeout(startGameLoop, 500);
-    } else {
-      finishGame();
-    }
-  }, 2000);
-}
-
-// UPDATE SCORE
-function updateScore() {
-  scoreEl.textContent = score;
-  levelEl.textContent = currentLevel;
-  currentLevelEl.textContent = currentLevel + 1;
-  progressFill.style.width = ((currentLevel) / questions.length * 100) + '%';
-}
-
-// CONFETTI
-function createConfetti() {
-  for(let i=0; i<30; i++) {
-    const conf = document.createElement('div');
-    conf.className = 'confetti';
-    conf.style.left = Math.random() * 100 + '%';
-    conf.style.background = `hsl(${Math.random()*360}, 100%, 50%)`;
-    conf.style.animationDuration = (2 + Math.random() * 2) + 's';
-    document.body.appendChild(conf);
-    setTimeout(() => conf.remove(), 3000);
-  }
-}
-
-// FINISH GAME
-function finishGame() {
-  rocket.style.bottom = '30%';
-  
-  setTimeout(() => {
-    result.style.display = 'flex';
-    
-    const rankEl = document.getElementById('rank');
-    const finalEl = document.getElementById('finalScore');
-    
-    finalEl.textContent = `You scored ${score} out of 15!`;
-    
-    if(score >= 13) {
-      rankEl.textContent = '🏅 MASTER SPACE PILOT';
-      createConfetti();
-      clapSound.play();
-    } else if(score >= 9) {
-      rankEl.textContent = '⭐ CADET VERB EXPLORER';
-    } else {
-      rankEl.textContent = '🌙 MOON LEARNER';
-    }
-  }, 3000);
-}
-</script>
-
-</body>
-</html>
+  margin-bottom:
+</parameter>
+</function>
+</tool_call>
