@@ -33,7 +33,7 @@ html {
     height: -webkit-fill-available;
 }
 
-/* DETECTIVE BACKGROUND CANVAS MATRIX */
+/* DETECTIVE BACKGROUND CANVAS MATRIX (FIXED LAYER INTERACTION Z-INDEX) */
 #detectiveMatrixCanvas {
     position: fixed;
     top: 0;
@@ -41,7 +41,7 @@ html {
     width: 100vw;
     height: 100vh;
     z-index: 1;
-    pointer-events: none;
+    pointer-events: none; /* Allows click-through instantly */
     opacity: 0.35;
 }
 
@@ -60,13 +60,13 @@ html {
     padding: 20px;
     box-sizing: border-box;
     overflow: hidden;
-    z-index: 5;
+    z-index: 5; /* Places the interactive cards safely over the matrix */
 }
 .screen.active {
     display: flex;
 }
 
-/* STAGE 1: LOGO SCREEN (STRICTLY LOGO ONLY FOR 5s) */
+/* STAGE 1: LOGO SCREEN */
 #logoScreen {
     background: #ffffff;
     z-index: 9999;
@@ -234,7 +234,7 @@ button.game-btn.wrong {
 .banner-action.text-correct { color: #1b4332; }
 .banner-action.text-wrong { color: #e63946; }
 
-/* STAGE 4: VISUAL CAPSTONE SUMMARY CARD */
+/* STAGE 4: EVALUATION SUMMARY CARD */
 .summary-box {
     background: rgba(20, 15, 61, 0.95);
     color: #fff;
@@ -496,7 +496,6 @@ function initDetectiveBackgroundMatrix() {
     window.addEventListener("resize", resizeBg);
     resizeBg();
     
-    // Grid coordinates items definition arrays
     let clues = [];
     const elementsList = ["🔍", "👣", "📜", "💼", "🔑", "📌", "0", "1"];
     
@@ -513,14 +512,12 @@ function initDetectiveBackgroundMatrix() {
     function animateBackground() {
         bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
         
-        // Render cyber grid lines
         bgCtx.strokeStyle = "rgba(0, 255, 204, 0.05)";
         bgCtx.lineWidth = 1;
         for(let x=0; x<bgCanvas.width; x+=50) {
             bgCtx.beginPath(); bgCtx.moveTo(x, 0); bgCtx.lineTo(x, bgCanvas.height); bgCtx.stroke();
         }
         
-        // Draw detective icon nodes floating slowly up
         bgCtx.fillStyle = "rgba(0, 255, 204, 0.35)";
         clues.forEach(clue => {
             bgCtx.font = `${clue.size}px monospace`;
