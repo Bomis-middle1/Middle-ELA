@@ -13,7 +13,6 @@ body {
   overflow: hidden;
 }
 
-/* SPLASH */
 #splash {
   position: fixed;
   width: 100%;
@@ -29,7 +28,6 @@ body {
   width: 40%;
 }
 
-/* GAME */
 .container {
   max-width: 800px;
   margin: auto;
@@ -63,7 +61,6 @@ h1 {
   cursor: pointer;
 }
 
-/* BOTTLE */
 #potionContainer {
   width: 50px;
   height: 200px;
@@ -84,7 +81,6 @@ h1 {
   transition: height 0.4s;
 }
 
-/* END SCREEN */
 #endScreen {
   position: fixed;
   width: 100%;
@@ -107,17 +103,14 @@ h1 {
   border-radius: 10px;
 }
 </style>
-
 </head>
 
 <body>
 
-<!-- SPLASH -->
 <div id="splash">
-  <img src="assets/logo.png">
+  <img src="assets/logo.png" alt="Logo">
 </div>
 
-<!-- GAME -->
 <div class="container">
   <h1 id="levelTitle"></h1>
   <div id="scoreBoard">Score: 0</div>
@@ -130,7 +123,6 @@ h1 {
   </div>
 </div>
 
-<!-- END -->
 <div id="endScreen">
   <h2 id="finalScore"></h2>
   <button id="restartBtn" onclick="location.reload()">Play Again</button>
@@ -140,42 +132,40 @@ h1 {
 <audio id="wrongSound" src="assets/wrong.mp3"></audio>
 
 <script>
-
-/* LEVELS (UNCHANGED CONTENT AS YOU REQUIRED) */
 const levels = [
-{
-title:"Level 1 - Homophones",
-questions:[
-{q:"The cake is too ___ to eat.",options:["sweet","suite"],answer:"sweet"},
-{q:"I need to ___ my new shoes.",options:["buy","by"],answer:"buy"},
-{q:"He went to the ___ to meet his friend.",options:["sea","see"],answer:"see"},
-{q:"The wind will ___ the leaves away.",options:["blow","below"],answer:"blow"},
-{q:"She used a ___ to tie her hair.",options:["band","banned"],answer:"band"},
-{q:"I can't ___ what he said.",options:["hear","here"],answer:"hear"}
-]
-},
+  {
+    title: "Level 1 - Homophones",
+    questions: [
+      { q: "The cake is too ___ to eat.", options: ["sweet", "suite"], answer: "sweet" },
+      { q: "I need to ___ my new shoes.", options: ["buy", "by"], answer: "buy" },
+      { q: "He went to the ___ to meet his friend.", options: ["sea", "see"], answer: "see" },
+      { q: "The wind will ___ the leaves away.", options: ["blow", "below"], answer: "blow" },
+      { q: "She used a ___ to tie her hair.", options: ["band", "banned"], answer: "band" },
+      { q: "I can't ___ what he said.", options: ["hear", "here"], answer: "hear" }
+    ]
+  },
 
-{
-title:"Level 2 - Homographs",
-questions:[
-{q:"I will ___ the book on the table.",options:["lead","lead"],answer:"lead"},
-{q:"I cannot ___ the problem.",options:["read","reed"],answer:"read"},
-{q:"The soldier took a ___ to the enemy.",options:["tear","tear"],answer:"tear"},
-{q:"She decided to ___ the letter.",options:["wind","winde"],answer:"wind"},
-{q:"The teacher will ___ the class.",options:["lead","leads"],answer:"leads"}
-]
-},
+  {
+    title: "Level 2 - Homographs",
+    questions: [
+      { q: "I will ___ the book on the table.", options: ["lead - guide", "lead - metal"], answer: "lead - guide" },
+      { q: "Please ___ the children to the hall.", options: ["lead - guide", "lead - metal"], answer: "lead - guide" },
+      { q: "A ___ rolled down her cheek.", options: ["tear - drop", "tear - rip"], answer: "tear - drop" },
+      { q: "Please do not ___ the paper.", options: ["tear - rip", "tear - drop"], answer: "tear - rip" },
+      { q: "The wind began to ___ hard.", options: ["blow - move air", "blow - a kiss"], answer: "blow - move air" }
+    ]
+  },
 
-{
-title:"Level 3 - Mixed",
-questions:[
-{q:"I will ___ the window before leaving.",options:["close","close"],answer:"close"},
-{q:"I need to ___ my homework.",options:["do","due"],answer:"do"},
-{q:"The ___ is shining bright.",options:["sun","son"],answer:"sun"},
-{q:"The show will ___ at 7 PM.",options:["start","start"],answer:"start"},
-{q:"They used a ___ to lift the box.",options:["lead","lead"],answer:"lead"}
-]
-}
+  {
+    title: "Level 3 - Mixed",
+    questions: [
+      { q: "I will ___ the window before leaving.", options: ["close - shut", "close - near"], answer: "close - shut" },
+      { q: "I need to ___ my homework.", options: ["do", "due"], answer: "do" },
+      { q: "The ___ is shining bright.", options: ["sun", "son"], answer: "sun" },
+      { q: "The show will ___ at 7 PM.", options: ["start", "star"], answer: "start" },
+      { q: "The farmer used a ___ to carry water.", options: ["pail", "pale"], answer: "pail" }
+    ]
+  }
 ];
 
 let currentLevel = 0;
@@ -187,87 +177,92 @@ const optEl = document.getElementById("options");
 const levelTitle = document.getElementById("levelTitle");
 const scoreBoard = document.getElementById("scoreBoard");
 const potionFill = document.getElementById("potionFill");
+const correctSound = document.getElementById("correctSound");
+const wrongSound = document.getElementById("wrongSound");
 
-/* RESET BOTTLE */
-function resetBottle(){
+function resetBottle() {
   potionFill.style.height = "0%";
 }
 
-/* UPDATE BOTTLE (FIXED PROPERLY) */
-function updateBottle(){
-  let total = levels[currentLevel].questions.length;
-
-  // +1 because we show progress AFTER correct answer
-  let progress = (currentQuestion / total) * 100;
-
+function updateBottle() {
+  const total = levels[currentLevel].questions.length;
+  const progress = (currentQuestion / total) * 100;
   potionFill.style.height = progress + "%";
 }
 
-/* LOAD QUESTION */
-function loadQuestion(){
+function validateLevels() {
+  levels.forEach((level, levelIndex) => {
+    level.questions.forEach((q, questionIndex) => {
+      if (!q.options.includes(q.answer)) {
+        console.warn(`Answer mismatch at Level ${levelIndex + 1}, Question ${questionIndex + 1}:`, q);
+      }
+    });
+  });
+}
 
-  if(currentQuestion >= levels[currentLevel].questions.length){
+function loadQuestion() {
+  if (currentQuestion >= levels[currentLevel].questions.length) {
     currentLevel++;
     currentQuestion = 0;
 
-    if(currentLevel >= levels.length){
+    if (currentLevel >= levels.length) {
       endGame();
       return;
     }
 
-    resetBottle(); // FIXED
+    resetBottle();
   }
 
-  let q = levels[currentLevel].questions[currentQuestion];
-
+  const q = levels[currentLevel].questions[currentQuestion];
   levelTitle.innerText = levels[currentLevel].title;
   qEl.innerText = q.q;
   optEl.innerHTML = "";
 
   updateBottle();
 
-  q.options.forEach(opt=>{
-    let btn = document.createElement("button");
+  q.options.forEach(opt => {
+    const btn = document.createElement("button");
     btn.className = "btn";
     btn.innerText = opt;
-    btn.onclick = ()=>checkAnswer(opt);
+    btn.onclick = () => checkAnswer(opt);
     optEl.appendChild(btn);
   });
 }
 
-/* CHECK ANSWER */
-function checkAnswer(opt){
-  let q = levels[currentLevel].questions[currentQuestion];
+function checkAnswer(opt) {
+  const q = levels[currentLevel].questions[currentQuestion];
 
-  if(opt === q.answer){
+  if (!q.options.includes(opt)) {
+    alert("Invalid choice.");
+    return;
+  }
+
+  if (opt === q.answer) {
     score += 20;
     scoreBoard.innerText = "Score: " + score;
-
+    if (correctSound) correctSound.play();
     currentQuestion++;
-    updateBottle(); // FIXED timing
-
     loadQuestion();
   } else {
+    if (wrongSound) wrongSound.play();
     alert("Wrong!");
   }
 }
 
-/* END GAME */
-function endGame(){
+function endGame() {
   document.querySelector(".container").style.display = "none";
   document.getElementById("endScreen").style.display = "flex";
 
+  const totalQuestions = levels.reduce((sum, level) => sum + level.questions.length, 0);
   document.getElementById("finalScore").innerText =
-    "Final Score: " + score +
-    " / " + (levels.flatMap(l=>l.questions).length * 20);
+    "Final Score: " + score + " / " + (totalQuestions * 20);
 }
 
-/* SPLASH */
-setTimeout(()=>{
+setTimeout(() => {
   document.getElementById("splash").style.display = "none";
+  validateLevels();
   loadQuestion();
-},3000);
-
+}, 3000);
 </script>
 
 </body>
