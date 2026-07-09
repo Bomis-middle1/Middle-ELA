@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>Perfect Tenses: Before & After Lab</title>
+<style>
+:root {
+    --bg-warm: #fcf8f2;
+    --card-bg: #ffffff;
+    --terracotta: #c85a24;
+    --terracotta-dark: #9e3f14;
+    --gold: #d99b26;
+    --olive: #5b7042;
+    --text-main: #362a22;
+    --text-muted: #7c6d63;
+    --border-color: #e8ded2;
+    --shadow: 0 10px 30px rgba(200, 90, 36, 0.12);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Georgia', 'Trebuchet MS', serif;
+    user-select: none;
+}
+
+body {
+    background-color: var(--bg-warm);
+    background-image: radial-gradient(#e8ded2 1px, transparent 1px);
+    background-size: 24px 24px;
+    color: var(--text-main);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 15px;
+}
+
+/* Splash Screen */
+#splash {
+    position: fixed;
+    inset: 0;
+    background: #fbf6ef;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    transition: opacity 0.5s ease;
+    text-align: center;
+    padding: 20px;
+}
+
+.splash-badge {
+    background: var(--terracotta);
+    color: white;
+    font-size: 1.2rem;
+    font-weight: bold;
+    padding: 8px 20px;
+    border-radius: 12px;
+    margin-bottom: 15px;
+    letter-spacing: 2px;
+}
+
+#splash-title {
+    font-size: clamp(2rem, 5vw, 3rem);
+    color: var(--terracotta-dark);
+    margin-bottom: 10px;
+}
+
+.splash-sub {
+    color: var(--text-muted);
+    font-style: italic;
+    font-size: 1.1rem;
+    margin-bottom: 30px;
+}
+
+.loader {
+    width: 220px;
+    height: 8px;
+    background: #e8ded2;
+    border-radius: 50px;
+    overflow: hidden;
+}
+
+.loader div {
+    height: 100%;
+    width: 0;
+    background: var(--terracotta);
+    transition: width 0.1s ease;
+}
+
+/* Main Cabinet Box */
+#game-container {
+    position: relative;
+    width: 100%;
+    max-width: 920px;
+    background: var(--card-bg);
+    border-radius: 28px;
+    padding: clamp(20px, 4vw, 32px);
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    border: 2px solid var(--border-color);
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+/* Header Area */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 16px;
+}
+
+.chapter-tag {
+    background: var(--terracotta);
+    color: white;
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+
+.title {
+    font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+    color: var(--terracotta-dark);
+    font-weight: bold;
+}
+
+.status-bar {
+    display: flex;
+    gap: 12px;
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+
+.badge {
+    padding: 6px 14px;
+    border-radius: 20px;
+    background: #f7ede2;
+    border: 1px solid var(--terracotta);
+    color: var(--terracotta-dark);
+}
+
+/* Before & After Interactive Showcase */
+.before-after-display {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    background: #fbf6ef;
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    padding: 16px;
+}
+
+@media(max-width: 600px) {
+    .before-after-display { grid-template-columns: 1fr; }
+}
+
+.state-card {
+    background: white;
+    border-radius: 16px;
+    padding: 15px;
+    border: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 10px;
+}
+
+.state-tag {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    font-weight: bold;
+    padding: 4px 12px;
+    border-radius: 10px;
+}
+
+.tag-before { background: #fef2f2; color: #dc2626; border: 1px solid #fca5a5; }
+.tag-after { background: #f0fdf4; color: #16a34a; border: 1px solid #86efac; }
+
+.state-icon {
+    font-size: 3.5rem;
+    line-height: 1;
+}
+
+.state-desc {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+/* Question Banner */
+.question-card {
+    background: #fff8f0;
+    border-left: 5px solid var(--terracotta);
+    padding: 14px 18px;
+    border-radius: 12px;
+}
+
+.q-tense-type {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: bold;
+    color: var(--gold);
+    margin-bottom: 4px;
+}
+
+.question-text {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: var(--text-main);
+}
+
+/* Slot Assembly Area */
+.builder-area {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.slot-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
+
+@media(max-width: 650px) {
+    .slot-container { grid-template-columns: 1fr; }
+}
+
+.slot-box {
+    background: #faf7f2;
+    border: 2px dashed var(--terracotta);
+    border-radius: 16px;
+    min-height: 70px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    transition: all 0.2s ease;
+}
+
+.slot-box.hovered {
+    background: #f5e6d8;
+    border-color: var(--terracotta-dark);
+}
+
+.slot-box.filled {
+    border-style: solid;
+    background: #fdf3eb;
+    border-color: var(--terracotta);
+}
+
+.slot-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+}
+
+.slot-content {
+    font-weight: bold;
+    font-size: 1rem;
+    color: var(--terracotta-dark);
+    text-align: center;
+}
+
+/* Palette */
+.tiles-label {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--terracotta);
+    font-weight: bold;
+}
+
+.tiles-bank {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    min-height: 80px;
+    background: #fbf6ef;
+    padding: 15px;
+    border-radius: 16px;
+    border: 1px solid var(--border-color);
+    align-items: center;
+    justify-content: center;
+}
+
+.tile {
+    background: white;
+    border: 1px solid var(--terracotta);
+    color: var(--text-main);
+    padding: 10px 16px;
+    border-radius: 12px;
+    font-weight: bold;
+    font-size: 0.95rem;
+    cursor: grab;
+    transition: all 0.2s ease;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.05);
+}
+
+.tile:hover {
+    background: var(--terracotta);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(200, 90, 36, 0.25);
+}
+
+.tile.dragging { opacity: 0.3; }
+
+/* Control Actions */
+.action-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+}
+
+.feedback-bar {
+    flex: 1;
+    background: #fbf6ef;
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    padding: 12px 16px;
+    font-size: 0.95rem;
+    font-weight: bold;
+    color: var(--text-muted);
+    text-align: center;
+}
+
+.btn-check {
+    background: var(--terracotta);
+    color: white;
+    border: 0;
+    padding: 14px 30px;
+    border-radius: 25px;
+    font-weight: bold;
+    font-size: 1rem;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(200, 90, 36, 0.3);
+    transition: all 0.2s ease;
+}
+
+.btn-check:hover {
+    background: var(--terracotta-dark);
+    transform: scale(1.03);
+}
+
+/* End Screen */
+#end-screen {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 20px;
+    padding: 30px 10px;
+}
+
+#end-screen h2 {
+    font-size: 2.2rem;
+    color: var(--terracotta-dark);
+}
+</style>
+</head>
+<body>
+
+<!-- Splash Loader -->
+<div id="splash">
+    <div class="splash-badge">CHAPTER 04</div>
+    <div id="splash-title">Perfect Tenses Lab</div>
+    <div class="splash-sub">Inspired by image_c2c8a2.png — Master Present, Past & Future Perfect Tenses!</div>
+    <div class="loader"><div id="loadFill"></div></div>
+</div>
+
+<!-- Main Game Container -->
+<div id="game-container">
+    <div class="header">
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <div class="chapter-tag">04</div>
+            <div class="title">Perfect Tenses: Before & After</div>
+        </div>
+        <div class="status-bar">
+            <div class="badge">Task: <span id="lbl-q">1</span>/8</div>
+            <div class="badge">Shields: <span id="lbl-shields">2</span></div>
+        </div>
+    </div>
+
+    <!-- Visual Before & After Showcase -->
+    <div class="before-after-display">
+        <div class="state-card">
+            <span class="state-tag tag-before">BEFORE</span>
+            <div class="state-icon" id="img-before">🚗💨</div>
+            <div class="state-desc" id="desc-before">Dirty car covered in mud</div>
+        </div>
+        <div class="state-card">
+            <span class="state-tag tag-after">AFTER</span>
+            <div class="state-icon" id="img-after">✨🚗</div>
+            <div class="state-desc" id="desc-after">Clean, sparkling car</div>
+        </div>
+    </div>
+
+    <div class="question-card">
+        <div class="q-tense-type" id="lbl-tense-type">Present Perfect Tense</div>
+        <div class="question-text" id="lbl-question">Describe what the person has done between picture 1 and picture 2!</div>
+    </div>
+
+    <div class="builder-area">
+        <div class="slot-container">
+            <div class="slot-box" id="slot-0">
+                <span class="slot-label">Subject</span>
+                <span class="slot-content" id="slot-val-0">Drop Tile</span>
+            </div>
+            <div class="slot-box" id="slot-1">
+                <span class="slot-label">Helping Verb (Have/Has/Had/Will have)</span>
+                <span class="slot-content" id="slot-val-1">Drop Tile</span>
+            </div>
+            <div class="slot-box" id="slot-2">
+                <span class="slot-label">Past Participle (V3)</span>
+                <span class="slot-content" id="slot-val-2">Drop Tile</span>
+            </div>
+        </div>
+
+        <div class="tiles-label">🧩 Word Bank (Drag tiles into the correct slots)</div>
+        <div class="tiles-bank" id="tiles-bank"></div>
+    </div>
+
+    <div class="action-bar">
+        <div class="feedback-bar" id="lbl-feedback">Drag sentence tiles to complete the Perfect Tense statement.</div>
+        <button class="btn-check" onclick="verifyAssembly()">Verify Tense</button>
+    </div>
+
+    <div id="end-screen">
+        <div style="font-size: 4rem;">🏆</div>
+        <h2>Perfect Tense Master!</h2>
+        <p style="color: var(--text-muted); font-size: 1.1rem; max-width: 500px;">
+            You have successfully mastered Present Perfect, Past Perfect, and Future Perfect tense constructions across all Before & After scenarios!
+        </p>
+        <button class="btn-check" onclick="location.reload()">Play Again</button>
+    </div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+let currentQ = 0;
+let shields = 2;
+let slotValues = ["", "", ""];
+let draggedTileText = "";
+
+/* Audio Synthesizer fallback */
+function playAudioTone(freq, type) {
+    try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, ctx.currentTime);
+        gain.gain.setValueAtTime(0.2, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.3);
+    } catch(e) {}
+}
+
+/* Question Database referencing image_c2c8a2.png examples & concepts */
+const database = [
+    {
+        tenseType: "Present Perfect (Action completed now)",
+        question: "Look at the dirty car vs clean car: What HAS the person done?",
+        beforeIcon: "🚗🤎",
+        beforeDesc: "The car was full of dirt and mud.",
+        afterIcon: "✨🚗",
+        afterDesc: "The car is sparkling clean now.",
+        slots: ["The car", "has been", "washed thoroughly."],
+        bankOptions: ["has been", "washed thoroughly.", "The car", "had been", "will have washed", "was washing"]
+    },
+    {
+        tenseType: "Past Perfect (Action completed BEFORE a past moment)",
+        question: "What HAD already happened before his parents came home yesterday?",
+        beforeIcon: "🧹🚗",
+        beforeDesc: "He cleaned the car early in the afternoon.",
+        afterIcon: "🏡🚗",
+        afterDesc: "Parents arrived home at 6 PM.",
+        slots: ["He", "had washed", "the car in time."],
+        bankOptions: ["had washed", "the car in time.", "He", "has washed", "will have washed", "was wash"]
+    },
+    {
+        tenseType: "Future Perfect (Action completed BEFORE a future time)",
+        question: "What WILL HAVE happened by tomorrow morning?",
+        beforeIcon: "🌙🚗",
+        beforeDesc: "Working on the car overnight.",
+        afterIcon: "🌅✨",
+        afterDesc: "By tomorrow 8 AM, job complete.",
+        slots: ["He", "will have washed", "the car completely."],
+        bankOptions: ["will have washed", "the car completely.", "He", "had washed", "has washed", "washing car"]
+    },
+    {
+        tenseType: "Present Perfect (Dinner Scenario)",
+        question: "Look at the empty plate vs delicious steak dinner: What HAS she done?",
+        beforeIcon: "🍽️❌",
+        beforeDesc: "An empty dinner plate.",
+        afterIcon: "🥩🥦",
+        afterDesc: "A hot meal served on the plate.",
+        slots: ["She", "has cooked", "a delicious meal."],
+        bankOptions: ["has cooked", "a delicious meal.", "She", "had cooked", "will have cooked", "is cook"]
+    },
+    {
+        tenseType: "Past Perfect (Dinner Scenario)",
+        question: "What HAD already happened before the guests arrived?",
+        beforeIcon: "🍳🔥",
+        beforeDesc: "Preparing food in the kitchen.",
+        afterIcon: "👥🍽️",
+        afterDesc: "Guests entered the dining room.",
+        slots: ["She", "had prepared", "the dinner table."],
+        bankOptions: ["had prepared", "the dinner table.", "She", "has prepared", "will have prepared", "prepares"]
+    },
+    {
+        tenseType: "Future Perfect (Dinner Scenario)",
+        question: "What WILL HAVE happened by 8:00 PM tonight?",
+        beforeIcon: "⏰⏲️",
+        beforeDesc: "Baking in the oven.",
+        afterIcon: "🥧✨",
+        afterDesc: "Timer rings at 8:00 PM.",
+        slots: ["They", "will have finished", "their dinner."],
+        bankOptions: ["will have finished", "their dinner.", "They", "had finished", "has finished", "finishing"]
+    },
+    {
+        tenseType: "Present Perfect (Room Cleanup)",
+        question: "Look at the messy room vs clean room: What HAS the boy done?",
+        beforeIcon: "📦🧸",
+        beforeDesc: "Toys and clothes scattered everywhere.",
+        afterIcon: "✨🛏️",
+        afterDesc: "Neat, organized bedroom.",
+        slots: ["The boy", "has cleaned", "his entire bedroom."],
+        bankOptions: ["has cleaned", "his entire bedroom.", "The boy", "had cleaned", "will have cleaned", "clean room"]
+    },
+    {
+        tenseType: "Past Perfect (Homework Completion)",
+        question: "What HAD she done before she went out to play?",
+        beforeIcon: "📚✍️",
+        beforeDesc: "Studying at her desk.",
+        afterIcon: "🛝☀️",
+        afterDesc: "Playing outside in the park.",
+        slots: ["She", "had completed", "all her homework."],
+        bankOptions: ["had completed", "all her homework.", "She", "has completed", "will have completed", "completes"]
+    }
+];
+
+// Loader simulation
+let loadVal = 0;
+let loadTimer = setInterval(() => {
+    loadVal += 5;
+    $('loadFill').style.width = loadVal + '%';
+    if(loadVal >= 100){
+        clearInterval(loadTimer);
+        $('splash').style.opacity = 0;
+        setTimeout(() => {
+            $('splash').remove();
+            $('game-container').style.opacity = 1;
+            loadQuestion();
+        }, 500);
+    }
+}, 30);
+
+function loadQuestion() {
+    if(currentQ >= database.length) {
+        $('game-container').innerHTML = '';
+        $('game-container').appendChild($('end-screen'));
+        $('end-screen').style.display = 'flex';
+        return;
+    }
+
+    shields = 2;
+    slotValues = ["", "", ""];
+    $('lbl-q').innerText = currentQ + 1;
+    $('lbl-shields').innerText = shields;
+    $('lbl-feedback').innerText = "Drag sentence tiles to complete the Perfect Tense statement.";
+    $('lbl-feedback').style.color = "var(--text-muted)";
+
+    let data = database[currentQ];
+    $('lbl-tense-type').innerText = data.tenseType;
+    $('lbl-question').innerText = data.question;
+    $('img-before').innerText = data.beforeIcon;
+    $('desc-before').innerText = data.beforeDesc;
+    $('img-after').innerText = data.afterIcon;
+    $('desc-after').innerText = data.afterDesc;
+
+    // Reset Slots
+    for(let i=0; i<3; i++) {
+        let slotEl = $(`slot-${i}`);
+        let slotValEl = $(`slot-val-${i}`);
+        slotEl.className = "slot-box";
+        slotValEl.innerText = "Drop Tile";
+    }
+
+    // Populate Palette
+    let bank = $('tiles-bank');
+    bank.innerHTML = '';
+    let shuffled = [...data.bankOptions].sort(() => Math.random() - 0.5);
+    
+    shuffled.forEach(text => {
+        let tile = document.createElement('div');
+        tile.className = 'tile';
+        tile.innerText = text;
+        tile.draggable = true;
+
+        tile.addEventListener('dragstart', () => {
+            tile.classList.add('dragging');
+            draggedTileText = text;
+        });
+
+        tile.addEventListener('dragend', () => {
+            tile.classList.remove('dragging');
+        });
+
+        bank.appendChild(tile);
+    });
+
+    setupSlotEvents();
+}
+
+function setupSlotEvents() {
+    for(let i=0; i<3; i++) {
+        let slot = $(`slot-${i}`);
+        
+        slot.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            slot.classList.add('hovered');
+        });
+
+        slot.addEventListener('dragleave', () => {
+            slot.classList.remove('hovered');
+        });
+
+        slot.addEventListener('drop', (e) => {
+            e.preventDefault();
+            slot.classList.remove('hovered');
+            
+            slotValues[i] = draggedTileText;
+            $(`slot-val-${i}`).innerText = draggedTileText;
+            slot.classList.add('filled');
+        });
+    }
+}
+
+function verifyAssembly() {
+    let data = database[currentQ];
+    let isCorrect = true;
+
+    for(let i=0; i<3; i++) {
+        if(slotValues[i] !== data.slots[i]) {
+            isCorrect = false;
+            break;
+        }
+    }
+
+    if(isCorrect) {
+        playAudioTone(587.33, 'triangle'); // High cheerful pitch
+        $('lbl-feedback').innerText = "✓ Perfect! Sentence constructed accurately.";
+        $('lbl-feedback').style.color = "var(--olive)";
+        
+        setTimeout(() => {
+            currentQ++;
+            loadQuestion();
+        }, 1800);
+    } else {
+        shields--;
+        $('lbl-shields').innerText = shields;
+
+        if(shields > 0) {
+            playAudioTone(220, 'sawtooth');
+            $('lbl-feedback').innerText = "✕ Incorrect auxiliary or main verb form! Try again (1 Shield left).";
+            $('lbl-feedback').style.color = "var(--terracotta)";
+        } else {
+            playAudioTone(180, 'sawtooth');
+            $('lbl-feedback').innerText = `⚡ Correct Solution: "${data.slots.join(' ')}"`;
+            $('lbl-feedback').style.color = "var(--terracotta-dark)";
+
+            for(let i=0; i<3; i++) {
+                $(`slot-val-${i}`).innerText = data.slots[i];
+                $(`slot-${i}`).className = "slot-box filled";
+            }
+
+            setTimeout(() => {
+                currentQ++;
+                loadQuestion();
+            }, 3000);
+        }
+    }
+}
+</script>
+</body>
+</html>
