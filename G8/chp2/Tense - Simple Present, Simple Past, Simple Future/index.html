@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>Space Mission: Tense Orbital Command</title>
+<style>
+:root {
+    --bg-dark-space: #0b0d17;
+    --panel-card: #151928;
+    --cyan-border: #1e293b;
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --neon-cyan: #06b6d4;
+    --neon-purple: #a855f7;
+    --neon-green: #10b981;
+    --neon-red: #ef4444;
+    --gold: #f59e0b;
+}
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    user-select: none;
+    -webkit-user-select: none;
+}
+body {
+    background-color: var(--bg-dark-space);
+    color: var(--text-main);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 15px;
+    overflow: hidden;
+    position: relative;
+}
+
+/* Background Canvas */
+#space-bg {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+}
+
+/* Splash Screen */
+#splash {
+    position: fixed;
+    inset: 0;
+    background: #05070f;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    transition: opacity .5s ease;
+    color: #fff;
+}
+.logo-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 30px;
+}
+.app-brand-logo {
+    width: clamp(90px, 15vw, 130px);
+    height: auto;
+    filter: drop-shadow(0 0 16px rgba(6, 182, 212, 0.7));
+    animation: pulseGlow 3s ease-in-out infinite;
+}
+#splash-title {
+    font-size: 2.2rem;
+    font-weight: 900;
+    letter-spacing: 3px;
+    background: linear-gradient(45deg, #06b6d4, #a855f7, #38bdf8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+.loader {
+    position: absolute;
+    bottom: 18%;
+    width: 190px;
+    height: 8px;
+    background: #1e293b;
+    border-radius: 50px;
+    overflow: hidden;
+    border: 1px solid rgba(6, 182, 212, 0.4);
+}
+.loader div {
+    height: 100%;
+    width: 0;
+    background: linear-gradient(90deg, #06b6d4, #a855f7, #10b981);
+}
+
+/* Main Container */
+#game-container {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    max-width: 920px;
+    background: rgba(21, 25, 40, 0.92);
+    backdrop-filter: blur(12px);
+    border-radius: 24px;
+    padding: clamp(20px, 4vw, 32px);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(6, 182, 212, 0.2);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    border: 1px solid rgba(6, 182, 212, 0.3);
+    opacity: 0;
+    transition: opacity 0.45s ease;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #1e293b;
+    padding-bottom: 16px;
+}
+.title {
+    font-size: clamp(1.1rem, 2.8vw, 1.4rem);
+    color: var(--text-main);
+    font-weight: 800;
+    letter-spacing: -0.3px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.title span { color: var(--neon-cyan); }
+.status-bar {
+    display: flex;
+    gap: 12px;
+    font-size: 0.9rem;
+    font-weight: 700;
+}
+.progress { color: var(--neon-cyan); background: rgba(6, 182, 212, 0.15); border: 1px solid rgba(6, 182, 212, 0.3); padding: 6px 14px; border-radius: 30px; }
+.chances { color: var(--neon-red); background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); padding: 6px 14px; border-radius: 30px; }
+
+/* Workbench Layout */
+.workbench {
+    display: grid;
+    grid-template-columns: 1.25fr 0.75fr;
+    gap: 24px;
+    min-height: 250px;
+}
+@media(max-width: 768px) {
+    .workbench { grid-template-columns: 1fr; }
+}
+
+/* Question & Target Area */
+.drop-area {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background: rgba(11, 13, 23, 0.85);
+    border: 2px dashed #334155;
+    border-radius: 18px;
+    padding: 25px;
+    position: relative;
+}
+.drop-area.hovered {
+    border-color: var(--neon-cyan);
+    background: rgba(6, 182, 212, 0.12);
+}
+.q-type-badge {
+    align-self: flex-start;
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--gold);
+    background: rgba(245, 158, 11, 0.15);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    padding: 4px 10px;
+    border-radius: 20px;
+    margin-bottom: 12px;
+}
+.question-text {
+    font-size: clamp(0.98rem, 2vw, 1.1rem);
+    line-height: 1.6;
+    color: #e2e8f0;
+    font-weight: 600;
+    white-space: pre-line;
+}
+.target-slot {
+    border: 2px dashed #0284c7;
+    background: rgba(15, 23, 42, 0.6);
+    border-radius: 14px;
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 1.05rem;
+    color: var(--text-muted);
+    margin-top: 20px;
+    padding: 10px;
+    text-align: center;
+    transition: all 0.2s ease;
+}
+.target-slot.filled {
+    border-style: solid;
+}
+
+/* Options Bank */
+.bank-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.bank-title {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--neon-cyan);
+    font-weight: 800;
+}
+.options-bank {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.drag-item {
+    background: #1e293b;
+    border: 1px solid #334155;
+    color: #f1f5f9;
+    padding: 12px 14px;
+    border-radius: 12px;
+    cursor: grab;
+    font-weight: 700;
+    font-size: 0.9rem;
+    text-align: center;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+.drag-item:hover {
+    background: #0f172a;
+    border-color: var(--neon-cyan);
+    box-shadow: 0 0 15px rgba(6, 182, 212, 0.5);
+    transform: translateY(-2px);
+}
+.drag-item:active { cursor: grabbing; }
+.drag-item.dragging { opacity: 0.3; }
+
+/* Feedback Bar */
+.feedback-container {
+    background: rgba(11, 13, 23, 0.85);
+    border: 1px solid #334155;
+    border-radius: 14px;
+    padding: 16px;
+    min-height: 55px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text-muted);
+}
+
+#end-screen {
+    text-align: center;
+    padding: 40px 20px;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 22px;
+}
+#end-screen h2 {
+    font-size: 2.2rem;
+    background: linear-gradient(45deg, var(--neon-cyan), var(--neon-purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+#end-screen p { color: var(--text-muted); font-size: 1.1rem; line-height: 1.6; }
+.reset-btn {
+    background: linear-gradient(135deg, var(--neon-cyan), #0284c7);
+    color: white;
+    border: 0;
+    padding: 15px 35px;
+    font-weight: 800;
+    font-size: 1rem;
+    border-radius: 30px;
+    cursor: pointer;
+    box-shadow: 0 5px 20px rgba(6, 182, 212, 0.4);
+    transition: all 0.2s ease;
+}
+.reset-btn:hover { transform: scale(1.05); }
+
+@keyframes pulseGlow {
+    0%, 100% { transform: scale(1); filter: drop-shadow(0 0 12px rgba(6, 182, 212, 0.5)); }
+    50% { transform: scale(1.04); filter: drop-shadow(0 0 25px rgba(168, 85, 247, 0.8)); }
+}
+</style>
+</head>
+<body>
+
+<canvas id="space-bg"></canvas>
+
+<audio id="audio-correct" src="assets/correct.mp3" preload="auto"></audio>
+<audio id="audio-wrong" src="assets/wrong.mp3" preload="auto"></audio>
+
+<div id="splash">
+  <div class="logo-container">
+    <img src="assets/logo.png" alt="Innovine Logo" class="app-brand-logo" />
+    <div id="splash-title">INNOVINE</div>
+  </div>
+  <div class="loader"><div id="loadFill"></div></div>
+</div>
+
+<div id="game-container">
+  <div class="header">
+    <div class="title">🚀 Space Mission <span>// Tense Control Deck</span></div>
+    <div class="status-bar">
+      <div class="progress">Sector: <span id="lbl-question">1</span>/10</div>
+      <div class="chances">Shield Charges: <span id="lbl-chances">2</span></div>
+    </div>
+  </div>
+
+  <div class="workbench" id="main-layout">
+    <div class="drop-area" id="drop-zone">
+      <div class="q-type-badge" id="type-badge">Scenario-Based</div>
+      <div class="question-text" id="question-box">Loading orbital telemetry...</div>
+      <div class="target-slot" id="target-slot">Drag Correct Resolution Here</div>
+    </div>
+
+    <div class="bank-panel">
+      <div class="bank-title">Option Console</div>
+      <div class="options-bank" id="options-bank"></div>
+    </div>
+  </div>
+
+  <div class="feedback-container" id="feedback-text">
+    Analyze the temporal context and drag the correct choice into the control slot.
+  </div>
+
+  <div id="end-screen">
+    <img src="assets/logo.png" alt="Innovine" style="width:80px; height:auto; filter:drop-shadow(0 0 12px rgba(6,182,212,0.6));" />
+    <h2>🛸 Orbit Mission Accomplished!</h2>
+    <p>Exemplary navigation, Commander! You have successfully mastered Simple Present, Simple Past, and Simple Future tenses across all telemetry sectors.</p>
+    <button class="reset-btn" onclick="location.reload()">Re-Initialize Launch Sequence</button>
+  </div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+let currentQuestion = 0;
+let attemptsLeft = 2;
+let draggedText = "";
+
+/* Questions on Simple Present, Simple Past, and Simple Future */
+const database = [
+    {
+        type: "Scenario-based",
+        q: "Space Log: 'Yesterday, our rover _____ a strange mineral deposit inside the lunar crater.' Which verb form correctly fits the completed past event?",
+        options: ["discovered", "discovers", "will discover", "is discovering"],
+        answer: "discovered"
+    },
+    {
+        type: "Sentence Completion",
+        q: "Flight Controller: 'Every 10 minutes, the satellite _____ diagnostic telemetry back to Earth base.'",
+        options: ["transmits", "transmitted", "will transmit", "was transmitting"],
+        answer: "transmits"
+    },
+    {
+        type: "Real-life Application",
+        q: "Launch Operations: 'The rocket payload _____ its trajectory to Mars tomorrow at dawn.' Which option expresses Simple Future?",
+        options: ["will adjust", "adjusted", "adjusts", "has adjusted"],
+        answer: "will adjust"
+    },
+    {
+        type: "Error Detection",
+        q: "Spot the sentence containing a verb tense error:",
+        options: [
+            "Last night, the astronaut sees an unidentified comet.",
+            "Solar panels absorb light energy.",
+            "The shuttle will land early tomorrow.",
+            "They explored the space station yesterday."
+        ],
+        answer: "Last night, the astronaut sees an unidentified comet."
+    },
+    {
+        type: "Sentence Transformation",
+        q: "Transform the Simple Present sentence 'The engineer checks the thrusters' into Simple Future Tense:",
+        options: [
+            "The engineer will check the thrusters.",
+            "The engineer checked the thrusters.",
+            "The engineer is checking the thrusters.",
+            "The engineer checks the thrusters tomorrow."
+        ],
+        answer: "The engineer will check the thrusters."
+    },
+    {
+        type: "Identify and Categorise",
+        q: "Categorize the sentence: 'The crew calibrated the solar sails two days ago.'",
+        options: ["Simple Past", "Simple Present", "Simple Future", "Present Continuous"],
+        answer: "Simple Past"
+    },
+    {
+        type: "Dialogue Completion",
+        q: "Pilot A: 'Did you lock the airlock hatch?'\nPilot B: 'Yes, I _____ it securely two minutes ago.'",
+        options: ["locked", "lock", "will lock", "am locking"],
+        answer: "locked"
+    },
+    {
+        type: "Assertion–Reason",
+        q: "Assertion: 'Earth orbits the Sun' uses Simple Present Tense.\nReason: Simple Present Tense is used to state universal scientific facts.",
+        options: [
+            "Both Assertion and Reason are true.",
+            "Assertion is true, Reason is false.",
+            "Assertion is false, Reason is true.",
+            "Both Assertion and Reason are false."
+        ],
+        answer: "Both Assertion and Reason are true."
+    },
+    {
+        type: "Sentence Transformation",
+        q: "Transform 'We will explore the asteroid belt' into Simple Past Tense:",
+        options: [
+            "We explored the asteroid belt.",
+            "We explore the asteroid belt.",
+            "We are exploring the asteroid belt.",
+            "We will explore the asteroid belt yesterday."
+        ],
+        answer: "We explored the asteroid belt."
+    },
+    {
+        type: "Odd One Out",
+        q: "Select the verb phrase that represents Simple Future Tense among these options:",
+        options: ["will launch", "launched", "launches", "launching"],
+        answer: "will launch"
+    }
+];
+
+// Starfield Canvas Animation
+const bgCanvas = $('space-bg');
+const bgCtx = bgCanvas.getContext('2d');
+let stars = [];
+
+function initStarfield() {
+    bgCanvas.width = window.innerWidth;
+    bgCanvas.height = window.innerHeight;
+    stars = [];
+    for(let i=0; i<120; i++){
+        stars.push({
+            x: Math.random() * bgCanvas.width,
+            y: Math.random() * bgCanvas.height,
+            size: Math.random() * 2,
+            speed: Math.random() * 0.5 + 0.1
+        });
+    }
+}
+function drawStarfield() {
+    bgCtx.clearRect(0,0,bgCanvas.width,bgCanvas.height);
+    bgCtx.fillStyle = '#ffffff';
+    stars.forEach(s => {
+        bgCtx.beginPath();
+        bgCtx.arc(s.x, s.y, s.size, 0, Math.PI*2);
+        bgCtx.fill();
+        s.y += s.speed;
+        if(s.y > bgCanvas.height) s.y = 0;
+    });
+    requestAnimationFrame(drawStarfield);
+}
+window.addEventListener('resize', initStarfield);
+initStarfield();
+drawStarfield();
+
+// Loader Controller
+let load = 0, loadTimer = setInterval(() => {
+    load += 4;
+    $('loadFill').style.width = load + '%';
+    if (load >= 100) {
+        clearInterval(loadTimer);
+        $('splash').style.opacity = 0;
+        setTimeout(() => {
+            $('splash').remove();
+            $('game-container').style.opacity = 1;
+            loadQuestion();
+        }, 500);
+    }
+}, 35);
+
+function playSound(type) {
+    const audio = $(`audio-${type}`);
+    if (audio) {
+        audio.currentTime = 0;
+        audio.play().catch(e => console.log("Audio awaiting gesture context."));
+    }
+}
+
+function loadQuestion() {
+    if (currentQuestion >= database.length) {
+        $('main-layout').style.display = 'none';
+        $('feedback-text').style.display = 'none';
+        $('end-screen').style.display = 'flex';
+        return;
+    }
+
+    attemptsLeft = 2; 
+    $('lbl-question').innerText = currentQuestion + 1;
+    $('lbl-chances').innerText = attemptsLeft;
+    $('feedback-text').innerText = "Analyze the temporal context and drag the correct choice into the control slot.";
+    $('feedback-text').style.color = "var(--text-muted)";
+
+    let data = database[currentQuestion];
+    $('type-badge').innerText = data.type;
+    $('question-box').innerText = data.q;
+
+    // Reset Target Area Box
+    let slot = $('target-slot');
+    slot.innerText = "Drag Correct Resolution Here";
+    slot.className = "target-slot";
+    slot.style.borderColor = "";
+    slot.style.color = "";
+    slot.style.backgroundColor = "";
+
+    // Generate Question Options
+    let bank = $('options-bank');
+    bank.innerHTML = '';
+    data.options.forEach(opt => {
+        let div = document.createElement('div');
+        div.className = 'drag-item';
+        div.innerText = opt;
+        div.draggable = true;
+        
+        div.addEventListener('dragstart', () => {
+            div.classList.add('dragging');
+            draggedText = opt;
+        });
+
+        div.addEventListener('dragend', () => {
+            div.classList.remove('dragging');
+        });
+
+        bank.appendChild(div);
+    });
+
+    setupDragDropHandlers();
+}
+
+function setupDragDropHandlers() {
+    let zone = $('drop-zone');
+    const newZone = zone.cloneNode(true);
+    zone.parentNode.replaceChild(newZone, zone);
+
+    newZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        newZone.classList.add('hovered');
+    });
+
+    newZone.addEventListener('dragleave', () => {
+        newZone.classList.remove('hovered');
+    });
+
+    newZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        newZone.classList.remove('hovered');
+        processDroppedAnswer(draggedText);
+    });
+}
+
+function processDroppedAnswer(answer) {
+    let data = database[currentQuestion];
+    let slot = $('target-slot');
+
+    if (answer === data.answer) {
+        playSound('correct');
+        slot.innerText = answer;
+        slot.className = "target-slot filled";
+        slot.style.backgroundColor = "rgba(16, 185, 129, 0.15)";
+        slot.style.borderColor = "var(--neon-green)";
+        slot.style.color = "#34d399";
+        $('feedback-text').innerText = "✓ Telemetry Aligned! Answer verified successfully.";
+        $('feedback-text').style.color = "#34d399";
+        disableCurrentBank();
+        
+        setTimeout(() => {
+            currentQuestion++;
+            loadQuestion();
+        }, 2200);
+
+    } else {
+        attemptsLeft--;
+        $('lbl-chances').innerText = attemptsLeft;
+
+        if (attemptsLeft > 0) {
+            playSound('wrong');
+            $('feedback-text').innerText = "✕ Calibration Warning! Incorrect parameter (1 shield charge left).";
+            $('feedback-text').style.color = "var(--gold)";
+            
+            slot.innerText = "Drag Correct Resolution Here";
+            slot.className = "target-slot";
+        } else {
+            playSound('wrong');
+            slot.innerText = data.answer;
+            slot.className = "target-slot filled";
+            slot.style.backgroundColor = "rgba(239, 68, 68, 0.15)";
+            slot.style.borderColor = "var(--neon-red)";
+            slot.style.color = "#fca5a5";
+            $('feedback-text').innerText = `⚡ Orbital Override. The correct answer is "${data.answer}".`;
+            $('feedback-text').style.color = "#fca5a5";
+            disableCurrentBank();
+
+            setTimeout(() => {
+                currentQuestion++;
+                loadQuestion();
+            }, 3200);
+        }
+    }
+}
+
+function disableCurrentBank() {
+    let items = document.querySelectorAll('.drag-item');
+    items.forEach(item => {
+        item.draggable = false;
+        item.style.cursor = 'not-allowed';
+        item.style.opacity = '0.25';
+    });
+}
+</script>
+</body>
+</html>
