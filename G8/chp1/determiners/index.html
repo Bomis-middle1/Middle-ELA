@@ -150,7 +150,7 @@ body {
     .workbench { grid-template-columns: 1fr; }
 }
 
-/* Drop Zone Styles */
+/* Question & Target Area */
 .drop-area {
     display: flex;
     flex-direction: column;
@@ -165,8 +165,21 @@ body {
     border-color: var(--aqua-glow);
     background: rgba(0, 166, 251, 0.12);
 }
+.q-type-badge {
+    align-self: flex-start;
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--sand-gold);
+    background: rgba(255, 183, 3, 0.15);
+    border: 1px solid rgba(255, 183, 3, 0.3);
+    padding: 4px 10px;
+    border-radius: 20px;
+    margin-bottom: 12px;
+}
 .question-text {
-    font-size: clamp(1rem, 2.2vw, 1.15rem);
+    font-size: clamp(0.98rem, 2vw, 1.1rem);
     line-height: 1.6;
     color: #e2e8f0;
     font-weight: 600;
@@ -183,13 +196,15 @@ body {
     font-size: 1.05rem;
     color: var(--text-muted);
     margin-top: 20px;
+    padding: 10px;
+    text-align: center;
     transition: all 0.2s ease;
 }
 .target-slot.filled {
     border-style: solid;
 }
 
-/* Word Bank */
+/* Options Bank */
 .bank-panel {
     display: flex;
     flex-direction: column;
@@ -211,11 +226,11 @@ body {
     background: #002855;
     border: 1px solid #006494;
     color: #f1f5f9;
-    padding: 14px;
+    padding: 12px 14px;
     border-radius: 12px;
     cursor: grab;
     font-weight: 700;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     text-align: center;
     transition: all 0.2s ease;
     box-shadow: 0 4px 12px rgba(0,0,0,0.3);
@@ -229,7 +244,7 @@ body {
 .drag-item:active { cursor: grabbing; }
 .drag-item.dragging { opacity: 0.3; }
 
-/* Feedback */
+/* Feedback Bar */
 .feedback-container {
     background: rgba(5, 25, 35, 0.85);
     border: 1px solid #006494;
@@ -240,7 +255,7 @@ body {
     align-items: center;
     justify-content: center;
     text-align: center;
-    font-size: 0.98rem;
+    font-size: 0.95rem;
     font-weight: 700;
     color: var(--text-muted);
 }
@@ -299,34 +314,35 @@ body {
 
 <div id="game-container">
   <div class="header">
-    <div class="title">🥽 Underwater Explorer <span>// Determiners Expedition</span></div>
+    <div class="title">🥽 Underwater Explorer <span>// Applied Determiners</span></div>
     <div class="status-bar">
-      <div class="progress">Depth Zone: <span id="lbl-question">1</span>/10</div>
-      <div class="chances">Oxygen Oxygen: <span id="lbl-chances">2</span></div>
+      <div class="progress">Sector: <span id="lbl-question">1</span>/10</div>
+      <div class="chances">Oxygen Shields: <span id="lbl-chances">2</span></div>
     </div>
   </div>
 
   <div class="workbench" id="main-layout">
     <div class="drop-area" id="drop-zone">
-      <div class="question-text" id="question-box">Loading submarine expedition logs...</div>
-      <div class="target-slot" id="target-slot">Place Matching Determiner Here</div>
+      <div class="q-type-badge" id="type-badge">Scenario-Based</div>
+      <div class="question-text" id="question-box">Loading underwater telemetry...</div>
+      <div class="target-slot" id="target-slot">Drag Correct Resolution Here</div>
     </div>
 
     <div class="bank-panel">
-      <div class="bank-title">Word Bank</div>
+      <div class="bank-title">Analysis Bank</div>
       <div class="options-bank" id="options-bank"></div>
     </div>
   </div>
 
   <div class="feedback-container" id="feedback-text">
-    Pick a determiner term from the word bank and slot it into the log console.
+    Analyze the situation and drag the matching solution into the analysis console.
   </div>
 
   <div id="end-screen">
     <img src="assets/logo.png" alt="Innovine" style="width:80px; height:auto; filter:drop-shadow(0 0 12px rgba(0,166,251,0.6));" />
-    <h2>🔱 Ocean Quest Complete!</h2>
-    <p>Splendid exploration! You have identified articles, possessives, quantifiers, demonstratives, and numbers across Chapter 01: Determiners.</p>
-    <button class="reset-btn" onclick="location.reload()">Dive Again</button>
+    <h2>🔱 Mission Completed!</h2>
+    <p>Outstanding analytical work, Explorer! You applied determiners across complex real-world scenarios, error detections, and logical classifications.</p>
+    <button class="reset-btn" onclick="location.reload()">Re-Initialize Expedition</button>
   </div>
 </div>
 
@@ -336,61 +352,91 @@ let currentQuestion = 0;
 let attemptsLeft = 2;
 let draggedText = "";
 
-// Database created directly from image_8e9c8b.png
+/* Application & Scenario-based Questions mapped to Chapter 01: Determiners */
 const database = [
     {
-        q: "In the diver's phrase 'WHY MY SHARK!', which type of determiner is 'MY'?",
-        options: ["Possessives", "Articles", "Quantifiers", "Interrogatives"],
-        answer: "Possessives"
+        type: "Scenario-based",
+        q: "Submarine Captain's Log: 'We spotted a hammerhead shark near our vessel, but _____ shark swam away into the dark trench.' Which determiner correctly maintains definite reference?",
+        options: ["the shark", "a shark", "any shark", "some shark"],
+        answer: "the shark"
     },
     {
-        q: "In the phrase 'THIS SHARK', what category of determiner is used to point out the specific position of the object?",
-        options: ["Demonstratives", "Quantifiers", "Numbers", "Pre-determiners"],
-        answer: "Demonstratives"
+        type: "Error Detection",
+        q: "Identify the incorrect sentence written by the research assistant:",
+        options: [
+            "We need an oxygen tank.",
+            "Submarine found an underwater cave.",
+            "This scanner is working well.",
+            "Both divers reached safely."
+        ],
+        answer: "Submarine found an underwater cave."
     },
     {
-        q: "Which group of determiners includes 'A', 'An', and 'The' as shown in the textbook overview?",
-        options: ["Articles", "Quantifiers", "Possessives", "Pre-distributives"],
-        answer: "Articles"
+        type: "Real-life Application",
+        q: "The oceanographer wants to indicate that ALL divers in the team must check their gear. Which Pre-distributive determiner fits best in: '_____ diver must perform a safety check'?",
+        options: ["Every", "All", "Half", "Both"],
+        answer: "Every"
     },
     {
-        q: "Determiners like 'much', 'a little', 'a bit (of)', and 'a great deal of' answer 'How much?' and are classified as:",
-        options: ["Quantifiers", "Numbers", "Pre-determiners", "Interrogatives"],
-        answer: "Quantifiers"
+        type: "Assertion–Reason",
+        q: "Assertion: 'Which depth gauge is failing?' uses an Interrogative determiner.\nReason: 'Which' comes directly before the noun 'depth gauge' to ask a specific question.",
+        options: [
+            "Both Assertion and Reason are true.",
+            "Assertion is true, Reason is false.",
+            "Assertion is false, Reason is true.",
+            "Both Assertion and Reason are false."
+        ],
+        answer: "Both Assertion and Reason are true."
     },
     {
-        q: "Words like 'all', 'both', 'half', 'each', 'every', 'either', and 'neither' fall into which specific category?",
-        options: ["Pre-distributives", "Pre-determiners", "Demonstratives", "Possessives"],
-        answer: "Pre-distributives"
+        type: "Sentence Transformation",
+        q: "Transform the plural statement 'Those ancient coins belong to the wreck' into a singular statement referring to an item close to the diver:",
+        options: [
+            "This ancient coin belongs to the wreck.",
+            "These ancient coins belong to the wreck.",
+            "That ancient coin belongs to the wreck.",
+            "Any ancient coin belongs to the wreck."
+        ],
+        answer: "This ancient coin belongs to the wreck."
     },
     {
-        q: "According to Chapter 1, determiners used to ask questions such as 'which', 'what', and 'whose' are named:",
-        options: ["Interrogatives", "Articles", "Demonstratives", "Possessives"],
-        answer: "Interrogatives"
+        type: "Sorting / Classification",
+        q: "Which word among the following options is categorized as a Quantifier rather than a Possessive?",
+        options: ["much", "their", "her", "whose"],
+        answer: "much"
     },
     {
-        q: "Numbers are categorized as determiners in two forms: Cardinal (one, two, three) and:",
-        options: ["Ordinal", "Distributive", "Definite", "Indefinite"],
-        answer: "Ordinal"
+        type: "Odd One Out",
+        q: "Select the word that does NOT belong to the category of Pre-distributives:",
+        options: ["these", "either", "neither", "half"],
+        answer: "these"
     },
     {
-        q: "Determiners that come before other determiners to modify their meaning (like 'one', 'two', 'first', 'second') are called:",
-        options: ["Pre- determiners", "Pre-distributives", "Quantifiers", "Possessives"],
-        answer: "Pre- determiners"
+        type: "Sentence Completion",
+        q: "Sonar Operator: 'There is only _____ water left in the primary cooling tank; we must refill it immediately!'",
+        options: ["a little", "many", "a few", "several"],
+        answer: "a little"
     },
     {
-        q: "According to the rules in Chapter 01, determiners are required before which type of noun?",
-        options: ["Singular noun", "Plural noun", "Proper noun", "Abstract noun"],
-        answer: "Singular noun"
+        type: "Dialogue Completion",
+        q: "Diver A: '_____ oxygen canister belongs to your suit?'\nDiver B: 'The silver one on the left desk.'",
+        options: ["Which", "Whom", "Where", "How"],
+        answer: "Which"
     },
     {
-        q: "Determiners are words that come before nouns or describing adjectives to specify or identify the noun in terms of:",
-        options: ["Quantity and ownership", "Speed and velocity", "Color and texture", "Past and future"],
-        answer: "Quantity and ownership"
+        type: "Pairing / Matching",
+        q: "Match the phrase 'the second coral reef' with its correct determiner classification:",
+        options: [
+            "Ordinal Number",
+            "Indefinite Article",
+            "Possessive Pronoun",
+            "Pre-distributive"
+        ],
+        answer: "Ordinal Number"
     }
 ];
 
-// Underwater Bubble Animation
+// Background Particle Animation
 const bgCanvas = $('ocean-bg');
 const bgCtx = bgCanvas.getContext('2d');
 let bubbles = [];
@@ -411,15 +457,12 @@ function initBubbles() {
 }
 function drawOcean() {
     bgCtx.clearRect(0,0,bgCanvas.width,bgCanvas.height);
-    
-    // Gradient Background
     let grad = bgCtx.createLinearGradient(0, 0, 0, bgCanvas.height);
     grad.addColorStop(0, '#001e3d');
     grad.addColorStop(1, '#020c1b');
     bgCtx.fillStyle = grad;
     bgCtx.fillRect(0, 0, bgCanvas.width, bgCanvas.height);
 
-    // Draw Bubbles
     bgCtx.strokeStyle = 'rgba(0, 166, 251, 0.4)';
     bgCtx.fillStyle = 'rgba(0, 166, 251, 0.15)';
     bubbles.forEach(b => {
@@ -474,15 +517,16 @@ function loadQuestion() {
     attemptsLeft = 2; 
     $('lbl-question').innerText = currentQuestion + 1;
     $('lbl-chances').innerText = attemptsLeft;
-    $('feedback-text').innerText = "Pick a determiner term from the word bank and slot it into the log console.";
+    $('feedback-text').innerText = "Analyze the situation and drag the matching solution into the analysis console.";
     $('feedback-text').style.color = "var(--text-muted)";
 
     let data = database[currentQuestion];
+    $('type-badge').innerText = data.type;
     $('question-box').innerText = data.q;
 
     // Reset Target Area Box
     let slot = $('target-slot');
-    slot.innerText = "Place Matching Determiner Here";
+    slot.innerText = "Drag Correct Resolution Here";
     slot.className = "target-slot";
     slot.style.borderColor = "";
     slot.style.color = "";
@@ -544,7 +588,7 @@ function processDroppedAnswer(answer) {
         slot.style.backgroundColor = "rgba(56, 176, 0, 0.2)";
         slot.style.borderColor = "var(--seaweed-green)";
         slot.style.color = "#70e000";
-        $('feedback-text').innerText = "✓ Perfect match! The determiner fits precisely.";
+        $('feedback-text').innerText = "✓ Precise Application! Analysis verified successfully.";
         $('feedback-text').style.color = "#70e000";
         disableCurrentBank();
         
@@ -559,10 +603,10 @@ function processDroppedAnswer(answer) {
 
         if (attemptsLeft > 0) {
             playSound('wrong');
-            $('feedback-text').innerText = "✕ Not quite. Check the determiner rule and try again! (1 try left)";
+            $('feedback-text').innerText = "✕ Analysis Warning! Re-evaluating scenario parameters (1 shield left).";
             $('feedback-text').style.color = "var(--sand-gold)";
             
-            slot.innerText = "Place Matching Determiner Here";
+            slot.innerText = "Drag Correct Resolution Here";
             slot.className = "target-slot";
         } else {
             playSound('wrong');
@@ -571,7 +615,7 @@ function processDroppedAnswer(answer) {
             slot.style.backgroundColor = "rgba(255, 89, 94, 0.2)";
             slot.style.borderColor = "var(--coral-red)";
             slot.style.color = "#ff85a1";
-            $('feedback-text').innerText = `🌊 Oxygen depleted. Chapter 1 states that the correct term is "${data.answer}".`;
+            $('feedback-text').innerText = `🌊 Overridden. The correct applied answer is "${data.answer}".`;
             $('feedback-text').style.color = "#ff85a1";
             disableCurrentBank();
 
