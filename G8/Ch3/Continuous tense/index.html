@@ -3,31 +3,31 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-<title>Grammar Lab: Continuous Tense Matrix</title>
+<title>Grammar Synth: Continuous Tense Arcade</title>
 <style>
 :root {
-    --bg-dark: #0f172a;
-    --panel-bg: #1e293b;
-    --accent-purple: #8b5cf6;
-    --accent-cyan: #06b6d4;
-    --accent-pink: #ec4899;
-    --accent-green: #10b981;
-    --accent-red: #ef4444;
-    --text-main: #f8fafc;
-    --text-muted: #94a3b8;
+    --bg-dark: #0d0221;
+    --card-bg: rgba(26, 11, 46, 0.85);
+    --neon-pink: #ff007f;
+    --neon-cyan: #00f0ff;
+    --neon-yellow: #ffe600;
+    --neon-purple: #9d00ff;
+    --neon-green: #00ff66;
+    --text-light: #ffffff;
+    --text-dim: #b8a9c9;
 }
 
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Trebuchet MS', 'Segoe UI', sans-serif;
     user-select: none;
 }
 
 body {
     background-color: var(--bg-dark);
-    color: var(--text-main);
+    color: var(--text-light);
     min-height: 100vh;
     display: flex;
     align-items: center;
@@ -37,19 +37,37 @@ body {
     overflow-x: hidden;
 }
 
-/* Background Animated Particles */
-#lab-bg {
+/* Synthwave Grid & Background Elements */
+#arcade-bg {
     position: fixed;
     inset: 0;
     z-index: 0;
     pointer-events: none;
+    background: radial-gradient(circle at 50% 30%, #2a085c 0%, #0d0221 80%);
+}
+
+.synth-grid {
+    position: absolute;
+    inset: 0;
+    background-image: 
+        linear-gradient(to right, rgba(255, 0, 127, 0.15) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(0, 240, 255, 0.15) 1px, transparent 1px);
+    background-size: 40px 40px;
+    transform: perspective(500px) rotateX(60deg) translateY(-100px);
+    transform-origin: top center;
+    animation: gridMove 20s linear infinite;
+}
+
+@keyframes gridMove {
+    0% { background-position: 0 0; }
+    100% { background-position: 0 400px; }
 }
 
 /* Splash Loader */
 #splash {
     position: fixed;
     inset: 0;
-    background: #020617;
+    background: #080114;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -67,219 +85,243 @@ body {
 }
 
 .app-brand-logo {
-    width: clamp(90px, 15vw, 130px);
-    filter: drop-shadow(0 0 20px rgba(139, 92, 246, 0.6));
-    animation: pulse 2.5s infinite ease-in-out;
+    width: clamp(100px, 18vw, 140px);
+    filter: drop-shadow(0 0 25px var(--neon-pink));
+    animation: bounce 2s infinite ease-in-out;
 }
 
 #splash-title {
-    font-size: 2.2rem;
+    font-size: 2.5rem;
     font-weight: 900;
-    letter-spacing: 2px;
-    background: linear-gradient(45deg, var(--accent-purple), var(--accent-pink));
+    letter-spacing: 4px;
+    font-style: italic;
+    background: linear-gradient(45deg, var(--neon-pink), var(--neon-yellow));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 20px rgba(255, 0, 127, 0.5);
 }
 
 .loader {
-    width: 200px;
-    height: 8px;
-    background: #334155;
+    width: 220px;
+    height: 10px;
+    background: #1a0b2e;
     border-radius: 50px;
+    border: 1px solid var(--neon-cyan);
     overflow: hidden;
+    box-shadow: 0 0 10px var(--neon-cyan);
 }
 
 .loader div {
     height: 100%;
     width: 0;
-    background: linear-gradient(90deg, var(--accent-purple), var(--accent-cyan));
+    background: linear-gradient(90deg, var(--neon-pink), var(--neon-cyan));
 }
 
-/* Game Interface Container */
+/* Main Arcade Cabinet Box */
 #game-container {
     position: relative;
     z-index: 10;
     width: 100%;
     max-width: 900px;
-    background: rgba(30, 41, 59, 0.95);
-    backdrop-filter: blur(16px);
-    border-radius: 24px;
-    padding: clamp(20px, 4vw, 30px);
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 30px rgba(139, 92, 246, 0.2);
+    background: var(--card-bg);
+    backdrop-filter: blur(12px);
+    border-radius: 28px;
+    padding: clamp(20px, 4vw, 35px);
+    box-shadow: 0 0 50px rgba(255, 0, 127, 0.25), inset 0 0 2px var(--neon-pink);
     display: flex;
     flex-direction: column;
-    gap: 20px;
-    border: 1px solid rgba(139, 92, 246, 0.3);
+    gap: 22px;
+    border: 2px solid var(--neon-pink);
     opacity: 0;
     transition: opacity 0.5s ease;
 }
 
+/* Header Area */
 .header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 2px solid #334155;
-    padding-bottom: 15px;
+    border-bottom: 2px solid rgba(255, 0, 127, 0.3);
+    padding-bottom: 16px;
 }
 
 .title {
-    font-size: clamp(1.1rem, 2.5vw, 1.3rem);
-    font-weight: 800;
+    font-size: clamp(1.2rem, 2.5vw, 1.5rem);
+    font-weight: 900;
+    font-style: italic;
+    letter-spacing: 1px;
+    text-transform: uppercase;
     display: flex;
     align-items: center;
     gap: 10px;
 }
 
-.title span { color: var(--accent-cyan); }
+.title span { color: var(--neon-cyan); text-shadow: 0 0 10px var(--neon-cyan); }
 
 .status-bar {
     display: flex;
-    gap: 10px;
+    gap: 12px;
     font-size: 0.9rem;
-    font-weight: 700;
+    font-weight: 800;
 }
 
 .badge {
-    padding: 6px 14px;
-    border-radius: 20px;
-    background: rgba(15, 23, 42, 0.6);
-    border: 1px solid #334155;
+    padding: 8px 16px;
+    border-radius: 30px;
+    background: rgba(13, 2, 33, 0.8);
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
 }
 
-.progress-badge { color: var(--accent-cyan); border-color: rgba(6, 182, 212, 0.4); }
-.shield-badge { color: var(--accent-pink); border-color: rgba(236, 72, 153, 0.4); }
+.progress-badge { 
+    color: var(--neon-cyan); 
+    border: 1px solid var(--neon-cyan);
+    box-shadow: 0 0 12px rgba(0, 240, 255, 0.3);
+}
 
-/* Scenario Box */
+.shield-badge { 
+    color: var(--neon-pink); 
+    border: 1px solid var(--neon-pink);
+    box-shadow: 0 0 12px rgba(255, 0, 127, 0.3);
+}
+
+/* Question / Scenario Screen */
 .scenario-card {
-    background: rgba(15, 23, 42, 0.8);
-    border: 1px solid #334155;
-    border-radius: 16px;
-    padding: 20px;
+    background: linear-gradient(135deg, rgba(42, 8, 92, 0.6), rgba(13, 2, 33, 0.9));
+    border: 1px solid var(--neon-cyan);
+    border-radius: 20px;
+    padding: 22px;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
+    box-shadow: 0 0 20px rgba(0, 240, 255, 0.15);
 }
 
 .q-badge {
     align-self: flex-start;
-    font-size: 0.75rem;
-    font-weight: 800;
+    font-size: 0.8rem;
+    font-weight: 900;
     text-transform: uppercase;
-    letter-spacing: 1.2px;
-    color: var(--accent-pink);
-    background: rgba(236, 72, 153, 0.15);
-    border: 1px solid rgba(236, 72, 153, 0.3);
-    padding: 4px 10px;
-    border-radius: 12px;
+    letter-spacing: 1.5px;
+    color: var(--neon-yellow);
+    background: rgba(255, 230, 0, 0.15);
+    border: 1px solid var(--neon-yellow);
+    padding: 5px 14px;
+    border-radius: 20px;
+    box-shadow: 0 0 10px rgba(255, 230, 0, 0.3);
 }
 
 .scenario-text {
-    font-size: 1.05rem;
-    font-weight: 600;
-    line-height: 1.6;
-    color: #e2e8f0;
+    font-size: 1.15rem;
+    font-weight: 700;
+    line-height: 1.5;
+    color: #ffffff;
 }
 
-/* Multi-Slot Construction Lab Mechanics */
+/* Multi-Slot Arcade Pods */
 .builder-area {
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 18px;
 }
 
 .slot-container {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
+    gap: 15px;
 }
 
-@media(max-width: 600px) {
+@media(max-width: 650px) {
     .slot-container { grid-template-columns: 1fr; }
 }
 
 .slot-box {
-    background: #0f172a;
-    border: 2px dashed #475569;
-    border-radius: 14px;
-    min-height: 65px;
+    background: rgba(13, 2, 33, 0.9);
+    border: 2px dashed rgba(255, 0, 127, 0.5);
+    border-radius: 18px;
+    min-height: 75px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 10px;
-    transition: all 0.2s ease;
+    padding: 12px;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 .slot-box.hovered {
-    border-color: var(--accent-cyan);
-    background: rgba(6, 182, 212, 0.1);
+    border-color: var(--neon-cyan);
+    background: rgba(0, 240, 255, 0.15);
+    transform: scale(1.02);
 }
 
 .slot-box.filled {
     border-style: solid;
-    border-color: var(--accent-purple);
-    background: rgba(139, 92, 246, 0.15);
+    border-color: var(--neon-cyan);
+    background: linear-gradient(135deg, rgba(0, 240, 255, 0.2), rgba(157, 0, 255, 0.2));
+    box-shadow: 0 0 20px rgba(0, 240, 255, 0.4);
 }
 
 .slot-label {
-    font-size: 0.7rem;
+    font-size: 0.72rem;
     text-transform: uppercase;
-    letter-spacing: 1px;
-    color: var(--text-muted);
-    margin-bottom: 4px;
+    font-weight: 800;
+    letter-spacing: 1.2px;
+    color: var(--text-dim);
+    margin-bottom: 5px;
 }
 
 .slot-content {
-    font-weight: 800;
-    font-size: 0.95rem;
-    color: var(--accent-cyan);
+    font-weight: 900;
+    font-size: 1.05rem;
+    color: var(--neon-cyan);
     text-align: center;
+    text-shadow: 0 0 8px rgba(0, 240, 255, 0.6);
 }
 
-/* Word/Phrase Tile Selection Bank */
+/* Tile Palette */
 .tiles-bank-label {
-    font-size: 0.8rem;
+    font-size: 0.85rem;
     text-transform: uppercase;
-    letter-spacing: 1px;
-    color: var(--accent-cyan);
-    font-weight: 800;
+    letter-spacing: 1.5px;
+    color: var(--neon-pink);
+    font-weight: 900;
 }
 
 .tiles-bank {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px;
-    min-height: 80px;
-    background: rgba(15, 23, 42, 0.5);
-    padding: 15px;
-    border-radius: 16px;
-    border: 1px solid #334155;
+    gap: 12px;
+    min-height: 90px;
+    background: rgba(13, 2, 33, 0.6);
+    padding: 18px;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 0, 127, 0.3);
     align-items: center;
     justify-content: center;
 }
 
 .tile {
-    background: #334155;
-    border: 1px solid #475569;
-    color: var(--text-main);
-    padding: 10px 16px;
-    border-radius: 10px;
-    font-weight: 700;
-    font-size: 0.9rem;
+    background: linear-gradient(135deg, #2a085c, #1a0b2e);
+    border: 1px solid var(--neon-pink);
+    color: var(--text-light);
+    padding: 12px 18px;
+    border-radius: 12px;
+    font-weight: 800;
+    font-size: 0.95rem;
     cursor: grab;
     transition: all 0.2s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
 }
 
 .tile:hover {
-    background: #475569;
-    border-color: var(--accent-cyan);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(6, 182, 212, 0.3);
+    background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
+    border-color: var(--neon-yellow);
+    transform: translateY(-3px) scale(1.03);
+    box-shadow: 0 0 20px rgba(255, 0, 127, 0.6);
 }
 
 .tile.dragging { opacity: 0.3; }
 
-/* Control Actions */
+/* Bottom Action Bar */
 .action-bar {
     display: flex;
     justify-content: space-between;
@@ -289,57 +331,67 @@ body {
 
 .feedback-bar {
     flex: 1;
-    background: rgba(15, 23, 42, 0.8);
-    border: 1px solid #334155;
-    border-radius: 12px;
-    padding: 12px 16px;
-    font-size: 0.9rem;
-    font-weight: 700;
-    color: var(--text-muted);
+    background: rgba(13, 2, 33, 0.9);
+    border: 1px solid rgba(255, 0, 127, 0.3);
+    border-radius: 16px;
+    padding: 14px 18px;
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: var(--text-dim);
     text-align: center;
 }
 
-.btn-verify {
-    background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink));
+.btn-synth {
+    background: linear-gradient(45deg, var(--neon-pink), var(--neon-purple));
     color: white;
     border: 0;
-    padding: 12px 28px;
-    border-radius: 12px;
-    font-weight: 800;
-    font-size: 0.95rem;
+    padding: 14px 32px;
+    border-radius: 30px;
+    font-weight: 900;
+    font-size: 1rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
     cursor: pointer;
-    box-shadow: 0 4px 15px rgba(236, 72, 153, 0.4);
+    box-shadow: 0 0 20px rgba(255, 0, 127, 0.5);
     transition: all 0.2s ease;
 }
 
-.btn-verify:hover { transform: scale(1.03); }
+.btn-synth:hover { 
+    transform: scale(1.05);
+    box-shadow: 0 0 30px rgba(255, 0, 127, 0.8), 0 0 10px var(--neon-yellow);
+}
 
-/* End Screen */
+/* Game Finish Screen */
 #end-screen {
     display: none;
     flex-direction: column;
     align-items: center;
     text-align: center;
-    gap: 20px;
+    gap: 22px;
     padding: 30px 10px;
 }
 
 #end-screen h2 {
-    font-size: 2.2rem;
-    background: linear-gradient(45deg, var(--accent-cyan), var(--accent-pink));
+    font-size: 2.5rem;
+    font-weight: 900;
+    font-style: italic;
+    background: linear-gradient(45deg, var(--neon-yellow), var(--neon-pink));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 20px rgba(255, 230, 0, 0.5);
 }
 
-@keyframes pulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.05); }
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
 }
 </style>
 </head>
 <body>
 
-<canvas id="lab-bg"></canvas>
+<div id="arcade-bg">
+    <div class="synth-grid"></div>
+</div>
 
 <!-- Audio Assets -->
 <audio id="audio-correct" src="assets/correct.mp3" preload="auto"></audio>
@@ -354,51 +406,53 @@ body {
     <div class="loader"><div id="loadFill"></div></div>
 </div>
 
-<!-- Main Game Container -->
+<!-- Main Game Arcade Container -->
 <div id="game-container">
     <div class="header">
-        <div class="title">🧪 Sentence Surgery <span>// Continuous Lab</span></div>
+        <div class="title">🕹️ GRAMMAR SYNTH <span>// CONTINUOUS ARCADE</span></div>
         <div class="status-bar">
-            <div class="badge progress-badge">Experiment: <span id="lbl-q">1</span>/10</div>
-            <div class="badge shield-badge">Shields: <span id="lbl-shields">2</span></div>
+            <div class="badge progress-badge">STAGE: <span id="lbl-q">1</span>/10</div>
+            <div class="badge shield-badge">LIVES: <span id="lbl-shields">2</span></div>
         </div>
     </div>
 
     <div class="scenario-card" id="main-card">
         <div class="q-badge" id="lbl-type">Grammar Detective</div>
-        <div class="scenario-text" id="lbl-scenario">Loading lab sequence...</div>
+        <div class="scenario-text" id="lbl-scenario">Booting up grammar matrix...</div>
     </div>
 
     <div class="builder-area" id="builder-layout">
         <div class="slot-container">
             <div class="slot-box" id="slot-0" data-index="0">
                 <span class="slot-label">Part 1: Subject</span>
-                <span class="slot-content" id="slot-val-0">Drop Tile</span>
+                <span class="slot-content" id="slot-val-0">Slot Empty</span>
             </div>
             <div class="slot-box" id="slot-1" data-index="1">
                 <span class="slot-label">Part 2: Aux Verb</span>
-                <span class="slot-content" id="slot-val-1">Drop Tile</span>
+                <span class="slot-content" id="slot-val-1">Slot Empty</span>
             </div>
             <div class="slot-box" id="slot-2" data-index="2">
                 <span class="slot-label">Part 3: Verb (-ing)</span>
-                <span class="slot-content" id="slot-val-2">Drop Tile</span>
+                <span class="slot-content" id="slot-val-2">Slot Empty</span>
             </div>
         </div>
 
-        <div class="tiles-bank-label">Assembly Tile Palette (Drag tiles into slots)</div>
+        <div class="tiles-bank-label">🎛️ Synthesizer Palette (Drag tiles into slots)</div>
         <div class="tiles-bank" id="tiles-bank"></div>
     </div>
 
     <div class="action-bar" id="action-layout">
-        <div class="feedback-bar" id="lbl-feedback">Assemble all three components to test the reaction.</div>
-        <button class="btn-verify" id="btn-submit" onclick="verifyAssembly()">Synthesize Formula</button>
+        <div class="feedback-bar" id="lbl-feedback">Drag syntax components into pods and lock them in!</div>
+        <button class="btn-synth" id="btn-submit" onclick="verifyAssembly()">Lock Formula</button>
     </div>
 
     <div id="end-screen">
-        <img src="assets/logo.png" alt="Innovine Logo" style="width: 80px; filter: drop-shadow(0 0 15px rgba(139, 92, 246, 0.6));" />
-        <h2>🧬 Synthesis Complete!</h2>
-        <p>Outstanding precision, Researcher! You have successfully mastered Continuous Tenses through 3-part sentence synthesis.</p>
-        <button class="btn-verify" onclick="location.reload()">Re-Run Experiments</button>
+        <img src="assets/logo.png" alt="Innovine Logo" style="width: 90px; filter: drop-shadow(0 0 20px var(--neon-pink));" />
+        <h2>🏆 STAGE CLEARED!</h2>
+        <p style="color: var(--text-dim); font-size: 1.1rem; max-width: 500px;">
+            High Score Achieved! You've mastered Present Continuous, Past Continuous, and Future Continuous tense structures with total synth perfection.
+        </p>
+        <button class="btn-synth" onclick="location.reload()">PLAY AGAIN</button>
     </div>
 </div>
 
@@ -409,109 +463,71 @@ let shields = 2;
 let slotValues = ["", "", ""];
 let draggedTileText = "";
 
-/* New 3-Slot Assembly Pattern Database for Continuous Tenses */
+/* Questions Pool focused on Continuous Tense Mechanics */
 const database = [
     {
-        type: "Grammar Lab / Present Continuous",
-        scenario: "Lab Log: Synthesize a Present Continuous sentence describing an ongoing action happening RIGHT NOW.",
-        slots: ["The lead scientist", "is currently", "analyzing samples."],
-        bankOptions: ["is currently", "analyzing samples.", "The lead scientist", "was yesterday", "analyzed data", "will be tomorrow"]
+        type: "Grammar Detective / Present Continuous",
+        scenario: "Ongoing Action Right Now: Assemble the sentence describing what the synth player is doing this exact second.",
+        slots: ["The synth artist", "is currently", "playing live."],
+        bankOptions: ["is currently", "playing live.", "The synth artist", "was yesterday", "played beats", "will be tomorrow"]
     },
     {
         type: "Sentence Surgery / Past Continuous",
-        scenario: "Reconstruct the interrupted past event: What was happening when the power failure occurred?",
-        slots: ["The backup systems", "were actively", "running tests."],
-        bankOptions: ["were actively", "running tests.", "The backup systems", "is now", "will run", "will be running"]
+        scenario: "Interrupted Event: Reconstruct what was happening in the arcade when the power suddenly cut off.",
+        slots: ["The arcade players", "were loudly", "cheering high scores."],
+        bankOptions: ["were loudly", "cheering high scores.", "The arcade players", "is right now", "will cheer", "will be cheering"]
     },
     {
         type: "Scenario Solver / Future Continuous",
-        scenario: "Projected Schedule: Assemble a Future Continuous statement for tomorrow's orbital scan at 09:00.",
-        slots: ["Our space probe", "will be", "mapping the asteroid."],
-        bankOptions: ["will be", "mapping the asteroid.", "Our space probe", "was quietly", "mapped yesterday", "is now"]
+        scenario: "Tomorrow's Schedule: Assemble a Future Continuous forecast for tomorrow night's tournament.",
+        slots: ["Top champions", "will be", "competing for gold."],
+        bankOptions: ["will be", "competing for gold.", "Top champions", "was competing", "competed earlier", "is now"]
     },
     {
         type: "Error Hunt / Present Continuous",
-        scenario: "Correction Mode: Replace the wrong verb form to create a correct Present Continuous action.",
-        slots: ["The cyber units", "are rapidly", "upgrading firewalls."],
-        bankOptions: ["are rapidly", "upgrading firewalls.", "The cyber units", "was yesterday", "upgrade fast", "will upgraded"]
+        scenario: "Fix the tense fault: Assemble the correct active Present Continuous statement.",
+        slots: ["The laser lights", "are actively", "flashing bright."],
+        bankOptions: ["are actively", "flashing bright.", "The laser lights", "was yesterday", "flashed hard", "will flashed"]
     },
     {
         type: "Cause and Effect / Past Continuous",
-        scenario: "Link the cause: The alarms sounded because the automated drones _____ when the surge hit.",
-        slots: ["The automated drones", "were continuously", "recharging batteries."],
-        bankOptions: ["were continuously", "recharging batteries.", "The automated drones", "will be soon", "is currently", "recharged fully"]
+        scenario: "Past Continuous Cause: The sound system overheated because the speakers _____ all night.",
+        slots: ["The heavy speakers", "were constantly", "blasting bass."],
+        bankOptions: ["were constantly", "blasting bass.", "The heavy speakers", "will be soon", "is currently", "blasted loud"]
     },
     {
         type: "Dialogue Builder / Future Continuous",
-        scenario: "Synthesize Pilot A's response: 'Do not radio us at 14:00 hours because ____.'",
-        slots: ["Our flight crew", "will be", "entering warp speed."],
-        bankOptions: ["will be", "entering warp speed.", "Our flight crew", "is right now", "entered fast", "was early"]
+        scenario: "Gamer Dialogue: 'Don't interrupt me at 8 PM tomorrow because I _____ the final boss.'",
+        slots: ["I", "will be", "battling the boss."],
+        bankOptions: ["will be", "battling the boss.", "I", "am right now", "battled fast", "was early"]
     },
     {
-        type: "Grammar Detective / Present Continuous",
-        scenario: "Detect the ongoing environmental shift: Construct the correct statement.",
-        slots: ["Ocean temperatures", "are steadily", "rising global wide."],
-        bankOptions: ["are steadily", "rising global wide.", "Ocean temperatures", "was earlier", "will rose", "rose quickly"]
+        type: "Grammar Lab / Present Continuous",
+        scenario: "Real-time Trend: Construct the statement showing how neon trends are spreading currently.",
+        slots: ["Neon designs", "are rapidly", "gaining popularity."],
+        bankOptions: ["are rapidly", "gaining popularity.", "Neon designs", "was earlier", "will gained", "gained fast"]
     },
     {
         type: "Sentence Remix / Past Continuous",
-        scenario: "Assemble two simultaneous past events: While Agent A was monitoring radar, Agent B _____.",
-        slots: ["Agent B", "was carefully", "decrypting codes."],
-        bankOptions: ["was carefully", "decrypting codes.", "Agent B", "is right now", "will decrypt", "decrypted yesterday"]
+        scenario: "Dual Simultaneous Actions: While DJ Ray was mixing tracks, Beatmaster Vance _____.",
+        slots: ["Beatmaster Vance", "was smoothly", "adjusting tempos."],
+        bankOptions: ["was smoothly", "adjusting tempos.", "Beatmaster Vance", "is right now", "will adjust", "adjusted early"]
     },
     {
         type: "Application Challenge / Future Continuous",
-        scenario: "Formulate the trajectory plan for next month's expedition team.",
-        slots: ["The entire team", "will be", "exploring new depths."],
-        bankOptions: ["will be", "exploring new depths.", "The entire team", "is currently", "was previously", "explored deep"]
+        scenario: "Projected Event: Formulate the continuous plan for next year's synth festival.",
+        slots: ["Music fans", "will be", "dancing all night."],
+        bankOptions: ["will be", "dancing all night.", "Music fans", "is currently", "was previously", "danced early"]
     },
     {
         type: "Rule Finder / Continuous Structure",
-        scenario: "Assemble a valid Present Continuous sentence that obeys Subject + Aux (am/is/are) + Verb(-ing).",
-        slots: ["The research team", "is diligently", "gathering findings."],
-        bankOptions: ["is diligently", "gathering findings.", "The research team", "will gathered", "were gathered", "gather daily"]
+        scenario: "Continuous Formula Test: Assemble a valid Present Continuous sentence obeying standard syntax.",
+        slots: ["The gaming club", "is proudly", "hosting events."],
+        bankOptions: ["is proudly", "hosting events.", "The gaming club", "will hosted", "were hosted", "host daily"]
     }
 ];
 
-// Star / Lab Particle Background
-const bgCanvas = $('lab-bg');
-const bgCtx = bgCanvas.getContext('2d');
-let particles = [];
-
-function initParticles() {
-    bgCanvas.width = window.innerWidth;
-    bgCanvas.height = window.innerHeight;
-    particles = [];
-    for(let i=0; i<70; i++){
-        particles.push({
-            x: Math.random() * bgCanvas.width,
-            y: Math.random() * bgCanvas.height,
-            r: Math.random() * 2 + 1,
-            dx: (Math.random() - 0.5) * 0.6,
-            dy: (Math.random() - 0.5) * 0.6
-        });
-    }
-}
-
-function drawParticles() {
-    bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
-    bgCtx.fillStyle = '#8b5cf6';
-    particles.forEach(p => {
-        bgCtx.beginPath();
-        bgCtx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        bgCtx.fill();
-        p.x += p.dx;
-        p.y += p.dy;
-        if(p.x < 0 || p.x > bgCanvas.width) p.dx *= -1;
-        if(p.y < 0 || p.y > bgCanvas.height) p.dy *= -1;
-    });
-    requestAnimationFrame(drawParticles);
-}
-window.addEventListener('resize', initParticles);
-initParticles();
-drawParticles();
-
-// Splash Screen Timer
+// Splash Screen Loader
 let loadVal = 0;
 let loadTimer = setInterval(() => {
     loadVal += 5;
@@ -548,26 +564,25 @@ function loadQuestion() {
     slotValues = ["", "", ""];
     $('lbl-q').innerText = currentQ + 1;
     $('lbl-shields').innerText = shields;
-    $('lbl-feedback').innerText = "Assemble all three components to test the reaction.";
-    $('lbl-feedback').style.color = "var(--text-muted)";
+    $('lbl-feedback').innerText = "Drag syntax components into pods and lock them in!";
+    $('lbl-feedback').style.color = "var(--text-dim)";
 
     let data = database[currentQ];
     $('lbl-type').innerText = data.type;
     $('lbl-scenario').innerText = data.scenario;
 
-    // Reset Slots
+    // Reset Pod Slots
     for(let i=0; i<3; i++) {
         let slotEl = $(`slot-${i}`);
         let slotValEl = $(`slot-val-${i}`);
         slotEl.className = "slot-box";
-        slotValEl.innerText = "Drop Tile";
+        slotValEl.innerText = "Slot Empty";
     }
 
-    // Build Tile Palette
+    // Build Palette
     let bank = $('tiles-bank');
     bank.innerHTML = '';
     
-    // Shuffle tiles
     let shuffled = [...data.bankOptions].sort(() => Math.random() - 0.5);
     shuffled.forEach(text => {
         let tile = document.createElement('div');
@@ -607,7 +622,6 @@ function setupSlotEvents() {
             e.preventDefault();
             slot.classList.remove('hovered');
             
-            // Assign Tile text to Slot
             slotValues[i] = draggedTileText;
             $(`slot-val-${i}`).innerText = draggedTileText;
             slot.classList.add('filled');
@@ -628,27 +642,26 @@ function verifyAssembly() {
 
     if(isCorrect) {
         playSound('correct');
-        $('lbl-feedback').innerText = "✓ Perfect Synthesis! Sentence alignment confirmed.";
-        $('lbl-feedback').style.color = "var(--accent-green)";
+        $('lbl-feedback').innerText = "⚡ SYNTH PERFECT! Correct Tense Sequence Locked.";
+        $('lbl-feedback').style.color = "var(--neon-green)";
         
         setTimeout(() => {
             currentQ++;
             loadQuestion();
-        }, 2000);
+        }, 1800);
     } else {
         shields--;
         $('lbl-shields').innerText = shields;
 
         if(shields > 0) {
             playSound('wrong');
-            $('lbl-feedback').innerText = "✕ Mismatched Elements! Re-check verb tense structure (1 shield left).";
-            $('lbl-feedback').style.color = "var(--accent-pink)";
+            $('lbl-feedback').innerText = "✕ SYNTAX ERROR! Re-check verb structure (1 Life Remaining).";
+            $('lbl-feedback').style.color = "var(--neon-yellow)";
         } else {
             playSound('wrong');
-            $('lbl-feedback').innerText = `⚡ Lab Override. Formula: "${data.slots.join(' ')}"`;
-            $('lbl-feedback').style.color = "var(--accent-red)";
+            $('lbl-feedback').innerText = `💥 SYSTEM OVERRIDE. Solution: "${data.slots.join(' ')}"`;
+            $('lbl-feedback').style.color = "var(--neon-pink)";
 
-            // Fill correct values automatically on failure
             for(let i=0; i<3; i++) {
                 $(`slot-val-${i}`).innerText = data.slots[i];
                 $(`slot-${i}`).className = "slot-box filled";
@@ -657,7 +670,7 @@ function verifyAssembly() {
             setTimeout(() => {
                 currentQ++;
                 loadQuestion();
-            }, 3200);
+            }, 3000);
         }
     }
 }
