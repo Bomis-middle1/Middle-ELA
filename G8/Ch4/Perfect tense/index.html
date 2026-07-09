@@ -3,46 +3,73 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-<title>Perfect Tenses: Before & After Lab</title>
+<title>G8 English: Perfect Tenses Lab</title>
 <style>
 :root {
-    --bg-warm: #fcf8f2;
-    --card-bg: #ffffff;
-    --terracotta: #c85a24;
-    --terracotta-dark: #9e3f14;
-    --gold: #d99b26;
-    --olive: #5b7042;
-    --text-main: #362a22;
-    --text-muted: #7c6d63;
-    --border-color: #e8ded2;
-    --shadow: 0 10px 30px rgba(200, 90, 36, 0.12);
+    --card-bg: rgba(255, 255, 255, 0.92);
+    --primary-purple: #6a1b9a;
+    --accent-pink: #e91e63;
+    --accent-blue: #0288d1;
+    --accent-amber: #f57c00;
+    --accent-green: #2e7d32;
+    --text-main: #1f142e;
+    --text-muted: #5c4e70;
+    --border-color: rgba(255, 255, 255, 0.6);
+    --shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
 }
 
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    font-family: 'Georgia', 'Trebuchet MS', serif;
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
     user-select: none;
 }
 
+/* Vibrant Colorful Backdrop with Animated Gradient */
 body {
-    background-color: var(--bg-warm);
-    background-image: radial-gradient(#e8ded2 1px, transparent 1px);
-    background-size: 24px 24px;
+    background: linear-gradient(-45deg, #ff416c, #8a2387, #e91e63, #240b36, #00c6ff, #0072ff);
+    background-size: 400% 400%;
+    animation: gradientBG 15s ease infinite;
     color: var(--text-main);
     min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 15px;
+    position: relative;
+    overflow-x: hidden;
+}
+
+@keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* Floating Ambient Orbs */
+.orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(50px);
+    opacity: 0.6;
+    pointer-events: none;
+    z-index: 0;
+}
+.orb-1 { width: 300px; height: 300px; background: #ffeb3b; top: 10%; left: 5%; animation: float 8s infinite alternate; }
+.orb-2 { width: 350px; height: 350px; background: #00e676; bottom: 10%; right: 5%; animation: float 10s infinite alternate-reverse; }
+
+@keyframes float {
+    0% { transform: translateY(0) scale(1); }
+    100% { transform: translateY(-30px) scale(1.1); }
 }
 
 /* Splash Screen */
 #splash {
     position: fixed;
     inset: 0;
-    background: #fbf6ef;
+    background: linear-gradient(135deg, #2a0845, #6441a5);
+    color: white;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -54,33 +81,35 @@ body {
 }
 
 .splash-badge {
-    background: var(--terracotta);
+    background: linear-gradient(45deg, #ff007f, #ffaa00);
     color: white;
-    font-size: 1.2rem;
-    font-weight: bold;
-    padding: 8px 20px;
-    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: 800;
+    padding: 8px 22px;
+    border-radius: 20px;
     margin-bottom: 15px;
     letter-spacing: 2px;
+    box-shadow: 0 4px 15px rgba(255, 0, 127, 0.4);
 }
 
 #splash-title {
-    font-size: clamp(2rem, 5vw, 3rem);
-    color: var(--terracotta-dark);
+    font-size: clamp(2.2rem, 5vw, 3.2rem);
+    font-weight: 900;
     margin-bottom: 10px;
+    text-shadow: 0 4px 20px rgba(0,0,0,0.3);
 }
 
 .splash-sub {
-    color: var(--text-muted);
-    font-style: italic;
+    color: #e0d0f5;
     font-size: 1.1rem;
     margin-bottom: 30px;
+    max-width: 600px;
 }
 
 .loader {
-    width: 220px;
-    height: 8px;
-    background: #e8ded2;
+    width: 250px;
+    height: 10px;
+    background: rgba(255, 255, 255, 0.2);
     border-radius: 50px;
     overflow: hidden;
 }
@@ -88,16 +117,18 @@ body {
 .loader div {
     height: 100%;
     width: 0;
-    background: var(--terracotta);
+    background: linear-gradient(90deg, #00f2fe, #4facfe);
     transition: width 0.1s ease;
 }
 
-/* Main Cabinet Box */
+/* Game Card Box */
 #game-container {
     position: relative;
+    z-index: 10;
     width: 100%;
-    max-width: 920px;
+    max-width: 940px;
     background: var(--card-bg);
+    backdrop-filter: blur(16px);
     border-radius: 28px;
     padding: clamp(20px, 4vw, 32px);
     box-shadow: var(--shadow);
@@ -114,38 +145,40 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 2px solid var(--border-color);
+    border-bottom: 2px solid rgba(0, 0, 0, 0.08);
     padding-bottom: 16px;
 }
 
-.chapter-tag {
-    background: var(--terracotta);
+.grade-badge {
+    background: linear-gradient(45deg, #8e2de2, #4a00e0);
     color: white;
-    padding: 6px 14px;
-    border-radius: 8px;
-    font-weight: bold;
-    font-size: 0.9rem;
+    padding: 6px 16px;
+    border-radius: 12px;
+    font-weight: 800;
+    font-size: 0.95rem;
+    box-shadow: 0 4px 10px rgba(142, 45, 226, 0.3);
 }
 
 .title {
     font-size: clamp(1.1rem, 2.5vw, 1.5rem);
-    color: var(--terracotta-dark);
-    font-weight: bold;
+    color: var(--primary-purple);
+    font-weight: 800;
 }
 
 .status-bar {
     display: flex;
     gap: 12px;
     font-size: 0.9rem;
-    font-weight: bold;
+    font-weight: 800;
 }
 
 .badge {
-    padding: 6px 14px;
+    padding: 6px 16px;
     border-radius: 20px;
-    background: #f7ede2;
-    border: 1px solid var(--terracotta);
-    color: var(--terracotta-dark);
+    background: #ffffff;
+    border: 1px solid #dcd0ea;
+    color: var(--primary-purple);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
 /* Before & After Interactive Showcase */
@@ -153,7 +186,7 @@ body {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 15px;
-    background: #fbf6ef;
+    background: rgba(255, 255, 255, 0.6);
     border: 1px solid var(--border-color);
     border-radius: 20px;
     padding: 16px;
@@ -166,26 +199,27 @@ body {
 .state-card {
     background: white;
     border-radius: 16px;
-    padding: 15px;
-    border: 1px solid var(--border-color);
+    padding: 16px;
+    border: 1px solid rgba(0,0,0,0.06);
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
     gap: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
 }
 
 .state-tag {
     font-size: 0.75rem;
     text-transform: uppercase;
     letter-spacing: 1.5px;
-    font-weight: bold;
-    padding: 4px 12px;
+    font-weight: 900;
+    padding: 4px 14px;
     border-radius: 10px;
 }
 
-.tag-before { background: #fef2f2; color: #dc2626; border: 1px solid #fca5a5; }
-.tag-after { background: #f0fdf4; color: #16a34a; border: 1px solid #86efac; }
+.tag-before { background: #ffebee; color: #c62828; border: 1px solid #ffcdd2; }
+.tag-after { background: #e8f5e9; color: #2e7d32; border: 1px solid #c8e6c9; }
 
 .state-icon {
     font-size: 3.5rem;
@@ -195,29 +229,29 @@ body {
 .state-desc {
     font-size: 0.95rem;
     color: var(--text-muted);
-    font-style: italic;
+    font-weight: 600;
 }
 
 /* Question Banner */
 .question-card {
-    background: #fff8f0;
-    border-left: 5px solid var(--terracotta);
-    padding: 14px 18px;
-    border-radius: 12px;
+    background: linear-gradient(135deg, #f3e5f5, #e1bee7);
+    border-left: 6px solid var(--primary-purple);
+    padding: 16px 20px;
+    border-radius: 14px;
 }
 
 .q-tense-type {
     font-size: 0.8rem;
     text-transform: uppercase;
-    letter-spacing: 1px;
-    font-weight: bold;
-    color: var(--gold);
+    letter-spacing: 1.2px;
+    font-weight: 900;
+    color: var(--accent-pink);
     margin-bottom: 4px;
 }
 
 .question-text {
-    font-size: 1.1rem;
-    font-weight: bold;
+    font-size: 1.15rem;
+    font-weight: 700;
     color: var(--text-main);
 }
 
@@ -239,10 +273,10 @@ body {
 }
 
 .slot-box {
-    background: #faf7f2;
-    border: 2px dashed var(--terracotta);
-    border-radius: 16px;
-    min-height: 70px;
+    background: #ffffff;
+    border: 2px dashed var(--accent-blue);
+    border-radius: 18px;
+    min-height: 75px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -252,71 +286,75 @@ body {
 }
 
 .slot-box.hovered {
-    background: #f5e6d8;
-    border-color: var(--terracotta-dark);
+    background: #e1f5fe;
+    border-color: #0277bd;
+    transform: scale(1.02);
 }
 
 .slot-box.filled {
     border-style: solid;
-    background: #fdf3eb;
-    border-color: var(--terracotta);
+    background: #f0f4c3;
+    border-color: #afb42b;
+    box-shadow: 0 4px 12px rgba(175, 180, 43, 0.2);
 }
 
 .slot-label {
-    font-size: 0.7rem;
+    font-size: 0.72rem;
     text-transform: uppercase;
     letter-spacing: 1px;
+    font-weight: 800;
     color: var(--text-muted);
     margin-bottom: 4px;
 }
 
 .slot-content {
-    font-weight: bold;
-    font-size: 1rem;
-    color: var(--terracotta-dark);
+    font-weight: 800;
+    font-size: 1.05rem;
+    color: #2e7d32;
     text-align: center;
 }
 
-/* Palette */
+/* Word Bank Palette */
 .tiles-label {
     font-size: 0.85rem;
     text-transform: uppercase;
-    letter-spacing: 1px;
-    color: var(--terracotta);
-    font-weight: bold;
+    letter-spacing: 1.2px;
+    color: var(--primary-purple);
+    font-weight: 900;
 }
 
 .tiles-bank {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px;
-    min-height: 80px;
-    background: #fbf6ef;
-    padding: 15px;
-    border-radius: 16px;
+    gap: 12px;
+    min-height: 85px;
+    background: rgba(255, 255, 255, 0.7);
+    padding: 16px;
+    border-radius: 18px;
     border: 1px solid var(--border-color);
     align-items: center;
     justify-content: center;
 }
 
 .tile {
-    background: white;
-    border: 1px solid var(--terracotta);
+    background: linear-gradient(135deg, #ffffff, #f5f5f5);
+    border: 2px solid #8e2de2;
     color: var(--text-main);
-    padding: 10px 16px;
-    border-radius: 12px;
-    font-weight: bold;
+    padding: 12px 18px;
+    border-radius: 14px;
+    font-weight: 800;
     font-size: 0.95rem;
     cursor: grab;
     transition: all 0.2s ease;
-    box-shadow: 0 3px 8px rgba(0,0,0,0.05);
+    box-shadow: 0 4px 10px rgba(142, 45, 226, 0.15);
 }
 
 .tile:hover {
-    background: var(--terracotta);
+    background: linear-gradient(45deg, #ff007f, #7928ca);
     color: white;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(200, 90, 36, 0.25);
+    border-color: transparent;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(255, 0, 127, 0.35);
 }
 
 .tile.dragging { opacity: 0.3; }
@@ -331,32 +369,33 @@ body {
 
 .feedback-bar {
     flex: 1;
-    background: #fbf6ef;
-    border: 1px solid var(--border-color);
-    border-radius: 14px;
-    padding: 12px 16px;
+    background: white;
+    border: 1px solid rgba(0,0,0,0.08);
+    border-radius: 16px;
+    padding: 14px 18px;
     font-size: 0.95rem;
-    font-weight: bold;
+    font-weight: 800;
     color: var(--text-muted);
     text-align: center;
 }
 
 .btn-check {
-    background: var(--terracotta);
+    background: linear-gradient(45deg, #ff007f, #7928ca);
     color: white;
     border: 0;
-    padding: 14px 30px;
-    border-radius: 25px;
-    font-weight: bold;
+    padding: 14px 32px;
+    border-radius: 30px;
+    font-weight: 900;
     font-size: 1rem;
+    letter-spacing: 1px;
     cursor: pointer;
-    box-shadow: 0 4px 15px rgba(200, 90, 36, 0.3);
+    box-shadow: 0 6px 20px rgba(121, 40, 202, 0.4);
     transition: all 0.2s ease;
 }
 
 .btn-check:hover {
-    background: var(--terracotta-dark);
-    transform: scale(1.03);
+    transform: scale(1.05);
+    box-shadow: 0 8px 25px rgba(255, 0, 127, 0.5);
 }
 
 /* End Screen */
@@ -370,18 +409,23 @@ body {
 }
 
 #end-screen h2 {
-    font-size: 2.2rem;
-    color: var(--terracotta-dark);
+    font-size: 2.4rem;
+    font-weight: 900;
+    color: var(--primary-purple);
 }
 </style>
 </head>
 <body>
 
+<!-- Ambient Backdrop Orbs -->
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+
 <!-- Splash Loader -->
 <div id="splash">
-    <div class="splash-badge">CHAPTER 04</div>
-    <div id="splash-title">Perfect Tenses Lab</div>
-    <div class="splash-sub">Inspired by image_c2c8a2.png — Master Present, Past & Future Perfect Tenses!</div>
+    <div class="splash-badge">GRADE 8 ENGLISH</div>
+    <div id="splash-title">Perfect Tenses Masterclass</div>
+    <div class="splash-sub">Inspired by image_c2c8a2.png — Advanced Before & After Syntactic Analysis</div>
     <div class="loader"><div id="loadFill"></div></div>
 </div>
 
@@ -389,11 +433,11 @@ body {
 <div id="game-container">
     <div class="header">
         <div style="display: flex; align-items: center; gap: 10px;">
-            <div class="chapter-tag">04</div>
+            <div class="grade-badge">GRADE 8</div>
             <div class="title">Perfect Tenses: Before & After</div>
         </div>
         <div class="status-bar">
-            <div class="badge">Task: <span id="lbl-q">1</span>/8</div>
+            <div class="badge">Question: <span id="lbl-q">1</span>/8</div>
             <div class="badge">Shields: <span id="lbl-shields">2</span></div>
         </div>
     </div>
@@ -401,54 +445,54 @@ body {
     <!-- Visual Before & After Showcase -->
     <div class="before-after-display">
         <div class="state-card">
-            <span class="state-tag tag-before">BEFORE</span>
-            <div class="state-icon" id="img-before">🚗💨</div>
-            <div class="state-desc" id="desc-before">Dirty car covered in mud</div>
+            <span class="state-tag tag-before">INITIAL STATE</span>
+            <div class="state-icon" id="img-before">🚗🤎</div>
+            <div class="state-desc" id="desc-before">Loading state...</div>
         </div>
         <div class="state-card">
-            <span class="state-tag tag-after">AFTER</span>
+            <span class="state-tag tag-after">RESULTING STATE</span>
             <div class="state-icon" id="img-after">✨🚗</div>
-            <div class="state-desc" id="desc-after">Clean, sparkling car</div>
+            <div class="state-desc" id="desc-after">Loading state...</div>
         </div>
     </div>
 
     <div class="question-card">
         <div class="q-tense-type" id="lbl-tense-type">Present Perfect Tense</div>
-        <div class="question-text" id="lbl-question">Describe what the person has done between picture 1 and picture 2!</div>
+        <div class="question-text" id="lbl-question">Question loading...</div>
     </div>
 
     <div class="builder-area">
         <div class="slot-container">
             <div class="slot-box" id="slot-0">
-                <span class="slot-label">Subject</span>
+                <span class="slot-label">Subject & Modifier</span>
                 <span class="slot-content" id="slot-val-0">Drop Tile</span>
             </div>
             <div class="slot-box" id="slot-1">
-                <span class="slot-label">Helping Verb (Have/Has/Had/Will have)</span>
+                <span class="slot-label">Auxiliary Verb Phrase</span>
                 <span class="slot-content" id="slot-val-1">Drop Tile</span>
             </div>
             <div class="slot-box" id="slot-2">
-                <span class="slot-label">Past Participle (V3)</span>
+                <span class="slot-label">Past Participle + Complement</span>
                 <span class="slot-content" id="slot-val-2">Drop Tile</span>
             </div>
         </div>
 
-        <div class="tiles-label">🧩 Word Bank (Drag tiles into the correct slots)</div>
+        <div class="tiles-label">🧩 Word Bank (Synthesizer Palette)</div>
         <div class="tiles-bank" id="tiles-bank"></div>
     </div>
 
     <div class="action-bar">
-        <div class="feedback-bar" id="lbl-feedback">Drag sentence tiles to complete the Perfect Tense statement.</div>
-        <button class="btn-check" onclick="verifyAssembly()">Verify Tense</button>
+        <div class="feedback-bar" id="lbl-feedback">Drag syntax components into pods and lock them in!</div>
+        <button class="btn-check" onclick="verifyAssembly()">Lock Formula</button>
     </div>
 
     <div id="end-screen">
-        <div style="font-size: 4rem;">🏆</div>
-        <h2>Perfect Tense Master!</h2>
-        <p style="color: var(--text-muted); font-size: 1.1rem; max-width: 500px;">
-            You have successfully mastered Present Perfect, Past Perfect, and Future Perfect tense constructions across all Before & After scenarios!
+        <div style="font-size: 4.5rem;">🎓</div>
+        <h2>G8 Grammar Mastered!</h2>
+        <p style="color: var(--text-muted); font-size: 1.1rem; max-width: 550px; line-height: 1.6;">
+            Outstanding performance! You have mastered Grade 8 level Present Perfect, Past Perfect, and Future Perfect tense constructions across complex before-and-after scenarios.
         </p>
-        <button class="btn-check" onclick="location.reload()">Play Again</button>
+        <button class="btn-check" onclick="location.reload()">Replay Challenge</button>
     </div>
 </div>
 
@@ -476,87 +520,87 @@ function playAudioTone(freq, type) {
     } catch(e) {}
 }
 
-/* Question Database referencing image_c2c8a2.png examples & concepts */
+/* Grade 8 Database featuring higher-level vocabulary & complex structures based on image_c2c8a2.png */
 const database = [
     {
-        tenseType: "Present Perfect (Action completed now)",
-        question: "Look at the dirty car vs clean car: What HAS the person done?",
+        tenseType: "Present Perfect (Completed Action with Present Relevance)",
+        question: "Referencing the car transformation: Describe what meticulous action the owner HAS completed.",
         beforeIcon: "🚗🤎",
-        beforeDesc: "The car was full of dirt and mud.",
+        beforeDesc: "Vehicle encrusted with mud and road grime.",
         afterIcon: "✨🚗",
-        afterDesc: "The car is sparkling clean now.",
-        slots: ["The car", "has been", "washed thoroughly."],
-        bankOptions: ["has been", "washed thoroughly.", "The car", "had been", "will have washed", "was washing"]
+        afterDesc: "Polished exterior restored to pristine condition.",
+        slots: ["The diligent detailer", "has thoroughly", "restored the car's finish."],
+        bankOptions: ["has thoroughly", "restored the car's finish.", "The diligent detailer", "had thoroughly", "will have restored", "was restoring"]
     },
     {
-        tenseType: "Past Perfect (Action completed BEFORE a past moment)",
-        question: "What HAD already happened before his parents came home yesterday?",
-        beforeIcon: "🧹🚗",
-        beforeDesc: "He cleaned the car early in the afternoon.",
+        tenseType: "Past Perfect (Sequence of Two Past Events)",
+        question: "Before his parents returned home yesterday evening, what HAD the teenager accomplished?",
+        beforeIcon: "🧽🚗",
+        beforeDesc: "Washing the sedan in the driveway at 3 PM.",
         afterIcon: "🏡🚗",
         afterDesc: "Parents arrived home at 6 PM.",
-        slots: ["He", "had washed", "the car in time."],
-        bankOptions: ["had washed", "the car in time.", "He", "has washed", "will have washed", "was wash"]
+        slots: ["He", "had meticulously washed", "the car prior to their arrival."],
+        bankOptions: ["had meticulously washed", "the car prior to their arrival.", "He", "has washed", "will have washed", "was washing"]
     },
     {
-        tenseType: "Future Perfect (Action completed BEFORE a future time)",
-        question: "What WILL HAVE happened by tomorrow morning?",
-        beforeIcon: "🌙🚗",
-        beforeDesc: "Working on the car overnight.",
-        afterIcon: "🌅✨",
-        afterDesc: "By tomorrow 8 AM, job complete.",
-        slots: ["He", "will have washed", "the car completely."],
-        bankOptions: ["will have washed", "the car completely.", "He", "had washed", "has washed", "washing car"]
+        tenseType: "Future Perfect (Action Completed Before a Specified Future Time)",
+        question: "By tomorrow morning's auto exhibition, what WILL HAVE transpired?",
+        beforeIcon: "🌙🚘",
+        beforeDesc: "Detailing underway overnight.",
+        afterIcon: "🌅🏆",
+        afterDesc: "Exhibition judging begins at 8 AM.",
+        slots: ["The service team", "will have fully prepped", "the vehicle for judging."],
+        bankOptions: ["will have fully prepped", "the vehicle for judging.", "The service team", "has prepped", "had prepped", "is prepping"]
     },
     {
-        tenseType: "Present Perfect (Dinner Scenario)",
-        question: "Look at the empty plate vs delicious steak dinner: What HAS she done?",
+        tenseType: "Present Perfect (Culinary Arts Scenario)",
+        question: "Comparing the empty plate to the gourmet dinner: What HAS the chef executed?",
         beforeIcon: "🍽️❌",
-        beforeDesc: "An empty dinner plate.",
+        beforeDesc: "Bare ceramic dinner plate.",
         afterIcon: "🥩🥦",
-        afterDesc: "A hot meal served on the plate.",
-        slots: ["She", "has cooked", "a delicious meal."],
-        bankOptions: ["has cooked", "a delicious meal.", "She", "had cooked", "will have cooked", "is cook"]
+        afterDesc: "Plated filet mignon with steamed vegetables.",
+        slots: ["The executive chef", "has artfully arranged", "a gourmet steak dinner."],
+        bankOptions: ["has artfully arranged", "a gourmet steak dinner.", "The executive chef", "had arranged", "will have arranged", "arranges"]
     },
     {
-        tenseType: "Past Perfect (Dinner Scenario)",
-        question: "What HAD already happened before the guests arrived?",
+        tenseType: "Past Perfect (Prior Completed Past Condition)",
+        question: "What HAD occurred before the restaurant critic sat down at her table?",
         beforeIcon: "🍳🔥",
-        beforeDesc: "Preparing food in the kitchen.",
-        afterIcon: "👥🍽️",
-        afterDesc: "Guests entered the dining room.",
-        slots: ["She", "had prepared", "the dinner table."],
-        bankOptions: ["had prepared", "the dinner table.", "She", "has prepared", "will have prepared", "prepares"]
+        beforeDesc: "Kitchen staff working during pre-service.",
+        afterIcon: "📝🥂",
+        afterDesc: "Critic seated for dinner evaluation.",
+        slots: ["The culinary team", "had already cooked", "the multi-course meal."],
+        bankOptions: ["had already cooked", "the multi-course meal.", "The culinary team", "has cooked", "will have cooked", "is cooking"]
     },
     {
-        tenseType: "Future Perfect (Dinner Scenario)",
-        question: "What WILL HAVE happened by 8:00 PM tonight?",
-        beforeIcon: "⏰⏲️",
-        beforeDesc: "Baking in the oven.",
-        afterIcon: "🥧✨",
-        afterDesc: "Timer rings at 8:00 PM.",
-        slots: ["They", "will have finished", "their dinner."],
-        bankOptions: ["will have finished", "their dinner.", "They", "had finished", "has finished", "finishing"]
+        tenseType: "Future Perfect (Projected Completion)",
+        question: "By the time the gala begins at 8:00 PM, what WILL HAVE happened?",
+        beforeIcon: "⏲️🥘",
+        beforeDesc: "Preparations underway in the kitchen.",
+        afterIcon: "✨🍽️",
+        afterDesc: "Gala doors open at 8:00 PM.",
+        slots: ["The kitchen staff", "will have prepared", "hundreds of exquisite dishes."],
+        bankOptions: ["will have prepared", "hundreds of exquisite dishes.", "The kitchen staff", "had prepared", "has prepared", "prepares"]
     },
     {
-        tenseType: "Present Perfect (Room Cleanup)",
-        question: "Look at the messy room vs clean room: What HAS the boy done?",
-        beforeIcon: "📦🧸",
-        beforeDesc: "Toys and clothes scattered everywhere.",
-        afterIcon: "✨🛏️",
-        afterDesc: "Neat, organized bedroom.",
-        slots: ["The boy", "has cleaned", "his entire bedroom."],
-        bankOptions: ["has cleaned", "his entire bedroom.", "The boy", "had cleaned", "will have cleaned", "clean room"]
+        tenseType: "Present Perfect (Environmental Restoration)",
+        question: "Reflecting on the polluted stream vs the revived ecosystem: What HAS the volunteer corps achieved?",
+        beforeIcon: "🌊🚮",
+        beforeDesc: "Stream littered with debris.",
+        afterIcon: "🌿🐟",
+        afterDesc: "Clean aquatic habitat flourishing.",
+        slots: ["The conservation group", "has successfully rehabilitated", "the local ecosystem."],
+        bankOptions: ["has successfully rehabilitated", "the local ecosystem.", "The conservation group", "had rehabilitated", "will have rehabilitated", "rehabilitating"]
     },
     {
-        tenseType: "Past Perfect (Homework Completion)",
-        question: "What HAD she done before she went out to play?",
-        beforeIcon: "📚✍️",
-        beforeDesc: "Studying at her desk.",
-        afterIcon: "🛝☀️",
-        afterDesc: "Playing outside in the park.",
-        slots: ["She", "had completed", "all her homework."],
-        bankOptions: ["had completed", "all her homework.", "She", "has completed", "will have completed", "completes"]
+        tenseType: "Past Perfect (Academic Research Project)",
+        question: "What HAD the student researchers completed before presenting at the symposium?",
+        beforeIcon: "📊🔬",
+        beforeDesc: "Analyzing data sets in the lab.",
+        afterIcon: "🎤🏛️",
+        afterDesc: "Presenting findings on stage.",
+        slots: ["The research team", "had compiled comprehensive", "data prior to the conference."],
+        bankOptions: ["had compiled comprehensive", "data prior to the conference.", "The research team", "has compiled", "will have compiled", "compiles"]
     }
 ];
 
@@ -588,7 +632,7 @@ function loadQuestion() {
     slotValues = ["", "", ""];
     $('lbl-q').innerText = currentQ + 1;
     $('lbl-shields').innerText = shields;
-    $('lbl-feedback').innerText = "Drag sentence tiles to complete the Perfect Tense statement.";
+    $('lbl-feedback').innerText = "Drag syntax components into pods and lock them in!";
     $('lbl-feedback').style.color = "var(--text-muted)";
 
     let data = database[currentQ];
@@ -669,9 +713,9 @@ function verifyAssembly() {
     }
 
     if(isCorrect) {
-        playAudioTone(587.33, 'triangle'); // High cheerful pitch
-        $('lbl-feedback').innerText = "✓ Perfect! Sentence constructed accurately.";
-        $('lbl-feedback').style.color = "var(--olive)";
+        playAudioTone(587.33, 'triangle');
+        $('lbl-feedback').innerText = "✓ EXCELLENT! Syntactic sequence correctly constructed.";
+        $('lbl-feedback').style.color = "var(--accent-green)";
         
         setTimeout(() => {
             currentQ++;
@@ -683,12 +727,12 @@ function verifyAssembly() {
 
         if(shields > 0) {
             playAudioTone(220, 'sawtooth');
-            $('lbl-feedback').innerText = "✕ Incorrect auxiliary or main verb form! Try again (1 Shield left).";
-            $('lbl-feedback').style.color = "var(--terracotta)";
+            $('lbl-feedback').innerText = "✕ Tense sequence mismatch! Review auxiliary & participle pairings.";
+            $('lbl-feedback').style.color = "var(--accent-amber)";
         } else {
             playAudioTone(180, 'sawtooth');
             $('lbl-feedback').innerText = `⚡ Correct Solution: "${data.slots.join(' ')}"`;
-            $('lbl-feedback').style.color = "var(--terracotta-dark)";
+            $('lbl-feedback').style.color = "var(--accent-pink)";
 
             for(let i=0; i<3; i++) {
                 $(`slot-val-${i}`).innerText = data.slots[i];
@@ -698,7 +742,7 @@ function verifyAssembly() {
             setTimeout(() => {
                 currentQ++;
                 loadQuestion();
-            }, 3000);
+            }, 3200);
         }
     }
 }
