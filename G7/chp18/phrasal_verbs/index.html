@@ -1,1 +1,1062 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#5a4fcf">
+<title>Phrasal Verb Context Quest</title>
+<style>
+:root{
+  --ink:#26334d;
+  --muted:#61708a;
+  --purple:#6557d6;
+  --purple-dark:#493bb3;
+  --purple-soft:#eeeaff;
+  --teal:#1a9c9b;
+  --teal-soft:#def7f5;
+  --gold:#ffc857;
+  --gold-dark:#d99412;
+  --green:#239567;
+  --green-soft:#ddf7ea;
+  --red:#cf455c;
+  --red-soft:#ffe3e8;
+  --blue:#3e83d8;
+  --blue-soft:#e4f1ff;
+  --card:#ffffff;
+  --line:#d9d5ff;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{width:100%;height:100%}
+body{
+  font-family:Arial, Helvetica, sans-serif;
+  color:var(--ink);
+  background:
+    radial-gradient(circle at 12% 14%,rgba(172,157,255,.32),transparent 28%),
+    radial-gradient(circle at 88% 84%,rgba(112,218,215,.26),transparent 30%),
+    linear-gradient(145deg,#f8f6ff 0%,#edf8ff 52%,#fff9eb 100%);
+  overflow:hidden;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+button{font:inherit}
+button:focus-visible{outline:3px solid #1c74d9;outline-offset:3px}
 
+/* Mandatory five-second Innovine splash */
+#splash{
+  position:fixed;inset:0;background:#fff;z-index:9999;
+  display:flex;align-items:center;justify-content:center;
+  transition:opacity .38s ease;
+}
+#splash.fade{opacity:0;pointer-events:none}
+#splash img{
+  max-width:min(68vw,500px);max-height:42vh;object-fit:contain;
+  animation:logoFlash 1s ease-in-out infinite;
+}
+@keyframes logoFlash{
+  0%,100%{opacity:1;transform:scale(1);filter:drop-shadow(0 0 0 rgba(101,87,214,0))}
+  50%{opacity:.55;transform:scale(1.045);filter:drop-shadow(0 0 18px rgba(101,87,214,.28))}
+}
+
+#confetti{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:7000}
+
+/* Lightweight decorative background */
+.decor{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:0}
+.float-word{
+  position:absolute;font-weight:900;letter-spacing:2px;color:rgba(82,69,180,.10);
+  animation:drift 8s ease-in-out infinite alternate;
+}
+.fw1{left:4%;top:12%;font-size:38px}.fw2{right:6%;top:18%;font-size:32px;animation-delay:-2s}
+.fw3{left:7%;bottom:13%;font-size:31px;animation-delay:-5s}.fw4{right:5%;bottom:10%;font-size:36px;animation-delay:-3s}
+.fw5{left:47%;top:4%;font-size:25px;animation-delay:-6s}
+@keyframes drift{from{transform:translateY(-4px) rotate(-3deg)}to{transform:translateY(14px) rotate(3deg)}}
+.spark{position:absolute;width:8px;height:8px;border-radius:50%;background:rgba(255,190,72,.48);animation:twinkle 2.6s ease-in-out infinite}
+.s1{left:18%;top:8%}.s2{right:17%;top:9%;animation-delay:-1s}.s3{left:11%;bottom:21%;animation-delay:-1.8s}.s4{right:13%;bottom:24%;animation-delay:-.6s}
+@keyframes twinkle{0%,100%{transform:scale(.65);opacity:.25}50%{transform:scale(1.35);opacity:.75}}
+.streamer{position:absolute;width:68px;height:12px;border-top:3px solid rgba(29,156,155,.19);border-radius:50%;animation:sway 5s ease-in-out infinite alternate}
+.st1{left:2%;top:43%;transform:rotate(-25deg)}.st2{right:2%;top:51%;transform:rotate(20deg);animation-delay:-2s}
+@keyframes sway{from{translate:0 -3px}to{translate:0 8px}}
+
+.screen{
+  display:none;position:relative;z-index:2;
+  width:min(95vw,940px);height:min(94dvh,720px);
+  padding:8px;animation:screenIn .3s ease-out;
+}
+.screen.active{display:block}
+@keyframes screenIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+.panel{
+  width:100%;height:100%;background:rgba(255,255,255,.97);
+  border:5px solid #cbc4ff;border-radius:30px;
+  box-shadow:0 18px 50px rgba(68,55,150,.20);
+  overflow:hidden;position:relative;
+  display:flex;flex-direction:column;padding:16px 20px;
+}
+.panel::before{
+  content:"";position:absolute;width:170px;height:170px;border-radius:50%;
+  background:rgba(232,227,255,.78);right:-72px;top:-74px;
+}
+.panel>*{position:relative;z-index:1}
+
+h1{font-size:clamp(29px,4.5vw,46px);line-height:1.05;color:var(--purple-dark);text-shadow:1px 2px 0 #e7e3ff}
+h2{font-size:clamp(22px,3vw,31px);color:var(--purple-dark)}
+.sub{font-size:clamp(15px,2.1vw,19px);line-height:1.42;color:var(--muted);font-weight:700}
+
+/* Start screen */
+.start-wrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:8px}
+.quest-mark{
+  width:102px;height:102px;border-radius:30px;display:grid;place-items:center;
+  background:linear-gradient(145deg,#eeeaff,#dcf8f5);border:3px solid #bfb6ff;
+  font-size:54px;margin-bottom:12px;box-shadow:0 10px 24px rgba(78,63,177,.14);transform:rotate(-3deg)
+}
+.badges{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:15px 0 10px}
+.badge{padding:7px 11px;border-radius:999px;font-size:13px;font-weight:900;border:2px solid}
+.badge:nth-child(1){background:var(--purple-soft);border-color:#bdb4ff;color:#5344bd}
+.badge:nth-child(2){background:var(--teal-soft);border-color:#9bddda;color:#187b7a}
+.badge:nth-child(3){background:#fff3d6;border-color:#ffd47d;color:#8f5b00}
+.badge:nth-child(4){background:var(--blue-soft);border-color:#aed2fa;color:#2a6ab6}
+.start-note{margin-top:10px;font-size:13px;color:#6f7c92;font-weight:700}
+.btn{
+  border:none;border-radius:17px;min-height:48px;padding:12px 23px;
+  font-weight:900;cursor:pointer;transition:transform .12s ease,box-shadow .12s ease;
+}
+.btn:active{transform:translateY(3px)}
+.btn-primary{background:var(--gold);color:#49320e;box-shadow:0 6px 0 var(--gold-dark);font-size:19px;margin-top:12px}
+.btn-primary:active{box-shadow:0 3px 0 var(--gold-dark)}
+.btn-purple{background:var(--purple);color:white;box-shadow:0 5px 0 #4433a7}
+.btn-purple:active{box-shadow:0 2px 0 #4433a7}
+.btn-ghost{background:#f4f2ff;color:#5144b4;border:2px solid #cbc4ff;box-shadow:none}
+
+/* Game HUD */
+.hud{display:grid;grid-template-columns:1.2fr .9fr .9fr .9fr auto;gap:8px;margin-bottom:10px}
+.hud-box{
+  min-height:46px;padding:7px 8px;border-radius:14px;
+  background:#f6f4ff;border:2px solid #d7d1ff;
+  display:flex;align-items:center;justify-content:center;text-align:center;
+  color:#5446b9;font-size:13px;font-weight:900;
+}
+.hud-box strong{font-size:16px;margin-left:4px}
+.timer-low{background:#fff0e5!important;border-color:#ffc19b!important;color:#b84b16!important;animation:timerPulse .65s ease-in-out infinite alternate}
+@keyframes timerPulse{to{transform:scale(1.035)}}
+.icon-btn{width:48px;border-radius:14px;border:2px solid #b9ddf8;background:#edf8ff;font-size:21px;cursor:pointer}
+.progress-track{height:8px;background:#ece9ff;border-radius:999px;overflow:hidden;margin:0 2px 10px}
+.progress-fill{height:100%;width:0;background:linear-gradient(90deg,var(--purple),var(--teal));border-radius:inherit;transition:width .35s ease}
+
+/* Task area */
+.task-shell{flex:1;min-height:0;display:flex;flex-direction:column}
+.task-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:8px}
+.type-tag{display:inline-flex;align-items:center;gap:5px;background:var(--teal-soft);border:2px solid #a9e2df;color:#187d7a;padding:6px 10px;border-radius:999px;font-size:12px;font-weight:900;white-space:nowrap}
+.task-title{font-size:clamp(19px,2.6vw,25px);line-height:1.22;color:#35415b;text-align:left}
+.context-card{
+  background:linear-gradient(100deg,#f7f5ff,#edfafa);border:2px solid #d5d0ff;
+  border-left:7px solid var(--purple);border-radius:16px;padding:10px 14px;
+  text-align:left;font-size:clamp(14px,1.9vw,17px);line-height:1.4;color:#43516c;font-weight:700;margin-bottom:9px;
+}
+.instruction{text-align:left;color:#68758c;font-size:13px;font-weight:800;margin:0 2px 7px}
+.interaction{flex:1;min-height:0;overflow:auto;padding:2px 3px 4px;scrollbar-width:thin}
+.feedback{min-height:28px;margin-top:6px;font-size:14px;font-weight:900;display:flex;align-items:center;justify-content:center;text-align:center}
+.feedback.good{color:var(--green)}.feedback.bad{color:var(--red)}.feedback.hint{color:#9b6410}
+
+/* Choice cards — used as contextual decision cards, not A/B/C/D MCQs */
+.choice-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.choice-card{
+  min-height:62px;border:2px solid #d8d4f5;border-radius:15px;background:white;
+  color:#34415b;padding:11px 12px;text-align:left;font-weight:800;line-height:1.28;
+  cursor:pointer;box-shadow:0 5px 12px rgba(65,55,130,.07);transition:.14s ease;
+}
+.choice-card:hover{transform:translateY(-1px);border-color:#a99ef0}
+.choice-card.selected{background:#eeeaff;border-color:#7464dc;box-shadow:0 0 0 3px rgba(101,87,214,.14)}
+.choice-card.correct{background:var(--green-soft);border-color:#69bf96;color:#17633f}
+.choice-card.wrong{background:var(--red-soft);border-color:#e88696;color:#9f2539;animation:shake .33s ease}
+.choice-card.dim{opacity:.55}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+
+/* Select-all */
+.multi-card{position:relative;padding-left:47px}
+.multi-card::before{
+  content:"";position:absolute;left:14px;top:50%;transform:translateY(-50%);
+  width:20px;height:20px;border:2px solid #aaa4d8;border-radius:6px;background:#fff;
+}
+.multi-card.selected::before{content:"✓";display:grid;place-items:center;background:var(--purple);border-color:var(--purple);color:#fff;font-size:15px}
+.action-row{display:flex;justify-content:center;gap:9px;margin-top:8px;flex-wrap:wrap}
+.action-row .btn{min-height:42px;padding:9px 18px;font-size:14px}
+
+/* Sorting */
+.sort-grid{display:grid;grid-template-columns:1fr;gap:7px}
+.sort-row{display:grid;grid-template-columns:1.35fr .8fr .8fr;gap:7px;align-items:stretch}
+.sort-label{display:flex;align-items:center;padding:9px 11px;border-radius:13px;border:2px solid #d9d5f2;background:#fff;font-weight:900;color:#35415b}
+.sort-btn{border:2px solid #c9c3ed;border-radius:13px;background:#f8f7ff;color:#5a4ebe;font-weight:900;cursor:pointer}
+.sort-btn.selected{background:var(--purple);color:#fff;border-color:var(--purple)}
+
+/* Reorder / sequence */
+.word-bank,.answer-tray{display:flex;flex-wrap:wrap;gap:8px;align-content:flex-start;padding:10px;border-radius:15px;min-height:74px}
+.word-bank{background:#f7f6ff;border:2px dashed #bcb5e9;margin-bottom:8px}
+.answer-tray{background:#ecfbf9;border:2px solid #a9ded9}
+.chunk{border:2px solid #c9c3ed;border-radius:12px;background:#fff;padding:9px 11px;font-weight:900;color:#443a9f;cursor:pointer;box-shadow:0 3px 7px rgba(64,53,128,.08)}
+.chunk.in-tray{background:#fff;border-color:#55b9b2;color:#176e6b}
+.tray-label{width:100%;font-size:12px;font-weight:900;color:#4f847f;text-transform:uppercase;letter-spacing:.5px}
+
+/* Matching */
+.match-wrap{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.match-col{display:flex;flex-direction:column;gap:7px}
+.match-heading{text-align:center;font-size:12px;text-transform:uppercase;letter-spacing:.7px;font-weight:900;color:#748096}
+.match-item{min-height:46px;border:2px solid #d8d4f1;border-radius:13px;background:#fff;padding:8px 10px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;text-align:center}
+.match-item.active{border-color:var(--purple);background:var(--purple-soft);color:#4f41b6}
+.match-item.matched{border-color:#71c4b8;background:#e5f9f5;color:#176e64}
+.match-number{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--teal);color:#fff;font-size:12px;margin-right:6px;flex:0 0 auto}
+
+/* Sequence cards */
+.sequence-note{font-size:12px;color:#66768e;font-weight:700;margin-bottom:6px}
+
+/* Cross / tick indicators */
+.result-pop{
+  position:fixed;left:50%;top:50%;transform:translate(-50%,-50%) scale(.6);
+  width:92px;height:92px;border-radius:50%;display:grid;place-items:center;
+  font-size:58px;font-weight:900;z-index:6500;opacity:0;pointer-events:none;
+}
+.result-pop.show{animation:popResult .7s ease-out forwards}
+.result-pop.cross{background:rgba(255,236,239,.96);color:var(--red);border:4px solid #ef9baa}
+.result-pop.tick{background:rgba(226,249,237,.97);color:var(--green);border:4px solid #89d2ae}
+@keyframes popResult{0%{opacity:0;transform:translate(-50%,-50%) scale(.55)}35%{opacity:1;transform:translate(-50%,-50%) scale(1.06)}75%{opacity:1;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-50%) scale(.95)}}
+
+/* Explanation overlay */
+#reviewOverlay{
+  position:absolute;inset:0;background:rgba(38,31,89,.72);z-index:30;
+  display:none;align-items:center;justify-content:center;padding:18px;
+}
+#reviewOverlay.show{display:flex}
+.review-card{width:min(92%,620px);max-height:90%;overflow:auto;background:#fff;border:4px solid #c9c1ff;border-radius:24px;padding:20px;text-align:center;box-shadow:0 18px 45px rgba(20,15,60,.30)}
+.review-icon{font-size:40px;margin-bottom:4px}
+.review-title{font-size:24px;color:var(--purple-dark);font-weight:900;margin-bottom:8px}
+.correct-answer{background:var(--green-soft);border:2px solid #7bc7a4;border-radius:14px;padding:10px 12px;color:#17633f;font-weight:900;line-height:1.35;margin:10px 0}
+.explain{font-size:15px;line-height:1.48;color:#52617a;font-weight:700;text-align:left;background:#f8f7ff;border-radius:14px;padding:11px 13px}
+
+/* Final */
+.final-wrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:6px}
+.final-icon{font-size:68px;margin-bottom:5px;animation:bob 1.8s ease-in-out infinite alternate}
+@keyframes bob{to{transform:translateY(-7px) rotate(3deg)}}
+.final-score{font-size:clamp(34px,6vw,58px);font-weight:900;color:var(--purple-dark);margin:7px 0}
+.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;width:min(100%,620px);margin:13px 0}
+.stat{background:#f7f5ff;border:2px solid #d5d0ff;border-radius:15px;padding:10px 7px;font-size:13px;font-weight:800;color:#66718a}
+.stat strong{display:block;font-size:24px;color:#5142b8;margin-bottom:2px}
+.final-message{font-size:16px;line-height:1.45;color:#526078;font-weight:800;max-width:620px}
+
+@media (max-width:700px){
+  .screen{width:100vw;height:100dvh;padding:0}
+  .panel{border-width:0;border-radius:0;padding:12px 12px}
+  .hud{grid-template-columns:1fr 1fr 1fr auto;gap:6px}
+  .hud .mission-box{grid-column:span 1}
+  .hud-box{font-size:11px;min-height:42px;padding:5px}
+  .hud-box strong{font-size:14px}
+  .attempt-box{display:none}
+  .choice-grid{grid-template-columns:1fr;gap:7px}
+  .choice-card{min-height:51px;padding:9px 10px;font-size:14px}
+  .context-card{padding:8px 10px;font-size:14px}
+  .task-title{font-size:19px}
+  .type-tag{font-size:10px;padding:5px 7px}
+  .sort-row{grid-template-columns:1.15fr .8fr .8fr}
+  .sort-label,.sort-btn{font-size:12px;padding:7px}
+  .match-wrap{gap:7px}.match-item{font-size:12px;padding:6px;min-height:41px}
+  .stat-grid{gap:6px}.stat{font-size:11px;padding:8px 4px}.stat strong{font-size:20px}
+}
+@media (max-height:650px){
+  .panel{padding-top:9px;padding-bottom:9px}
+  .hud{margin-bottom:6px}.progress-track{margin-bottom:6px}
+  .context-card{padding-top:7px;padding-bottom:7px;margin-bottom:6px}
+  .choice-card{min-height:48px;padding:8px 10px}
+  .feedback{min-height:22px;margin-top:2px}
+  .quest-mark{width:80px;height:80px;font-size:43px}
+  .badges{margin:8px 0 5px}.start-note{margin-top:4px}
+}
+</style>
+</head>
+<body>
+<div id="splash">
+  <img src="assets/innovine-logo.png" alt="Innovine logo" onerror="this.style.display='none';document.getElementById('logoMissing').style.display='block'">
+  <div id="logoMissing" style="display:none;text-align:center;color:#5b4fc4;font:700 18px Arial;padding:20px">Upload the Innovine logo as<br><strong>assets/innovine-logo.png</strong></div>
+</div>
+
+<canvas id="confetti"></canvas>
+<div class="decor" aria-hidden="true">
+  <span class="float-word fw1">UP</span><span class="float-word fw2">OFF</span>
+  <span class="float-word fw3">AFTER</span><span class="float-word fw4">BACK</span><span class="float-word fw5">OUT</span>
+  <span class="spark s1"></span><span class="spark s2"></span><span class="spark s3"></span><span class="spark s4"></span>
+  <span class="streamer st1"></span><span class="streamer st2"></span>
+</div>
+<div id="resultPop" class="result-pop" aria-hidden="true"></div>
+
+<section id="startScreen" class="screen active">
+  <div class="panel">
+    <div class="start-wrap">
+      <div class="quest-mark">🧩</div>
+      <h1>Phrasal Verb<br>Context Quest</h1>
+      <p class="sub" style="max-width:700px;margin-top:12px">Solve real-life language missions by using phrasal verbs naturally, spotting errors, building sentences, matching meanings and sorting structures.</p>
+      <div class="badges">
+        <span class="badge">Scenario-based</span>
+        <span class="badge">Error Detective</span>
+        <span class="badge">Build & Order</span>
+        <span class="badge">Sort & Match</span>
+      </div>
+      <button id="startBtn" class="btn btn-primary">Start the Quest</button>
+      <p class="start-note">15 mixed missions • 45 seconds each • one retry • no login</p>
+    </div>
+  </div>
+</section>
+
+<section id="gameScreen" class="screen">
+  <div class="panel">
+    <div class="hud">
+      <div class="hud-box mission-box">Mission <strong id="missionNo">1/15</strong></div>
+      <div class="hud-box">Score <strong id="score">0</strong></div>
+      <div id="attemptBox" class="hud-box attempt-box">Attempt <strong id="attempt">1/2</strong></div>
+      <div id="timerBox" class="hud-box">⏱ <strong id="timer">45</strong>s</div>
+      <button id="muteBtn" class="icon-btn" aria-label="Mute or unmute sound">🔊</button>
+    </div>
+    <div class="progress-track"><div id="progressFill" class="progress-fill"></div></div>
+
+    <div class="task-shell">
+      <div class="task-top">
+        <h2 id="taskTitle" class="task-title">Mission</h2>
+        <span id="typeTag" class="type-tag">Context</span>
+      </div>
+      <div id="contextCard" class="context-card"></div>
+      <div id="instruction" class="instruction"></div>
+      <div id="interaction" class="interaction"></div>
+      <div id="feedback" class="feedback" aria-live="polite"></div>
+    </div>
+
+    <div id="reviewOverlay">
+      <div class="review-card">
+        <div class="review-icon">💡</div>
+        <div class="review-title">Let’s Understand</div>
+        <div id="correctAnswer" class="correct-answer"></div>
+        <div id="explanation" class="explain"></div>
+        <button id="nextBtn" class="btn btn-purple" style="margin-top:14px">Next Mission</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="finalScreen" class="screen">
+  <div class="panel">
+    <div class="final-wrap">
+      <div class="final-icon">🏆</div>
+      <h1>Quest Complete!</h1>
+      <div id="finalScore" class="final-score">0 / 150</div>
+      <p id="finalMessage" class="final-message"></p>
+      <div class="stat-grid">
+        <div class="stat"><strong id="firstTryStat">0</strong>First-Try Wins</div>
+        <div class="stat"><strong id="retryStat">0</strong>Retry Wins</div>
+        <div class="stat"><strong id="reviewStat">0</strong>Reviewed</div>
+      </div>
+      <button id="playAgainBtn" class="btn btn-primary">Play Again</button>
+    </div>
+  </div>
+</section>
+
+<audio id="correctSound" preload="auto" src="assets/correct.mp3"></audio>
+<audio id="wrongSound" preload="auto" src="assets/wrong.mp3"></audio>
+<audio id="clapSound" preload="auto" src="assets/clapping.mp3"></audio>
+
+<script>
+(() => {
+  'use strict';
+
+  const TOTAL_MISSIONS = 15;
+  const QUESTION_TIME = 45;
+
+  const tasks = [
+    {
+      type:'context', tag:'Real-life Application', icon:'🎒',
+      title:'The Empty Art Cupboard',
+      context:'The art team opens the cupboard and discovers that there is no chart paper left for the display.',
+      prompt:'Complete the team leader’s message with the most natural phrasal verb.',
+      stem:'“We have ___ chart paper, so I’ll ask the office for another pack.”',
+      choices:['run out of','look after','bring back','get along with'], answer:'run out of',
+      answerText:'“We have run out of chart paper.”',
+      explanation:'“Run out of” means to have none left. The context clue is that the cupboard has no chart paper remaining.'
+    },
+    {
+      type:'context', tag:'Scenario-based', icon:'🐶',
+      title:'A Neighbour Needs Help',
+      context:'Mrs Mehta is away for two days. Kabir agrees to feed her puppy, refill its water bowl and take it for a walk.',
+      prompt:'Choose the phrasal verb that best describes Kabir’s responsibility.',
+      stem:'Kabir will ___ the puppy while Mrs Mehta is away.',
+      choices:['look after','look for','throw away','take off'], answer:'look after',
+      answerText:'Kabir will look after the puppy.',
+      explanation:'“Look after” means to take care of someone or something. It acts as one unit and should not be separated.'
+    },
+    {
+      type:'context', tag:'Cause and Effect', icon:'⛈️',
+      title:'Storm over the Sports Ground',
+      context:'Lightning begins just before football practice. The coach decides that the session cannot safely take place.',
+      prompt:'Complete the coach’s announcement.',
+      stem:'“Because of the storm, we must ___ today’s practice.”',
+      choices:['call off','pick up','put on','bring back'], answer:'call off',
+      answerText:'“We must call off today’s practice.”',
+      explanation:'“Call off” means to cancel. The unsafe weather is the cause; cancelling practice is the effect.'
+    },
+    {
+      type:'context', tag:'Dialogue Completion', icon:'📚',
+      title:'The Borrowed Atlas',
+      context:'Lina borrowed the school atlas for a project. Her teacher needs it for tomorrow’s geography lesson.',
+      prompt:'Complete the teacher’s reminder naturally.',
+      stem:'“Please ___ the atlas tomorrow morning.”',
+      choices:['bring back','run out of','look for','give up'], answer:'bring back',
+      answerText:'“Please bring back the atlas tomorrow morning.”',
+      explanation:'“Bring back” means to return something. The atlas must come back to the school.'
+    },
+    {
+      type:'context', tag:'Context-based', icon:'🪪',
+      title:'The Missing Identity Card',
+      context:'Aarav checks his bag, desk and locker because he cannot find his school identity card.',
+      prompt:'Choose the phrasal verb that matches what Aarav is doing.',
+      stem:'Aarav is trying to ___ his identity card.',
+      choices:['look for','look after','turn off','get along with'], answer:'look for',
+      answerText:'Aarav is trying to look for his identity card.',
+      explanation:'“Look for” means to search. It is inseparable, so the object comes after the complete phrasal verb.'
+    },
+    {
+      type:'context', tag:'Justify Your Choice', icon:'🏀',
+      title:'One Missed Shot',
+      context:'Nisha misses an important basket and says she wants to stop practising. Her friend wants to encourage her.',
+      prompt:'Choose the message that uses a phrasal verb naturally and gives the best advice.',
+      stem:'What should her friend say?',
+      choices:['“Don’t give up after one mistake; try again.”','“Don’t give away after one mistake.”','“Don’t get up the practice.”','“Don’t call off your confidence.”'],
+      answer:'“Don’t give up after one mistake; try again.”',
+      answerText:'“Don’t give up after one mistake; try again.”',
+      explanation:'“Give up” means to stop trying. The sentence encourages Nisha to continue practising instead.'
+    },
+    {
+      type:'context', tag:'Real-life Application', icon:'♻️',
+      title:'Clean-up after the Fair',
+      context:'After the school fair, volunteers collect used paper cups and wrappers that cannot be reused.',
+      prompt:'Complete the instruction with the best phrasal verb.',
+      stem:'“Please ___ the damaged wrappers in the correct waste bin.”',
+      choices:['throw away','bring back','put on','wake up'], answer:'throw away',
+      answerText:'“Please throw away the damaged wrappers.”',
+      explanation:'“Throw away” means to discard. The sentence is about disposing of waste responsibly.'
+    },
+    {
+      type:'context', tag:'Context-based', icon:'🤝',
+      title:'New Members on the Team',
+      context:'The new students listen to one another, share equipment and work together without arguments.',
+      prompt:'Choose the phrasal verb that best describes their relationship.',
+      stem:'The new team members ___ one another very well.',
+      choices:['get along with','run out of','check out','take off'], answer:'get along with',
+      answerText:'The new team members get along with one another very well.',
+      explanation:'“Get along with” means to have a friendly relationship. The teamwork clues show that the students are friendly and cooperative.'
+    },
+    {
+      type:'cause', tag:'Cause and Effect', icon:'🔋',
+      title:'No Batteries on the Shelf',
+      context:'The electronics shop has run out of batteries during a busy weekend.',
+      prompt:'Which outcome follows most logically from this situation?',
+      choices:['Customers may have to wait for new stock.','The shop will automatically become larger.','Every customer will receive two free batteries.','The shelves will start producing batteries.'],
+      answer:'Customers may have to wait for new stock.',
+      answerText:'Customers may have to wait for new stock.',
+      explanation:'“Run out of” means to have none left. If there are no batteries available, customers may need to wait for a new delivery.'
+    },
+    {
+      type:'context', tag:'Application-based', icon:'📦',
+      title:'Project Sheets at Reception',
+      context:'The office has printed the project sheets. The class monitor must collect them from reception before the lesson.',
+      prompt:'Complete the class teacher’s instruction.',
+      stem:'“Please ___ the project sheets from reception.”',
+      choices:['pick up','put up with','call off','look after'], answer:'pick up',
+      answerText:'“Please pick up the project sheets from reception.”',
+      explanation:'“Pick up” can mean to collect or lift. Here, the context is collecting the project sheets from reception.'
+    },
+
+    {
+      type:'detect', tag:'Error Detection', icon:'🔎',
+      title:'Find the Word-order Error',
+      context:'The class is preparing to leave the AV room. Three instructions are correct, but one has a word-order error.',
+      prompt:'Tap the sentence that needs correction.',
+      choices:['Please turn off the projector.','Please turn the projector off.','Please turn it off.','Please turn off it.'],
+      answer:'Please turn off it.',
+      answerText:'Incorrect: “Please turn off it.” Correct: “Please turn it off.”',
+      explanation:'With a separable phrasal verb such as “turn off”, a pronoun object must go between the verb and the particle: “turn it off”.'
+    },
+    {
+      type:'detect', tag:'Error Detection', icon:'🧠',
+      title:'Protect the Phrasal Verb',
+      context:'Riya regularly takes care of her younger cousin after school. One sentence breaks an inseparable phrasal verb.',
+      prompt:'Tap the sentence with the error.',
+      choices:['Riya looks after her younger cousin.','Who will look after the plants?','Riya looks her younger cousin after.','They look after the class pet together.'],
+      answer:'Riya looks her younger cousin after.',
+      answerText:'Incorrect: “Riya looks her younger cousin after.” Correct: “Riya looks after her younger cousin.”',
+      explanation:'“Look after” is inseparable. The object must come after the complete phrasal verb: “look after her younger cousin”.'
+    },
+    {
+      type:'detect', tag:'Error Correction', icon:'🛠️',
+      title:'Repair the Science-club Sentence',
+      context:'The science club had no glue left, but the report sentence has been written incorrectly.',
+      prompt:'Choose the corrected sentence.',
+      choices:['We ran out of glue during the model-making activity.','We ran the glue out of during the model-making activity.','We out ran of glue during the model-making activity.','We ran glue out during of the model-making activity.'],
+      answer:'We ran out of glue during the model-making activity.',
+      answerText:'We ran out of glue during the model-making activity.',
+      explanation:'“Run out of” is a three-word phrasal verb meaning “have none left”. Keep all three words together before the object.'
+    },
+
+    {
+      type:'multi', tag:'Choose All That Apply', icon:'✅',
+      title:'Every Correct Way to Switch It Off',
+      context:'The media team is checking different ways to tell someone to switch off the projector.',
+      prompt:'Select every grammatically correct sentence, then tap “Check Answer”.',
+      choices:['Turn off the projector.','Turn the projector off.','Turn it off.','Turn off it.'],
+      answers:['Turn off the projector.','Turn the projector off.','Turn it off.'],
+      answerText:'Correct: “Turn off the projector.”, “Turn the projector off.” and “Turn it off.”',
+      explanation:'“Turn off” is separable. A noun object may go after the phrasal verb or between its parts. A pronoun must go between: “turn it off”.'
+    },
+    {
+      type:'multi', tag:'Multiple Correct Answers', icon:'📥',
+      title:'Collect or Lift?',
+      context:'The phrasal verb “pick up” can mean collect or lift. The language club wants examples that use it correctly.',
+      prompt:'Select every natural sentence, then tap “Check Answer”.',
+      choices:['Please pick up the parcel from reception.','She picked the coin up from the floor.','Please pick it up carefully.','Please pick up it carefully.'],
+      answers:['Please pick up the parcel from reception.','She picked the coin up from the floor.','Please pick it up carefully.'],
+      answerText:'The first three sentences are correct. “Please pick up it carefully” is incorrect.',
+      explanation:'“Pick up” is separable. Noun objects can appear in either position, but a pronoun must go between: “pick it up”.'
+    },
+
+    {
+      type:'sort', tag:'Classification', icon:'🗂️',
+      title:'Sort the Phrasal Verbs',
+      context:'The language lab needs each phrasal verb placed in the correct structure folder.',
+      prompt:'Classify every item as Separable or Inseparable, then check your work.',
+      categories:['Separable','Inseparable'],
+      items:[
+        {text:'turn off',answer:'Separable'},
+        {text:'pick up',answer:'Separable'},
+        {text:'look after',answer:'Inseparable'},
+        {text:'run out of',answer:'Inseparable'}
+      ],
+      answerText:'Separable: turn off, pick up. Inseparable: look after, run out of.',
+      explanation:'Separable phrasal verbs can place a noun object between the verb and particle. Inseparable phrasal verbs stay together before their object.'
+    },
+    {
+      type:'sort', tag:'Identify and Categorise', icon:'📂',
+      title:'File Each Expression Correctly',
+      context:'Four expressions appear in a school newsletter. Sort them by whether the verb and particle can be separated by an object.',
+      prompt:'Choose a category for every phrasal verb, then check your work.',
+      categories:['Separable','Inseparable'],
+      items:[
+        {text:'bring back',answer:'Separable'},
+        {text:'call off',answer:'Separable'},
+        {text:'look for',answer:'Inseparable'},
+        {text:'get along with',answer:'Inseparable'}
+      ],
+      answerText:'Separable: bring back, call off. Inseparable: look for, get along with.',
+      explanation:'“Bring back” and “call off” can be split around a noun object. “Look for” and “get along with” must remain together before the object.'
+    },
+
+    {
+      type:'reorder', tag:'Sentence Construction', icon:'🧱',
+      title:'Build a Clear Exit Reminder',
+      context:'The class monitor is writing a reminder for the last person leaving the classroom.',
+      prompt:'Tap the chunks in the correct order to build the sentence.',
+      chunks:['Please','turn','the classroom lights','off','before you leave.'],
+      answer:['Please','turn','the classroom lights','off','before you leave.'],
+      answerText:'Please turn the classroom lights off before you leave.',
+      explanation:'“Turn off” is separable, so the noun object “the classroom lights” may come between “turn” and “off”.'
+    },
+    {
+      type:'reorder', tag:'Sentence Rearrangement', icon:'🧩',
+      title:'Keep the Inseparable Verb Together',
+      context:'Mina is helping a neighbour during the holidays. Build a sentence that keeps the phrasal verb intact.',
+      prompt:'Tap the chunks in the correct order.',
+      chunks:['Mina','looks after','her neighbour’s cat','during the holidays.'],
+      answer:['Mina','looks after','her neighbour’s cat','during the holidays.'],
+      answerText:'Mina looks after her neighbour’s cat during the holidays.',
+      explanation:'“Look after” is inseparable, so it stays together before the object “her neighbour’s cat”.'
+    },
+    {
+      type:'reorder', tag:'Sentence Construction', icon:'🎨',
+      title:'Explain What Happened',
+      context:'During an art activity, the class had no chart paper left. Build the report sentence.',
+      prompt:'Tap the chunks in the correct order.',
+      chunks:['We','ran out of','chart paper','during the art activity.'],
+      answer:['We','ran out of','chart paper','during the art activity.'],
+      answerText:'We ran out of chart paper during the art activity.',
+      explanation:'The three-word phrasal verb “ran out of” means “had none left” and stays together before its object.'
+    },
+
+    {
+      type:'sequence', tag:'Sequence / Ordering', icon:'⏰',
+      title:'Put the Morning Routine in Order',
+      context:'The times and clues show the order of Dev’s morning routine.',
+      prompt:'Tap the cards from first to last.',
+      items:['At 6:00, I wake up.','At 6:05, I get up.','At 6:30, I put on my uniform.','Before leaving, I turn off the fan.'],
+      answer:['At 6:00, I wake up.','At 6:05, I get up.','At 6:30, I put on my uniform.','Before leaving, I turn off the fan.'],
+      answerText:'wake up → get up → put on the uniform → turn off the fan',
+      explanation:'The time clues create the sequence. The phrasal verbs describe the actions naturally in Dev’s daily routine.'
+    },
+
+    {
+      type:'match', tag:'Pairing / Matching', icon:'🔗',
+      title:'Match Each Action to Its Meaning',
+      context:'The school help desk is creating a quick-reference board for everyday phrasal verbs.',
+      prompt:'Match all four phrasal verbs with their meanings, then check your work.',
+      pairs:[
+        ['call off','cancel'],
+        ['bring back','return something'],
+        ['throw away','discard'],
+        ['look for','search']
+      ],
+      answerText:'call off → cancel; bring back → return something; throw away → discard; look for → search.',
+      explanation:'The meaning of a phrasal verb often cannot be worked out word by word, so context and repeated use help build understanding.'
+    },
+    {
+      type:'match', tag:'Pairing / Matching', icon:'🧠',
+      title:'Connect the Routine Words',
+      context:'A learner is building a vocabulary map from a daily-routine paragraph.',
+      prompt:'Match every phrasal verb to its meaning, then check your work.',
+      pairs:[
+        ['wake up','stop sleeping'],
+        ['get up','rise from bed'],
+        ['look after','take care of'],
+        ['run out of','have none left']
+      ],
+      answerText:'wake up → stop sleeping; get up → rise from bed; look after → take care of; run out of → have none left.',
+      explanation:'These meanings come from the complete expressions. For example, “wake up” and “get up” describe different stages of a morning routine.'
+    },
+
+    {
+      type:'compare', tag:'Compare and Contrast', icon:'⚖️',
+      title:'Which Pair Keeps the Meaning and Grammar?',
+      context:'Two editors are comparing sentence pairs. Only one pair contains two correct sentences with the same meaning.',
+      prompt:'Choose the pair that works in both forms.',
+      choices:[
+        '“Please turn off the fan.” / “Please turn the fan off.”',
+        '“She looks after her grandmother.” / “She looks her grandmother after.”',
+        '“We ran out of milk.” / “We ran the milk out of.”',
+        '“I look for my notebook.” / “I look my notebook for.”'
+      ],
+      answer:'“Please turn off the fan.” / “Please turn the fan off.”',
+      answerText:'“Please turn off the fan.” and “Please turn the fan off.” are both correct.',
+      explanation:'“Turn off” is separable, so a noun object may come after the phrasal verb or between its two parts. The other phrasal verbs shown are inseparable.'
+    }
+  ];
+
+  const $ = id => document.getElementById(id);
+  const screens = {start:$('startScreen'), game:$('gameScreen'), final:$('finalScreen')};
+  const correctSound = $('correctSound');
+  const wrongSound = $('wrongSound');
+  const clapSound = $('clapSound');
+
+  let missionList = [];
+  let missionIndex = 0;
+  let currentTask = null;
+  let attempt = 1;
+  let score = 0;
+  let firstTry = 0;
+  let retryWins = 0;
+  let reviewed = 0;
+  let seconds = QUESTION_TIME;
+  let timerId = null;
+  let muted = false;
+  let locked = false;
+  let selectedSingle = null;
+  let selectedMulti = new Set();
+  let sortAnswers = {};
+  let bankChunks = [];
+  let trayChunks = [];
+  let matchState = {selectedLeft:null, assignments:{}, rightItems:null};
+
+  function shuffle(array){
+    const a = array.slice();
+    for(let i=a.length-1;i>0;i--){
+      const j = Math.floor(Math.random()*(i+1));
+      [a[i],a[j]]=[a[j],a[i]];
+    }
+    return a;
+  }
+
+  function showScreen(name){
+    Object.values(screens).forEach(s => s.classList.remove('active'));
+    screens[name].classList.add('active');
+  }
+
+  function buildMissionList(){
+    const take=(list,count)=>shuffle(list).slice(0,count);
+    const selected=[
+      ...take(tasks.filter(t=>['context','cause'].includes(t.type)),5),
+      ...take(tasks.filter(t=>t.type==='detect'),2),
+      ...take(tasks.filter(t=>t.type==='multi'),2),
+      ...take(tasks.filter(t=>t.type==='sort'),2),
+      ...take(tasks.filter(t=>['reorder','sequence'].includes(t.type)),2),
+      ...take(tasks.filter(t=>['match','compare'].includes(t.type)),2)
+    ];
+    return shuffle(selected);
+  }
+
+  function safePlay(audio){
+    if(muted) return;
+    try{ audio.currentTime = 0; audio.play().catch(()=>{}); }catch(e){}
+  }
+
+  function updateMute(){
+    $('muteBtn').textContent = muted ? '🔇' : '🔊';
+    $('muteBtn').setAttribute('aria-label', muted ? 'Unmute sound' : 'Mute sound');
+  }
+
+  function beginGame(){
+    missionList = buildMissionList();
+    missionIndex = 0; score = 0; firstTry = 0; retryWins = 0; reviewed = 0;
+    showScreen('game');
+    loadMission();
+  }
+
+  function loadMission(){
+    clearInterval(timerId);
+    currentTask = missionList[missionIndex];
+    attempt = 1; locked = false; selectedSingle = null; selectedMulti = new Set(); sortAnswers = {};
+    bankChunks = []; trayChunks = []; matchState = {selectedLeft:null,assignments:{},rightItems:null};
+    $('reviewOverlay').classList.remove('show');
+    $('feedback').textContent=''; $('feedback').className='feedback';
+    $('missionNo').textContent = `${missionIndex+1}/${TOTAL_MISSIONS}`;
+    $('score').textContent = score;
+    $('attempt').textContent = '1/2';
+    $('progressFill').style.width = `${(missionIndex/TOTAL_MISSIONS)*100}%`;
+    $('taskTitle').textContent = `${currentTask.icon || '🧩'} ${currentTask.title}`;
+    $('typeTag').textContent = currentTask.tag;
+    $('contextCard').textContent = currentTask.context;
+    $('instruction').textContent = currentTask.prompt;
+    renderInteraction();
+    startTimer();
+  }
+
+  function renderInteraction(){
+    const box = $('interaction');
+    box.innerHTML='';
+    const t = currentTask;
+
+    if(['context','cause','detect','compare'].includes(t.type)){
+      if(t.stem){
+        const stem = document.createElement('div');
+        stem.style.cssText='font-size:17px;font-weight:900;color:#42399b;text-align:center;margin:3px 0 9px;line-height:1.35';
+        stem.textContent=t.stem; box.appendChild(stem);
+      }
+      const grid=document.createElement('div'); grid.className='choice-grid';
+      shuffle(t.choices).forEach(text=>{
+        const b=document.createElement('button'); b.className='choice-card'; b.textContent=text;
+        b.onclick=()=>selectSingle(text,b,grid);
+        grid.appendChild(b);
+      });
+      box.appendChild(grid);
+      return;
+    }
+
+    if(t.type==='multi'){
+      const grid=document.createElement('div'); grid.className='choice-grid';
+      shuffle(t.choices).forEach(text=>{
+        const b=document.createElement('button'); b.className='choice-card multi-card'; b.textContent=text;
+        b.onclick=()=>{if(locked)return; b.classList.toggle('selected'); b.classList.contains('selected')?selectedMulti.add(text):selectedMulti.delete(text)};
+        grid.appendChild(b);
+      });
+      box.appendChild(grid);
+      box.appendChild(makeActionRow(true));
+      return;
+    }
+
+    if(t.type==='sort'){
+      const grid=document.createElement('div'); grid.className='sort-grid';
+      t.items.forEach((item,idx)=>{
+        const row=document.createElement('div'); row.className='sort-row';
+        const label=document.createElement('div'); label.className='sort-label'; label.textContent=item.text; row.appendChild(label);
+        t.categories.forEach(cat=>{
+          const b=document.createElement('button'); b.className='sort-btn'; b.textContent=cat;
+          b.onclick=()=>{
+            if(locked)return;
+            sortAnswers[idx]=cat;
+            row.querySelectorAll('.sort-btn').forEach(x=>x.classList.remove('selected'));
+            b.classList.add('selected');
+          };
+          row.appendChild(b);
+        });
+        grid.appendChild(row);
+      });
+      box.appendChild(grid); box.appendChild(makeActionRow(true));
+      return;
+    }
+
+    if(t.type==='reorder'){
+      bankChunks=shuffle(t.chunks.map((text,id)=>({id,text}))); trayChunks=[];
+      renderOrderUI('Build your sentence here');
+      return;
+    }
+
+    if(t.type==='sequence'){
+      bankChunks=shuffle(t.items.map((text,id)=>({id,text}))); trayChunks=[];
+      const note=document.createElement('div'); note.className='sequence-note'; note.textContent='Use the time and transition clues. Tap a card to move it into the sequence.'; box.appendChild(note);
+      renderOrderUI('Your sequence');
+      return;
+    }
+
+    if(t.type==='match'){
+      renderMatchUI();
+    }
+  }
+
+  function makeActionRow(includeReset){
+    const row=document.createElement('div'); row.className='action-row';
+    const check=document.createElement('button'); check.className='btn btn-purple'; check.textContent='Check Answer'; check.onclick=submitStructured;
+    row.appendChild(check);
+    if(includeReset){
+      const reset=document.createElement('button'); reset.className='btn btn-ghost'; reset.textContent='Reset'; reset.onclick=resetCurrent;
+      row.appendChild(reset);
+    }
+    return row;
+  }
+
+  function renderOrderUI(label){
+    const box=$('interaction');
+    // preserve a sequence note if already inserted
+    Array.from(box.querySelectorAll('.word-bank,.answer-tray,.action-row')).forEach(n=>n.remove());
+    const bank=document.createElement('div'); bank.className='word-bank';
+    bankChunks.forEach(ch=>{
+      const b=document.createElement('button'); b.className='chunk'; b.textContent=ch.text;
+      b.onclick=()=>{if(locked)return; bankChunks=bankChunks.filter(x=>x.id!==ch.id);trayChunks.push(ch);renderOrderUI(label)};
+      bank.appendChild(b);
+    });
+    const tray=document.createElement('div'); tray.className='answer-tray';
+    const tl=document.createElement('div'); tl.className='tray-label'; tl.textContent=label; tray.appendChild(tl);
+    trayChunks.forEach(ch=>{
+      const b=document.createElement('button'); b.className='chunk in-tray'; b.textContent=ch.text;
+      b.onclick=()=>{if(locked)return;trayChunks=trayChunks.filter(x=>x.id!==ch.id);bankChunks.push(ch);renderOrderUI(label)};
+      tray.appendChild(b);
+    });
+    box.appendChild(bank);box.appendChild(tray);box.appendChild(makeActionRow(true));
+  }
+
+  function renderMatchUI(){
+    const box=$('interaction'); box.innerHTML='';
+    const wrap=document.createElement('div');wrap.className='match-wrap';
+    const left=document.createElement('div');left.className='match-col';
+    const right=document.createElement('div');right.className='match-col';
+    const lh=document.createElement('div');lh.className='match-heading';lh.textContent='Phrasal verbs';left.appendChild(lh);
+    const rh=document.createElement('div');rh.className='match-heading';rh.textContent='Meanings';right.appendChild(rh);
+    if(!matchState.rightItems){
+      matchState.rightItems=shuffle(currentTask.pairs.map((p,i)=>({text:p[1],original:i})));
+    }
+    const rightItems=matchState.rightItems;
+
+    currentTask.pairs.forEach((pair,i)=>{
+      const b=document.createElement('button');b.className='match-item';b.dataset.left=i;
+      const assigned=matchState.assignments[i];
+      if(assigned!==undefined){b.classList.add('matched');b.innerHTML=`<span class="match-number">${Object.keys(matchState.assignments).indexOf(String(i))+1}</span>${pair[0]}`}
+      else b.textContent=pair[0];
+      if(matchState.selectedLeft===i)b.classList.add('active');
+      b.onclick=()=>{if(locked)return;matchState.selectedLeft=i;renderMatchUI()};
+      left.appendChild(b);
+    });
+
+    rightItems.forEach((item,displayIndex)=>{
+      const b=document.createElement('button');b.className='match-item';b.dataset.right=displayIndex;
+      const leftKey=Object.keys(matchState.assignments).find(k=>matchState.assignments[k]===item.text);
+      if(leftKey!==undefined){
+        const n=Object.keys(matchState.assignments).indexOf(leftKey)+1;
+        b.classList.add('matched');b.innerHTML=`<span class="match-number">${n}</span>${item.text}`;
+      }else b.textContent=item.text;
+      b.onclick=()=>{
+        if(locked||matchState.selectedLeft===null)return;
+        // remove previous owner of this meaning and previous assignment of selected left
+        Object.keys(matchState.assignments).forEach(k=>{if(matchState.assignments[k]===item.text)delete matchState.assignments[k]});
+        matchState.assignments[matchState.selectedLeft]=item.text;
+        matchState.selectedLeft=null;renderMatchUI();
+      };
+      right.appendChild(b);
+    });
+    wrap.appendChild(left);wrap.appendChild(right);box.appendChild(wrap);box.appendChild(makeActionRow(true));
+  }
+
+  function resetCurrent(){
+    if(locked)return;
+    selectedMulti.clear();sortAnswers={};matchState={selectedLeft:null,assignments:{},rightItems:null};
+    if(currentTask.type==='reorder') {bankChunks=shuffle(currentTask.chunks.map((text,id)=>({id,text})));trayChunks=[];renderOrderUI('Build your sentence here');return}
+    if(currentTask.type==='sequence') {bankChunks=shuffle(currentTask.items.map((text,id)=>({id,text})));trayChunks=[];renderInteraction();return}
+    renderInteraction();
+  }
+
+  function selectSingle(text,button,grid){
+    if(locked)return;
+    selectedSingle=text;
+    grid.querySelectorAll('.choice-card').forEach(x=>x.classList.remove('selected'));
+    button.classList.add('selected');
+    evaluate(text===currentTask.answer, text);
+  }
+
+  function submitStructured(){
+    if(locked)return;
+    const t=currentTask;
+    let complete=true, correct=false;
+    if(t.type==='multi'){
+      if(selectedMulti.size===0)complete=false;
+      const a=[...selectedMulti].sort(), b=t.answers.slice().sort();
+      correct=a.length===b.length&&a.every((x,i)=>x===b[i]);
+    }else if(t.type==='sort'){
+      complete=Object.keys(sortAnswers).length===t.items.length;
+      correct=complete&&t.items.every((it,i)=>sortAnswers[i]===it.answer);
+    }else if(t.type==='reorder'){
+      complete=trayChunks.length===t.answer.length;
+      correct=complete&&trayChunks.map(x=>x.text).every((x,i)=>x===t.answer[i]);
+    }else if(t.type==='sequence'){
+      complete=trayChunks.length===t.answer.length;
+      correct=complete&&trayChunks.map(x=>x.text).every((x,i)=>x===t.answer[i]);
+    }else if(t.type==='match'){
+      complete=Object.keys(matchState.assignments).length===t.pairs.length;
+      correct=complete&&t.pairs.every((pair,i)=>matchState.assignments[i]===pair[1]);
+    }
+    if(!complete){
+      $('feedback').textContent='Complete every part before checking your answer.';
+      $('feedback').className='feedback hint';
+      return;
+    }
+    evaluate(correct,null);
+  }
+
+  function evaluate(isCorrect,chosen){
+    if(locked)return;
+    if(isCorrect){
+      locked=true;clearInterval(timerId);
+      if(attempt===1){score+=10;firstTry++}else{score+=5;retryWins++}
+      $('score').textContent=score;
+      $('feedback').textContent=attempt===1?'Excellent! You used the context clue accurately.':'Well recovered! Your second choice is correct.';
+      $('feedback').className='feedback good';
+      markCorrectVisuals();
+      safePlay(correctSound);showResult('✓','tick');burstStars(34);
+      setTimeout(nextMission,1100);
+    }else{
+      locked=true;
+      safePlay(wrongSound);showResult('×','cross');markWrongVisuals(chosen);
+      if(attempt===1){
+        attempt=2;$('attempt').textContent='2/2';
+        $('feedback').textContent='Not quite. Try once more—use the situation, meaning or word order as your clue.';
+        $('feedback').className='feedback bad';
+        // allow another attempt and clear temporary wrong styling
+        setTimeout(()=>{clearWrongVisuals();selectedSingle=null;locked=false},500);
+      }else{
+        locked=true;clearInterval(timerId);reviewed++;
+        $('feedback').textContent='Let’s review the correct answer.';$('feedback').className='feedback hint';
+        setTimeout(showReview,650);
+      }
+    }
+  }
+
+  function markCorrectVisuals(){
+    const t=currentTask;
+    if(['context','cause','detect','compare'].includes(t.type)){
+      document.querySelectorAll('#interaction .choice-card').forEach(b=>{
+        if(b.textContent===t.answer)b.classList.add('correct');else b.classList.add('dim');
+      });
+    }else if(t.type==='multi'){
+      document.querySelectorAll('#interaction .choice-card').forEach(b=>{
+        if(t.answers.includes(b.textContent))b.classList.add('correct');else b.classList.add('dim');
+      });
+    }
+  }
+
+  function markWrongVisuals(chosen){
+    if(chosen!==null){
+      document.querySelectorAll('#interaction .choice-card').forEach(b=>{if(b.textContent===chosen)b.classList.add('wrong')});
+    }else{
+      const shell=$('interaction');shell.style.animation='shake .33s ease';setTimeout(()=>shell.style.animation='',350);
+    }
+  }
+
+  function clearWrongVisuals(){
+    document.querySelectorAll('#interaction .wrong').forEach(x=>x.classList.remove('wrong'));
+    if(['context','cause','detect','compare'].includes(currentTask.type))document.querySelectorAll('#interaction .choice-card').forEach(x=>x.classList.remove('selected'));
+  }
+
+  function showReview(){
+    $('correctAnswer').textContent=currentTask.answerText;
+    $('explanation').textContent=currentTask.explanation;
+    $('reviewOverlay').classList.add('show');
+  }
+
+  function nextMission(){
+    missionIndex++;
+    if(missionIndex>=TOTAL_MISSIONS)finishGame();else loadMission();
+  }
+
+  function startTimer(){
+    seconds=QUESTION_TIME;updateTimer();
+    timerId=setInterval(()=>{
+      seconds--;updateTimer();
+      if(seconds<=0){
+        clearInterval(timerId);locked=true;reviewed++;
+        $('feedback').textContent='Time is up. Review the answer and explanation.';
+        $('feedback').className='feedback hint';
+        showResult('⏱','cross');showReview();
+      }
+    },1000);
+  }
+
+  function updateTimer(){
+    $('timer').textContent=seconds;
+    $('timerBox').classList.toggle('timer-low',seconds<=10);
+  }
+
+  function finishGame(){
+    clearInterval(timerId);
+    $('progressFill').style.width='100%';
+    showScreen('final');
+    const max=TOTAL_MISSIONS*10;
+    $('finalScore').textContent=`${score} / ${max}`;
+    $('firstTryStat').textContent=firstTry;$('retryStat').textContent=retryWins;$('reviewStat').textContent=reviewed;
+    const pct=score/max;
+    let msg='';
+    if(pct>=.8)msg='Excellent context thinking! You applied phrasal verbs naturally and handled structure with confidence.';
+    else if(pct>=.6)msg='Good work! You understand many phrasal verbs. Review the explanations for the few tricky structures.';
+    else if(pct>=.45)msg='Well tried! Your context skills are growing. Replay the quest and use each explanation as a clue.';
+    else msg='Keep practising! Focus on the complete meaning of each phrasal verb and whether it can be separated.';
+    $('finalMessage').textContent=msg;
+    safePlay(clapSound);burstStars(110);
+  }
+
+  function showResult(symbol,type){
+    const pop=$('resultPop');pop.className=`result-pop ${type}`;pop.textContent=symbol;
+    void pop.offsetWidth;pop.classList.add('show');
+  }
+
+  // Star-shaped confetti, lightweight canvas implementation
+  const canvas=$('confetti'),ctx=canvas.getContext('2d');
+  let pieces=[],animating=false;
+  function resizeCanvas(){canvas.width=innerWidth*devicePixelRatio;canvas.height=innerHeight*devicePixelRatio;ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0)}
+  addEventListener('resize',resizeCanvas);resizeCanvas();
+  function burstStars(count){
+    const colors=['#6657d6','#1a9c9b','#ffc857','#ef7a6d','#4a8fe7','#7bcf9c'];
+    for(let i=0;i<count;i++)pieces.push({x:innerWidth/2+(Math.random()-.5)*100,y:innerHeight*.42,vx:(Math.random()-.5)*9,vy:-3-Math.random()*7,g:.16+Math.random()*.10,r:4+Math.random()*5,rot:Math.random()*Math.PI,vr:(Math.random()-.5)*.24,color:colors[Math.floor(Math.random()*colors.length)],life:80+Math.random()*45});
+    if(!animating){animating=true;requestAnimationFrame(drawConfetti)}
+  }
+  function starPath(x,y,r,rot){
+    ctx.beginPath();
+    for(let i=0;i<10;i++){
+      const a=rot-Math.PI/2+i*Math.PI/5,rr=i%2===0?r:r*.45,px=x+Math.cos(a)*rr,py=y+Math.sin(a)*rr;
+      i===0?ctx.moveTo(px,py):ctx.lineTo(px,py);
+    }
+    ctx.closePath();
+  }
+  function drawConfetti(){
+    ctx.clearRect(0,0,innerWidth,innerHeight);
+    pieces.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=p.g;p.rot+=p.vr;p.life--;ctx.fillStyle=p.color;starPath(p.x,p.y,p.r,p.rot);ctx.fill()});
+    pieces=pieces.filter(p=>p.life>0&&p.y<innerHeight+30);
+    if(pieces.length){requestAnimationFrame(drawConfetti)}else{animating=false;ctx.clearRect(0,0,innerWidth,innerHeight)}
+  }
+
+  $('startBtn').addEventListener('click',beginGame);
+  $('nextBtn').addEventListener('click',()=>{ $('reviewOverlay').classList.remove('show'); nextMission(); });
+  $('playAgainBtn').addEventListener('click',beginGame);
+  $('muteBtn').addEventListener('click',()=>{muted=!muted;updateMute()});
+
+  // Keep the Innovine logo on screen for exactly the first five seconds.
+  setTimeout(()=>{
+    $('splash').classList.add('fade');
+    setTimeout(()=>$('splash').style.display='none',400);
+  },5000);
+})();
+</script>
+</body>
+</html>
