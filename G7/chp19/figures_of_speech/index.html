@@ -1,1 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Figures of Speech: Language Carnival</title>
+<style>
+:root{
+  --bg1:#fff1da;
+  --bg2:#f3ecff;
+  --bg3:#e7f8ff;
+  --ink:#21314f;
+  --accent:#7f56da;
+  --accent2:#37a8df;
+  --good:#21a760;
+  --bad:#d95366;
+  --paper:rgba(255,255,255,.94);
+  --cardShadow:0 18px 40px rgba(48,66,112,.16);
+}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;font-family:Inter,system-ui,-apple-system,Segoe UI,Arial,sans-serif;color:var(--ink)}
+body{
+  background:
+    radial-gradient(circle at 12% 18%, rgba(255,255,255,.85), transparent 22%),
+    radial-gradient(circle at 87% 15%, rgba(255,255,255,.6), transparent 18%),
+    linear-gradient(135deg,var(--bg1) 0%, var(--bg2) 52%, var(--bg3) 100%);
+}
+button{font:inherit}
+button:focus-visible,.tile:focus-visible,.slot:focus-visible,.bucket:focus-visible,.match-item:focus-visible{
+  outline:4px solid rgba(69,123,255,.34);outline-offset:3px
+}
+#splash{position:fixed;inset:0;z-index:1000;background:#fff;display:flex;align-items:center;justify-content:center}
+#splash img{width:min(40vw,280px);max-height:45vh;object-fit:contain;animation:flashLogo 1s ease-in-out infinite}
+@keyframes flashLogo{0%,100%{opacity:.38;transform:scale(.95)}50%{opacity:1;transform:scale(1.05)}}
+#app{display:none;height:100%;position:relative;overflow:hidden}
+.carnival-lights{position:absolute;left:0;right:0;top:0;height:54px;display:flex;justify-content:space-around;z-index:1;pointer-events:none}
+.bulb{width:16px;height:16px;border-radius:50%;margin-top:10px;box-shadow:0 0 12px currentColor;animation:twinkle 1.6s infinite ease-in-out}
+.bulb:nth-child(4n+1){color:#ff6a85}.bulb:nth-child(4n+2){color:#4ab7e6}.bulb:nth-child(4n+3){color:#6ed39c}.bulb:nth-child(4n+4){color:#ffc14d}
+.bulb::before{content:"";display:block;width:2px;height:10px;background:#7e8db0;position:relative;left:7px;top:-10px}
+@keyframes twinkle{50%{opacity:.45;transform:translateY(2px) scale(.9)}}
+.sky-prop,.sky-prop2,.sky-prop3,.sky-prop4{position:absolute;pointer-events:none;opacity:.2;z-index:0;animation:float 8s ease-in-out infinite}
+.sky-prop{left:2%;top:16%;font-size:60px}.sky-prop2{right:4%;top:18%;font-size:54px;animation-delay:-2s}.sky-prop3{left:7%;bottom:18%;font-size:40px;animation-delay:-3s}.sky-prop4{right:8%;bottom:20%;font-size:46px;animation-delay:-5s}
+@keyframes float{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-14px) rotate(5deg)}}
+.carnival-ground{position:absolute;left:0;right:0;bottom:0;height:90px;z-index:0;background:linear-gradient(to top, rgba(126,95,60,.18), rgba(126,95,60,0));pointer-events:none}
+.tent-row{position:absolute;left:0;right:0;bottom:0;height:110px;display:flex;justify-content:space-evenly;align-items:flex-end;pointer-events:none;z-index:0;opacity:.82}
+.tent{width:120px;height:92px;background:linear-gradient(180deg,rgba(255,255,255,.72),rgba(255,255,255,.36));border-radius:10px 10px 0 0;position:relative;box-shadow:inset 0 0 0 2px rgba(255,255,255,.6)}
+.tent:before{content:"";position:absolute;left:0;right:0;top:-44px;margin:auto;width:0;height:0;border-left:60px solid transparent;border-right:60px solid transparent;border-bottom:44px solid rgba(255,255,255,.72)}
+.tent:after{content:"";position:absolute;left:18px;right:18px;top:0;bottom:0;background:repeating-linear-gradient(90deg,var(--accent) 0 18px,#ffffff 18px 36px);opacity:.65;border-radius:10px 10px 0 0}
+.screen{position:relative;z-index:2;height:100%;display:none;padding:clamp(10px,2vw,22px)}
+.screen.active{display:flex}
+.center{align-items:center;justify-content:center;text-align:center}
+.card{width:min(980px,96vw);background:var(--paper);backdrop-filter:blur(12px);border-radius:28px;box-shadow:var(--cardShadow);padding:clamp(18px,4vw,38px);border:1px solid rgba(255,255,255,.95)}
+.home-hero{display:grid;grid-template-columns:1.1fr .9fr;gap:18px;align-items:center}
+.hero-art{min-height:290px;border-radius:24px;background:linear-gradient(145deg,#fff7e6,#f1f0ff);position:relative;overflow:hidden;border:1px solid #ecefff}
+.hero-art .zone{position:absolute;border-radius:18px;padding:10px 14px;font-weight:900;color:#fff;box-shadow:0 8px 20px rgba(42,59,104,.18)}
+.hero-art .z1{left:18px;top:20px;background:#4aa6d7}
+.hero-art .z2{right:18px;top:32px;background:#d95c92}
+.hero-art .z3{left:28px;bottom:72px;background:#f2a93f}
+.hero-art .z4{right:28px;bottom:88px;background:#52b77a}
+.hero-art .z5{left:50%;transform:translateX(-50%);bottom:18px;background:#7f56da}
+.hero-art .wheel{position:absolute;left:50%;top:53%;transform:translate(-50%,-50%);width:170px;height:170px;border-radius:50%;background:conic-gradient(#ffb84d 0 72deg,#68d2ff 72deg 144deg,#ff89a7 144deg 216deg,#86e6a5 216deg 288deg,#b193ff 288deg 360deg);box-shadow:0 0 0 14px rgba(255,255,255,.75), 0 10px 24px rgba(30,44,85,.18)}
+.hero-art .wheel:before{content:"";position:absolute;inset:32px;background:#fff;border-radius:50%}
+.hero-art .wheel:after{content:"🎡";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:70px}
+.home-title{font-size:clamp(34px,5.7vw,62px);line-height:1;margin:0 0 10px;color:#6b4ed2}
+.home-sub{font-size:clamp(17px,2vw,22px);line-height:1.5;margin:0 0 18px}
+.chips{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:18px 0}
+.chip{background:#eef2ff;color:#5f49cb;border-radius:999px;padding:9px 13px;font-weight:800;font-size:14px}
+.btn{border:0;border-radius:999px;padding:14px 28px;cursor:pointer;font-weight:900;color:#fff;background:linear-gradient(135deg,var(--accent),var(--accent2));box-shadow:0 10px 24px rgba(73,83,201,.28);transition:.18s transform,.18s opacity}
+.btn:hover{transform:translateY(-2px)}
+.mini-note{margin-top:14px;font-size:13px;opacity:.72}
+#game{flex-direction:column;gap:10px}
+.topbar{display:grid;grid-template-columns:auto 1fr auto auto auto;gap:10px;align-items:center;background:rgba(255,255,255,.9);border-radius:18px;padding:10px 14px;box-shadow:0 8px 20px rgba(40,60,100,.12)}
+.zone-pill{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border-radius:999px;padding:8px 14px;font-weight:900}
+.brand{font-weight:900;letter-spacing:.06em;color:#7055d1}
+.pill{background:#f3f6ff;border-radius:999px;padding:8px 13px;font-weight:900;white-space:nowrap}
+#timer.warn{background:#ffe5e8;color:#be3148;animation:pulse .7s infinite}
+@keyframes pulse{50%{transform:scale(1.06)}}
+.game-card{flex:1;min-height:0;overflow:auto;background:var(--paper);border-radius:26px;box-shadow:var(--cardShadow);padding:clamp(14px,2vw,24px);display:flex;flex-direction:column;gap:10px;position:relative}
+.zone-banner{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 14px;border-radius:18px;background:linear-gradient(135deg,rgba(255,255,255,.95),rgba(255,255,255,.6));border:1px solid rgba(255,255,255,.95)}
+.zone-left{display:flex;align-items:center;gap:12px}
+.zone-icon{font-size:44px;width:58px;height:58px;border-radius:18px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.75);box-shadow:inset 0 0 0 1px rgba(255,255,255,.75)}
+.zone-name{font-size:13px;text-transform:uppercase;letter-spacing:.12em;font-weight:900;opacity:.8}
+.zone-desc{font-size:16px;font-weight:700}
+.ticket{font-size:13px;font-weight:900;background:#fff7dd;color:#8b6705;padding:7px 11px;border-radius:999px;border:1px solid #f4dda0}
+#missionTitle{font-size:clamp(25px,3.4vw,38px);margin:2px 0 0}
+#prompt{font-size:clamp(16px,2vw,21px);line-height:1.5;margin:0 0 8px}
+#workArea{flex:1;display:flex;flex-direction:column;gap:14px;min-height:250px}
+.stage-box{background:linear-gradient(135deg,#fbfdff,#fff7e8);border:1px solid #e8edff;border-radius:22px;padding:18px;position:relative;overflow:hidden}
+.stage-box:before{content:"";position:absolute;inset:auto 0 0 0;height:18px;background:repeating-linear-gradient(90deg,rgba(255,255,255,.2) 0 20px,rgba(127,86,218,.12) 20px 40px)}
+.scene-top{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;margin-bottom:8px}
+.scene-emoji{font-size:44px}
+.scene-caption{font-size:18px;font-weight:800;text-align:center}
+.tile-bank,.build-bank,.match-grid,.bucket-items,.tag-bank,.select-grid{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:center}
+.tile,.select-card{
+  border:2px solid #dde5ff;background:#fff;border-radius:16px;padding:12px 15px;font-weight:900;color:var(--ink);
+  cursor:pointer;box-shadow:0 6px 14px rgba(52,71,115,.1);transition:.16s transform,.16s border,.16s background
+}
+.tile:hover,.select-card:hover{transform:translateY(-2px)}
+.tile.selected,.select-card.selected{background:#eee9ff;border-color:#7f56da}
+.tile.used{opacity:.38;pointer-events:none}
+.tile.good,.select-card.good{background:#ddf7e8;border-color:#25b56e}
+.tile.bad,.select-card.bad{background:#ffe3e8;border-color:#dc5e71}
+.slot{display:inline-flex;min-width:170px;min-height:52px;align-items:center;justify-content:center;padding:10px 14px;border:2px dashed #a9b6d8;border-radius:16px;background:#f8fbff;vertical-align:middle;font-weight:900;cursor:pointer}
+.slot.filled{border-style:solid;background:#fff}
+.toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:8px}
+#feedback{min-height:24px;font-weight:900}
+.check-btn{padding:11px 24px}
+.sentence-display{font-size:clamp(19px,2.4vw,28px);line-height:1.55;text-align:center}
+.build-row{min-height:72px;display:flex;flex-wrap:wrap;gap:10px;justify-content:center;align-items:center}
+.bucket-wrap{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.bucket-wrap.three{grid-template-columns:repeat(3,1fr)}
+.bucket{min-height:155px;background:rgba(255,255,255,.78);border:3px dashed #b4bfdf;border-radius:20px;padding:12px;cursor:pointer}
+.bucket h3{margin:0 0 10px;text-align:center;font-size:17px}
+.match-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}
+.match-col{display:flex;flex-direction:column;gap:10px}
+.match-item{min-height:56px;border:2px solid #dde5ff;background:#fff;border-radius:16px;padding:12px;font-weight:800;cursor:pointer;text-align:center;display:flex;align-items:center;justify-content:center}
+.match-item.selected{background:#eee9ff;border-color:#7f56da}
+.match-item.matched{background:#ddf7e8;border-color:#25b56e;opacity:.78;pointer-events:none}
+.select-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.select-card{min-height:72px;display:flex;align-items:center;justify-content:center;text-align:center}
+.hint{border-radius:16px;background:#fff8df;border:1px solid #f2da89;padding:13px;font-size:15px;line-height:1.45}
+#overlay{position:fixed;inset:0;z-index:50;background:rgba(19,30,56,.58);display:none;align-items:center;justify-content:center;padding:18px}
+#overlay.show{display:flex}
+.overlay-card{width:min(680px,95vw);background:#fff;border-radius:28px;padding:28px;box-shadow:var(--cardShadow);text-align:center}
+.overlay-card h2{margin:0 0 10px;color:#6b4ed2;font-size:34px}
+.overlay-card p{font-size:18px;line-height:1.55}
+.answer-box{background:#f7f9ff;border-radius:16px;padding:14px;margin:12px 0;text-align:left;font-size:16px}
+.cross{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%) scale(.3);font-size:92px;color:rgba(209,56,72,.84);opacity:0;pointer-events:none;z-index:60}
+.cross.show{animation:crossPop .55s ease}
+@keyframes crossPop{0%{opacity:0;transform:translate(-50%,-50%) scale(.3)}35%{opacity:1;transform:translate(-50%,-50%) scale(1.1)}100%{opacity:0;transform:translate(-50%,-50%) scale(.92)}}
+.shake{animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-7px)}50%{transform:translateX(7px)}75%{transform:translateX(-4px)}}
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:70}
+.result-wrap{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:20px 0}
+.result-box{background:#f5f7ff;border-radius:18px;padding:16px}
+.result-box strong{display:block;font-size:30px;color:#6d51d2}
+.finish-art{display:flex;justify-content:center;gap:14px;font-size:42px;margin-bottom:10px}
+@media(max-width:800px){
+  .home-hero{grid-template-columns:1fr}
+  .topbar{grid-template-columns:1fr auto auto;gap:8px}
+  .zone-pill{grid-column:1/-1;justify-content:center}
+  .brand{grid-column:1/-1;text-align:center;font-size:14px}
+  .match-grid,.bucket-wrap,.bucket-wrap.three{grid-template-columns:1fr}
+  .select-grid{grid-template-columns:1fr 1fr}
+  .result-wrap{grid-template-columns:1fr 1fr}
+}
+@media(max-width:560px){
+  .screen{padding:8px}
+  .card{padding:16px}
+  .hero-art{min-height:250px}
+  .hero-art .wheel{width:138px;height:138px}
+  .hero-art .wheel:after{font-size:54px}
+  .zone-banner{flex-direction:column;align-items:flex-start}
+  .select-grid{grid-template-columns:1fr}
+  .result-wrap{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div id="splash" aria-label="Innovine splash screen"><img src="assets/innovine-logo.png" alt="Innovine logo"></div>
+<div id="app">
+  <div class="carnival-lights"><div class="bulb"></div><div class="bulb"></div><div class="bulb"></div><div class="bulb"></div><div class="bulb"></div><div class="bulb"></div><div class="bulb"></div><div class="bulb"></div><div class="bulb"></div><div class="bulb"></div><div class="bulb"></div><div class="bulb"></div><div class="bulb"></div><div class="bulb"></div><div class="bulb"></div><div class="bulb"></div><div class="bulb"></div><div class="bulb"></div><div class="bulb"></div><div class="bulb"></div><div class="bulb"></div><div class="bulb"></div><div class="bulb"></div><div class="bulb"></div><div class="bulb"></div><div class="bulb"></div><div class="bulb"></div><div class="bulb"></div></div>
+  <div class="sky-prop">🎪</div>
+  <div class="sky-prop2">🎭</div>
+  <div class="sky-prop3">✨</div>
+  <div class="sky-prop4">🎠</div>
+  <div class="carnival-ground"></div>
+  <div class="tent-row"><div class="tent"></div><div class="tent"></div><div class="tent"></div><div class="tent"></div></div>
 
+  <section id="home" class="screen active center">
+    <div class="card home-hero">
+      <div>
+        <h1 class="home-title">The Language Carnival</h1>
+        <p class="home-sub">Restore the magic of creative language by travelling through five game zones: the <strong>Alliteration Sound Stage</strong>, <strong>Oxymoron Lab</strong>, <strong>Irony Detective Agency</strong>, <strong>Pun Workshop</strong> and <strong>Idiom Rescue Room</strong>.</p>
+        <div class="chips">
+          <div class="chip">12 missions</div>
+          <div class="chip">45 seconds each</div>
+          <div class="chip">One retry</div>
+          <div class="chip">Hints + explanations</div>
+        </div>
+        <button class="btn" id="startBtn">Enter the Carnival</button>
+        <div class="mini-note">A proper game experience with themed backgrounds, props, score tracking, star confetti, a 5-second Innovine splash and local audio assets.</div>
+      </div>
+      <div class="hero-art" aria-hidden="true">
+        <div class="zone z1">🎤 Sound Stage</div>
+        <div class="zone z2">⚡ Oxymoron Lab</div>
+        <div class="zone z3">🔍 Irony Agency</div>
+        <div class="zone z4">😄 Pun Workshop</div>
+        <div class="zone z5">🎭 Idiom Rescue Room</div>
+        <div class="wheel"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="game" class="screen">
+    <div class="topbar">
+      <div class="zone-pill" id="zonePill">🎤 <span id="zonePillText">Sound Stage</span></div>
+      <div class="brand">FIGURES OF SPEECH: LANGUAGE CARNIVAL</div>
+      <div class="pill" id="missionCount">Mission 1/12</div>
+      <div class="pill" id="score">Score: 0</div>
+      <div class="pill" id="timer">⏱ 45</div>
+    </div>
+    <div class="game-card" id="gameCard">
+      <div class="zone-banner">
+        <div class="zone-left">
+          <div class="zone-icon" id="zoneIcon">🎤</div>
+          <div>
+            <div class="zone-name" id="zoneName">Alliteration Sound Stage</div>
+            <div class="zone-desc" id="zoneDesc">Listen for repeated sounds and build catchy phrases.</div>
+          </div>
+        </div>
+        <div class="ticket" id="ticketTag">🎟 Mission Ticket</div>
+      </div>
+      <h2 id="missionTitle"></h2>
+      <p id="prompt"></p>
+      <div id="workArea"></div>
+      <div class="toolbar">
+        <div id="feedback" aria-live="polite"></div>
+        <button class="btn check-btn" id="checkBtn">Check Mission</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="finish" class="screen center">
+    <div class="card">
+      <div class="finish-art">🏆 🎪 ✨ 🎭</div>
+      <h1 class="home-title" style="font-size:clamp(36px,5vw,58px)">Carnival Restored!</h1>
+      <p class="home-sub" id="resultMessage"></p>
+      <div class="result-wrap">
+        <div class="result-box"><strong id="finalScore">0</strong>Score</div>
+        <div class="result-box"><strong id="firstWins">0</strong>First-Try Wins</div>
+        <div class="result-box"><strong id="retryWins">0</strong>Retry Wins</div>
+        <div class="result-box"><strong id="reviewedCount">0</strong>Reviewed</div>
+      </div>
+      <button class="btn" id="playAgain">Play Again</button>
+    </div>
+  </section>
+</div>
+
+<div id="overlay"><div class="overlay-card"><h2 id="overlayTitle">Let's Understand!</h2><div class="answer-box" id="overlayAnswer"></div><p id="overlayExplain"></p><button class="btn" id="nextBtn">Next Mission</button></div></div>
+<div class="cross" id="cross">✕</div>
+<canvas id="confetti"></canvas>
+<audio id="correctAudio" src="assets/correct.mp3" preload="auto"></audio>
+<audio id="wrongAudio" src="assets/wrong.mp3" preload="auto"></audio>
+<audio id="clapAudio" src="assets/clapping.mp3" preload="auto"></audio>
+<script>
+const $ = s => document.querySelector(s);
+const clean = s => s.trim().toLowerCase().replace(/[.,!?]/g,'').replace(/\s+/g,' ');
+const shuffle = arr => [...arr].sort(()=>Math.random()-.5);
+
+const zoneMap = {
+  alliteration:{icon:'🎤',name:'Alliteration Sound Stage',desc:'Listen for repeated sounds and build catchy phrases.',colors:['#55b8eb','#7a57d8']},
+  oxymoron:{icon:'⚡',name:'Oxymoron Opposites Lab',desc:'Combine opposite ideas to make surprising phrases.',colors:['#ff8ab0','#ffb34f']},
+  irony:{icon:'🔍',name:'Irony Detective Agency',desc:'Compare what is expected with what really happens.',colors:['#ff8a66','#7f56da']},
+  pun:{icon:'😄',name:'Pun Workshop',desc:'Decode double meanings and clever wordplay.',colors:['#56c98d','#34a8df']},
+  idiom:{icon:'🎭',name:'Idiom Rescue Room',desc:'Match colourful expressions with their real meanings.',colors:['#7f56da','#ef6d8d']}
+};
+
+const missions = [
+  {
+    zone:'alliteration', type:'Sound Hunt', kind:'tapselect',
+    title:'Find the Repeated Beginning Sounds',
+    prompt:'Tap all the words that create the alliteration in the sentence.',
+    stageEmoji:'🦁', stageCaption:'A catchy line from the Sound Stage',
+    sentence:'Lazy lions lounged in the sunlight.',
+    options:['Lazy','lions','lounged','in','the','sunlight'],
+    answer:['Lazy','lions','lounged'],
+    explain:'Alliteration repeats the same beginning consonant sound in nearby words. Here, lazy, lions and lounged all begin with the /l/ sound.'
+  },
+  {
+    zone:'alliteration', type:'Slogan Builder', kind:'build',
+    title:'Build an Alliterative Carnival Slogan',
+    prompt:'Tap the word tiles in order to build a musical, alliterative sentence.',
+    stageEmoji:'🥤', stageCaption:'Create a smooth line with repeated S sounds',
+    chunks:['Sally','silently','sipped','sweet','soda.'],
+    answer:'Sally silently sipped sweet soda.',
+    explain:'This line is alliterative because several nearby words begin with the same /s/ sound.'
+  },
+  {
+    zone:'oxymoron', type:'Opposites Pairing', kind:'pair',
+    title:'Build the Oxymorons',
+    prompt:'Match each word on the left with its contradictory partner on the right.',
+    stageEmoji:'🧪', stageCaption:'The Opposites Lab is running!',
+    pairs:[
+      ['deafening','silence'],
+      ['seriously','funny'],
+      ['definite','maybe'],
+      ['bitter','sweet']
+    ],
+    explain:'An oxymoron joins opposite or contradictory words together to create a striking effect, such as deafening silence or seriously funny.'
+  },
+  {
+    zone:'oxymoron', type:'Context Fill', kind:'fill',
+    title:'Choose the Best Oxymoron',
+    prompt:'Complete the sentence with the expression that best fits the context.',
+    stageEmoji:'🎭', stageCaption:'A comedian is performing on stage',
+    sentence:'The comedian gave a <span class="slot" id="fillSlot">drop the phrase here</span> performance.',
+    options:['seriously funny','once in a blue moon','lost interest','raining cats and dogs'],
+    answer:'seriously funny',
+    explain:'Seriously funny is an oxymoron because seriously and funny create a surprising contrast.'
+  },
+  {
+    zone:'irony', type:'Detective Board', kind:'sort',
+    title:'Expected vs Actually Happened',
+    prompt:'Drag or tap each clue into the correct detective board.',
+    stageEmoji:'🔥', stageCaption:'Two surprising situations are under investigation',
+    items:[
+      'Firefighters are expected to stop fires.',
+      'The fire station burned down.',
+      'A police officer is expected to enforce traffic rules.',
+      'The police officer got a speeding ticket.'
+    ],
+    categories:[
+      {name:'Expected',accepts:['Firefighters are expected to stop fires.','A police officer is expected to enforce traffic rules.']},
+      {name:'Actually Happened',accepts:['The fire station burned down.','The police officer got a speeding ticket.']}
+    ],
+    explain:'Irony happens when reality turns out to be the opposite of what is expected. A fire station burning and a police officer getting a speeding ticket are both ironic.'
+  },
+  {
+    zone:'irony', type:'Meaning Scanner', kind:'sort',
+    title:'Spoken Words vs Real Meaning',
+    prompt:'Place the cards under what was said and what was really happening.',
+    stageEmoji:'🌧️', stageCaption:'Mira speaks in the middle of heavy rain',
+    items:[
+      '“Lovely weather!”',
+      'It was pouring heavily.',
+      '“Oh great!”',
+      'I just failed the test.'
+    ],
+    categories:[
+      {name:'Words Spoken',accepts:['“Lovely weather!”','“Oh great!”']},
+      {name:'Real Situation',accepts:['It was pouring heavily.','I just failed the test.']}
+    ],
+    explain:'Verbal irony happens when someone says one thing but means the opposite. The cheerful words do not match the unpleasant reality.'
+  },
+  {
+    zone:'pun', type:'Wordplay Match', kind:'pair',
+    title:'Decode the Pun',
+    prompt:'Match each line with the explanation that shows the double meaning.',
+    stageEmoji:'😂', stageCaption:'The Pun Workshop is full of clever jokes',
+    pairs:[
+      ['I used to be a banker, but I lost interest.','interest means money earned and also enthusiasm'],
+      ['The math teacher called me average. How mean!','mean means average and also unkind'],
+      ["I’m reading a book about anti-gravity. It’s impossible to put down.",'put down means stop holding and also stop reading']
+    ],
+    explain:'A pun plays with a word or phrase that has more than one meaning. The humour comes from noticing both meanings together.'
+  },
+  {
+    zone:'idiom', type:'Meaning Match-Up', kind:'pair',
+    title:'Idiom to Meaning',
+    prompt:'Match each idiom with its real meaning.',
+    stageEmoji:'🎟️', stageCaption:'Unlock the rescue room by matching the meanings',
+    pairs:[
+      ['piece of cake','very easy'],
+      ['under the weather','feeling unwell'],
+      ['break the ice','start a friendly conversation'],
+      ['once in a blue moon','rarely']
+    ],
+    explain:'Idioms have meanings that are different from the literal meaning of the words. You must understand them in context.'
+  },
+  {
+    zone:'idiom', type:'Party Rescue', kind:'fill',
+    title:'Choose the Right Idiom for the Situation',
+    prompt:'Complete the sentence with the idiom that fits the party situation.',
+    stageEmoji:'🎉', stageCaption:'Riya tells a joke so people will start talking',
+    sentence:'To <span class="slot" id="fillSlot">drop the idiom here</span> at the party, Riya told a funny joke.',
+    options:['break the ice','cost an arm and a leg','under the weather','hit the nail on the head'],
+    answer:'break the ice',
+    explain:'Break the ice means to begin a friendly conversation or make people feel comfortable in a social situation.'
+  },
+  {
+    zone:'mixed', type:'Grand Sorting Parade', kind:'sort',
+    title:'Send Each Line to the Right Carnival Tent',
+    prompt:'Sort each line into the correct figure-of-speech tent.',
+    stageEmoji:'🎪', stageCaption:'Every tent wants the right type of expression',
+    items:[
+      'Whistling winds whipped wildly.',
+      'She had a bittersweet feeling.',
+      '“Lovely weather!” said Mira as it poured heavily.',
+      'The banker lost interest.',
+      'I’m on cloud nine.'
+    ],
+    categories:[
+      {name:'Alliteration',accepts:['Whistling winds whipped wildly.']},
+      {name:'Oxymoron',accepts:['She had a bittersweet feeling.']},
+      {name:'Irony',accepts:['“Lovely weather!” said Mira as it poured heavily.']},
+      {name:'Pun',accepts:['The banker lost interest.']},
+      {name:'Idiom',accepts:['I’m on cloud nine.']}
+    ],
+    explain:'Each figure of speech works differently: alliteration repeats sounds, oxymoron combines opposites, irony reverses expectations, pun plays with meanings and idiom carries a special meaning.'
+  },
+  {
+    zone:'oxymoron', type:'Repair Booth', kind:'build',
+    title:'Repair the Broken Expression',
+    prompt:'The sentence uses the figure of speech incorrectly. Rebuild it to make a correct oxymoron.',
+    stageEmoji:'🧩', stageCaption:'Fix the phrase before the parade begins',
+    broken:'He made a loud silence.',
+    chunks:['He','made','a','deafening','silence.'],
+    answer:'He made a deafening silence.',
+    explain:'The correct oxymoron is deafening silence. It combines a word linked with loudness and a word linked with quietness.'
+  },
+  {
+    zone:'idiom', type:'Literal or Intended?', kind:'sort',
+    title:'Choose the Real Meaning of the Idiom',
+    prompt:'Send each card to Literal Meaning or Intended Meaning.',
+    stageEmoji:'🐱', stageCaption:'The idiom rescue room is testing your understanding',
+    items:[
+      'It was raining heavily.',
+      'Cats and dogs falling from the sky.',
+      'She revealed a secret.',
+      'A cat jumping out of a bag.'
+    ],
+    categories:[
+      {name:'Intended Meaning',accepts:['It was raining heavily.','She revealed a secret.']},
+      {name:'Literal Meaning',accepts:['Cats and dogs falling from the sky.','A cat jumping out of a bag.']}
+    ],
+    explain:'Idioms should not be understood literally. Raining cats and dogs means heavy rain, and let the cat out of the bag means revealing a secret.'
+  }
+];
+
+let order = missions.map((_,i)=>i), idx=0, score=0, timer=45, tick=null, attempts=0, firstWins=0, retryWins=0, reviewed=0, state={};
+
+function show(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); $('#'+id).classList.add('active'); }
+setTimeout(()=>{ $('#splash').style.display='none'; $('#app').style.display='block'; },5000);
+$('#startBtn').onclick = startGame;
+$('#playAgain').onclick = startGame;
+$('#checkBtn').onclick = checkMission;
+$('#nextBtn').onclick = nextMission;
+
+function startGame(){ idx=0; score=0; firstWins=0; retryWins=0; reviewed=0; show('game'); loadMission(); }
+function currentMission(){ return missions[order[idx]]; }
+function startTimer(){ clearInterval(tick); timer=45; updateTimer(); tick = setInterval(()=>{ timer--; updateTimer(); if(timer<=0){ clearInterval(tick); handleWrong(true); } },1000); }
+function updateTimer(){ $('#timer').textContent = '⏱ '+timer; $('#timer').classList.toggle('warn', timer<=10); }
+
+function loadMission(){
+  attempts=0; state={}; $('#feedback').textContent=''; $('#gameCard').classList.remove('shake');
+  const m = currentMission();
+  $('#missionCount').textContent = `Mission ${idx+1}/${missions.length}`;
+  $('#score').textContent = `Score: ${score}`;
+  $('#ticketTag').textContent = `🎟 ${m.type}`;
+  $('#missionTitle').textContent = m.title;
+  $('#prompt').textContent = m.prompt;
+  applyZone(m.zone);
+  renderMission(m);
+  startTimer();
+}
+
+function applyZone(zoneKey){
+  const z = zoneMap[zoneKey] || {icon:'🎪',name:'Carnival Mix Zone',desc:'A mixed challenge from across the carnival.',colors:['#7f56da','#37a8df']};
+  document.documentElement.style.setProperty('--accent', z.colors[0]);
+  document.documentElement.style.setProperty('--accent2', z.colors[1]);
+  $('#zonePill').style.background = `linear-gradient(135deg, ${z.colors[0]}, ${z.colors[1]})`;
+  $('#zonePillText').textContent = z.name;
+  $('#zoneIcon').textContent = z.icon;
+  $('#zoneName').textContent = z.name;
+  $('#zoneDesc').textContent = z.desc;
+  const bgMap = {
+    alliteration:['#e8fbff','#edf0ff','#fff8e8'],
+    oxymoron:['#fff1f7','#fff8e9','#f5ecff'],
+    irony:['#fff2ec','#f3ecff','#eaf8ff'],
+    pun:['#ebfff3','#ebf8ff','#fff8e5'],
+    idiom:['#f7ecff','#fff0f7','#ebf9ff'],
+    mixed:['#fff4df','#f3efff','#ebfbff']
+  };
+  const colors = bgMap[zoneKey] || bgMap.mixed;
+  document.body.style.background = `radial-gradient(circle at 12% 18%, rgba(255,255,255,.85), transparent 22%), radial-gradient(circle at 87% 15%, rgba(255,255,255,.6), transparent 18%), linear-gradient(135deg, ${colors[0]} 0%, ${colors[1]} 52%, ${colors[2]} 100%)`;
+}
+
+function stageBox(m, inner){
+  return `<div class="stage-box"><div class="scene-top"><div class="scene-emoji">${m.stageEmoji||'🎪'}</div><div class="scene-caption">${m.stageCaption||''}</div></div>${inner}</div>`;
+}
+
+function renderMission(m){
+  const w = $('#workArea'); w.innerHTML='';
+  if(m.kind==='tapselect') renderTapSelect(m,w);
+  if(m.kind==='build') renderBuild(m,w);
+  if(m.kind==='pair') renderPair(m,w);
+  if(m.kind==='fill') renderFill(m,w);
+  if(m.kind==='sort') renderSort(m,w);
+}
+
+function renderTapSelect(m,w){
+  state.selected = [];
+  w.innerHTML = stageBox(m, `<div class="sentence-display">${m.sentence}</div>`);
+  const grid = document.createElement('div'); grid.className='select-grid';
+  shuffle(m.options).forEach(opt=>{
+    const b=document.createElement('button'); b.className='select-card'; b.textContent=opt;
+    b.onclick=()=>{
+      const pos = state.selected.indexOf(opt);
+      if(pos>-1){ state.selected.splice(pos,1); b.classList.remove('selected'); }
+      else { state.selected.push(opt); b.classList.add('selected'); }
+    };
+    grid.appendChild(b);
+  });
+  w.appendChild(grid);
+}
+
+function renderBuild(m,w){
+  let inner = '';
+  if(m.broken) inner += `<div class="sentence-display" style="margin-bottom:10px"><strong>Broken line:</strong> ${m.broken}</div>`;
+  inner += `<div class="build-row" id="buildRow"><span style="opacity:.7;font-weight:800">Tap the tiles below to build the sentence.</span></div>`;
+  w.innerHTML = stageBox(m, inner);
+  state.answer = [];
+  const bank = document.createElement('div'); bank.className='build-bank';
+  shuffle(m.chunks).forEach(chunk=>{
+    const t=document.createElement('button'); t.className='tile'; t.textContent=chunk;
+    t.onclick=()=>{
+      if(t.classList.contains('used')) return;
+      const row = $('#buildRow');
+      if(row.textContent.includes('Tap the tiles')) row.innerHTML='';
+      state.answer.push(chunk); t.classList.add('used');
+      const placed=document.createElement('button'); placed.className='tile'; placed.textContent=chunk;
+      placed.onclick=()=>{ const i=state.answer.indexOf(chunk); if(i>-1) state.answer.splice(i,1); placed.remove(); t.classList.remove('used'); if(!state.answer.length) row.innerHTML='<span style="opacity:.7;font-weight:800">Tap the tiles below to build the sentence.</span>'; };
+      row.appendChild(placed);
+    };
+    bank.appendChild(t);
+  });
+  w.appendChild(bank);
+}
+
+function renderPair(m,w){
+  state.matches = {}; state.left = null;
+  w.innerHTML = stageBox(m, '');
+  const grid=document.createElement('div'); grid.className='match-grid';
+  const left=document.createElement('div'); left.className='match-col';
+  const right=document.createElement('div'); right.className='match-col';
+  shuffle(m.pairs.map(p=>p[0])).forEach(txt=>{
+    const b=document.createElement('button'); b.className='match-item'; b.textContent=txt;
+    b.onclick=()=>{ if(b.classList.contains('matched')) return; state.left=txt; [...left.children].forEach(x=>x.classList.toggle('selected',x===b)); };
+    left.appendChild(b);
+  });
+  shuffle(m.pairs.map(p=>p[1])).forEach(txt=>{
+    const b=document.createElement('button'); b.className='match-item'; b.textContent=txt;
+    b.onclick=()=>{
+      if(!state.left || b.classList.contains('matched')) return;
+      state.matches[state.left]=txt;
+      const lb=[...left.children].find(x=>x.textContent===state.left);
+      lb.classList.add('matched'); lb.classList.remove('selected');
+      b.classList.add('matched'); state.left=null;
+    };
+    right.appendChild(b);
+  });
+  grid.appendChild(left); grid.appendChild(right); w.appendChild(grid);
+}
+
+function renderFill(m,w){
+  state.answer=''; state.selected='';
+  w.innerHTML = stageBox(m, `<div class="sentence-display">${m.sentence}</div>`);
+  const bank=document.createElement('div'); bank.className='tile-bank';
+  shuffle(m.options).forEach(opt=>{
+    const b=document.createElement('button'); b.className='tile'; b.textContent=opt; b.dataset.value=opt;
+    b.onclick=()=>{
+      state.selected=opt; state.answer=opt;
+      document.querySelectorAll('.tile').forEach(x=>x.classList.toggle('selected',x.dataset.value===opt));
+      const slot=$('#fillSlot'); if(slot){ slot.textContent=opt; slot.classList.add('filled'); }
+    };
+    bank.appendChild(b);
+  });
+  w.appendChild(bank);
+  const slot=$('#fillSlot'); if(slot) slot.onclick=()=>{ if(state.selected){ slot.textContent=state.selected; slot.classList.add('filled'); state.answer=state.selected; } };
+}
+
+function renderSort(m,w){
+  state.placements = {}; state.selected='';
+  w.innerHTML = stageBox(m, '');
+  const bank=document.createElement('div'); bank.className='tag-bank'; bank.id='sortBank';
+  shuffle(m.items).forEach(item=>{
+    const b=document.createElement('button'); b.className='tile'; b.textContent=item; b.dataset.value=item;
+    b.onclick=()=>{ state.selected=item; document.querySelectorAll('#sortBank .tile').forEach(x=>x.classList.toggle('selected',x.dataset.value===item)); };
+    bank.appendChild(b);
+  });
+  w.appendChild(bank);
+  const wrap=document.createElement('div'); wrap.className='bucket-wrap'+(m.categories.length===3?' three':'');
+  if(m.categories.length>3) wrap.style.gridTemplateColumns=`repeat(${m.categories.length}, 1fr)`;
+  m.categories.forEach(cat=>{
+    const bucket=document.createElement('div'); bucket.className='bucket'; bucket.tabIndex=0;
+    bucket.innerHTML=`<h3>${cat.name}</h3><div class="bucket-items"></div>`;
+    const place=()=>{
+      if(!state.selected) return;
+      state.placements[state.selected]=cat.name;
+      const orig=[...bank.querySelectorAll('.tile')].find(x=>x.dataset.value===state.selected);
+      if(orig) orig.classList.add('used');
+      const chip=document.createElement('button'); chip.className='tile'; chip.textContent=state.selected;
+      chip.onclick=()=>{ delete state.placements[chip.textContent]; chip.remove(); if(orig) orig.classList.remove('used'); };
+      bucket.querySelector('.bucket-items').appendChild(chip);
+      state.selected=''; bank.querySelectorAll('.tile').forEach(x=>x.classList.remove('selected'));
+    };
+    bucket.onclick=place; bucket.onkeydown=e=>{ if(e.key==='Enter' || e.key===' ') place(); };
+    wrap.appendChild(bucket);
+  });
+  w.appendChild(wrap);
+}
+
+function correctForCurrent(){
+  const m=currentMission();
+  if(m.kind==='tapselect') return setEqual(state.selected,m.answer);
+  if(m.kind==='build') return clean((state.answer||[]).join(' '))===clean(m.answer);
+  if(m.kind==='pair') return m.pairs.every(([a,b])=>state.matches[a]===b);
+  if(m.kind==='fill') return clean(state.answer||'')===clean(m.answer);
+  if(m.kind==='sort') return m.items.every(item=>{ const cat = m.categories.find(c=>c.accepts.includes(item)); return state.placements[item]===cat.name; });
+}
+function setEqual(a,b){ if((a||[]).length!==b.length) return false; return b.every(x=>(a||[]).includes(x)); }
+
+function checkMission(){ if(correctForCurrent()) handleCorrect(); else handleWrong(false); }
+function handleCorrect(){
+  clearInterval(tick);
+  if(attempts===0){ score+=10; firstWins++; $('#feedback').textContent='⭐ Brilliant! You won this ticket on the first try.'; }
+  else { score+=5; retryWins++; $('#feedback').textContent='✅ Great comeback! You solved the mission on your retry.'; }
+  $('#score').textContent=`Score: ${score}`;
+  playAudio('correctAudio'); launchStars(28);
+  setTimeout(()=>showOverlay(true),700);
+}
+function handleWrong(timeUp){
+  clearInterval(tick); attempts++; playAudio('wrongAudio'); flashCross();
+  $('#gameCard').classList.remove('shake'); void $('#gameCard').offsetWidth; $('#gameCard').classList.add('shake');
+  if(attempts===1 && !timeUp){
+    $('#feedback').textContent='Not quite. Use the hint and try once more!';
+    addHint(currentMission()); startTimer();
+  } else {
+    reviewed++; $('#feedback').textContent = timeUp ? 'Time is up. Let’s visit the answer tent.' : 'Let’s visit the answer tent.';
+    setTimeout(()=>showOverlay(false),600);
+  }
+}
+function addHint(m){
+  const old=$('#hintBox'); if(old) old.remove();
+  const h=document.createElement('div'); h.id='hintBox'; h.className='hint';
+  let text='Hint: Think about how the figure of speech works in the sentence.';
+  if(m.kind==='pair') text='Hint: Read both parts aloud and look for opposite meanings, special meanings or double meanings.';
+  if(m.kind==='sort') text='Hint: Compare each card carefully with the category labels before placing it.';
+  if(m.kind==='build') text='Hint: Start with the subject or opening word, then add the key figure of speech in the natural place.';
+  if(m.kind==='tapselect') text='Hint: Focus on the repeated beginning sound rather than every word in the sentence.';
+  if(m.kind==='fill') text='Hint: Choose the expression that matches the situation, not the literal meaning.';
+  h.textContent=text; $('#workArea').prepend(h);
+}
+function showOverlay(correct){
+  const m=currentMission();
+  $('#overlayTitle').textContent = correct ? 'Ticket Won!' : 'Let’s Understand!';
+  $('#overlayAnswer').innerHTML = `<strong>Correct response:</strong><br>${answerText(m)}`;
+  $('#overlayExplain').textContent = m.explain;
+  $('#overlay').classList.add('show');
+}
+function answerText(m){
+  if(m.kind==='tapselect') return m.answer.join(', ');
+  if(m.kind==='build' || m.kind==='fill') return m.answer;
+  if(m.kind==='pair') return m.pairs.map(p=>`${p[0]} → ${p[1]}`).join('<br>');
+  if(m.kind==='sort') return m.categories.map(c=>`${c.name}: ${c.accepts.join(', ')}`).join('<br>');
+  return '';
+}
+function nextMission(){ $('#overlay').classList.remove('show'); idx++; if(idx>=missions.length) finishGame(); else loadMission(); }
+function finishGame(){
+  clearInterval(tick); show('finish'); playAudio('clapAudio'); launchStars(90);
+  $('#finalScore').textContent=score; $('#firstWins').textContent=firstWins; $('#retryWins').textContent=retryWins; $('#reviewedCount').textContent=reviewed;
+  const pct = score/(missions.length*10);
+  $('#resultMessage').textContent = pct>=.8 ? 'Outstanding! You restored the Language Carnival with sharp listening, clever thinking and colourful expression.' : pct>=.6 ? 'Well done! The carnival is glowing again, and your understanding of figures of speech is getting stronger.' : 'Good effort! Review the answer tents and play again to collect more language tickets.';
+}
+function playAudio(id){ const a=$('#'+id); try{ a.currentTime=0; a.play().catch(()=>{}); }catch(e){} }
+function flashCross(){ const c=$('#cross'); c.classList.remove('show'); void c.offsetWidth; c.classList.add('show'); }
+function launchStars(n){
+  const canvas=$('#confetti'), ctx=canvas.getContext('2d'); canvas.width=innerWidth; canvas.height=innerHeight;
+  const parts=Array.from({length:n},()=>({x:Math.random()*canvas.width,y:-20-Math.random()*canvas.height*.2,s:7+Math.random()*9,v:2+Math.random()*4,r:Math.random()*6.28,rv:(Math.random()-.5)*.2,h:Math.random()*360}));
+  let frame=0; (function draw(){ ctx.clearRect(0,0,canvas.width,canvas.height); parts.forEach(p=>{ p.y+=p.v; p.r+=p.rv; ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.r); ctx.fillStyle=`hsl(${p.h} 85% 60%)`; ctx.beginPath(); for(let i=0;i<10;i++){ const a=-Math.PI/2+i*Math.PI/5; const rad=i%2?p.s*.45:p.s; const x=Math.cos(a)*rad; const y=Math.sin(a)*rad; i?ctx.lineTo(x,y):ctx.moveTo(x,y);} ctx.closePath(); ctx.fill(); ctx.restore(); }); frame++; if(frame<180) requestAnimationFrame(draw); else ctx.clearRect(0,0,canvas.width,canvas.height); })();
+}
+</script>
+</body>
+</html>
