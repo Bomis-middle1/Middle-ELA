@@ -8,7 +8,7 @@
 :root {
     --card-bg: rgba(255, 255, 255, 0.95);
     --primary-blue: #025091;
-    --secondary-blue: #0374cf;
+    --secondary-blue: #0373cf;
     --accent-gold: #ffb300;
     --accent-pink: #d81b60;
     --accent-green: #2e7d32;
@@ -272,13 +272,16 @@ body {
     transition: width 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
+/* Character facing RIGHT */
 .character {
     position: absolute;
     left: 45px;
     bottom: 110px;
     font-size: 2.2rem;
+    transform: scaleX(-1); /* Flips character to face right */
     transition: left 0.8s ease-in-out;
     z-index: 3;
+    display: inline-block;
 }
 
 .task-card {
@@ -429,7 +432,7 @@ body {
     <div class="instruction-box">
         <div class="instruction-item">
             <div class="inst-num">1</div>
-            <div>Examine sentences and phrases based on rules from <strong>image_6802b5.png</strong> and <strong>image_6802f2.png</strong>.</div>
+            <div>Examine sentences and phrases based on rules.</div>
         </div>
         <div class="instruction-item">
             <div class="inst-num">2</div>
@@ -638,9 +641,10 @@ function loadRound() {
     attemptsLeft = 2;
     isProcessing = false;
     
-    // Reset Bridge visual state
+    // Reset Bridge visual state & Character position facing right
     $('bridge-plank').style.width = '0%';
     $('game-char').style.left = '45px';
+    $('game-char').style.transform = 'scaleX(-1)'; 
 
     $('lbl-q').innerText = currentRound + 1;
     $('lbl-attempts').innerText = attemptsLeft;
@@ -678,7 +682,7 @@ function makeGuess(selectedChoice) {
         isProcessing = true;
         playCorrectSound();
         
-        // Extend bridge plank and move character
+        // Extend bridge plank and walk character across facing right
         $('bridge-plank').style.width = '100%';
         setTimeout(() => {
             $('game-char').style.left = 'calc(100% - 130px)';
@@ -704,8 +708,11 @@ function makeGuess(selectedChoice) {
             $('lbl-feedback').innerText = `⚡ Out of attempts! Correct phrase: "${task.correct}". (${task.rule})`;
             $('lbl-feedback').style.color = "var(--accent-gold)";
 
-            // Show answer reveal bridge completion
+            // Reveal bridge plank and move character
             $('bridge-plank').style.width = '100%';
+            setTimeout(() => {
+                $('game-char').style.left = 'calc(100% - 130px)';
+            }, 300);
 
             setTimeout(() => {
                 currentRound++;
