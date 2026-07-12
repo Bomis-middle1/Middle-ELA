@@ -90,6 +90,36 @@ body {
     100% { transform: scale(1); opacity: 1; }
 }
 
+/* Fallback styling if assets/logo.png is not found */
+.logo-fallback-box {
+    display: none;
+    align-items: center;
+    gap: 14px;
+    animation: logoPop 1.2s ease-out;
+}
+
+.logo-fallback-mark {
+    width: 54px;
+    height: 54px;
+    background: linear-gradient(135deg, #00f2fe, #ff007f);
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    color: white;
+    box-shadow: 0 0 25px rgba(0, 242, 254, 0.5);
+}
+
+.logo-fallback-text {
+    font-size: clamp(2.5rem, 7vw, 4rem);
+    font-weight: 900;
+    letter-spacing: 3px;
+    background: linear-gradient(45deg, #ffffff, #00f2fe, #ff007f);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
 .logo-timer-bar {
     position: absolute;
     bottom: 0;
@@ -397,9 +427,21 @@ body {
 </head>
 <body>
 
-<!-- SCREEN 1: Innovine Logo Screen (Strictly 5 Seconds) -->
+<!-- SCREEN 1: Innovine Logo Screen (Strictly 5 Seconds with Smart Image Fallback) -->
 <div id="screen-logo">
-    <img src="assets/logo.png" alt="Innovine Logo" class="innovine-logo-img" />
+    <img 
+        src="assets/logo.png" 
+        alt="Innovine Logo" 
+        class="innovine-logo-img" 
+        onerror="this.style.display='none'; document.getElementById('logo-fallback').style.display='flex';"
+    />
+    
+    <!-- Automatic Vector Fallback if assets/logo.png fails to load -->
+    <div id="logo-fallback" class="logo-fallback-box">
+        <div class="logo-fallback-mark">✦</div>
+        <div class="logo-fallback-text">INNOVINE</div>
+    </div>
+
     <div class="logo-timer-bar" id="logo-progress"></div>
 </div>
 
