@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>Innovine - Prepositions Bubble Burst Challenge</title>
+<style>
+:root {
+    --card-bg: rgba(255, 255, 255, 0.94);
+    --primary-purple: #4a148c;
+    --accent-pink: #d81b60;
+    --accent-blue: #0288d1;
+    --accent-amber: #f57c00;
+    --accent-green: #2e7d32;
+    --text-main: #120b24;
+    --text-muted: #53457a;
+    --border-color: rgba(255, 255, 255, 0.7);
+    --shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+    user-select: none;
+}
+
+/* Cosmic Aqua Animated Background */
+body {
+    background: linear-gradient(-45deg, #0f2027, #203a43, #2c5364, #120b24);
+    background-size: 300% 300%;
+    animation: gradientBG 14s ease infinite;
+    color: var(--text-main);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px;
+    overflow-x: hidden;
+}
+
+@keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.view-panel {
+    position: relative;
+    width: 100%;
+    max-width: 900px;
+    background: var(--card-bg);
+    backdrop-filter: blur(12px);
+    border-radius: 24px;
+    padding: clamp(16px, 4vw, 28px);
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    border: 2px solid var(--border-color);
+    animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.97); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+/* SCREEN 1: Innovine Logo Screen (Strictly 5 Seconds) */
+#screen-logo {
+    position: fixed;
+    inset: 0;
+    background: #090314;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    transition: opacity 0.6s ease;
+    padding: 20px;
+}
+
+.innovine-logo-img {
+    max-width: 280px;
+    width: 70vw;
+    height: auto;
+    object-fit: contain;
+    animation: logoPop 1.2s ease-out;
+    filter: drop-shadow(0 0 25px rgba(255, 255, 255, 0.2));
+}
+
+@keyframes logoPop {
+    0% { transform: scale(0.85); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.logo-fallback-box {
+    display: none;
+    align-items: center;
+    gap: 14px;
+    animation: logoPop 1.2s ease-out;
+}
+
+.logo-fallback-mark {
+    width: 54px;
+    height: 54px;
+    background: linear-gradient(135deg, #00f2fe, #ff007f);
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    color: white;
+}
+
+.logo-fallback-text {
+    font-size: clamp(2.5rem, 7vw, 4rem);
+    font-weight: 900;
+    letter-spacing: 3px;
+    background: linear-gradient(45deg, #ffffff, #00f2fe, #ff007f);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.logo-timer-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 6px;
+    background: linear-gradient(90deg, #00f2fe, #ff007f);
+    width: 0%;
+    transition: width 0.05s linear;
+}
+
+/* SCREEN 2: Instruction Screen */
+#screen-instructions {
+    display: none;
+    text-align: center;
+    align-items: center;
+    gap: 20px;
+}
+
+.instruction-title {
+    font-size: clamp(1.8rem, 4vw, 2.5rem);
+    color: var(--primary-purple);
+    font-weight: 900;
+}
+
+.instruction-box {
+    background: rgba(255, 255, 255, 0.85);
+    border: 1px solid rgba(0,0,0,0.08);
+    border-radius: 18px;
+    padding: 22px;
+    text-align: left;
+    width: 100%;
+    max-width: 650px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.instruction-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-size: clamp(0.95rem, 2.2vw, 1.1rem);
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.inst-num {
+    background: var(--primary-purple);
+    color: white;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    flex-shrink: 0;
+}
+
+/* SCREEN 3: Game Play Area */
+#screen-game {
+    display: none;
+    flex-direction: column;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid rgba(0, 0, 0, 0.08);
+    padding-bottom: 12px;
+}
+
+.grade-badge {
+    background: linear-gradient(45deg, #00c6ff, #0072ff);
+    color: white;
+    padding: 4px 14px;
+    border-radius: 12px;
+    font-weight: 800;
+    font-size: 0.85rem;
+}
+
+.title {
+    font-size: clamp(1rem, 2.5vw, 1.3rem);
+    color: var(--primary-purple);
+    font-weight: 800;
+}
+
+.status-bar {
+    display: flex;
+    gap: 10px;
+    font-size: 0.85rem;
+    font-weight: 800;
+}
+
+.badge {
+    padding: 6px 14px;
+    border-radius: 20px;
+    background: #ffffff;
+    border: 1px solid #dcd0ea;
+    color: var(--primary-purple);
+}
+
+/* Question Banner */
+.question-card {
+    background: linear-gradient(135deg, #e0f7fa, #b2ebf2);
+    border-left: 5px solid #00acc1;
+    padding: 16px;
+    border-radius: 14px;
+    text-align: center;
+}
+
+.category-tag {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    font-weight: 900;
+    color: #007791;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+}
+
+.question-text {
+    font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+    font-weight: 800;
+    color: #004d40;
+}
+
+/* Bubble Playfield Arena */
+.bubble-arena {
+    position: relative;
+    width: 100%;
+    height: 280px;
+    background: radial-gradient(circle, rgba(224, 247, 250, 0.4) 0%, rgba(178, 235, 242, 0.2) 100%);
+    border: 2px dashed rgba(0, 172, 193, 0.4);
+    border-radius: 20px;
+    overflow: hidden;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    padding: 15px;
+}
+
+.bubble {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, #ffffff, #80deea 60%, #00acc1);
+    box-shadow: 0 8px 20px rgba(0, 172, 193, 0.3), inset -4px -4px 10px rgba(0, 77, 64, 0.2), inset 4px 4px 10px rgba(255, 255, 255, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    font-weight: 900;
+    color: #004d40;
+    cursor: pointer;
+    animation: floatBob 3s ease-in-out infinite alternate;
+    transition: transform 0.2s ease, opacity 0.3s ease;
+}
+
+.bubble:nth-child(even) {
+    animation-duration: 2.5s;
+    animation-delay: 0.5s;
+}
+
+.bubble:nth-child(3n) {
+    animation-duration: 3.5s;
+    animation-delay: 0.2s;
+}
+
+.bubble:hover {
+    transform: scale(1.1);
+}
+
+@keyframes floatBob {
+    0% { transform: translateY(0px) rotate(-2deg); }
+    100% { transform: translateY(-12px) rotate(2deg); }
+}
+
+/* Burst Pop Animation */
+.bubble.popping {
+    animation: popEffect 0.3s forwards ease-out !important;
+}
+
+@keyframes popEffect {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.3); opacity: 0.8; background: #ff4081; }
+    100% { transform: scale(0); opacity: 0; }
+}
+
+.action-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
+
+.feedback-bar {
+    flex: 1;
+    background: white;
+    border-radius: 12px;
+    padding: 12px;
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: var(--text-muted);
+    text-align: center;
+}
+
+.btn-main {
+    background: linear-gradient(45deg, #ff007f, #0072ff);
+    color: white;
+    border: 0;
+    padding: 12px 28px;
+    border-radius: 25px;
+    font-weight: 900;
+    font-size: 0.95rem;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0, 114, 255, 0.35);
+    transition: transform 0.15s ease;
+}
+
+.btn-main:hover {
+    transform: scale(1.04);
+}
+
+/* SCREEN 4: Completion Screen */
+#screen-completion {
+    display: none;
+    text-align: center;
+    align-items: center;
+    gap: 20px;
+    padding: 20px 10px;
+}
+
+.trophy-glow {
+    font-size: 5rem;
+    animation: bounce 2s infinite ease-in-out;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-15px); }
+}
+
+.congrats-title {
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 900;
+    background: linear-gradient(45deg, #00c6ff, #ff007f);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+</style>
+</head>
+<body>
+
+<!-- SCREEN 1: Innovine Logo Screen (Strictly 5 Seconds) -->
+<div id="screen-logo">
+    <img 
+        src="assets/logo.png" 
+        alt="Innovine Logo" 
+        class="innovine-logo-img" 
+        onerror="this.style.display='none'; document.getElementById('logo-fallback').style.display='flex';"
+    />
+    
+    <div id="logo-fallback" class="logo-fallback-box">
+        <div class="logo-fallback-mark">✦</div>
+        <div class="logo-fallback-text">INNOVINE</div>
+    </div>
+
+    <div class="logo-timer-bar" id="logo-progress"></div>
+</div>
+
+<!-- SCREEN 2: Instruction Screen (No Logo) -->
+<div id="screen-instructions" class="view-panel">
+    <div class="instruction-title">Preposition Bubble Burst</div>
+    
+    <div class="instruction-box">
+        <div class="instruction-item">
+            <div class="inst-num">1</div>
+            <div>Read the incomplete preposition sentence in the top box.</div>
+        </div>
+        <div class="instruction-item">
+            <div class="inst-num">2</div>
+            <div>Find and <strong>pop/burst</strong> the floating bubble containing the correct preposition.</div>
+        </div>
+        <div class="instruction-item">
+            <div class="inst-num">3</div>
+            <div>You get <strong>2 attempts</strong> per level. Burst carefully!</div>
+        </div>
+    </div>
+
+    <button class="btn-main" onclick="startGame()">Start Game</button>
+</div>
+
+<!-- SCREEN 3: Game Play Area -->
+<div id="screen-game" class="view-panel">
+    <div class="header">
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <div class="grade-badge">G8 ENGLISH</div>
+            <div class="title">Prepositions: Time & Travel</div>
+        </div>
+        <div class="status-bar">
+            <div class="badge">Level: <span id="lbl-q">1</span>/8</div>
+            <div class="badge">Attempts Left: <span id="lbl-attempts">2</span></div>
+        </div>
+    </div>
+
+    <div class="question-card">
+        <div class="category-tag" id="lbl-category">Preposition Rule</div>
+        <div class="question-text" id="lbl-question">Loading sentence...</div>
+    </div>
+
+    <!-- Bubble Arena -->
+    <div class="bubble-arena" id="bubble-arena">
+        <!-- Bubbles injected dynamically -->
+    </div>
+
+    <div class="action-bar">
+        <div class="feedback-bar" id="lbl-feedback">Tap the floating bubble to burst it!</div>
+    </div>
+</div>
+
+<!-- SCREEN 4: Completion Screen -->
+<div id="screen-completion" class="view-panel">
+    <div class="trophy-glow">🫧✨</div>
+    <div class="congrats-title">Mastery Achieved!</div>
+    <p style="color: var(--text-muted); font-size: 1.1rem; max-width: 520px; font-weight: 600; line-height: 1.5;">
+        You burst all the correct prepositions across Travel (image_66a9bd.png) and Time (image_66a9f6.png) rules!
+    </p>
+    <button class="btn-main" onclick="location.reload()">Play Again</button>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+
+let currentQ = 0;
+let attemptsLeft = 2;
+let isProcessing = false;
+
+/* Question Bank direct from image_66a9bd.png & image_66a9f6.png */
+const questionBank = [
+    {
+        category: "Preposition of Travel (image_66a9bd.png)",
+        sentence: "We are travelling _____ Paris next week.",
+        correct: "to",
+        options: ["to", "from", "on", "in", "at"]
+    },
+    {
+        category: "Preposition of Travel (image_66a9bd.png)",
+        sentence: "The train departs _____ London at 9:00 AM.",
+        correct: "from",
+        options: ["from", "to", "through", "by", "on"]
+    },
+    {
+        category: "Preposition of Travel (image_66a9bd.png)",
+        sentence: "We travelled _____ a car across the country.",
+        correct: "in",
+        options: ["in", "on", "by", "at", "to"]
+    },
+    {
+        category: "Preposition of Travel (image_66a9bd.png)",
+        sentence: "We travelled _____ plane to reach our destination.",
+        correct: "by",
+        options: ["by", "in", "on", "through", "at"]
+    },
+    {
+        category: "Preposition of Travel (image_66a9bd.png)",
+        sentence: "We journeyed _____ the mountains to reach the valley.",
+        correct: "through",
+        options: ["through", "from", "to", "on", "at"]
+    },
+    {
+        category: "Preposition of Time (image_66a9f6.png)",
+        sentence: "The meeting is scheduled _____ 3 PM sharp.",
+        correct: "at",
+        options: ["at", "on", "in", "by", "to"]
+    },
+    {
+        category: "Preposition of Time (image_66a9f6.png)",
+        sentence: "She was born _____ January 1st.",
+        correct: "on",
+        options: ["on", "in", "at", "from", "through"]
+    },
+    {
+        category: "Preposition of Time (image_66a9f6.png)",
+        sentence: "We love going skiing _____ winter.",
+        correct: "in",
+        options: ["in", "on", "at", "to", "by"]
+    }
+];
+
+// Screen 1 Timer (5 Seconds)
+const LOGO_DURATION = 5000;
+let logoElapsed = 0;
+
+let logoInterval = setInterval(() => {
+    logoElapsed += 50;
+    let pct = Math.min((logoElapsed / LOGO_DURATION) * 100, 100);
+    $('logo-progress').style.width = pct + '%';
+
+    if (logoElapsed >= LOGO_DURATION) {
+        clearInterval(logoInterval);
+        $('screen-logo').style.opacity = 0;
+        setTimeout(() => {
+            $('screen-logo').style.display = 'none';
+            $('screen-instructions').style.display = 'flex';
+        }, 600);
+    }
+}, 50);
+
+function startGame() {
+    $('screen-instructions').style.display = 'none';
+    $('screen-game').style.display = 'flex';
+    loadLevel();
+}
+
+function loadLevel() {
+    if (currentQ >= questionBank.length) {
+        $('screen-game').style.display = 'none';
+        $('screen-completion').style.display = 'flex';
+        return;
+    }
+
+    attemptsLeft = 2;
+    isProcessing = false;
+    $('lbl-q').innerText = currentQ + 1;
+    $('lbl-attempts').innerText = attemptsLeft;
+    $('lbl-feedback').innerText = "Tap the floating bubble to burst it!";
+    $('lbl-feedback').style.color = "var(--text-muted)";
+
+    let data = questionBank[currentQ];
+    $('lbl-category').innerText = data.category;
+    $('lbl-question').innerText = data.sentence;
+
+    let arena = $('bubble-arena');
+    arena.innerHTML = '';
+
+    // Shuffle options
+    let shuffled = [...data.options].sort(() => Math.random() - 0.5);
+
+    shuffled.forEach(option => {
+        let bubble = document.createElement('div');
+        bubble.className = 'bubble';
+        bubble.innerText = option;
+        bubble.onclick = () => burstBubble(bubble, option);
+        arena.appendChild(bubble);
+    });
+}
+
+function burstBubble(bubbleElem, selectedVal) {
+    if (isProcessing) return;
+
+    let data = questionBank[currentQ];
+
+    // Add popping animation class
+    bubbleElem.classList.add('popping');
+
+    if (selectedVal === data.correct) {
+        isProcessing = true;
+        $('lbl-feedback').innerText = `💥 POP! Correct! "${data.sentence.replace('_____', selectedVal)}"`;
+        $('lbl-feedback').style.color = "var(--accent-green)";
+
+        setTimeout(() => {
+            currentQ++;
+            loadLevel();
+        }, 1500);
+    } else {
+        attemptsLeft--;
+        $('lbl-attempts').innerText = attemptsLeft;
+
+        if (attemptsLeft > 0) {
+            $('lbl-feedback').innerText = `❌ Burst the wrong bubble! 1 attempt left.`;
+            $('lbl-feedback').style.color = "var(--accent-amber)";
+            setTimeout(() => {
+                bubbleElem.style.display = 'none';
+            }, 300);
+        } else {
+            isProcessing = true;
+            $('lbl-feedback').innerText = `⚡ Out of attempts! Right answer: "${data.correct}"`;
+            $('lbl-feedback').style.color = "var(--accent-pink)";
+
+            // Highlight and burst correct bubble
+            let allBubbles = Array.from(document.querySelectorAll('.bubble'));
+            let correctBubble = allBubbles.find(b => b.innerText === data.correct);
+            if (correctBubble) {
+                correctBubble.style.background = '#00e676';
+            }
+
+            setTimeout(() => {
+                currentQ++;
+                loadLevel();
+            }, 2500);
+        }
+    }
+}
+</script>
+</body>
+</html>
