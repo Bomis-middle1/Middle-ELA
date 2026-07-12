@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>Innovine - Conjunctions Connect the Dots Challenge</title>
+<style>
+:root {
+    --card-bg: rgba(255, 255, 255, 0.95);
+    --primary-purple: #4a148c;
+    --accent-pink: #d81b60;
+    --accent-blue: #0288d1;
+    --accent-amber: #f57c00;
+    --accent-green: #2e7d32;
+    --text-main: #120b24;
+    --text-muted: #53457a;
+    --border-color: rgba(255, 255, 255, 0.7);
+    --shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+    user-select: none;
+}
+
+body {
+    background: linear-gradient(-45deg, #1a2a6c, #b21f1f, #fdbb2d, #120b24);
+    background-size: 300% 300%;
+    animation: gradientBG 14s ease infinite;
+    color: var(--text-main);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px;
+    overflow-x: hidden;
+}
+
+@keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.view-panel {
+    position: relative;
+    width: 100%;
+    max-width: 900px;
+    background: var(--card-bg);
+    backdrop-filter: blur(12px);
+    border-radius: 24px;
+    padding: clamp(16px, 4vw, 28px);
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    border: 2px solid var(--border-color);
+    animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.97); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+/* SCREEN 1: Innovine Logo Screen */
+#screen-logo {
+    position: fixed;
+    inset: 0;
+    background: #090314;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    transition: opacity 0.6s ease;
+    padding: 20px;
+}
+
+.innovine-logo-img {
+    max-width: 280px;
+    width: 70vw;
+    height: auto;
+    object-fit: contain;
+    animation: logoPop 1.2s ease-out;
+    filter: drop-shadow(0 0 25px rgba(255, 255, 255, 0.2));
+}
+
+@keyframes logoPop {
+    0% { transform: scale(0.85); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.logo-fallback-box {
+    display: none;
+    align-items: center;
+    gap: 14px;
+    animation: logoPop 1.2s ease-out;
+}
+
+.logo-fallback-mark {
+    width: 54px;
+    height: 54px;
+    background: linear-gradient(135deg, #00f2fe, #ff007f);
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    color: white;
+}
+
+.logo-fallback-text {
+    font-size: clamp(2.5rem, 7vw, 4rem);
+    font-weight: 900;
+    letter-spacing: 3px;
+    background: linear-gradient(45deg, #ffffff, #00f2fe, #ff007f);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.logo-timer-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 6px;
+    background: linear-gradient(90deg, #00f2fe, #ff007f);
+    width: 0%;
+    transition: width 0.05s linear;
+}
+
+/* SCREEN 2: Instruction Screen */
+#screen-instructions {
+    display: none;
+    text-align: center;
+    align-items: center;
+    gap: 20px;
+}
+
+.instruction-title {
+    font-size: clamp(1.8rem, 4vw, 2.5rem);
+    color: var(--primary-purple);
+    font-weight: 900;
+}
+
+.instruction-box {
+    background: rgba(255, 255, 255, 0.85);
+    border: 1px solid rgba(0,0,0,0.08);
+    border-radius: 18px;
+    padding: 22px;
+    text-align: left;
+    width: 100%;
+    max-width: 650px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.instruction-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-size: clamp(0.95rem, 2.2vw, 1.1rem);
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.inst-num {
+    background: var(--primary-purple);
+    color: white;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    flex-shrink: 0;
+}
+
+/* SCREEN 3: Game Area */
+#screen-game {
+    display: none;
+    flex-direction: column;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid rgba(0, 0, 0, 0.08);
+    padding-bottom: 12px;
+}
+
+.grade-badge {
+    background: linear-gradient(45deg, #00c6ff, #0072ff);
+    color: white;
+    padding: 4px 14px;
+    border-radius: 12px;
+    font-weight: 800;
+    font-size: 0.85rem;
+}
+
+.title {
+    font-size: clamp(1rem, 2.5vw, 1.3rem);
+    color: var(--primary-purple);
+    font-weight: 800;
+}
+
+.status-bar {
+    display: flex;
+    gap: 10px;
+    font-size: 0.85rem;
+    font-weight: 800;
+}
+
+.badge {
+    padding: 6px 14px;
+    border-radius: 20px;
+    background: #ffffff;
+    border: 1px solid #dcd0ea;
+    color: var(--primary-purple);
+}
+
+/* Connect Canvas Board Container */
+.board-container {
+    position: relative;
+    width: 100%;
+    min-height: 360px;
+    background: linear-gradient(135deg, #f3e5f5, #e1bee7);
+    border-radius: 20px;
+    border: 2px solid #ce93d8;
+    display: flex;
+    justify-content: space-between;
+    padding: 20px;
+    touch-action: none;
+}
+
+canvas#line-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 2;
+}
+
+.column {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    z-index: 3;
+    width: 42%;
+}
+
+.connect-node {
+    background: white;
+    border: 2px solid #8e24aa;
+    border-radius: 14px;
+    padding: 12px;
+    font-size: clamp(0.85rem, 2vw, 1rem);
+    font-weight: 700;
+    color: #4a148c;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    display: flex;
+    align-items: center;
+    position: relative;
+    cursor: pointer;
+    transition: transform 0.15s ease, background 0.2s ease;
+}
+
+.connect-node:hover {
+    transform: scale(1.02);
+}
+
+.node-dot {
+    width: 20px;
+    height: 20px;
+    background: #ab47bc;
+    border: 3px solid white;
+    border-radius: 50%;
+    box-shadow: 0 0 6px rgba(0, 0, 0, 0.3);
+    position: absolute;
+}
+
+.left-node .node-dot {
+    right: -10px;
+}
+
+.right-node .node-dot {
+    left: -10px;
+}
+
+.left-node {
+    padding-right: 20px;
+}
+
+.right-node {
+    padding-left: 20px;
+    justify-content: center;
+    text-align: center;
+    font-size: 1.2rem;
+    font-weight: 900;
+}
+
+.action-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
+
+.feedback-bar {
+    flex: 1;
+    background: white;
+    border-radius: 12px;
+    padding: 12px;
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: var(--text-muted);
+    text-align: center;
+}
+
+.btn-main {
+    background: linear-gradient(45deg, #ff007f, #0072ff);
+    color: white;
+    border: 0;
+    padding: 12px 28px;
+    border-radius: 25px;
+    font-weight: 900;
+    font-size: 0.95rem;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0, 114, 255, 0.35);
+    transition: transform 0.15s ease;
+}
+
+.btn-main:hover {
+    transform: scale(1.04);
+}
+
+/* SCREEN 4: Completion Screen */
+#screen-completion {
+    display: none;
+    text-align: center;
+    align-items: center;
+    gap: 20px;
+    padding: 20px 10px;
+}
+
+.trophy-glow {
+    font-size: 5rem;
+    animation: bounce 2s infinite ease-in-out;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-15px); }
+}
+
+.congrats-title {
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 900;
+    background: linear-gradient(45deg, #00c6ff, #ff007f);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+</style>
+</head>
+<body>
+
+<!-- AUDIO ASSETS -->
+<audio id="snd-correct" src="assets/correct.mp3" preload="auto"></audio>
+<audio id="snd-wrong" src="assets/wrong.mp3" preload="auto"></audio>
+
+<!-- SCREEN 1: Logo Screen (Strictly 5 Seconds) -->
+<div id="screen-logo">
+    <img 
+        src="assets/logo.png" 
+        alt="Innovine Logo" 
+        class="innovine-logo-img" 
+        onerror="this.style.display='none'; document.getElementById('logo-fallback').style.display='flex';"
+    />
+    
+    <div id="logo-fallback" class="logo-fallback-box">
+        <div class="logo-fallback-mark">✦</div>
+        <div class="logo-fallback-text">INNOVINE</div>
+    </div>
+
+    <div class="logo-timer-bar" id="logo-progress"></div>
+</div>
+
+<!-- SCREEN 2: Instruction Screen -->
+<div id="screen-instructions" class="view-panel">
+    <div class="instruction-title">Conjunctions Connect the Dots</div>
+    
+    <div class="instruction-box">
+        <div class="instruction-item">
+            <div class="inst-num">1</div>
+            <div>Read the sentence missing a coordinating conjunction on the left.</div>
+        </div>
+        <div class="instruction-item">
+            <div class="inst-num">2</div>
+            <div>Click & drag a line from the sentence dot to the correct <strong>FANBOYS</strong> conjunction dot on the right.</div>
+        </div>
+        <div class="instruction-item">
+            <div class="inst-num">3</div>
+            <div>You have <strong>2 attempts</strong> per round to make the right connection!</div>
+        </div>
+    </div>
+
+    <button class="btn-main" onclick="startGame()">Start Game</button>
+</div>
+
+<!-- SCREEN 3: Game Play Area -->
+<div id="screen-game" class="view-panel">
+    <div class="header">
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <div class="grade-badge">ENGLISH GRAMMAR</div>
+            <div class="title">Coordinating Conjunctions (FANBOYS)</div>
+        </div>
+        <div class="status-bar">
+            <div class="badge">Round: <span id="lbl-round">1</span>/2</div>
+            <div class="badge">Attempts Left: <span id="lbl-attempts">2</span></div>
+        </div>
+    </div>
+
+    <div class="board-container" id="board-container">
+        <canvas id="line-canvas"></canvas>
+
+        <div class="column" id="left-column">
+            <!-- Dynamic Sentences -->
+        </div>
+
+        <div class="column" id="right-column">
+            <!-- Dynamic Conjunctions -->
+        </div>
+    </div>
+
+    <div class="action-bar">
+        <div class="feedback-bar" id="lbl-feedback">Click and drag a line from a sentence to its matching conjunction dot.</div>
+    </div>
+</div>
+
+<!-- SCREEN 4: Completion Screen -->
+<div id="screen-completion" class="view-panel">
+    <div class="trophy-glow">🎉🔗</div>
+    <div class="congrats-title">FANBOYS Master!</div>
+    <p style="color: var(--text-muted); font-size: 1.1rem; max-width: 520px; font-weight: 600; line-height: 1.5;">
+        You successfully connected all coordinating conjunctions based on image_66b863.png!
+    </p>
+    <button class="btn-main" onclick="location.reload()">Play Again</button>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+
+let currentRound = 0;
+let attemptsLeft = 2;
+let activeDrag = false;
+let startNode = null;
+let currentMousePos = { x: 0, y: 0 };
+let activeConnections = []; // stores finalized { leftId, rightId, color }
+
+/* Question Sets direct from image_66b863.png */
+const roundsData = [
+    {
+        pairs: [
+            { id: 1, text: "I go to the park _____ I love to watch ducks.", ans: "For" },
+            { id: 2, text: "I watch ducks _____ the men playing soccer.", ans: "And" },
+            { id: 3, text: "I don't go for fresh air _____ for ducks.", ans: "Nor" },
+            { id: 4, text: "Soccer is fun _____ better in summer.", ans: "But" }
+        ],
+        conjunctions: ["For", "And", "Nor", "But"]
+    },
+    {
+        pairs: [
+            { id: 5, text: "I will go to London _____ France next month.", ans: "Or" },
+            { id: 6, text: "He was tired, _____ he kept running.", ans: "Yet" },
+            { id: 7, text: "It was raining, _____ we took an umbrella.", ans: "So" },
+            { id: 8, text: "She loves tea _____ she drinks coffee daily.", ans: "But" }
+        ],
+        conjunctions: ["Or", "Yet", "So", "But"]
+    }
+];
+
+// Screen 1 Timer (5 Seconds)
+const LOGO_DURATION = 5000;
+let logoElapsed = 0;
+
+let logoInterval = setInterval(() => {
+    logoElapsed += 50;
+    let pct = Math.min((logoElapsed / LOGO_DURATION) * 100, 100);
+    $('logo-progress').style.width = pct + '%';
+
+    if (logoElapsed >= LOGO_DURATION) {
+        clearInterval(logoInterval);
+        $('screen-logo').style.opacity = 0;
+        setTimeout(() => {
+            $('screen-logo').style.display = 'none';
+            $('screen-instructions').style.display = 'flex';
+        }, 600);
+    }
+}, 50);
+
+function playCorrectSound() {
+    const snd = $('snd-correct');
+    if (snd) {
+        snd.currentTime = 0;
+        snd.play().catch(e => {});
+    }
+}
+
+function playWrongSound() {
+    const snd = $('snd-wrong');
+    if (snd) {
+        snd.currentTime = 0;
+        snd.play().catch(e => {});
+    }
+}
+
+function startGame() {
+    $('screen-instructions').style.display = 'none';
+    $('screen-game').style.display = 'flex';
+    initCanvas();
+    loadRound();
+}
+
+function initCanvas() {
+    const canvas = $('line-canvas');
+    const container = $('board-container');
+    canvas.width = container.clientWidth;
+    canvas.height = container.clientHeight;
+
+    window.addEventListener('resize', () => {
+        canvas.width = container.clientWidth;
+        canvas.height = container.clientHeight;
+        drawLines();
+    });
+
+    // Touch & Mouse Drag Listeners
+    container.addEventListener('pointerdown', handlePointerDown);
+    container.addEventListener('pointermove', handlePointerMove);
+    container.addEventListener('pointerup', handlePointerUp);
+}
+
+function loadRound() {
+    if (currentRound >= roundsData.length) {
+        $('screen-game').style.display = 'none';
+        $('screen-completion').style.display = 'flex';
+        return;
+    }
+
+    attemptsLeft = 2;
+    activeConnections = [];
+    $('lbl-round').innerText = currentRound + 1;
+    $('lbl-attempts').innerText = attemptsLeft;
+    $('lbl-feedback').innerText = "Drag from a sentence dot to a matching conjunction dot!";
+    $('lbl-feedback').style.color = "var(--text-muted)";
+
+    let data = roundsData[currentRound];
+
+    // Build Left Column
+    let leftCol = $('left-column');
+    leftCol.innerHTML = '';
+    data.pairs.forEach(p => {
+        let node = document.createElement('div');
+        node.className = 'connect-node left-node';
+        node.dataset.id = p.id;
+        node.dataset.ans = p.ans;
+        node.innerHTML = `<span>${p.text}</span><div class="node-dot"></div>`;
+        leftCol.appendChild(node);
+    });
+
+    // Build Right Column (Shuffled)
+    let rightCol = $('right-column');
+    rightCol.innerHTML = '';
+    let shuffledConj = [...data.conjunctions].sort(() => Math.random() - 0.5);
+    shuffledConj.forEach(c => {
+        let node = document.createElement('div');
+        node.className = 'connect-node right-node';
+        node.dataset.val = c;
+        node.innerHTML = `<div class="node-dot"></div><span>${c}</span>`;
+        rightCol.appendChild(node);
+    });
+
+    drawLines();
+}
+
+function getDotCenter(nodeElem) {
+    const dot = nodeElem.querySelector('.node-dot');
+    const rect = dot.getBoundingClientRect();
+    const containerRect = $('board-container').getBoundingClientRect();
+    return {
+        x: rect.left + rect.width / 2 - containerRect.left,
+        y: rect.top + rect.height / 2 - containerRect.top
+    };
+}
+
+function handlePointerDown(e) {
+    const node = e.target.closest('.left-node');
+    if (!node || node.dataset.solved === 'true') return;
+
+    activeDrag = true;
+    startNode = node;
+    updateMousePos(e);
+}
+
+function handlePointerMove(e) {
+    if (!activeDrag) return;
+    updateMousePos(e);
+    drawLines();
+}
+
+function handlePointerUp(e) {
+    if (!activeDrag) return;
+    activeDrag = false;
+
+    const targetRight = document.elementFromPoint(e.clientX, e.clientY)?.closest('.right-node');
+
+    if (targetRight && startNode) {
+        verifyConnection(startNode, targetRight);
+    } else {
+        drawLines();
+    }
+    startNode = null;
+}
+
+function updateMousePos(e) {
+    const containerRect = $('board-container').getBoundingClientRect();
+    currentMousePos = {
+        x: e.clientX - containerRect.left,
+        y: e.clientY - containerRect.top
+    };
+}
+
+function verifyConnection(leftElem, rightElem) {
+    const correctAns = leftElem.dataset.ans;
+    const selectedVal = rightElem.dataset.val;
+
+    if (correctAns === selectedVal) {
+        playCorrectSound();
+        leftElem.dataset.solved = "true";
+        leftElem.style.background = "#e8f5e9";
+        leftElem.style.borderColor = "#2e7d32";
+
+        activeConnections.push({
+            start: getDotCenter(leftElem),
+            end: getDotCenter(rightElem),
+            color: "#2e7d32"
+        });
+
+        $('lbl-feedback').innerText = `✨ Correct match: "${correctAns}"!`;
+        $('lbl-feedback').style.color = "var(--accent-green)";
+        drawLines();
+
+        checkRoundCompletion();
+    } else {
+        attemptsLeft--;
+        $('lbl-attempts').innerText = attemptsLeft;
+        playWrongSound();
+
+        if (attemptsLeft > 0) {
+            $('lbl-feedback').innerText = `❌ Incorrect conjunction! 1 attempt remaining.`;
+            $('lbl-feedback').style.color = "var(--accent-amber)";
+            drawLines();
+        } else {
+            // Out of attempts: auto connect correct
+            $('lbl-feedback').innerText = `⚡ Out of attempts! Automatically linking correct pair.`;
+            $('lbl-feedback').style.color = "var(--accent-pink)";
+
+            const rightNodes = Array.from(document.querySelectorAll('.right-node'));
+            const actualRight = rightNodes.find(r => r.dataset.val === correctAns);
+
+            leftElem.dataset.solved = "true";
+            leftElem.style.background = "#fff3e0";
+            leftElem.style.borderColor = "#f57c00";
+
+            if (actualRight) {
+                activeConnections.push({
+                    start: getDotCenter(leftElem),
+                    end: getDotCenter(actualRight),
+                    color: "#f57c00"
+                });
+            }
+
+            drawLines();
+            setTimeout(() => {
+                attemptsLeft = 2;
+                $('lbl-attempts').innerText = attemptsLeft;
+                checkRoundCompletion();
+            }, 1800);
+        }
+    }
+}
+
+function checkRoundCompletion() {
+    const totalLeft = document.querySelectorAll('.left-node').length;
+    const solvedLeft = document.querySelectorAll('.left-node[data-solved="true"]').length;
+
+    if (totalLeft === solvedLeft) {
+        setTimeout(() => {
+            currentRound++;
+            loadRound();
+        }, 1500);
+    }
+}
+
+function drawLines() {
+    const canvas = $('line-canvas');
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Draw finalized correct connections
+    activeConnections.forEach(conn => {
+        ctx.beginPath();
+        ctx.moveTo(conn.start.x, conn.start.y);
+        ctx.lineTo(conn.end.x, conn.end.y);
+        ctx.strokeStyle = conn.color;
+        ctx.lineWidth = 5;
+        ctx.lineCap = 'round';
+        ctx.stroke();
+    });
+
+    // Draw active drag line
+    if (activeDrag && startNode) {
+        const startPos = getDotCenter(startNode);
+        ctx.beginPath();
+        ctx.moveTo(startPos.x, startPos.y);
+        ctx.lineTo(currentMousePos.x, currentMousePos.y);
+        ctx.strokeStyle = '#ab47bc';
+        ctx.lineWidth = 4;
+        ctx.setLineDash([8, 6]);
+        ctx.lineCap = 'round';
+        ctx.stroke();
+        ctx.setLineDash([]);
+    }
+}
+</script>
+</body>
+</html>
