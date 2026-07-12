@@ -64,20 +64,41 @@ body {
     100% { transform: translateY(-30px) scale(1.1); }
 }
 
-/* Splash Screen */
+/* Mandatory 5-Second Splash / Logo Screen */
 #splash {
     position: fixed;
     inset: 0;
-    background: linear-gradient(135deg, #2a0845, #6441a5);
+    background: linear-gradient(135deg, #1a022d, #4a154b, #2a0845);
     color: white;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     z-index: 9999;
-    transition: opacity 0.5s ease;
+    transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1);
     text-align: center;
     padding: 20px;
+}
+
+.logo-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 25px;
+    animation: logoPulse 2.5s infinite ease-in-out;
+}
+
+@keyframes logoPulse {
+    0%, 100% { transform: scale(1); filter: drop-shadow(0 0 15px rgba(233, 30, 99, 0.4)); }
+    50% { transform: scale(1.05); filter: drop-shadow(0 0 30px rgba(0, 242, 254, 0.7)); }
+}
+
+.brand-icon {
+    font-size: 4.5rem;
+    background: linear-gradient(45deg, #ff007f, #00f2fe);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
 .splash-badge {
@@ -85,40 +106,61 @@ body {
     color: white;
     font-size: 1.1rem;
     font-weight: 800;
-    padding: 8px 22px;
+    padding: 8px 24px;
     border-radius: 20px;
-    margin-bottom: 15px;
-    letter-spacing: 2px;
+    letter-spacing: 2.5px;
     box-shadow: 0 4px 15px rgba(255, 0, 127, 0.4);
 }
 
 #splash-title {
-    font-size: clamp(2.2rem, 5vw, 3.2rem);
+    font-size: clamp(2.4rem, 5vw, 3.5rem);
     font-weight: 900;
-    margin-bottom: 10px;
-    text-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    margin-top: 10px;
+    margin-bottom: 8px;
+    background: linear-gradient(45deg, #ffffff, #e0d0f5);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 4px 20px rgba(0,0,0,0.4);
 }
 
 .splash-sub {
-    color: #e0d0f5;
+    color: #bfa1e6;
     font-size: 1.1rem;
-    margin-bottom: 30px;
+    margin-bottom: 35px;
     max-width: 600px;
+    font-weight: 600;
+}
+
+.loader-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
 }
 
 .loader {
-    width: 250px;
+    width: 280px;
     height: 10px;
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.15);
     border-radius: 50px;
     overflow: hidden;
+    box-shadow: inset 0 2px 5px rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.2);
 }
 
 .loader div {
     height: 100%;
-    width: 0;
-    background: linear-gradient(90deg, #00f2fe, #4facfe);
-    transition: width 0.1s ease;
+    width: 0%;
+    background: linear-gradient(90deg, #ff007f, #00f2fe);
+    border-radius: 50px;
+}
+
+.timer-text {
+    font-size: 0.85rem;
+    color: #a892c9;
+    letter-spacing: 1px;
+    font-weight: 700;
+    text-transform: uppercase;
 }
 
 /* Game Card Box */
@@ -421,12 +463,18 @@ body {
 <div class="orb orb-1"></div>
 <div class="orb orb-2"></div>
 
-<!-- Splash Loader -->
+<!-- 5-Second Splash / Logo Screen -->
 <div id="splash">
-    <div class="splash-badge">GRADE 8 ENGLISH</div>
-    <div id="splash-title">Perfect Tenses Masterclass</div>
+    <div class="logo-container">
+        <div class="brand-icon">🎓💎</div>
+        <div class="splash-badge">GRADE 8 ENGLISH</div>
+    </div>
+    <div id="splash-title">Perfect Tenses Lab</div>
     <div class="splash-sub">Inspired by image_c2c8a2.png — Advanced Before & After Syntactic Analysis</div>
-    <div class="loader"><div id="loadFill"></div></div>
+    <div class="loader-container">
+        <div class="loader"><div id="loadFill"></div></div>
+        <div class="timer-text" id="timer-text">Initializing Game (5s)...</div>
+    </div>
 </div>
 
 <!-- Main Game Container -->
@@ -487,7 +535,7 @@ body {
     </div>
 
     <div id="end-screen">
-        <div style="font-size: 4.5rem;">🎓</div>
+        <div style="font-size: 4.5rem;">🏆</div>
         <h2>G8 Grammar Mastered!</h2>
         <p style="color: var(--text-muted); font-size: 1.1rem; max-width: 550px; line-height: 1.6;">
             Outstanding performance! You have mastered Grade 8 level Present Perfect, Past Perfect, and Future Perfect tense constructions across complex before-and-after scenarios.
@@ -520,7 +568,7 @@ function playAudioTone(freq, type) {
     } catch(e) {}
 }
 
-/* Grade 8 Database featuring higher-level vocabulary & complex structures based on image_c2c8a2.png */
+/* Database featuring higher-level G8 vocabulary & complex structures based on image_c2c8a2.png */
 const database = [
     {
         tenseType: "Present Perfect (Completed Action with Present Relevance)",
@@ -604,21 +652,33 @@ const database = [
     }
 ];
 
-// Loader simulation
-let loadVal = 0;
+// Explicit 5-Second Splash Screen timer logic
+const SPLASH_DURATION_MS = 5000;
+let elapsedMs = 0;
+const intervalMs = 50;
+
 let loadTimer = setInterval(() => {
-    loadVal += 5;
-    $('loadFill').style.width = loadVal + '%';
-    if(loadVal >= 100){
+    elapsedMs += intervalMs;
+    let pct = Math.min((elapsedMs / SPLASH_DURATION_MS) * 100, 100);
+    $('loadFill').style.width = pct + '%';
+    
+    let remainingSec = Math.ceil((SPLASH_DURATION_MS - elapsedMs) / 1000);
+    if(remainingSec > 0) {
+        $('timer-text').innerText = `Initializing Game (${remainingSec}s)...`;
+    } else {
+        $('timer-text').innerText = `Launching Experience...`;
+    }
+
+    if(elapsedMs >= SPLASH_DURATION_MS){
         clearInterval(loadTimer);
         $('splash').style.opacity = 0;
         setTimeout(() => {
             $('splash').remove();
             $('game-container').style.opacity = 1;
             loadQuestion();
-        }, 500);
+        }, 800);
     }
-}, 30);
+}, intervalMs);
 
 function loadQuestion() {
     if(currentQ >= database.length) {
