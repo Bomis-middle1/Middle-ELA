@@ -132,7 +132,7 @@ body {
     transition: width 0.05s linear;
 }
 
-/* SCREEN 2: Instruction / Briefing Screen */
+/* SCREEN 2: Instruction Screen */
 #screen-instructions {
     display: none;
     text-align: center;
@@ -255,11 +255,11 @@ body {
     border: 1px dashed rgba(255, 255, 255, 0.2);
 }
 
-/* Falling Word Target Zone */
+/* Floating Target Arena */
 .catch-area {
     position: relative;
     width: 100%;
-    height: 240px;
+    height: 250px;
     background: #eef7ff;
     border: 2px dashed #0373cf;
     border-radius: 18px;
@@ -382,11 +382,11 @@ body {
         </div>
         <div class="instruction-item">
             <div class="inst-num">2</div>
-            <div>Click or tap the correct floating modal verb to complete the sentence.</div>
+            <div>Click or tap the correct floating modal word.</div>
         </div>
         <div class="instruction-item">
             <div class="inst-num">3</div>
-            <div>You have <strong>2 attempts</strong> per sentence. Complete all rounds to win!</div>
+            <div>Questions are <strong>randomized</strong> each game! You have 2 attempts per question across 10 rounds.</div>
         </div>
     </div>
 
@@ -401,7 +401,7 @@ body {
             <div class="title">Catch the Correct Word</div>
         </div>
         <div class="status-bar">
-            <div class="badge">Round: <span id="lbl-q">1</span>/5</div>
+            <div class="badge">Round: <span id="lbl-q">1</span>/10</div>
             <div class="badge">Attempts: <span id="lbl-attempts">2</span></div>
         </div>
     </div>
@@ -427,14 +427,15 @@ body {
     <div class="trophy-glow">🎓🏆</div>
     <div class="congrats-title">Mastery Achieved!</div>
     <p style="color: var(--text-muted); font-size: 1.1rem; max-width: 540px; font-weight: 600; line-height: 1.5;">
-        You successfully caught all correct modal verbs across Requests, Suggestions, Obligations, Possibilities, and Certainties according to image_6799b8.png!
+        You completed all 10 randomized rounds across Requests, Suggestions, Obligations, Possibilities, and Certainties according to image_6799b8.png!
     </p>
-    <button class="btn-main" onclick="location.reload()">Play Again</button>
+    <button class="btn-main" onclick="startGame()">Play Again (Reshuffle)</button>
 </div>
 
 <script>
 const $ = id => document.getElementById(id);
 
+let activeQuestions = [];
 let currentRound = 0;
 let attemptsLeft = 2;
 let isProcessing = false;
@@ -456,8 +457,8 @@ function playWrongSound() {
     }
 }
 
-/* Dataset sourced directly from image_6799b8.png */
-const gameTasks = [
+/* 10 Total Questions directly referencing image_6799b8.png */
+const questionBank = [
     {
         category: "Requests",
         sentence: "[ ____ ] you pass the salt, please?",
@@ -466,10 +467,31 @@ const gameTasks = [
         rule: "Used to ask for something politely (can, could, will, would)."
     },
     {
+        category: "Requests",
+        sentence: "[ ____ ] you please lend me your pen?",
+        correct: "Could",
+        options: ["Could", "Must", "Might", "Ought to"],
+        rule: "Used to ask for something politely (can, could, will, would)."
+    },
+    {
+        category: "Requests",
+        sentence: "[ ____ ] you mind opening the window?",
+        correct: "Would",
+        options: ["Would", "May", "Should", "Must"],
+        rule: "Used to ask for something politely (can, could, will, would)."
+    },
+    {
         category: "Suggestions",
         sentence: "You [ ____ ] eat more vegetables.",
         correct: "should",
-        options: ["should", "must", "may", "would"],
+        options: ["should", "must", "may", "will"],
+        rule: "Offers advice or recommendations (should, ought to)."
+    },
+    {
+        category: "Suggestions",
+        sentence: "You [ ____ ] to visit the museum; it's fascinating.",
+        correct: "ought",
+        options: ["ought", "must", "might", "can"],
         rule: "Offers advice or recommendations (should, ought to)."
     },
     {
@@ -480,10 +502,24 @@ const gameTasks = [
         rule: "Indicates duties or necessary actions (must, have to, should)."
     },
     {
+        category: "Obligation or Necessity",
+        sentence: "I [ ____ ] to attend the meeting.",
+        correct: "have",
+        options: ["have", "might", "could", "would"],
+        rule: "Indicates duties or necessary actions (must, have to, should)."
+    },
+    {
         category: "Possibility",
         sentence: "It [ ____ ] rain later.",
         correct: "might",
         options: ["might", "will", "must", "should"],
+        rule: "Expresses uncertainty or likelihood (might, may, could)."
+    },
+    {
+        category: "Possibility",
+        sentence: "She [ ____ ] come to the party.",
+        correct: "may",
+        options: ["may", "must", "will", "should"],
         rule: "Expresses uncertainty or likelihood (might, may, could)."
     },
     {
@@ -494,6 +530,16 @@ const gameTasks = [
         rule: "Expresses confidence about a future event (will, would, must)."
     }
 ];
+
+// Array Randomizer (Fisher-Yates Shuffle)
+function shuffleArray(arr) {
+    let array = [...arr];
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+}
 
 // Screen 1 Timer (Strict 5 Seconds)
 const LOGO_DURATION = 5000;
@@ -515,13 +561,16 @@ let logoInterval = setInterval(() => {
 }, 50);
 
 function startGame() {
+    activeQuestions = shuffleArray(questionBank);
+    currentRound = 0;
     $('screen-instructions').style.display = 'none';
+    $('screen-completion').style.display = 'none';
     $('screen-game').style.display = 'flex';
     loadRound();
 }
 
 function loadRound() {
-    if (currentRound >= gameTasks.length) {
+    if (currentRound >= activeQuestions.length) {
         clearInterval(floatInterval);
         $('screen-game').style.display = 'none';
         $('screen-completion').style.display = 'flex';
@@ -535,7 +584,7 @@ function loadRound() {
     $('lbl-feedback').innerText = "Catch the correct floating modal word!";
     $('lbl-feedback').style.color = "var(--text-muted)";
 
-    let task = gameTasks[currentRound];
+    let task = activeQuestions[currentRound];
     $('lbl-category').innerText = `Category: ${task.category}`;
     $('lbl-sentence').innerText = `"${task.sentence}"`;
 
@@ -547,8 +596,10 @@ function spawnFloatingWords(task) {
     arena.innerHTML = '';
     clearInterval(floatInterval);
 
+    let randomizedOptions = shuffleArray(task.options);
     let tiles = [];
-    task.options.forEach((word) => {
+
+    randomizedOptions.forEach((word) => {
         let tile = document.createElement('div');
         tile.className = 'word-tile';
         tile.innerText = word;
@@ -556,8 +607,8 @@ function spawnFloatingWords(task) {
         // Random placement inside arena
         let x = Math.random() * (arena.clientWidth - 110);
         let y = Math.random() * (arena.clientHeight - 50);
-        let dx = (Math.random() - 0.5) * 3;
-        let dy = (Math.random() - 0.5) * 3;
+        let dx = (Math.random() - 0.5) * 3.2;
+        let dy = (Math.random() - 0.5) * 3.2;
 
         tile.style.left = `${x}px`;
         tile.style.top = `${y}px`;
@@ -586,7 +637,7 @@ function spawnFloatingWords(task) {
 function catchWord(selectedWord) {
     if (isProcessing) return;
 
-    let task = gameTasks[currentRound];
+    let task = activeQuestions[currentRound];
 
     if (selectedWord.toLowerCase() === task.correct.toLowerCase()) {
         isProcessing = true;
@@ -598,7 +649,7 @@ function catchWord(selectedWord) {
         setTimeout(() => {
             currentRound++;
             loadRound();
-        }, 2200);
+        }, 2000);
     } else {
         attemptsLeft--;
         $('lbl-attempts').innerText = attemptsLeft;
@@ -615,7 +666,7 @@ function catchWord(selectedWord) {
             setTimeout(() => {
                 currentRound++;
                 loadRound();
-            }, 3000);
+            }, 2800);
         }
     }
 }
