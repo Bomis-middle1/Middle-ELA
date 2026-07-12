@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>Innovine - Phrase Bridge Builder</title>
+<style>
+:root {
+    --card-bg: rgba(255, 255, 255, 0.95);
+    --primary-blue: #025091;
+    --secondary-blue: #0373cf;
+    --accent-gold: #ffb300;
+    --accent-pink: #d81b60;
+    --accent-green: #2e7d32;
+    --text-main: #120b24;
+    --text-muted: #53457a;
+    --border-color: rgba(255, 255, 255, 0.7);
+    --shadow: 0 15px 35px rgba(0, 0, 0, 0.35);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+    user-select: none;
+}
+
+body {
+    background: linear-gradient(-45deg, #0f2027, #203a43, #2c5364, #1a0826);
+    background-size: 300% 300%;
+    animation: gradientBG 14s ease infinite;
+    color: var(--text-main);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px;
+    overflow-x: hidden;
+}
+
+@keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.view-panel {
+    position: relative;
+    width: 100%;
+    max-width: 900px;
+    background: var(--card-bg);
+    backdrop-filter: blur(12px);
+    border-radius: 24px;
+    padding: clamp(16px, 4vw, 28px);
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    border: 2px solid var(--border-color);
+    animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.97); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+/* SCREEN 1: Innovine Logo Screen */
+#screen-logo {
+    position: fixed;
+    inset: 0;
+    background: #090314;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    transition: opacity 0.6s ease;
+    padding: 20px;
+}
+
+.innovine-logo-img {
+    max-width: 280px;
+    width: 70vw;
+    height: auto;
+    object-fit: contain;
+    animation: logoPop 1.2s ease-out;
+    filter: drop-shadow(0 0 25px rgba(255, 255, 255, 0.2));
+}
+
+@keyframes logoPop {
+    0% { transform: scale(0.85); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.logo-fallback-box {
+    display: none;
+    align-items: center;
+    gap: 14px;
+    animation: logoPop 1.2s ease-out;
+}
+
+.logo-fallback-mark {
+    width: 54px;
+    height: 54px;
+    background: linear-gradient(135deg, #ffb300, #ff007f);
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    color: white;
+}
+
+.logo-fallback-text {
+    font-size: clamp(2.5rem, 7vw, 4rem);
+    font-weight: 900;
+    letter-spacing: 3px;
+    background: linear-gradient(45deg, #ffffff, #ffb300, #ff007f);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.logo-timer-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 6px;
+    background: linear-gradient(90deg, #ffb300, #ff007f);
+    width: 0%;
+    transition: width 0.05s linear;
+}
+
+/* SCREEN 2: Instruction Screen */
+#screen-instructions {
+    display: none;
+    text-align: center;
+    align-items: center;
+    gap: 20px;
+}
+
+.instruction-title {
+    font-size: clamp(1.8rem, 4vw, 2.5rem);
+    color: var(--primary-blue);
+    font-weight: 900;
+}
+
+.instruction-box {
+    background: rgba(255, 255, 255, 0.85);
+    border: 1px solid rgba(0,0,0,0.08);
+    border-radius: 18px;
+    padding: 22px;
+    text-align: left;
+    width: 100%;
+    max-width: 650px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.instruction-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-size: clamp(0.95rem, 2.2vw, 1.1rem);
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.inst-num {
+    background: var(--primary-blue);
+    color: white;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    flex-shrink: 0;
+}
+
+/* SCREEN 3: Game Play Area */
+#screen-game {
+    display: none;
+    flex-direction: column;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid rgba(0, 0, 0, 0.08);
+    padding-bottom: 12px;
+}
+
+.grade-badge {
+    background: linear-gradient(45deg, #025091, #0373cf);
+    color: white;
+    padding: 4px 14px;
+    border-radius: 12px;
+    font-weight: 800;
+    font-size: 0.85rem;
+}
+
+.title {
+    font-size: clamp(1rem, 2.5vw, 1.3rem);
+    color: var(--primary-blue);
+    font-weight: 800;
+}
+
+.status-bar {
+    display: flex;
+    gap: 10px;
+    font-size: 0.85rem;
+    font-weight: 800;
+}
+
+.badge {
+    padding: 6px 14px;
+    border-radius: 20px;
+    background: #ffffff;
+    border: 1px solid #cce3f5;
+    color: var(--primary-blue);
+}
+
+/* Bridge Arena */
+.bridge-arena {
+    position: relative;
+    width: 100%;
+    height: 200px;
+    background: linear-gradient(180deg, #87ceeb 0%, #e0f6ff 60%, #1e5799 60%, #002d62 100%);
+    border-radius: 18px;
+    overflow: hidden;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding: 0 20px 20px;
+    border: 2px solid #0373cf;
+}
+
+.cliff {
+    width: 110px;
+    height: 90px;
+    background: #6e5239;
+    border-top: 8px solid #4d8c22;
+    border-radius: 6px;
+    position: relative;
+    z-index: 2;
+}
+
+.bridge-gap {
+    position: absolute;
+    left: 125px;
+    right: 125px;
+    bottom: 60px;
+    height: 18px;
+    border-bottom: 4px dashed rgba(255, 255, 255, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.5s ease;
+}
+
+.bridge-plank {
+    width: 0%;
+    height: 100%;
+    background: linear-gradient(90deg, #8a5a36, #a66e43);
+    border-radius: 6px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+    transition: width 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.character {
+    position: absolute;
+    left: 45px;
+    bottom: 110px;
+    font-size: 2.2rem;
+    transition: left 0.8s ease-in-out;
+    z-index: 3;
+}
+
+.task-card {
+    background: #112233;
+    color: white;
+    padding: 18px;
+    border-radius: 18px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    border-left: 6px solid var(--accent-gold);
+    text-align: center;
+}
+
+.category-label {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    color: var(--accent-gold);
+    letter-spacing: 1.5px;
+    font-weight: 800;
+    margin-bottom: 6px;
+}
+
+.sentence-text {
+    font-size: clamp(1.1rem, 2.3vw, 1.35rem);
+    font-weight: 600;
+    line-height: 1.5;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px dashed rgba(255, 255, 255, 0.2);
+}
+
+/* Choices Grid */
+.choices-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+}
+
+.btn-choice {
+    background: white;
+    border: 2px solid var(--primary-blue);
+    color: var(--primary-blue);
+    border-radius: 14px;
+    padding: 14px;
+    font-size: 1rem;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transition: all 0.2s ease;
+}
+
+.btn-choice:hover {
+    background: var(--primary-blue);
+    color: white;
+    transform: translateY(-2px);
+}
+
+.action-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
+
+.feedback-bar {
+    flex: 1;
+    background: white;
+    border-radius: 12px;
+    padding: 12px;
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: var(--text-muted);
+    text-align: center;
+}
+
+.btn-main {
+    background: linear-gradient(45deg, #025091, #0072ff);
+    color: white;
+    border: 0;
+    padding: 12px 28px;
+    border-radius: 25px;
+    font-weight: 900;
+    font-size: 0.95rem;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0, 114, 255, 0.35);
+    transition: transform 0.15s ease;
+}
+
+.btn-main:hover {
+    transform: scale(1.04);
+}
+
+/* SCREEN 4: Completion Screen */
+#screen-completion {
+    display: none;
+    text-align: center;
+    align-items: center;
+    gap: 20px;
+    padding: 20px 10px;
+}
+
+.trophy-glow {
+    font-size: 5rem;
+    animation: bounce 2s infinite ease-in-out;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-15px); }
+}
+
+.congrats-title {
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 900;
+    background: linear-gradient(45deg, #025091, #ff007f);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+</style>
+</head>
+<body>
+
+<!-- AUDIO ASSETS -->
+<audio id="snd-correct" src="assets/correct.mp3" preload="auto"></audio>
+<audio id="snd-wrong" src="assets/wrong.mp3" preload="auto"></audio>
+
+<!-- SCREEN 1: Innovine Logo Screen (Strict 5 Seconds) -->
+<div id="screen-logo">
+    <img 
+        src="assets/logo.png" 
+        alt="Innovine Logo" 
+        class="innovine-logo-img" 
+        onerror="this.style.display='none'; document.getElementById('logo-fallback').style.display='flex';"
+    />
+    
+    <div id="logo-fallback" class="logo-fallback-box">
+        <div class="logo-fallback-mark">🌉</div>
+        <div class="logo-fallback-text">INNOVINE</div>
+    </div>
+
+    <div class="logo-timer-bar" id="logo-progress"></div>
+</div>
+
+<!-- SCREEN 2: Instruction Screen -->
+<div id="screen-instructions" class="view-panel">
+    <div class="instruction-title">Phrase Bridge Builder</div>
+    
+    <div class="instruction-box">
+        <div class="instruction-item">
+            <div class="inst-num">1</div>
+            <div>Examine sentences and phrases based on rules from <strong>image_6802b5.png</strong> and <strong>image_6802f2.png</strong>.</div>
+        </div>
+        <div class="instruction-item">
+            <div class="inst-num">2</div>
+            <div>Select the correct phrase type or missing bridge phrase to construct the plank across the canyon.</div>
+        </div>
+        <div class="instruction-item">
+            <div class="inst-num">3</div>
+            <div>Questions are <strong>randomized</strong> each game. You have <strong>2 attempts</strong> per question across 10 rounds!</div>
+        </div>
+    </div>
+
+    <button class="btn-main" onclick="startGame()">Start Building</button>
+</div>
+
+<!-- SCREEN 3: Game Play Area -->
+<div id="screen-game" class="view-panel">
+    <div class="header">
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <div class="grade-badge">GRAMMAR BRIDGE</div>
+            <div class="title">Phrase Identification</div>
+        </div>
+        <div class="status-bar">
+            <div class="badge">Round: <span id="lbl-q">1</span>/10</div>
+            <div class="badge">Attempts: <span id="lbl-attempts">2</span></div>
+        </div>
+    </div>
+
+    <div class="bridge-arena">
+        <div class="character" id="game-char">🚶‍♂️</div>
+        <div class="cliff"></div>
+        <div class="bridge-gap">
+            <div class="bridge-plank" id="bridge-plank"></div>
+        </div>
+        <div class="cliff"></div>
+    </div>
+
+    <div class="task-card">
+        <div class="category-label" id="lbl-category">Identify the Phrase</div>
+        <div class="sentence-text" id="lbl-sentence">
+            "Loading sentence..."
+        </div>
+    </div>
+
+    <div class="choices-grid" id="choices-container">
+        <!-- Option buttons dynamically render here -->
+    </div>
+
+    <div class="action-bar">
+        <div class="feedback-bar" id="lbl-feedback">Select the correct phrase block to build the bridge plank!</div>
+    </div>
+</div>
+
+<!-- SCREEN 4: Completion Screen -->
+<div id="screen-completion" class="view-panel">
+    <div class="trophy-glow">🌉🏆</div>
+    <div class="congrats-title">Bridge Master!</div>
+    <p style="color: var(--text-muted); font-size: 1.1rem; max-width: 540px; font-weight: 600; line-height: 1.5;">
+        You successfully built all 10 bridge planks by identifying Noun Phrases, Adjective Phrases, and Adverb Phrases according to image_6802b5.png and image_6802f2.png!
+    </p>
+    <button class="btn-main" onclick="startGame()">Build Again (Reshuffle)</button>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+
+let activeQuestions = [];
+let currentRound = 0;
+let attemptsLeft = 2;
+let isProcessing = false;
+
+function playCorrectSound() {
+    const snd = $('snd-correct');
+    if (snd) {
+        snd.currentTime = 0;
+        snd.play().catch(e => {});
+    }
+}
+
+function playWrongSound() {
+    const snd = $('snd-wrong');
+    if (snd) {
+        snd.currentTime = 0;
+        snd.play().catch(e => {});
+    }
+}
+
+/* 10 Questions derived directly from image_6802b5.png and image_6802f2.png */
+const questionBank = [
+    {
+        category: "Noun Phrase Identification",
+        sentence: "Identify the noun phrase in: 'The curious cat with fluffy fur chased the small mouse.'",
+        correct: "The curious cat with fluffy fur",
+        options: ["The curious cat with fluffy fur", "chased the small mouse", "with fluffy fur chased", "curious cat chased"],
+        rule: "Centered around a noun or pronoun that acts as subject or object (image_6802b5.png & image_6802f2.png)."
+    },
+    {
+        category: "Adjective Phrase Identification",
+        sentence: "Identify the adjective phrase in: 'She is an extremely talented musician.'",
+        correct: "Extremely talented",
+        options: ["Extremely talented", "She is an", "talented musician", "extremely talented musician"],
+        rule: "Functions as an adjective to modify a noun/pronoun (image_6802f2.png)."
+    },
+    {
+        category: "Adverb Phrase Identification",
+        sentence: "Identify the adverb phrase in: 'The runner finished the race very quickly.'",
+        correct: "Very quickly",
+        options: ["Very quickly", "finished the race", "The runner finished", "race very quickly"],
+        rule: "Functions as an adverb to modify a verb, adjective, or adverb (image_6802f2.png)."
+    },
+    {
+        category: "Noun Phrase Identification",
+        sentence: "Identify the noun phrase in: 'The big, black dog barked at night.'",
+        correct: "The big, black dog",
+        options: ["The big, black dog", "barked at night", "black dog barked", "at night"],
+        rule: "Includes determiners, adjectives, and noun functioning as a unit (image_6802b5.png)."
+    },
+    {
+        category: "Noun Phrase Identification",
+        sentence: "Identify the noun phrase in: 'My grandmother's old house by the river is full of antiques.'",
+        correct: "My grandmother's old house by the river",
+        options: ["My grandmother's old house by the river", "is full of antiques", "old house is full", "by the river is full"],
+        rule: "A group of words centered around a noun acting as subject (image_6802f2.png)."
+    },
+    {
+        category: "Adverb Phrase Identification",
+        sentence: "Identify the adverb phrase in: 'After work, I will go to the gym.'",
+        correct: "After work",
+        options: ["After work", "will go to", "the gym", "I will go"],
+        rule: "Modifies the verb 'go' to indicate when the action happens (image_6802b5.png)."
+    },
+    {
+        category: "Noun Phrase Identification",
+        sentence: "Identify the noun phrase in: 'The diligent student with glasses always sits in the front row.'",
+        correct: "The diligent student with glasses",
+        options: ["The diligent student with glasses", "always sits in", "in the front row", "student with glasses sits"],
+        rule: "Acts as the complete subject centered around 'student' (image_6802f2.png)."
+    },
+    {
+        category: "Adjective Phrase Identification",
+        sentence: "Identify the adjective phrase in: 'The delicious, homemade pizza was served hot.'",
+        correct: "The delicious, homemade",
+        options: ["The delicious, homemade", "pizza was served", "was served hot", "served hot"],
+        rule: "Modifies the noun 'pizza' (image_6802b5.png)."
+    },
+    {
+        category: "Noun Phrase Identification",
+        sentence: "Identify the noun phrase in: 'The famous artist painted a masterpiece in his studio.'",
+        correct: "The famous artist",
+        options: ["The famous artist", "painted a masterpiece", "in his studio", "famous artist painted"],
+        rule: "Determiner + adjective + noun forming the subject phrase (image_6802f2.png)."
+    },
+    {
+        category: "Noun Phrase Identification",
+        sentence: "Identify the noun phrase in: 'After the long journey, the weary travellers reached their destination.'",
+        correct: "the weary travellers",
+        options: ["the weary travellers", "After the long journey", "reached their destination", "long journey travellers"],
+        rule: "Nouns phrase functioning as the subject performing the action (image_6802f2.png)."
+    }
+];
+
+// Fisher-Yates Shuffle Algorithm
+function shuffleArray(arr) {
+    let array = [...arr];
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+}
+
+// Screen 1 Timer (Strict 5 Seconds)
+const LOGO_DURATION = 5000;
+let logoElapsed = 0;
+
+let logoInterval = setInterval(() => {
+    logoElapsed += 50;
+    let pct = Math.min((logoElapsed / LOGO_DURATION) * 100, 100);
+    $('logo-progress').style.width = pct + '%';
+
+    if (logoElapsed >= LOGO_DURATION) {
+        clearInterval(logoInterval);
+        $('screen-logo').style.opacity = 0;
+        setTimeout(() => {
+            $('screen-logo').style.display = 'none';
+            $('screen-instructions').style.display = 'flex';
+        }, 600);
+    }
+}, 50);
+
+function startGame() {
+    activeQuestions = shuffleArray(questionBank);
+    currentRound = 0;
+    $('screen-instructions').style.display = 'none';
+    $('screen-completion').style.display = 'none';
+    $('screen-game').style.display = 'flex';
+    loadRound();
+}
+
+function loadRound() {
+    if (currentRound >= activeQuestions.length) {
+        $('screen-game').style.display = 'none';
+        $('screen-completion').style.display = 'flex';
+        return;
+    }
+
+    attemptsLeft = 2;
+    isProcessing = false;
+    
+    // Reset Bridge visual state
+    $('bridge-plank').style.width = '0%';
+    $('game-char').style.left = '45px';
+
+    $('lbl-q').innerText = currentRound + 1;
+    $('lbl-attempts').innerText = attemptsLeft;
+    $('lbl-feedback').innerText = "Select the correct phrase block to extend the bridge plank!";
+    $('lbl-feedback').style.color = "var(--text-muted)";
+
+    let task = activeQuestions[currentRound];
+    $('lbl-category').innerText = `Category: ${task.category}`;
+    $('lbl-sentence').innerText = `"${task.sentence}"`;
+
+    renderOptions(task);
+}
+
+function renderOptions(task) {
+    const container = $('choices-container');
+    container.innerHTML = '';
+
+    let randomizedChoices = shuffleArray(task.options);
+
+    randomizedChoices.forEach(choice => {
+        let btn = document.createElement('button');
+        btn.className = 'btn-choice';
+        btn.innerText = choice;
+        btn.onclick = () => makeGuess(choice);
+        container.appendChild(btn);
+    });
+}
+
+function makeGuess(selectedChoice) {
+    if (isProcessing) return;
+
+    let task = activeQuestions[currentRound];
+
+    if (selectedChoice === task.correct) {
+        isProcessing = true;
+        playCorrectSound();
+        
+        // Extend bridge plank and move character
+        $('bridge-plank').style.width = '100%';
+        setTimeout(() => {
+            $('game-char').style.left = 'calc(100% - 130px)';
+        }, 300);
+
+        $('lbl-feedback').innerText = `🧱 PLANK PLACED! Correct. (${task.rule})`;
+        $('lbl-feedback').style.color = "var(--accent-green)";
+
+        setTimeout(() => {
+            currentRound++;
+            loadRound();
+        }, 2200);
+    } else {
+        attemptsLeft--;
+        $('lbl-attempts').innerText = attemptsLeft;
+        playWrongSound();
+
+        if (attemptsLeft > 0) {
+            $('lbl-feedback').innerText = `❌ Unstable phrase choice! 1 attempt remaining for this plank.`;
+            $('lbl-feedback').style.color = "var(--accent-pink)";
+        } else {
+            isProcessing = true;
+            $('lbl-feedback').innerText = `⚡ Out of attempts! Correct phrase: "${task.correct}". (${task.rule})`;
+            $('lbl-feedback').style.color = "var(--accent-gold)";
+
+            // Show answer reveal bridge completion
+            $('bridge-plank').style.width = '100%';
+
+            setTimeout(() => {
+                currentRound++;
+                loadRound();
+            }, 3000);
+        }
+    }
+}
+</script>
+</body>
+</html>
