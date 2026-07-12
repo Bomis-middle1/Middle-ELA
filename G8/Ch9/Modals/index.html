@@ -1,1 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Modals Grammar Grab Challenge</title>
+<style>
+    /* GAME STYLES - Cool Blue and Educational Flat-Design */
+    :root {
+        --bg-color: #fdfdfd;
+        --primary-blue: #025091;
+        --secondary-blue: #0373cf;
+        --accent-blue: #8fdcfc;
+        --text-color: #333;
+        --correct-green: #2ecc71;
+        --wrong-red: #e74c3c;
+    }
 
+    * { box-sizing: border-box; }
+
+    body {
+        background-color: var(--bg-color);
+        font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        color: var(--text-color);
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        overflow: hidden; /* Important for word physics */
+    }
+
+    /* Task Area (Top Box) */
+    #task-banner {
+        width: 90%;
+        max-width: 800px;
+        background-color: #fff;
+        border: 2px solid var(--accent-blue);
+        border-radius: 12px;
+        padding: 20px;
+        margin-top: 20px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        text-align: center;
+        z-index: 10;
+        position: relative;
+    }
+
+    #function-label {
+        color: var(--secondary-blue);
+        font-weight: 800;
+        text-transform: uppercase;
+        font-size: 1.1em;
+        margin-bottom: 5px;
+    }
+
+    #sentence-display {
+        color: var(--text-color);
+        font-size: 1.4em;
+        font-weight: 600;
+    }
+
+    /* Falling Words Zone */
+    #game-arena {
+        position: relative;
+        width: 100vw;
+        height: 70vh; /* Takes up most of the screen below task area */
+        overflow: hidden;
+    }
+
+    .word-tile {
+        position: absolute;
+        background-color: var(--primary-blue);
+        color: #fff;
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-weight: bold;
+        font-size: 1.2em;
+        cursor: pointer;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        user-select: none;
+        white-space: nowrap;
+    }
+
+    .word-tile:hover {
+        background-color: var(--secondary-blue);
+    }
+
+    /* Player Bucket (Bottom) */
+    #bucket-container {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        height: 100px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #f1f1f1;
+        border-top: 2px solid #ccc;
+    }
+
+    #player-bucket {
+        width: 150px;
+        height: 80px;
+        background-color: #ddd;
+        border-radius: 0 0 15px 15px;
+        border: 4px solid var(--primary-blue);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        position: relative;
+        cursor: grab;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-weight: bold;
+        color: var(--primary-blue);
+        font-size: 1.1em;
+    }
+
+    /* Score and Info */
+    #hud {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        z-index: 100;
+    }
+
+    .hud-box {
+        background: #fff;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        padding: 10px 15px;
+        font-weight: bold;
+    }
+
+    #restart-btn {
+        display: none;
+        background-color: var(--accent-blue);
+        border: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        color: #fff;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+</style>
+</head>
+<body>
+
+    <!-- Task Banner (Top) -->
+    <div id="task-banner">
+        <div id="function-label">Grammar grab challenge</div>
+        <div id="sentence-display">Click to start! [ _____ ]</div>
+    </div>
+
+    <!-- Gameplay Arena -->
+    <div id="game-arena">
+        <div id="bucket-container">
+            <div id="player-bucket">My bucket</div>
+        </div>
+    </div>
+
+    <!-- HUD (Score and restart) -->
+    <div id="hud">
+        <div class="hud-box">Score: <span id="score-display">0</span></div>
+        <div class="hud-box">Item: <span id="item-count">1</span>/10</div>
+        <button id="restart-btn" onclick="startGame()">Restart Game</button>
+    </div>
+
+<script>
+    /* GAME LOGIC - Built on image_6799b8.png rules */
+    const taskBanner = document.getElementById('task-banner');
+    const functionLabel = document.getElementById('function-label');
+    const sentenceDisplay = document.getElementById('sentence-display');
+    const gameArena = document.getElementById('game-arena');
+    const playerBucket = document.getElementById('player-bucket');
+    const scoreDisplay = document.getElementById('score-display');
+    const itemCountDisplay = document.getElementById('item-count');
+    const restartBtn = document.getElementById('restart-btn');
+
+    let score = 0;
+    let itemCount = 1;
+    let currentTask = null;
+    let currentWords = [];
+    let isGameOver = false;
+    let bucketPosition = window.innerWidth / 2; // Start center
+    const totalItems = 10;
+    const bucketWidth = 150;
+    let spawnTimer = null;
+
+    /* The Question Database - Referencing image_6799b8.png examples */
+    const modalsDB = [
+        { function: "Request", sentence: "[ _____ ] you pass the salt, please?", correct: "Can", wrong: ["Must", "Should", "May"] },
+        { function: "Suggestion", sentence: "You [ _____ ] eat more vegetables.", correct: "Should", wrong: ["Must", "Could", "Would"] },
+        { function: "Obligation", sentence: "You [ _____ ] finish your homework before watching TV.", correct: "Must", wrong: ["Might", "Would", "Can"] },
+        { function: "Possibility", sentence: "It [ _____ ] rain later.", correct: "Might", wrong: ["Will", "Must", "Can"] },
+        { function: "Request", sentence: "[ _____ ] you please lend me your pen?", correct: "Could", wrong: ["Ought", "Must", "Might"] },
+        { function: "Certainty", sentence: "She [ _____ ] be there by now.", correct: "Would", wrong: ["Can", "Ought", "Might"] },
+        { function: "Possibility", sentence: "She [ _____ ] come to the party.", correct: "May", wrong: ["Must", "Should", "Will"] },
+        { function: "Obligation", sentence: "I [ _____ ] attend the meeting.", correct: "Have to", wrong: ["Might", "Could", "Can"] },
+        { function: "Suggestion", sentence: "You [ _____ ] visit the museum; it's fascinating.", correct: "Ought", wrong: ["Have to", "Might", "Will"] },
+        { function: "Prediction", sentence: "I [ _____ ] definitely pass the exam.", correct: "Will", wrong: ["Must", "Would", "Should"] }
+    ];
+
+    /* Initial Setup */
+    function startGame() {
+        score = 0;
+        itemCount = 1;
+        isGameOver = false;
+        restartBtn.style.display = 'none';
+        sentenceDisplay.innerHTML = "Get ready...";
+        functionLabel.innerHTML = "MODALS GRAMMAR GRAB";
+        updateHUD();
+        nextTask();
+        spawnWordsLoop();
+    }
+
+    /* Update Score and Item count display */
+    function updateHUD() {
+        scoreDisplay.innerText = score;
+        itemCountDisplay.innerText = itemCount;
+    }
+
+    /* Load next random task */
+    function nextTask() {
+        // Find a random item from the DB
+        const randomIndex = Math.floor(Math.random() * modalsDB.length);
+        currentTask = modalsDB[randomIndex];
+
+        functionLabel.innerHTML = `Category: ${currentTask.function}`;
+        sentenceDisplay.innerHTML = currentTask.sentence.replace('_____', '<span style="color:var(--secondary-blue); font-weight:900;">[ Catch ]</span>');
+
+        clearGameArea();
+    }
+
+    /* Function to regularly spawn words */
+    function spawnWordsLoop() {
+        clearTimeout(spawnTimer);
+        if (isGameOver) return;
+
+        spawnWord(); // Spawn one immediately
+        // Repeat at varying intervals (1s to 2.5s)
+        const delay = Math.random() * 1500 + 1000;
+        spawnTimer = setTimeout(spawnWordsLoop, delay);
+    }
+
+    /* Remove existing falling words */
+    function clearGameArea() {
+        const words = gameArena.querySelectorAll('.word-tile');
+        words.forEach(w => w.remove());
+    }
+
+    /* Create a single falling word tile */
+    function spawnWord() {
+        if (!currentTask || isGameOver) return;
+
+        // Decide whether to spawn the correct word or a wrong one
+        // Higher chance of correct word as the item progresses to make it easier
+        const isCorrectChance = (Math.random() < 0.35); // 35% chance correct
+
+        let wordText;
+        if (isCorrectChance) {
+            wordText = currentTask.correct;
+        } else {
+            const wrongIndex = Math.floor(Math.random() * currentTask.wrong.length);
+            wordText = currentTask.wrong[wrongIndex];
+        }
+
+        const tile = document.createElement('div');
+        tile.className = 'word-tile';
+        tile.innerText = wordText;
+        tile.dataset.value = wordText;
+
+        // Position - must be above the arena
+        const startX = Math.random() * (window.innerWidth - 100); // Account for width
+        tile.style.left = startX + 'px';
+        tile.style.top = '-50px';
+
+        gameArena.appendChild(tile);
+        animateWord(tile);
+    }
+
+    /* Move the word tile down the screen */
+    function animateWord(tile) {
+        if (!gameArena.contains(tile) || isGameOver) return;
+
+        let currentY = parseFloat(tile.style.top);
+        currentY += 4; // Falling speed
+
+        tile.style.top = currentY + 'px';
+
+        checkCollision(tile);
+
+        if (currentY < (gameArena.offsetHeight - 50)) {
+            requestAnimationFrame(() => animateWord(tile));
+        } else {
+            tile.remove(); // Word missed
+        }
+    }
+
+    /* Collision Detection - Check if bucket caught the word */
+    function checkCollision(tile) {
+        if (!activeDrag || isGameOver || !gameArena.contains(tile)) return; // Only check if player is active
+
+        const tileRect = tile.getBoundingClientRect();
+        const bucketRect = playerBucket.getBoundingClientRect();
+
+        // Standard 2D collision check with a little padding
+        if (tileRect.bottom > bucketRect.top &&
+            tileRect.top < bucketRect.bottom &&
+            tileRect.right > bucketRect.left &&
+            tileRect.left < bucketRect.right) {
+            
+            handleCatch(tile);
+        }
+    }
+
+    /* Handle word interaction (scoring) */
+    function handleCatch(tile) {
+        const caughtValue = tile.dataset.value;
+        const isCorrect = (caughtValue === currentTask.correct);
+
+        // Visual feedback
+        tile.classList.add('popping'); // Visual burst
+        gameArena.style.pointerEvents = 'none'; // Prevent interactions until next task
+        clearTimeout(spawnTimer); // Stop spawning immediately
+
+        if (isCorrect) {
+            score += 100;
+            sentenceDisplay.innerHTML = currentTask.sentence.replace('_____', `<span style="color:var(--correct-green); font-weight:900;">${caughtValue}</span>`);
+            // Flash success
+            taskBanner.style.backgroundColor = '#d4edda';
+            taskBanner.style.borderColor = var(--correct-green);
+
+        } else {
+            score -= 25;
+            sentenceDisplay.innerHTML = currentTask.sentence.replace('_____', `<span style="color:var(--wrong-red); font-weight:900;">${caughtValue} (No!)</span>`);
+            // Flash wrong
+            taskBanner.style.backgroundColor = '#f8d7da';
+            taskBanner.style.borderColor = var(--wrong-red);
+        }
+
+        updateHUD();
+        
+        // Setup next task
+        setTimeout(() => {
+            if (itemCount < totalItems) {
+                itemCount++;
+                taskBanner.style.backgroundColor = '#fff';
+                taskBanner.style.borderColor = var(--accent-blue);
+                nextTask();
+                gameArena.style.pointerEvents = 'auto'; // Re-enable interaction
+                spawnWordsLoop(); // Resume spawn loop
+            } else {
+                gameOver();
+            }
+        }, 1500); // 1.5s pause to read results
+        
+        // Remove word tile visually instantly
+        tile.style.opacity = '0';
+        setTimeout(() => tile.remove(), 200); 
+    }
+
+    /* End of game logic */
+    function gameOver() {
+        isGameOver = true;
+        clearGameArea();
+        clearTimeout(spawnTimer);
+        
+        functionLabel.innerHTML = "GAME OVER";
+        sentenceDisplay.innerHTML = `Score: <span style="font-size:1.6em;">${score}</span>! Thank you for catching words.`;
+        
+        taskBanner.style.backgroundColor = '#fef6cd';
+        taskBanner.style.borderColor = var(--accent-blue);
+
+        restartBtn.style.display = 'block';
+    }
+
+    /* Player Bucket Control (Dragging) */
+    let activeDrag = false;
+
+    gameArena.addEventListener('pointerdown', e => {
+        const rect = e.target.closest('#player-bucket');
+        if (rect) {
+            activeDrag = true;
+            playerBucket.style.cursor = 'grabbing';
+            updateBucketPosition(e);
+        }
+    });
+
+    gameArena.addEventListener('pointermove', e => {
+        if (!activeDrag) return;
+        updateBucketPosition(e);
+    });
+
+    gameArena.addEventListener('pointerup', e => {
+        activeDrag = false;
+        playerBucket.style.cursor = 'grab';
+    });
+    
+    // Safety check if pointer leaves arena
+    gameArena.addEventListener('pointerleave', e => { activeDrag = false; });
+
+    function updateBucketPosition(e) {
+        const x = e.clientX;
+        // Keep bucket within arena bounds
+        const minX = bucketWidth / 2;
+        const maxX = window.innerWidth - (bucketWidth / 2);
+        
+        // Set center of bucket
+        const newX = Math.max(minX, Math.min(maxX, x));
+        
+        playerBucket.style.left = (newX - bucketWidth / 2) + 'px';
+    }
+
+    /* Start the game on page load */
+    window.onload = () => {
+        // Initial bucket centering
+        playerBucket.style.left = (window.innerWidth / 2 - bucketWidth / 2) + 'px';
+        startGame();
+    };
+
+</script>
+</body>
+</html>
