@@ -3,19 +3,19 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-<title>Innovine - Perfect Continuous Story Challenge</title>
+<title>Innovine - The Whispering Observatory Mystery</title>
 <style>
 :root {
-    --card-bg: rgba(255, 255, 255, 0.95);
-    --primary-purple: #4a148c;
-    --accent-pink: #d81b60;
-    --accent-blue: #0288d1;
-    --accent-amber: #f57c00;
-    --accent-green: #2e7d32;
-    --text-main: #1a0e2e;
-    --text-muted: #524366;
-    --border-color: rgba(255, 255, 255, 0.6);
-    --shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
+    --card-bg: rgba(255, 255, 255, 0.94);
+    --primary-cosmic: #311b92;
+    --accent-magenta: #e91e63;
+    --accent-teal: #00e5ff;
+    --accent-amber: #ff9100;
+    --accent-green: #00e676;
+    --text-main: #120b24;
+    --text-muted: #53457a;
+    --border-color: rgba(255, 255, 255, 0.7);
+    --shadow: 0 15px 35px rgba(18, 11, 36, 0.3);
 }
 
 * {
@@ -26,10 +26,11 @@
     user-select: none;
 }
 
+/* Beautiful Cosmic Responsive Background */
 body {
-    background: linear-gradient(-45deg, #8e2de2, #4a00e0, #00c6ff, #15002b);
+    background: linear-gradient(-45deg, #120b24, #311b92, #6a1b9a, #001220);
     background-size: 300% 300%;
-    animation: gradientBG 12s ease infinite;
+    animation: gradientBG 15s ease infinite;
     color: var(--text-main);
     min-height: 100vh;
     display: flex;
@@ -45,6 +46,7 @@ body {
     100% { background-position: 0% 50%; }
 }
 
+/* Core Responsive Panel Container */
 .view-panel {
     position: relative;
     width: 100%;
@@ -58,13 +60,19 @@ body {
     flex-direction: column;
     gap: 16px;
     border: 2px solid var(--border-color);
+    animation: fadeIn 0.4s ease-out;
 }
 
-/* SCREEN 1: Innovine Splash Screen (5 Seconds) */
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.97); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+/* SCREEN 1: Logo Screen (Strictly 5 Seconds) */
 #screen-logo {
     position: fixed;
     inset: 0;
-    background: #0d021a;
+    background: #090314;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -80,7 +88,6 @@ body {
     height: auto;
     object-fit: contain;
     animation: logoPop 1.2s ease-out;
-    filter: drop-shadow(0 0 25px rgba(255, 255, 255, 0.2));
 }
 
 @keyframes logoPop {
@@ -98,7 +105,7 @@ body {
 .logo-fallback-mark {
     width: 54px;
     height: 54px;
-    background: linear-gradient(135deg, #00f2fe, #ff007f);
+    background: linear-gradient(135deg, var(--accent-teal), var(--accent-magenta));
     clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
     display: flex;
     align-items: center;
@@ -111,7 +118,7 @@ body {
     font-size: clamp(2.5rem, 7vw, 4rem);
     font-weight: 900;
     letter-spacing: 3px;
-    background: linear-gradient(45deg, #ffffff, #00f2fe, #ff007f);
+    background: linear-gradient(45deg, #ffffff, var(--accent-teal), var(--accent-magenta));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
@@ -121,7 +128,7 @@ body {
     bottom: 0;
     left: 0;
     height: 6px;
-    background: linear-gradient(90deg, #00f2fe, #ff007f);
+    background: linear-gradient(90deg, var(--accent-teal), var(--accent-magenta));
     width: 0%;
     transition: width 0.05s linear;
 }
@@ -136,37 +143,38 @@ body {
 
 .instruction-title {
     font-size: clamp(1.8rem, 4vw, 2.5rem);
-    color: var(--primary-purple);
+    color: var(--primary-cosmic);
     font-weight: 900;
+    letter-spacing: -0.5px;
 }
 
 .instruction-box {
     background: rgba(255, 255, 255, 0.85);
-    border: 1px solid rgba(0,0,0,0.1);
+    border: 1px solid rgba(0,0,0,0.06);
     border-radius: 18px;
-    padding: 20px;
+    padding: 22px;
     text-align: left;
     width: 100%;
     max-width: 650px;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 14px;
 }
 
 .instruction-item {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 14px;
     font-size: clamp(0.95rem, 2.2vw, 1.1rem);
     font-weight: 700;
     color: var(--text-main);
 }
 
 .inst-num {
-    background: var(--primary-purple);
+    background: var(--primary-cosmic);
     color: white;
-    width: 30px;
-    height: 30px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -190,7 +198,7 @@ body {
 }
 
 .grade-badge {
-    background: linear-gradient(45deg, #8e2de2, #4a00e0);
+    background: linear-gradient(45deg, #8e2de2, var(--primary-cosmic));
     color: white;
     padding: 4px 14px;
     border-radius: 12px;
@@ -200,7 +208,7 @@ body {
 
 .title {
     font-size: clamp(1rem, 2.5vw, 1.3rem);
-    color: var(--primary-purple);
+    color: var(--primary-cosmic);
     font-weight: 800;
 }
 
@@ -216,14 +224,14 @@ body {
     border-radius: 20px;
     background: #ffffff;
     border: 1px solid #dcd0ea;
-    color: var(--primary-purple);
+    color: var(--primary-cosmic);
 }
 
 /* Story Scene Showcase */
 .story-scene-card {
     display: flex;
     gap: 16px;
-    background: rgba(255, 255, 255, 0.75);
+    background: rgba(255, 255, 255, 0.8);
     border: 1px solid var(--border-color);
     border-radius: 18px;
     padding: 16px;
@@ -235,11 +243,11 @@ body {
 }
 
 .scene-icon {
-    font-size: 3.5rem;
+    font-size: 3.2rem;
     background: white;
     padding: 12px;
     border-radius: 16px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
     flex-shrink: 0;
 }
 
@@ -252,7 +260,7 @@ body {
 .scene-chapter {
     font-size: 0.75rem;
     font-weight: 900;
-    color: var(--accent-pink);
+    color: var(--accent-magenta);
     text-transform: uppercase;
     letter-spacing: 1px;
 }
@@ -264,9 +272,10 @@ body {
     line-height: 1.4;
 }
 
+/* Question Banner */
 .question-card {
     background: linear-gradient(135deg, #f3e5f5, #e1bee7);
-    border-left: 5px solid var(--primary-purple);
+    border-left: 5px solid var(--primary-cosmic);
     padding: 12px 16px;
     border-radius: 12px;
 }
@@ -275,7 +284,7 @@ body {
     font-size: 0.75rem;
     text-transform: uppercase;
     font-weight: 900;
-    color: var(--accent-pink);
+    color: var(--accent-magenta);
     margin-bottom: 2px;
 }
 
@@ -329,6 +338,7 @@ body {
     text-align: center;
 }
 
+/* Word Bank Palette */
 .tiles-bank {
     display: flex;
     flex-wrap: wrap;
@@ -356,7 +366,7 @@ body {
 }
 
 .tile:hover {
-    background: var(--primary-purple);
+    background: var(--primary-cosmic);
     color: white;
 }
 
@@ -379,7 +389,7 @@ body {
 }
 
 .btn-main {
-    background: linear-gradient(45deg, #ff007f, #7928ca);
+    background: linear-gradient(45deg, var(--accent-magenta), var(--primary-cosmic));
     color: white;
     border: 0;
     padding: 12px 28px;
@@ -417,7 +427,7 @@ body {
 .congrats-title {
     font-size: clamp(2rem, 5vw, 3rem);
     font-weight: 900;
-    background: linear-gradient(45deg, #8e2de2, #ff007f);
+    background: linear-gradient(45deg, #8e2de2, var(--accent-magenta));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
@@ -442,26 +452,26 @@ body {
     <div class="logo-timer-bar" id="logo-progress"></div>
 </div>
 
-<!-- SCREEN 2: Instruction Screen (Simple & Precise) -->
+<!-- SCREEN 2: Instruction Screen (No Logo) -->
 <div id="screen-instructions" class="view-panel">
-    <div class="instruction-title">Story Completion Rules</div>
+    <div class="instruction-title">Story Completion Challenge</div>
     
     <div class="instruction-box">
         <div class="instruction-item">
             <div class="inst-num">1</div>
-            <div>Read the story scenario based on <strong>image_664802.png</strong> carefully.</div>
+            <div>Read the narrative chapters of <strong>"The Whispering Observatory Mystery"</strong>.</div>
         </div>
         <div class="instruction-item">
             <div class="inst-num">2</div>
-            <div>Tap tiles into the 3 sentence slots to form the correct <strong>Perfect Continuous Tense</strong> sentence.</div>
+            <div>Tap the syntax tiles to construct the correct <strong>Perfect Continuous Tense</strong>.</div>
         </div>
         <div class="instruction-item">
             <div class="inst-num">3</div>
-            <div>You get <strong>2 chances</strong> per question. If incorrect on the 2nd attempt, the right answer will be revealed.</div>
+            <div>You get exactly <strong>2 chances</strong> per chapter. Double-faulting will automatically reveal the correct key.</div>
         </div>
     </div>
 
-    <button class="btn-main" onclick="startGame()">Start Story</button>
+    <button class="btn-main" onclick="startGame()">Start Chronicle</button>
 </div>
 
 <!-- SCREEN 3: Game Play Area -->
@@ -469,7 +479,7 @@ body {
     <div class="header">
         <div style="display: flex; align-items: center; gap: 8px;">
             <div class="grade-badge">G8 ENGLISH</div>
-            <div class="title">Perfect Continuous Tenses</div>
+            <div class="title">The Whispering Observatory</div>
         </div>
         <div class="status-bar">
             <div class="badge">Chapter: <span id="lbl-q">1</span>/6</div>
@@ -479,7 +489,7 @@ body {
 
     <!-- Story Context Area -->
     <div class="story-scene-card">
-        <div class="scene-icon" id="scene-icon">📚</div>
+        <div class="scene-icon" id="scene-icon">📡</div>
         <div class="scene-info">
             <span class="scene-chapter" id="scene-chapter">Chapter 1</span>
             <div class="scene-story-text" id="scene-story-text">Loading story...</div>
@@ -494,11 +504,11 @@ body {
     <div class="builder-area">
         <div class="slot-container">
             <div class="slot-box" id="slot-0" onclick="clearSlot(0)">
-                <span class="slot-label">Subject</span>
+                <span class="slot-label">Subject Phrase</span>
                 <span class="slot-content" id="slot-val-0">Select Tile</span>
             </div>
             <div class="slot-box" id="slot-1" onclick="clearSlot(1)">
-                <span class="slot-label">Auxiliary Structure</span>
+                <span class="slot-label">Auxiliary Verb</span>
                 <span class="slot-content" id="slot-val-1">Select Tile</span>
             </div>
             <div class="slot-box" id="slot-2" onclick="clearSlot(2)">
@@ -511,19 +521,19 @@ body {
     </div>
 
     <div class="action-bar">
-        <div class="feedback-bar" id="lbl-feedback">Tap tiles to complete the story sentence.</div>
-        <button class="btn-main" onclick="verifyAnswer()">Submit</button>
+        <div class="feedback-bar" id="lbl-feedback">Tap tiles to complete the cosmic log.</div>
+        <button class="btn-main" onclick="verifyAnswer()">Lock Sequence</button>
     </div>
 </div>
 
 <!-- SCREEN 4: Completion Screen -->
 <div id="screen-completion" class="view-panel">
-    <div class="trophy-glow">📖✨</div>
-    <div class="congrats-title">Story Completed!</div>
-    <p style="color: var(--text-muted); font-size: 1.1rem; max-width: 520px; font-weight: 600;">
-        You have successfully completed the story while mastering Present, Past, and Future Perfect Continuous Tenses as shown in image_664802.png!
+    <div class="trophy-glow">🌌✨</div>
+    <div class="congrats-title">Mystery Unraveled!</div>
+    <p style="color: var(--text-muted); font-size: 1.1rem; max-width: 520px; font-weight: 600; line-height: 1.5;">
+        Spectacular work! You successfully assisted Dr. Aris in documenting the signal while mastering Present, Past, and Future Perfect Continuous grammar structures.
     </p>
-    <button class="btn-main" onclick="location.reload()">Play Again</button>
+    <button class="btn-main" onclick="location.reload()">Re-initialize Chronicle</button>
 </div>
 
 <script>
@@ -533,65 +543,65 @@ let currentQ = 0;
 let attemptsLeft = 2;
 let slotValues = ["", "", ""];
 
-/* Story Database directly referencing image_664802.png concepts */
+/* Completely original story independent of the textbook images */
 const storyDatabase = [
     {
-        chapter: "Chapter 1: The Long Study Session",
-        storyText: "As shown in image_664802.png, the boy is sitting at his desk with open books, looking tired while the clock shows hours passing.",
-        question: "What has the boy been doing continuously up until now?",
+        chapter: "Chapter 1: The First Signal",
+        storyText: "High up on the dark mountain, Dr. Aris monitors the control panels of the observatory. A glowing pulse suddenly begins to ping across her screens.",
+        question: "How do we describe Dr. Aris's ongoing action up until this exact moment?",
         tenseType: "Present Perfect Continuous Tense",
-        icon: "⏰📖",
-        slots: ["The boy", "has been studying", "for three hours."],
-        bankOptions: ["has been studying", "for three hours.", "The boy", "had been studying", "will have been studying", "is studying"]
+        icon: "📡🌌",
+        slots: ["Dr. Aris", "has been tracking", "a cosmic radio signal since midnight."],
+        bankOptions: ["has been tracking", "a cosmic radio signal since midnight.", "Dr. Aris", "had been tracking", "will have been tracking", "is tracking"]
     },
     {
-        chapter: "Chapter 2: The Interrupted Routine",
-        storyText: "Yesterday afternoon, his friend called him on the phone while he was deeply focused on his exam preparation.",
-        question: "What had the boy been doing before his friend called him?",
+        chapter: "Chapter 2: Decades of Research",
+        storyText: "Before achieving tonight's breakthrough, she spent years running simulations on complex stellar pattern equations without finding a matches.",
+        question: "How do we describe her continuous academic efforts before the breakthrough happened?",
         tenseType: "Past Perfect Continuous Tense",
-        icon: "📞📝",
-        slots: ["He", "had been studying", "before his friend called."],
-        bankOptions: ["had been studying", "before his friend called.", "He", "has been studying", "will have been studying", "was studying"]
+        icon: "💻🔍",
+        slots: ["The astronomer", "had been decoding", "telemetry arrays prior to her breakthrough."],
+        bankOptions: ["had been decoding", "telemetry arrays prior to her breakthrough.", "The astronomer", "has been decoding", "will have been decoding", "decodes"]
     },
     {
-        chapter: "Chapter 3: The Overnight Prep",
-        storyText: "His final exam starts tomorrow morning at 8 AM, and he plans to keep studying without taking a long break.",
-        question: "What will the boy have been doing by the time his exam starts tomorrow morning?",
+        chapter: "Chapter 3: The Deep-Space Probe",
+        storyText: "Tomorrow morning, the expedition space probe will reach the outermost border of the solar system, continuing its voyage without pause.",
+        question: "How do we project the probe's continuous flight duration up to tomorrow morning?",
         tenseType: "Future Perfect Continuous Tense",
-        icon: "🌙🌅",
-        slots: ["He", "will have been studying", "all night."],
-        bankOptions: ["will have been studying", "all night.", "He", "has been studying", "had been studying", "studies"]
+        icon: "🚀🛸",
+        slots: ["The probe", "will have been traveling", "through deep space for ten years."],
+        bankOptions: ["will have been traveling", "through deep space for ten years.", "The probe", "has been traveling", "had been traveling", "travels"]
     },
     {
-        chapter: "Chapter 4: Kitchen Preparation",
-        storyText: "In the household, his mother started preparing a special dinner early in the morning and is still in the kitchen.",
-        question: "How do we describe Mother's ongoing action using Present Perfect Continuous?",
+        chapter: "Chapter 4: Generator Endurance",
+        storyText: "Down in the generator room, the emergency power systems are hum steadily to support the heavy telescope gears.",
+        question: "How do we describe the continuous operation of the power units currently?",
         tenseType: "Present Perfect Continuous Tense",
-        icon: "🍳🥘",
-        slots: ["Mother", "has been cooking", "since morning."],
-        bankOptions: ["has been cooking", "since morning.", "Mother", "had been cooking", "will have been cooking", "was cooking"]
+        icon: "⚙️🔥",
+        slots: ["The power systems", "have been operating", "continuously for three days."],
+        bankOptions: ["have been operating", "continuously for three days.", "The power systems", "had been operating", "will have been operating", "are operating"]
     },
     {
-        chapter: "Chapter 5: Rainy Afternoon",
-        storyText: "Rain began falling at noon and continued non-stop until the storm finally stopped late in the evening.",
-        question: "What had the rain been doing before the storm stopped?",
+        chapter: "Chapter 5: The Sudden Blackout",
+        storyText: "Last night, the main computers were actively processing critical tracking coordinates when a massive solar flare caused an unexpected failure.",
+        question: "What had the maincomputers been doing right before the system crashed?",
         tenseType: "Past Perfect Continuous Tense",
-        icon: "🌧️⚡",
-        slots: ["The rain", "had been pouring", "for hours before it stopped."],
-        bankOptions: ["had been pouring", "for hours before it stopped.", "The rain", "has been pouring", "will have been pouring", "poured"]
+        icon: "🔌💥",
+        slots: ["The computers", "had been calculating", "satellite coordinates prior to the crash."],
+        bankOptions: ["had been calculating", "satellite coordinates prior to the crash.", "The computers", "has been calculating", "will have been calculating", "calculated"]
     },
     {
-        chapter: "Chapter 6: Final Milestone",
-        storyText: "By next month, the students will mark six months of continuous preparation for their national exams.",
-        question: "How do we describe their long-term continuous effort by next month?",
+        chapter: "Chapter 6: The Ultimate Milestone",
+        storyText: "Next month, Dr. Aris and her elite scientific team will celebrate a massive milestone of continuous observatory tracking operations.",
+        question: "How do we phrase their continuous observation project reaching into next month?",
         tenseType: "Future Perfect Continuous Tense",
-        icon: "🎓⭐",
-        slots: ["They", "will have been practicing", "for six full months."],
-        bankOptions: ["will have been practicing", "for six full months.", "They", "has been practicing", "had been practicing", "are practicing"]
+        icon: "🔭🏆",
+        slots: ["The scientific team", "will have been monitoring", "the galaxy for a full year."],
+        bankOptions: ["will have been monitoring", "the galaxy for a full year.", "The scientific team", "has been monitoring", "had been monitoring", "is monitoring"]
     }
 ];
 
-// 5-Second Innovine Logo Timer
+// Screen 1: 5-Second Innovine Logo Timer
 const LOGO_DURATION = 5000;
 let logoElapsed = 0;
 
@@ -675,7 +685,7 @@ function verifyAnswer() {
     let isCorrect = slotValues.join(" ") === data.slots.join(" ");
 
     if (isCorrect) {
-        $('lbl-feedback').innerText = "✓ Correct! Excellent story sentence assembly.";
+        $('lbl-feedback').innerText = "✓ Sequence authorized! Chapter complete.";
         $('lbl-feedback').style.color = "var(--accent-green)";
         setTimeout(() => {
             currentQ++;
@@ -686,11 +696,11 @@ function verifyAnswer() {
         $('lbl-attempts').innerText = attemptsLeft;
 
         if (attemptsLeft > 0) {
-            $('lbl-feedback').innerText = "✕ Incorrect attempt. You have 1 final chance!";
+            $('lbl-feedback').innerText = "✕ Calibration failed. You have 1 final chance!";
             $('lbl-feedback').style.color = "var(--accent-amber)";
         } else {
-            $('lbl-feedback').innerText = `⚡ Correct Sentence: "${data.slots.join(' ')}"`;
-            $('lbl-feedback').style.color = "var(--accent-pink)";
+            $('lbl-feedback').innerText = `⚡ Override Sentence: "${data.slots.join(' ')}"`;
+            $('lbl-feedback').style.color = "var(--accent-magenta)";
 
             for (let i = 0; i < 3; i++) {
                 $(`slot-val-${i}`).innerText = data.slots[i];
