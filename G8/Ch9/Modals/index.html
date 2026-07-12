@@ -1,429 +1,624 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Modals Grammar Grab Challenge</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>Innovine - Modals Catch the Correct Word</title>
 <style>
-    /* GAME STYLES - Cool Blue and Educational Flat-Design */
-    :root {
-        --bg-color: #fdfdfd;
-        --primary-blue: #025091;
-        --secondary-blue: #0373cf;
-        --accent-blue: #8fdcfc;
-        --text-color: #333;
-        --correct-green: #2ecc71;
-        --wrong-red: #e74c3c;
-    }
+:root {
+    --card-bg: rgba(255, 255, 255, 0.95);
+    --primary-blue: #025091;
+    --secondary-blue: #0373cf;
+    --accent-gold: #ffb300;
+    --accent-pink: #d81b60;
+    --accent-green: #2e7d32;
+    --text-main: #120b24;
+    --text-muted: #53457a;
+    --border-color: rgba(255, 255, 255, 0.7);
+    --shadow: 0 15px 35px rgba(0, 0, 0, 0.35);
+}
 
-    * { box-sizing: border-box; }
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+    user-select: none;
+}
 
-    body {
-        background-color: var(--bg-color);
-        font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-        color: var(--text-color);
-        margin: 0;
-        padding: 0;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        min-height: 100vh;
-        overflow: hidden; /* Important for word physics */
-    }
+body {
+    background: linear-gradient(-45deg, #0f2027, #203a43, #2c5364, #1a0826);
+    background-size: 300% 300%;
+    animation: gradientBG 14s ease infinite;
+    color: var(--text-main);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px;
+    overflow-x: hidden;
+}
 
-    /* Task Area (Top Box) */
-    #task-banner {
-        width: 90%;
-        max-width: 800px;
-        background-color: #fff;
-        border: 2px solid var(--accent-blue);
-        border-radius: 12px;
-        padding: 20px;
-        margin-top: 20px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        text-align: center;
-        z-index: 10;
-        position: relative;
-    }
+@keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
 
-    #function-label {
-        color: var(--secondary-blue);
-        font-weight: 800;
-        text-transform: uppercase;
-        font-size: 1.1em;
-        margin-bottom: 5px;
-    }
+.view-panel {
+    position: relative;
+    width: 100%;
+    max-width: 900px;
+    background: var(--card-bg);
+    backdrop-filter: blur(12px);
+    border-radius: 24px;
+    padding: clamp(16px, 4vw, 28px);
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    border: 2px solid var(--border-color);
+    animation: fadeIn 0.4s ease-out;
+}
 
-    #sentence-display {
-        color: var(--text-color);
-        font-size: 1.4em;
-        font-weight: 600;
-    }
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.97); }
+    to { opacity: 1; transform: scale(1); }
+}
 
-    /* Falling Words Zone */
-    #game-arena {
-        position: relative;
-        width: 100vw;
-        height: 70vh; /* Takes up most of the screen below task area */
-        overflow: hidden;
-    }
+/* SCREEN 1: Innovine Logo Screen */
+#screen-logo {
+    position: fixed;
+    inset: 0;
+    background: #090314;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    transition: opacity 0.6s ease;
+    padding: 20px;
+}
 
-    .word-tile {
-        position: absolute;
-        background-color: var(--primary-blue);
-        color: #fff;
-        padding: 10px 20px;
-        border-radius: 8px;
-        font-weight: bold;
-        font-size: 1.2em;
-        cursor: pointer;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-        user-select: none;
-        white-space: nowrap;
-    }
+.innovine-logo-img {
+    max-width: 280px;
+    width: 70vw;
+    height: auto;
+    object-fit: contain;
+    animation: logoPop 1.2s ease-out;
+    filter: drop-shadow(0 0 25px rgba(255, 255, 255, 0.2));
+}
 
-    .word-tile:hover {
-        background-color: var(--secondary-blue);
-    }
+@keyframes logoPop {
+    0% { transform: scale(0.85); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
 
-    /* Player Bucket (Bottom) */
-    #bucket-container {
-        position: absolute;
-        bottom: 0;
-        width: 100%;
-        height: 100px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        background-color: #f1f1f1;
-        border-top: 2px solid #ccc;
-    }
+.logo-fallback-box {
+    display: none;
+    align-items: center;
+    gap: 14px;
+    animation: logoPop 1.2s ease-out;
+}
 
-    #player-bucket {
-        width: 150px;
-        height: 80px;
-        background-color: #ddd;
-        border-radius: 0 0 15px 15px;
-        border: 4px solid var(--primary-blue);
-        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        position: relative;
-        cursor: grab;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        font-weight: bold;
-        color: var(--primary-blue);
-        font-size: 1.1em;
-    }
+.logo-fallback-mark {
+    width: 54px;
+    height: 54px;
+    background: linear-gradient(135deg, #ffb300, #ff007f);
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    color: white;
+}
 
-    /* Score and Info */
-    #hud {
-        position: absolute;
-        top: 20px;
-        right: 20px;
-        display: flex;
-        flex-direction: column;
-        gap: 5px;
-        z-index: 100;
-    }
+.logo-fallback-text {
+    font-size: clamp(2.5rem, 7vw, 4rem);
+    font-weight: 900;
+    letter-spacing: 3px;
+    background: linear-gradient(45deg, #ffffff, #ffb300, #ff007f);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
 
-    .hud-box {
-        background: #fff;
-        border: 1px solid #ccc;
-        border-radius: 8px;
-        padding: 10px 15px;
-        font-weight: bold;
-    }
+.logo-timer-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 6px;
+    background: linear-gradient(90deg, #ffb300, #ff007f);
+    width: 0%;
+    transition: width 0.05s linear;
+}
 
-    #restart-btn {
-        display: none;
-        background-color: var(--accent-blue);
-        border: none;
-        padding: 10px 20px;
-        border-radius: 8px;
-        color: #fff;
-        font-weight: bold;
-        cursor: pointer;
-    }
+/* SCREEN 2: Instruction / Briefing Screen */
+#screen-instructions {
+    display: none;
+    text-align: center;
+    align-items: center;
+    gap: 20px;
+}
 
+.instruction-title {
+    font-size: clamp(1.8rem, 4vw, 2.5rem);
+    color: var(--primary-blue);
+    font-weight: 900;
+}
+
+.instruction-box {
+    background: rgba(255, 255, 255, 0.85);
+    border: 1px solid rgba(0,0,0,0.08);
+    border-radius: 18px;
+    padding: 22px;
+    text-align: left;
+    width: 100%;
+    max-width: 650px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.instruction-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-size: clamp(0.95rem, 2.2vw, 1.1rem);
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.inst-num {
+    background: var(--primary-blue);
+    color: white;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    flex-shrink: 0;
+}
+
+/* SCREEN 3: Game Play Area */
+#screen-game {
+    display: none;
+    flex-direction: column;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid rgba(0, 0, 0, 0.08);
+    padding-bottom: 12px;
+}
+
+.grade-badge {
+    background: linear-gradient(45deg, #025091, #0373cf);
+    color: white;
+    padding: 4px 14px;
+    border-radius: 12px;
+    font-weight: 800;
+    font-size: 0.85rem;
+}
+
+.title {
+    font-size: clamp(1rem, 2.5vw, 1.3rem);
+    color: var(--primary-blue);
+    font-weight: 800;
+}
+
+.status-bar {
+    display: flex;
+    gap: 10px;
+    font-size: 0.85rem;
+    font-weight: 800;
+}
+
+.badge {
+    padding: 6px 14px;
+    border-radius: 20px;
+    background: #ffffff;
+    border: 1px solid #cce3f5;
+    color: var(--primary-blue);
+}
+
+/* Task Card */
+.task-card {
+    background: #112233;
+    color: white;
+    padding: 20px;
+    border-radius: 18px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    border-left: 6px solid var(--accent-gold);
+    text-align: center;
+}
+
+.category-label {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    color: var(--accent-gold);
+    letter-spacing: 1.5px;
+    font-weight: 800;
+    margin-bottom: 8px;
+}
+
+.sentence-text {
+    font-size: clamp(1.2rem, 2.5vw, 1.45rem);
+    font-weight: 600;
+    line-height: 1.5;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 16px;
+    border-radius: 12px;
+    border: 1px dashed rgba(255, 255, 255, 0.2);
+}
+
+/* Falling Word Target Zone */
+.catch-area {
+    position: relative;
+    width: 100%;
+    height: 240px;
+    background: #eef7ff;
+    border: 2px dashed #0373cf;
+    border-radius: 18px;
+    overflow: hidden;
+    margin-top: 10px;
+}
+
+.word-tile {
+    position: absolute;
+    background: var(--primary-blue);
+    color: white;
+    padding: 10px 22px;
+    border-radius: 25px;
+    font-weight: 800;
+    font-size: 1.1rem;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    transition: transform 0.1s ease, background 0.2s ease;
+}
+
+.word-tile:hover {
+    background: var(--secondary-blue);
+    transform: scale(1.05);
+}
+
+.action-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
+
+.feedback-bar {
+    flex: 1;
+    background: white;
+    border-radius: 12px;
+    padding: 12px;
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: var(--text-muted);
+    text-align: center;
+}
+
+.btn-main {
+    background: linear-gradient(45deg, #025091, #0072ff);
+    color: white;
+    border: 0;
+    padding: 12px 28px;
+    border-radius: 25px;
+    font-weight: 900;
+    font-size: 0.95rem;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0, 114, 255, 0.35);
+    transition: transform 0.15s ease;
+}
+
+.btn-main:hover {
+    transform: scale(1.04);
+}
+
+/* SCREEN 4: Completion Screen */
+#screen-completion {
+    display: none;
+    text-align: center;
+    align-items: center;
+    gap: 20px;
+    padding: 20px 10px;
+}
+
+.trophy-glow {
+    font-size: 5rem;
+    animation: bounce 2s infinite ease-in-out;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-15px); }
+}
+
+.congrats-title {
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 900;
+    background: linear-gradient(45deg, #025091, #ff007f);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
 </style>
 </head>
 <body>
 
-    <!-- Task Banner (Top) -->
-    <div id="task-banner">
-        <div id="function-label">Grammar grab challenge</div>
-        <div id="sentence-display">Click to start! [ _____ ]</div>
+<!-- AUDIO ASSETS -->
+<audio id="snd-correct" src="assets/correct.mp3" preload="auto"></audio>
+<audio id="snd-wrong" src="assets/wrong.mp3" preload="auto"></audio>
+
+<!-- SCREEN 1: Innovine Logo Screen (Strict 5 Seconds) -->
+<div id="screen-logo">
+    <img 
+        src="assets/logo.png" 
+        alt="Innovine Logo" 
+        class="innovine-logo-img" 
+        onerror="this.style.display='none'; document.getElementById('logo-fallback').style.display='flex';"
+    />
+    
+    <div id="logo-fallback" class="logo-fallback-box">
+        <div class="logo-fallback-mark">🎯</div>
+        <div class="logo-fallback-text">INNOVINE</div>
     </div>
 
-    <!-- Gameplay Arena -->
-    <div id="game-arena">
-        <div id="bucket-container">
-            <div id="player-bucket">My bucket</div>
+    <div class="logo-timer-bar" id="logo-progress"></div>
+</div>
+
+<!-- SCREEN 2: Instruction Screen -->
+<div id="screen-instructions" class="view-panel">
+    <div class="instruction-title">Modals Catch Game</div>
+    
+    <div class="instruction-box">
+        <div class="instruction-item">
+            <div class="inst-num">1</div>
+            <div>Read the sentence and check its category (Requests, Suggestions, Obligation, Possibility, or Certainty).</div>
+        </div>
+        <div class="instruction-item">
+            <div class="inst-num">2</div>
+            <div>Click or tap the correct floating modal verb to complete the sentence.</div>
+        </div>
+        <div class="instruction-item">
+            <div class="inst-num">3</div>
+            <div>You have <strong>2 attempts</strong> per sentence. Complete all rounds to win!</div>
         </div>
     </div>
 
-    <!-- HUD (Score and restart) -->
-    <div id="hud">
-        <div class="hud-box">Score: <span id="score-display">0</span></div>
-        <div class="hud-box">Item: <span id="item-count">1</span>/10</div>
-        <button id="restart-btn" onclick="startGame()">Restart Game</button>
+    <button class="btn-main" onclick="startGame()">Start Game</button>
+</div>
+
+<!-- SCREEN 3: Game Play Area -->
+<div id="screen-game" class="view-panel">
+    <div class="header">
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <div class="grade-badge">MODAL VERBS</div>
+            <div class="title">Catch the Correct Word</div>
+        </div>
+        <div class="status-bar">
+            <div class="badge">Round: <span id="lbl-q">1</span>/5</div>
+            <div class="badge">Attempts: <span id="lbl-attempts">2</span></div>
+        </div>
     </div>
 
+    <div class="task-card">
+        <div class="category-label" id="lbl-category">Category: Requests</div>
+        <div class="sentence-text" id="lbl-sentence">
+            "Loading sentence..."
+        </div>
+    </div>
+
+    <div class="catch-area" id="catch-arena">
+        <!-- Floating modal words render here -->
+    </div>
+
+    <div class="action-bar">
+        <div class="feedback-bar" id="lbl-feedback">Catch the correct modal verb floating in the arena!</div>
+    </div>
+</div>
+
+<!-- SCREEN 4: Completion Screen -->
+<div id="screen-completion" class="view-panel">
+    <div class="trophy-glow">🎓🏆</div>
+    <div class="congrats-title">Mastery Achieved!</div>
+    <p style="color: var(--text-muted); font-size: 1.1rem; max-width: 540px; font-weight: 600; line-height: 1.5;">
+        You successfully caught all correct modal verbs across Requests, Suggestions, Obligations, Possibilities, and Certainties according to image_6799b8.png!
+    </p>
+    <button class="btn-main" onclick="location.reload()">Play Again</button>
+</div>
+
 <script>
-    /* GAME LOGIC - Built on image_6799b8.png rules */
-    const taskBanner = document.getElementById('task-banner');
-    const functionLabel = document.getElementById('function-label');
-    const sentenceDisplay = document.getElementById('sentence-display');
-    const gameArena = document.getElementById('game-arena');
-    const playerBucket = document.getElementById('player-bucket');
-    const scoreDisplay = document.getElementById('score-display');
-    const itemCountDisplay = document.getElementById('item-count');
-    const restartBtn = document.getElementById('restart-btn');
+const $ = id => document.getElementById(id);
 
-    let score = 0;
-    let itemCount = 1;
-    let currentTask = null;
-    let currentWords = [];
-    let isGameOver = false;
-    let bucketPosition = window.innerWidth / 2; // Start center
-    const totalItems = 10;
-    const bucketWidth = 150;
-    let spawnTimer = null;
+let currentRound = 0;
+let attemptsLeft = 2;
+let isProcessing = false;
+let floatInterval = null;
 
-    /* The Question Database - Referencing image_6799b8.png examples */
-    const modalsDB = [
-        { function: "Request", sentence: "[ _____ ] you pass the salt, please?", correct: "Can", wrong: ["Must", "Should", "May"] },
-        { function: "Suggestion", sentence: "You [ _____ ] eat more vegetables.", correct: "Should", wrong: ["Must", "Could", "Would"] },
-        { function: "Obligation", sentence: "You [ _____ ] finish your homework before watching TV.", correct: "Must", wrong: ["Might", "Would", "Can"] },
-        { function: "Possibility", sentence: "It [ _____ ] rain later.", correct: "Might", wrong: ["Will", "Must", "Can"] },
-        { function: "Request", sentence: "[ _____ ] you please lend me your pen?", correct: "Could", wrong: ["Ought", "Must", "Might"] },
-        { function: "Certainty", sentence: "She [ _____ ] be there by now.", correct: "Would", wrong: ["Can", "Ought", "Might"] },
-        { function: "Possibility", sentence: "She [ _____ ] come to the party.", correct: "May", wrong: ["Must", "Should", "Will"] },
-        { function: "Obligation", sentence: "I [ _____ ] attend the meeting.", correct: "Have to", wrong: ["Might", "Could", "Can"] },
-        { function: "Suggestion", sentence: "You [ _____ ] visit the museum; it's fascinating.", correct: "Ought", wrong: ["Have to", "Might", "Will"] },
-        { function: "Prediction", sentence: "I [ _____ ] definitely pass the exam.", correct: "Will", wrong: ["Must", "Would", "Should"] }
-    ];
-
-    /* Initial Setup */
-    function startGame() {
-        score = 0;
-        itemCount = 1;
-        isGameOver = false;
-        restartBtn.style.display = 'none';
-        sentenceDisplay.innerHTML = "Get ready...";
-        functionLabel.innerHTML = "MODALS GRAMMAR GRAB";
-        updateHUD();
-        nextTask();
-        spawnWordsLoop();
+function playCorrectSound() {
+    const snd = $('snd-correct');
+    if (snd) {
+        snd.currentTime = 0;
+        snd.play().catch(e => {});
     }
+}
 
-    /* Update Score and Item count display */
-    function updateHUD() {
-        scoreDisplay.innerText = score;
-        itemCountDisplay.innerText = itemCount;
+function playWrongSound() {
+    const snd = $('snd-wrong');
+    if (snd) {
+        snd.currentTime = 0;
+        snd.play().catch(e => {});
     }
+}
 
-    /* Load next random task */
-    function nextTask() {
-        // Find a random item from the DB
-        const randomIndex = Math.floor(Math.random() * modalsDB.length);
-        currentTask = modalsDB[randomIndex];
-
-        functionLabel.innerHTML = `Category: ${currentTask.function}`;
-        sentenceDisplay.innerHTML = currentTask.sentence.replace('_____', '<span style="color:var(--secondary-blue); font-weight:900;">[ Catch ]</span>');
-
-        clearGameArea();
+/* Dataset sourced directly from image_6799b8.png */
+const gameTasks = [
+    {
+        category: "Requests",
+        sentence: "[ ____ ] you pass the salt, please?",
+        correct: "Can",
+        options: ["Can", "Must", "Should", "Might"],
+        rule: "Used to ask for something politely (can, could, will, would)."
+    },
+    {
+        category: "Suggestions",
+        sentence: "You [ ____ ] eat more vegetables.",
+        correct: "should",
+        options: ["should", "must", "may", "would"],
+        rule: "Offers advice or recommendations (should, ought to)."
+    },
+    {
+        category: "Obligation or Necessity",
+        sentence: "You [ ____ ] finish your homework before watching TV.",
+        correct: "must",
+        options: ["must", "might", "could", "would"],
+        rule: "Indicates duties or necessary actions (must, have to, should)."
+    },
+    {
+        category: "Possibility",
+        sentence: "It [ ____ ] rain later.",
+        correct: "might",
+        options: ["might", "will", "must", "should"],
+        rule: "Expresses uncertainty or likelihood (might, may, could)."
+    },
+    {
+        category: "Certainty and Prediction",
+        sentence: "I [ ____ ] definitely pass the exam.",
+        correct: "will",
+        options: ["will", "might", "could", "should"],
+        rule: "Expresses confidence about a future event (will, would, must)."
     }
+];
 
-    /* Function to regularly spawn words */
-    function spawnWordsLoop() {
-        clearTimeout(spawnTimer);
-        if (isGameOver) return;
+// Screen 1 Timer (Strict 5 Seconds)
+const LOGO_DURATION = 5000;
+let logoElapsed = 0;
 
-        spawnWord(); // Spawn one immediately
-        // Repeat at varying intervals (1s to 2.5s)
-        const delay = Math.random() * 1500 + 1000;
-        spawnTimer = setTimeout(spawnWordsLoop, delay);
-    }
+let logoInterval = setInterval(() => {
+    logoElapsed += 50;
+    let pct = Math.min((logoElapsed / LOGO_DURATION) * 100, 100);
+    $('logo-progress').style.width = pct + '%';
 
-    /* Remove existing falling words */
-    function clearGameArea() {
-        const words = gameArena.querySelectorAll('.word-tile');
-        words.forEach(w => w.remove());
-    }
-
-    /* Create a single falling word tile */
-    function spawnWord() {
-        if (!currentTask || isGameOver) return;
-
-        // Decide whether to spawn the correct word or a wrong one
-        // Higher chance of correct word as the item progresses to make it easier
-        const isCorrectChance = (Math.random() < 0.35); // 35% chance correct
-
-        let wordText;
-        if (isCorrectChance) {
-            wordText = currentTask.correct;
-        } else {
-            const wrongIndex = Math.floor(Math.random() * currentTask.wrong.length);
-            wordText = currentTask.wrong[wrongIndex];
-        }
-
-        const tile = document.createElement('div');
-        tile.className = 'word-tile';
-        tile.innerText = wordText;
-        tile.dataset.value = wordText;
-
-        // Position - must be above the arena
-        const startX = Math.random() * (window.innerWidth - 100); // Account for width
-        tile.style.left = startX + 'px';
-        tile.style.top = '-50px';
-
-        gameArena.appendChild(tile);
-        animateWord(tile);
-    }
-
-    /* Move the word tile down the screen */
-    function animateWord(tile) {
-        if (!gameArena.contains(tile) || isGameOver) return;
-
-        let currentY = parseFloat(tile.style.top);
-        currentY += 4; // Falling speed
-
-        tile.style.top = currentY + 'px';
-
-        checkCollision(tile);
-
-        if (currentY < (gameArena.offsetHeight - 50)) {
-            requestAnimationFrame(() => animateWord(tile));
-        } else {
-            tile.remove(); // Word missed
-        }
-    }
-
-    /* Collision Detection - Check if bucket caught the word */
-    function checkCollision(tile) {
-        if (!activeDrag || isGameOver || !gameArena.contains(tile)) return; // Only check if player is active
-
-        const tileRect = tile.getBoundingClientRect();
-        const bucketRect = playerBucket.getBoundingClientRect();
-
-        // Standard 2D collision check with a little padding
-        if (tileRect.bottom > bucketRect.top &&
-            tileRect.top < bucketRect.bottom &&
-            tileRect.right > bucketRect.left &&
-            tileRect.left < bucketRect.right) {
-            
-            handleCatch(tile);
-        }
-    }
-
-    /* Handle word interaction (scoring) */
-    function handleCatch(tile) {
-        const caughtValue = tile.dataset.value;
-        const isCorrect = (caughtValue === currentTask.correct);
-
-        // Visual feedback
-        tile.classList.add('popping'); // Visual burst
-        gameArena.style.pointerEvents = 'none'; // Prevent interactions until next task
-        clearTimeout(spawnTimer); // Stop spawning immediately
-
-        if (isCorrect) {
-            score += 100;
-            sentenceDisplay.innerHTML = currentTask.sentence.replace('_____', `<span style="color:var(--correct-green); font-weight:900;">${caughtValue}</span>`);
-            // Flash success
-            taskBanner.style.backgroundColor = '#d4edda';
-            taskBanner.style.borderColor = var(--correct-green);
-
-        } else {
-            score -= 25;
-            sentenceDisplay.innerHTML = currentTask.sentence.replace('_____', `<span style="color:var(--wrong-red); font-weight:900;">${caughtValue} (No!)</span>`);
-            // Flash wrong
-            taskBanner.style.backgroundColor = '#f8d7da';
-            taskBanner.style.borderColor = var(--wrong-red);
-        }
-
-        updateHUD();
-        
-        // Setup next task
+    if (logoElapsed >= LOGO_DURATION) {
+        clearInterval(logoInterval);
+        $('screen-logo').style.opacity = 0;
         setTimeout(() => {
-            if (itemCount < totalItems) {
-                itemCount++;
-                taskBanner.style.backgroundColor = '#fff';
-                taskBanner.style.borderColor = var(--accent-blue);
-                nextTask();
-                gameArena.style.pointerEvents = 'auto'; // Re-enable interaction
-                spawnWordsLoop(); // Resume spawn loop
-            } else {
-                gameOver();
-            }
-        }, 1500); // 1.5s pause to read results
-        
-        // Remove word tile visually instantly
-        tile.style.opacity = '0';
-        setTimeout(() => tile.remove(), 200); 
+            $('screen-logo').style.display = 'none';
+            $('screen-instructions').style.display = 'flex';
+        }, 600);
+    }
+}, 50);
+
+function startGame() {
+    $('screen-instructions').style.display = 'none';
+    $('screen-game').style.display = 'flex';
+    loadRound();
+}
+
+function loadRound() {
+    if (currentRound >= gameTasks.length) {
+        clearInterval(floatInterval);
+        $('screen-game').style.display = 'none';
+        $('screen-completion').style.display = 'flex';
+        return;
     }
 
-    /* End of game logic */
-    function gameOver() {
-        isGameOver = true;
-        clearGameArea();
-        clearTimeout(spawnTimer);
+    attemptsLeft = 2;
+    isProcessing = false;
+    $('lbl-q').innerText = currentRound + 1;
+    $('lbl-attempts').innerText = attemptsLeft;
+    $('lbl-feedback').innerText = "Catch the correct floating modal word!";
+    $('lbl-feedback').style.color = "var(--text-muted)";
+
+    let task = gameTasks[currentRound];
+    $('lbl-category').innerText = `Category: ${task.category}`;
+    $('lbl-sentence').innerText = `"${task.sentence}"`;
+
+    spawnFloatingWords(task);
+}
+
+function spawnFloatingWords(task) {
+    const arena = $('catch-arena');
+    arena.innerHTML = '';
+    clearInterval(floatInterval);
+
+    let tiles = [];
+    task.options.forEach((word) => {
+        let tile = document.createElement('div');
+        tile.className = 'word-tile';
+        tile.innerText = word;
         
-        functionLabel.innerHTML = "GAME OVER";
-        sentenceDisplay.innerHTML = `Score: <span style="font-size:1.6em;">${score}</span>! Thank you for catching words.`;
-        
-        taskBanner.style.backgroundColor = '#fef6cd';
-        taskBanner.style.borderColor = var(--accent-blue);
+        // Random placement inside arena
+        let x = Math.random() * (arena.clientWidth - 110);
+        let y = Math.random() * (arena.clientHeight - 50);
+        let dx = (Math.random() - 0.5) * 3;
+        let dy = (Math.random() - 0.5) * 3;
 
-        restartBtn.style.display = 'block';
-    }
+        tile.style.left = `${x}px`;
+        tile.style.top = `${y}px`;
 
-    /* Player Bucket Control (Dragging) */
-    let activeDrag = false;
+        tile.onclick = () => catchWord(word);
+        arena.appendChild(tile);
 
-    gameArena.addEventListener('pointerdown', e => {
-        const rect = e.target.closest('#player-bucket');
-        if (rect) {
-            activeDrag = true;
-            playerBucket.style.cursor = 'grabbing';
-            updateBucketPosition(e);
+        tiles.push({ el: tile, x, y, dx, dy });
+    });
+
+    // Floating motion loop
+    floatInterval = setInterval(() => {
+        tiles.forEach(t => {
+            t.x += t.dx;
+            t.y += t.dy;
+
+            if (t.x <= 0 || t.x >= arena.clientWidth - 110) t.dx *= -1;
+            if (t.y <= 0 || t.y >= arena.clientHeight - 50) t.dy *= -1;
+
+            t.el.style.left = `${t.x}px`;
+            t.el.style.top = `${t.y}px`;
+        });
+    }, 30);
+}
+
+function catchWord(selectedWord) {
+    if (isProcessing) return;
+
+    let task = gameTasks[currentRound];
+
+    if (selectedWord.toLowerCase() === task.correct.toLowerCase()) {
+        isProcessing = true;
+        playCorrectSound();
+        $('lbl-feedback').innerText = `🎯 EXCELLENT CATCH! "${task.correct}" is correct. (${task.rule})`;
+        $('lbl-feedback').style.color = "var(--accent-green)";
+        $('lbl-sentence').innerText = `"${task.sentence.replace('[ ____ ]', task.correct)}"`;
+
+        setTimeout(() => {
+            currentRound++;
+            loadRound();
+        }, 2200);
+    } else {
+        attemptsLeft--;
+        $('lbl-attempts').innerText = attemptsLeft;
+        playWrongSound();
+
+        if (attemptsLeft > 0) {
+            $('lbl-feedback').innerText = `❌ Incorrect modal caught! 1 attempt remaining.`;
+            $('lbl-feedback').style.color = "var(--accent-pink)";
+        } else {
+            isProcessing = true;
+            $('lbl-feedback').innerText = `⚡ Out of attempts! Correct modal: "${task.correct}". (${task.rule})`;
+            $('lbl-feedback').style.color = "var(--accent-gold)";
+
+            setTimeout(() => {
+                currentRound++;
+                loadRound();
+            }, 3000);
         }
-    });
-
-    gameArena.addEventListener('pointermove', e => {
-        if (!activeDrag) return;
-        updateBucketPosition(e);
-    });
-
-    gameArena.addEventListener('pointerup', e => {
-        activeDrag = false;
-        playerBucket.style.cursor = 'grab';
-    });
-    
-    // Safety check if pointer leaves arena
-    gameArena.addEventListener('pointerleave', e => { activeDrag = false; });
-
-    function updateBucketPosition(e) {
-        const x = e.clientX;
-        // Keep bucket within arena bounds
-        const minX = bucketWidth / 2;
-        const maxX = window.innerWidth - (bucketWidth / 2);
-        
-        // Set center of bucket
-        const newX = Math.max(minX, Math.min(maxX, x));
-        
-        playerBucket.style.left = (newX - bucketWidth / 2) + 'px';
     }
-
-    /* Start the game on page load */
-    window.onload = () => {
-        // Initial bucket centering
-        playerBucket.style.left = (window.innerWidth / 2 - bucketWidth / 2) + 'px';
-        startGame();
-    };
-
+}
 </script>
 </body>
 </html>
