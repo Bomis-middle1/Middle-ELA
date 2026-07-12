@@ -1,1 +1,69 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Active vs Passive – Voice Vault</title>
+<style>
+body{margin:0;padding:0;font-family:Inter,sans-serif;background:#08111f;color:#edf6ff;overflow:hidden}
+#splash{position:fixed;inset:0;display:flex;justify-content:center;align-items:center;background:#fff;z-index:999}
+#splash img{width:40vw;max-width:280px;animation:flash 1s infinite}
+@keyframes flash{0%,100%{opacity:.3;transform:scale(.95)}50%{opacity:1;transform:scale(1.05)}}
+.screen{display:none;height:100vh;padding:20px;box-sizing:border-box}
+.screen.active{display:flex;flex-direction:column;align-items:center;justify-content:center}
+.panel{background:rgba(16,29,57,.95);border-radius:28px;padding:20px;max-width:800px;width:95%;text-align:center;box-shadow:0 18px 45px rgba(0,0,0,.35);}
+h1{font-size:2rem;margin-bottom:10px}
+h2{font-size:1.5rem;margin:10px 0}
+button{padding:12px 24px;border-radius:999px;border:none;font-weight:900;cursor:pointer;margin-top:10px;background:linear-gradient(135deg,#43d8ff,#8b72ff);color:#08111f}
+#gamePanel{margin-top:20px;width:100%;max-width:800px}
+#scoreBoard{margin-top:12px;display:flex;justify-content:space-around;width:80%}
+#timer{font-weight:900;color:#ffd166}
+</style>
+</head>
+<body>
+<div id="splash"><img src="assets/innovine-logo.png" alt="Innovine logo"></div>
+
+<div id="intro" class="screen active">
+  <div class="panel">
+    <h1>Active vs Passive – Voice Vault</h1>
+    <p>Restore the voice balance in the vault! Complete 12 missions to repair Active and Passive structures.</p>
+    <button id="startBtn">Start Mission</button>
+  </div>
+</div>
+
+<div id="game" class="screen">
+  <div class="panel" id="gamePanel">
+    <h2 id="missionTitle">Mission Title</h2>
+    <p id="prompt">Mission prompt will appear here.</p>
+    <div id="workArea"></div>
+    <div id="scoreBoard">
+      <span id="score">Score: 0</span>
+      <span id="missionCount">Mission 1/12</span>
+      <span id="timer">⏱ 45</span>
+    </div>
+    <button id="checkBtn">Check Answer</button>
+  </div>
+</div>
+
+<div id="result" class="screen">
+  <div class="panel">
+    <h1>Mission Complete!</h1>
+    <p>Your results:</p>
+    <div id="finalScore">Score: 0</div>
+    <button id="playAgain">Play Again</button>
+  </div>
+</div>
+
+<audio id="correctAudio" src="assets/correct.mp3" preload="auto"></audio>
+<audio id="wrongAudio" src="assets/wrong.mp3" preload="auto"></audio>
+<audio id="clapAudio" src="assets/clapping.mp3" preload="auto"></audio>
+
+<script>
+const $ = s => document.querySelector(s);
+setTimeout(()=>{$("#splash").style.display="none";$("#intro").classList.add("active")},5000);
+$("#startBtn").onclick = ()=>{ $("#intro").classList.remove("active"); $("#game").classList.add("active"); };
+$("#playAgain").onclick = ()=>{ location.reload(); };
+</script>
+</body>
+</html>
