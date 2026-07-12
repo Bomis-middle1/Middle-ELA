@@ -7,7 +7,7 @@
 <style>
 :root {
     --card-bg: rgba(255, 255, 255, 0.94);
-    --primary-purple: #4a148d;
+    --primary-purple: #4a148c;
     --accent-pink: #d81b60;
     --accent-blue: #0288d1;
     --accent-amber: #f57c00;
@@ -379,6 +379,10 @@ body {
 </head>
 <body>
 
+<!-- AUDIO ASSETS -->
+<audio id="snd-correct" src="assets/correct.mp3" preload="auto"></audio>
+<audio id="snd-wrong" src="assets/wrong.mp3" preload="auto"></audio>
+
 <!-- SCREEN 1: Innovine Logo Screen (Strictly 5 Seconds) -->
 <div id="screen-logo">
     <img 
@@ -462,6 +466,23 @@ const $ = id => document.getElementById(id);
 let currentQ = 0;
 let attemptsLeft = 2;
 let isProcessing = false;
+
+/* Helper functions to play sound effects */
+function playCorrectSound() {
+    const snd = $('snd-correct');
+    if (snd) {
+        snd.currentTime = 0;
+        snd.play().catch(e => console.log('Audio playback prevented:', e));
+    }
+}
+
+function playWrongSound() {
+    const snd = $('snd-wrong');
+    if (snd) {
+        snd.currentTime = 0;
+        snd.play().catch(e => console.log('Audio playback prevented:', e));
+    }
+}
 
 /* Question Bank direct from image_66a9bd.png & image_66a9f6.png */
 const questionBank = [
@@ -583,6 +604,7 @@ function burstBubble(bubbleElem, selectedVal) {
 
     if (selectedVal === data.correct) {
         isProcessing = true;
+        playCorrectSound();
         $('lbl-feedback').innerText = `💥 POP! Correct! "${data.sentence.replace('_____', selectedVal)}"`;
         $('lbl-feedback').style.color = "var(--accent-green)";
 
@@ -593,6 +615,7 @@ function burstBubble(bubbleElem, selectedVal) {
     } else {
         attemptsLeft--;
         $('lbl-attempts').innerText = attemptsLeft;
+        playWrongSound();
 
         if (attemptsLeft > 0) {
             $('lbl-feedback').innerText = `❌ Burst the wrong bubble! 1 attempt left.`;
@@ -605,7 +628,7 @@ function burstBubble(bubbleElem, selectedVal) {
             $('lbl-feedback').innerText = `⚡ Out of attempts! Right answer: "${data.correct}"`;
             $('lbl-feedback').style.color = "var(--accent-pink)";
 
-            // Highlight and burst correct bubble
+            // Highlight correct bubble
             let allBubbles = Array.from(document.querySelectorAll('.bubble'));
             let correctBubble = allBubbles.find(b => b.innerText === data.correct);
             if (correctBubble) {
