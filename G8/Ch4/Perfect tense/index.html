@@ -3,19 +3,19 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-<title>G8 English: Perfect Tenses Lab</title>
+<title>Innovine - Perfect Tenses Challenge</title>
 <style>
 :root {
-    --card-bg: rgba(255, 255, 255, 0.92);
-    --primary-purple: #6a1b9a;
-    --accent-pink: #e91e63;
+    --card-bg: rgba(255, 255, 255, 0.94);
+    --primary-purple: #5c1d8f;
+    --accent-pink: #d81b60;
     --accent-blue: #0288d1;
     --accent-amber: #f57c00;
     --accent-green: #2e7d32;
     --text-main: #1f142e;
     --text-muted: #5c4e70;
     --border-color: rgba(255, 255, 255, 0.6);
-    --shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    --shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
 }
 
 * {
@@ -26,18 +26,17 @@
     user-select: none;
 }
 
-/* Vibrant Colorful Backdrop with Animated Gradient */
+/* Vibrant Responsive Background */
 body {
-    background: linear-gradient(-45deg, #ff416c, #8a2387, #e91e63, #240b36, #00c6ff, #0072ff);
-    background-size: 400% 400%;
-    animation: gradientBG 15s ease infinite;
+    background: linear-gradient(-45deg, #e91e63, #6a1b9a, #00c6ff, #240b36);
+    background-size: 300% 300%;
+    animation: gradientBG 12s ease infinite;
     color: var(--text-main);
     min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 15px;
-    position: relative;
+    padding: 12px;
     overflow-x: hidden;
 }
 
@@ -47,267 +46,238 @@ body {
     100% { background-position: 0% 50%; }
 }
 
-/* Floating Ambient Orbs */
-.orb {
-    position: absolute;
-    border-radius: 50%;
-    filter: blur(50px);
-    opacity: 0.6;
-    pointer-events: none;
-    z-index: 0;
+/* Base View Layout */
+.view-panel {
+    position: relative;
+    width: 100%;
+    max-width: 900px;
+    background: var(--card-bg);
+    backdrop-filter: blur(12px);
+    border-radius: 24px;
+    padding: clamp(16px, 4vw, 28px);
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    border: 2px solid var(--border-color);
 }
-.orb-1 { width: 300px; height: 300px; background: #ffeb3b; top: 10%; left: 5%; animation: float 8s infinite alternate; }
-.orb-2 { width: 350px; height: 350px; background: #00e676; bottom: 10%; right: 5%; animation: float 10s infinite alternate-reverse; }
 
-@keyframes float {
-    0% { transform: translateY(0) scale(1); }
-    100% { transform: translateY(-30px) scale(1.1); }
-}
-
-/* Mandatory 5-Second Splash / Logo Screen */
-#splash {
+/* SCREEN 1: Innovine Logo Screen (Strictly 5 Seconds) */
+#screen-logo {
     position: fixed;
     inset: 0;
-    background: linear-gradient(135deg, #1a022d, #4a154b, #2a0845);
-    color: white;
+    background: #0d021a;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     z-index: 9999;
-    transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-    text-align: center;
-    padding: 20px;
+    transition: opacity 0.6s ease;
 }
 
-.logo-container {
+.innovine-logo {
     display: flex;
-    flex-direction: column;
     align-items: center;
-    gap: 15px;
-    margin-bottom: 25px;
-    animation: logoPulse 2.5s infinite ease-in-out;
+    gap: 12px;
+    animation: logoPop 1.5s ease-out;
 }
 
-@keyframes logoPulse {
-    0%, 100% { transform: scale(1); filter: drop-shadow(0 0 15px rgba(233, 30, 99, 0.4)); }
-    50% { transform: scale(1.05); filter: drop-shadow(0 0 30px rgba(0, 242, 254, 0.7)); }
+@keyframes logoPop {
+    0% { transform: scale(0.8); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
 }
 
-.brand-icon {
-    font-size: 4.5rem;
-    background: linear-gradient(45deg, #ff007f, #00f2fe);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-
-.splash-badge {
-    background: linear-gradient(45deg, #ff007f, #ffaa00);
+.innovine-mark {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #00f2fe, #4facfe, #ff007f);
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
     color: white;
-    font-size: 1.1rem;
-    font-weight: 800;
-    padding: 8px 24px;
-    border-radius: 20px;
-    letter-spacing: 2.5px;
-    box-shadow: 0 4px 15px rgba(255, 0, 127, 0.4);
+    box-shadow: 0 0 30px rgba(0, 242, 254, 0.6);
 }
 
-#splash-title {
-    font-size: clamp(2.4rem, 5vw, 3.5rem);
+.innovine-text {
+    font-size: clamp(3rem, 8vw, 4.5rem);
     font-weight: 900;
-    margin-top: 10px;
-    margin-bottom: 8px;
-    background: linear-gradient(45deg, #ffffff, #e0d0f5);
+    letter-spacing: 2px;
+    background: linear-gradient(45deg, #ffffff, #00f2fe, #ff007f);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    text-shadow: 0 4px 20px rgba(0,0,0,0.4);
 }
 
-.splash-sub {
-    color: #bfa1e6;
-    font-size: 1.1rem;
-    margin-bottom: 35px;
-    max-width: 600px;
-    font-weight: 600;
-}
-
-.loader-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-}
-
-.loader {
-    width: 280px;
-    height: 10px;
-    background: rgba(255, 255, 255, 0.15);
-    border-radius: 50px;
-    overflow: hidden;
-    box-shadow: inset 0 2px 5px rgba(0,0,0,0.3);
-    border: 1px solid rgba(255,255,255,0.2);
-}
-
-.loader div {
-    height: 100%;
+.logo-timer-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 6px;
+    background: linear-gradient(90deg, #00f2fe, #ff007f);
     width: 0%;
-    background: linear-gradient(90deg, #ff007f, #00f2fe);
-    border-radius: 50px;
+    transition: width 0.05s linear;
 }
 
-.timer-text {
-    font-size: 0.85rem;
-    color: #a892c9;
-    letter-spacing: 1px;
-    font-weight: 700;
-    text-transform: uppercase;
+/* SCREEN 2: Instruction Screen */
+#screen-instructions {
+    display: none;
+    text-align: center;
+    align-items: center;
+    gap: 20px;
 }
 
-/* Game Card Box */
-#game-container {
-    position: relative;
-    z-index: 10;
+.instruction-title {
+    font-size: clamp(1.8rem, 4vw, 2.5rem);
+    color: var(--primary-purple);
+    font-weight: 900;
+}
+
+.instruction-box {
+    background: rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(0,0,0,0.1);
+    border-radius: 18px;
+    padding: 20px;
+    text-align: left;
     width: 100%;
-    max-width: 940px;
-    background: var(--card-bg);
-    backdrop-filter: blur(16px);
-    border-radius: 28px;
-    padding: clamp(20px, 4vw, 32px);
-    box-shadow: var(--shadow);
+    max-width: 650px;
     display: flex;
     flex-direction: column;
-    gap: 20px;
-    border: 2px solid var(--border-color);
-    opacity: 0;
-    transition: opacity 0.5s ease;
+    gap: 12px;
 }
 
-/* Header Area */
+.instruction-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: clamp(0.95rem, 2.2vw, 1.1rem);
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.inst-num {
+    background: var(--primary-purple);
+    color: white;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    flex-shrink: 0;
+}
+
+/* SCREEN 3: Game Play Area */
+#screen-game {
+    display: none;
+    flex-direction: column;
+}
+
 .header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     border-bottom: 2px solid rgba(0, 0, 0, 0.08);
-    padding-bottom: 16px;
+    padding-bottom: 12px;
 }
 
 .grade-badge {
     background: linear-gradient(45deg, #8e2de2, #4a00e0);
     color: white;
-    padding: 6px 16px;
+    padding: 4px 14px;
     border-radius: 12px;
     font-weight: 800;
-    font-size: 0.95rem;
-    box-shadow: 0 4px 10px rgba(142, 45, 226, 0.3);
+    font-size: 0.85rem;
 }
 
 .title {
-    font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+    font-size: clamp(1rem, 2.5vw, 1.3rem);
     color: var(--primary-purple);
     font-weight: 800;
 }
 
 .status-bar {
     display: flex;
-    gap: 12px;
-    font-size: 0.9rem;
+    gap: 10px;
+    font-size: 0.85rem;
     font-weight: 800;
 }
 
 .badge {
-    padding: 6px 16px;
+    padding: 6px 14px;
     border-radius: 20px;
     background: #ffffff;
     border: 1px solid #dcd0ea;
     color: var(--primary-purple);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
 /* Before & After Interactive Showcase */
 .before-after-display {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 15px;
+    gap: 12px;
     background: rgba(255, 255, 255, 0.6);
     border: 1px solid var(--border-color);
-    border-radius: 20px;
-    padding: 16px;
+    border-radius: 18px;
+    padding: 12px;
 }
 
-@media(max-width: 600px) {
+@media(max-width: 550px) {
     .before-after-display { grid-template-columns: 1fr; }
 }
 
 .state-card {
     background: white;
-    border-radius: 16px;
-    padding: 16px;
-    border: 1px solid rgba(0,0,0,0.06);
+    border-radius: 14px;
+    padding: 12px;
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
-    gap: 10px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    gap: 6px;
 }
 
 .state-tag {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     text-transform: uppercase;
     letter-spacing: 1.5px;
     font-weight: 900;
-    padding: 4px 14px;
-    border-radius: 10px;
+    padding: 3px 10px;
+    border-radius: 8px;
 }
 
-.tag-before { background: #ffebee; color: #c62828; border: 1px solid #ffcdd2; }
-.tag-after { background: #e8f5e9; color: #2e7d32; border: 1px solid #c8e6c9; }
+.tag-before { background: #ffebee; color: #c62828; }
+.tag-after { background: #e8f5e9; color: #2e7d32; }
 
-.state-icon {
-    font-size: 3.5rem;
-    line-height: 1;
-}
+.state-icon { font-size: 2.8rem; line-height: 1; }
+.state-desc { font-size: 0.88rem; color: var(--text-muted); font-weight: 600; }
 
-.state-desc {
-    font-size: 0.95rem;
-    color: var(--text-muted);
-    font-weight: 600;
-}
-
-/* Question Banner */
 .question-card {
     background: linear-gradient(135deg, #f3e5f5, #e1bee7);
-    border-left: 6px solid var(--primary-purple);
-    padding: 16px 20px;
-    border-radius: 14px;
+    border-left: 5px solid var(--primary-purple);
+    padding: 12px 16px;
+    border-radius: 12px;
 }
 
 .q-tense-type {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     text-transform: uppercase;
-    letter-spacing: 1.2px;
     font-weight: 900;
     color: var(--accent-pink);
-    margin-bottom: 4px;
+    margin-bottom: 2px;
 }
 
 .question-text {
-    font-size: 1.15rem;
+    font-size: clamp(0.95rem, 2vw, 1.1rem);
     font-weight: 700;
-    color: var(--text-main);
 }
 
-/* Slot Assembly Area */
-.builder-area {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
+/* Slots Assembly Area */
 .slot-container {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
+    gap: 10px;
 }
 
 @media(max-width: 650px) {
@@ -317,382 +287,362 @@ body {
 .slot-box {
     background: #ffffff;
     border: 2px dashed var(--accent-blue);
-    border-radius: 18px;
-    min-height: 75px;
+    border-radius: 14px;
+    min-height: 65px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 10px;
+    padding: 8px;
     transition: all 0.2s ease;
-}
-
-.slot-box.hovered {
-    background: #e1f5fe;
-    border-color: #0277bd;
-    transform: scale(1.02);
 }
 
 .slot-box.filled {
     border-style: solid;
     background: #f0f4c3;
     border-color: #afb42b;
-    box-shadow: 0 4px 12px rgba(175, 180, 43, 0.2);
 }
 
 .slot-label {
-    font-size: 0.72rem;
+    font-size: 0.68rem;
     text-transform: uppercase;
-    letter-spacing: 1px;
     font-weight: 800;
     color: var(--text-muted);
-    margin-bottom: 4px;
 }
 
 .slot-content {
     font-weight: 800;
-    font-size: 1.05rem;
+    font-size: 0.95rem;
     color: #2e7d32;
     text-align: center;
 }
 
 /* Word Bank Palette */
-.tiles-label {
-    font-size: 0.85rem;
-    text-transform: uppercase;
-    letter-spacing: 1.2px;
-    color: var(--primary-purple);
-    font-weight: 900;
-}
-
 .tiles-bank {
     display: flex;
     flex-wrap: wrap;
-    gap: 12px;
-    min-height: 85px;
+    gap: 8px;
+    min-height: 75px;
     background: rgba(255, 255, 255, 0.7);
-    padding: 16px;
-    border-radius: 18px;
+    padding: 12px;
+    border-radius: 16px;
     border: 1px solid var(--border-color);
     align-items: center;
     justify-content: center;
 }
 
 .tile {
-    background: linear-gradient(135deg, #ffffff, #f5f5f5);
+    background: white;
     border: 2px solid #8e2de2;
     color: var(--text-main);
-    padding: 12px 18px;
-    border-radius: 14px;
+    padding: 8px 14px;
+    border-radius: 12px;
     font-weight: 800;
-    font-size: 0.95rem;
-    cursor: grab;
-    transition: all 0.2s ease;
-    box-shadow: 0 4px 10px rgba(142, 45, 226, 0.15);
+    font-size: 0.88rem;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    box-shadow: 0 3px 8px rgba(142, 45, 226, 0.15);
 }
 
 .tile:hover {
-    background: linear-gradient(45deg, #ff007f, #7928ca);
+    background: var(--primary-purple);
     color: white;
-    border-color: transparent;
-    transform: translateY(-3px);
-    box-shadow: 0 6px 20px rgba(255, 0, 127, 0.35);
 }
 
-.tile.dragging { opacity: 0.3; }
-
-/* Control Actions */
+/* Controls */
 .action-bar {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 15px;
+    gap: 12px;
 }
 
 .feedback-bar {
     flex: 1;
     background: white;
-    border: 1px solid rgba(0,0,0,0.08);
-    border-radius: 16px;
-    padding: 14px 18px;
-    font-size: 0.95rem;
+    border-radius: 12px;
+    padding: 10px 14px;
+    font-size: 0.9rem;
     font-weight: 800;
     color: var(--text-muted);
     text-align: center;
 }
 
-.btn-check {
+.btn-main {
     background: linear-gradient(45deg, #ff007f, #7928ca);
     color: white;
     border: 0;
-    padding: 14px 32px;
-    border-radius: 30px;
+    padding: 12px 28px;
+    border-radius: 25px;
     font-weight: 900;
-    font-size: 1rem;
-    letter-spacing: 1px;
+    font-size: 0.95rem;
     cursor: pointer;
-    box-shadow: 0 6px 20px rgba(121, 40, 202, 0.4);
-    transition: all 0.2s ease;
+    box-shadow: 0 4px 15px rgba(121, 40, 202, 0.35);
+    transition: transform 0.15s ease;
 }
 
-.btn-check:hover {
-    transform: scale(1.05);
-    box-shadow: 0 8px 25px rgba(255, 0, 127, 0.5);
+.btn-main:hover {
+    transform: scale(1.04);
 }
 
-/* End Screen */
-#end-screen {
+/* SCREEN 4: Completion Screen */
+#screen-completion {
     display: none;
-    flex-direction: column;
-    align-items: center;
     text-align: center;
+    align-items: center;
     gap: 20px;
-    padding: 30px 10px;
+    padding: 20px 10px;
 }
 
-#end-screen h2 {
-    font-size: 2.4rem;
+.trophy-glow {
+    font-size: 5rem;
+    animation: bounce 2s infinite ease-in-out;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-15px); }
+}
+
+.congrats-title {
+    font-size: clamp(2rem, 5vw, 3rem);
     font-weight: 900;
-    color: var(--primary-purple);
+    background: linear-gradient(45deg, #8e2de2, #ff007f);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 </style>
 </head>
 <body>
 
-<!-- Ambient Backdrop Orbs -->
-<div class="orb orb-1"></div>
-<div class="orb orb-2"></div>
-
-<!-- 5-Second Splash / Logo Screen -->
-<div id="splash">
-    <div class="logo-container">
-        <div class="brand-icon">🎓💎</div>
-        <div class="splash-badge">GRADE 8 ENGLISH</div>
+<!-- SCREEN 1: Innovine Logo Screen (Strictly 5 seconds) -->
+<div id="screen-logo">
+    <div class="innovine-logo">
+        <div class="innovine-mark">✦</div>
+        <div class="innovine-text">INNOVINE</div>
     </div>
-    <div id="splash-title">Perfect Tenses Lab</div>
-    <div class="splash-sub">Inspired by image_c2c8a2.png — Advanced Before & After Syntactic Analysis</div>
-    <div class="loader-container">
-        <div class="loader"><div id="loadFill"></div></div>
-        <div class="timer-text" id="timer-text">Initializing Game (5s)...</div>
-    </div>
+    <div class="logo-timer-bar" id="logo-progress"></div>
 </div>
 
-<!-- Main Game Container -->
-<div id="game-container">
+<!-- SCREEN 2: Instruction Screen -->
+<div id="screen-instructions" class="view-panel">
+    <div class="instruction-title">How to Play</div>
+    
+    <div class="instruction-box">
+        <div class="instruction-item">
+            <div class="inst-num">1</div>
+            <div>Examine the <strong>BEFORE</strong> and <strong>AFTER</strong> visual states carefully.</div>
+        </div>
+        <div class="instruction-item">
+            <div class="inst-num">2</div>
+            <div>Tap or drag tiles into the 3 sentence slots to form the correct Perfect Tense sentence.</div>
+        </div>
+        <div class="instruction-item">
+            <div class="inst-num">3</div>
+            <div>You get <strong>2 chances</strong> per question. If incorrect on the 2nd chance, the right answer will be revealed.</div>
+        </div>
+    </div>
+
+    <button class="btn-main" onclick="startGame()">Start Challenge</button>
+</div>
+
+<!-- SCREEN 3: Game Play Area -->
+<div id="screen-game" class="view-panel">
     <div class="header">
-        <div style="display: flex; align-items: center; gap: 10px;">
-            <div class="grade-badge">GRADE 8</div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <div class="grade-badge">G8 ENGLISH</div>
             <div class="title">Perfect Tenses: Before & After</div>
         </div>
         <div class="status-bar">
             <div class="badge">Question: <span id="lbl-q">1</span>/8</div>
-            <div class="badge">Shields: <span id="lbl-shields">2</span></div>
+            <div class="badge">Attempts Left: <span id="lbl-attempts">2</span></div>
         </div>
     </div>
 
     <!-- Visual Before & After Showcase -->
     <div class="before-after-display">
         <div class="state-card">
-            <span class="state-tag tag-before">INITIAL STATE</span>
+            <span class="state-tag tag-before">BEFORE</span>
             <div class="state-icon" id="img-before">🚗🤎</div>
-            <div class="state-desc" id="desc-before">Loading state...</div>
+            <div class="state-desc" id="desc-before">Loading...</div>
         </div>
         <div class="state-card">
-            <span class="state-tag tag-after">RESULTING STATE</span>
+            <span class="state-tag tag-after">AFTER</span>
             <div class="state-icon" id="img-after">✨🚗</div>
-            <div class="state-desc" id="desc-after">Loading state...</div>
+            <div class="state-desc" id="desc-after">Loading...</div>
         </div>
     </div>
 
     <div class="question-card">
-        <div class="q-tense-type" id="lbl-tense-type">Present Perfect Tense</div>
-        <div class="question-text" id="lbl-question">Question loading...</div>
+        <div class="q-tense-type" id="lbl-tense-type">Present Perfect</div>
+        <div class="question-text" id="lbl-question">Loading question...</div>
     </div>
 
     <div class="builder-area">
         <div class="slot-container">
-            <div class="slot-box" id="slot-0">
-                <span class="slot-label">Subject & Modifier</span>
-                <span class="slot-content" id="slot-val-0">Drop Tile</span>
+            <div class="slot-box" id="slot-0" onclick="clearSlot(0)">
+                <span class="slot-label">Subject Phrase</span>
+                <span class="slot-content" id="slot-val-0">Select Tile</span>
             </div>
-            <div class="slot-box" id="slot-1">
-                <span class="slot-label">Auxiliary Verb Phrase</span>
-                <span class="slot-content" id="slot-val-1">Drop Tile</span>
+            <div class="slot-box" id="slot-1" onclick="clearSlot(1)">
+                <span class="slot-label">Auxiliary Verb</span>
+                <span class="slot-content" id="slot-val-1">Select Tile</span>
             </div>
-            <div class="slot-box" id="slot-2">
-                <span class="slot-label">Past Participle + Complement</span>
-                <span class="slot-content" id="slot-val-2">Drop Tile</span>
+            <div class="slot-box" id="slot-2" onclick="clearSlot(2)">
+                <span class="slot-label">Past Participle</span>
+                <span class="slot-content" id="slot-val-2">Select Tile</span>
             </div>
         </div>
 
-        <div class="tiles-label">🧩 Word Bank (Synthesizer Palette)</div>
         <div class="tiles-bank" id="tiles-bank"></div>
     </div>
 
     <div class="action-bar">
-        <div class="feedback-bar" id="lbl-feedback">Drag syntax components into pods and lock them in!</div>
-        <button class="btn-check" onclick="verifyAssembly()">Lock Formula</button>
+        <div class="feedback-bar" id="lbl-feedback">Tap tiles to assemble sentence.</div>
+        <button class="btn-main" onclick="verifyAnswer()">Submit</button>
     </div>
+</div>
 
-    <div id="end-screen">
-        <div style="font-size: 4.5rem;">🏆</div>
-        <h2>G8 Grammar Mastered!</h2>
-        <p style="color: var(--text-muted); font-size: 1.1rem; max-width: 550px; line-height: 1.6;">
-            Outstanding performance! You have mastered Grade 8 level Present Perfect, Past Perfect, and Future Perfect tense constructions across complex before-and-after scenarios.
-        </p>
-        <button class="btn-check" onclick="location.reload()">Replay Challenge</button>
-    </div>
+<!-- SCREEN 4: Completion Screen -->
+<div id="screen-completion" class="view-panel">
+    <div class="trophy-glow">🎓✨</div>
+    <div class="congrats-title">Congratulations!</div>
+    <p style="color: var(--text-muted); font-size: 1.1rem; max-width: 500px; font-weight: 600;">
+        You have successfully mastered Grade 8 Perfect Tenses across all Before & After scenarios!
+    </p>
+    <button class="btn-main" onclick="location.reload()">Play Again</button>
 </div>
 
 <script>
 const $ = id => document.getElementById(id);
+
 let currentQ = 0;
-let shields = 2;
+let attemptsLeft = 2;
 let slotValues = ["", "", ""];
-let draggedTileText = "";
 
-/* Audio Synthesizer fallback */
-function playAudioTone(freq, type) {
-    try {
-        const ctx = new (window.AudioContext || window.webkitAudioContext)();
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.type = type;
-        osc.frequency.setValueAtTime(freq, ctx.currentTime);
-        gain.gain.setValueAtTime(0.2, ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.start();
-        osc.stop(ctx.currentTime + 0.3);
-    } catch(e) {}
-}
-
-/* Database featuring higher-level G8 vocabulary & complex structures based on image_c2c8a2.png */
+/* Grade 8 Database strictly aligned with image_c2c8a2.png concepts */
 const database = [
     {
-        tenseType: "Present Perfect (Completed Action with Present Relevance)",
-        question: "Referencing the car transformation: Describe what meticulous action the owner HAS completed.",
+        tenseType: "Present Perfect Tense",
+        question: "Referencing the dirty vs clean car: What HAS the owner done?",
         beforeIcon: "🚗🤎",
-        beforeDesc: "Vehicle encrusted with mud and road grime.",
+        beforeDesc: "Vehicle covered in thick mud.",
         afterIcon: "✨🚗",
-        afterDesc: "Polished exterior restored to pristine condition.",
-        slots: ["The diligent detailer", "has thoroughly", "restored the car's finish."],
-        bankOptions: ["has thoroughly", "restored the car's finish.", "The diligent detailer", "had thoroughly", "will have restored", "was restoring"]
+        afterDesc: "Polished exterior completely clean.",
+        slots: ["The owner", "has thoroughly", "restored the car's shine."],
+        bankOptions: ["has thoroughly", "restored the car's shine.", "The owner", "had thoroughly", "will have restored", "was restoring"]
     },
     {
-        tenseType: "Past Perfect (Sequence of Two Past Events)",
-        question: "Before his parents returned home yesterday evening, what HAD the teenager accomplished?",
+        tenseType: "Past Perfect Tense",
+        question: "What HAD already happened before his parents arrived home yesterday?",
         beforeIcon: "🧽🚗",
-        beforeDesc: "Washing the sedan in the driveway at 3 PM.",
+        beforeDesc: "Cleaning the car at 3 PM.",
         afterIcon: "🏡🚗",
-        afterDesc: "Parents arrived home at 6 PM.",
-        slots: ["He", "had meticulously washed", "the car prior to their arrival."],
-        bankOptions: ["had meticulously washed", "the car prior to their arrival.", "He", "has washed", "will have washed", "was washing"]
+        afterDesc: "Parents returned at 6 PM.",
+        slots: ["He", "had meticulously washed", "the car in advance."],
+        bankOptions: ["had meticulously washed", "the car in advance.", "He", "has washed", "will have washed", "was washing"]
     },
     {
-        tenseType: "Future Perfect (Action Completed Before a Specified Future Time)",
-        question: "By tomorrow morning's auto exhibition, what WILL HAVE transpired?",
+        tenseType: "Future Perfect Tense",
+        question: "By tomorrow morning's car show, what WILL HAVE taken place?",
         beforeIcon: "🌙🚘",
-        beforeDesc: "Detailing underway overnight.",
+        beforeDesc: "Overnight detailing underway.",
         afterIcon: "🌅🏆",
-        afterDesc: "Exhibition judging begins at 8 AM.",
-        slots: ["The service team", "will have fully prepped", "the vehicle for judging."],
-        bankOptions: ["will have fully prepped", "the vehicle for judging.", "The service team", "has prepped", "had prepped", "is prepping"]
+        afterDesc: "Exhibition starts at 8 AM.",
+        slots: ["The team", "will have prepped", "the vehicle completely."],
+        bankOptions: ["will have prepped", "the vehicle completely.", "The team", "has prepped", "had prepped", "is prepping"]
     },
     {
-        tenseType: "Present Perfect (Culinary Arts Scenario)",
-        question: "Comparing the empty plate to the gourmet dinner: What HAS the chef executed?",
+        tenseType: "Present Perfect Tense",
+        question: "Comparing the empty plate to the steak meal: What HAS the chef done?",
         beforeIcon: "🍽️❌",
-        beforeDesc: "Bare ceramic dinner plate.",
+        beforeDesc: "Bare dinner plate.",
         afterIcon: "🥩🥦",
-        afterDesc: "Plated filet mignon with steamed vegetables.",
-        slots: ["The executive chef", "has artfully arranged", "a gourmet steak dinner."],
-        bankOptions: ["has artfully arranged", "a gourmet steak dinner.", "The executive chef", "had arranged", "will have arranged", "arranges"]
+        afterDesc: "Hot gourmet steak meal served.",
+        slots: ["The chef", "has artfully prepared", "a complete steak dinner."],
+        bankOptions: ["has artfully prepared", "a complete steak dinner.", "The chef", "had prepared", "will have prepared", "prepares"]
     },
     {
-        tenseType: "Past Perfect (Prior Completed Past Condition)",
-        question: "What HAD occurred before the restaurant critic sat down at her table?",
+        tenseType: "Past Perfect Tense",
+        question: "What HAD occurred before the restaurant guests arrived?",
         beforeIcon: "🍳🔥",
-        beforeDesc: "Kitchen staff working during pre-service.",
-        afterIcon: "📝🥂",
-        afterDesc: "Critic seated for dinner evaluation.",
-        slots: ["The culinary team", "had already cooked", "the multi-course meal."],
-        bankOptions: ["had already cooked", "the multi-course meal.", "The culinary team", "has cooked", "will have cooked", "is cooking"]
+        beforeDesc: "Pre-service kitchen prep.",
+        afterIcon: "👥🍽️",
+        afterDesc: "Guests seated in dining hall.",
+        slots: ["The staff", "had already cooked", "the entire meal."],
+        bankOptions: ["had already cooked", "the entire meal.", "The staff", "has cooked", "will have cooked", "is cooking"]
     },
     {
-        tenseType: "Future Perfect (Projected Completion)",
-        question: "By the time the gala begins at 8:00 PM, what WILL HAVE happened?",
+        tenseType: "Future Perfect Tense",
+        question: "By 8:00 PM tonight, what WILL HAVE happened?",
         beforeIcon: "⏲️🥘",
-        beforeDesc: "Preparations underway in the kitchen.",
-        afterIcon: "✨🍽️",
-        afterDesc: "Gala doors open at 8:00 PM.",
-        slots: ["The kitchen staff", "will have prepared", "hundreds of exquisite dishes."],
-        bankOptions: ["will have prepared", "hundreds of exquisite dishes.", "The kitchen staff", "had prepared", "has prepared", "prepares"]
+        beforeDesc: "Baking in the oven.",
+        afterIcon: "🥧✨",
+        afterDesc: "Timer rings at 8:00 PM.",
+        slots: ["They", "will have completed", "their dinner preparations."],
+        bankOptions: ["will have completed", "their dinner preparations.", "They", "had completed", "has completed", "completes"]
     },
     {
-        tenseType: "Present Perfect (Environmental Restoration)",
-        question: "Reflecting on the polluted stream vs the revived ecosystem: What HAS the volunteer corps achieved?",
-        beforeIcon: "🌊🚮",
-        beforeDesc: "Stream littered with debris.",
-        afterIcon: "🌿🐟",
-        afterDesc: "Clean aquatic habitat flourishing.",
-        slots: ["The conservation group", "has successfully rehabilitated", "the local ecosystem."],
-        bankOptions: ["has successfully rehabilitated", "the local ecosystem.", "The conservation group", "had rehabilitated", "will have rehabilitated", "rehabilitating"]
+        tenseType: "Present Perfect Tense",
+        question: "Look at the messy room vs clean room: What HAS the student done?",
+        beforeIcon: "📦🧸",
+        beforeDesc: "Cluttered, unorganized room.",
+        afterIcon: "✨🛏️",
+        afterDesc: "Neat, organized bedroom.",
+        slots: ["The student", "has successfully organized", "the whole room."],
+        bankOptions: ["has successfully organized", "the whole room.", "The student", "had organized", "will have organized", "organizes"]
     },
     {
-        tenseType: "Past Perfect (Academic Research Project)",
-        question: "What HAD the student researchers completed before presenting at the symposium?",
-        beforeIcon: "📊🔬",
-        beforeDesc: "Analyzing data sets in the lab.",
-        afterIcon: "🎤🏛️",
-        afterDesc: "Presenting findings on stage.",
-        slots: ["The research team", "had compiled comprehensive", "data prior to the conference."],
-        bankOptions: ["had compiled comprehensive", "data prior to the conference.", "The research team", "has compiled", "will have compiled", "compiles"]
+        tenseType: "Past Perfect Tense",
+        question: "What HAD she finished before she went out to play?",
+        beforeIcon: "📚✍️",
+        beforeDesc: "Studying at her desk.",
+        afterIcon: "🛝☀️",
+        afterDesc: "Playing outside in the park.",
+        slots: ["She", "had completed", "all assigned homework."],
+        bankOptions: ["had completed", "all assigned homework.", "She", "has completed", "will have completed", "completing"]
     }
 ];
 
-// Explicit 5-Second Splash Screen timer logic
-const SPLASH_DURATION_MS = 5000;
-let elapsedMs = 0;
-const intervalMs = 50;
+// --- 1) Innovine Logo Screen Logic (5 Seconds Exactly) ---
+const LOGO_DURATION = 5000;
+let logoElapsed = 0;
 
-let loadTimer = setInterval(() => {
-    elapsedMs += intervalMs;
-    let pct = Math.min((elapsedMs / SPLASH_DURATION_MS) * 100, 100);
-    $('loadFill').style.width = pct + '%';
-    
-    let remainingSec = Math.ceil((SPLASH_DURATION_MS - elapsedMs) / 1000);
-    if(remainingSec > 0) {
-        $('timer-text').innerText = `Initializing Game (${remainingSec}s)...`;
-    } else {
-        $('timer-text').innerText = `Launching Experience...`;
-    }
+let logoInterval = setInterval(() => {
+    logoElapsed += 50;
+    let pct = Math.min((logoElapsed / LOGO_DURATION) * 100, 100);
+    $('logo-progress').style.width = pct + '%';
 
-    if(elapsedMs >= SPLASH_DURATION_MS){
-        clearInterval(loadTimer);
-        $('splash').style.opacity = 0;
+    if (logoElapsed >= LOGO_DURATION) {
+        clearInterval(logoInterval);
+        $('screen-logo').style.opacity = 0;
         setTimeout(() => {
-            $('splash').remove();
-            $('game-container').style.opacity = 1;
-            loadQuestion();
-        }, 800);
+            $('screen-logo').style.display = 'none';
+            // --- 2) Show Instruction Screen ---
+            $('screen-instructions').style.display = 'flex';
+        }, 600);
     }
-}, intervalMs);
+}, 50);
+
+// Transition from Instructions to Game
+function startGame() {
+    $('screen-instructions').style.display = 'none';
+    $('screen-game').style.display = 'flex';
+    loadQuestion();
+}
 
 function loadQuestion() {
-    if(currentQ >= database.length) {
-        $('game-container').innerHTML = '';
-        $('game-container').appendChild($('end-screen'));
-        $('end-screen').style.display = 'flex';
+    if (currentQ >= database.length) {
+        $('screen-game').style.display = 'none';
+        $('screen-completion').style.display = 'flex';
         return;
     }
 
-    shields = 2;
+    attemptsLeft = 2;
     slotValues = ["", "", ""];
     $('lbl-q').innerText = currentQ + 1;
-    $('lbl-shields').innerText = shields;
-    $('lbl-feedback').innerText = "Drag syntax components into pods and lock them in!";
+    $('lbl-attempts').innerText = attemptsLeft;
+    $('lbl-feedback').innerText = "Tap tiles to assemble sentence.";
     $('lbl-feedback').style.color = "var(--text-muted)";
 
     let data = database[currentQ];
@@ -703,98 +653,65 @@ function loadQuestion() {
     $('img-after').innerText = data.afterIcon;
     $('desc-after').innerText = data.afterDesc;
 
-    // Reset Slots
-    for(let i=0; i<3; i++) {
-        let slotEl = $(`slot-${i}`);
-        let slotValEl = $(`slot-val-${i}`);
-        slotEl.className = "slot-box";
-        slotValEl.innerText = "Drop Tile";
+    for (let i = 0; i < 3; i++) {
+        $(`slot-${i}`).className = "slot-box";
+        $(`slot-val-${i}`).innerText = "Select Tile";
     }
 
-    // Populate Palette
+    // Shuffle & Render Tiles
     let bank = $('tiles-bank');
     bank.innerHTML = '';
     let shuffled = [...data.bankOptions].sort(() => Math.random() - 0.5);
-    
+
     shuffled.forEach(text => {
         let tile = document.createElement('div');
         tile.className = 'tile';
         tile.innerText = text;
-        tile.draggable = true;
-
-        tile.addEventListener('dragstart', () => {
-            tile.classList.add('dragging');
-            draggedTileText = text;
-        });
-
-        tile.addEventListener('dragend', () => {
-            tile.classList.remove('dragging');
-        });
-
+        tile.onclick = () => selectTile(text);
         bank.appendChild(tile);
     });
-
-    setupSlotEvents();
 }
 
-function setupSlotEvents() {
-    for(let i=0; i<3; i++) {
-        let slot = $(`slot-${i}`);
-        
-        slot.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            slot.classList.add('hovered');
-        });
-
-        slot.addEventListener('dragleave', () => {
-            slot.classList.remove('hovered');
-        });
-
-        slot.addEventListener('drop', (e) => {
-            e.preventDefault();
-            slot.classList.remove('hovered');
-            
-            slotValues[i] = draggedTileText;
-            $(`slot-val-${i}`).innerText = draggedTileText;
-            slot.classList.add('filled');
-        });
+function selectTile(text) {
+    let emptyIndex = slotValues.indexOf("");
+    if (emptyIndex !== -1) {
+        slotValues[emptyIndex] = text;
+        $(`slot-val-${emptyIndex}`).innerText = text;
+        $(`slot-${emptyIndex}`).classList.add('filled');
     }
 }
 
-function verifyAssembly() {
+function clearSlot(index) {
+    slotValues[index] = "";
+    $(`slot-val-${index}`).innerText = "Select Tile";
+    $(`slot-${index}`).classList.remove('filled');
+}
+
+// --- 5) 2 Chance Verification System ---
+function verifyAnswer() {
     let data = database[currentQ];
-    let isCorrect = true;
+    let isCorrect = slotValues.join(" ") === data.slots.join(" ");
 
-    for(let i=0; i<3; i++) {
-        if(slotValues[i] !== data.slots[i]) {
-            isCorrect = false;
-            break;
-        }
-    }
-
-    if(isCorrect) {
-        playAudioTone(587.33, 'triangle');
-        $('lbl-feedback').innerText = "✓ EXCELLENT! Syntactic sequence correctly constructed.";
+    if (isCorrect) {
+        $('lbl-feedback').innerText = "✓ Correct! Excellent grammar logic.";
         $('lbl-feedback').style.color = "var(--accent-green)";
-        
         setTimeout(() => {
             currentQ++;
             loadQuestion();
-        }, 1800);
+        }, 1500);
     } else {
-        shields--;
-        $('lbl-shields').innerText = shields;
+        attemptsLeft--;
+        $('lbl-attempts').innerText = attemptsLeft;
 
-        if(shields > 0) {
-            playAudioTone(220, 'sawtooth');
-            $('lbl-feedback').innerText = "✕ Tense sequence mismatch! Review auxiliary & participle pairings.";
+        if (attemptsLeft > 0) {
+            $('lbl-feedback').innerText = "✕ Incorrect attempt. You have 1 final chance!";
             $('lbl-feedback').style.color = "var(--accent-amber)";
         } else {
-            playAudioTone(180, 'sawtooth');
-            $('lbl-feedback').innerText = `⚡ Correct Solution: "${data.slots.join(' ')}"`;
+            // Out of attempts: reveal right answer
+            $('lbl-feedback').innerText = `⚡ Right Answer: "${data.slots.join(' ')}"`;
             $('lbl-feedback').style.color = "var(--accent-pink)";
 
-            for(let i=0; i<3; i++) {
+            for (let i = 0; i < 3; i++) {
                 $(`slot-val-${i}`).innerText = data.slots[i];
                 $(`slot-${i}`).className = "slot-box filled";
             }
@@ -802,7 +719,7 @@ function verifyAssembly() {
             setTimeout(() => {
                 currentQ++;
                 loadQuestion();
-            }, 3200);
+            }, 3000);
         }
     }
 }
