@@ -73,40 +73,21 @@ body {
     justify-content: center;
     z-index: 9999;
     transition: opacity 0.6s ease;
+    padding: 20px;
 }
 
-.innovine-logo {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    animation: logoPop 1.5s ease-out;
+.innovine-logo-img {
+    max-width: 280px;
+    width: 70vw;
+    height: auto;
+    object-fit: contain;
+    animation: logoPop 1.2s ease-out;
+    filter: drop-shadow(0 0 25px rgba(255, 255, 255, 0.2));
 }
 
 @keyframes logoPop {
-    0% { transform: scale(0.8); opacity: 0; }
+    0% { transform: scale(0.85); opacity: 0; }
     100% { transform: scale(1); opacity: 1; }
-}
-
-.innovine-mark {
-    width: 60px;
-    height: 60px;
-    background: linear-gradient(135deg, #00f2fe, #4facfe, #ff007f);
-    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 2rem;
-    color: white;
-    box-shadow: 0 0 30px rgba(0, 242, 254, 0.6);
-}
-
-.innovine-text {
-    font-size: clamp(3rem, 8vw, 4.5rem);
-    font-weight: 900;
-    letter-spacing: 2px;
-    background: linear-gradient(45deg, #ffffff, #00f2fe, #ff007f);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
 }
 
 .logo-timer-bar {
@@ -212,7 +193,7 @@ body {
     color: var(--primary-purple);
 }
 
-/* Before & After Interactive Showcase */
+/* Before & After Showcase */
 .before-after-display {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -295,6 +276,7 @@ body {
     justify-content: center;
     padding: 8px;
     transition: all 0.2s ease;
+    cursor: pointer;
 }
 
 .slot-box.filled {
@@ -415,16 +397,13 @@ body {
 </head>
 <body>
 
-<!-- SCREEN 1: Innovine Logo Screen (Strictly 5 seconds) -->
+<!-- SCREEN 1: Innovine Logo Screen (Strictly 5 Seconds) -->
 <div id="screen-logo">
-    <div class="innovine-logo">
-        <div class="innovine-mark">✦</div>
-        <div class="innovine-text">INNOVINE</div>
-    </div>
+    <img src="assets/logo.png" alt="Innovine Logo" class="innovine-logo-img" />
     <div class="logo-timer-bar" id="logo-progress"></div>
 </div>
 
-<!-- SCREEN 2: Instruction Screen -->
+<!-- SCREEN 2: Instruction Screen (No Logo) -->
 <div id="screen-instructions" class="view-panel">
     <div class="instruction-title">How to Play</div>
     
@@ -435,7 +414,7 @@ body {
         </div>
         <div class="instruction-item">
             <div class="inst-num">2</div>
-            <div>Tap or drag tiles into the 3 sentence slots to form the correct Perfect Tense sentence.</div>
+            <div>Tap tiles into the 3 sentence slots to form the correct Perfect Tense sentence.</div>
         </div>
         <div class="instruction-item">
             <div class="inst-num">3</div>
@@ -520,7 +499,6 @@ let currentQ = 0;
 let attemptsLeft = 2;
 let slotValues = ["", "", ""];
 
-/* Grade 8 Database strictly aligned with image_c2c8a2.png concepts */
 const database = [
     {
         tenseType: "Present Perfect Tense",
@@ -604,7 +582,7 @@ const database = [
     }
 ];
 
-// --- 1) Innovine Logo Screen Logic (5 Seconds Exactly) ---
+// 5-Second Innovine Logo Screen Timer
 const LOGO_DURATION = 5000;
 let logoElapsed = 0;
 
@@ -618,13 +596,11 @@ let logoInterval = setInterval(() => {
         $('screen-logo').style.opacity = 0;
         setTimeout(() => {
             $('screen-logo').style.display = 'none';
-            // --- 2) Show Instruction Screen ---
             $('screen-instructions').style.display = 'flex';
         }, 600);
     }
 }, 50);
 
-// Transition from Instructions to Game
 function startGame() {
     $('screen-instructions').style.display = 'none';
     $('screen-game').style.display = 'flex';
@@ -658,7 +634,6 @@ function loadQuestion() {
         $(`slot-val-${i}`).innerText = "Select Tile";
     }
 
-    // Shuffle & Render Tiles
     let bank = $('tiles-bank');
     bank.innerHTML = '';
     let shuffled = [...data.bankOptions].sort(() => Math.random() - 0.5);
@@ -687,7 +662,6 @@ function clearSlot(index) {
     $(`slot-${index}`).classList.remove('filled');
 }
 
-// --- 5) 2 Chance Verification System ---
 function verifyAnswer() {
     let data = database[currentQ];
     let isCorrect = slotValues.join(" ") === data.slots.join(" ");
@@ -707,7 +681,6 @@ function verifyAnswer() {
             $('lbl-feedback').innerText = "✕ Incorrect attempt. You have 1 final chance!";
             $('lbl-feedback').style.color = "var(--accent-amber)";
         } else {
-            // Out of attempts: reveal right answer
             $('lbl-feedback').innerText = `⚡ Right Answer: "${data.slots.join(' ')}"`;
             $('lbl-feedback').style.color = "var(--accent-pink)";
 
