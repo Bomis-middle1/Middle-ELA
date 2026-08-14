@@ -1,69 +1,528 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Grammar Galaxy: The Verb Mission</title>
-<style>
-body{margin:0;padding:0;font-family:Inter, sans-serif;background:#08111f;color:#edf6ff;overflow:hidden}
-#splash{position:fixed;inset:0;display:flex;justify-content:center;align-items:center;background:#fff;z-index:999}
-#splash img{width:40vw;max-width:280px;animation:flash 1s infinite}
-@keyframes flash{0%,100%{opacity:.3;transform:scale(.95)}50%{opacity:1;transform:scale(1.05)}}
-.screen{display:none;height:100vh;padding:20px;box-sizing:border-box}
-.screen.active{display:flex;flex-direction:column;align-items:center;justify-content:center}
-.panel{background:rgba(16,29,57,.95);border-radius:28px;padding:20px;max-width:800px;width:95%;text-align:center;box-shadow:0 18px 45px rgba(0,0,0,.35);}
-h1{font-size:2rem;margin-bottom:10px}
-h2{font-size:1.5rem;margin:10px 0}
-button{padding:12px 24px;border-radius:999px;border:none;font-weight:900;cursor:pointer;margin-top:10px;background:linear-gradient(135deg,#43d8ff,#8b72ff);color:#08111f}
-#gamePanel{margin-top:20px;width:100%;max-width:800px}
-#scoreBoard{margin-top:12px;display:flex;justify-content:space-around;width:80%}
-#timer{font-weight:900;color:#ffd166}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dungeon Tower Climb - Grammar Quest</title>
+    <!-- Canvas Confetti Library for animations -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            --primary-bg: #4A90E2;
+            --card-bg: #FFFFFF;
+            --accent: #FF6B6B;
+            --text-color: #2C3E50;
+            --success: #2ECC71;
+            --gold: #F1C40F;
+            --tower-bg: #34495E;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Fredoka', 'Comic Sans MS', 'Chalkboard SE', 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #74ebe5 0%, #89f7fe 100%);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 15px;
+        }
+
+        /* 5-Second Splash Screen */
+        #splashScreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+
+        #splashScreen img {
+            max-width: 250px;
+            max-height: 250px;
+            object-fit: contain;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* Game Layout */
+        .game-container {
+            display: flex;
+            flex-direction: row;
+            gap: 20px;
+            max-width: 900px;
+            width: 100%;
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            border: 4px solid #FFF;
+        }
+
+        /* Tower Sidebar */
+        .tower-sidebar {
+            width: 160px;
+            background: var(--tower-bg);
+            border-radius: 12px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column-reverse;
+            gap: 6px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .tower-floor {
+            padding: 8px;
+            text-align: center;
+            background: #2C3E50;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: #BDC3C7;
+            transition: all 0.3s ease;
+        }
+
+        .tower-floor.current {
+            background: var(--gold);
+            color: #2C3E50;
+            transform: scale(1.03);
+            box-shadow: 0 0 8px var(--gold);
+        }
+
+        .tower-floor.cleared {
+            background: var(--success);
+            color: white;
+        }
+
+        /* Main Game Panel */
+        .main-game {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 3px dashed #E0E0E0;
+            padding-bottom: 12px;
+            margin-bottom: 15px;
+        }
+
+        .audio-control {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        .audio-control input[type=range] {
+            cursor: pointer;
+        }
+
+        .question-box {
+            margin: 10px 0;
+        }
+
+        .question-text {
+            font-size: 1.25rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            line-height: 1.4;
+            color: #2C3E50;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .btn-option {
+            background: #F0F4F8;
+            color: #2C3E50;
+            border: 2px solid #CBD5E1;
+            padding: 14px 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: all 0.2s ease;
+            text-align: left;
+        }
+
+        .btn-option:hover {
+            background: #E2E8F0;
+            border-color: var(--primary-bg);
+            transform: translateY(-2px);
+        }
+
+        .feedback {
+            margin-top: 15px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            min-height: 30px;
+            text-align: center;
+        }
+
+        .feedback.correct { color: var(--success); }
+        .feedback.incorrect { color: var(--accent); }
+
+        /* Restart Button at bottom */
+        .restart-container {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .btn-restart {
+            background: var(--success);
+            color: white;
+            border: none;
+            padding: 12px 28px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 30px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(46, 204, 113, 0.3);
+            transition: transform 0.2s, background-color 0.2s;
+        }
+
+        .btn-restart:hover {
+            background: #27AE60;
+            transform: scale(1.05);
+        }
+
+        /* Mobile / Tablet Responsiveness */
+        @media (max-width: 768px) {
+            .game-container {
+                flex-direction: column-reverse;
+                padding: 15px;
+            }
+            .tower-sidebar {
+                width: 100%;
+                max-height: 80px;
+                flex-direction: row;
+                overflow-x: auto;
+            }
+            .tower-floor {
+                min-width: 70px;
+            }
+            .options-grid {
+                grid-template-columns: 1fr;
+            }
+            .question-text {
+                font-size: 1.1rem;
+            }
+        }
+    </style>
 </head>
 <body>
-<div id="splash"><img src="assets/innovine-logo.png" alt="Innovine logo"></div>
 
-<div id="intro" class="screen active">
-  <div class="panel">
-    <h1>Grammar Galaxy: The Verb Mission</h1>
-    <p>Repair the spaceship engines: Gerund, Infinitive and Participle engines are broken. Complete 12 missions to restore the galaxy.</p>
-    <button id="startBtn">Start Mission</button>
-  </div>
+<!-- 1. Innovine Logo Splash Screen -->
+<div id="splashScreen">
+    <img src="assets/innovine-logo.png" alt="Innovine Logo">
 </div>
 
-<div id="game" class="screen">
-  <div class="panel" id="gamePanel">
-    <h2 id="missionTitle">Mission Title</h2>
-    <p id="prompt">Mission prompt will appear here.</p>
-    <div id="workArea"></div>
-    <div id="scoreBoard">
-      <span id="score">Score: 0</span>
-      <span id="missionCount">Mission 1/12</span>
-      <span id="timer">⏱ 45</span>
+<!-- Audio Assets -->
+<audio id="soundCorrect" src="assets/correct.mp3" preload="auto"></audio>
+<audio id="soundWrong" src="assets/wrong.mp3" preload="auto"></audio>
+<audio id="soundClapping" src="assets/clapping.mp3" preload="auto"></audio>
+
+<div class="game-container">
+    <!-- Tower Progress Sidebar -->
+    <div class="tower-sidebar" id="towerSidebar"></div>
+
+    <!-- Main Game Panel -->
+    <div class="main-game">
+        <div class="header">
+            <h2>🏰 Grammar Tower</h2>
+            <div class="audio-control">
+                🔊 <input type="range" id="volumeControl" min="0" max="1" step="0.1" value="1" onchange="adjustVolume(this.value)">
+            </div>
+            <div>Score: <span id="scoreDisplay" style="color: var(--gold); font-weight: bold; font-size: 1.2rem;">0</span></div>
+        </div>
+
+        <div id="quizSection">
+            <div class="question-box">
+                <p id="questionText" class="question-text">Loading...</p>
+                <div id="optionsGrid" class="options-grid"></div>
+            </div>
+            <div id="feedback" class="feedback"></div>
+        </div>
+
+        <div id="victorySection" style="display: none; text-align: center; padding: 30px 0;">
+            <h1 style="color: var(--gold); font-size: 2.2rem;">🎉 Tower Conquered! 🎉</h1>
+            <p style="font-size: 1.2rem; margin: 15px 0;">Great job completing all 12 floors!</p>
+            <p style="font-size: 1.1rem;">Final Score: <strong id="finalScore">0</strong> / 120</p>
+        </div>
+
+        <!-- Restart Button at bottom -->
+        <div class="restart-container" id="restartContainer" style="display: none;">
+            <button class="btn-restart" onclick="restartGame()">🔄 Play Again</button>
+        </div>
     </div>
-    <button id="checkBtn">Check Answer</button>
-  </div>
 </div>
-
-<div id="result" class="screen">
-  <div class="panel">
-    <h1>Mission Complete!</h1>
-    <p>Your results:</p>
-    <div id="finalScore">Score: 0</div>
-    <button id="playAgain">Play Again</button>
-  </div>
-</div>
-
-<audio id="correctAudio" src="assets/correct.mp3" preload="auto"></audio>
-<audio id="wrongAudio" src="assets/wrong.mp3" preload="auto"></audio>
-<audio id="clapAudio" src="assets/clapping.mp3" preload="auto"></audio>
 
 <script>
-const $ = s => document.querySelector(s);
-setTimeout(()=>{$("#splash").style.display="none";$("#intro").classList.add("active")},5000);
-$("#startBtn").onclick = ()=>{ $("#intro").classList.remove("active"); $("#game").classList.add("active"); };
-$("#playAgain").onclick = ()=>{ location.reload(); };
+    // Audio Elements
+    const audioCorrect = document.getElementById('soundCorrect');
+    const audioWrong = document.getElementById('soundWrong');
+    const audioClapping = document.getElementById('soundClapping');
+
+    function adjustVolume(val) {
+        audioCorrect.volume = val;
+        audioWrong.volume = val;
+        audioClapping.volume = val;
+    }
+
+    // Question Bank (Derived strictly from Chapter 12)
+    const baseQuestions = [
+        {
+            q: "She enjoys ___________ mystery novels during her free time.",
+            options: ["A) to read", "B) reading", "C) read", "D) reads"],
+            correct: 1
+        },
+        {
+            q: "His hobby is ___________ landscapes.",
+            options: ["A) painting", "B) to paint", "C) painted", "D) paint"],
+            correct: 0
+        },
+        {
+            q: "She agreed ___________ her friend with the project after school.",
+            options: ["A) helping", "B) help", "C) to help", "D) helped"],
+            correct: 2
+        },
+        {
+            q: "The manager offered ___________ additional training for the new employees.",
+            options: ["A) provide", "B) to provide", "C) providing", "D) provided"],
+            correct: 1
+        },
+        {
+            q: "According to the chapter, what is a gerund?",
+            options: ["A) A verb form made of 'to + verb'", "B) A verb ending in '-ing' that acts as a noun", "C) A verb used only after modal verbs", "D) A word that describes an adjective"],
+            correct: 1
+        },
+        {
+            q: "How is an infinitive formed?",
+            options: ["A) verb + '-ed'", "B) verb + '-ing'", "C) 'to' + verb", "D) 'having' + past participle"],
+            correct: 2
+        },
+        {
+            q: "Identify the infinitive in this sentence:\n'Sarah hopes to become a doctor and help people in need.'",
+            options: ["A) hopes", "B) to become", "C) people", "D) need"],
+            correct: 1
+        },
+        {
+            q: "Identify the gerund in this sentence:\n'Reading improves your vocabulary.'",
+            options: ["A) Reading", "B) improves", "C) your", "D) vocabulary"],
+            correct: 0
+        },
+        {
+            q: "Which option uses a bare infinitive correctly after a modal verb?",
+            options: ["A) He could to swim across the lake.", "B) He could swim across the lake effortlessly.", "C) He could swimming across the lake.", "D) He could swam across the lake."],
+            correct: 1
+        },
+        {
+            q: "In the sentence 'The running water sounded soothing,' what type of word is 'running'?",
+            options: ["A) Infinitive", "B) Present Participle", "C) Past Participle", "D) Bare Infinitive"],
+            correct: 1
+        },
+        {
+            q: "In the sentence 'The broken vase lay on the floor,' what type of word is 'broken'?",
+            options: ["A) Present Participle", "B) Past Participle", "C) Gerund", "D) Infinitive"],
+            correct: 1
+        },
+        {
+            q: "What type of participle is formed using 'having + past participle'?",
+            options: ["A) Present Participle", "B) Past Participle", "C) Perfect Participle", "D) Bare Infinitive"],
+            correct: 2
+        }
+    ];
+
+    let questions = [];
+    let currentFloor = 0;
+    let score = 0;
+    let answered = false;
+
+    // Helper function to shuffle questions array
+    function shuffleArray(array) {
+        let shuffled = [...array];
+        for (let i = shuffled.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+        return shuffled;
+    }
+
+    // Handle Splash Screen (5 Seconds)
+    window.onload = () => {
+        setTimeout(() => {
+            const splash = document.getElementById('splashScreen');
+            splash.style.opacity = '0';
+            setTimeout(() => {
+                splash.style.display = 'none';
+            }, 500);
+        }, 5000);
+
+        initGame();
+    };
+
+    function initGame() {
+        questions = shuffleArray(baseQuestions);
+        currentFloor = 0;
+        score = 0;
+        document.getElementById('scoreDisplay').innerText = score;
+        document.getElementById('quizSection').style.display = 'block';
+        document.getElementById('victorySection').style.display = 'none';
+        document.getElementById('restartContainer').style.display = 'none';
+        renderSidebar();
+        loadFloor();
+    }
+
+    function renderSidebar() {
+        const sidebar = document.getElementById('towerSidebar');
+        sidebar.innerHTML = '';
+        for (let i = 0; i < questions.length; i++) {
+            const floorDiv = document.createElement('div');
+            floorDiv.className = `tower-floor ${i === currentFloor ? 'current' : ''}`;
+            floorDiv.id = `floor-${i}`;
+            floorDiv.innerText = `Floor ${i + 1}`;
+            sidebar.appendChild(floorDiv);
+        }
+    }
+
+    function loadFloor() {
+        answered = false;
+        document.getElementById('feedback').innerText = '';
+        document.getElementById('feedback').className = 'feedback';
+
+        const qData = questions[currentFloor];
+        document.getElementById('questionText').innerText = `Floor ${currentFloor + 1}: ${qData.q}`;
+
+        const optionsGrid = document.getElementById('optionsGrid');
+        optionsGrid.innerHTML = '';
+
+        qData.options.forEach((opt, idx) => {
+            const btn = document.createElement('button');
+            btn.className = 'btn-option';
+            btn.innerText = opt;
+            btn.onclick = () => selectOption(idx);
+            optionsGrid.appendChild(btn);
+        });
+
+        updateSidebar();
+    }
+
+    function selectOption(index) {
+        if (answered) return;
+        answered = true;
+
+        const qData = questions[currentFloor];
+        const feedback = document.getElementById('feedback');
+        const buttons = document.querySelectorAll('.btn-option');
+
+        if (index === qData.correct) {
+            score += 10;
+            document.getElementById('scoreDisplay').innerText = score;
+            feedback.innerText = "✨ Correct!";
+            feedback.className = "feedback correct";
+            buttons[index].style.borderColor = "var(--success)";
+            buttons[index].style.background = "#E8F8F0";
+
+            // Play correct audio
+            audioCorrect.currentTime = 0;
+            audioCorrect.play().catch(() => {});
+
+            // Trigger Confetti Animation
+            confetti({
+                particleCount: 50,
+                spread: 60,
+                origin: { y: 0.7 }
+            });
+
+        } else {
+            feedback.innerText = `❌ Wrong! Correct answer: ${qData.options[qData.correct]}`;
+            feedback.className = "feedback incorrect";
+            buttons[index].style.borderColor = "var(--accent)";
+            buttons[qData.correct].style.borderColor = "var(--success)";
+
+            // Play wrong audio
+            audioWrong.currentTime = 0;
+            audioWrong.play().catch(() => {});
+        }
+
+        // Auto transition to next question after 2 seconds
+        setTimeout(() => {
+            nextFloor();
+        }, 2000);
+    }
+
+    function nextFloor() {
+        const currentFloorDiv = document.getElementById(`floor-${currentFloor}`);
+        if (currentFloorDiv) {
+            currentFloorDiv.classList.remove('current');
+            currentFloorDiv.classList.add('cleared');
+        }
+
+        currentFloor++;
+
+        if (currentFloor < questions.length) {
+            loadFloor();
+        } else {
+            showVictory();
+        }
+    }
+
+    function updateSidebar() {
+        const floorDiv = document.getElementById(`floor-${currentFloor}`);
+        if (floorDiv) {
+            floorDiv.classList.add('current');
+        }
+    }
+
+    function showVictory() {
+        document.getElementById('quizSection').style.display = 'none';
+        document.getElementById('victorySection').style.display = 'block';
+        document.getElementById('restartContainer').style.display = 'block';
+        document.getElementById('finalScore').innerText = score;
+
+        // Play Clapping Audio & Grand Confetti
+        audioClapping.currentTime = 0;
+        audioClapping.play().catch(() => {});
+
+        confetti({
+            particleCount: 150,
+            spread: 100,
+            origin: { y: 0.6 }
+        });
+    }
+
+    function restartGame() {
+        initGame();
+    }
 </script>
+
 </body>
 </html>
