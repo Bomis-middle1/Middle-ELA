@@ -1,69 +1,486 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Active vs Passive – Voice Vault</title>
-<style>
-body{margin:0;padding:0;font-family:Inter,sans-serif;background:#08111f;color:#edf6ff;overflow:hidden}
-#splash{position:fixed;inset:0;display:flex;justify-content:center;align-items:center;background:#fff;z-index:999}
-#splash img{width:40vw;max-width:280px;animation:flash 1s infinite}
-@keyframes flash{0%,100%{opacity:.3;transform:scale(.95)}50%{opacity:1;transform:scale(1.05)}}
-.screen{display:none;height:100vh;padding:20px;box-sizing:border-box}
-.screen.active{display:flex;flex-direction:column;align-items:center;justify-content:center}
-.panel{background:rgba(16,29,57,.95);border-radius:28px;padding:20px;max-width:800px;width:95%;text-align:center;box-shadow:0 18px 45px rgba(0,0,0,.35);}
-h1{font-size:2rem;margin-bottom:10px}
-h2{font-size:1.5rem;margin:10px 0}
-button{padding:12px 24px;border-radius:999px;border:none;font-weight:900;cursor:pointer;margin-top:10px;background:linear-gradient(135deg,#43d8ff,#8b72ff);color:#08111f}
-#gamePanel{margin-top:20px;width:100%;max-width:800px}
-#scoreBoard{margin-top:12px;display:flex;justify-content:space-around;width:80%}
-#timer{font-weight:900;color:#ffd166}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Transformer Arena - Active & Passive Voice</title>
+    <!-- Canvas Confetti Library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            --primary-bg: #6C5CE7;
+            --card-bg: #FFFFFF;
+            --accent: #FF7675;
+            --text-color: #2D3436;
+            --success: #00B894;
+            --gold: #FDCB6E;
+            --boss-hp: #E17055;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Fredoka', 'Comic Sans MS', 'Chalkboard SE', 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #a8c0ff 0%, #3f2b96 100%);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 15px;
+        }
+
+        /* 5-Second Splash Screen */
+        #splashScreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+
+        #splashScreen img {
+            max-width: 250px;
+            max-height: 250px;
+            object-fit: contain;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* Game Container */
+        .game-container {
+            max-width: 800px;
+            width: 100%;
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 25px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            border: 4px solid #FFF;
+        }
+
+        /* Top Bar & Audio */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 3px dashed #E0E0E0;
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+        }
+
+        .audio-control {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        /* Boss Battle Arena Header */
+        .boss-arena {
+            background: #F8F9FA;
+            border-radius: 16px;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 2px solid #E9ECEF;
+            text-align: center;
+        }
+
+        .hp-bar-container {
+            width: 100%;
+            background-color: #DFE6E9;
+            border-radius: 20px;
+            height: 20px;
+            margin-top: 10px;
+            overflow: hidden;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .hp-bar-fill {
+            height: 100%;
+            width: 100%;
+            background: linear-gradient(90deg, #FF7675, #D63031);
+            transition: width 0.4s ease;
+        }
+
+        /* Question Box */
+        .question-box {
+            margin: 15px 0;
+        }
+
+        .question-text {
+            font-size: 1.25rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            line-height: 1.4;
+            color: #2D3436;
+            text-align: center;
+            white-space: pre-line;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .btn-option {
+            background: #F1F2F6;
+            color: #2D3436;
+            border: 2px solid #CED6E0;
+            padding: 14px 16px;
+            border-radius: 14px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: all 0.2s ease;
+            text-align: left;
+        }
+
+        .btn-option:hover {
+            background: #E4E7EB;
+            border-color: var(--primary-bg);
+            transform: translateY(-2px);
+        }
+
+        .feedback {
+            margin-top: 15px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            min-height: 30px;
+            text-align: center;
+        }
+
+        .feedback.correct { color: var(--success); }
+        .feedback.incorrect { color: var(--accent); }
+
+        /* Restart Button */
+        .restart-container {
+            margin-top: 25px;
+            text-align: center;
+        }
+
+        .btn-restart {
+            background: var(--success);
+            color: white;
+            border: none;
+            padding: 14px 32px;
+            font-size: 1.15rem;
+            font-weight: bold;
+            border-radius: 30px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 184, 148, 0.4);
+            transition: transform 0.2s, background-color 0.2s;
+        }
+
+        .btn-restart:hover {
+            background: #00A383;
+            transform: scale(1.05);
+        }
+
+        /* Responsiveness */
+        @media (max-width: 600px) {
+            .game-container {
+                padding: 15px;
+            }
+            .options-grid {
+                grid-template-columns: 1fr;
+            }
+            .question-text {
+                font-size: 1.1rem;
+            }
+        }
+    </style>
 </head>
 <body>
-<div id="splash"><img src="assets/innovine-logo.png" alt="Innovine logo"></div>
 
-<div id="intro" class="screen active">
-  <div class="panel">
-    <h1>Active vs Passive – Voice Vault</h1>
-    <p>Restore the voice balance in the vault! Complete 12 missions to repair Active and Passive structures.</p>
-    <button id="startBtn">Start Mission</button>
-  </div>
+<!-- 1. Innovine Logo Splash Screen -->
+<div id="splashScreen">
+    <img src="assets/innovine-logo.png" alt="Innovine Logo">
 </div>
 
-<div id="game" class="screen">
-  <div class="panel" id="gamePanel">
-    <h2 id="missionTitle">Mission Title</h2>
-    <p id="prompt">Mission prompt will appear here.</p>
-    <div id="workArea"></div>
-    <div id="scoreBoard">
-      <span id="score">Score: 0</span>
-      <span id="missionCount">Mission 1/12</span>
-      <span id="timer">⏱ 45</span>
+<!-- Audio Assets -->
+<audio id="soundCorrect" src="assets/correct.mp3" preload="auto"></audio>
+<audio id="soundWrong" src="assets/wrong.mp3" preload="auto"></audio>
+<audio id="soundClapping" src="assets/clapping.mp3" preload="auto"></audio>
+
+<div class="game-container">
+    <div class="header">
+        <h2>⚡ Voice Transformer Arena</h2>
+        <div class="audio-control">
+            🔊 <input type="range" id="volumeControl" min="0" max="1" step="0.1" value="1" onchange="adjustVolume(this.value)">
+        </div>
+        <div>Score: <span id="scoreDisplay" style="color: var(--gold); font-weight: bold; font-size: 1.3rem;">0</span></div>
     </div>
-    <button id="checkBtn">Check Answer</button>
-  </div>
-</div>
 
-<div id="result" class="screen">
-  <div class="panel">
-    <h1>Mission Complete!</h1>
-    <p>Your results:</p>
-    <div id="finalScore">Score: 0</div>
-    <button id="playAgain">Play Again</button>
-  </div>
-</div>
+    <!-- Boss Battle Arena Progress -->
+    <div class="boss-arena" id="bossArena">
+        <div style="display: flex; justify-content: space-between; font-weight: bold;">
+            <span>🤖 Voice Monster HP</span>
+            <span id="hpText">120 / 120</span>
+        </div>
+        <div class="hp-bar-container">
+            <div class="hp-bar-fill" id="hpBar"></div>
+        </div>
+    </div>
 
-<audio id="correctAudio" src="assets/correct.mp3" preload="auto"></audio>
-<audio id="wrongAudio" src="assets/wrong.mp3" preload="auto"></audio>
-<audio id="clapAudio" src="assets/clapping.mp3" preload="auto"></audio>
+    <!-- Quiz Panel -->
+    <div id="quizSection">
+        <div class="question-box">
+            <p id="questionText" class="question-text">Loading game...</p>
+            <div id="optionsGrid" class="options-grid"></div>
+        </div>
+        <div id="feedback" class="feedback"></div>
+    </div>
+
+    <!-- Victory Panel -->
+    <div id="victorySection" style="display: none; text-align: center; padding: 30px 0;">
+        <h1 style="color: var(--gold); font-size: 2.2rem;">🏆 Defeated the Voice Monster! 🏆</h1>
+        <p style="font-size: 1.2rem; margin: 15px 0;">You mastered Active and Passive Voice!</p>
+        <p style="font-size: 1.1rem;">Final Score: <strong id="finalScore">0</strong> / 120</p>
+    </div>
+
+    <!-- Restart Button at Bottom -->
+    <div class="restart-container" id="restartContainer" style="display: none;">
+        <button class="btn-restart" onclick="restartGame()">🔄 Play Again</button>
+    </div>
+</div>
 
 <script>
-const $ = s => document.querySelector(s);
-setTimeout(()=>{$("#splash").style.display="none";$("#intro").classList.add("active")},5000);
-$("#startBtn").onclick = ()=>{ $("#intro").classList.remove("active"); $("#game").classList.add("active"); };
-$("#playAgain").onclick = ()=>{ location.reload(); };
+    // Audio Elements
+    const audioCorrect = document.getElementById('soundCorrect');
+    const audioWrong = document.getElementById('soundWrong');
+    const audioClapping = document.getElementById('soundClapping');
+
+    function adjustVolume(val) {
+        audioCorrect.volume = val;
+        audioWrong.volume = val;
+        audioClapping.volume = val;
+    }
+
+    // Question Bank (Derived strictly from Chapter 13)
+    const baseQuestions = [
+        {
+            q: "In the active voice, what does the subject of the sentence do?",
+            options: ["A) Performs the action expressed by the verb", "B) Receives the action expressed by the verb", "C) Stays silent in the sentence", "D) Always follows the word 'by'"],
+            correct: 0
+        },
+        {
+            q: "In the passive voice, what happens to the subject of the sentence?",
+            options: ["A) It performs the action", "B) It receives the action expressed by the verb", "C) It is always completely removed", "D) It becomes an adjective"],
+            correct: 1
+        },
+        {
+            q: "What form of the main verb is always used in a passive voice sentence?",
+            options: ["A) Present Participle (-ing)", "B) Base form", "C) Past Participle", "D) Simple Present"],
+            correct: 2
+        },
+        {
+            q: "Identify the voice of this sentence:\n'The cat chased the mouse.'",
+            options: ["A) Passive Voice", "B) Active Voice", "C) Infinitive Voice", "D) Continuous Voice"],
+            correct: 1
+        },
+        {
+            q: "Identify the voice of this sentence:\n'The mouse was chased by the cat.'",
+            options: ["A) Active Voice", "B) Passive Voice", "C) Perfect Voice", "D) Bare Voice"],
+            correct: 1
+        },
+        {
+            q: "Convert to passive voice:\n'The chef cooks delicious meals.'",
+            options: ["A) Delicious meals was cooked by the chef.", "B) Delicious meals are cooked by the chef.", "C) Delicious meals cook the chef.", "D) Delicious meals were cooking by the chef."],
+            correct: 1
+        },
+        {
+            q: "Convert to passive voice:\n'The patient rang the bell.'",
+            options: ["A) The bell was rung by the patient.", "B) The bell is rung by the patient.", "C) The bell had ring by the patient.", "D) The bell was ringing by the patient."],
+            correct: 0
+        },
+        {
+            q: "Convert to passive voice:\n'Radha is distributing chocolates.'",
+            options: ["A) Chocolates are distributed by Radha.", "B) Chocolates are being distributed by Radha.", "C) Chocolates have been distributed by Radha.", "D) Chocolates were distributed by Radha."],
+            correct: 1
+        },
+        {
+            q: "Convert to passive voice:\n'Radha has distributed chocolates.'",
+            options: ["A) Chocolates are distributed by Radha.", "B) Chocolates are being distributed by Radha.", "C) Chocolates have been distributed by Radha.", "D) Chocolates will be distributed by Radha."],
+            correct: 2
+        },
+        {
+            q: "Convert to passive voice:\n'I shall read a book.'",
+            options: ["A) A book will be read by me.", "B) A book is read by me.", "C) A book will have read by me.", "D) A book was read by me."],
+            correct: 0
+        },
+        {
+            q: "Which of these verb tenses CANNOT be converted into the passive voice?",
+            options: ["A) Simple Present", "B) Simple Past", "C) Future Continuous", "D) Present Perfect"],
+            correct: 2
+        },
+        {
+            q: "Choose the sentence with the correct past participle verb form in passive voice:",
+            options: ["A) The novel was wrote by Mark Twain.", "B) The novel was written by Mark Twain.", "C) The novel was write by Mark Twain.", "D) The novel was writing by Mark Twain."],
+            correct: 1
+        }
+    ];
+
+    let questions = [];
+    let currentQuestion = 0;
+    let score = 0;
+    let monsterHP = 120;
+    let answered = false;
+
+    // Helper function to shuffle questions array
+    function shuffleArray(array) {
+        let shuffled = [...array];
+        for (let i = shuffled.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+        return shuffled;
+    }
+
+    // Handle Splash Screen (5 Seconds)
+    window.onload = () => {
+        setTimeout(() => {
+            const splash = document.getElementById('splashScreen');
+            splash.style.opacity = '0';
+            setTimeout(() => {
+                splash.style.display = 'none';
+            }, 500);
+        }, 5000);
+
+        initGame();
+    };
+
+    function initGame() {
+        questions = shuffleArray(baseQuestions);
+        currentQuestion = 0;
+        score = 0;
+        monsterHP = 120;
+        document.getElementById('scoreDisplay').innerText = score;
+        updateHPBar();
+        document.getElementById('quizSection').style.display = 'block';
+        document.getElementById('bossArena').style.display = 'block';
+        document.getElementById('victorySection').style.display = 'none';
+        document.getElementById('restartContainer').style.display = 'none';
+        loadQuestion();
+    }
+
+    function loadQuestion() {
+        answered = false;
+        document.getElementById('feedback').innerText = '';
+        document.getElementById('feedback').className = 'feedback';
+
+        const qData = questions[currentQuestion];
+        document.getElementById('questionText').innerText = `Round ${currentQuestion + 1}: ${qData.q}`;
+
+        const optionsGrid = document.getElementById('optionsGrid');
+        optionsGrid.innerHTML = '';
+
+        qData.options.forEach((opt, idx) => {
+            const btn = document.createElement('button');
+            btn.className = 'btn-option';
+            btn.innerText = opt;
+            btn.onclick = () => selectOption(idx);
+            optionsGrid.appendChild(btn);
+        });
+    }
+
+    function selectOption(index) {
+        if (answered) return;
+        answered = true;
+
+        const qData = questions[currentQuestion];
+        const feedback = document.getElementById('feedback');
+        const buttons = document.querySelectorAll('.btn-option');
+
+        if (index === qData.correct) {
+            score += 10;
+            monsterHP = Math.max(0, monsterHP - 10);
+            document.getElementById('scoreDisplay').innerText = score;
+            updateHPBar();
+
+            feedback.innerText = "💥 Critical Hit! Correct answer!";
+            feedback.className = "feedback correct";
+            buttons[index].style.borderColor = "var(--success)";
+            buttons[index].style.background = "#E8F8F0";
+
+            // Play correct audio
+            audioCorrect.currentTime = 0;
+            audioCorrect.play().catch(() => {});
+
+            // Confetti effect
+            confetti({
+                particleCount: 50,
+                spread: 60,
+                origin: { y: 0.7 }
+            });
+
+        } else {
+            feedback.innerText = `❌ Missed! Correct answer: ${qData.options[qData.correct]}`;
+            feedback.className = "feedback incorrect";
+            buttons[index].style.borderColor = "var(--accent)";
+            buttons[qData.correct].style.borderColor = "var(--success)";
+
+            // Play wrong audio
+            audioWrong.currentTime = 0;
+            audioWrong.play().catch(() => {});
+        }
+
+        // Auto move to next after 2 seconds
+        setTimeout(() => {
+            currentQuestion++;
+            if (currentQuestion < questions.length) {
+                loadQuestion();
+            } else {
+                showVictory();
+            }
+        }, 2000);
+    }
+
+    function updateHPBar() {
+        document.getElementById('hpText').innerText = `${monsterHP} / 120`;
+        const percentage = (monsterHP / 120) * 100;
+        document.getElementById('hpBar').style.width = `${percentage}%`;
+    }
+
+    function showVictory() {
+        document.getElementById('quizSection').style.display = 'none';
+        document.getElementById('bossArena').style.display = 'none';
+        document.getElementById('victorySection').style.display = 'block';
+        document.getElementById('restartContainer').style.display = 'block';
+        document.getElementById('finalScore').innerText = score;
+
+        // Play Clapping Audio & Grand Confetti
+        audioClapping.currentTime = 0;
+        audioClapping.play().catch(() => {});
+
+        confetti({
+            particleCount: 150,
+            spread: 100,
+            origin: { y: 0.6 }
+        });
+    }
+
+    function restartGame() {
+        initGame();
+    }
 </script>
+
 </body>
 </html>
