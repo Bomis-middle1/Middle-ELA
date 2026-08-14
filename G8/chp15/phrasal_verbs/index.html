@@ -1,68 +1,472 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Phrasal Verbs Adventure – Fun Quest</title>
-<style>
-body{margin:0;padding:0;font-family:Inter,sans-serif;background:#08111f;color:#edf6ff;overflow:hidden}
-#splash{position:fixed;inset:0;display:flex;justify-content:center;align-items:center;background:#fff;z-index:999}
-#splash img{width:40vw;max-width:280px;animation:flash 1s infinite}
-@keyframes flash{0%,100%{opacity:.3;transform:scale(.95)}50%{opacity:1;transform:scale(1.05)}}
-.screen{display:none;height:100vh;padding:20px;box-sizing:border-box}
-.screen.active{display:flex;flex-direction:column;align-items:center;justify-content:center}
-.panel{background:rgba(16,29,57,.95);border-radius:28px;padding:20px;max-width:800px;width:95%;text-align:center;box-shadow:0 18px 45px rgba(0,0,0,.35);}
-h1{font-size:2rem;margin-bottom:10px}
-h2{font-size:1.5rem;margin:10px 0}
-button{padding:12px 24px;border-radius:999px;border:none;font-weight:900;cursor:pointer;margin-top:10px;background:linear-gradient(135deg,#43d8ff,#8b72ff);color:#08111f}
-#gamePanel{margin-top:20px;width:100%;max-width:800px}
-#scoreBoard{margin-top:12px;display:flex;justify-content:space-around;width:80%}
-#timer{font-weight:900;color:#ffd166}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Phrasal Verbs Game</title>
+  <!-- Canvas Confetti Library -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Comic Sans MS', 'Chalkboard SE', 'Fredoka One', cursive, sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #a8edf0 0%, #fed6e3 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 15px;
+      overflow-x: hidden;
+    }
+
+    /* --- Splash Screen --- */
+    #splash-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: #ffffff;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      transition: opacity 0.8s ease, visibility 0.8s;
+    }
+
+    #splash-screen img {
+      max-width: 280px;
+      width: 70%;
+      height: auto;
+      animation: pulse 1.5s infinite ease-in-out;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(0.95); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(0.95); }
+    }
+
+    /* --- Game Card --- */
+    .game-card {
+      background: #ffffff;
+      border: 4px solid #ff9f43;
+      border-radius: 24px;
+      box-shadow: 0 12px 28px rgba(0,0,0,0.15);
+      max-width: 600px;
+      width: 100%;
+      padding: 25px;
+      text-align: center;
+      position: relative;
+    }
+
+    .header-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .volume-box {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: #fff3e0;
+      padding: 6px 12px;
+      border-radius: 12px;
+      border: 2px solid #ffe0b2;
+      font-size: 0.9rem;
+      font-weight: bold;
+      color: #e67e22;
+    }
+
+    .volume-box input[type="range"] {
+      width: 80px;
+      cursor: pointer;
+    }
+
+    .score-badge {
+      background: #ff6b6b;
+      color: #fff;
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-weight: bold;
+      font-size: 1rem;
+    }
+
+    .badge {
+      display: inline-block;
+      background: #4ecdc4;
+      color: white;
+      padding: 6px 18px;
+      border-radius: 15px;
+      font-size: 0.95rem;
+      font-weight: bold;
+      margin-bottom: 15px;
+    }
+
+    .question {
+      font-size: 1.25rem;
+      color: #2c3e50;
+      margin-bottom: 25px;
+      line-height: 1.5;
+      min-height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .options-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    @media (min-width: 480px) {
+      .options-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .btn-opt {
+      background: #f1f2f6;
+      border: 3px solid #ced6e0;
+      color: #2f3542;
+      padding: 14px 18px;
+      border-radius: 16px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      word-break: break-word;
+    }
+
+    .btn-opt:hover:not(:disabled) {
+      background: #dfe4ea;
+      transform: translateY(-2px);
+    }
+
+    .btn-opt.correct {
+      background: #2ed573 !important;
+      border-color: #26af5f !important;
+      color: white !important;
+    }
+
+    .btn-opt.wrong {
+      background: #ff4757 !important;
+      border-color: #d63031 !important;
+      color: white !important;
+    }
+
+    .btn-opt:disabled {
+      cursor: not-allowed;
+    }
+
+    /* --- End Screen --- */
+    .end-screen {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .end-screen h2 {
+      font-size: 2rem;
+      color: #ff9f43;
+    }
+
+    .end-screen p {
+      font-size: 1.25rem;
+      color: #2c3e50;
+    }
+
+    .restart-btn {
+      background: #ff9f43;
+      border: none;
+      color: white;
+      padding: 14px 32px;
+      border-radius: 20px;
+      font-size: 1.2rem;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 6px 0 #e67e22;
+      transition: all 0.2s ease;
+      margin-top: 10px;
+    }
+
+    .restart-btn:hover {
+      background: #ffa801;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 0 #e67e22;
+    }
+
+    .restart-btn:active {
+      transform: translateY(4px);
+      box-shadow: 0 2px 0 #e67e22;
+    }
+  </style>
 </head>
 <body>
-<div id="splash"><img src="assets/innovine-logo.png" alt="Innovine logo"></div>
 
-<div id="intro" class="screen active">
-  <div class="panel">
-    <h1>Phrasal Verbs Adventure</h1>
-    <p>Complete fun missions by using phrasal verbs to unlock scenarios and rescue characters!</p>
-    <button id="startBtn">Start Quest</button>
+  <!-- Splash Screen -->
+  <div id="splash-screen">
+    <img src="assets/innovine-logo.png" alt="Innovine Logo" />
   </div>
-</div>
 
-<div id="game" class="screen">
-  <div class="panel" id="gamePanel">
-    <h2 id="missionTitle">Mission Title</h2>
-    <p id="prompt">Mission prompt will appear here.</p>
-    <div id="workArea"></div>
-    <div id="scoreBoard">
-      <span id="score">Score: 0</span>
-      <span id="missionCount">Mission 1/12</span>
-      <span id="timer">⏱ 45</span>
+  <!-- Audio Elements -->
+  <audio id="sound-correct" src="assets/correct.mp3" preload="auto"></audio>
+  <audio id="sound-wrong" src="assets/wrong.mp3" preload="auto"></audio>
+  <audio id="sound-clapping" src="assets/clapping.mp3" preload="auto"></audio>
+
+  <!-- Main Game Container -->
+  <div class="game-card">
+    <div class="header-controls">
+      <div class="volume-box">
+        🔊
+        <input type="range" id="volumeSlider" min="0" max="1" step="0.1" value="1" />
+      </div>
+      <div class="score-badge" id="scoreDisplay">Score: 0</div>
     </div>
-    <button id="checkBtn">Check Answer</button>
+
+    <div id="game-body">
+      <div class="badge" id="categoryBadge">Round</div>
+      <div class="question" id="questionText">Loading...</div>
+      <div class="options-grid" id="optionsGrid"></div>
+    </div>
+
+    <!-- End Screen -->
+    <div class="end-screen" id="endScreen">
+      <h2>🎉 Game Complete!</h2>
+      <p id="finalScoreText">Your Final Score: 0 / 0</p>
+      <button class="restart-btn" id="restartBtn" onclick="restartGame()">Play Again 🔄</button>
+    </div>
   </div>
-</div>
 
-<div id="result" class="screen">
-  <div class="panel">
-    <h1>Adventure Complete!</h1>
-    <p>Your results:</p>
-    <div id="finalScore">Score: 0</div>
-    <button id="playAgain">Play Again</button>
-  </div>
-</div>
+  <script>
+    // Chapter 15 Question Bank
+    const baseQuestions = [
+      {
+        badge: "Fill in the Blank",
+        q: "The teacher asked the students to ________ their notebooks.",
+        options: ["hand in", "break down", "run out", "look into"],
+        answer: 0
+      },
+      {
+        badge: "Word Upgrade",
+        q: "He <b>created</b> a story to avoid punishment.",
+        options: ["broke down", "made up", "looked into", "ran into"],
+        answer: 1
+      },
+      {
+        badge: "Fill in the Blank",
+        q: "We have ________ sugar, so we need to buy more.",
+        options: ["looked after", "run out of", "taken over", "set up"],
+        answer: 1
+      },
+      {
+        badge: "Structure Challenge",
+        q: "Select the sentence with correct pronoun placement:",
+        options: ["She wrote down it.", "She wrote it down.", "She down wrote it.", "She down it wrote."],
+        answer: 1
+      },
+      {
+        badge: "Word Upgrade",
+        q: "Governments must <b>establish</b> better healthcare facilities.",
+        options: ["set up", "break out", "hand in", "give up"],
+        answer: 0
+      },
+      {
+        badge: "Word Upgrade",
+        q: "My parents <b>cared for</b> us while we swam in the shallow water.",
+        options: ["looked after", "ran into", "took off", "set off"],
+        answer: 0
+      },
+      {
+        badge: "Dialogue Completion",
+        q: "Person A: 'Did you fix your car?'<br>Person B: 'Yes, I had to ________ the engine to test it.'",
+        options: ["turn on", "give in", "run into", "look after"],
+        answer: 0
+      },
+      {
+        badge: "Dialogue Completion",
+        q: "Person A: 'Are you still trying to solve that puzzle?'<br>Person B: 'No, I decided to ________ for now.'",
+        options: ["give up", "set up", "hand in", "look into"],
+        answer: 0
+      },
+      {
+        badge: "Object Placement",
+        q: "Which option places the object correctly for <i>'She took off her jacket'</i>?",
+        options: ["She took her jacket off.", "She off took her jacket.", "She jacket took off her.", "She off her jacket took."],
+        answer: 0
+      },
+      {
+        badge: "Fill in the Blank",
+        q: "A fire suddenly ________ in the wooden building.",
+        options: ["broke out", "handed in", "looked after", "gave up"],
+        answer: 0
+      }
+    ];
 
-<audio id="correctAudio" src="assets/correct.mp3" preload="auto"></audio>
-<audio id="wrongAudio" src="assets/wrong.mp3" preload="auto"></audio>
-<audio id="clapAudio" src="assets/clapping.mp3" preload="auto"></audio>
+    let gameQuestions = [];
+    let currentQIndex = 0;
+    let score = 0;
 
-<script>
-const $ = s => document.querySelector(s);
-setTimeout(()=>{$("#splash").style.display="none";$("#intro").classList.add("active")},5000);
-$("#startBtn").onclick = ()=>{ $("#intro").classList.remove("active"); $("#game").classList.add("active"); };
-$("#playAgain").onclick = ()=>{ location.reload(); };
-</script>
+    // Elements
+    const splashScreen = document.getElementById("splash-screen");
+    const gameBody = document.getElementById("game-body");
+    const endScreen = document.getElementById("endScreen");
+    const categoryBadge = document.getElementById("categoryBadge");
+    const questionText = document.getElementById("questionText");
+    const optionsGrid = document.getElementById("optionsGrid");
+    const scoreDisplay = document.getElementById("scoreDisplay");
+    const finalScoreText = document.getElementById("finalScoreText");
+
+    // Audio Elements
+    const soundCorrect = document.getElementById("sound-correct");
+    const soundWrong = document.getElementById("sound-wrong");
+    const soundClapping = document.getElementById("sound-clapping");
+    const volumeSlider = document.getElementById("volumeSlider");
+
+    // Volume Control Listener
+    volumeSlider.addEventListener("input", (e) => {
+      const vol = parseFloat(e.target.value);
+      soundCorrect.volume = vol;
+      soundWrong.volume = vol;
+      soundClapping.volume = vol;
+    });
+
+    // Handle Splash Screen (5 Seconds)
+    window.addEventListener("DOMContentLoaded", () => {
+      setTimeout(() => {
+        splashScreen.style.opacity = "0";
+        setTimeout(() => {
+          splashScreen.style.visibility = "hidden";
+        }, 800);
+      }, 5000);
+
+      initGame();
+    });
+
+    // Shuffle Array Helper
+    function shuffleArray(array) {
+      const arr = [...array];
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    // Initialize/Reset Game State
+    function initGame() {
+      // Randomize questions each load
+      gameQuestions = shuffleArray(baseQuestions);
+      currentQIndex = 0;
+      score = 0;
+      scoreDisplay.innerText = `Score: ${score}`;
+      endScreen.style.display = "none";
+      gameBody.style.display = "block";
+      loadQuestion();
+    }
+
+    // Load Single Question
+    function loadQuestion() {
+      const qData = gameQuestions[currentQIndex];
+      categoryBadge.innerText = qData.badge;
+      questionText.innerHTML = qData.q;
+      optionsGrid.innerHTML = "";
+
+      qData.options.forEach((option, index) => {
+        const btn = document.createElement("button");
+        btn.className = "btn-opt";
+        btn.innerHTML = option;
+        btn.onclick = () => handleAnswer(index, btn);
+        optionsGrid.appendChild(btn);
+      });
+    }
+
+    // Handle User Choice
+    function handleAnswer(selectedIndex, clickedBtn) {
+      // Disable all buttons to prevent double click
+      const buttons = optionsGrid.querySelectorAll(".btn-opt");
+      buttons.forEach(btn => btn.disabled = true);
+
+      const qData = gameQuestions[currentQIndex];
+
+      if (selectedIndex === qData.answer) {
+        // Correct Answer
+        clickedBtn.classList.add("correct");
+        score++;
+        scoreDisplay.innerText = `Score: ${score}`;
+        playSound(soundCorrect);
+        triggerConfetti();
+      } else {
+        // Wrong Answer
+        clickedBtn.classList.add("wrong");
+        buttons[qData.answer].classList.add("correct");
+        playSound(soundWrong);
+      }
+
+      // Auto-advance to next question after 1.5 seconds
+      setTimeout(() => {
+        currentQIndex++;
+        if (currentQIndex < gameQuestions.length) {
+          loadQuestion();
+        } else {
+          showEndScreen();
+        }
+      }, 1500);
+    }
+
+    // Play Sound with Volume Safety
+    function playSound(audioEl) {
+      audioEl.currentTime = 0;
+      audioEl.play().catch(() => {
+        // Handle potential browser autoplay restrictions smoothly
+      });
+    }
+
+    // Confetti Animation
+    function triggerConfetti() {
+      if (typeof confetti === 'function') {
+        confetti({
+          particleCount: 60,
+          spread: 70,
+          origin: { y: 0.6 }
+        });
+      }
+    }
+
+    // End Screen
+    function showEndScreen() {
+      gameBody.style.display = "none";
+      endScreen.style.display = "flex";
+      finalScoreText.innerText = `Your Final Score: ${score} / ${gameQuestions.length}`;
+      playSound(soundClapping);
+      
+      // Bigger Celebration Confetti
+      if (typeof confetti === 'function') {
+        confetti({
+          particleCount: 120,
+          spread: 100,
+          origin: { y: 0.5 }
+        });
+      }
+    }
+
+    // Restart Game Function
+    function restartGame() {
+      soundClapping.pause();
+      soundClapping.currentTime = 0;
+      initGame();
+    }
+  </script>
 </body>
 </html>
