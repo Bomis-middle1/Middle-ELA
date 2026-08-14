@@ -1,69 +1,527 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Speech Switch Simulator – Direct & Indirect Speech</title>
-<style>
-body{margin:0;padding:0;font-family:Inter,sans-serif;background:#08111f;color:#edf6ff;overflow:hidden}
-#splash{position:fixed;inset:0;display:flex;justify-content:center;align-items:center;background:#fff;z-index:999}
-#splash img{width:40vw;max-width:280px;animation:flash 1s infinite}
-@keyframes flash{0%,100%{opacity:.3;transform:scale(.95)}50%{opacity:1;transform:scale(1.05)}}
-.screen{display:none;height:100vh;padding:20px;box-sizing:border-box}
-.screen.active{display:flex;flex-direction:column;align-items:center;justify-content:center}
-.panel{background:rgba(16,29,57,.95);border-radius:28px;padding:20px;max-width:800px;width:95%;text-align:center;box-shadow:0 18px 45px rgba(0,0,0,.35);}
-h1{font-size:2rem;margin-bottom:10px}
-h2{font-size:1.5rem;margin:10px 0}
-button{padding:12px 24px;border-radius:999px;border:none;font-weight:900;cursor:pointer;margin-top:10px;background:linear-gradient(135deg,#43d8ff,#8b72ff);color:#08111f}
-#gamePanel{margin-top:20px;width:100%;max-width:800px}
-#scoreBoard{margin-top:12px;display:flex;justify-content:space-around;width:80%}
-#timer{font-weight:900;color:#ffd166}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reporter's Desk - Direct & Indirect Speech</title>
+    <!-- Canvas Confetti Library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            --primary-bg: #2C3E50;
+            --card-bg: #FFFFFF;
+            --accent: #E74C3C;
+            --text-color: #2C3E50;
+            --success: #2ECC71;
+            --gold: #F1C40F;
+            --news-header: #34495E;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Fredoka', 'Segoe UI', 'Comic Sans MS', sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 15px;
+        }
+
+        /* 5-Second Splash Screen */
+        #splashScreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+
+        #splashScreen img {
+            max-width: 250px;
+            max-height: 250px;
+            object-fit: contain;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* Game Layout */
+        .game-container {
+            max-width: 800px;
+            width: 100%;
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
+            border: 4px solid #FFF;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 3px dashed #CBD5E1;
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+        }
+
+        .audio-control {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        .audio-control input[type=range] {
+            cursor: pointer;
+        }
+
+        /* News Ticker Progress */
+        .news-ticker {
+            background: var(--news-header);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 12px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .report-badge {
+            background: var(--gold);
+            color: #2C3E50;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        .question-box {
+            margin: 15px 0;
+        }
+
+        .speech-bubble {
+            background: #F8FAFC;
+            border: 2px solid #CBD5E1;
+            border-left: 6px solid #3B82F6;
+            border-radius: 12px;
+            padding: 18px;
+            font-size: 1.15rem;
+            font-weight: bold;
+            line-height: 1.4;
+            color: #1E293B;
+            margin-bottom: 20px;
+            position: relative;
+            white-space: pre-line;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .btn-option {
+            background: #F1F5F9;
+            color: #334155;
+            border: 2px solid #CBD5E1;
+            padding: 14px 18px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            text-align: left;
+        }
+
+        .btn-option:hover {
+            background: #E2E8F0;
+            border-color: #3B82F6;
+            transform: translateX(4px);
+        }
+
+        .feedback {
+            margin-top: 15px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            min-height: 30px;
+            text-align: center;
+        }
+
+        .feedback.correct { color: var(--success); }
+        .feedback.incorrect { color: var(--accent); }
+
+        /* Restart Button */
+        .restart-container {
+            margin-top: 25px;
+            text-align: center;
+        }
+
+        .btn-restart {
+            background: var(--success);
+            color: white;
+            border: none;
+            padding: 14px 32px;
+            font-size: 1.15rem;
+            font-weight: bold;
+            border-radius: 30px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(46, 204, 113, 0.4);
+            transition: transform 0.2s, background-color 0.2s;
+        }
+
+        .btn-restart:hover {
+            background: #27AE60;
+            transform: scale(1.05);
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 600px) {
+            .game-container {
+                padding: 15px;
+            }
+            .speech-bubble {
+                font-size: 1rem;
+                padding: 14px;
+            }
+            .btn-option {
+                font-size: 0.88rem;
+                padding: 12px 14px;
+            }
+        }
+    </style>
 </head>
 <body>
-<div id="splash"><img src="assets/innovine-logo.png" alt="Innovine logo"></div>
 
-<div id="intro" class="screen active">
-  <div class="panel">
-    <h1>Speech Switch Simulator</h1>
-    <p>Convert sentences between Direct and Indirect Speech to restore the Voice Vault. Complete 12 missions to stabilize communication.</p>
-    <button id="startBtn">Start Mission</button>
-  </div>
+<!-- 1. Innovine Logo Splash Screen -->
+<div id="splashScreen">
+    <img src="assets/innovine-logo.png" alt="Innovine Logo">
 </div>
 
-<div id="game" class="screen">
-  <div class="panel" id="gamePanel">
-    <h2 id="missionTitle">Mission Title</h2>
-    <p id="prompt">Mission prompt will appear here.</p>
-    <div id="workArea"></div>
-    <div id="scoreBoard">
-      <span id="score">Score: 0</span>
-      <span id="missionCount">Mission 1/12</span>
-      <span id="timer">⏱ 45</span>
+<!-- Audio Assets -->
+<audio id="soundCorrect" src="assets/correct.mp3" preload="auto"></audio>
+<audio id="soundWrong" src="assets/wrong.mp3" preload="auto"></audio>
+<audio id="soundClapping" src="assets/clapping.mp3" preload="auto"></audio>
+
+<div class="game-container">
+    <div class="header">
+        <h2>🎙️ Reporter's Speech Decoder</h2>
+        <div class="audio-control">
+            🔊 <input type="range" id="volumeControl" min="0" max="1" step="0.1" value="1" onchange="adjustVolume(this.value)">
+        </div>
+        <div>Score: <span id="scoreDisplay" style="color: var(--gold); font-weight: bold; font-size: 1.3rem;">0</span></div>
     </div>
-    <button id="checkBtn">Check Answer</button>
-  </div>
-</div>
 
-<div id="result" class="screen">
-  <div class="panel">
-    <h1>Mission Complete!</h1>
-    <p>Your results:</p>
-    <div id="finalScore">Score: 0</div>
-    <button id="playAgain">Play Again</button>
-  </div>
-</div>
+    <!-- News Ticker Progress Bar -->
+    <div class="news-ticker" id="newsTicker">
+        <span>📰 BREAKING REPORT</span>
+        <span class="report-badge" id="reportBadge">Report 1 of 12</span>
+    </div>
 
-<audio id="correctAudio" src="assets/correct.mp3" preload="auto"></audio>
-<audio id="wrongAudio" src="assets/wrong.mp3" preload="auto"></audio>
-<audio id="clapAudio" src="assets/clapping.mp3" preload="auto"></audio>
+    <!-- Quiz Panel -->
+    <div id="quizSection">
+        <div class="question-box">
+            <div id="questionText" class="speech-bubble">Loading headline...</div>
+            <div id="optionsGrid" class="options-grid"></div>
+        </div>
+        <div id="feedback" class="feedback"></div>
+    </div>
+
+    <!-- Victory Panel -->
+    <div id="victorySection" style="display: none; text-align: center; padding: 30px 0;">
+        <h1 style="color: var(--gold); font-size: 2.2rem;">🎉 Master News Anchor! 🎉</h1>
+        <p style="font-size: 1.2rem; margin: 15px 0;">You successfully decoded all 12 speech reports!</p>
+        <p style="font-size: 1.1rem;">Final Score: <strong id="finalScore">0</strong> / 120</p>
+    </div>
+
+    <!-- Restart Button -->
+    <div class="restart-container" id="restartContainer" style="display: none;">
+        <button class="btn-restart" onclick="restartGame()">🔄 Play Again</button>
+    </div>
+</div>
 
 <script>
-const $ = s => document.querySelector(s);
-setTimeout(()=>{$("#splash").style.display="none";$("#intro").classList.add("active")},5000);
-$("#startBtn").onclick = ()=>{ $("#intro").classList.remove("active"); $("#game").classList.add("active"); };
-$("#playAgain").onclick = ()=>{ location.reload(); };
+    // Audio Elements
+    const audioCorrect = document.getElementById('soundCorrect');
+    const audioWrong = document.getElementById('soundWrong');
+    const audioClapping = document.getElementById('soundClapping');
+
+    function adjustVolume(val) {
+        audioCorrect.volume = val;
+        audioWrong.volume = val;
+        audioClapping.volume = val;
+    }
+
+    // Question Bank (All options explicitly detailed from Chapter 14)
+    const baseQuestions = [
+        {
+            q: "Convert to Indirect Speech:\n\"I will submit the project by the end of the week,\" Alice assured her team.",
+            options: [
+                "(A) Alice assured her team that she would submit the project by the end of the week.",
+                "(B) Alice assures her team that she will submit the project by the end of the week.",
+                "(C) Alice assured her team that she will submit the project by the end of the week."
+            ],
+            correct: 0
+        },
+        {
+            q: "Convert to Indirect Speech:\n\"You should visit the museum if you are interested in art,\" the guide suggested.",
+            options: [
+                "(A) The guide suggests that they should visit the museum if they are interested in art.",
+                "(B) The guide suggested that they should visit the museum if they were interested in art.",
+                "(C) The guide suggested visiting the museum if they are interested in art."
+            ],
+            correct: 1
+        },
+        {
+            q: "Convert to Indirect Speech:\n\"We have been working on this assignment for three days,\" the students complained.",
+            options: [
+                "(A) The students complained that they have been working on this assignment for three days.",
+                "(B) The students complained that they had been working on that assignment for three days.",
+                "(C) The students complain that they have been working on that assignment for three days."
+            ],
+            correct: 1
+        },
+        {
+            q: "Convert to Indirect Speech:\n\"I cannot believe that you forgot my birthday,\" Sarah said to John.",
+            options: [
+                "(A) Sarah told to John that she cannot believe that he forgot her birthday.",
+                "(B) Sarah said to John that she could not believe that he forgot her birthday.",
+                "(C) Sarah said that she could not believe that he had forgotten her birthday."
+            ],
+            correct: 2
+        },
+        {
+            q: "Convert to Indirect Speech:\n\"If it rains tomorrow, the event will be postponed,\" the organiser announced.",
+            options: [
+                "(A) The organiser announced that if it rained tomorrow, the event would be postponed.",
+                "(B) The organiser announced that if it rains tomorrow, the event would be postponed.",
+                "(C) The organiser announced that if it rained the next day, the event would be postponed."
+            ],
+            correct: 2
+        },
+        {
+            q: "Convert to Direct Speech:\nMaria mentioned that she would finish her homework before dinner.\nMaria said,",
+            options: [
+                "a) \"I will finish my homework before dinner.\"",
+                "b) \"I should finish my homework before dinner.\"",
+                "c) \"I would finish my homework before dinner.\"",
+                "d) \"I can finish my homework before dinner.\""
+            ],
+            correct: 0
+        },
+        {
+            q: "Convert to Direct Speech:\nThe teacher informed the students that the science fair was scheduled for next month.\nThe teacher said,",
+            options: [
+                "a) \"The science fair is scheduled for next month.\"",
+                "b) \"The science fair will be scheduled for next month.\"",
+                "c) \"The science fair was scheduled for next month.\"",
+                "d) \"The science fair has been scheduled for next month.\""
+            ],
+            correct: 0
+        },
+        {
+            q: "Convert to Direct Speech:\nAlex explained that he couldn't attend the party because he was feeling unwell.\nAlex said,",
+            options: [
+                "a) \"I can't attend the party because I am feeling unwell.\"",
+                "b) \"I couldn't attend the party because I was feeling unwell.\"",
+                "c) \"I cannot attend the party because I am feeling unwell.\"",
+                "d) \"I couldn't attend the party because I am feeling unwell.\""
+            ],
+            correct: 0
+        },
+        {
+            q: "Convert to Direct Speech:\nThe tour guide explained that the museum would be closed on Mondays for maintenance.\nThe tour guide said,",
+            options: [
+                "a) \"The museum will be closed on Mondays for maintenance.\"",
+                "b) \"The museum would be closed on Mondays for maintenance.\"",
+                "c) \"The museum is closed on Mondays for maintenance.\"",
+                "d) \"The museum has been closed on Mondays for maintenance.\""
+            ],
+            correct: 0
+        },
+        {
+            q: "Convert to Direct Speech:\nJennifer complained that she had lost her favourite book in the library.\nJennifer said,",
+            options: [
+                "a) \"I lost my favourite book in the library.\"",
+                "b) \"I had lost my favourite book in the library.\"",
+                "c) \"I have lost my favourite book in the library.\"",
+                "d) \"I will lose my favourite book in the library.\""
+            ],
+            correct: 0
+        },
+        {
+            q: "Convert to Indirect Speech:\n\"I will finish my homework by tomorrow,\" Sarah promised her teacher.",
+            options: [
+                "a) Sarah promised her teacher that she would finish her homework by the next day.",
+                "b) Sarah promised her teacher that she will finish her homework tomorrow.",
+                "c) Sarah promised her teacher that I will finish my homework by tomorrow."
+            ],
+            correct: 0
+        },
+        {
+            q: "Convert to Indirect Speech:\n\"Can you help me with this math problem?\" asked John.",
+            options: [
+                "a) John asked if I could help him with that math problem.",
+                "b) John asked can you help me with this math problem.",
+                "c) John asked that I can help him with that math problem."
+            ],
+            correct: 0
+        }
+    ];
+
+    let questions = [];
+    let currentQuestion = 0;
+    let score = 0;
+    let answered = false;
+
+    // Shuffle questions
+    function shuffleArray(array) {
+        let shuffled = [...array];
+        for (let i = shuffled.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+        return shuffled;
+    }
+
+    // Splash Screen Handler (5 Seconds)
+    window.onload = () => {
+        setTimeout(() => {
+            const splash = document.getElementById('splashScreen');
+            splash.style.opacity = '0';
+            setTimeout(() => {
+                splash.style.display = 'none';
+            }, 500);
+        }, 5000);
+
+        initGame();
+    };
+
+    function initGame() {
+        questions = shuffleArray(baseQuestions);
+        currentQuestion = 0;
+        score = 0;
+        document.getElementById('scoreDisplay').innerText = score;
+        document.getElementById('quizSection').style.display = 'block';
+        document.getElementById('newsTicker').style.display = 'flex';
+        document.getElementById('victorySection').style.display = 'none';
+        document.getElementById('restartContainer').style.display = 'none';
+        loadQuestion();
+    }
+
+    function loadQuestion() {
+        answered = false;
+        document.getElementById('feedback').innerText = '';
+        document.getElementById('feedback').className = 'feedback';
+        document.getElementById('reportBadge').innerText = `Report ${currentQuestion + 1} of 12`;
+
+        const qData = questions[currentQuestion];
+        document.getElementById('questionText').innerText = `💬 ${qData.q}`;
+
+        const optionsGrid = document.getElementById('optionsGrid');
+        optionsGrid.innerHTML = '';
+
+        qData.options.forEach((opt, idx) => {
+            const btn = document.createElement('button');
+            btn.className = 'btn-option';
+            btn.innerText = opt;
+            btn.onclick = () => selectOption(idx);
+            optionsGrid.appendChild(btn);
+        });
+    }
+
+    function selectOption(index) {
+        if (answered) return;
+        answered = true;
+
+        const qData = questions[currentQuestion];
+        const feedback = document.getElementById('feedback');
+        const buttons = document.querySelectorAll('.btn-option');
+
+        if (index === qData.correct) {
+            score += 10;
+            document.getElementById('scoreDisplay').innerText = score;
+
+            feedback.innerText = "✨ Correctly Reported!";
+            feedback.className = "feedback correct";
+            buttons[index].style.borderColor = "var(--success)";
+            buttons[index].style.background = "#E8F8F0";
+
+            // Play correct audio
+            audioCorrect.currentTime = 0;
+            audioCorrect.play().catch(() => {});
+
+            // Confetti effect
+            confetti({
+                particleCount: 50,
+                spread: 60,
+                origin: { y: 0.7 }
+            });
+
+        } else {
+            feedback.innerText = `❌ Reporting Error! Correct: ${qData.options[qData.correct]}`;
+            feedback.className = "feedback incorrect";
+            buttons[index].style.borderColor = "var(--accent)";
+            buttons[qData.correct].style.borderColor = "var(--success)";
+
+            // Play wrong audio
+            audioWrong.currentTime = 0;
+            audioWrong.play().catch(() => {});
+        }
+
+        // Transition to next report after 2 seconds
+        setTimeout(() => {
+            currentQuestion++;
+            if (currentQuestion < questions.length) {
+                loadQuestion();
+            } else {
+                showVictory();
+            }
+        }, 2000);
+    }
+
+    function showVictory() {
+        document.getElementById('quizSection').style.display = 'none';
+        document.getElementById('newsTicker').style.display = 'none';
+        document.getElementById('victorySection').style.display = 'block';
+        document.getElementById('restartContainer').style.display = 'block';
+        document.getElementById('finalScore').innerText = score;
+
+        // Play Clapping Audio & Grand Confetti
+        audioClapping.currentTime = 0;
+        audioClapping.play().catch(() => {});
+
+        confetti({
+            particleCount: 150,
+            spread: 100,
+            origin: { y: 0.6 }
+        });
+    }
+
+    function restartGame() {
+        initGame();
+    }
 </script>
+
 </body>
 </html>
