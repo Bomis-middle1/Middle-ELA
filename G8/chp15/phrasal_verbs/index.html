@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Phrasal Verbs Game</title>
+  <title>Dialogue Detective - Phrasal Verbs</title>
   <!-- Canvas Confetti Library -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <style>
@@ -22,9 +22,10 @@
       align-items: center;
       padding: 15px;
       overflow-x: hidden;
+      color: #2c3e50;
     }
 
-    /* --- Splash Screen --- */
+    /* --- Splash Screen (5 Seconds) --- */
     #splash-screen {
       position: fixed;
       top: 0;
@@ -41,8 +42,8 @@
     }
 
     #splash-screen img {
-      max-width: 280px;
-      width: 70%;
+      max-width: 320px;
+      width: 75%;
       height: auto;
       animation: pulse 1.5s infinite ease-in-out;
     }
@@ -53,13 +54,13 @@
       100% { transform: scale(0.95); }
     }
 
-    /* --- Game Card --- */
+    /* --- Main Game Card --- */
     .game-card {
       background: #ffffff;
       border: 4px solid #ff9f43;
-      border-radius: 24px;
-      box-shadow: 0 12px 28px rgba(0,0,0,0.15);
-      max-width: 600px;
+      border-radius: 28px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+      max-width: 650px;
       width: 100%;
       padding: 25px;
       text-align: center;
@@ -76,57 +77,123 @@
     .volume-box {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
       background: #fff3e0;
-      padding: 6px 12px;
-      border-radius: 12px;
+      padding: 8px 14px;
+      border-radius: 14px;
       border: 2px solid #ffe0b2;
-      font-size: 0.9rem;
+      font-size: 0.95rem;
       font-weight: bold;
       color: #e67e22;
     }
 
     .volume-box input[type="range"] {
-      width: 80px;
+      width: 90px;
       cursor: pointer;
     }
 
     .score-badge {
       background: #ff6b6b;
-      color: #fff;
-      padding: 6px 16px;
+      color: #ffffff;
+      padding: 8px 18px;
       border-radius: 20px;
       font-weight: bold;
-      font-size: 1rem;
+      font-size: 1.1rem;
     }
 
     .badge {
       display: inline-block;
-      background: #4ecdc4;
+      background: #ff9f43;
       color: white;
-      padding: 6px 18px;
+      padding: 6px 20px;
       border-radius: 15px;
-      font-size: 0.95rem;
+      font-size: 1rem;
       font-weight: bold;
       margin-bottom: 15px;
     }
 
-    .question {
-      font-size: 1.25rem;
+    /* --- Comic Dialogue Stage --- */
+    .comic-stage {
+      display: flex;
+      justify-content: space-around;
+      align-items: flex-end;
+      background: #f1f2f6;
+      border: 3px dashed #4ecdc4;
+      border-radius: 20px;
+      padding: 20px 10px;
+      margin-bottom: 20px;
+      min-height: 260px;
+    }
+
+    .character-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 48%;
+      position: relative;
+    }
+
+    .avatar {
+      font-size: 4.5rem;
+      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+    }
+
+    .character-name {
+      font-size: 0.85rem;
+      font-weight: bold;
+      color: #7f8c8d;
+      margin-top: 5px;
+    }
+
+    /* Speech Bubbles */
+    .speech-bubble {
+      position: relative;
+      background: #ffffff;
+      border: 3px solid #2c3e50;
+      border-radius: 18px;
+      padding: 12px 14px;
+      font-size: 0.95rem;
+      line-height: 1.4;
       color: #2c3e50;
-      margin-bottom: 25px;
-      line-height: 1.5;
-      min-height: 60px;
+      margin-bottom: 15px;
+      width: 100%;
+      min-height: 80px;
       display: flex;
       align-items: center;
       justify-content: center;
+      box-shadow: 0 4px 0 #2c3e50;
     }
 
+    .speech-bubble::after {
+      content: '';
+      position: absolute;
+      bottom: -13px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-width: 12px 10px 0;
+      border-style: solid;
+      border-color: #2c3e50 transparent;
+      display: block;
+      width: 0;
+    }
+
+    .blank-target {
+      display: inline-block;
+      min-width: 85px;
+      padding: 2px 8px;
+      margin: 0 4px;
+      border-bottom: 3px dashed #ff9f43;
+      color: #e67e22;
+      font-weight: bold;
+    }
+
+    /* --- Choice Buttons --- */
     .options-grid {
       display: grid;
       grid-template-columns: 1fr;
       gap: 12px;
-      margin-bottom: 20px;
+      margin-bottom: 10px;
     }
 
     @media (min-width: 480px) {
@@ -136,33 +203,38 @@
     }
 
     .btn-opt {
-      background: #f1f2f6;
+      background: #ffffff;
       border: 3px solid #ced6e0;
       color: #2f3542;
       padding: 14px 18px;
-      border-radius: 16px;
-      font-size: 1rem;
+      border-radius: 18px;
+      font-size: 1.05rem;
       font-weight: bold;
       cursor: pointer;
       transition: all 0.2s ease;
       word-break: break-word;
+      box-shadow: 0 5px 0 #ced6e0;
     }
 
     .btn-opt:hover:not(:disabled) {
-      background: #dfe4ea;
+      border-color: #ff9f43;
+      color: #ff9f43;
       transform: translateY(-2px);
+      box-shadow: 0 7px 0 #ff9f43;
     }
 
     .btn-opt.correct {
       background: #2ed573 !important;
       border-color: #26af5f !important;
       color: white !important;
+      box-shadow: 0 5px 0 #26af5f !important;
     }
 
     .btn-opt.wrong {
       background: #ff4757 !important;
       border-color: #d63031 !important;
       color: white !important;
+      box-shadow: 0 5px 0 #d63031 !important;
     }
 
     .btn-opt:disabled {
@@ -174,26 +246,22 @@
       display: none;
       flex-direction: column;
       align-items: center;
-      gap: 15px;
+      gap: 20px;
+      padding: 20px 0;
     }
 
     .end-screen h2 {
-      font-size: 2rem;
+      font-size: 2.2rem;
       color: #ff9f43;
-    }
-
-    .end-screen p {
-      font-size: 1.25rem;
-      color: #2c3e50;
     }
 
     .restart-btn {
       background: #ff9f43;
       border: none;
       color: white;
-      padding: 14px 32px;
-      border-radius: 20px;
-      font-size: 1.2rem;
+      padding: 16px 36px;
+      border-radius: 22px;
+      font-size: 1.25rem;
       font-weight: bold;
       cursor: pointer;
       box-shadow: 0 6px 0 #e67e22;
@@ -215,7 +283,7 @@
 </head>
 <body>
 
-  <!-- Splash Screen -->
+  <!-- 5-Second Innovine Splash Screen -->
   <div id="splash-screen">
     <img src="assets/innovine-logo.png" alt="Innovine Logo" />
   </div>
@@ -225,108 +293,119 @@
   <audio id="sound-wrong" src="assets/wrong.mp3" preload="auto"></audio>
   <audio id="sound-clapping" src="assets/clapping.mp3" preload="auto"></audio>
 
-  <!-- Main Game Container -->
+  <!-- Game Container -->
   <div class="game-card">
     <div class="header-controls">
       <div class="volume-box">
-        🔊
+        🔊 Sound
         <input type="range" id="volumeSlider" min="0" max="1" step="0.1" value="1" />
       </div>
       <div class="score-badge" id="scoreDisplay">Score: 0</div>
     </div>
 
     <div id="game-body">
-      <div class="badge" id="categoryBadge">Round</div>
-      <div class="question" id="questionText">Loading...</div>
+      <div class="badge">🔍 Dialogue Detective</div>
+
+      <!-- Comic Stage -->
+      <div class="comic-stage">
+        <!-- Speaker A -->
+        <div class="character-box">
+          <div class="speech-bubble" id="bubbleA">...</div>
+          <div class="avatar" id="avatarA">🧐</div>
+          <div class="character-name" id="nameA">Detective Alex</div>
+        </div>
+
+        <!-- Speaker B -->
+        <div class="character-box">
+          <div class="speech-bubble" id="bubbleB">...</div>
+          <div class="avatar" id="avatarB">🤨</div>
+          <div class="character-name" id="nameB">Friend Sam</div>
+        </div>
+      </div>
+
+      <!-- Option Choices -->
       <div class="options-grid" id="optionsGrid"></div>
     </div>
 
-    <!-- End Screen -->
+    <!-- End Screen (Restart Button at Bottom) -->
     <div class="end-screen" id="endScreen">
-      <h2>🎉 Game Complete!</h2>
-      <p id="finalScoreText">Your Final Score: 0 / 0</p>
-      <button class="restart-btn" id="restartBtn" onclick="restartGame()">Play Again 🔄</button>
+      <h2>🎉 Case Solved!</h2>
+      <p id="finalScoreText" style="font-size: 1.3rem; color: #2c3e50;">Your Final Score: 0 / 0</p>
+      <button class="restart-btn" onclick="restartGame()">Play Again 🔄</button>
     </div>
   </div>
 
   <script>
-    // Chapter 15 Question Bank
-    const baseQuestions = [
+    // Chapter 15 Phrasal Verbs Question Bank (Dialogue Detective Format)
+    const baseCases = [
       {
-        badge: "Fill in the Blank",
-        q: "The teacher asked the students to ________ their notebooks.",
-        options: ["hand in", "break down", "run out", "look into"],
-        answer: 0
+        speakerA: "Did you fix your car's engine yet?",
+        speakerB: "Yes, but I had to ________ it to test where the sound came from.",
+        options: ["break down", "hand in", "look into", "run out"],
+        answer: 0,
+        avatars: { normalA: "🧐", normalB: "🚗", correctA: "💡", correctB: "🛠️", wrongA: "🤦‍♂️", wrongB: "💥" }
       },
       {
-        badge: "Word Upgrade",
-        q: "He <b>created</b> a story to avoid punishment.",
-        options: ["broke down", "made up", "looked into", "ran into"],
-        answer: 1
+        speakerA: "Are you still trying to solve that puzzle?",
+        speakerB: "No, it is too hard! I decided to ________ for now.",
+        options: ["give up", "set up", "turn on", "look after"],
+        answer: 0,
+        avatars: { normalA: "🧐", normalB: "🧩", correctA: "😌", correctB: "🏳️", wrongA: "🤨", wrongB: "🤯" }
       },
       {
-        badge: "Fill in the Blank",
-        q: "We have ________ sugar, so we need to buy more.",
-        options: ["looked after", "run out of", "taken over", "set up"],
-        answer: 1
+        speakerA: "Why did you stop at the store on the way home?",
+        speakerB: "We had ________ sugar, so I had to buy more.",
+        options: ["looked after", "run out of", "taken over", "broken out"],
+        answer: 1,
+        avatars: { normalA: "🧐", normalB: "🛒", correctA: "🛍️", correctB: "😄", wrongA: "😒", wrongB: "❓" }
       },
       {
-        badge: "Structure Challenge",
-        q: "Select the sentence with correct pronoun placement:",
-        options: ["She wrote down it.", "She wrote it down.", "She down wrote it.", "She down it wrote."],
-        answer: 1
+        speakerA: "Where did you find this old notebook?",
+        speakerB: "I unexpectedly ________ it while cleaning my room.",
+        options: ["ran into", "came across", "turned off", "handed in"],
+        answer: 1,
+        avatars: { normalA: "🧐", normalB: "📦", correctA: "😲", correctB: "📸", wrongA: "🤔", wrongB: "🚫" }
       },
       {
-        badge: "Word Upgrade",
-        q: "Governments must <b>establish</b> better healthcare facilities.",
-        options: ["set up", "break out", "hand in", "give up"],
-        answer: 0
+        speakerA: "Did the teacher get your assignment?",
+        speakerB: "Yes, I managed to ________ my project before class.",
+        options: ["hand in", "break out", "set off", "look after"],
+        answer: 0,
+        avatars: { normalA: "👩‍🏫", normalB: "🎒", correctA: "✅", correctB: "🥳", wrongA: "😠", wrongB: "😰" }
       },
       {
-        badge: "Word Upgrade",
-        q: "My parents <b>cared for</b> us while we swam in the shallow water.",
-        options: ["looked after", "ran into", "took off", "set off"],
-        answer: 0
+        speakerA: "Who will take care of your dog during vacation?",
+        speakerB: "My parents offered to ________ him while we are away.",
+        options: ["look after", "give up", "run out", "break down"],
+        answer: 0,
+        avatars: { normalA: "🧐", normalB: "🐶", correctA: "🦴", correctB: "😊", wrongA: "🤔", wrongB: "😢" }
       },
       {
-        badge: "Dialogue Completion",
-        q: "Person A: 'Did you fix your car?'<br>Person B: 'Yes, I had to ________ the engine to test it.'",
-        options: ["turn on", "give in", "run into", "look after"],
-        answer: 0
-      },
-      {
-        badge: "Dialogue Completion",
-        q: "Person A: 'Are you still trying to solve that puzzle?'<br>Person B: 'No, I decided to ________ for now.'",
-        options: ["give up", "set up", "hand in", "look into"],
-        answer: 0
-      },
-      {
-        badge: "Object Placement",
-        q: "Which option places the object correctly for <i>'She took off her jacket'</i>?",
-        options: ["She took her jacket off.", "She off took her jacket.", "She jacket took off her.", "She off her jacket took."],
-        answer: 0
-      },
-      {
-        badge: "Fill in the Blank",
-        q: "A fire suddenly ________ in the wooden building.",
-        options: ["broke out", "handed in", "looked after", "gave up"],
-        answer: 0
+        speakerA: "How did the new business start?",
+        speakerB: "They decided to ________ a small office downtown.",
+        options: ["set up", "hand in", "run out", "look into"],
+        answer: 0,
+        avatars: { normalA: "🧐", normalB: "🏢", correctA: "🎉", correctB: "💼", wrongA: "❓", wrongB: "😅" }
       }
     ];
 
-    let gameQuestions = [];
-    let currentQIndex = 0;
+    let gameCases = [];
+    let currentCaseIndex = 0;
     let score = 0;
+    let nextTimeout = null;
 
     // Elements
     const splashScreen = document.getElementById("splash-screen");
     const gameBody = document.getElementById("game-body");
     const endScreen = document.getElementById("endScreen");
-    const categoryBadge = document.getElementById("categoryBadge");
-    const questionText = document.getElementById("questionText");
-    const optionsGrid = document.getElementById("optionsGrid");
     const scoreDisplay = document.getElementById("scoreDisplay");
     const finalScoreText = document.getElementById("finalScoreText");
+
+    const bubbleA = document.getElementById("bubbleA");
+    const bubbleB = document.getElementById("bubbleB");
+    const avatarA = document.getElementById("avatarA");
+    const avatarB = document.getElementById("avatarB");
+    const optionsGrid = document.getElementById("optionsGrid");
 
     // Audio Elements
     const soundCorrect = document.getElementById("sound-correct");
@@ -334,7 +413,7 @@
     const soundClapping = document.getElementById("sound-clapping");
     const volumeSlider = document.getElementById("volumeSlider");
 
-    // Volume Control Listener
+    // Volume Adjustment
     volumeSlider.addEventListener("input", (e) => {
       const vol = parseFloat(e.target.value);
       soundCorrect.volume = vol;
@@ -342,19 +421,19 @@
       soundClapping.volume = vol;
     });
 
-    // Handle Splash Screen (5 Seconds)
+    // Handle 5-Second Splash Screen on Page Load
     window.addEventListener("DOMContentLoaded", () => {
       setTimeout(() => {
         splashScreen.style.opacity = "0";
         setTimeout(() => {
           splashScreen.style.visibility = "hidden";
         }, 800);
-      }, 5000);
+      }, 5000); // 5 Seconds Splash Duration
 
       initGame();
     });
 
-    // Shuffle Array Helper
+    // Helper: Fisher-Yates Array Shuffle
     function shuffleArray(array) {
       const arr = [...array];
       for (let i = arr.length - 1; i > 0; i--) {
@@ -364,45 +443,67 @@
       return arr;
     }
 
-    // Initialize/Reset Game State
+    // Initialize or Reset Game State
     function initGame() {
-      // Randomize questions each load
-      gameQuestions = shuffleArray(baseQuestions);
-      currentQIndex = 0;
+      // Randomize question sequence each time game loads
+      gameCases = shuffleArray(baseCases);
+      currentCaseIndex = 0;
       score = 0;
       scoreDisplay.innerText = `Score: ${score}`;
       endScreen.style.display = "none";
       gameBody.style.display = "block";
-      loadQuestion();
+      loadCase();
     }
 
-    // Load Single Question
-    function loadQuestion() {
-      const qData = gameQuestions[currentQIndex];
-      categoryBadge.innerText = qData.badge;
-      questionText.innerHTML = qData.q;
-      optionsGrid.innerHTML = "";
+    // Load Single Dialogue Question
+    function loadCase() {
+      const cData = gameCases[currentCaseIndex];
 
-      qData.options.forEach((option, index) => {
+      // Speech bubble contents
+      bubbleA.innerText = cData.speakerA;
+      bubbleB.innerHTML = cData.speakerB.replace("________", `<span class="blank-target">_______</span>`);
+
+      // Reset character avatars
+      avatarA.innerText = cData.avatars.normalA;
+      avatarB.innerText = cData.avatars.normalB;
+      avatarA.style.transform = "scale(1)";
+      avatarB.style.transform = "scale(1)";
+
+      // Prepare options grid and shuffle choices per question
+      optionsGrid.innerHTML = "";
+      const mappedOptions = cData.options.map((opt, idx) => ({
+        text: opt,
+        isCorrect: idx === cData.answer
+      }));
+
+      const shuffledOpts = shuffleArray(mappedOptions);
+
+      shuffledOpts.forEach((optObj) => {
         const btn = document.createElement("button");
         btn.className = "btn-opt";
-        btn.innerHTML = option;
-        btn.onclick = () => handleAnswer(index, btn);
+        btn.innerText = optObj.text;
+        btn.onclick = () => handleChoice(optObj, btn, cData);
         optionsGrid.appendChild(btn);
       });
     }
 
-    // Handle User Choice
-    function handleAnswer(selectedIndex, clickedBtn) {
-      // Disable all buttons to prevent double click
+    // Handle User Answer Selection
+    function handleChoice(selectedOpt, clickedBtn, caseData) {
+      // Disable all option buttons to prevent multiple clicks
       const buttons = optionsGrid.querySelectorAll(".btn-opt");
       buttons.forEach(btn => btn.disabled = true);
 
-      const qData = gameQuestions[currentQIndex];
-
-      if (selectedIndex === qData.answer) {
+      if (selectedOpt.isCorrect) {
         // Correct Answer
+        bubbleB.innerHTML = caseData.speakerB.replace("________", `<span class="blank-target" style="color:#2ecc71">${selectedOpt.text}</span>`);
         clickedBtn.classList.add("correct");
+
+        // React Character Avatars
+        avatarA.innerText = caseData.avatars.correctA;
+        avatarB.innerText = caseData.avatars.correctB;
+        avatarA.style.transform = "scale(1.2)";
+        avatarB.style.transform = "scale(1.2)";
+
         score++;
         scoreDisplay.innerText = `Score: ${score}`;
         playSound(soundCorrect);
@@ -410,30 +511,43 @@
       } else {
         // Wrong Answer
         clickedBtn.classList.add("wrong");
-        buttons[qData.answer].classList.add("correct");
+
+        // Highlight correct button
+        buttons.forEach(btn => {
+          if (btn.innerText === caseData.options[caseData.answer]) {
+            btn.classList.add("correct");
+          }
+        });
+
+        // React Character Avatars
+        avatarA.innerText = caseData.avatars.wrongA;
+        avatarB.innerText = caseData.avatars.wrongB;
+        avatarA.style.transform = "scale(0.9)";
+        avatarB.style.transform = "scale(0.9)";
+
         playSound(soundWrong);
       }
 
-      // Auto-advance to next question after 1.5 seconds
-      setTimeout(() => {
-        currentQIndex++;
-        if (currentQIndex < gameQuestions.length) {
-          loadQuestion();
+      // Automatically move to the next question after 1.5 seconds
+      nextTimeout = setTimeout(() => {
+        currentCaseIndex++;
+        if (currentCaseIndex < gameCases.length) {
+          loadCase();
         } else {
           showEndScreen();
         }
       }, 1500);
     }
 
-    // Play Sound with Volume Safety
+    // Sound Player with Autoplay Fail-Safe
     function playSound(audioEl) {
       audioEl.currentTime = 0;
       audioEl.play().catch(() => {
-        // Handle potential browser autoplay restrictions smoothly
+        // Smoothly handle browser autoplay restrictions
       });
     }
 
-    // Confetti Animation
+    // Canvas Confetti Effect
     function triggerConfetti() {
       if (typeof confetti === 'function') {
         confetti({
@@ -444,14 +558,13 @@
       }
     }
 
-    // End Screen
+    // Show Final End Screen
     function showEndScreen() {
       gameBody.style.display = "none";
       endScreen.style.display = "flex";
-      finalScoreText.innerText = `Your Final Score: ${score} / ${gameQuestions.length}`;
+      finalScoreText.innerText = `Your Final Score: ${score} / ${gameCases.length}`;
       playSound(soundClapping);
-      
-      // Bigger Celebration Confetti
+
       if (typeof confetti === 'function') {
         confetti({
           particleCount: 120,
@@ -461,8 +574,9 @@
       }
     }
 
-    // Restart Game Function
+    // Restart Game Logic
     function restartGame() {
+      if (nextTimeout) clearTimeout(nextTimeout);
       soundClapping.pause();
       soundClapping.currentTime = 0;
       initGame();
