@@ -2,14 +2,14 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-select=none">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
 <title>Traffic Command Center</title>
 
 <style>
 /* ==========================================================================
    SYSTEM CORE RESET & CONTAINER GEOMETRY
    ========================================================================== */
-* {
+*, *::before, *::after {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
@@ -17,11 +17,20 @@
     -webkit-tap-highlight-color: transparent;
 }
 
-body {
+html, body {
+    width: 100%;
+    min-height: 100vh;
+    min-height: 100svh;
     background: #0f172a;
     color: #f8fafc;
-    overflow: hidden;
-    height: 100vh;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+}
+
+body {
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 
 /* SCREEN LAYOUT ABSTRACTIONS */
@@ -45,6 +54,7 @@ body {
 #logoScreen img {
     width: 220px;
     max-width: 80%;
+    height: auto;
 }
 #logoText {
     font-size: 22px;
@@ -57,25 +67,25 @@ body {
 #instructionScreen {
     background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
     z-index: 9000;
-    display: none; /* Controlled explicitly by script now */
+    display: none;
 }
 #instructionScreen h1 {
-    font-size: 32px;
+    font-size: 28px;
     color: #38bdf8;
     margin-bottom: 16px;
 }
 .rules-card {
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid rgba(255, 255, 255, 0.08);
-    padding: 20px;
+    padding: 16px;
     border-radius: 16px;
     max-width: 500px;
     text-align: left;
-    margin-bottom: 24px;
+    margin-bottom: 20px;
 }
 .rules-line {
-    font-size: 16px;
-    line-height: 1.6;
+    font-size: 15px;
+    line-height: 1.5;
     color: #cbd5e1;
     margin-bottom: 8px;
     display: flex;
@@ -93,8 +103,9 @@ body {
 
 /* INTERACTIVE ENGINE CONTROLS */
 button {
-    padding: 14px 36px;
-    font-size: 18px;
+    min-height: 48px;
+    padding: 12px 32px;
+    font-size: 17px;
     font-weight: bold;
     border: none;
     border-radius: 30px;
@@ -102,7 +113,8 @@ button {
     color: white;
     cursor: pointer;
     box-shadow: 0 4px 14px rgba(245, 124, 0, 0.4);
-    transition: transform 0.2s, box-shadow 0.2s;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    touch-action: manipulation;
 }
 button:active {
     transform: scale(0.95);
@@ -115,9 +127,13 @@ button:active {
     display: none;
     flex-direction: column;
     justify-content: space-between;
-    width: 100vw;
-    height: 100vh;
-    padding: 16px;
+    align-items: center;
+    width: 100%;
+    max-width: 600px;
+    min-height: 100vh;
+    min-height: 100svh;
+    margin: 0 auto;
+    padding: 10px 12px 14px 12px;
     background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
 }
 
@@ -125,17 +141,16 @@ button:active {
 #titleBox {
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid rgba(56, 189, 248, 0.2);
-    padding: 12px;
-    border-radius: 14px;
-    font-size: 15px;
+    padding: 8px 12px;
+    border-radius: 12px;
+    font-size: 13px;
     font-weight: bold;
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 0.5px;
     color: #38bdf8;
     text-align: center;
     width: 100%;
-    max-width: 600px;
-    margin: 0 auto 12px auto;
+    margin-bottom: 8px;
 }
 
 /* TELEMETRY MATRIX HUD STAGE */
@@ -143,129 +158,145 @@ button:active {
     display: flex;
     justify-content: space-between;
     width: 100%;
-    max-width: 600px;
-    margin: 0 auto 12px auto;
-    gap: 12px;
+    margin-bottom: 8px;
+    gap: 8px;
 }
 .hud-metric {
     flex: 1;
     background: rgba(0, 0, 0, 0.4);
     border: 1px solid rgba(255, 255, 255, 0.05);
-    padding: 8px 12px;
-    border-radius: 10px;
-    font-size: 13px;
+    padding: 6px 8px;
+    border-radius: 8px;
+    font-size: 11px;
     font-weight: bold;
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 .metric-val {
-    font-size: 15px;
+    font-size: 13px;
     color: #f8fafc;
 }
 
 /* RADAR CONSOLE SCENARIO BLOCK */
 .radar-console {
-    flex: 1;
+    flex: 0 1 auto;
     background: rgba(15, 23, 42, 0.85);
     border: 2px solid #3b82f6;
-    box-shadow: 0 0 20px rgba(59, 130, 246, 0.15);
-    border-radius: 16px;
-    padding: 20px;
+    box-shadow: 0 0 16px rgba(59, 130, 246, 0.15);
+    border-radius: 14px;
+    padding: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
     width: 100%;
-    max-width: 600px;
-    margin: 0 auto 16px auto;
-    min-height: 140px;
+    margin-bottom: 10px;
+    min-height: 90px;
+    max-height: 180px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
 }
 #question {
-    font-size: 16px;
-    line-height: 1.5;
+    font-size: 14px;
+    line-height: 1.4;
     font-weight: bold;
     text-align: center;
     color: #e2e8f0;
+    width: 100%;
 }
 
 /* INTERACTIVE DECISION COMMAND CARDS GRID */
 #optionsGrid {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 8px;
     width: 100%;
-    max-width: 600px;
-    margin: 0 auto;
+    margin-top: auto;
 }
 .option {
     background: linear-gradient(135deg, #1e293b, #0f172a);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.12);
     color: #cbd5e1;
-    padding: 14px 16px;
-    border-radius: 12px;
+    padding: 10px 12px;
+    border-radius: 10px;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 500;
-    line-height: 1.4;
+    line-height: 1.35;
     text-align: left;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
-    transition: all 0.2s ease;
-}
-.option:hover {
-    background: linear-gradient(135deg, #273549, #111a2e);
-    border-color: rgba(56, 189, 248, 0.3);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+    transition: transform 0.12s ease, background 0.12s ease;
+    touch-action: manipulation;
+    word-break: break-word;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
 }
 .option:active {
-    transform: scale(0.98);
+    transform: scale(0.97);
+    background: linear-gradient(135deg, #273549, #111a2e);
 }
 
 /* RUNTIME EVENT FEEDBACK INTERLAYS */
 #feedbackOverlay {
     position: fixed;
     inset: 0;
-    background: rgba(15, 23, 42, 0.9);
+    background: rgba(15, 23, 42, 0.92);
     backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     display: none;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     z-index: 5000;
-    padding: 24px;
+    padding: 20px;
     text-align: center;
 }
 #feedbackStatus {
-    font-size: 28px;
+    font-size: 24px;
     font-weight: bold;
     margin-bottom: 8px;
+}
+#feedbackPrompt {
+    font-size: 14px;
+    color: #94a3b8;
+    max-width: 450px;
+    line-height: 1.4;
+    white-space: pre-line;
 }
 
 /* END SCORECARD DISPLAY CONFIGURATIONS */
 .stats-badge {
     background: rgba(255, 255, 255, 0.04);
     border: 1px solid rgba(255, 255, 255, 0.08);
-    padding: 24px;
+    padding: 20px;
     border-radius: 16px;
     width: 100%;
     max-width: 360px;
-    margin-bottom: 24px;
+    margin-bottom: 20px;
 }
 .stats-row {
     display: flex;
     justify-content: space-between;
-    font-size: 16px;
-    margin: 10px 0;
+    font-size: 15px;
+    margin: 8px 0;
     border-bottom: 1px dashed rgba(255,255,255,0.08);
-    padding-bottom: 8px;
+    padding-bottom: 6px;
 }
 .stats-row:last-child { border: none; }
 
 /* MEDIA ADAPTATIONS FOR BIGGER CONTROL SCREENS */
 @media (min-width: 601px) {
-    #titleBox { font-size: 18px; padding: 14px; }
-    .hud-metric { font-size: 15px; padding: 10px 16px; }
-    .metric-val { font-size: 18px; }
-    #question { font-size: 18px; }
-    .option { font-size: 15px; padding: 16px 20px; }
+    #titleBox { font-size: 16px; padding: 12px; margin-bottom: 12px; }
+    .hud-strip { gap: 12px; margin-bottom: 12px; }
+    .hud-metric { font-size: 13px; padding: 8px 12px; }
+    .metric-val { font-size: 15px; }
+    .radar-console { min-height: 120px; padding: 16px; margin-bottom: 14px; }
+    #question { font-size: 16px; }
+    #optionsGrid { gap: 10px; }
+    .option { font-size: 14px; padding: 12px 16px; min-height: 48px; }
+    #feedbackStatus { font-size: 28px; }
+    #feedbackPrompt { font-size: 16px; }
 }
 </style>
 </head>
@@ -277,7 +308,7 @@ button:active {
 <audio id="clapSound" src="assets/clapping.mp3" preload="auto"></audio>
 
 <div id="logoScreen" class="screen">
-    <img src="assets/innovine-logo.png" alt="Innovine Logo">
+    <img src="assets/innovine-logo.png" alt="Innovine Logo" onerror="this.style.display='none'">
     <div id="logoText">Innovine Learning Adventures</div>
 </div>
 
@@ -294,13 +325,13 @@ button:active {
 </div>
 
 <div id="startScreen" class="screen">
-    <h1 style="font-size:36px; margin-bottom:10px; color:#ff9800;">🚦 Traffic Command Center</h1>
-    <p style="margin-bottom:20px;">Authorize navigation lines and master sequential adverb placements.</p>
+    <h1 style="font-size:32px; margin-bottom:10px; color:#ff9800;">🚦 Traffic Command Center</h1>
+    <p style="margin-bottom:20px; color:#cbd5e1; font-size:15px; max-width:400px;">Authorize navigation lines and master sequential adverb placements.</p>
     <button onclick="startGame()">Launch Dashboard</button>
 </div>
 
 <div id="endScreen" class="screen">
-    <h1 style="color:#4caf50; font-size:36px; margin-bottom:15px;">🏆 Operation Complete</h1>
+    <h1 style="color:#4caf50; font-size:32px; margin-bottom:15px;">🏆 Operation Complete</h1>
     <div class="stats-badge">
         <div class="stats-row"><span>Final Status:</span> <span id="final" style="font-weight:bold; color:#ff9800;"></span></div>
     </div>
@@ -334,7 +365,7 @@ button:active {
 
 <div id="feedbackOverlay">
     <div id="feedbackStatus"></div>
-    <div id="feedbackPrompt" style="font-size:16px; color:#94a3b8; max-width:450px; white-space: pre-line;"></div>
+    <div id="feedbackPrompt"></div>
 </div>
 
 <script>
@@ -346,7 +377,7 @@ let isProcessingAnswer = false;
 setTimeout(() => {
     document.getElementById("logoScreen").style.display = "none";
     document.getElementById("instructionScreen").style.display = "flex";
-}, 5000);
+}, 2200);
 
 function showStart() {
     document.getElementById("instructionScreen").style.display = "none";
@@ -525,7 +556,6 @@ function safeAudioPlayback(elementId) {
 
     audioElement.currentTime = 0;
     audioElement.play().catch(error => {
-        // Fallback catch parameters to prevent code crash if files are absent
         console.log("Audio skipped safely: " + elementId);
     });
 }
@@ -603,7 +633,7 @@ function processSelection(x) {
         overlay.style.display = "none";
         i++;
         load();
-    }, 2800);
+    }, 2400);
 }
 
 function restartGame() {
