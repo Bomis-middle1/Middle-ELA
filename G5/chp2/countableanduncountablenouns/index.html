@@ -290,6 +290,19 @@
     let locked = false;
     let balloonTimer = null;
 
+    // Some browsers/webviews don't return a real Promise from .play(),
+    // or throw synchronously if the audio file is missing/blocked.
+    // This wrapper makes sure a broken sound file can never freeze the game.
+    function safePlay(audioEl) {
+      try {
+        audioEl.currentTime = 0;
+        const p = audioEl.play();
+        if (p && typeof p.catch === "function") {
+          p.catch(() => {});
+        }
+      } catch (e) {}
+    }
+
     function showScreen(screen) {
       [splashScreen, gameScreen, resultScreen].forEach(s => s.classList.remove("active"));
       screen.classList.add("active");
@@ -340,12 +353,10 @@
         score++;
         scoreEl.textContent = score;
         feedbackEl.textContent = "Correct!";
-        correctSound.currentTime = 0;
-        correctSound.play().catch(() => {});
+        safePlay(correctSound);
       } else {
         feedbackEl.textContent = "Wrong!";
-        wrongSound.currentTime = 0;
-        wrongSound.play().catch(() => {});
+        safePlay(wrongSound);
       }
 
       setTimeout(() => {
@@ -362,8 +373,7 @@
       stopBalloons();
       finalScoreEl.textContent = score;
       showScreen(resultScreen);
-      clapSound.currentTime = 0;
-      clapSound.play().catch(() => {});
+      safePlay(clapSound);
     }
 
     function createBalloon() {
