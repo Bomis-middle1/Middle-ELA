@@ -7,202 +7,254 @@
 
 <style>
 *{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:Arial,sans-serif;
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial,sans-serif;
 }
 
 body{
-overflow:hidden;
-background:#ffd1dc;
+    overflow:hidden;
+    background:#ffd1dc;
 }
 
 #gameArea{
-position:relative;
-width:100vw;
-height:100vh;
-overflow:hidden;
-background:linear-gradient(to bottom,#ffdde1,#ee9ca7,#ffd3b6);
+    position:relative;
+    width:100vw;
+    height:100vh;
+    overflow:hidden;
+    background:linear-gradient(to bottom,#ffdde1,#ee9ca7,#ffd3b6);
 }
 
 /* LIGHT EFFECTS */
 .light{
-position:absolute;
-width:300px;
-height:300px;
-background:rgba(255,255,255,0.08);
-border-radius:50%;
-filter:blur(50px);
-animation:moveLight 10s infinite alternate;
+    position:absolute;
+    width:300px;
+    height:300px;
+    background:rgba(255,255,255,0.08);
+    border-radius:50%;
+    filter:blur(50px);
+    animation:moveLight 10s infinite alternate;
 }
 .light2{animation-duration:16s;}
 
 @keyframes moveLight{
-from{transform:translate(-100px,-50px);}
-to{transform:translate(220px,120px);}
+    from{transform:translate(-100px,-50px);}
+    to{transform:translate(220px,120px);}
 }
 
 /* LOGO */
 #logoScreen{
-position:absolute;
-width:100%;
-height:100%;
-background:white;
-display:flex;
-justify-content:center;
-align-items:center;
-z-index:9999;
+    position:absolute;
+    width:100%;
+    height:100%;
+    background:white;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    z-index:9999;
 }
 
 #logoScreen img{
-width:260px;
-max-width:80%;
+    width:260px;
+    max-width:80%;
 }
 
 /* START & END */
 #startScreen,#endScreen{
-position:absolute;
-width:100%;
-height:100%;
-background:rgba(0,0,0,0.82);
-display:flex;
-justify-content:center;
-align-items:center;
-flex-direction:column;
-color:white;
-text-align:center;
-z-index:5000;
-padding:20px;
+    position:absolute;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,0.82);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    flex-direction:column;
+    color:white;
+    text-align:center;
+    z-index:5000;
+    padding:20px;
 }
 
 .mainBtn{
-padding:16px 34px;
-font-size:22px;
-border:none;
-border-radius:18px;
-background:#ff4081;
-color:white;
-margin-top:20px;
-cursor:pointer;
+    padding:16px 34px;
+    font-size:22px;
+    border:none;
+    border-radius:18px;
+    background:#ff4081;
+    color:white;
+    margin-top:20px;
+    cursor:pointer;
 }
 
 /* TITLE */
 #stageTitle{
-position:absolute;
-top:20px;
-left:50%;
-transform:translateX(-50%);
-width:82%;
-background:white;
-border:6px solid #ff4081;
-border-radius:18px;
-font-size:24px;
-font-weight:bold;
-color:#c2185b;
-padding:10px;
-text-align:center;
-z-index:50;
+    position:absolute;
+    top:20px;
+    left:50%;
+    transform:translateX(-50%);
+    width:82%;
+    background:white;
+    border:6px solid #ff4081;
+    border-radius:18px;
+    font-size:24px;
+    font-weight:bold;
+    color:#c2185b;
+    padding:10px;
+    text-align:center;
+    z-index:50;
 }
 
 /* CHARACTER */
 #character{
-position:absolute;
-bottom:110px;
-left:50%;
-transform:translateX(-50%);
-font-size:120px;
-}
-
-/* GIRL CHARACTER ADDED */
-#character{
-content:"👩‍🎤";
+    position:absolute;
+    bottom:110px;
+    left:50%;
+    transform:translateX(-50%);
+    font-size:120px;
 }
 
 /* ITEMS */
 #itemsArea{
-position:absolute;
-bottom:20px;
-left:50%;
-transform:translateX(-50%);
-width:95%;
-display:flex;
-justify-content:center;
-flex-wrap:wrap;
-gap:15px;
+    position:absolute;
+    bottom:20px;
+    left:50%;
+    transform:translateX(-50%);
+    width:95%;
+    display:flex;
+    justify-content:center;
+    flex-wrap:wrap;
+    gap:15px;
 }
 
 .item{
-width:85px;
-height:85px;
-background:white;
-border-radius:18px;
-display:flex;
-justify-content:center;
-align-items:center;
-font-size:42px;
-cursor:pointer;
-box-shadow:0 0 10px rgba(0,0,0,0.2);
-transition:0.2s;
+    width:85px;
+    height:85px;
+    background:white;
+    border-radius:18px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:42px;
+    cursor:pointer;
+    box-shadow:0 0 10px rgba(0,0,0,0.2);
+    transition:0.2s;
 }
 
-/* SCORE */
+.item.selected{
+    background:#81c784 !important;
+    pointer-events:none;
+}
+
+/* SCORE & VOLUME */
 #scoreBoard{
-position:absolute;
-top:10px;
-left:10px;
-background:white;
-padding:10px 14px;
-border-radius:12px;
-font-weight:bold;
-z-index:200;
+    position:absolute;
+    top:10px;
+    left:10px;
+    background:white;
+    padding:10px 14px;
+    border-radius:12px;
+    font-weight:bold;
+    z-index:200;
+}
+
+#volumeBox{
+    position:absolute;
+    top:10px;
+    right:10px;
+    background:white;
+    padding:10px 14px;
+    border-radius:12px;
+    font-weight:bold;
+    z-index:200;
+    font-size:14px;
 }
 
 /* CHALLENGE */
 #challengeBox{
-position:absolute;
-top:120px;
-left:50%;
-transform:translateX(-50%);
-background:#fff9c4;
-padding:14px 20px;
-border-radius:15px;
-font-weight:bold;
-color:#e65100;
-z-index:150;
+    position:absolute;
+    top:120px;
+    left:50%;
+    transform:translateX(-50%);
+    background:#fff9c4;
+    padding:14px 20px;
+    border-radius:15px;
+    font-weight:bold;
+    color:#e65100;
+    z-index:150;
 }
 
 /* QUESTION */
 #questionBox{
-position:absolute;
-top:50%;
-left:50%;
-transform:translate(-50%,-50%);
-width:90%;
-max-width:600px;
-background:#fff8e1;
-padding:20px;
-border-radius:20px;
-display:none;
-z-index:4000;
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    width:90%;
+    max-width:600px;
+    background:#fff8e1;
+    padding:20px;
+    border-radius:20px;
+    display:none;
+    z-index:4000;
+    box-shadow:0 0 20px rgba(0,0,0,0.3);
 }
 
 .optionBtn{
-width:100%;
-padding:12px;
-margin:8px 0;
-border:none;
-border-radius:12px;
-background:#4caf50;
-color:white;
-font-size:16px;
-cursor:pointer;
+    width:100%;
+    padding:12px;
+    margin:8px 0;
+    border:none;
+    border-radius:12px;
+    background:#4caf50;
+    color:white;
+    font-size:16px;
+    cursor:pointer;
 }
 
 /* FEEDBACK */
-.correct{color:green;font-size:24px;text-align:center;}
-.wrong{color:red;font-size:24px;text-align:center;}
+#feedback{
+    margin-top:10px;
+    font-weight:bold;
+}
+.correct{color:green;font-size:24px;text-align:center;animation:pop 0.4s;}
+.wrong{color:red;font-size:24px;text-align:center;animation:shake 0.4s;}
 
+@keyframes pop{
+    0%{transform:scale(0.8);}
+    50%{transform:scale(1.2);}
+    100%{transform:scale(1);}
+}
+
+@keyframes shake{
+    0%{transform:translateX(0);}
+    25%{transform:translateX(-8px);}
+    50%{transform:translateX(8px);}
+    75%{transform:translateX(-8px);}
+    100%{transform:translateX(0);}
+}
+
+/* CONFETTI */
+#confetti{
+    position:absolute;
+    width:100%;
+    height:100%;
+    pointer-events:none;
+    overflow:hidden;
+    z-index:4500;
+}
+
+.confettiPiece{
+    position:absolute;
+    width:10px;
+    height:10px;
+    animation:fall 2s linear forwards;
+}
+
+@keyframes fall{
+    from{transform:translateY(-50px) rotate(0deg);}
+    to{transform:translateY(100vh) rotate(720deg);}
+}
 </style>
 </head>
 
@@ -210,26 +262,34 @@ cursor:pointer;
 
 <div id="gameArea">
 
+<div class="light"></div>
+<div class="light light2"></div>
+
 <div id="logoScreen">
-<img src="assets/innovine-logo.png">
+    <img src="assets/innovine-logo.png" alt="Innovine Logo" onerror="this.style.display='none'">
 </div>
 
 <div id="startScreen" style="display:none;">
-<h1>Fashion Show Makeover Studio</h1>
-<button class="mainBtn" onclick="startGame()">Start</button>
+    <h1>👗 Fashion Show Makeover Studio 👠</h1>
+    <p style="margin-top:15px; font-size:18px;">Select 3 fashion items to design a look, then answer questions on <strong>Kinds of Adjectives</strong>!</p>
+    <button class="mainBtn" onclick="startGame()">Start Studio</button>
 </div>
 
 <div id="endScreen" style="display:none;">
-<h1>Game Complete</h1>
-<h2 id="finalText"></h2>
-<button class="mainBtn" onclick="restartGame()">Play Again</button>
+    <h1>🎉 Game Complete! 🎉</h1>
+    <h2 id="finalText" style="margin-top:15px;"></h2>
+    <button class="mainBtn" onclick="restartGame()">Play Again</button>
 </div>
 
 <div id="stageTitle">👗 Fashion Challenge</div>
 
 <div id="scoreBoard">
-Styles: <span id="styleCount">0</span> |
-Q: <span id="questionCount">0</span>/10
+    Styles: <span id="styleCount">0</span> |
+    Q: <span id="questionCount">0</span>/10
+</div>
+
+<div id="volumeBox">
+    🔊 <input type="range" id="volumeSlider" min="0" max="1" step="0.1" value="1">
 </div>
 
 <div id="challengeBox">Choose 3 items!</div>
@@ -239,206 +299,250 @@ Q: <span id="questionCount">0</span>/10
 <div id="itemsArea"></div>
 
 <div id="questionBox">
-<div id="questionText"></div>
-<div id="options"></div>
-<div id="feedback"></div>
+    <div id="questionText"></div>
+    <div id="options"></div>
+    <div id="feedback"></div>
 </div>
+
+<div id="confetti"></div>
 
 </div>
 
 <script>
-
-/* LOGO */
+/* LOGO SPLASH */
 setTimeout(()=>{
-document.getElementById("logoScreen").style.display="none";
-document.getElementById("startScreen").style.display="flex";
-},5000);
+    document.getElementById("logoScreen").style.display="none";
+    document.getElementById("startScreen").style.display="flex";
+},2000);
+
+/* AUDIO SETUP */
+const correctSound = new Audio("assets/correct.mp3");
+const wrongSound = new Audio("assets/wrong.mp3");
+const clapSound = new Audio("assets/clapping.mp3");
+
+const volumeSlider = document.getElementById("volumeSlider");
+
+function updateVolume(){
+    correctSound.volume = volumeSlider.value;
+    wrongSound.volume = volumeSlider.value;
+    clapSound.volume = volumeSlider.value;
+}
+volumeSlider.addEventListener("input", updateVolume);
 
 /* THEMES */
 const fashionThemes=[
-{emoji:"👑 Royal",items:["👑","💍","👜","👗","🕶️","👒"]},
-{emoji:"👕 Casual",items:["👕","👟","🧢","🧥","🎒","🧦"]},
-{emoji:"🎉 Party",items:["👗","👠","💄","🎩","✨","👜"]},
-{emoji:"❄️ Winter",items:["🧥","🧣","🧤","👢","☕","👒"]},
-{emoji:"🏃 Sport",items:["👟","🏀","🎽","🧢","🏅","🏈"]}
+    {emoji:"👑 Royal",items:["👑","💍","👜","👗","🕶️","👒"]},
+    {emoji:"👕 Casual",items:["👕","👟","🧢","🧥","🎒","🧦"]},
+    {emoji:"🎉 Party",items:["👗","👠","💄","🎩","✨","👜"]},
+    {emoji:"❄️ Winter",items:["🧥","🧣","🧤","👢","☕","👒"]},
+    {emoji:"🏃 Sport",items:["👟","🏀","🎽","🧢","🏅","🏈"]}
 ];
 
 let themeIndex=0;
-
-/* GAME STATE */
 let stylesCompleted=0;
 let currentQuestion=0;
 let selectedCount=0;
 let attempt=0;
 
-/* QUESTIONS (UNCHANGED) */
+/* KINDS OF ADJECTIVES QUESTIONS */
 const questions=[
-{
-q:`👗 Mia bought a beautiful dress for the school concert.<br><br>Which word is the adjective of quality?`,
-o:["Mia","beautiful","dress","concert"],
-a:1
-},
-{
-q:`🍎 The grocery cart had many apples inside it.<br><br>Which word is the adjective of quantity?`,
-o:["grocery","many","inside","apples"],
-a:1
-},
-{
-q:`🎈 Three balloons floated to the ceiling.<br><br>Which word is the adjective of number?`,
-o:["Three","balloons","floated","ceiling"],
-a:0
-},
-{
-q:`👟 Those shoes near the window are expensive.<br><br>Which word is the demonstrative adjective?`,
-o:["window","Those","expensive","shoes"],
-a:1
-},
-{
-q:`🍛 We ate delicious Indian food at the festival.<br><br>Which word is the proper adjective?`,
-o:["festival","delicious","Indian","food"],
-a:2
-},
-{
-q:`🎒 Her backpack is filled with art supplies.<br><br>Which word is the possessive adjective?`,
-o:["Her","filled","backpack","supplies"],
-a:0
-},
-{
-q:`🧥 Which jacket should we buy for winter?<br><br>Which word is the interrogative adjective?`,
-o:["buy","winter","Which","jacket"],
-a:2
-},
-{
-q:`🐶 The playful puppy chased the ball around the park.<br><br>Which word is the adjective of quality?`,
-o:["park","playful","ball","around"],
-a:1
-},
-{
-q:`🍪 Few cookies remained after the party ended.<br><br>Which word is the adjective of quantity?`,
-o:["Few","cookies","party","ended"],
-a:0
-},
-{
-q:`📚 These books belong to our classroom library.<br><br>Which word is the demonstrative adjective?`,
-o:["library","books","These","classroom"],
-a:2
-}
+    {
+        q:`👗 Mia bought a beautiful dress for the school concert.<br><br>Which word is the <strong>Adjective of Quality</strong>?`,
+        o:["Mia","beautiful","dress","concert"],
+        a:1
+    },
+    {
+        q:`🍎 The grocery cart had many apples inside it.<br><br>Which word is the <strong>Adjective of Quantity</strong>?`,
+        o:["grocery","many","inside","apples"],
+        a:1
+    },
+    {
+        q:`🎈 Three balloons floated to the ceiling.<br><br>Which word is the <strong>Adjective of Number</strong>?`,
+        o:["Three","balloons","floated","ceiling"],
+        a:0
+    },
+    {
+        q:`👟 Those shoes near the window are expensive.<br><br>Which word is the <strong>Demonstrative Adjective</strong>?`,
+        o:["window","Those","expensive","shoes"],
+        a:1
+    },
+    {
+        q:`🍛 We ate delicious Indian food at the festival.<br><br>Which word is the <strong>Proper Adjective</strong>?`,
+        o:["festival","delicious","Indian","food"],
+        a:2
+    },
+    {
+        q:`🎒 Her backpack is filled with art supplies.<br><br>Which word is the <strong>Possessive Adjective</strong>?`,
+        o:["Her","filled","backpack","supplies"],
+        a:0
+    },
+    {
+        q:`🧥 Which jacket should we buy for winter?<br><br>Which word is the <strong>Interrogative Adjective</strong>?`,
+        o:["buy","winter","Which","jacket"],
+        a:2
+    },
+    {
+        q:`🐶 The playful puppy chased the ball around the park.<br><br>Which word is the <strong>Adjective of Quality</strong>?`,
+        o:["park","playful","ball","around"],
+        a:1
+    },
+    {
+        q:`🍪 Few cookies remained after the party ended.<br><br>Which word is the <strong>Adjective of Quantity</strong>?`,
+        o:["Few","cookies","party","ended"],
+        a:0
+    },
+    {
+        q:`📚 These books belong to our classroom library.<br><br>Which word is the <strong>Demonstrative Adjective</strong>?`,
+        o:["library","books","These","classroom"],
+        a:2
+    }
 ];
 
 questions.sort(()=>Math.random()-0.5);
 
-/* START */
 function startGame(){
-document.getElementById("startScreen").style.display="none";
-loadItems();
+    document.getElementById("startScreen").style.display="none";
+    loadItems();
 }
 
-/* THEME */
 function setTheme(){
-let t=fashionThemes[themeIndex];
-themeIndex=(themeIndex+1)%fashionThemes.length;
-document.getElementById("stageTitle").innerText=t.emoji+" Fashion Challenge";
-return t;
+    let t=fashionThemes[themeIndex];
+    themeIndex=(themeIndex+1)%fashionThemes.length;
+    document.getElementById("stageTitle").innerText=t.emoji+" Fashion Challenge";
+    return t;
 }
 
-/* LOAD ITEMS */
 function loadItems(){
-itemsArea.innerHTML="";
-selectedCount=0;
-attempt=0;
+    const itemsArea = document.getElementById("itemsArea");
+    itemsArea.innerHTML="";
+    selectedCount=0;
+    attempt=0;
 
-let theme=setTheme();
+    let theme=setTheme();
+    let shuffled=[...theme.items].sort(()=>Math.random()-0.5).slice(0,5);
 
-let shuffled=[...theme.items].sort(()=>Math.random()-0.5).slice(0,5);
-
-shuffled.forEach(i=>{
-let div=document.createElement("div");
-div.className="item";
-div.innerText=i;
-div.onclick=()=>selectItem(div);
-itemsArea.appendChild(div);
-});
+    shuffled.forEach(i=>{
+        let div=document.createElement("div");
+        div.className="item";
+        div.innerText=i;
+        div.onclick=()=>selectItem(div);
+        itemsArea.appendChild(div);
+    });
 }
 
-/* SELECT */
 function selectItem(div){
-div.style.background="#81c784";
-selectedCount++;
-if(selectedCount>=3){
-showQuestion();
-}
+    if(div.classList.contains("selected")) return;
+    div.classList.add("selected");
+    selectedCount++;
+    
+    if(selectedCount>=3){
+        setTimeout(showQuestion, 300);
+    }
 }
 
-/* QUESTION */
 function showQuestion(){
-document.getElementById("questionBox").style.display="block";
+    document.getElementById("questionBox").style.display="block";
 
-let q=questions[currentQuestion];
-document.getElementById("questionText").innerHTML=q.q;
+    let q=questions[currentQuestion];
+    document.getElementById("questionText").innerHTML=q.q;
 
-let options=document.getElementById("options");
-options.innerHTML="";
-document.getElementById("feedback").innerHTML="";
+    let options=document.getElementById("options");
+    options.innerHTML="";
+    document.getElementById("feedback").innerHTML="";
+    document.getElementById("feedback").className="";
 
-q.o.forEach((op,i)=>{
-let btn=document.createElement("button");
-btn.className="optionBtn";
-btn.innerText=op;
-btn.onclick=()=>checkAnswer(i,q.a);
-options.appendChild(btn);
-});
+    q.o.forEach((op,i)=>{
+        let btn=document.createElement("button");
+        btn.className="optionBtn";
+        btn.innerText=op;
+        btn.onclick=()=>checkAnswer(i,q.a);
+        options.appendChild(btn);
+    });
 }
 
-/* ANSWER */
 function checkAnswer(sel,correct){
-let fb=document.getElementById("feedback");
+    let fb=document.getElementById("feedback");
+    let buttons = document.querySelectorAll(".optionBtn");
 
-if(sel===correct){
-fb.innerHTML="Correct!";
-fb.className="correct";
+    if(sel===correct){
+        buttons.forEach(b => b.disabled = true);
+        fb.innerHTML="✅ Correct!";
+        fb.className="correct";
 
-stylesCompleted++;
-currentQuestion++;
+        correctSound.currentTime = 0;
+        correctSound.play().catch(()=>{});
 
-document.getElementById("styleCount").innerText=stylesCompleted;
-document.getElementById("questionCount").innerText=currentQuestion;
+        stylesCompleted++;
+        currentQuestion++;
 
-setTimeout(()=>{
-document.getElementById("questionBox").style.display="none";
-if(currentQuestion>=10){
-endGame();
-}else{
-loadItems();
+        document.getElementById("styleCount").innerText=stylesCompleted;
+        document.getElementById("questionCount").innerText=currentQuestion;
+
+        setTimeout(()=>{
+            document.getElementById("questionBox").style.display="none";
+            if(currentQuestion>=10){
+                endGame();
+            }else{
+                loadItems();
+            }
+        },1200);
+
+    }else{
+        attempt++;
+        wrongSound.currentTime = 0;
+        wrongSound.play().catch(()=>{});
+
+        if(attempt < 2){
+            fb.innerHTML = "❌ Try Again!";
+            fb.className="wrong";
+        } else {
+            buttons.forEach(b => b.disabled = true);
+            buttons[correct].style.background = "#2e7d32";
+            buttons[correct].innerText = "✅ " + buttons[correct].innerText;
+            fb.innerHTML = "Answer Revealed!";
+            fb.className="wrong";
+
+            setTimeout(()=>{
+                document.getElementById("questionBox").style.display="none";
+                currentQuestion++;
+                document.getElementById("questionCount").innerText=currentQuestion;
+                if(currentQuestion>=10){
+                    endGame();
+                }else{
+                    loadItems();
+                }
+            },1500);
+        }
+    }
 }
-},1000);
 
-}else{
-attempt++;
-fb.innerHTML = attempt<2 ? "Try Again!" : "Answer Revealed!";
-fb.className="wrong";
+function createConfetti(){
+    const confetti = document.getElementById("confetti");
+    for(let i=0; i<40; i++){
+        const piece = document.createElement("div");
+        piece.classList.add("confettiPiece");
+        piece.style.left = Math.random()*100 + "%";
+        piece.style.background = `hsl(${Math.random()*360},100%,50%)`;
+        piece.style.animationDuration = (1 + Math.random()*2) + "s";
+        confetti.appendChild(piece);
 
-if(attempt>=2){
-setTimeout(()=>{
-document.getElementById("questionBox").style.display="none";
-currentQuestion++;
-loadItems();
-},1200);
-}
-}
+        setTimeout(()=>{ piece.remove(); }, 2500);
+    }
 }
 
-/* END */
 function endGame(){
-document.getElementById("endScreen").style.display="flex";
-document.getElementById("finalText").innerText=
-"You completed "+stylesCompleted+" fashion missions!";
+    document.getElementById("endScreen").style.display="flex";
+    document.getElementById("finalText").innerText=
+        "You completed "+stylesCompleted+" fashion missions!";
+
+    clapSound.currentTime = 0;
+    clapSound.play().catch(()=>{});
+    createConfetti();
 }
 
-/* RESTART */
 function restartGame(){
-location.reload();
+    location.reload();
 }
-
 </script>
 
 </body>
