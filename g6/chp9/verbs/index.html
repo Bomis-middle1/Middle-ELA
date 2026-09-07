@@ -2,413 +2,412 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
 <title>🎢 Theme Park Rebuilder</title>
 
 <style>
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:Arial,sans-serif;
+/* CSS RESET & BASE STYLES */
+*, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
     -webkit-tap-highlight-color: transparent;
 }
 
-body{
-    overflow:hidden;
-    background:#90caf9;
-    user-select:none;
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: #90caf9;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
 }
 
-#gameArea{
-    position:relative;
-    width:100vw;
-    height:100vh;
-    height:100svh;
-    overflow:hidden;
-    background:linear-gradient(to bottom,#64b5f6,#e1f5fe);
-    display:flex;
-    flex-direction:column;
-    justify-content:space-between;
-    align-items:center;
-    padding:10px;
+/* CONTAINER (DYNAMIC VIEWPORT FALLBACK) */
+#gameArea {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    height: 100svh;
+    overflow: hidden;
+    background: linear-gradient(to bottom, #64b5f6, #e1f5fe);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px;
 }
 
-/* CLOUDS */
-.cloud{
-    position:absolute;
-    background:white;
-    border-radius:50px;
-    opacity:0.9;
-    animation:moveCloud linear infinite;
-    pointer-events:none;
+/* CLOUDS (LIGHTWEIGHT CSS ANIMATION) */
+#cloudContainer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 40%;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 1;
 }
 
-@keyframes moveCloud{
-    from{transform:translateX(-300px);}
-    to{transform:translateX(120vw);}
+.cloud {
+    position: absolute;
+    background: #ffffff;
+    border-radius: 50px;
+    opacity: 0.85;
+    will-change: transform;
+    animation: moveCloud linear infinite;
 }
 
-/* LOGO */
-#logoScreen{
-    position:absolute;
-    top:0;
-    left:0;
-    width:100%;
-    height:100%;
-    background:white;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    flex-direction:column;
-    z-index:9999;
+@keyframes moveCloud {
+    from { transform: translate3d(-150px, 0, 0); }
+    to { transform: translate3d(100vw, 0, 0); }
 }
 
-#logoScreen img{
-    width:260px;
-    max-width:80%;
+/* LOGO SCREEN */
+#logoScreen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #ffffff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    z-index: 9999;
 }
 
-/* START + END */
-#startScreen,
-#endScreen{
-    position:absolute;
-    top:0;
-    left:0;
-    width:100%;
-    height:100%;
-    background:rgba(0,0,0,0.85);
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    flex-direction:column;
-    text-align:center;
-    padding:20px;
-    color:white;
-    z-index:5000;
+#logoScreen img {
+    width: 220px;
+    max-width: 75%;
+    height: auto;
 }
 
-.mainBtn{
-    min-height:52px;
-    padding:14px 28px;
-    font-size:18px;
-    font-weight:bold;
-    border:none;
-    border-radius:18px;
-    background:#ff9800;
-    color:white;
-    cursor:pointer;
-    margin-top:20px;
-    transition:transform 0.15s, background-color 0.15s;
-    touch-action:manipulation;
+/* OVERLAYS (START / END) */
+#startScreen, #endScreen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.88);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    text-align: center;
+    padding: 20px;
+    color: #ffffff;
+    z-index: 5000;
 }
 
-.mainBtn:active, .mainBtn:hover{
-    transform:scale(1.05);
-    background:#e68a00;
+.mainBtn {
+    min-height: 48px;
+    padding: 12px 28px;
+    font-size: 18px;
+    font-weight: bold;
+    border: none;
+    border-radius: 16px;
+    background: #ff9800;
+    color: #ffffff;
+    cursor: pointer;
+    margin-top: 18px;
+    transition: transform 0.15s ease, background-color 0.15s ease;
+    touch-action: manipulation;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
 }
 
-/* HEADER CONTAINER */
-#headerContainer{
-    width:100%;
-    max-width:800px;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    gap:6px;
-    z-index:100;
+.mainBtn:active, .mainBtn:hover {
+    transform: scale(1.04);
+    background: #e68a00;
 }
 
-#titleBox{
-    width:100%;
-    background:white;
-    padding:8px 12px;
-    border-radius:15px;
-    font-size:15px;
-    font-weight:bold;
-    text-align:center;
-    color:#6a1b9a;
-    border:3px solid #ffca28;
+/* HEADER UI */
+#headerContainer {
+    width: 100%;
+    max-width: 760px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    z-index: 100;
 }
 
-#infoBar{
-    width:100%;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap:10px;
+#titleBox {
+    width: 100%;
+    background: #ffffff;
+    padding: 6px 10px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: bold;
+    text-align: center;
+    color: #6a1b9a;
+    border: 3px solid #ffca28;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-#scoreBoard{
-    background:white;
-    padding:8px 12px;
-    border-radius:12px;
-    font-size:12px;
-    font-weight:bold;
-    line-height:1.3;
-    box-shadow:0 2px 5px rgba(0,0,0,0.15);
+#infoBar {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
 }
 
-#volumeBox{
-    background:white;
-    padding:8px 12px;
-    border-radius:12px;
-    font-size:12px;
-    font-weight:bold;
-    box-shadow:0 2px 5px rgba(0,0,0,0.15);
-    display:flex;
-    align-items:center;
-    gap:6px;
+#scoreBoard, #volumeBox {
+    background: #ffffff;
+    padding: 6px 10px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: bold;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
 }
 
-#volumeSlider{
-    width:70px;
-    height:24px;
-    cursor:pointer;
+#volumeBox { gap: 6px; }
+
+#volumeSlider {
+    width: 60px;
+    height: 20px;
+    cursor: pointer;
 }
 
-/* RIDE AREA */
-#rideArea{
-    width:100%;
-    max-width:800px;
-    flex:1;
-    margin:6px 0;
-    background:#fffde7;
-    border-radius:20px;
-    border:4px solid #42a5f5;
-    position:relative;
-    display:flex;
-    flex-direction:column;
-    justify-content:space-around;
-    align-items:center;
-    overflow:hidden;
-    padding:10px;
+/* STAGE / RIDE AREA */
+#rideArea {
+    width: 100%;
+    max-width: 760px;
+    flex: 1;
+    margin: 6px 0;
+    background: #fffde7;
+    border-radius: 16px;
+    border: 4px solid #42a5f5;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    overflow: hidden;
+    padding: 10px;
+    z-index: 10;
 }
 
-#rideEmoji{
-    font-size:65px;
-    transition:0.5s;
-    line-height:1;
+#rideEmoji {
+    font-size: 60px;
+    line-height: 1;
+    will-change: transform, opacity;
 }
 
-.spin{ animation:spinRide 2s infinite linear; }
-.swing{ animation:swingRide 1s infinite alternate ease-in-out; }
-.bounce{ animation:bounceRide 1s infinite alternate; }
-.flash{ animation:flashRide 0.5s infinite alternate; }
+.spin { animation: spinRide 2s infinite linear; }
+.swing { animation: swingRide 1s infinite alternate ease-in-out; }
+.bounce { animation: bounceRide 1s infinite alternate ease-in-out; }
+.flash { animation: flashRide 0.6s infinite alternate ease-in-out; }
 
-@keyframes spinRide{
-    from{transform:rotate(0deg);}
-    to{transform:rotate(360deg);}
+@keyframes spinRide {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
 }
-@keyframes swingRide{
-    from{transform:rotate(-15deg);}
-    to{transform:rotate(15deg);}
+@keyframes swingRide {
+    from { transform: rotate(-14deg); }
+    to { transform: rotate(14deg); }
 }
-@keyframes bounceRide{
-    from{transform:translateY(0);}
-    to{transform:translateY(-15px);}
+@keyframes bounceRide {
+    from { transform: translate3d(0, 0, 0); }
+    to { transform: translate3d(0, -14px, 0); }
 }
-@keyframes flashRide{
-    from{opacity:1;}
-    to{opacity:0.2;}
-}
-
-/* PROBLEM */
-#problemBox{
-    background:white;
-    padding:10px 14px;
-    border-radius:14px;
-    border:3px dashed red;
-    text-align:center;
-    width:95%;
-    max-width:600px;
-    transition:0.3s;
+@keyframes flashRide {
+    from { opacity: 1; }
+    to { opacity: 0.25; }
 }
 
-#problemText{
-    font-size:14px;
-    font-weight:bold;
-    color:#d32f2f;
+/* PROBLEM CARD */
+#problemBox {
+    background: #ffffff;
+    padding: 8px 12px;
+    border-radius: 12px;
+    border: 3px dashed #d32f2f;
+    text-align: center;
+    width: 95%;
+    max-width: 580px;
 }
 
-/* TOOLBOX */
-#toolBox{
-    width:100%;
-    max-width:800px;
-    display:flex;
-    justify-content:center;
-    gap:12px;
-    z-index:200;
-    padding-bottom:5px;
+#problemText {
+    font-size: 13px;
+    font-weight: bold;
+    color: #d32f2f;
 }
 
-.tool{
-    width:64px;
-    height:64px;
-    min-width:54px;
-    min-height:54px;
-    background:white;
-    border-radius:16px;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    font-size:32px;
-    cursor:pointer;
-    border:4px solid #29b6f6;
-    transition:transform 0.1s, background-color 0.1s;
-    touch-action:manipulation;
-    box-shadow:0 3px 6px rgba(0,0,0,0.15);
+/* BOTTOM TOOLBAR */
+#toolBox {
+    width: 100%;
+    max-width: 760px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    z-index: 200;
+    padding-bottom: 2px;
 }
 
-.tool:active, .tool:hover{
-    transform:scale(1.08);
-    background:#fff9c4;
+.tool {
+    width: 58px;
+    height: 58px;
+    min-width: 48px;
+    min-height: 48px;
+    background: #ffffff;
+    border-radius: 14px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 30px;
+    cursor: pointer;
+    border: 3px solid #29b6f6;
+    transition: transform 0.12s ease, background-color 0.12s ease;
+    touch-action: manipulation;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.12);
+    outline: none;
 }
 
-/* QUESTION BOX */
-#questionBox{
-    position:absolute;
-    top:50%;
-    left:50%;
-    transform:translate(-50%,-50%);
-    width:92%;
-    max-width:650px;
-    max-height:85vh;
-    max-height:85svh;
-    overflow-y:auto;
-    background:#fff8e1;
-    padding:18px;
-    border-radius:20px;
-    display:none;
-    z-index:8000;
-    box-shadow:0 0 30px rgba(0,0,0,0.5);
-    animation:popup 0.3s;
+.tool:focus, .tool:active {
+    transform: scale(1.08);
+    background: #fff9c4;
 }
 
-#questionTitle{
-    font-size:18px;
-    font-weight:bold;
-    color:#e65100;
-    margin-bottom:8px;
-    text-align:center;
+/* POPUP MODALS */
+#questionBox, #feedbackPopup {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate3d(-50%, -50%, 0);
+    width: 92%;
+    max-width: 600px;
+    max-height: 85vh;
+    max-height: 85svh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: 18px;
+    padding: 16px;
+    display: none;
+    box-shadow: 0 0 25px rgba(0,0,0,0.45);
+    animation: popupAnim 0.25s ease-out;
 }
 
-#questionText{
-    font-size:14px;
-    line-height:1.4;
-    margin-bottom:12px;
-    color:#333;
+#questionBox {
+    background: #fff8e1;
+    z-index: 8000;
 }
 
-#options{
-    display:grid;
+#feedbackPopup {
+    background: #ffffff;
+    z-index: 9000;
+    text-align: center;
+}
+
+#questionTitle {
+    font-size: 17px;
+    font-weight: bold;
+    color: #e65100;
+    margin-bottom: 8px;
+    text-align: center;
+}
+
+#questionText {
+    font-size: 14px;
+    line-height: 1.35;
+    margin-bottom: 12px;
+    color: #222222;
+}
+
+#options {
+    display: grid;
     grid-template-columns: 1fr;
-    gap:8px;
+    gap: 8px;
 }
 
-.optionBtn{
-    width:100%;
-    min-height:48px;
-    padding:12px 14px;
-    border:none;
-    border-radius:12px;
-    background:#4caf50;
-    color:white;
-    font-size:14px;
-    font-weight:bold;
-    cursor:pointer;
-    transition:background-color 0.15s, transform 0.1s;
-    text-align:left;
-    line-height:1.3;
-    touch-action:manipulation;
-    display:flex;
-    align-items:center;
+.optionBtn {
+    width: 100%;
+    min-height: 48px;
+    padding: 10px 12px;
+    border: none;
+    border-radius: 10px;
+    background: #4caf50;
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.12s ease;
+    text-align: left;
+    line-height: 1.3;
+    touch-action: manipulation;
+    display: flex;
+    align-items: center;
+    outline: none;
 }
 
-.optionBtn:active, .optionBtn:hover{
-    background:#388e3c;
-    transform:translateY(-1px);
+.optionBtn:focus, .optionBtn:active {
+    background: #388e3c;
 }
 
-/* FEEDBACK POPUP */
-#feedbackPopup{
-    position:absolute;
-    top:50%;
-    left:50%;
-    transform:translate(-50%,-50%);
-    width:88%;
-    max-width:550px;
-    max-height:80vh;
-    max-height:80svh;
-    overflow-y:auto;
-    background:white;
-    padding:18px;
-    border-radius:20px;
-    display:none;
-    z-index:9000;
-    text-align:center;
-    box-shadow:0 0 30px rgba(0,0,0,0.5);
-    animation:popup 0.3s;
+#feedbackTitle {
+    font-size: 20px;
+    margin-bottom: 6px;
+    font-weight: bold;
 }
 
-#feedbackTitle{
-    font-size:22px;
-    margin-bottom:8px;
-    font-weight:bold;
+#feedbackText {
+    font-size: 14px;
+    line-height: 1.4;
+    color: #333333;
 }
 
-#feedbackText{
-    font-size:14px;
-    line-height:1.4;
-    color:#333;
+/* CONFETTI ANIMATION */
+.confetti {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    will-change: transform, opacity;
+    animation: fall 2.5s linear forwards;
+    pointer-events: none;
+    z-index: 9500;
 }
 
-/* CONFETTI */
-.confetti{
-    position:absolute;
-    width:10px;
-    height:10px;
-    animation:fall 3s linear forwards;
-    pointer-events:none;
+@keyframes fall {
+    from { transform: translate3d(0, -20px, 0) rotate(0deg); opacity: 1; }
+    to { transform: translate3d(0, 100vh, 0) rotate(720deg); opacity: 0; }
 }
 
-@keyframes fall{
-    from{ transform:translateY(-50px) rotate(0deg); }
-    to{ transform:translateY(100vh) rotate(720deg); opacity:0; }
+@keyframes popupAnim {
+    from { transform: translate3d(-50%, -50%, 0) scale(0.75); opacity: 0; }
+    to { transform: translate3d(-50%, -50%, 0) scale(1); opacity: 1; }
 }
 
-@keyframes popup{
-    from{ transform:translate(-50%,-50%) scale(0.6); opacity:0; }
-    to{ transform:translate(-50%,-50%) scale(1); opacity:1; }
+/* MEDIA QUERIES FOR LARGER SCREENS */
+@media (min-width: 600px) {
+    #options { grid-template-columns: 1fr 1fr; }
+    #titleBox { font-size: 16px; }
+    #scoreBoard, #volumeBox { font-size: 13px; }
+    #rideEmoji { font-size: 80px; }
+    #problemText { font-size: 15px; }
+    .tool { width: 68px; height: 68px; font-size: 36px; }
+    #questionTitle { font-size: 20px; }
+    #questionText { font-size: 15px; }
+    .optionBtn { font-size: 14px; }
 }
 
-/* TABLET LAYOUT ADJUSTMENTS */
-@media(min-width:600px){
-    #options{
-        grid-template-columns: 1fr 1fr;
-    }
-    #titleBox{ font-size:18px; }
-    #scoreBoard, #volumeBox{ font-size:13px; }
-    #rideEmoji{ font-size:85px; }
-    #problemText{ font-size:16px; }
-    .tool{ width:72px; height:72px; font-size:38px; }
-    #questionTitle{ font-size:22px; }
-    #questionText{ font-size:16px; }
-    .optionBtn{ font-size:15px; }
-}
-
-/* LAPTOP / DESKTOP ADJUSTMENTS */
-@media(min-width:1024px){
-    #titleBox{ font-size:22px; padding:12px; }
-    #scoreBoard, #volumeBox{ font-size:14px; padding:8px 14px; }
-    #rideEmoji{ font-size:110px; }
-    #problemText{ font-size:18px; }
-    .tool{ width:80px; height:80px; font-size:42px; }
-    #questionTitle{ font-size:24px; }
-    #questionText{ font-size:18px; }
-    .optionBtn{ font-size:16px; padding:14px; }
-    #feedbackTitle{ font-size:28px; }
-    #feedbackText{ font-size:17px; }
+@media (min-width: 1024px) {
+    #titleBox { font-size: 20px; padding: 10px; }
+    #scoreBoard, #volumeBox { font-size: 14px; padding: 8px 12px; }
+    #rideEmoji { font-size: 100px; }
+    #problemText { font-size: 17px; }
+    .tool { width: 76px; height: 76px; font-size: 40px; }
+    #questionTitle { font-size: 22px; }
+    #questionText { font-size: 17px; }
+    .optionBtn { font-size: 15px; padding: 12px; }
+    #feedbackTitle { font-size: 26px; }
+    #feedbackText { font-size: 16px; }
 }
 </style>
 </head>
@@ -417,39 +416,26 @@ body{
 
 <div id="gameArea">
 
-<script>
-for(let i=0;i<6;i++){
-    document.write(`
-    <div class="cloud"
-    style="
-    width:${80+Math.random()*80}px;
-    height:${35+Math.random()*25}px;
-    top:${Math.random()*30}%;
-    left:${Math.random()*100}%;
-    animation-duration:${20+Math.random()*15}s;
-    "></div>
-    `);
-}
-</script>
+<div id="cloudContainer"></div>
 
-<!-- LOGO -->
+<!-- LOGO SCREEN -->
 <div id="logoScreen">
     <img src="assets/innovine-logo.png" alt="Innovine Logo" onerror="this.style.display='none'">
 </div>
 
-<!-- START -->
+<!-- START SCREEN -->
 <div id="startScreen" style="display:none;">
-    <h1 style="font-size:32px;">🎢 Theme Park Rebuilder</h1>
-    <p style="margin-top:15px;font-size:16px;max-width:500px;line-height:1.4;">
+    <h1 style="font-size:28px;">🎢 Theme Park Rebuilder</h1>
+    <p style="margin-top:12px;font-size:15px;max-width:480px;line-height:1.4;">
     Repair broken rides using the correct tools and solve exciting verb challenges!
     </p>
     <button class="mainBtn" onclick="startGame()">Start Rebuilding</button>
 </div>
 
-<!-- END -->
+<!-- END SCREEN -->
 <div id="endScreen" style="display:none;">
-    <h1 style="font-size:28px;">🏆 Theme Park Fully Reopened! 🏆</h1>
-    <h2 id="finalText" style="margin-top:15px; line-height:1.6; font-size:16px;"></h2>
+    <h1 style="font-size:26px;">🏆 Theme Park Fully Reopened! 🏆</h1>
+    <h2 id="finalText" style="margin-top:12px; line-height:1.5; font-size:15px; font-weight:normal;"></h2>
     <button class="mainBtn" onclick="restartGame()">Play Again</button>
 </div>
 
@@ -465,12 +451,12 @@ for(let i=0;i<6;i++){
         </div>
 
         <div id="volumeBox">
-            🔊 <input type="range" id="volumeSlider" min="0" max="1" step="0.1" value="1">
+            🔊 <input type="range" id="volumeSlider" min="0" max="1" step="0.1" value="1" aria-label="Volume Slider">
         </div>
     </div>
 </div>
 
-<!-- RIDE DISPLAY -->
+<!-- RIDE AREA -->
 <div id="rideArea">
     <div id="rideEmoji">🎡</div>
 
@@ -481,10 +467,10 @@ for(let i=0;i<6;i++){
 
 <!-- TOOLBOX -->
 <div id="toolBox">
-    <div class="tool" data-tool="wrench" role="button" tabindex="0">🔧</div>
-    <div class="tool" data-tool="screwdriver" role="button" tabindex="0">🪛</div>
-    <div class="tool" data-tool="battery" role="button" tabindex="0">🔋</div>
-    <div class="tool" data-tool="gear" role="button" tabindex="0">⚙️</div>
+    <button class="tool" data-tool="wrench" aria-label="Wrench">🔧</button>
+    <button class="tool" data-tool="screwdriver" aria-label="Screwdriver">🪛</button>
+    <button class="tool" data-tool="battery" aria-label="Battery">🔋</button>
+    <button class="tool" data-tool="gear" aria-label="Gear">⚙️</button>
 </div>
 
 <!-- QUESTION POPUP -->
@@ -503,29 +489,63 @@ for(let i=0;i<6;i++){
 </div>
 
 <script>
-/* LOGO */
-setTimeout(()=>{
-    document.getElementById("logoScreen").style.display="none";
-    document.getElementById("startScreen").style.display="flex";
-},2000);
+/* GENERATE CLOUDS DYNAMICALLY WITHOUT DOCUMENT.WRITE */
+(function generateClouds() {
+    const container = document.getElementById('cloudContainer');
+    const cloudCount = 5;
+    for (let i = 0; i < cloudCount; i++) {
+        const cloud = document.createElement('div');
+        cloud.className = 'cloud';
+        const width = 70 + Math.random() * 70;
+        const height = 30 + Math.random() * 20;
+        const top = Math.random() * 28;
+        const duration = 18 + Math.random() * 12;
+        const delay = -(Math.random() * duration);
 
-/* AUDIO */
+        cloud.style.width = width + 'px';
+        cloud.style.height = height + 'px';
+        cloud.style.top = top + '%';
+        cloud.style.animationDuration = duration + 's';
+        cloud.style.animationDelay = delay + 's';
+        container.appendChild(cloud);
+    }
+})();
+
+/* LOGO SCREEN CONTROLLER */
+setTimeout(() => {
+    const logo = document.getElementById("logoScreen");
+    if (logo) logo.style.display = "none";
+    document.getElementById("startScreen").style.display = "flex";
+}, 1800);
+
+/* AUDIO MANAGEMENT WITH SAFE FALLBACKS */
 const correctSound = new Audio("assets/correct.mp3");
 const wrongSound = new Audio("assets/wrong.mp3");
 const clapSound = new Audio("assets/clapping.mp3");
 
 const volumeSlider = document.getElementById("volumeSlider");
 
-function updateVolume(){
-    correctSound.volume = volumeSlider.value;
-    wrongSound.volume = volumeSlider.value;
-    clapSound.volume = volumeSlider.value;
+function updateVolume() {
+    const vol = parseFloat(volumeSlider.value);
+    correctSound.volume = vol;
+    wrongSound.volume = vol;
+    clapSound.volume = vol;
 }
 
-volumeSlider.addEventListener("input",updateVolume);
+volumeSlider.addEventListener("input", updateVolume);
 updateVolume();
 
-/* GAME DATA */
+function playAudio(audioObj) {
+    try {
+        audioObj.currentTime = 0;
+        const promise = audioObj.play();
+        if (promise !== undefined) {
+            promise.catch(() => {});
+        }
+    } catch(e) {}
+}
+
+/* GAME STATE DATA */
 let level = 0;
 let correctCount = 0;
 let wrongCount = 0;
@@ -545,162 +565,159 @@ const rides = [
 
 const questions = [
     {
-        q:"🎢 Which sentence sounds BEST?",
-        o:[
+        q: "🎢 Which sentence sounds BEST?",
+        o: [
             "The workers fixing the track arrived quickly.",
             "The workers fixeding the track arrived quickly.",
             "The workers fix the track arriving quickly.",
             "The workers to fixing the track arrived."
         ],
-        a:0,
-        e:"'Fixing' is correctly used as a non-finite verb."
+        a: 0,
+        e: "'Fixing' is correctly used as a non-finite verb."
     },
     {
-        q:"👻 The visitors screamed loudly after seeing the ghost jumping from the ceiling.<br><br>What was the ghost doing?",
-        o:["screamed","seeing","jumping","loudly"],
-        a:2,
-        e:"'Jumping' tells us the ghost's action."
+        q: "👻 The visitors screamed loudly after seeing the ghost jumping from the ceiling.<br><br>What was the ghost doing?",
+        o: ["screamed", "seeing", "jumping", "loudly"],
+        a: 2,
+        e: "'Jumping' tells us the ghost's action."
     },
     {
-        q:"💦 Which sentence sounds WRONG?",
-        o:[
+        q: "💦 Which sentence sounds WRONG?",
+        o: [
             "Running near the ride is dangerous.",
             "The children waiting in line were excited.",
             "The operator checking the ride smiled.",
             "The visitors slippinged near the pool laughed."
         ],
-        a:3,
-        e:"'Slippinged' is not a real verb form."
+        a: 3,
+        e: "'Slippinged' is not a real verb form."
     },
     {
-        q:"🎡 Mia stood near the Ferris wheel, eating popcorn while watching fireworks.<br><br>Which action happened at the same time?",
-        o:["stood","Ferris wheel","eating","fireworks"],
-        a:2,
-        e:"'Eating' happened while Mia stood there."
+        q: "🎡 Mia stood near the Ferris wheel, eating popcorn while watching fireworks.<br><br>Which action happened at the same time?",
+        o: ["stood", "Ferris wheel", "eating", "fireworks"],
+        a: 2,
+        e: "'Eating' happened while Mia stood there."
     },
     {
-        q:"🏴‍☠️ The pirate ride stopped moving after making a strange sound.<br><br>What happened FIRST?",
-        o:[
+        q: "🏴‍☠️ The pirate ride stopped moving after making a strange sound.<br><br>What happened FIRST?",
+        o: [
             "stopped moving",
             "making a strange sound",
             "pirate ride",
             "strange"
         ],
-        a:1,
-        e:"The strange sound happened before the ride stopped."
+        a: 1,
+        e: "The strange sound happened before the ride stopped."
     },
     {
-        q:"🎠 Which announcement sounds BEST?",
-        o:[
+        q: "🎠 Which announcement sounds BEST?",
+        o: [
             "The clown dancing near the carousel waved happily.",
             "The clown danceding near the carousel waved happily.",
             "The clown dance near the carousel waving happily.",
             "The clown to dancing near the carousel waved."
         ],
-        a:0,
-        e:"'Dancing' is correctly used here."
+        a: 0,
+        e: "'Dancing' is correctly used here."
     },
     {
-        q:"🍿 The popcorn machine exploded while cooking snacks.<br><br>What was the machine doing before exploding?",
-        o:["exploded","visitors","cooking","snacks"],
-        a:2,
-        e:"The machine was cooking snacks first."
+        q: "🍿 The popcorn machine exploded while cooking snacks.<br><br>What was the machine doing before exploding?",
+        o: ["exploded", "visitors", "cooking", "snacks"],
+        a: 2,
+        e: "The machine was cooking snacks first."
     },
     {
-        q:"🚗 The children raced around the arena, trying to avoid crashing.<br><br>What were the children trying to do?",
-        o:["raced","avoid crashing","arena","children"],
-        a:1,
-        e:"They were trying to avoid crashing."
+        q: "🚗 The children raced around the arena, trying to avoid crashing.<br><br>What were the children trying to do?",
+        o: ["raced", "avoid crashing", "arena", "children"],
+        a: 1,
+        e: "They were trying to avoid crashing."
     },
     {
-        q:"🎩 The magician opened the giant box, hoping to surprise the audience.<br><br>What was the magician hoping to do?",
-        o:["opened","hoping","surprise the audience","audience"],
-        a:2,
-        e:"The magician wanted to surprise the audience."
+        q: "🎩 The magician opened the giant box, hoping to surprise the audience.<br><br>What was the magician hoping to do?",
+        o: ["opened", "hoping", "surprise the audience", "audience"],
+        a: 2,
+        e: "The magician wanted to surprise the audience."
     },
     {
-        q:"⚡ Which sentence sounds most natural?",
-        o:[
+        q: "⚡ Which sentence sounds most natural?",
+        o: [
             "Checking the rollercoaster carefully, the engineer found the problem.",
             "The engineer checkinged the rollercoaster found the problem.",
             "Checking the rollercoaster, the engineer finding the problem.",
             "To checking the rollercoaster, the engineer found the problem."
         ],
-        a:0,
-        e:"'Checking' is correctly used as a non-finite verb."
+        a: 0,
+        e: "'Checking' is correctly used as a non-finite verb."
     }
 ];
 
-function startGame(){
-    document.getElementById("startScreen").style.display="none";
+function startGame() {
+    document.getElementById("startScreen").style.display = "none";
     loadLevel();
 }
 
-function loadLevel(){
+function loadLevel() {
     const r = rides[level];
     const rideEmoji = document.getElementById("rideEmoji");
 
     rideEmoji.className = "";
     rideEmoji.innerHTML = r.ride;
 
-    setTimeout(()=>{
+    setTimeout(() => {
         rideEmoji.classList.add(r.animation);
-    },100);
+    }, 50);
 
     document.getElementById("problemText").innerHTML = r.problem;
     shuffleTools();
 }
 
-function shuffleTools(){
+function shuffleTools() {
     const toolbox = document.getElementById("toolBox");
-    for(let i = toolbox.children.length; i >= 0; i--){
+    for (let i = toolbox.children.length; i >= 0; i--) {
         toolbox.appendChild(toolbox.children[Math.random() * i | 0]);
     }
 }
 
-document.querySelectorAll(".tool").forEach(tool=>{
-    tool.addEventListener("click",()=>{
-        checkTool(tool.dataset.tool);
-    });
+/* DELEGATED TOOL SELECTION EVENT */
+document.getElementById("toolBox").addEventListener("click", (e) => {
+    const toolEl = e.target.closest(".tool");
+    if (toolEl) {
+        checkTool(toolEl.dataset.tool);
+    }
 });
 
-function checkTool(tool){
+function checkTool(selectedTool) {
     const correctTool = rides[level].tool;
 
-    if(tool === correctTool){
-        correctSound.currentTime = 0;
-        correctSound.play().catch(()=>{});
-        clapSound.currentTime = 0;
-        clapSound.play().catch(()=>{});
-
+    if (selectedTool === correctTool) {
+        playAudio(correctSound);
+        playAudio(clapSound);
         createConfetti();
         showQuestion();
-    }else{
+    } else {
         wrongCount++;
         document.getElementById("wrongScore").innerHTML = wrongCount;
-
-        wrongSound.currentTime = 0;
-        wrongSound.play().catch(()=>{});
+        playAudio(wrongSound);
 
         const popup = document.getElementById("feedbackPopup");
         popup.style.display = "block";
 
         document.getElementById("feedbackTitle").innerHTML = "❌ Wrong Tool!";
-        document.getElementById("feedbackTitle").style.color = "red";
+        document.getElementById("feedbackTitle").style.color = "#d32f2f";
         document.getElementById("feedbackText").innerHTML = "This ride needs a different repair tool. Look carefully and try again!";
 
         const box = document.getElementById("problemBox");
-        box.style.borderColor = "red";
+        box.style.borderColor = "#d32f2f";
 
-        setTimeout(()=>{
+        setTimeout(() => {
             popup.style.display = "none";
-            box.style.borderColor = "red";
-        },1500);
+        }, 1400);
     }
 }
 
-function showQuestion(){
-    document.getElementById("questionBox").style.display = "block";
+function showQuestion() {
+    const qBox = document.getElementById("questionBox");
+    qBox.style.display = "block";
     const q = questions[level];
 
     document.getElementById("questionText").innerHTML = q.q;
@@ -708,41 +725,37 @@ function showQuestion(){
     const optionsDiv = document.getElementById("options");
     optionsDiv.innerHTML = "";
 
-    q.o.forEach((option,index)=>{
+    q.o.forEach((optionText, index) => {
         const btn = document.createElement("button");
-        btn.classList.add("optionBtn");
-        btn.innerHTML = option;
-        btn.onclick = ()=>checkAnswer(index,q);
+        btn.className = "optionBtn";
+        btn.innerHTML = optionText;
+        btn.onclick = () => checkAnswer(index, q);
         optionsDiv.appendChild(btn);
     });
 }
 
-function checkAnswer(selected,q){
+function checkAnswer(selectedIndex, q) {
     document.getElementById("questionBox").style.display = "none";
 
     const popup = document.getElementById("feedbackPopup");
     popup.style.display = "block";
 
-    if(selected === q.a){
+    if (selectedIndex === q.a) {
         correctCount++;
         document.getElementById("correctScore").innerHTML = correctCount;
-
-        correctSound.currentTime = 0;
-        correctSound.play().catch(()=>{});
+        playAudio(correctSound);
         createConfetti();
 
         document.getElementById("feedbackTitle").innerHTML = "✅ Correct!";
-        document.getElementById("feedbackTitle").style.color = "green";
+        document.getElementById("feedbackTitle").style.color = "#2e7d32";
         document.getElementById("feedbackText").innerHTML = q.e;
-    }else{
+    } else {
         wrongCount++;
         document.getElementById("wrongScore").innerHTML = wrongCount;
-
-        wrongSound.currentTime = 0;
-        wrongSound.play().catch(()=>{});
+        playAudio(wrongSound);
 
         document.getElementById("feedbackTitle").innerHTML = "❌ Incorrect!";
-        document.getElementById("feedbackTitle").style.color = "red";
+        document.getElementById("feedbackTitle").style.color = "#d32f2f";
         document.getElementById("feedbackText").innerHTML = `
             Correct Answer:<br><br>
             <b>${q.o[q.a]}</b><br><br>
@@ -752,43 +765,45 @@ function checkAnswer(selected,q){
 
     document.getElementById("questionNumber").innerHTML = level + 1;
 
-    setTimeout(()=>{
+    setTimeout(() => {
         popup.style.display = "none";
         level++;
 
-        if(level >= 10){
+        if (level >= 10) {
             endGame();
-        }else{
+        } else {
             loadLevel();
         }
-    },2500);
+    }, 2200);
 }
 
-function createConfetti(){
-    for(let i=0;i<30;i++){
+function createConfetti() {
+    const count = 20; // Reduced density for smooth performance on low-spec phones
+    const gameArea = document.getElementById("gameArea");
+    for (let i = 0; i < count; i++) {
         const conf = document.createElement("div");
-        conf.classList.add("confetti");
-        conf.style.left = Math.random()*100 + "%";
-        conf.style.background = `hsl(${Math.random()*360},100%,50%)`;
-        conf.style.animationDuration = (2 + Math.random()*2)+"s";
-        document.body.appendChild(conf);
+        conf.className = "confetti";
+        conf.style.left = (Math.random() * 96) + "%";
+        conf.style.background = `hsl(${Math.random() * 360}, 90%, 50%)`;
+        conf.style.animationDuration = (1.8 + Math.random() * 1.5) + "s";
+        gameArea.appendChild(conf);
 
-        setTimeout(()=>{ conf.remove(); },3000);
+        setTimeout(() => { conf.remove(); }, 3000);
     }
 }
 
-function endGame(){
+function endGame() {
     document.getElementById("endScreen").style.display = "flex";
-    let percentage = Math.round((correctCount / 10) * 100);
+    const percentage = Math.round((correctCount / 10) * 100);
     let message = "";
 
-    if(correctCount === 10){
+    if (correctCount === 10) {
         message = "🌟 PERFECT! You are a Theme Park Grammar Master!";
-    }else if(correctCount >= 8){
+    } else if (correctCount >= 8) {
         message = "🚀 Amazing Work! You repaired the park brilliantly!";
-    }else if(correctCount >= 6){
+    } else if (correctCount >= 6) {
         message = "🎡 Great Job! The visitors are enjoying the rides again!";
-    }else{
+    } else {
         message = "🎉 Nice Effort! You helped reopen the theme park!";
     }
 
@@ -800,7 +815,7 @@ function endGame(){
     `;
 }
 
-function restartGame(){
+function restartGame() {
     location.reload();
 }
 </script>
