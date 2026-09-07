@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,418 +6,368 @@
 <title>🎢 Theme Park Rebuilder</title>
 
 <style>
-
 *{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:Arial,sans-serif;
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial,sans-serif;
 }
 
 body{
-overflow:hidden;
-background:#90caf9;
+    overflow:hidden;
+    background:#90caf9;
 }
 
 #gameArea{
-position:relative;
-width:100vw;
-height:100vh;
-overflow:hidden;
-background:linear-gradient(to bottom,#64b5f6,#e1f5fe);
+    position:relative;
+    width:100vw;
+    height:100vh;
+    overflow:hidden;
+    background:linear-gradient(to bottom,#64b5f6,#e1f5fe);
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    align-items:center;
+    padding:10px;
 }
 
 /* CLOUDS */
-
 .cloud{
-position:absolute;
-background:white;
-border-radius:50px;
-opacity:0.9;
-animation:moveCloud linear infinite;
+    position:absolute;
+    background:white;
+    border-radius:50px;
+    opacity:0.9;
+    animation:moveCloud linear infinite;
+    pointer-events:none;
 }
 
 @keyframes moveCloud{
-from{transform:translateX(-300px);}
-to{transform:translateX(120vw);}
+    from{transform:translateX(-300px);}
+    to{transform:translateX(120vw);}
 }
 
 /* LOGO */
-
 #logoScreen{
-position:absolute;
-width:100%;
-height:100%;
-background:white;
-display:flex;
-justify-content:center;
-align-items:center;
-flex-direction:column;
-z-index:9999;
+    position:absolute;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:white;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    flex-direction:column;
+    z-index:9999;
 }
 
 #logoScreen img{
-width:260px;
-max-width:80%;
-}
-
-#logoText{
-margin-top:20px;
-font-size:32px;
-font-weight:bold;
-color:#333;
+    width:260px;
+    max-width:80%;
 }
 
 /* START + END */
-
 #startScreen,
 #endScreen{
-position:absolute;
-width:100%;
-height:100%;
-background:rgba(0,0,0,0.85);
-display:flex;
-justify-content:center;
-align-items:center;
-flex-direction:column;
-text-align:center;
-padding:20px;
-color:white;
-z-index:5000;
+    position:absolute;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,0.85);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    flex-direction:column;
+    text-align:center;
+    padding:20px;
+    color:white;
+    z-index:5000;
 }
 
 .mainBtn{
-padding:16px 34px;
-font-size:22px;
-border:none;
-border-radius:18px;
-background:#ff9800;
-color:white;
-cursor:pointer;
-margin-top:25px;
-transition:0.3s;
+    padding:14px 28px;
+    font-size:20px;
+    border:none;
+    border-radius:18px;
+    background:#ff9800;
+    color:white;
+    cursor:pointer;
+    margin-top:20px;
+    transition:0.3s;
 }
 
 .mainBtn:hover{
-transform:scale(1.05);
+    transform:scale(1.05);
 }
 
-/* TITLE */
+/* HEADER CONTAINER */
+#headerContainer{
+    width:100%;
+    max-width:800px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:8px;
+    z-index:100;
+}
 
 #titleBox{
-position:absolute;
-top:15px;
-left:50%;
-transform:translateX(-50%);
-width:92%;
-background:white;
-padding:15px;
-border-radius:20px;
-font-size:28px;
-font-weight:bold;
-text-align:center;
-color:#6a1b9a;
-border:6px solid #ffca28;
-z-index:100;
+    width:100%;
+    background:white;
+    padding:8px 12px;
+    border-radius:15px;
+    font-size:18px;
+    font-weight:bold;
+    text-align:center;
+    color:#6a1b9a;
+    border:4px solid #ffca28;
 }
 
-/* SCORE */
+#infoBar{
+    width:100%;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+}
 
 #scoreBoard{
-position:absolute;
-top:100px;
-left:20px;
-background:white;
-padding:12px 18px;
-border-radius:15px;
-font-size:18px;
-font-weight:bold;
-z-index:200;
-line-height:1.7;
-box-shadow:0 0 10px rgba(0,0,0,0.2);
+    background:white;
+    padding:6px 12px;
+    border-radius:12px;
+    font-size:13px;
+    font-weight:bold;
+    line-height:1.3;
+    box-shadow:0 2px 5px rgba(0,0,0,0.15);
 }
 
-/* VOLUME */
-
 #volumeBox{
-position:absolute;
-top:100px;
-right:20px;
-background:white;
-padding:12px;
-border-radius:15px;
-z-index:200;
-box-shadow:0 0 10px rgba(0,0,0,0.2);
+    background:white;
+    padding:6px 12px;
+    border-radius:12px;
+    font-size:13px;
+    font-weight:bold;
+    box-shadow:0 2px 5px rgba(0,0,0,0.15);
+    display:flex;
+    align-items:center;
+    gap:6px;
+}
+
+#volumeSlider{
+    width:70px;
 }
 
 /* RIDE AREA */
-
 #rideArea{
-position:absolute;
-top:180px;
-left:50%;
-transform:translateX(-50%);
-width:94%;
-height:58%;
-background:#fffde7;
-border-radius:30px;
-border:8px solid #42a5f5;
-overflow:hidden;
+    width:100%;
+    max-width:800px;
+    flex:1;
+    margin:8px 0;
+    background:#fffde7;
+    border-radius:20px;
+    border:6px solid #42a5f5;
+    position:relative;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-around;
+    align-items:center;
+    overflow:hidden;
+    padding:10px;
 }
-
-/* RIDE */
 
 #rideEmoji{
-position:absolute;
-top:30px;
-left:50%;
-transform:translateX(-50%);
-font-size:140px;
-transition:0.5s;
+    font-size:80px;
+    transition:0.5s;
+    line-height:1;
 }
 
-.spin{
-animation:spinRide 2s infinite linear;
-}
-
-.swing{
-animation:swingRide 1s infinite alternate ease-in-out;
-}
-
-.bounce{
-animation:bounceRide 1s infinite alternate;
-}
-
-.flash{
-animation:flashRide 0.5s infinite alternate;
-}
+.spin{ animation:spinRide 2s infinite linear; }
+.swing{ animation:swingRide 1s infinite alternate ease-in-out; }
+.bounce{ animation:bounceRide 1s infinite alternate; }
+.flash{ animation:flashRide 0.5s infinite alternate; }
 
 @keyframes spinRide{
-from{transform:translateX(-50%) rotate(0deg);}
-to{transform:translateX(-50%) rotate(360deg);}
+    from{transform:rotate(0deg);}
+    to{transform:rotate(360deg);}
 }
-
 @keyframes swingRide{
-from{transform:translateX(-50%) rotate(-15deg);}
-to{transform:translateX(-50%) rotate(15deg);}
+    from{transform:rotate(-15deg);}
+    to{transform:rotate(15deg);}
 }
-
 @keyframes bounceRide{
-from{transform:translateX(-50%) translateY(0);}
-to{transform:translateX(-50%) translateY(-30px);}
+    from{transform:translateY(0);}
+    to{transform:translateY(-20px);}
 }
-
 @keyframes flashRide{
-from{opacity:1;}
-to{opacity:0.2;}
+    from{opacity:1;}
+    to{opacity:0.2;}
 }
 
 /* PROBLEM */
-
 #problemBox{
-position:absolute;
-top:220px;
-left:50%;
-transform:translateX(-50%);
-background:white;
-padding:20px;
-border-radius:20px;
-border:5px dashed red;
-text-align:center;
-width:82%;
-max-width:650px;
-transition:0.3s;
+    background:white;
+    padding:12px;
+    border-radius:16px;
+    border:4px dashed red;
+    text-align:center;
+    width:92%;
+    max-width:600px;
+    transition:0.3s;
 }
 
 #problemText{
-font-size:24px;
-font-weight:bold;
-color:#d32f2f;
+    font-size:16px;
+    font-weight:bold;
+    color:#d32f2f;
 }
 
 /* TOOLBOX */
-
 #toolBox{
-position:absolute;
-bottom:20px;
-width:100%;
-display:flex;
-justify-content:center;
-gap:20px;
-flex-wrap:wrap;
+    width:100%;
+    max-width:800px;
+    display:flex;
+    justify-content:center;
+    gap:10px;
+    z-index:200;
+    padding-bottom:5px;
 }
 
 .tool{
-width:90px;
-height:90px;
-background:white;
-border-radius:20px;
-display:flex;
-justify-content:center;
-align-items:center;
-font-size:50px;
-cursor:pointer;
-border:5px solid #29b6f6;
-transition:0.3s;
-user-select:none;
+    width:65px;
+    height:65px;
+    background:white;
+    border-radius:16px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:36px;
+    cursor:pointer;
+    border:4px solid #29b6f6;
+    transition:0.2s;
+    user-select:none;
+    box-shadow:0 3px 6px rgba(0,0,0,0.15);
 }
 
-.tool:hover{
-transform:scale(1.1);
-background:#fff9c4;
+.tool:active, .tool:hover{
+    transform:scale(1.08);
+    background:#fff9c4;
 }
 
-/* QUESTION */
-
+/* QUESTION BOX */
 #questionBox{
-position:absolute;
-top:50%;
-left:50%;
-transform:translate(-50%,-50%);
-width:92%;
-max-width:700px;
-background:#fff8e1;
-padding:25px;
-border-radius:25px;
-display:none;
-z-index:8000;
-box-shadow:0 0 30px rgba(0,0,0,0.5);
-animation:popup 0.5s;
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    width:92%;
+    max-width:600px;
+    max-height:85vh;
+    overflow-y:auto;
+    background:#fff8e1;
+    padding:20px;
+    border-radius:20px;
+    display:none;
+    z-index:8000;
+    box-shadow:0 0 30px rgba(0,0,0,0.5);
+    animation:popup 0.4s;
 }
 
 #questionTitle{
-font-size:30px;
-color:#e65100;
-margin-bottom:15px;
-text-align:center;
+    font-size:22px;
+    font-weight:bold;
+    color:#e65100;
+    margin-bottom:10px;
+    text-align:center;
 }
 
 #questionText{
-font-size:22px;
-line-height:1.6;
-margin-bottom:20px;
-color:#333;
+    font-size:16px;
+    line-height:1.4;
+    margin-bottom:15px;
+    color:#333;
 }
 
 .optionBtn{
-width:100%;
-padding:15px;
-margin:10px 0;
-border:none;
-border-radius:15px;
-background:#4caf50;
-color:white;
-font-size:18px;
-cursor:pointer;
-transition:0.3s;
+    width:100%;
+    padding:12px;
+    margin:6px 0;
+    border:none;
+    border-radius:12px;
+    background:#4caf50;
+    color:white;
+    font-size:15px;
+    cursor:pointer;
+    transition:0.2s;
+    text-align:left;
 }
 
-.optionBtn:hover{
-background:#388e3c;
-transform:scale(1.03);
+.optionBtn:active, .optionBtn:hover{
+    background:#388e3c;
 }
 
 /* FEEDBACK POPUP */
-
 #feedbackPopup{
-position:absolute;
-top:50%;
-left:50%;
-transform:translate(-50%,-50%);
-width:90%;
-max-width:650px;
-background:white;
-padding:30px;
-border-radius:25px;
-display:none;
-z-index:9000;
-text-align:center;
-box-shadow:0 0 30px rgba(0,0,0,0.5);
-animation:popup 0.4s;
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    width:88%;
+    max-width:550px;
+    max-height:80vh;
+    overflow-y:auto;
+    background:white;
+    padding:20px;
+    border-radius:20px;
+    display:none;
+    z-index:9000;
+    text-align:center;
+    box-shadow:0 0 30px rgba(0,0,0,0.5);
+    animation:popup 0.3s;
 }
 
 #feedbackTitle{
-font-size:38px;
-margin-bottom:15px;
-font-weight:bold;
+    font-size:26px;
+    margin-bottom:10px;
+    font-weight:bold;
 }
 
 #feedbackText{
-font-size:22px;
-line-height:1.6;
-color:#333;
+    font-size:16px;
+    line-height:1.5;
+    color:#333;
 }
 
 /* CONFETTI */
-
 .confetti{
-position:absolute;
-width:12px;
-height:12px;
-animation:fall 3s linear forwards;
+    position:absolute;
+    width:10px;
+    height:10px;
+    animation:fall 3s linear forwards;
+    pointer-events:none;
 }
 
 @keyframes fall{
-from{
-transform:translateY(-100px) rotate(0deg);
-}
-to{
-transform:translateY(100vh) rotate(720deg);
-opacity:0;
-}
+    from{ transform:translateY(-50px) rotate(0deg); }
+    to{ transform:translateY(100vh) rotate(720deg); opacity:0; }
 }
 
 @keyframes popup{
-from{
-transform:translate(-50%,-50%) scale(0.5);
-opacity:0;
-}
-to{
-transform:translate(-50%,-50%) scale(1);
-opacity:1;
-}
+    from{ transform:translate(-50%,-50%) scale(0.6); opacity:0; }
+    to{ transform:translate(-50%,-50%) scale(1); opacity:1; }
 }
 
-/* MOBILE */
-
-@media(max-width:768px){
-
-#titleBox{
-font-size:20px;
+/* DESKTOP ADJUSTMENTS */
+@media(min-width:769px){
+    #titleBox{ font-size:22px; padding:12px; }
+    #scoreBoard, #volumeBox{ font-size:15px; padding:8px 15px; }
+    #rideEmoji{ font-size:110px; }
+    #problemText{ font-size:20px; }
+    .tool{ width:80px; height:80px; font-size:44px; }
+    #questionTitle{ font-size:26px; }
+    #questionText{ font-size:18px; }
+    .optionBtn{ font-size:16px; padding:14px; }
 }
-
-#rideEmoji{
-font-size:90px;
-}
-
-#problemText{
-font-size:18px;
-}
-
-.tool{
-width:70px;
-height:70px;
-font-size:38px;
-}
-
-#questionText{
-font-size:18px;
-}
-
-.optionBtn{
-font-size:16px;
-}
-
-#feedbackTitle{
-font-size:28px;
-}
-
-#feedbackText{
-font-size:18px;
-}
-
-}
-
 </style>
 </head>
 
@@ -427,145 +376,98 @@ font-size:18px;
 <div id="gameArea">
 
 <script>
-
-for(let i=0;i<8;i++){
-
-document.write(`
-<div class="cloud"
-style="
-width:${120+Math.random()*100}px;
-height:${50+Math.random()*30}px;
-top:${Math.random()*35}%;
-left:${Math.random()*100}%;
-animation-duration:${25+Math.random()*20}s;
-"></div>
-`);
-
+for(let i=0;i<6;i++){
+    document.write(`
+    <div class="cloud"
+    style="
+    width:${80+Math.random()*80}px;
+    height:${35+Math.random()*25}px;
+    top:${Math.random()*30}%;
+    left:${Math.random()*100}%;
+    animation-duration:${20+Math.random()*15}s;
+    "></div>
+    `);
 }
-
 </script>
 
 <!-- LOGO -->
-
 <div id="logoScreen">
-    <img src="assets/innovine-logo.png" alt="Innovine Logo">
+    <img src="assets/innovine-logo.png" alt="Innovine Logo" onerror="this.style.display='none'">
 </div>
 
 <!-- START -->
-
 <div id="startScreen" style="display:none;">
-
-<h1 style="font-size:52px;">🎢 Theme Park Rebuilder</h1>
-
-<p style="margin-top:20px;font-size:24px;max-width:700px;">
-Repair broken rides using the correct tools and solve exciting verb challenges!
-</p>
-
-<button class="mainBtn" onclick="startGame()">
-Start Rebuilding
-</button>
-
+    <h1 style="font-size:36px;">🎢 Theme Park Rebuilder</h1>
+    <p style="margin-top:15px;font-size:18px;max-width:500px;line-height:1.4;">
+    Repair broken rides using the correct tools and solve exciting verb challenges!
+    </p>
+    <button class="mainBtn" onclick="startGame()">Start Rebuilding</button>
 </div>
 
 <!-- END -->
-
 <div id="endScreen" style="display:none;">
-
-<h1>🏆 Theme Park Fully Reopened! 🏆</h1>
-
-<h2 id="finalText" style="margin-top:20px; line-height:1.8;"></h2>
-
-<button class="mainBtn" onclick="restartGame()">
-Play Again
-</button>
-
+    <h1 style="font-size:30px;">🏆 Theme Park Fully Reopened! 🏆</h1>
+    <h2 id="finalText" style="margin-top:15px; line-height:1.6; font-size:18px;"></h2>
+    <button class="mainBtn" onclick="restartGame()">Play Again</button>
 </div>
 
-<!-- TITLE -->
+<!-- HEADER CONTAINER -->
+<div id="headerContainer">
+    <div id="titleBox">
+        🔧 Choose the Correct Repair Tool!
+    </div>
+    
+    <div id="infoBar">
+        <div id="scoreBoard">
+            ✅ Correct: <span id="correctScore">0</span> | ❌ Wrong: <span id="wrongScore">0</span> | 📘 Q: <span id="questionNumber">0</span>/10
+        </div>
 
-<div id="titleBox">
-🔧 Observe the Ride Problem and Choose the Correct Tool!
+        <div id="volumeBox">
+            🔊 <input type="range" id="volumeSlider" min="0" max="1" step="0.1" value="1">
+        </div>
+    </div>
 </div>
 
-<!-- SCORE -->
-
-<div id="scoreBoard">
-✅ Correct: <span id="correctScore">0</span><br>
-❌ Wrong: <span id="wrongScore">0</span><br>
-📘 Question: <span id="questionNumber">0</span>/10
-</div>
-
-<!-- VOLUME -->
-
-<div id="volumeBox">
-Volume
-<input type="range" id="volumeSlider" min="0" max="1" step="0.1" value="1">
-</div>
-
-<!-- GAME -->
-
+<!-- RIDE DISPLAY -->
 <div id="rideArea">
+    <div id="rideEmoji">🎡</div>
 
-<div id="rideEmoji">🎡</div>
-
-<div id="problemBox">
-<div id="problemText">
-The Ferris wheel is wobbling dangerously!
-</div>
-</div>
-
+    <div id="problemBox">
+        <div id="problemText">The Ferris wheel is wobbling dangerously!</div>
+    </div>
 </div>
 
 <!-- TOOLBOX -->
-
 <div id="toolBox">
-
-<div class="tool" data-tool="wrench">🔧</div>
-<div class="tool" data-tool="screwdriver">🪛</div>
-<div class="tool" data-tool="battery">🔋</div>
-<div class="tool" data-tool="gear">⚙️</div>
-
+    <div class="tool" data-tool="wrench">🔧</div>
+    <div class="tool" data-tool="screwdriver">🪛</div>
+    <div class="tool" data-tool="battery">🔋</div>
+    <div class="tool" data-tool="gear">⚙️</div>
 </div>
 
-<!-- QUESTION -->
-
+<!-- QUESTION POPUP -->
 <div id="questionBox">
-
-<div id="questionTitle">
-⚡ Verb Challenge
+    <div id="questionTitle">⚡ Verb Challenge</div>
+    <div id="questionText"></div>
+    <div id="options"></div>
 </div>
 
-<div id="questionText"></div>
-
-<div id="options"></div>
-
-</div>
-
-<!-- FEEDBACK -->
-
+<!-- FEEDBACK POPUP -->
 <div id="feedbackPopup">
-
-<div id="feedbackTitle"></div>
-
-<div id="feedbackText"></div>
-
+    <div id="feedbackTitle"></div>
+    <div id="feedbackText"></div>
 </div>
 
 </div>
 
 <script>
-
 /* LOGO */
-
 setTimeout(()=>{
-
-document.getElementById("logoScreen").style.display="none";
-document.getElementById("startScreen").style.display="flex";
-
-},5000);
+    document.getElementById("logoScreen").style.display="none";
+    document.getElementById("startScreen").style.display="flex";
+},2000);
 
 /* AUDIO */
-
 const correctSound = new Audio("assets/correct.mp3");
 const wrongSound = new Audio("assets/wrong.mp3");
 const clapSound = new Audio("assets/clapping.mp3");
@@ -573,509 +475,292 @@ const clapSound = new Audio("assets/clapping.mp3");
 const volumeSlider = document.getElementById("volumeSlider");
 
 function updateVolume(){
-
-correctSound.volume = volumeSlider.value;
-wrongSound.volume = volumeSlider.value;
-clapSound.volume = volumeSlider.value;
-
+    correctSound.volume = volumeSlider.value;
+    wrongSound.volume = volumeSlider.value;
+    clapSound.volume = volumeSlider.value;
 }
 
 volumeSlider.addEventListener("input",updateVolume);
-
 updateVolume();
 
 /* GAME DATA */
-
 let level = 0;
 let correctCount = 0;
 let wrongCount = 0;
 
 const rides = [
-
-{
-ride:"🎡",
-animation:"spin",
-problem:"The Ferris wheel is wobbling dangerously!",
-tool:"wrench"
-},
-
-{
-ride:"🎢",
-animation:"bounce",
-problem:"The rollercoaster engine is making grinding noises!",
-tool:"gear"
-},
-
-{
-ride:"🏴‍☠️",
-animation:"swing",
-problem:"The pirate ship suddenly lost all power!",
-tool:"battery"
-},
-
-{
-ride:"👻",
-animation:"flash",
-problem:"The haunted house lights keep flickering!",
-tool:"screwdriver"
-},
-
-{
-ride:"🚗",
-animation:"bounce",
-problem:"The bumper cars are shaking wildly!",
-tool:"wrench"
-},
-
-{
-ride:"🎠",
-animation:"spin",
-problem:"The carousel suddenly stopped spinning!",
-tool:"gear"
-},
-
-{
-ride:"💦",
-animation:"flash",
-problem:"The water ride won't turn on anymore!",
-tool:"battery"
-},
-
-{
-ride:"🚀",
-animation:"bounce",
-problem:"The rocket ride control panel is hanging loose!",
-tool:"screwdriver"
-},
-
-{
-ride:"🎯",
-animation:"spin",
-problem:"The target machine suddenly jammed!",
-tool:"gear"
-},
-
-{
-ride:"🎆",
-animation:"flash",
-problem:"The fireworks system refuses to start!",
-tool:"battery"
-}
-
+    { ride:"🎡", animation:"spin", problem:"The Ferris wheel is wobbling dangerously!", tool:"wrench" },
+    { ride:"🎢", animation:"bounce", problem:"The rollercoaster engine is making grinding noises!", tool:"gear" },
+    { ride:"🏴‍☠️", animation:"swing", problem:"The pirate ship suddenly lost all power!", tool:"battery" },
+    { ride:"👻", animation:"flash", problem:"The haunted house lights keep flickering!", tool:"screwdriver" },
+    { ride:"🚗", animation:"bounce", problem:"The bumper cars are shaking wildly!", tool:"wrench" },
+    { ride:"🎠", animation:"spin", problem:"The carousel suddenly stopped spinning!", tool:"gear" },
+    { ride:"💦", animation:"flash", problem:"The water ride won't turn on anymore!", tool:"battery" },
+    { ride:"🚀", animation:"bounce", problem:"The rocket ride control panel is hanging loose!", tool:"screwdriver" },
+    { ride:"🎯", animation:"spin", problem:"The target machine suddenly jammed!", tool:"gear" },
+    { ride:"🎆", animation:"flash", problem:"The fireworks system refuses to start!", tool:"battery" }
 ];
 
 const questions = [
-
-{
-q:"🎢 Which sentence sounds BEST?",
-o:[
-"The workers fixing the track arrived quickly.",
-"The workers fixeding the track arrived quickly.",
-"The workers fix the track arriving quickly.",
-"The workers to fixing the track arrived."
-],
-a:0,
-e:"'Fixing' is correctly used as a non-finite verb."
-},
-
-{
-q:"👻 The visitors screamed loudly after seeing the ghost jumping from the ceiling.<br><br>What was the ghost doing?",
-o:["screamed","seeing","jumping","loudly"],
-a:2,
-e:"'Jumping' tells us the ghost's action."
-},
-
-{
-q:"💦 Which sentence sounds WRONG?",
-o:[
-"Running near the ride is dangerous.",
-"The children waiting in line were excited.",
-"The operator checking the ride smiled.",
-"The visitors slippinged near the pool laughed."
-],
-a:3,
-e:"'Slippinged' is not a real verb form."
-},
-
-{
-q:"🎡 Mia stood near the Ferris wheel, eating popcorn while watching fireworks.<br><br>Which action happened at the same time?",
-o:["stood","Ferris wheel","eating","fireworks"],
-a:2,
-e:"'Eating' happened while Mia stood there."
-},
-
-{
-q:"🏴‍☠️ The pirate ride stopped moving after making a strange sound.<br><br>What happened FIRST?",
-o:[
-"stopped moving",
-"making a strange sound",
-"pirate ride",
-"strange"
-],
-a:1,
-e:"The strange sound happened before the ride stopped."
-},
-
-{
-q:"🎠 Which announcement sounds BEST?",
-o:[
-"The clown dancing near the carousel waved happily.",
-"The clown danceding near the carousel waved happily.",
-"The clown dance near the carousel waving happily.",
-"The clown to dancing near the carousel waved."
-],
-a:0,
-e:"'Dancing' is correctly used here."
-},
-
-{
-q:"🍿 The popcorn machine exploded while cooking snacks.<br><br>What was the machine doing before exploding?",
-o:["exploded","visitors","cooking","snacks"],
-a:2,
-e:"The machine was cooking snacks first."
-},
-
-{
-q:"🚗 The children raced around the arena, trying to avoid crashing.<br><br>What were the children trying to do?",
-o:["raced","avoid crashing","arena","children"],
-a:1,
-e:"They were trying to avoid crashing."
-},
-
-{
-q:"🎩 The magician opened the giant box, hoping to surprise the audience.<br><br>What was the magician hoping to do?",
-o:["opened","hoping","surprise the audience","audience"],
-a:2,
-e:"The magician wanted to surprise the audience."
-},
-
-{
-q:"⚡ Which sentence sounds most natural?",
-o:[
-"Checking the rollercoaster carefully, the engineer found the problem.",
-"The engineer checkinged the rollercoaster found the problem.",
-"Checking the rollercoaster, the engineer finding the problem.",
-"To checking the rollercoaster, the engineer found the problem."
-],
-a:0,
-e:"'Checking' is correctly used as a non-finite verb."
-}
-
+    {
+        q:"🎢 Which sentence sounds BEST?",
+        o:[
+            "The workers fixing the track arrived quickly.",
+            "The workers fixeding the track arrived quickly.",
+            "The workers fix the track arriving quickly.",
+            "The workers to fixing the track arrived."
+        ],
+        a:0,
+        e:"'Fixing' is correctly used as a non-finite verb."
+    },
+    {
+        q:"👻 The visitors screamed loudly after seeing the ghost jumping from the ceiling.<br><br>What was the ghost doing?",
+        o:["screamed","seeing","jumping","loudly"],
+        a:2,
+        e:"'Jumping' tells us the ghost's action."
+    },
+    {
+        q:"💦 Which sentence sounds WRONG?",
+        o:[
+            "Running near the ride is dangerous.",
+            "The children waiting in line were excited.",
+            "The operator checking the ride smiled.",
+            "The visitors slippinged near the pool laughed."
+        ],
+        a:3,
+        e:"'Slippinged' is not a real verb form."
+    },
+    {
+        q:"🎡 Mia stood near the Ferris wheel, eating popcorn while watching fireworks.<br><br>Which action happened at the same time?",
+        o:["stood","Ferris wheel","eating","fireworks"],
+        a:2,
+        e:"'Eating' happened while Mia stood there."
+    },
+    {
+        q:"🏴‍☠️ The pirate ride stopped moving after making a strange sound.<br><br>What happened FIRST?",
+        o:[
+            "stopped moving",
+            "making a strange sound",
+            "pirate ride",
+            "strange"
+        ],
+        a:1,
+        e:"The strange sound happened before the ride stopped."
+    },
+    {
+        q:"🎠 Which announcement sounds BEST?",
+        o:[
+            "The clown dancing near the carousel waved happily.",
+            "The clown danceding near the carousel waved happily.",
+            "The clown dance near the carousel waving happily.",
+            "The clown to dancing near the carousel waved."
+        ],
+        a:0,
+        e:"'Dancing' is correctly used here."
+    },
+    {
+        q:"🍿 The popcorn machine exploded while cooking snacks.<br><br>What was the machine doing before exploding?",
+        o:["exploded","visitors","cooking","snacks"],
+        a:2,
+        e:"The machine was cooking snacks first."
+    },
+    {
+        q:"🚗 The children raced around the arena, trying to avoid crashing.<br><br>What were the children trying to do?",
+        o:["raced","avoid crashing","arena","children"],
+        a:1,
+        e:"They were trying to avoid crashing."
+    },
+    {
+        q:"🎩 The magician opened the giant box, hoping to surprise the audience.<br><br>What was the magician hoping to do?",
+        o:["opened","hoping","surprise the audience","audience"],
+        a:2,
+        e:"The magician wanted to surprise the audience."
+    },
+    {
+        q:"⚡ Which sentence sounds most natural?",
+        o:[
+            "Checking the rollercoaster carefully, the engineer found the problem.",
+            "The engineer checkinged the rollercoaster found the problem.",
+            "Checking the rollercoaster, the engineer finding the problem.",
+            "To checking the rollercoaster, the engineer found the problem."
+        ],
+        a:0,
+        e:"'Checking' is correctly used as a non-finite verb."
+    }
 ];
 
-/* START */
-
 function startGame(){
-
-document.getElementById("startScreen").style.display="none";
-
-loadLevel();
-
+    document.getElementById("startScreen").style.display="none";
+    loadLevel();
 }
-
-/* LOAD LEVEL */
 
 function loadLevel(){
+    const r = rides[level];
+    const rideEmoji = document.getElementById("rideEmoji");
 
-const r = rides[level];
+    rideEmoji.className = "";
+    rideEmoji.innerHTML = r.ride;
 
-const rideEmoji = document.getElementById("rideEmoji");
+    setTimeout(()=>{
+        rideEmoji.classList.add(r.animation);
+    },100);
 
-rideEmoji.className = "";
-rideEmoji.innerHTML = r.ride;
-
-setTimeout(()=>{
-rideEmoji.classList.add(r.animation);
-},100);
-
-document.getElementById("problemText").innerHTML =
-r.problem;
-
-shuffleTools();
-
+    document.getElementById("problemText").innerHTML = r.problem;
+    shuffleTools();
 }
-
-/* SHUFFLE */
 
 function shuffleTools(){
-
-const toolbox = document.getElementById("toolBox");
-
-for(let i = toolbox.children.length; i >= 0; i--){
-
-toolbox.appendChild(
-toolbox.children[Math.random() * i | 0]
-);
-
+    const toolbox = document.getElementById("toolBox");
+    for(let i = toolbox.children.length; i >= 0; i--){
+        toolbox.appendChild(toolbox.children[Math.random() * i | 0]);
+    }
 }
-
-}
-
-/* TOOL CLICK */
 
 document.querySelectorAll(".tool").forEach(tool=>{
-
-tool.addEventListener("click",()=>{
-
-checkTool(tool.dataset.tool);
-
+    tool.addEventListener("click",()=>{
+        checkTool(tool.dataset.tool);
+    });
 });
-
-});
-
-/* CHECK TOOL */
 
 function checkTool(tool){
+    const correctTool = rides[level].tool;
 
-const correctTool = rides[level].tool;
+    if(tool === correctTool){
+        correctSound.currentTime = 0;
+        correctSound.play().catch(()=>{});
+        clapSound.currentTime = 0;
+        clapSound.play().catch(()=>{});
 
-if(tool === correctTool){
+        createConfetti();
+        showQuestion();
+    }else{
+        wrongCount++;
+        document.getElementById("wrongScore").innerHTML = wrongCount;
 
-correctSound.play();
-clapSound.play();
+        wrongSound.currentTime = 0;
+        wrongSound.play().catch(()=>{});
 
-createConfetti();
+        const popup = document.getElementById("feedbackPopup");
+        popup.style.display = "block";
 
-showQuestion();
+        document.getElementById("feedbackTitle").innerHTML = "❌ Wrong Tool!";
+        document.getElementById("feedbackTitle").style.color = "red";
+        document.getElementById("feedbackText").innerHTML = "This ride needs a different repair tool. Look carefully and try again!";
 
-}else{
+        const box = document.getElementById("problemBox");
+        box.style.borderColor = "red";
 
-wrongCount++;
-
-document.getElementById("wrongScore").innerHTML =
-wrongCount;
-
-wrongSound.play();
-
-const popup =
-document.getElementById("feedbackPopup");
-
-popup.style.display = "block";
-
-document.getElementById("feedbackTitle").innerHTML =
-"❌ Wrong Tool!";
-
-document.getElementById("feedbackTitle").style.color =
-"red";
-
-document.getElementById("feedbackText").innerHTML =
-"This ride needs a different repair tool. Look carefully and try again!";
-
-const box =
-document.getElementById("problemBox");
-
-box.style.transform =
-"translateX(-50%) scale(1.05)";
-
-box.style.borderColor = "red";
-
-setTimeout(()=>{
-
-popup.style.display = "none";
-
-box.style.transform =
-"translateX(-50%) scale(1)";
-
-},1500);
-
+        setTimeout(()=>{
+            popup.style.display = "none";
+            box.style.borderColor = "red";
+        },1500);
+    }
 }
-
-}
-
-/* SHOW QUESTION */
 
 function showQuestion(){
+    document.getElementById("questionBox").style.display = "block";
+    const q = questions[level];
 
-document.getElementById("questionBox").style.display =
-"block";
+    document.getElementById("questionText").innerHTML = q.q;
 
-const q = questions[level];
+    const optionsDiv = document.getElementById("options");
+    optionsDiv.innerHTML = "";
 
-document.getElementById("questionText").innerHTML =
-q.q;
-
-const optionsDiv =
-document.getElementById("options");
-
-optionsDiv.innerHTML = "";
-
-q.o.forEach((option,index)=>{
-
-const btn = document.createElement("button");
-
-btn.classList.add("optionBtn");
-
-btn.innerHTML = option;
-
-btn.onclick = ()=>checkAnswer(index,q);
-
-optionsDiv.appendChild(btn);
-
-});
-
+    q.o.forEach((option,index)=>{
+        const btn = document.createElement("button");
+        btn.classList.add("optionBtn");
+        btn.innerHTML = option;
+        btn.onclick = ()=>checkAnswer(index,q);
+        optionsDiv.appendChild(btn);
+    });
 }
-
-/* CHECK ANSWER */
 
 function checkAnswer(selected,q){
+    document.getElementById("questionBox").style.display = "none";
 
-document.getElementById("questionBox").style.display =
-"none";
+    const popup = document.getElementById("feedbackPopup");
+    popup.style.display = "block";
 
-const popup =
-document.getElementById("feedbackPopup");
+    if(selected === q.a){
+        correctCount++;
+        document.getElementById("correctScore").innerHTML = correctCount;
 
-popup.style.display = "block";
+        correctSound.currentTime = 0;
+        correctSound.play().catch(()=>{});
+        createConfetti();
 
-if(selected === q.a){
+        document.getElementById("feedbackTitle").innerHTML = "✅ Correct!";
+        document.getElementById("feedbackTitle").style.color = "green";
+        document.getElementById("feedbackText").innerHTML = q.e;
+    }else{
+        wrongCount++;
+        document.getElementById("wrongScore").innerHTML = wrongCount;
 
-correctCount++;
+        wrongSound.currentTime = 0;
+        wrongSound.play().catch(()=>{});
 
-document.getElementById("correctScore").innerHTML =
-correctCount;
+        document.getElementById("feedbackTitle").innerHTML = "❌ Incorrect!";
+        document.getElementById("feedbackTitle").style.color = "red";
+        document.getElementById("feedbackText").innerHTML = `
+            Correct Answer:<br><br>
+            <b>${q.o[q.a]}</b><br><br>
+            ${q.e}
+        `;
+    }
 
-correctSound.play();
+    document.getElementById("questionNumber").innerHTML = level + 1;
 
-createConfetti();
+    setTimeout(()=>{
+        popup.style.display = "none";
+        level++;
 
-document.getElementById("feedbackTitle").innerHTML =
-"✅ Correct!";
-
-document.getElementById("feedbackTitle").style.color =
-"green";
-
-document.getElementById("feedbackText").innerHTML =
-q.e;
-
-}else{
-
-wrongCount++;
-
-document.getElementById("wrongScore").innerHTML =
-wrongCount;
-
-wrongSound.play();
-
-document.getElementById("feedbackTitle").innerHTML =
-"❌ Incorrect!";
-
-document.getElementById("feedbackTitle").style.color =
-"red";
-
-document.getElementById("feedbackText").innerHTML =
-`
-Correct Answer:<br><br>
-<b>${q.o[q.a]}</b><br><br>
-${q.e}
-`;
-
+        if(level >= 10){
+            endGame();
+        }else{
+            loadLevel();
+        }
+    },2500);
 }
-
-document.getElementById("questionNumber").innerHTML =
-level + 1;
-
-setTimeout(()=>{
-
-popup.style.display = "none";
-
-level++;
-
-if(level >= 10){
-
-endGame();
-
-}else{
-
-loadLevel();
-
-}
-
-},2500);
-
-}
-
-/* CONFETTI */
 
 function createConfetti(){
+    for(let i=0;i<30;i++){
+        const conf = document.createElement("div");
+        conf.classList.add("confetti");
+        conf.style.left = Math.random()*100 + "%";
+        conf.style.background = `hsl(${Math.random()*360},100%,50%)`;
+        conf.style.animationDuration = (2 + Math.random()*2)+"s";
+        document.body.appendChild(conf);
 
-for(let i=0;i<40;i++){
-
-const conf = document.createElement("div");
-
-conf.classList.add("confetti");
-
-conf.style.left = Math.random()*100 + "%";
-
-conf.style.background =
-`hsl(${Math.random()*360},100%,50%)`;
-
-conf.style.animationDuration =
-(2 + Math.random()*2)+"s";
-
-document.body.appendChild(conf);
-
-setTimeout(()=>{
-conf.remove();
-},4000);
-
+        setTimeout(()=>{ conf.remove(); },3000);
+    }
 }
-
-}
-
-/* END GAME */
 
 function endGame(){
+    document.getElementById("endScreen").style.display = "flex";
+    let percentage = Math.round((correctCount / 10) * 100);
+    let message = "";
 
-document.getElementById("endScreen").style.display =
-"flex";
+    if(correctCount === 10){
+        message = "🌟 PERFECT! You are a Theme Park Grammar Master!";
+    }else if(correctCount >= 8){
+        message = "🚀 Amazing Work! You repaired the park brilliantly!";
+    }else if(correctCount >= 6){
+        message = "🎡 Great Job! The visitors are enjoying the rides again!";
+    }else{
+        message = "🎉 Nice Effort! You helped reopen the theme park!";
+    }
 
-let percentage =
-Math.round((correctCount / 10) * 100);
-
-let message = "";
-
-if(correctCount === 10){
-
-message =
-"🌟 PERFECT! You are a Theme Park Grammar Master!";
-
-}else if(correctCount >= 8){
-
-message =
-"🚀 Amazing Work! You repaired the park brilliantly!";
-
-}else if(correctCount >= 6){
-
-message =
-"🎡 Great Job! The visitors are enjoying the rides again!";
-
-}else{
-
-message =
-"🎉 Nice Effort! You helped reopen the theme park!";
+    document.getElementById("finalText").innerHTML = `
+        🏆 Correct Answers: ${correctCount}/10<br>
+        ❌ Wrong Answers: ${wrongCount}<br>
+        ⭐ Score Percentage: ${percentage}%<br><br>
+        ${message}
+    `;
 }
-
-document.getElementById("finalText").innerHTML =
-`
-🏆 Correct Answers: ${correctCount}/10<br><br>
-
-❌ Wrong Answers: ${wrongCount}<br><br>
-
-⭐ Score Percentage: ${percentage}%<br><br>
-
-${message}
-`;
-
-}
-
-/* RESTART */
 
 function restartGame(){
-
-location.reload();
-
+    location.reload();
 }
-
 </script>
 
 </body>
