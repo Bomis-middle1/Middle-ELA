@@ -9,6 +9,8 @@
 body { background: linear-gradient(180deg, #0f0c29, #302b63, #24243e); min-height: 100vh; overflow: hidden; }
 #splash { position: fixed; inset: 0; background: #fff; display: flex; justify-content: center; align-items: center; z-index: 9999; transition: opacity 1s ease; }
 #splash img { max-width: 320px; width: 80%; }
+#splash p { margin-top: 20px; font-size: 18px; color: #0f0c29; font-weight: bold; letter-spacing: 1px; animation: pulse 1.2s ease-in-out infinite; }
+@keyframes pulse { 0%,100%{opacity:.4} 50%{opacity:1} }
 #stars { position: fixed; inset: 0; z-index: 0; }
 .star { position: absolute; width: 3px; height: 3px; background: white; border-radius: 50%; animation: moveStar 3s linear infinite; }
 @keyframes moveStar { from { transform: translateY(-100px); } to { transform: translateY(100vh); } }
@@ -56,7 +58,12 @@ body { background: linear-gradient(180deg, #0f0c29, #302b63, #24243e); min-heigh
 </head>
 <body>
 
-<div id="splash"><img src="assets/logo.png" onerror="this.style.display='none'"></div>
+<div id="splash">
+  <div style="text-align:center">
+    <img src="assets/logo.png" onerror="this.style.display='none'">
+    <p>Loading mission...</p>
+  </div>
+</div>
 <div id="stars"></div>
 <div id="rocket">🚀</div>
 <div id="planet">🪐</div>
@@ -172,6 +179,7 @@ function startGame() {
 }
 
 function startGameLoop() {
+  document.getElementById('gameArea').innerHTML = ''; // clear previous level's obstacles first
   for(let i=0; i<5; i++) {
     const obs = document.createElement('div');
     obs.className = 'obstacle';
