@@ -3,25 +3,34 @@
 <head>
 <meta charset="UTF-8">
 <title>Quest for Adverb Crystals</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-select=none">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
 
 <style>
 /* ==========================================================================
    GAME PLATFORM BASICS & GLOBAL STYLING
    ========================================================================== */
-* {
+*, *::before, *::after {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
     -webkit-tap-highlight-color: transparent;
 }
 
-body {
+html, body {
+    width: 100%;
+    min-height: 100vh;
+    min-height: 100svh;
     background: #0b132b;
-    color: white;
-    overflow: hidden;
-    height: 100vh;
+    color: #ffffff;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+}
+
+body {
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 
 /* SPLASH SCREEN INTRO */
@@ -36,23 +45,19 @@ body {
     z-index: 9999;
 }
 #splash img {
-    width: 220px;
-    max-width: 80%;
+    width: 200px;
+    max-width: 75%;
+    height: auto;
     filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
-}
-#logoText {
-    margin-top: 15px;
-    font-size: 20px;
-    font-weight: bold;
-    color: #333;
 }
 
 /* SCENE LAYOUT MANAGEMENT CONTAINER */
 .scene-container {
     display: none;
-    width: 100vw;
-    height: 100vh;
-    padding: 16px;
+    width: 100%;
+    min-height: 100vh;
+    min-height: 100svh;
+    padding: 20px 16px;
     background: linear-gradient(135deg, #0b132b 0%, #1c2541 50%, #3a506b 100%);
     flex-direction: column;
     justify-content: center;
@@ -62,82 +67,91 @@ body {
 
 /* TYPOGRAPHY COMPONENTS */
 h1 {
-    font-size: 32px;
+    font-size: 26px;
     color: #ffd54f;
-    text-shadow: 0 4px 10px rgba(255,213,79,0.3);
-    margin-bottom: 20px;
+    text-shadow: 0 3px 8px rgba(255,213,79,0.3);
+    margin-bottom: 16px;
 }
 p {
-    font-size: 16px;
-    line-height: 1.6;
+    font-size: 15px;
+    line-height: 1.5;
     max-width: 500px;
     color: #e0e1dd;
-    margin-bottom: 25px;
+    margin-bottom: 24px;
 }
 
 /* CORE INTERACTION CONTROLS */
 button.action-btn {
-    padding: 14px 36px;
-    font-size: 18px;
+    min-height: 48px;
+    padding: 12px 32px;
+    font-size: 17px;
     font-weight: bold;
     border: none;
     border-radius: 25px;
     background: linear-gradient(135deg, #ffd54f, #ffb300);
-    color: #111;
+    color: #111111;
     cursor: pointer;
-    box-shadow: 0 5px 15px rgba(255,213,79,0.4);
-    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 12px rgba(255,213,79,0.35);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    touch-action: manipulation;
 }
 button.action-btn:active {
-    transform: scale(0.95);
+    transform: scale(0.96);
 }
 
 /* ==========================================================================
    IMMERSIVE QUEST DASHBOARD HUD STAGE
    ========================================================================== */
 #game {
-    padding: 12px;
+    width: 100%;
+    max-width: 600px;
+    min-height: 100vh;
+    min-height: 100svh;
+    margin: 0 auto;
+    padding: 10px 12px 16px 12px;
     display: none;
     flex-direction: column;
     justify-content: space-between;
-    height: 100vh;
+    align-items: stretch;
     background: linear-gradient(to bottom, #0f172a, #1e293b);
 }
 
 /* HUD METRICS STRIP */
 .hud-panel {
+    width: 100%;
     display: flex;
     justify-content: space-between;
     align-items: center;
     background: rgba(255, 255, 255, 0.05);
-    padding: 10px 16px;
+    padding: 8px 12px;
     border-radius: 12px;
     border: 1px solid rgba(255, 255, 255, 0.1);
-    margin-bottom: 10px;
+    margin-bottom: 8px;
 }
 .hud-item {
-    font-size: 14px;
+    font-size: 13px;
     font-weight: bold;
     background: rgba(0,0,0,0.3);
-    padding: 6px 12px;
+    padding: 6px 10px;
     border-radius: 8px;
     border: 1px solid rgba(255,213,79,0.2);
 }
 
 /* CRYSTAL COLLECTOR VAULT DISPLAY */
 #crystalVault {
+    width: 100%;
     display: flex;
     justify-content: center;
     gap: 6px;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
     background: rgba(0,0,0,0.2);
-    padding: 8px;
+    padding: 6px;
     border-radius: 12px;
 }
 .vault-slot {
-    font-size: 20px;
-    width: 32px;
-    height: 32px;
+    font-size: 18px;
+    width: 30px;
+    height: 30px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -146,73 +160,83 @@ button.action-btn:active {
     border-radius: 50%;
     filter: grayscale(100%);
     opacity: 0.3;
-    transition: all 0.3s ease;
+    transition: transform 0.25s ease, filter 0.25s ease, opacity 0.25s ease;
 }
 .vault-slot.active {
     filter: grayscale(0%);
     opacity: 1;
     border-style: solid;
     border-color: #ffd54f;
-    transform: scale(1.1);
+    transform: scale(1.08);
     background: rgba(255, 213, 79, 0.1);
 }
 
 /* SCENARIO TEXT ARENA BOARD */
 .scenario-box {
-    flex: 1;
-    background: rgba(15, 23, 42, 0.8);
+    width: 100%;
+    flex: 0 1 auto;
+    margin-bottom: 10px;
+    background: rgba(15, 23, 42, 0.85);
     border: 2px solid #38bdf8;
-    box-shadow: 0 0 20px rgba(56, 189, 248, 0.15);
-    padding: 20px;
-    border-radius: 16px;
+    box-shadow: 0 0 16px rgba(56, 189, 248, 0.15);
+    padding: 14px 12px;
+    border-radius: 14px;
     display: flex;
-    flex-direction: column;
+    align-items: center;
     justify-content: center;
-    margin-bottom: 15px;
-    min-height: 160px;
+    min-height: 110px;
+    max-height: 220px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
 }
 #question {
-    font-size: 18px;
-    font-weight: bold;
-    line-height: 1.5;
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.45;
     color: #f1f5f9;
     text-align: center;
+    width: 100%;
 }
 
 /* DYNAMIC ADVERB CRYSTAL CARDS GRID */
 #options {
+    width: 100%;
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-    margin-bottom: 5px;
+    gap: 8px;
+    margin-top: auto;
 }
 .option {
     background: linear-gradient(135deg, #1e293b, #0f172a);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.15);
     color: #f8fafc;
-    padding: 16px 12px;
-    border-radius: 12px;
+    padding: 10px 8px;
+    border-radius: 10px;
     cursor: pointer;
-    font-size: 15px;
+    font-size: 13px;
     font-weight: 600;
     text-align: center;
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: 55px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-    transition: all 0.2s ease;
+    min-height: 48px;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.25);
+    transition: transform 0.12s ease, background 0.12s ease;
+    touch-action: manipulation;
+    word-break: break-word;
 }
 .option:active {
     transform: scale(0.96);
+    background: linear-gradient(135deg, #334155, #1e293b);
 }
 
 /* FEEDBACK OVERLAY UTILITY */
 #feedbackOverlay {
     position: fixed;
     inset: 0;
-    background: rgba(11, 19, 43, 0.9);
-    backdrop-filter: blur(8px);
+    background: rgba(11, 19, 43, 0.92);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
     display: none;
     align-items: center;
     justify-content: center;
@@ -222,14 +246,15 @@ button.action-btn:active {
     text-align: center;
 }
 #feedbackText {
-    font-size: 28px;
+    font-size: 22px;
     font-weight: bold;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
 }
 #feedbackSub {
-    font-size: 16px;
+    font-size: 14px;
     color: #cbd5e1;
-    max-width: 500px;
+    max-width: 450px;
+    line-height: 1.4;
 }
 
 /* ==========================================================================
@@ -239,30 +264,30 @@ button.action-btn:active {
     background: linear-gradient(to bottom, #0f172a, #111827);
 }
 .flash {
-    font-size: 28px;
+    font-size: 24px;
     font-weight: bold;
     color: #ffd54f;
-    text-shadow: 0 0 15px rgba(255,213,79,0.5);
-    margin-bottom: 20px;
+    text-shadow: 0 0 12px rgba(255,213,79,0.5);
+    margin-bottom: 16px;
     animation: pulse 1.5s infinite;
 }
 @keyframes pulse {
     0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.05); }
+    50% { transform: scale(1.04); }
 }
 .stats-card {
     background: rgba(255,255,255,0.05);
     border: 1px solid rgba(255,255,255,0.1);
-    padding: 20px;
-    border-radius: 16px;
+    padding: 16px;
+    border-radius: 14px;
     width: 100%;
-    max-width: 400px;
-    margin-bottom: 25px;
+    max-width: 380px;
+    margin-bottom: 20px;
 }
 .stats-line {
     display: flex;
     justify-content: space-between;
-    font-size: 16px;
+    font-size: 14px;
     margin: 8px 0;
     border-bottom: 1px dashed rgba(255,255,255,0.1);
     padding-bottom: 6px;
@@ -274,22 +299,34 @@ button.action-btn:active {
     width: 8px;
     height: 8px;
     top: -10px;
+    will-change: transform, opacity;
     animation: fall 2.5s linear forwards;
     z-index: 8000;
+    pointer-events: none;
 }
 @keyframes fall {
-    to { transform: translateY(105vh) rotate(360deg); opacity: 0; }
+    to { transform: translate3d(0, 105vh, 0) rotate(360deg); opacity: 0; }
 }
 
-/* MINOR PLATFORM BREAKPOINTS SETUP */
-@media (min-width: 601px) {
-    #options { gap: 16px; }
-    .option { font-size: 17px; min-height: 65px; }
-    #question { font-size: 22px; }
-    .scenario-box { max-width: 600px; width: 100%; margin-left: auto; margin-right: auto; }
-    #options { max-width: 600px; width: 100%; margin-left: auto; margin-right: auto; }
-    #crystalVault { max-width: 600px; width: 100%; margin-left: auto; margin-right: auto; }
-    .hud-panel { max-width: 600px; width: 100%; margin-left: auto; margin-right: auto; }
+/* RESPONSIVE SCALING BREAKPOINTS */
+@media (min-width: 600px) {
+    h1 { font-size: 30px; }
+    p { font-size: 16px; }
+    .hud-item { font-size: 14px; padding: 6px 12px; }
+    .vault-slot { font-size: 20px; width: 34px; height: 34px; }
+    .scenario-box { min-height: 130px; padding: 16px; }
+    #question { font-size: 18px; }
+    #options { gap: 12px; }
+    .option { font-size: 15px; min-height: 54px; padding: 12px 10px; }
+    #feedbackText { font-size: 26px; }
+    #feedbackSub { font-size: 16px; }
+}
+
+@media (min-width: 1024px) {
+    #game { max-width: 680px; }
+    .scenario-box { min-height: 150px; }
+    #question { font-size: 20px; }
+    .option { font-size: 16px; min-height: 60px; }
 }
 </style>
 </head>
@@ -297,7 +334,7 @@ button.action-btn:active {
 <body>
 
 <div id="splash">
-      <img src="assets/innovine-logo.png" alt="Innovine Logo">
+    <img src="assets/innovine-logo.png" alt="Innovine Logo" onerror="this.style.display='none'">
 </div>
 
 <div id="titleScreen" class="scene-container">
@@ -359,7 +396,7 @@ button.action-btn:active {
 /* FULL UNMODIFIED SYSTEM DATABASE MATRIX */
 let questions = [
 {
-q:`1.A sleeping lion blocks your path. How do you walk past it?`,
+q:`1. A sleeping lion blocks your path. How do you walk past it?`,
 options:[`quietly`,`tomorrow`,`here`,`always`],
 answer:`quietly`
 },
@@ -379,27 +416,27 @@ options:[`Where did the wizard vanish?`,`Why did the wizard vanish?`,`When did t
 answer:`Where did the wizard vanish?`
 },
 {
-q:`5.The cave is ______ dark that everyone lights a torch.`,
+q:`5. The cave is ______ dark that everyone lights a torch.`,
 options:[`very`,`yesterday`,`there`,`often`],
 answer:`very`
 },
 {
-q:`6. Heavy rain begins.Why do the explorers rush into a cave?`,
+q:`6. Heavy rain begins. Why do the explorers rush into a cave?`,
 options:[`because they want to stay dry`,`carefully`,`tomorrow`,`here`],
 answer:`because they want to stay dry`
 },
 {
-q:`7. Your treasure map says the key is hidden beside you.Which word tells the place?`,
+q:`7. Your treasure map says the key is hidden beside you. Which word tells the place?`,
 options:[`here`,`loudly`,`yesterday`,`always`],
 answer:`here`
 },
 {
-q:`8.You must hit the glowing target with one shot.How do you shoot the arrow?`,
+q:`8. You must hit the glowing target with one shot. How do you shoot the arrow?`,
 options:[`accurately`,`tomorrow`,`there`,`often`],
 answer:`accurately`
 },
 {
-q:`9. The dragon visits the village only a few times each year.Which adverb fits best?`,
+q:`9. The dragon visits the village only a few times each year. Which adverb fits best?`,
 options:[`rarely`,`quickly`,`here`,`yesterday`],
 answer:`rarely`
 },
@@ -409,27 +446,27 @@ options:[`quite`,`tomorrow`,`everywhere`,`carefully`],
 answer:`quite`
 },
 {
-q:`11. The bridge catches fire.Why do the villagers take another road?`,
+q:`11. The bridge catches fire. Why do the villagers take another road?`,
 options:[`because the bridge is unsafe`,`loudly`,`yesterday`,`there`],
 answer:`because the bridge is unsafe`
 },
 {
-q:`12.The magical bird flew in every direction.Which adverb tells where?`,
+q:`12. The magical bird flew in every direction. Which adverb tells where?`,
 options:[`everywhere`,`quietly`,`tomorrow`,`always`],
 answer:`everywhere`
 },
 {
-q:`13. The wizard says the secret door will open the next day.Which adverb tells when?`,
+q:`13. The wizard says the secret door will open the next day. Which adverb tells when?`,
 options:[`tomorrow`,`carefully`,`here`,`very`],
 answer:`tomorrow`
 },
 {
-q:`14. The dragon escaped.Which question asks why it escaped?`,
+q:`14. The dragon escaped. Which question asks why it escaped?`,
 options:[`Why did the dragon escape?`,`Where did the dragon escape?`,`When did the dragon escape?`,`How did the dragon escape?`],
 answer:`Why did the dragon escape?`
 },
 {
-q:`15.You have reached the final treasure.Choose the sentence with the adverb used correctly.`,
+q:`15. You have reached the final treasure. Choose the sentence with the adverb used correctly.`,
 options:[`The knight carefully crossed the shaky bridge.`,`The knight crossed tomorrow.`,`The knight crossed sword.`,`The knight crossed castle.`],
 answer:`The knight carefully crossed the shaky bridge.`
 }
@@ -448,14 +485,15 @@ return a;
 
 /* INTRO SPLASH PIPELINE FLOW CONTROL */
 setTimeout(()=>{
-    document.getElementById("splash").style.display="none";
+    const splash = document.getElementById("splash");
+    if (splash) splash.style.display="none";
     document.getElementById("titleScreen").style.display="flex";
 
     setTimeout(()=>{
         document.getElementById("titleScreen").style.display="none";
         document.getElementById("instructionScreen").style.display="flex";
-    }, 3000);
-}, 5000);
+    }, 2200);
+}, 1500);
 
 /* START ENGINE TRIGGER */
 function startGame(){
@@ -514,7 +552,6 @@ function check(ans){
         feedbackText.style.color = "#a7f3d0";
         feedbackSub.innerText = `"${ans}" perfectly answered the challenge context.`;
         
-        // Track up to 7 distinct visually illuminated milestones dynamically
         updateCrystalVault();
         confetti();
     } else {
@@ -528,15 +565,13 @@ function check(ans){
     setTimeout(() => {
         feedbackOverlay.style.display = "none";
         next();
-    }, 2000);
+    }, 1800);
 }
 
 function updateCrystalVault() {
     let slots = document.querySelectorAll(".vault-slot");
-    // Dynamic progressive calculation ensuring flawless crystal distribution up to exactly 7 items
     let unlockedSlotsCount = Math.min(7, Math.floor((score / 15) * 7));
     
-    // Edge safety configuration block
     if(score > 0 && unlockedSlotsCount === 0) unlockedSlotsCount = 1;
     
     for(let i=0; i<7; i++) {
@@ -564,7 +599,7 @@ function startTimer(){
         document.getElementById("timer").innerText=timer;
 
         if(timer<=0) {
-            wrong++; // Count timeout as a wrong turn
+            wrong++;
             next();
         }
     },1000);
@@ -572,14 +607,14 @@ function startTimer(){
 
 /* PARTICLE SYSTEM MATRIX EFFECTS */
 function confetti(){
-    for(let i=0;i<25;i++){
+    for(let i=0;i<18;i++){ // Reduced particle count for smooth rendering on low-spec smartphones
         let c=document.createElement("div");
         c.className="confetti";
-        c.style.left=Math.random()*100+"vw";
+        c.style.left=Math.random()*95+"vw";
         c.style.background=["#ffd54f","#38bdf8","#a7f3d0","#ec4899"][i%4];
-        c.style.animationDuration = (1.5 + Math.random() * 1.5) + "s";
+        c.style.animationDuration = (1.5 + Math.random() * 1.2) + "s";
         document.body.appendChild(c);
-        setTimeout(()=>c.remove(),3000);
+        setTimeout(()=>c.remove(),2500);
     }
 }
 
@@ -608,7 +643,10 @@ function safePlay(id) {
     const sound = document.getElementById(id);
     if (sound) {
         sound.currentTime = 0;
-        sound.play().catch(e => console.log("Audio play blocked until user interaction"));
+        const promise = sound.play();
+        if (promise !== undefined) {
+            promise.catch(() => {});
+        }
     }
 }
 
