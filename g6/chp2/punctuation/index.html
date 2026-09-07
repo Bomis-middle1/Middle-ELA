@@ -15,7 +15,7 @@
 body {
   font-family: Arial, sans-serif;
   background: linear-gradient(135deg,#ffecd2,#fcb69f,#a1c4fd,#c2e9fb);
-  height: 100vh;
+  height: 100dvh; /* Dynamic viewport height prevents browser bar cutoffs */
   width: 100vw;
   overflow: hidden;
   user-select: none;
@@ -36,7 +36,7 @@ body {
   padding: 16px;
 }
 
-#topicScreen { display: none; font-size: 24px; font-weight: bold; }
+#topicScreen { display: none; font-size: 22px; font-weight: bold; }
 #startScreen { display: none; }
 #endScreen { display: none; }
 
@@ -44,21 +44,21 @@ body {
   background: #f0f7ff;
   border: 2px dashed #1976d2;
   border-radius: 12px;
-  padding: 16px;
+  padding: 14px;
   width: 100%;
-  max-width: 420px;
-  margin: 12px 0 20px 0;
+  max-width: 400px;
+  margin: 10px 0 16px 0;
   box-shadow: 0 4px 10px rgba(0,0,0,0.08);
 }
 
 .instruction-card h3 {
   margin-bottom: 6px;
   color: #1976d2;
-  font-size: 18px;
+  font-size: 16px;
 }
 
 .instruction-card p {
-  font-size: 14px;
+  font-size: 13px;
   line-height: 1.4;
   color: #333;
 }
@@ -66,9 +66,9 @@ body {
 /* GAME CONTAINER */
 #game {
   display: none;
-  height: 100vh;
+  height: 100dvh;
   width: 100vw;
-  padding: 10px;
+  padding: 8px;
   flex-direction: column;
 }
 
@@ -76,44 +76,44 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 8px 14px;
+  padding: 6px 12px;
   background: rgba(255,255,255,0.85);
-  border-radius: 10px;
+  border-radius: 8px;
   font-weight: bold;
-  font-size: 15px;
-  height: 42px;
+  font-size: 14px;
+  height: 36px;
+  flex-shrink: 0;
 }
 
 .container {
   display: flex;
-  gap: 10px;
+  gap: 8px;
   flex: 1;
-  margin-top: 8px;
-  height: calc(100vh - 68px);
+  margin-top: 6px;
+  min-height: 0; /* Prevents flex children overflow */
 }
 
 /* LEFT SIDE: QUESTION CARD */
 .left {
   flex: 1;
   background: rgba(255,255,255,0.7);
-  border-radius: 12px;
-  padding: 10px;
+  border-radius: 10px;
+  padding: 8px;
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
 }
 
 .sentence {
   background: #ffd166;
-  padding: 14px;
-  border-radius: 10px;
+  padding: 12px 10px;
+  border-radius: 8px;
   cursor: grab;
   font-weight: bold;
-  font-size: 15px;
+  font-size: 14px;
   text-align: center;
   width: 100%;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  box-shadow: 0 3px 5px rgba(0,0,0,0.1);
   transition: transform 0.2s, background 0.2s;
 }
 
@@ -128,20 +128,20 @@ body {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
   justify-content: space-between;
 }
 
 .bucket {
   background: rgba(255,255,255,0.85);
   border: 2px dashed #1976d2;
-  border-radius: 10px;
-  padding: 8px 12px;
+  border-radius: 8px;
+  padding: 6px 10px;
   flex: 1;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: 15px;
+  font-size: 13px;
   font-weight: bold;
   color: #1976d2;
   cursor: pointer;
@@ -149,7 +149,7 @@ body {
 }
 
 .bucket span:last-child {
-  font-size: 20px;
+  font-size: 18px;
 }
 
 .bucket-hover {
@@ -158,12 +158,12 @@ body {
 }
 
 button {
-  padding: 12px 24px;
+  padding: 10px 20px;
   border: none;
-  border-radius: 10px;
+  border-radius: 8px;
   background: #1976d2;
   color: white;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: bold;
   cursor: pointer;
 }
@@ -183,23 +183,34 @@ button:hover {
 }
 
 @keyframes fall {
-  to { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+  to { transform: translateY(100dvh) rotate(360deg); opacity: 0; }
 }
 
+/* MOBILE SCREEN RESPONSIVE LAYOUT */
 @media (max-width: 600px) {
   .container {
     flex-direction: column;
   }
   .left {
-    height: 30%;
-    min-height: 90px;
+    flex: none;
+    height: 28%;
+    min-height: 70px;
   }
   .right {
-    height: 68%;
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Arrange in 2x2 grid to guarantee fit */
+    grid-template-rows: 1fr 1fr;
+    gap: 6px;
   }
   .bucket {
-    font-size: 14px;
-    padding: 6px 10px;
+    flex: none;
+    height: 100%;
+    padding: 6px 8px;
+    font-size: 12px;
+  }
+  .bucket span:last-child {
+    font-size: 16px;
   }
 }
 </style>
@@ -209,7 +220,7 @@ button:hover {
 
 <!-- SPLASH (SHOWS FOR 5 SECONDS) -->
 <div id="splash">
-  <img src="assets/innovine-logo.png" width="180" alt="Innovine Logo" onerror="this.style.display='none'">
+  <img src="assets/innovine-logo.png" width="160" alt="Innovine Logo" onerror="this.style.display='none'">
 </div>
 
 <!-- TOPIC -->
@@ -219,7 +230,7 @@ button:hover {
 
 <!-- START & INSTRUCTIONS SCREEN -->
 <div id="startScreen">
-  <h2 style="font-size: 20px;">Welcome Students!</h2>
+  <h2 style="font-size: 18px;">Welcome Students!</h2>
   
   <div class="instruction-card">
     <h3>📌 How to Play</h3>
@@ -233,8 +244,8 @@ button:hover {
 <div id="game">
   <div class="header">
     <div id="progress">Progress: 0 / 15</div>
-    <div style="font-size: 13px;">
-      🔊 Volume <input type="range" id="vol" min="0" max="1" step="0.1" value="1" style="vertical-align: middle; width: 60px;">
+    <div style="font-size: 12px;">
+      🔊 Volume <input type="range" id="vol" min="0" max="1" step="0.1" value="1" style="vertical-align: middle; width: 50px;">
     </div>
   </div>
 
@@ -253,8 +264,8 @@ button:hover {
 <!-- END SCREEN -->
 <div id="endScreen">
   <h1>🏆 Trophy Unlocked!</h1>
-  <h2 id="scoreText" style="margin: 10px 0;"></h2>
-  <p id="remark" style="margin-bottom: 20px;"></p>
+  <h2 id="scoreText" style="margin: 8px 0;"></h2>
+  <p id="remark" style="margin-bottom: 16px;"></p>
   <button onclick="location.reload()">RESTART</button>
 </div>
 
@@ -312,7 +323,7 @@ function shuffleArray(array) {
 function startGame() {
   document.getElementById("startScreen").style.display = "none";
   document.getElementById("game").style.display = "flex";
-  shuffleArray(data); // Randomizes question order
+  shuffleArray(data);
   renderQuestion();
 }
 
