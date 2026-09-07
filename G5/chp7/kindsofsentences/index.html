@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kinds of Sentences Quiz</title>
+<title>Kinds of Sentences: Feed the Monsters</title>
 <style>
 * { box-sizing: border-box; margin:0; padding:0; }
 body {
@@ -48,11 +48,11 @@ body::before {
 @keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
 @keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.05); } }
 
-h1 { 
-  margin: 20px; 
-  color: #2b4eff; 
-  text-align: center; 
-  font-size: 30px; 
+h1 {
+  margin: 20px;
+  color: #2b4eff;
+  text-align: center;
+  font-size: 30px;
   font-weight: bold;
   text-shadow: 2px 2px 4px rgba(43, 78, 255, 0.2);
 }
@@ -69,16 +69,16 @@ h1 {
   box-shadow: 0 8px 30px rgba(43, 78, 255, 0.15);
   border: 2px solid rgba(43, 78, 255, 0.1);
 }
-#instructions-screen h2 { 
-  color: #2b4eff; 
-  margin-bottom: 12px; 
-  font-size: 26px; 
+#instructions-screen h2 {
+  color: #2b4eff;
+  margin-bottom: 12px;
+  font-size: 26px;
   font-weight: bold;
 }
-#instructions-screen p { 
-  font-size: 16px; 
-  color: #333; 
-  margin: 8px 0; 
+#instructions-screen p {
+  font-size: 16px;
+  color: #333;
+  margin: 8px 0;
   line-height: 1.5;
 }
 #instructions-screen .tip {
@@ -100,14 +100,14 @@ h1 {
   box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
   transition: 0.3s;
 }
-#start-btn:hover { 
+#start-btn:hover {
   background: linear-gradient(135deg, #45a049, #3d8b40);
   transform: translateY(-3px);
   box-shadow: 0 6px 20px rgba(76, 175, 80, 0.5);
 }
 
 /* Game Area */
-#game-area { 
+#game-area {
   width: 90%; max-width: 900px;
   background: rgba(255, 255, 255, 0.85);
   border-radius: 20px;
@@ -118,109 +118,162 @@ h1 {
   border: 2px solid rgba(43, 78, 255, 0.1);
 }
 
-/* Question + mascot */
-#question-container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 25px;
-  flex-wrap: wrap;
-}
-#question { 
-  font-size: 22px; 
-  font-weight: bold; 
-  flex: 1; 
+/* Sentence card (the "food" being fed to a monster) */
+#sentence-card {
+  font-size: 22px;
+  font-weight: bold;
   color: #2b4eff;
   line-height: 1.4;
-  padding: 15px;
+  padding: 18px;
   background: rgba(43, 78, 255, 0.05);
-  border-radius: 12px;
+  border-radius: 14px;
+  text-align: center;
+  margin-bottom: 20px;
+  transition: transform 0.25s ease, background 0.25s ease;
 }
 
-/* CSS mascot */
-#mascot {
-  width: 90px; height: 90px;
-  background: radial-gradient(circle, #ffcc66, #ff6699);
+/* Correct/Wrong flashes on the sentence card */
+.correct-answer {
+  background: linear-gradient(135deg, #66ff99, #33cc66) !important;
+  color: white !important;
+  animation: correctPulse 0.5s;
+}
+.wrong-answer {
+  background: linear-gradient(135deg, #ff6666, #ff3333) !important;
+  color: white !important;
+  animation: wrongShake 0.5s;
+}
+@keyframes correctPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+}
+@keyframes wrongShake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-6px); }
+  75% { transform: translateX(6px); }
+}
+
+/* Monsters row */
+#monsters {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 18px;
+  flex-wrap: wrap;
+  margin: 10px 0 20px;
+}
+.monster-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 130px;
+}
+.monster {
+  width: 92px;
+  height: 92px;
   border-radius: 50%;
   display: flex;
   justify-content: center;
   align-items: center;
-  animation: bounce 1s infinite alternate, wiggle 2s infinite alternate;
-  font-size: 32px;
-  font-weight: bold;
-  color: white;
-  margin-left: 15px;
   position: relative;
-  box-shadow: 0 4px 15px rgba(255, 102, 153, 0.4);
-}
-#mascot::after {
-  content: "👀";
-  position: absolute;
-  top: 12px;
-  left: 18px;
-  font-size: 22px;
-}
-
-/* Mascot Animations */
-@keyframes bounce {
-  0% { transform: translateY(0); }
-  100% { transform: translateY(-15px); }
-}
-@keyframes wiggle {
-  0% { transform: translateY(-15px) rotate(-10deg); }
-  50% { transform: translateY(-10px) rotate(10deg); }
-  100% { transform: translateY(-15px) rotate(-10deg); }
-}
-
-/* Answer buttons */
-.answer-btn {
-  width: 100%;
-  max-width: 400px;
-  padding: 14px;
-  margin: 10px 0;
-  font-size: 17px;
-  background: linear-gradient(135deg, #ff9966, #ffcc66);
-  color: white;
-  border: none;
-  border-radius: 14px;
   cursor: pointer;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+  transition: transform 0.15s ease;
+}
+.monster:hover { transform: translateY(-4px) scale(1.05); }
+.monster:active { transform: scale(0.95); }
+.monster-eyes { font-size: 22px; position: absolute; top: 18px; }
+.monster-mouth {
+  position: absolute;
+  bottom: 16px;
+  width: 34px;
+  height: 12px;
+  background: rgba(0,0,0,0.55);
+  border-radius: 0 0 16px 16px;
+  transition: height 0.15s ease, transform 0.15s ease;
+}
+.monster-badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: white;
+  border-radius: 50%;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 15px;
   font-weight: bold;
-  transition: all 0.3s;
-  box-shadow: 0 3px 10px rgba(255, 153, 102, 0.3);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.25);
 }
-.answer-btn:hover { 
-  transform: scale(1.05); 
-  background: linear-gradient(135deg, #ffcc66, #ff9966);
-  box-shadow: 0 5px 15px rgba(255, 153, 102, 0.4);
+.monster-label {
+  margin-top: 8px;
+  font-weight: bold;
+  font-size: 14px;
+  text-align: center;
+  color: #333;
 }
-.answer-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  transform: none;
+.monster-label span {
+  display: block;
+  font-weight: normal;
+  font-size: 11px;
+  color: #777;
 }
+
+#monster-Declarative { background: radial-gradient(circle, #7fb2ff, #3366ff); }
+#monster-Interrogative { background: radial-gradient(circle, #c99bff, #7a33ff); }
+#monster-Imperative { background: radial-gradient(circle, #ffb266, #ff6600); }
+#monster-Exclamatory { background: radial-gradient(circle, #ff8fb3, #ff3366); }
+
+/* chomp = correct feed, mouth pops open then shuts, whole monster bounces */
+.chomp { animation: chompBounce 0.6s ease; }
+.chomp .monster-mouth { animation: chompMouth 0.6s ease; }
+@keyframes chompBounce {
+  0% { transform: scale(1); }
+  30% { transform: scale(1.25) rotate(-4deg); }
+  60% { transform: scale(0.95) rotate(3deg); }
+  100% { transform: scale(1); }
+}
+@keyframes chompMouth {
+  0% { height: 12px; }
+  40% { height: 34px; }
+  100% { height: 12px; }
+}
+
+/* spit = wrong feed, monster shakes head no */
+.spit { animation: spitShake 0.5s ease; }
+@keyframes spitShake {
+  0%, 100% { transform: translateX(0) rotate(0deg); }
+  20% { transform: translateX(-8px) rotate(-8deg); }
+  40% { transform: translateX(8px) rotate(8deg); }
+  60% { transform: translateX(-6px) rotate(-6deg); }
+  80% { transform: translateX(6px) rotate(6deg); }
+}
+.monster.locked { cursor: not-allowed; opacity: 0.85; }
 
 /* Result & Score */
-#result { 
-  margin-top: 20px; 
-  font-size: 20px; 
-  min-height: 28px; 
-  color: #2b4eff; 
+#result {
+  margin-top: 8px;
+  font-size: 20px;
+  min-height: 28px;
+  color: #2b4eff;
   font-weight: bold;
   text-align: center;
   padding: 10px;
   background: rgba(255, 255, 255, 0.6);
   border-radius: 10px;
 }
-
-#score { 
-  margin-top: 15px; 
-  font-size: 18px; 
+#score {
+  margin-top: 15px;
+  font-size: 18px;
   color: #333;
   font-weight: bold;
   background: rgba(255, 255, 255, 0.8);
   padding: 8px 20px;
   border-radius: 10px;
   box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+  text-align: center;
 }
 
 /* Progress Bar */
@@ -252,6 +305,7 @@ h1 {
   background: rgba(231, 111, 81, 0.1);
   border-radius: 8px;
   display: none;
+  text-align: center;
 }
 
 /* Confetti */
@@ -265,26 +319,6 @@ h1 {
 @keyframes fall {
   0% { transform: translateY(-10px) rotate(0deg); opacity: 1; }
   100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
-}
-
-/* Correct/Wrong Animations */
-.correct-answer {
-  background: linear-gradient(135deg, #66ff99, #33cc66);
-  animation: correctPulse 0.5s;
-}
-.wrong-answer {
-  background: linear-gradient(135deg, #ff6666, #ff3333);
-  animation: wrongShake 0.5s;
-}
-
-@keyframes correctPulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.08); }
-}
-@keyframes wrongShake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-5px); }
-  75% { transform: translateX(5px); }
 }
 
 /* Final Screen */
@@ -324,6 +358,13 @@ h1 {
   background: linear-gradient(135deg, #ee5a5a, #dd4a4a);
   transform: translateY(-3px);
 }
+
+@media (max-width: 500px) {
+  .monster { width: 76px; height: 76px; }
+  .monster-mouth { width: 26px; }
+  .monster-wrap { width: 100px; }
+  #sentence-card { font-size: 18px; }
+}
 </style>
 </head>
 <body>
@@ -338,22 +379,54 @@ h1 {
 <!-- Instructions -->
 <div id="instructions-screen">
   <h2>✨ How to Play</h2>
-  <p>Read each sentence and identify its type:</p>
+  <p>Read each sentence and feed it to the monster who "eats" that type:</p>
   <p><strong>Declarative</strong> (statement) • <strong>Interrogative</strong> (question) • <strong>Imperative</strong> (command) • <strong>Exclamatory</strong> (excitement)</p>
   <div class="tip">🔄 You have 2 attempts per question!</div>
-  <div class="tip">✅ Correct: 🎉 Sound + Confetti</div>
-  <div class="tip">❌ Wrong: Show correct answer + Move to next</div>
+  <div class="tip">✅ Correct: Monster chomps it + Sound + Confetti</div>
+  <div class="tip">❌ Wrong: Monster spits it out + Move to next after 2 tries</div>
   <button id="start-btn">🚀 Start Quiz</button>
 </div>
 
 <!-- Game Area -->
 <div id="game-area">
-  <div id="question-container">
-    <div id="question"></div>
-    <div id="mascot">🎯</div>
-  </div>
+  <div id="sentence-card"></div>
   <div id="attempts">Attempts left: 2</div>
-  <div id="answers"></div>
+
+  <div id="monsters">
+    <div class="monster-wrap">
+      <div class="monster" id="monster-Declarative">
+        <div class="monster-badge">.</div>
+        <div class="monster-eyes">👀</div>
+        <div class="monster-mouth"></div>
+      </div>
+      <div class="monster-label">Declarative<span>Statement</span></div>
+    </div>
+    <div class="monster-wrap">
+      <div class="monster" id="monster-Interrogative">
+        <div class="monster-badge">?</div>
+        <div class="monster-eyes">👀</div>
+        <div class="monster-mouth"></div>
+      </div>
+      <div class="monster-label">Interrogative<span>Question</span></div>
+    </div>
+    <div class="monster-wrap">
+      <div class="monster" id="monster-Imperative">
+        <div class="monster-badge">👉</div>
+        <div class="monster-eyes">👀</div>
+        <div class="monster-mouth"></div>
+      </div>
+      <div class="monster-label">Imperative<span>Command</span></div>
+    </div>
+    <div class="monster-wrap">
+      <div class="monster" id="monster-Exclamatory">
+        <div class="monster-badge">!</div>
+        <div class="monster-eyes">👀</div>
+        <div class="monster-mouth"></div>
+      </div>
+      <div class="monster-label">Exclamatory<span>Excitement</span></div>
+    </div>
+  </div>
+
   <div id="result"></div>
   <div id="score">Score: 0 / 15</div>
   <div id="progress-bar"><div id="progress-fill"></div></div>
@@ -394,13 +467,13 @@ let current = 0;
 let score = 0;
 let attempts = 2;
 let selectedQuestion = null;
+let locked = false;
 
 const startBtn = document.getElementById('start-btn');
 const instructionsScreen = document.getElementById('instructions-screen');
 const gameArea = document.getElementById('game-area');
 const finalScreen = document.getElementById('final-screen');
-const questionEl = document.getElementById('question');
-const answersEl = document.getElementById('answers');
+const sentenceCard = document.getElementById('sentence-card');
 const resultEl = document.getElementById('result');
 const scoreEl = document.getElementById('score');
 const attemptsEl = document.getElementById('attempts');
@@ -408,6 +481,28 @@ const progressFill = document.getElementById('progress-fill');
 const finalScoreEl = document.getElementById('final-score');
 const finalMessageEl = document.getElementById('final-message');
 const restartBtn = document.getElementById('restart-btn');
+const correctSound = document.getElementById('correct-sound');
+const wrongSound = document.getElementById('wrong-sound');
+const clapSound = document.getElementById('clap-sound');
+
+const monsterTypes = ['Declarative', 'Interrogative', 'Imperative', 'Exclamatory'];
+const monsters = {};
+monsterTypes.forEach(type => {
+  const el = document.getElementById('monster-' + type);
+  monsters[type] = el;
+  el.addEventListener('click', () => feedMonster(type, el));
+});
+
+// Guards against a missing/blocked audio file ever freezing the game.
+function safePlay(audioEl) {
+  try {
+    audioEl.currentTime = 0;
+    const p = audioEl.play();
+    if (p && typeof p.catch === "function") {
+      p.catch(() => {});
+    }
+  } catch (e) {}
+}
 
 function shuffle(array) {
   for(let i=array.length-1;i>0;i--){
@@ -417,82 +512,81 @@ function shuffle(array) {
   return array;
 }
 
-function loadQuestion() {
-  resultEl.innerText = '';
-  answersEl.innerHTML = '';
-  attemptsEl.style.display = 'none';
-  
-  if(current >= questions.length) {
-    showFinalScreen();
-    return;
-  }
-  
-  selectedQuestion = questions[current];
-  questionEl.innerText = selectedQuestion.sentence;
-  attempts = 2;
-  attemptsEl.innerText = 'Attempts left: ' + attempts;
-  attemptsEl.style.display = 'block';
-  
-  const options = shuffle(["Declarative","Interrogative","Imperative","Exclamatory"]);
-  options.forEach(opt => {
-    const btn = document.createElement('button');
-    btn.innerText = opt;
-    btn.className = "answer-btn";
-    btn.onclick = () => checkAnswer(btn, opt);
-    answersEl.appendChild(btn);
-  });
-  
-  // Update progress bar
-  progressFill.style.width = ((current) / questions.length * 100) + '%';
-}
-
-function checkAnswer(btn, selected) {
-  if(selected === selectedQuestion.type) {
-    // Correct!
-    btn.classList.add('correct-answer');
-    resultEl.innerText = '🎉 Correct! Amazing!';
-    resultEl.style.color = '#4caf50';
-    
-    document.getElementById('correct-sound').play();
-    document.getElementById('clap-sound').play();
-    createConfetti();
-    
-    score++;
-    scoreEl.innerText = 'Score: ' + score + ' / ' + questions.length;
-    
-    current++;
-    setTimeout(loadQuestion, 1200);
-  } else {
-    // Wrong!
-    btn.classList.add('wrong-answer');
-    btn.disabled = true;
-    
-    attempts--;
-    attemptsEl.innerText = 'Attempts left: ' + attempts;
-    
-    if(attempts === 0) {
-      // No more attempts - show correct answer
-      resultEl.innerText = '❌ Wrong! Correct answer is: ' + selectedQuestion.type;
-      resultEl.style.color = '#e76f51';
-      document.getElementById('wrong-sound').play();
-      
-      current++;
-      setTimeout(loadQuestion, 1500);
-    } else {
-      // One attempt left - give hint
-      resultEl.innerText = '❌ Try again! Hint: ' + getHint(selectedQuestion.type);
-      resultEl.style.color = '#e76f51';
-      document.getElementById('wrong-sound').play();
-    }
-  }
-}
-
 function getHint(type) {
   if(type === 'Declarative') return 'It makes a statement or tells something';
   if(type === 'Interrogative') return 'It asks a question (has ?)';
   if(type === 'Imperative') return 'It gives a command or request';
   if(type === 'Exclamatory') return 'It shows strong emotion (has !)';
   return '';
+}
+
+function loadQuestion() {
+  resultEl.innerText = '';
+  sentenceCard.className = '';
+  attemptsEl.style.display = 'none';
+  locked = false;
+
+  if(current >= questions.length) {
+    showFinalScreen();
+    return;
+  }
+
+  selectedQuestion = questions[current];
+  sentenceCard.innerText = selectedQuestion.sentence;
+  attempts = 2;
+  attemptsEl.innerText = 'Attempts left: ' + attempts;
+  attemptsEl.style.display = 'block';
+
+  progressFill.style.width = ((current) / questions.length * 100) + '%';
+}
+
+function feedMonster(selectedType, monsterEl) {
+  if (locked || !selectedQuestion) return;
+
+  if(selectedType === selectedQuestion.type) {
+    locked = true;
+    sentenceCard.classList.add('correct-answer');
+    monsterEl.classList.add('chomp');
+    resultEl.innerText = '🎉 Correct! Amazing!';
+    resultEl.style.color = '#4caf50';
+
+    safePlay(correctSound);
+    safePlay(clapSound);
+    createConfetti();
+
+    score++;
+    scoreEl.innerText = 'Score: ' + score + ' / ' + questions.length;
+
+    current++;
+    setTimeout(() => {
+      monsterEl.classList.remove('chomp');
+      loadQuestion();
+    }, 1200);
+  } else {
+    monsterEl.classList.add('spit');
+    sentenceCard.classList.add('wrong-answer');
+    setTimeout(() => {
+      monsterEl.classList.remove('spit');
+      sentenceCard.classList.remove('wrong-answer');
+    }, 500);
+
+    attempts--;
+    attemptsEl.innerText = 'Attempts left: ' + attempts;
+
+    if(attempts === 0) {
+      locked = true;
+      resultEl.innerText = '❌ Wrong! Correct answer is: ' + selectedQuestion.type;
+      resultEl.style.color = '#e76f51';
+      safePlay(wrongSound);
+
+      current++;
+      setTimeout(loadQuestion, 1500);
+    } else {
+      resultEl.innerText = '❌ Try again! Hint: ' + getHint(selectedQuestion.type);
+      resultEl.style.color = '#e76f51';
+      safePlay(wrongSound);
+    }
+  }
 }
 
 function createConfetti() {
@@ -512,9 +606,9 @@ function showFinalScreen() {
   gameArea.style.display = 'none';
   finalScreen.style.display = 'block';
   progressFill.style.width = '100%';
-  
+
   finalScoreEl.innerText = 'Score: ' + score + ' / 15';
-  
+
   if(score >= 12) {
     finalMessageEl.innerText = '🏆 AMAZING! You are a sentence expert!';
   } else if(score >= 8) {
@@ -522,7 +616,7 @@ function showFinalScreen() {
   } else {
     finalMessageEl.innerText = '💪 Try again to improve your score!';
   }
-  
+
   if(score >= 10) {
     createConfetti();
   }
@@ -534,6 +628,7 @@ startBtn.addEventListener('click', () => {
   shuffle(questions);
   current = 0;
   score = 0;
+  scoreEl.innerText = 'Score: 0 / ' + questions.length;
   loadQuestion();
 });
 
