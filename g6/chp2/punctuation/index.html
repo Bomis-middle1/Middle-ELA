@@ -6,23 +6,27 @@
 <title>Punctuation Power Game</title>
 
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&display=swap');
+
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  font-family: 'Fredoka', cursive, sans-serif;
 }
 
 body {
-  font-family: Arial, sans-serif;
-  background: linear-gradient(135deg,#ffecd2,#fcb69f,#a1c4fd,#c2e9fb);
-  height: 100dvh; /* Dynamic viewport height prevents browser bar cutoffs */
+  background: #2b1055;
+  background-image: radial-gradient(#451e7a 15%, transparent 16%), radial-gradient(#331263 15%, transparent 16%);
+  background-size: 30px 30px;
+  height: 100dvh;
   width: 100vw;
   overflow: hidden;
   user-select: none;
   -webkit-user-select: none;
 }
 
-/* SPLASH & OVERLAY SCREENS */
+/* OVERLAY SCREENS */
 #splash, #topicScreen, #startScreen, #endScreen {
   position: fixed;
   inset: 0;
@@ -30,249 +34,258 @@ body {
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  background: white;
+  background: #1e0b36;
+  color: white;
   z-index: 9999;
   text-align: center;
   padding: 16px;
 }
 
-#topicScreen { display: none; font-size: 22px; font-weight: bold; }
+#topicScreen { display: none; font-size: 26px; font-weight: bold; color: #ffe600; text-shadow: 0 4px #ff5252; }
 #startScreen { display: none; }
 #endScreen { display: none; }
 
+.game-title {
+  font-size: 26px;
+  color: #ff007f;
+  text-shadow: 3px 3px 0px #00ffff, 5px 5px 0px #000;
+  margin-bottom: 12px;
+}
+
 .instruction-card {
-  background: #f0f7ff;
-  border: 2px dashed #1976d2;
-  border-radius: 12px;
-  padding: 14px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 3px solid #00ffff;
+  box-shadow: 0 0 15px #00ffff;
+  border-radius: 16px;
+  padding: 16px;
   width: 100%;
-  max-width: 400px;
-  margin: 10px 0 16px 0;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+  max-width: 380px;
+  margin-bottom: 20px;
 }
 
 .instruction-card h3 {
-  margin-bottom: 6px;
-  color: #1976d2;
-  font-size: 16px;
+  color: #ffe600;
+  font-size: 18px;
+  margin-bottom: 8px;
 }
 
 .instruction-card p {
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.4;
-  color: #333;
+  color: #e0e0e0;
 }
 
-/* GAME CONTAINER */
+/* GAMEPLAY DASHBOARD */
 #game {
   display: none;
   height: 100dvh;
   width: 100vw;
   padding: 8px;
   flex-direction: column;
+  max-width: 600px;
+  margin: 0 auto;
 }
 
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 6px 12px;
-  background: rgba(255,255,255,0.85);
-  border-radius: 8px;
+  padding: 8px 14px;
+  background: #391475;
+  border: 3px solid #ff007f;
+  border-radius: 12px;
+  color: #ffe600;
   font-weight: bold;
   font-size: 14px;
-  height: 36px;
+  box-shadow: 0 4px 0 #1e0b36;
   flex-shrink: 0;
 }
 
 .container {
   display: flex;
-  gap: 8px;
+  flex-direction: column;
+  gap: 10px;
   flex: 1;
-  margin-top: 6px;
-  min-height: 0; /* Prevents flex children overflow */
+  margin-top: 8px;
+  min-height: 0;
 }
 
-/* LEFT SIDE: QUESTION CARD */
+/* CARD PLAY AREA */
 .left {
-  flex: 1;
-  background: rgba(255,255,255,0.7);
-  border-radius: 10px;
-  padding: 8px;
+  height: 30%;
+  min-height: 90px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 3px dashed #00ffff;
+  border-radius: 16px;
+  padding: 10px;
   display: flex;
   justify-content: center;
   align-items: center;
+  position: relative;
 }
 
 .sentence {
-  background: #ffd166;
-  padding: 12px 10px;
-  border-radius: 8px;
+  background: linear-gradient(180deg, #ffe600, #ffb703);
+  color: #2b1055;
+  border: 3px solid #ffffff;
+  padding: 14px;
+  border-radius: 14px;
   cursor: grab;
   font-weight: bold;
-  font-size: 14px;
+  font-size: 16px;
   text-align: center;
   width: 100%;
-  box-shadow: 0 3px 5px rgba(0,0,0,0.1);
-  transition: transform 0.2s, background 0.2s;
+  box-shadow: 0 6px 0 #b38000, 0 10px 15px rgba(0,0,0,0.5);
+  animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 .sentence.selected {
-  background: #ffb703;
-  transform: scale(1.02);
-  border: 2px solid #fb8500;
+  border-color: #00ffff;
+  box-shadow: 0 0 15px #00ffff, 0 6px 0 #b38000;
+  transform: translateY(-2px);
 }
 
-/* RIGHT SIDE: ANSWER BUCKETS */
+/* TARGET BUCKETS GRID */
 .right {
   flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 10px;
 }
 
 .bucket {
-  background: rgba(255,255,255,0.85);
-  border: 2px dashed #1976d2;
-  border-radius: 8px;
-  padding: 6px 10px;
-  flex: 1;
+  background: #391475;
+  border: 3px solid #a100ff;
+  border-radius: 14px;
+  padding: 8px 12px;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  font-size: 13px;
-  font-weight: bold;
-  color: #1976d2;
+  justify-content: center;
+  color: #ffffff;
   cursor: pointer;
-  transition: background 0.2s;
+  box-shadow: 0 5px 0 #1e0b36;
+  transition: transform 0.1s, background 0.2s, border-color 0.2s;
+  text-align: center;
+}
+
+.bucket span:first-child {
+  font-size: 13px;
+  color: #00ffff;
+  text-transform: uppercase;
 }
 
 .bucket span:last-child {
-  font-size: 18px;
+  font-size: 26px;
+  color: #ffe600;
+  text-shadow: 2px 2px 0 #000;
 }
 
-.bucket-hover {
-  background: #e3f2fd;
-  border-style: solid;
+.bucket:active, .bucket-hover {
+  background: #531ca8;
+  border-color: #00ffff;
+  transform: scale(0.98);
 }
 
-button {
-  padding: 10px 20px;
+/* BUTTONS & ANIMATIONS */
+.btn-play {
+  padding: 12px 32px;
   border: none;
-  border-radius: 8px;
-  background: #1976d2;
+  border-radius: 50px;
+  background: linear-gradient(180deg, #ff007f, #b30059);
   color: white;
-  font-size: 15px;
+  font-size: 18px;
   font-weight: bold;
   cursor: pointer;
+  box-shadow: 0 6px 0 #660033, 0 10px 20px rgba(0,0,0,0.4);
 }
 
-button:hover {
-  background: #1565c0;
+.btn-play:active {
+  transform: translateY(4px);
+  box-shadow: 0 2px 0 #660033;
 }
 
-/* CONFETTI */
-.confetti {
-  position: fixed;
-  width: 8px;
-  height: 8px;
-  top: 0;
-  z-index: 10000;
-  animation: fall 1.5s linear forwards;
+/* FLOATING SCORE POPUP */
+.floating-text {
+  position: absolute;
+  font-size: 20px;
+  font-weight: bold;
+  animation: floatUp 0.8s forwards;
+  pointer-events: none;
+  z-index: 100;
 }
 
-@keyframes fall {
-  to { transform: translateY(100dvh) rotate(360deg); opacity: 0; }
+@keyframes popIn {
+  from { transform: scale(0.5); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
 }
 
-/* MOBILE SCREEN RESPONSIVE LAYOUT */
-@media (max-width: 600px) {
-  .container {
-    flex-direction: column;
-  }
-  .left {
-    flex: none;
-    height: 28%;
-    min-height: 70px;
-  }
-  .right {
-    flex: 1;
-    display: grid;
-    grid-template-columns: 1fr 1fr; /* Arrange in 2x2 grid to guarantee fit */
-    grid-template-rows: 1fr 1fr;
-    gap: 6px;
-  }
-  .bucket {
-    flex: none;
-    height: 100%;
-    padding: 6px 8px;
-    font-size: 12px;
-  }
-  .bucket span:last-child {
-    font-size: 16px;
-  }
+@keyframes floatUp {
+  0% { opacity: 1; transform: translateY(0) scale(1); }
+  100% { opacity: 0; transform: translateY(-40px) scale(1.3); }
 }
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-8px); }
+  75% { transform: translateX(8px); }
+}
+
+.shake { animation: shake 0.3s; }
 </style>
 </head>
 
 <body>
 
-<!-- SPLASH (SHOWS FOR 5 SECONDS) -->
+<!-- SPLASH LOGO -->
 <div id="splash">
   <img src="assets/innovine-logo.png" width="160" alt="Innovine Logo" onerror="this.style.display='none'">
 </div>
 
-<!-- TOPIC -->
+<!-- TOPIC SCREEN -->
 <div id="topicScreen">
-  🎉 PUNCTUATION POWER CHALLENGE 🎉
+  ⚡ PUNCTUATION DASH ⚡
 </div>
 
-<!-- START & INSTRUCTIONS SCREEN -->
+<!-- START SCREEN -->
 <div id="startScreen">
-  <h2 style="font-size: 18px;">Welcome Students!</h2>
+  <h1 class="game-title">PUNCTUATION POWER</h1>
   
   <div class="instruction-card">
-    <h3>📌 How to Play</h3>
-    <p><strong>Drag the sentence</strong> or <strong>tap it to select</strong>, then place it inside the correct punctuation box!</p>
+    <h3>🎮 MISSION INSTRUCTIONS</h3>
+    <p><strong>Drag</strong> the sentence card or <strong>tap to select</strong> it, then drop it into its matching <strong>Punctuation Portal</strong>!</p>
   </div>
 
-  <button onclick="startGame()">START GAME</button>
+  <button class="btn-play" onclick="startGame()">START GAME</button>
 </div>
 
-<!-- GAME CONTAINER -->
+<!-- GAME BOARD -->
 <div id="game">
   <div class="header">
-    <div id="progress">Progress: 0 / 15</div>
-    <div style="font-size: 12px;">
-      🔊 Volume <input type="range" id="vol" min="0" max="1" step="0.1" value="1" style="vertical-align: middle; width: 50px;">
-    </div>
+    <div id="progress">STAGE: 1 / 15</div>
+    <div id="scoreDisplay">SCORE: 0</div>
   </div>
 
   <div class="container">
     <div class="left" id="list"></div>
 
     <div class="right">
-      <div class="bucket" data-type="?" onclick="handleBucketClick('?')"><span>Question Mark</span><span>?</span></div>
-      <div class="bucket" data-type="!" onclick="handleBucketClick('!')"><span>Exclamation Mark</span><span>!</span></div>
+      <div class="bucket" data-type="?" onclick="handleBucketClick('?')"><span>Question</span><span>?</span></div>
+      <div class="bucket" data-type="!" onclick="handleBucketClick('!')"><span>Exclamation</span><span>!</span></div>
       <div class="bucket" data-type="." onclick="handleBucketClick('.')"><span>Full Stop</span><span>.</span></div>
       <div class="bucket" data-type="," onclick="handleBucketClick(',')"><span>Comma Clause</span><span>,</span></div>
     </div>
   </div>
 </div>
 
-<!-- END SCREEN -->
+<!-- END GAME SCREEN -->
 <div id="endScreen">
-  <h1>🏆 Trophy Unlocked!</h1>
-  <h2 id="scoreText" style="margin: 8px 0;"></h2>
-  <p id="remark" style="margin-bottom: 16px;"></p>
-  <button onclick="location.reload()">RESTART</button>
+  <h1 style="color: #ffe600; text-shadow: 3px 3px #ff007f;">🏆 MISSION COMPLETE!</h1>
+  <h2 id="scoreText" style="margin: 14px 0; color: #00ffff;"></h2>
+  <p id="remark" style="margin-bottom: 24px; color: #ddd;"></p>
+  <button class="btn-play" onclick="location.reload()">PLAY AGAIN</button>
 </div>
-
-<!-- AUDIO -->
-<audio id="correctSound" src="assets/correct.mp3" preload="none"></audio>
-<audio id="wrongSound" src="assets/wrong.mp3" preload="none"></audio>
-<audio id="clapSound" src="assets/clapping.mp3" preload="none"></audio>
 
 <script>
 const data = [
@@ -293,15 +306,41 @@ const data = [
   {t: "When the bell rang the students left", type: ","}
 ];
 
-let correctCount = 0;
+let score = 0;
+let streak = 0;
+let currentStage = 0;
 let totalQuestions = data.length;
 let selectedItem = null;
 
-const correctSound = document.getElementById("correctSound");
-const wrongSound = document.getElementById("wrongSound");
-const clapSound = document.getElementById("clapSound");
+// SYNTHESIZED GAME AUDIO (No heavy files to load)
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-// 5-SECOND SPLASH LOGO TRANSITION
+function playAudioFX(type) {
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+
+  if (type === 'correct') {
+    osc.frequency.setValueAtTime(300, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + 0.15);
+    gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.15);
+  } else {
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(180, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(80, audioCtx.currentTime + 0.2);
+    gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.2);
+  }
+}
+
+// SPLASH TIMERS
 setTimeout(() => {
   document.getElementById("splash").style.display = "none";
   document.getElementById("topicScreen").style.display = "flex";
@@ -309,10 +348,9 @@ setTimeout(() => {
   setTimeout(() => {
     document.getElementById("topicScreen").style.display = "none";
     document.getElementById("startScreen").style.display = "flex";
-  }, 1500);
-}, 5000);
+  }, 1200);
+}, 3000);
 
-// Fisher-Yates Array Shuffle Algorithm
 function shuffleArray(array) {
   for (let i = array.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -334,6 +372,9 @@ function renderQuestion() {
 
   if (data.length === 0) return;
 
+  currentStage++;
+  document.getElementById("progress").innerText = `STAGE: ${currentStage} / ${totalQuestions}`;
+
   let item = data[0];
   let div = document.createElement("div");
   div.className = "sentence";
@@ -352,15 +393,14 @@ function renderQuestion() {
   box.appendChild(div);
 }
 
+// BUCKET DRAG / DROP LISTENERS
 document.querySelectorAll(".bucket").forEach(bucket => {
   bucket.ondragover = (e) => {
     e.preventDefault();
     bucket.classList.add("bucket-hover");
   };
 
-  bucket.ondragleave = () => {
-    bucket.classList.remove("bucket-hover");
-  };
+  bucket.ondragleave = () => bucket.classList.remove("bucket-hover");
 
   bucket.ondrop = (e) => {
     e.preventDefault();
@@ -368,32 +408,34 @@ document.querySelectorAll(".bucket").forEach(bucket => {
     try {
       let droppedData = JSON.parse(e.dataTransfer.getData("text/plain"));
       let targetType = bucket.getAttribute("data-type");
-      processAnswer(droppedData, targetType);
+      processAnswer(droppedData, targetType, bucket);
     } catch(err) {}
   };
 });
 
 function handleBucketClick(targetType) {
   if (selectedItem) {
-    processAnswer(selectedItem, targetType);
+    const bucketEl = document.querySelector(`.bucket[data-type="${targetType}"]`);
+    processAnswer(selectedItem, targetType, bucketEl);
   }
 }
 
-function processAnswer(itemData, targetType) {
-  let volumeVal = document.getElementById("vol").value;
-  correctSound.volume = volumeVal;
-  wrongSound.volume = volumeVal;
-  clapSound.volume = volumeVal;
-
+function processAnswer(itemData, targetType, bucketEl) {
   if (itemData.type === targetType) {
-    correctCount++;
-    playSound(correctSound);
-    confetti();
+    streak++;
+    let addedPoints = 100 * streak;
+    score += addedPoints;
+    playAudioFX('correct');
+    showFloatingText(`+${addedPoints}!`, "#00ffff", bucketEl);
   } else {
-    playSound(wrongSound);
+    streak = 0;
+    playAudioFX('wrong');
+    showFloatingText("MISS!", "#ff0055", bucketEl);
+    document.getElementById("game").classList.add("shake");
+    setTimeout(() => document.getElementById("game").classList.remove("shake"), 300);
   }
 
-  document.getElementById("progress").innerText = `Progress: ${correctCount} / ${totalQuestions}`;
+  document.getElementById("scoreDisplay").innerText = `SCORE: ${score}`;
   data.shift();
 
   if (data.length === 0) {
@@ -403,31 +445,24 @@ function processAnswer(itemData, targetType) {
   }
 }
 
-function playSound(audioEl) {
-  try {
-    audioEl.currentTime = 0;
-    audioEl.play().catch(e => {});
-  } catch(e) {}
-}
-
-function confetti() {
-  for (let i = 0; i < 15; i++) {
-    let c = document.createElement("div");
-    c.className = "confetti";
-    c.style.left = Math.random() * 100 + "vw";
-    c.style.background = ["#ff5252", "#ff4081", "#e040fb", "#7c4dff", "#53d2dc"][Math.floor(Math.random() * 5)];
-    document.body.appendChild(c);
-    setTimeout(() => c.remove(), 1500);
-  }
+function showFloatingText(txt, color, target) {
+  const el = document.createElement("div");
+  el.className = "floating-text";
+  el.innerText = txt;
+  el.style.color = color;
+  const rect = target.getBoundingClientRect();
+  el.style.left = `${rect.left + rect.width / 4}px`;
+  el.style.top = `${rect.top}px`;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 800);
 }
 
 function endGame() {
   document.getElementById("game").style.display = "none";
   document.getElementById("endScreen").style.display = "flex";
-  playSound(clapSound);
 
-  document.getElementById("scoreText").innerText = `Score: ${correctCount} / ${totalQuestions}`;
-  document.getElementById("remark").innerText = "Excellent Performance! 🎉 You reached the Trophy Zone!";
+  document.getElementById("scoreText").innerText = `FINAL SCORE: ${score}`;
+  document.getElementById("remark").innerText = score >= 1000 ? "🌟 LEGENDARY PUNCTUATION MASTER!" : "👍 GREAT JOB! KEEP PRACTICING!";
 }
 </script>
 
