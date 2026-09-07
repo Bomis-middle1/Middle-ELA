@@ -31,6 +31,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            flex-direction: column;
             z-index: 9999;
             transition: opacity 0.5s ease-out;
         }
@@ -47,6 +48,15 @@
             animation: logoFloat 2s ease-in-out infinite;
         }
 
+        .splash-screen p {
+            margin-top: 18px;
+            font-size: 18px;
+            color: #667eea;
+            font-weight: bold;
+            letter-spacing: 1px;
+            animation: pulseText 1.2s ease-in-out infinite;
+        }
+
         @keyframes logoFloat {
             0%, 100% {
                 transform: translateY(0px);
@@ -54,6 +64,11 @@
             50% {
                 transform: translateY(-20px);
             }
+        }
+
+        @keyframes pulseText {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 1; }
         }
 
         .container {
@@ -380,6 +395,7 @@
     <!-- Splash Screen with Logo -->
     <div class="splash-screen" id="splashScreen">
         <img src="assets/logo.png" alt="Innovine Logo" onerror="this.style.display='none'">
+        <p>Loading maze...</p>
     </div>
 
     <div class="container" id="mainContainer">
@@ -498,7 +514,7 @@
                 correct: 1
             },
             {
-                question: "Convert to INDIRECT SPEECH: He said, “I will finish the project tomorrow.”",
+                question: "Convert to INDIRECT SPEECH: He said, \u201cI will finish the project tomorrow.\u201d",
                 options: [
                     "He said that he would finish the project the next day",
                     "He said that I will finish the project tomorrow",
@@ -508,7 +524,7 @@
                 correct: 0
             },
             {
-                question: "Identify the tense: “They had already left before we arrived.”",
+                question: "Identify the tense: \u201cThey had already left before we arrived.\u201d",
                 options: ["Simple Past", "Past Perfect", "Present Perfect", "Past Continuous"],
                 correct: 1
             },
@@ -523,7 +539,7 @@
                 correct: 1
             },
             {
-                question: "Convert to past continuous: “She is writing a letter.”",
+                question: "Convert to past continuous: \u201cShe is writing a letter.\u201d",
                 options: [
                     "She writes a letter",
                     "She wrote a letter",
@@ -543,7 +559,7 @@
                 correct: 0
             },
             {
-                question: "Convert to INDIRECT SPEECH: They said, “We are playing football.”",
+                question: "Convert to INDIRECT SPEECH: They said, \u201cWe are playing football.\u201d",
                 options: [
                     "They said they played football",
                     "They said that we are playing football",
@@ -563,7 +579,7 @@
                 correct: 2
             },
             {
-                question: "Identify the tense: “She has been reading for two hours.”",
+                question: "Identify the tense: \u201cShe has been reading for two hours.\u201d",
                 options: [
                     "Present Perfect",
                     "Present Perfect Continuous",
@@ -608,42 +624,83 @@
         let starsCollected = 0;
         let totalStarsCollected = 0;
         let occupiedCells = new Set();
+        // The set of grid cells actually reachable from the player's start position.
+        // Used to guarantee the maze is never generated with the player boxed in,
+        // and that stars are never placed somewhere the player can't reach.
+        let reachableCells = new Set();
+
+        function computeReachable(startX, startY) {
+            const wallSet = new Set(walls.map(w => `${w.x},${w.y}`));
+            const startKey = `${startX},${startY}`;
+            if (wallSet.has(startKey)) return new Set();
+            const reachable = new Set([startKey]);
+            const queue = [[startX, startY]];
+            const dirs = [[1,0],[-1,0],[0,1],[0,-1]];
+            while (queue.length) {
+                const [cx, cy] = queue.shift();
+                for (const [dx, dy] of dirs) {
+                    const nx = cx + dx, ny = cy + dy;
+                    const key = `${nx},${ny}`;
+                    if (!wallSet.has(key) && !reachable.has(key)) {
+                        reachable.add(key);
+                        queue.push([nx, ny]);
+                    }
+                }
+            }
+            return reachable;
+        }
 
         function generateMaze() {
-            walls = [];
-            occupiedCells.clear();
             const cols = Math.floor(canvas.width / gridSize);
             const rows = Math.floor(canvas.height / gridSize);
+            const interiorCells = Math.max(1, (cols - 2) * (rows - 2) - 1);
+            const minReachable = Math.max(4, Math.floor(interiorCells * 0.5));
 
-            for (let i = 0; i < cols; i++) {
-                walls.push({x: i, y: 0});
-                walls.push({x: i, y: rows - 1});
-                occupiedCells.add(`${i},0`);
-                occupiedCells.add(`${i},${rows - 1}`);
-            }
-            for (let i = 0; i < rows; i++) {
-                walls.push({x: 0, y: i});
-                walls.push({x: cols - 1, y: i});
-                occupiedCells.add(`0,${i}`);
-                occupiedCells.add(`${cols - 1},${i}`);
-            }
+            let attempts = 0;
+            do {
+                walls = [];
+                occupiedCells.clear();
 
-            occupiedCells.add('1,1');
-
-            for (let i = 0; i < 15; i++) {
-                const wallX = Math.floor(Math.random() * (cols - 2)) + 1;
-                const wallY = Math.floor(Math.random() * (rows - 2)) + 1;
-                const cellKey = `${wallX},${wallY}`;
-                if (!occupiedCells.has(cellKey)) {
-                    walls.push({x: wallX, y: wallY});
-                    occupiedCells.add(cellKey);
+                for (let i = 0; i < cols; i++) {
+                    walls.push({x: i, y: 0});
+                    walls.push({x: i, y: rows - 1});
+                    occupiedCells.add(`${i},0`);
+                    occupiedCells.add(`${i},${rows - 1}`);
                 }
+                for (let i = 0; i < rows; i++) {
+                    walls.push({x: 0, y: i});
+                    walls.push({x: cols - 1, y: i});
+                    occupiedCells.add(`0,${i}`);
+                    occupiedCells.add(`${cols - 1},${i}`);
+                }
+
+                occupiedCells.add('1,1');
+
+                for (let i = 0; i < 15; i++) {
+                    const wallX = Math.floor(Math.random() * (cols - 2)) + 1;
+                    const wallY = Math.floor(Math.random() * (rows - 2)) + 1;
+                    const cellKey = `${wallX},${wallY}`;
+                    if (!occupiedCells.has(cellKey)) {
+                        walls.push({x: wallX, y: wallY});
+                        occupiedCells.add(cellKey);
+                    }
+                }
+
+                reachableCells = computeReachable(1, 1);
+                attempts++;
+            } while (reachableCells.size < minReachable && attempts < 25);
+
+            // Absolute fallback: force at least one open path if retries still weren't enough
+            if (reachableCells.size < 2) {
+                walls = walls.filter(w => !(w.x === 2 && w.y === 1));
+                reachableCells = computeReachable(1, 1);
             }
         }
 
         function isValidPosition(x, y) {
             const cellKey = `${x},${y}`;
             if (occupiedCells.has(cellKey)) return false;
+            if (!reachableCells.has(cellKey)) return false;
             for (let star of stars) {
                 if (star.x === x && star.y === y) return false;
             }
