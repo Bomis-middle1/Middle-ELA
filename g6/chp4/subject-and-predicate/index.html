@@ -455,8 +455,8 @@ body{
 <div id="gameArea">
 
     <div id="logoScreen">
-        <img src="assets/innovine-logo.png" alt="Innovine Logo">
-        <div id="logoText">Innovine Learning Adventures</div>
+        <img src="assets/innovine-logo.png" alt="Innovine Logo" onerror="this.style.display='none'">
+        <div id="logoText">Innovine</div>
     </div>
 
     <div id="scoreBoard">
@@ -519,7 +519,7 @@ body{
 setTimeout(()=>{
     document.getElementById("logoScreen").style.display="none";
     document.getElementById("startScreen").style.display="flex";
-},5000);
+},2000);
 
 const gameArea = document.getElementById("gameArea");
 const player = document.getElementById("player");
@@ -546,6 +546,7 @@ let totalGems = 0;
 let currentQuestion = 0;
 let answeredCorrect = 0;
 let animationId;
+let coinTimer, obstacleTimer;
 
 const questions = [
 {
@@ -622,7 +623,7 @@ function jump(){
     if(!gameRunning || questionBox.style.display === "block") return;
 
     if(!jumping){
-        velocity = -22;
+        velocity = -20;
         jumping = true;
         player.classList.add("jumpPose");
 
@@ -667,7 +668,7 @@ function spawnCoin(){
     coin.classList.add("coin");
     coin.innerHTML = "💎";
     coin.style.left = window.innerWidth + "px";
-    coin.style.top = (window.innerHeight - 330 - Math.random()*160) + "px";
+    coin.style.top = (window.innerHeight - 320 - Math.random()*120) + "px";
     gameArea.appendChild(coin);
 
     let move = setInterval(()=>{
@@ -695,7 +696,8 @@ function spawnCoin(){
             clearInterval(move);
 
             if(gems >= 3 && currentQuestion < questions.length){
-                gems = 0;
+                clearTimeout(coinTimer);
+                clearTimeout(obstacleTimer);
                 setTimeout(showQuestion,300);
             }
         }
@@ -706,7 +708,9 @@ function spawnCoin(){
         }
     },20);
 
-    setTimeout(spawnCoin,2300);
+    if(gameRunning && gems < 3) {
+        coinTimer = setTimeout(spawnCoin, 2200);
+    }
 }
 
 function spawnObstacle(){
@@ -728,15 +732,16 @@ function spawnObstacle(){
         }
 
         let left = parseInt(obstacle.style.left);
-        left -= 5;
+        left -= 4.5;
         obstacle.style.left = left + "px";
 
         const o = obstacle.getBoundingClientRect();
         const p = player.getBoundingClientRect();
 
         if(o.left < p.right && o.right > p.left && o.top < p.bottom && o.bottom > p.top){
-            gems = Math.max(0,gems-1);
-            coinCount.innerText = gems;
+            // Shake effect on hit instead of clearing points
+            player.style.transform = "translateX(-15px)";
+            setTimeout(() => { player.style.transform = "translateX(0px)"; }, 200);
             obstacle.remove();
             clearInterval(move);
         }
@@ -747,12 +752,15 @@ function spawnObstacle(){
         }
     },20);
 
-    setTimeout(spawnObstacle,3600);
+    if(gameRunning) {
+        obstacleTimer = setTimeout(spawnObstacle, 4500);
+    }
 }
 
 function showQuestion(){
     gameRunning = false;
     cancelAnimationFrame(animationId);
+    document.querySelectorAll(".coin,.obstacle").forEach(el=>el.remove());
 
     questionBox.style.display = "block";
     const q = questions[currentQuestion];
@@ -781,14 +789,14 @@ function checkAnswer(selected,correct){
         feedback.className = "correctAnim";
         correctSound.currentTime = 0;
         clapSound.currentTime = 0;
-        correctSound.play();
-        clapSound.play();
+        correctSound.play().catch(()=>{});
+        clapSound.play().catch(()=>{});
         createConfetti();
     }else{
         feedback.innerText = "❌ Wrong!";
         feedback.className = "wrongAnim";
         wrongSound.currentTime = 0;
-        wrongSound.play();
+        wrongSound.play().catch(()=>{});
 
         buttons[correct].style.background = "#4caf50";
         buttons[correct].innerText = "✅ " + buttons[correct].innerText;
@@ -804,6 +812,7 @@ function checkAnswer(selected,correct){
         if(currentQuestion >= questions.length){
             endGame();
         }else{
+            gems = 0;
             coinCount.innerText = gems;
             gameRunning = true;
             spawnCoin();
