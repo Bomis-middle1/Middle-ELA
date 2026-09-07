@@ -144,6 +144,12 @@ button.option:hover{
 transform:translateY(-2px);
 }
 
+button.option:disabled{
+opacity:.5;
+cursor:not-allowed;
+transform:none;
+}
+
 #noun{
 font-size:38px;
 font-weight:bold;
@@ -294,6 +300,12 @@ ctx.restore();
 
 drawWheel();
 
+// Enable/disable the answer buttons together, so players can't
+// answer before a word has actually been revealed on screen.
+function setOptionsEnabled(enabled){
+document.querySelectorAll('.option').forEach(btn=>btn.disabled=!enabled);
+}
+
 function spinWheel(){
 if(!canSpin){
 document.getElementById('result').innerHTML='🎯 Please answer first!';
@@ -309,8 +321,11 @@ document.getElementById('score').innerText=`Score: ${score} | Words Remaining: $
 
 wrongAttempts=0;
 canSpin=false;
+currentNoun=null; // no valid noun to answer against until the reveal below
+document.getElementById('noun').innerText='';
 document.getElementById('result').innerHTML='';
 document.getElementById('spinBtn').classList.add('disabled');
+setOptionsEnabled(false); // lock answers while the wheel is spinning
 
 const wheel=document.getElementById('wheel');
 
@@ -319,7 +334,7 @@ let availableIndices=nouns.map((_,i)=>i).filter(i=>!usedIndices.includes(i));
 const selectedIndex=availableIndices[Math.floor(Math.random()*availableIndices.length)];
 usedIndices.push(selectedIndex);
 
-currentNoun=nouns[selectedIndex];
+const selectedNoun=nouns[selectedIndex];
 
 const sectionAngle=360/nouns.length;
 const stopAngle=360-(selectedIndex*sectionAngle)-(sectionAngle/2);
@@ -333,8 +348,11 @@ currentRotation=1800+stopAngle;
 wheel.style.transform=`rotate(${currentRotation}deg)`;
 
 setTimeout(()=>{
+// Only now — once the word is actually visible — does it become answerable
+currentNoun=selectedNoun;
 document.getElementById('noun').innerText=currentNoun.word;
 document.getElementById('score').innerText=`Score: ${score} | Words Remaining: ${nouns.length-usedIndices.length}`;
+setOptionsEnabled(true);
 },4000);
 },50);
 }
@@ -355,6 +373,7 @@ playCorrect();
 createConfetti();
 canSpin=true;
 document.getElementById('spinBtn').classList.remove('disabled');
+setOptionsEnabled(false);
 currentNoun=null;
 wrongAttempts=0;
 }else{
@@ -366,6 +385,7 @@ if(wrongAttempts>=2){
 result.innerHTML=`❌ Correct Answer: <b>${currentNoun.type}</b><br>${currentNoun.explanation}`;
 canSpin=true;
 document.getElementById('spinBtn').classList.remove('disabled');
+setOptionsEnabled(false);
 currentNoun=null;
 wrongAttempts=0;
 }else{
@@ -414,6 +434,7 @@ stars.appendChild(star);
 }
 
 createStars();
+setOptionsEnabled(false); // no word is up yet, so answers start locked
 
 console.assert(nouns.length===15,'Nouns array should contain 15 items');
 console.assert(typeof spinWheel==='function','spinWheel missing');
