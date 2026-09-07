@@ -2,19 +2,28 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Punctuation Power Game FIXED</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Punctuation Power Game</title>
 
 <style>
-body {
+* {
+  box-sizing: border-box;
   margin: 0;
-  font-family: Arial;
-  background: linear-gradient(135deg,#ffecd2,#fcb69f,#a1c4fd,#c2e9fb);
-  overflow: hidden;
+  padding: 0;
 }
 
-/* SPLASH */
-#splash, #topicScreen, #startScreen {
+body {
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg,#ffecd2,#fcb69f,#a1c4fd,#c2e9fb);
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* SPLASH & OVERLAY SCREENS */
+#splash, #topicScreen, #startScreen, #endScreen {
   position: fixed;
   inset: 0;
   display: flex;
@@ -24,74 +33,143 @@ body {
   background: white;
   z-index: 9999;
   text-align: center;
+  padding: 16px;
 }
 
-#topicScreen { display: none; font-size: 28px; font-weight: bold; }
+#topicScreen { display: none; font-size: 24px; font-weight: bold; }
 #startScreen { display: none; }
+#endScreen { display: none; }
 
-/* GAME */
+.instruction-card {
+  background: #f0f7ff;
+  border: 2px dashed #1976d2;
+  border-radius: 12px;
+  padding: 16px;
+  width: 100%;
+  max-width: 420px;
+  margin: 12px 0 20px 0;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+}
+
+.instruction-card h3 {
+  margin-bottom: 6px;
+  color: #1976d2;
+  font-size: 18px;
+}
+
+.instruction-card p {
+  font-size: 14px;
+  line-height: 1.4;
+  color: #333;
+}
+
+/* GAME CONTAINER */
 #game {
   display: none;
+  height: 100vh;
+  width: 100vw;
   padding: 10px;
+  flex-direction: column;
 }
 
 .header {
   display: flex;
   justify-content: space-between;
-  padding: 10px;
+  align-items: center;
+  padding: 8px 14px;
+  background: rgba(255,255,255,0.85);
+  border-radius: 10px;
   font-weight: bold;
+  font-size: 15px;
+  height: 42px;
 }
 
 .container {
   display: flex;
   gap: 10px;
+  flex: 1;
+  margin-top: 8px;
+  height: calc(100vh - 68px);
 }
 
+/* LEFT SIDE: QUESTION CARD */
 .left {
-  width: 55%;
-  background: rgba(255,255,255,0.6);
+  flex: 1;
+  background: rgba(255,255,255,0.7);
   border-radius: 12px;
   padding: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 .sentence {
   background: #ffd166;
-  padding: 10px;
-  margin: 8px;
+  padding: 14px;
   border-radius: 10px;
   cursor: grab;
+  font-weight: bold;
+  font-size: 15px;
+  text-align: center;
+  width: 100%;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  transition: transform 0.2s, background 0.2s;
 }
 
+.sentence.selected {
+  background: #ffb703;
+  transform: scale(1.02);
+  border: 2px solid #fb8500;
+}
+
+/* RIGHT SIDE: ANSWER BUCKETS */
 .right {
-  width: 45%;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  justify-content: space-between;
 }
 
 .bucket {
-  background: rgba(255,255,255,0.6);
-  border: 2px dashed #333;
+  background: rgba(255,255,255,0.85);
+  border: 2px dashed #1976d2;
   border-radius: 10px;
-  padding: 10px;
-  margin-bottom: 10px;
-  min-height: 60px;
+  padding: 8px 12px;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 15px;
+  font-weight: bold;
+  color: #1976d2;
+  cursor: pointer;
+  transition: background 0.2s;
 }
 
-/* END */
-#endScreen {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: white;
-  z-index: 9999;
-  text-align: center;
-  padding: 20px;
+.bucket span:last-child {
+  font-size: 20px;
+}
+
+.bucket-hover {
+  background: #e3f2fd;
+  border-style: solid;
 }
 
 button {
-  padding: 10px 20px;
+  padding: 12px 24px;
   border: none;
   border-radius: 10px;
-  margin: 10px;
+  background: #1976d2;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
   cursor: pointer;
+}
+
+button:hover {
+  background: #1565c0;
 }
 
 /* CONFETTI */
@@ -100,20 +178,38 @@ button {
   width: 8px;
   height: 8px;
   top: 0;
-  animation: fall 2s linear forwards;
+  z-index: 10000;
+  animation: fall 1.5s linear forwards;
 }
 
 @keyframes fall {
-  to { transform: translateY(100vh); opacity: 0; }
+  to { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+}
+
+@media (max-width: 600px) {
+  .container {
+    flex-direction: column;
+  }
+  .left {
+    height: 30%;
+    min-height: 90px;
+  }
+  .right {
+    height: 68%;
+  }
+  .bucket {
+    font-size: 14px;
+    padding: 6px 10px;
+  }
 }
 </style>
 </head>
 
 <body>
 
-<!-- SPLASH (FIXED LOGO) -->
+<!-- SPLASH (SHOWS FOR 5 SECONDS) -->
 <div id="splash">
-  <img src="assets/innovine-logo.png" width="200">
+  <img src="assets/innovine-logo.png" width="180" alt="Innovine Logo" onerror="this.style.display='none'">
 </div>
 
 <!-- TOPIC -->
@@ -121,154 +217,207 @@ button {
   🎉 PUNCTUATION POWER CHALLENGE 🎉
 </div>
 
-<!-- START -->
+<!-- START & INSTRUCTIONS SCREEN -->
 <div id="startScreen">
-  <h2>Ready to Play?</h2>
+  <h2 style="font-size: 20px;">Welcome Students!</h2>
+  
+  <div class="instruction-card">
+    <h3>📌 How to Play</h3>
+    <p><strong>Drag the sentence</strong> or <strong>tap it to select</strong>, then place it inside the correct punctuation box!</p>
+  </div>
+
   <button onclick="startGame()">START GAME</button>
 </div>
 
-<!-- GAME -->
+<!-- GAME CONTAINER -->
 <div id="game">
-
-<div class="header">
-  <div id="progress">0 / 15</div>
-  <div>
-    🔊 <input type="range" id="vol" min="0" max="1" step="0.1" value="1">
-  </div>
-</div>
-
-<div class="container">
-
-  <div class="left" id="list"></div>
-
-  <div class="right">
-    <div class="bucket" data="?" >?</div>
-    <div class="bucket" data="!">!</div>
-    <div class="bucket" data=".">.</div>
-    <div class="bucket" data=",">,</div>
+  <div class="header">
+    <div id="progress">Progress: 0 / 15</div>
+    <div style="font-size: 13px;">
+      🔊 Volume <input type="range" id="vol" min="0" max="1" step="0.1" value="1" style="vertical-align: middle; width: 60px;">
+    </div>
   </div>
 
-</div>
+  <div class="container">
+    <div class="left" id="list"></div>
+
+    <div class="right">
+      <div class="bucket" data-type="?" onclick="handleBucketClick('?')"><span>Question Mark</span><span>?</span></div>
+      <div class="bucket" data-type="!" onclick="handleBucketClick('!')"><span>Exclamation Mark</span><span>!</span></div>
+      <div class="bucket" data-type="." onclick="handleBucketClick('.')"><span>Full Stop</span><span>.</span></div>
+      <div class="bucket" data-type="," onclick="handleBucketClick(',')"><span>Comma Clause</span><span>,</span></div>
+    </div>
+  </div>
 </div>
 
 <!-- END SCREEN -->
 <div id="endScreen">
   <h1>🏆 Trophy Unlocked!</h1>
-  <h2 id="scoreText"></h2>
-  <p id="remark"></p>
+  <h2 id="scoreText" style="margin: 10px 0;"></h2>
+  <p id="remark" style="margin-bottom: 20px;"></p>
   <button onclick="location.reload()">RESTART</button>
 </div>
 
 <!-- AUDIO -->
-<audio id="correct" src="assets/correct.mp3"></audio>
-<audio id="wrong" src="assets/wrong.mp3"></audio>
-<audio id="clap" src="assets/clapping.mp3"></audio>
+<audio id="correctSound" src="assets/correct.mp3" preload="none"></audio>
+<audio id="wrongSound" src="assets/wrong.mp3" preload="none"></audio>
+<audio id="clapSound" src="assets/clapping.mp3" preload="none"></audio>
 
 <script>
-
 const data = [
-{t:"Where are you going",type:"?"},
-{t:"What a beautiful day it is",type:"!"},
-{t:"The students completed the assignment on time",type:"."},
-{t:"After finishing homework he went out to play",type:","},
-
-{t:"Why is the teacher absent today",type:"?"},
-{t:"How amazing this performance was",type:"!"},
-{t:"She is reading a novel in the library",type:"."},
-{t:"Although it was late they continued studying",type:","},
-
-{t:"Can you solve this puzzle",type:"?"},
-{t:"What an incredible achievement",type:"!"},
-{t:"The sun rises in the east",type:"."},
-{t:"If you work hard you will succeed",type:","},
-
-{t:"Did you complete your project",type:"?"},
-{t:"That is absolutely fantastic",type:"!"}
+  {t: "Where are you going", type: "?"},
+  {t: "What a beautiful day it is", type: "!"},
+  {t: "The students completed the assignment on time", type: "."},
+  {t: "After finishing homework he went out to play", type: ","},
+  {t: "Why is the teacher absent today", type: "?"},
+  {t: "How amazing this performance was", type: "!"},
+  {t: "She is reading a novel in the library", type: "."},
+  {t: "Although it was late they continued studying", type: ","},
+  {t: "Can you solve this puzzle", type: "?"},
+  {t: "What an incredible achievement", type: "!"},
+  {t: "The sun rises in the east", type: "."},
+  {t: "If you work hard you will succeed", type: ","},
+  {t: "Did you complete your project", type: "?"},
+  {t: "That is absolutely fantastic", type: "!"},
+  {t: "When the bell rang the students left", type: ","}
 ];
 
-let correct=0;
+let correctCount = 0;
+let totalQuestions = data.length;
+let selectedItem = null;
 
-function shuffle(){
-  let box=document.getElementById("list");
-  box.innerHTML="";
-  data.forEach(d=>{
-    let div=document.createElement("div");
-    div.className="sentence";
-    div.draggable=true;
-    div.innerText=d.t;
-    div.ondragstart=(e)=>{
-      e.dataTransfer.setData("text",JSON.stringify(d));
-    };
-    box.appendChild(div);
-  });
-}
+const correctSound = document.getElementById("correctSound");
+const wrongSound = document.getElementById("wrongSound");
+const clapSound = document.getElementById("clapSound");
 
-document.querySelectorAll(".bucket").forEach(b=>{
-  b.ondragover=e=>e.preventDefault();
+// 5-SECOND SPLASH LOGO TRANSITION
+setTimeout(() => {
+  document.getElementById("splash").style.display = "none";
+  document.getElementById("topicScreen").style.display = "flex";
 
-  b.ondrop=e=>{
-    let d=JSON.parse(e.dataTransfer.getData("text"));
+  setTimeout(() => {
+    document.getElementById("topicScreen").style.display = "none";
+    document.getElementById("startScreen").style.display = "flex";
+  }, 1500);
+}, 5000);
 
-    let vol=document.getElementById("vol").value;
-    correctSound.volume=vol;
-    wrongSound.volume=vol;
-    clapSound.volume=vol;
-
-    if(d.type==b.dataset){
-      correct++;
-      correctSound.play();
-      confetti();
-    } else {
-      wrongSound.play();
-    }
-
-    document.getElementById("progress").innerText=correct+"/15";
-
-    data.splice(data.findIndex(x=>x.t===d.t),1);
-    shuffle();
-
-    if(correct===15){
-      endGame();
-    }
-  };
-});
-
-setTimeout(()=>{
-  document.getElementById("splash").style.display="none";
-  document.getElementById("topicScreen").style.display="flex";
-
-  setTimeout(()=>{
-    document.getElementById("topicScreen").style.display="none";
-    document.getElementById("startScreen").style.display="flex";
-  },3000);
-
-},5000);
-
-function startGame(){
-  document.getElementById("startScreen").style.display="none";
-  document.getElementById("game").style.display="block";
-  shuffle();
-}
-
-function confetti(){
-  for(let i=0;i<25;i++){
-    let c=document.createElement("div");
-    c.className="confetti";
-    c.style.left=Math.random()*100+"vw";
-    c.style.background=["red","blue","yellow","green"][Math.random()*4|0];
-    document.body.appendChild(c);
-    setTimeout(()=>c.remove(),2000);
+// Fisher-Yates Array Shuffle Algorithm
+function shuffleArray(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
   }
 }
 
-function endGame(){
-  document.getElementById("game").style.display="none";
-  document.getElementById("endScreen").style.display="block";
-
-  document.getElementById("scoreText").innerText="Score: "+correct+"/15";
-  document.getElementById("remark").innerText="Excellent Performance 🎉 You reached the Trophy Zone!";
+function startGame() {
+  document.getElementById("startScreen").style.display = "none";
+  document.getElementById("game").style.display = "flex";
+  shuffleArray(data); // Randomizes question order
+  renderQuestion();
 }
 
+function renderQuestion() {
+  let box = document.getElementById("list");
+  box.innerHTML = "";
+  selectedItem = null;
+
+  if (data.length === 0) return;
+
+  let item = data[0];
+  let div = document.createElement("div");
+  div.className = "sentence";
+  div.draggable = true;
+  div.innerText = item.t;
+
+  div.onclick = () => {
+    div.classList.toggle("selected");
+    selectedItem = div.classList.contains("selected") ? item : null;
+  };
+
+  div.ondragstart = (e) => {
+    e.dataTransfer.setData("text/plain", JSON.stringify(item));
+  };
+
+  box.appendChild(div);
+}
+
+document.querySelectorAll(".bucket").forEach(bucket => {
+  bucket.ondragover = (e) => {
+    e.preventDefault();
+    bucket.classList.add("bucket-hover");
+  };
+
+  bucket.ondragleave = () => {
+    bucket.classList.remove("bucket-hover");
+  };
+
+  bucket.ondrop = (e) => {
+    e.preventDefault();
+    bucket.classList.remove("bucket-hover");
+    try {
+      let droppedData = JSON.parse(e.dataTransfer.getData("text/plain"));
+      let targetType = bucket.getAttribute("data-type");
+      processAnswer(droppedData, targetType);
+    } catch(err) {}
+  };
+});
+
+function handleBucketClick(targetType) {
+  if (selectedItem) {
+    processAnswer(selectedItem, targetType);
+  }
+}
+
+function processAnswer(itemData, targetType) {
+  let volumeVal = document.getElementById("vol").value;
+  correctSound.volume = volumeVal;
+  wrongSound.volume = volumeVal;
+  clapSound.volume = volumeVal;
+
+  if (itemData.type === targetType) {
+    correctCount++;
+    playSound(correctSound);
+    confetti();
+  } else {
+    playSound(wrongSound);
+  }
+
+  document.getElementById("progress").innerText = `Progress: ${correctCount} / ${totalQuestions}`;
+  data.shift();
+
+  if (data.length === 0) {
+    endGame();
+  } else {
+    renderQuestion();
+  }
+}
+
+function playSound(audioEl) {
+  try {
+    audioEl.currentTime = 0;
+    audioEl.play().catch(e => {});
+  } catch(e) {}
+}
+
+function confetti() {
+  for (let i = 0; i < 15; i++) {
+    let c = document.createElement("div");
+    c.className = "confetti";
+    c.style.left = Math.random() * 100 + "vw";
+    c.style.background = ["#ff5252", "#ff4081", "#e040fb", "#7c4dff", "#53d2dc"][Math.floor(Math.random() * 5)];
+    document.body.appendChild(c);
+    setTimeout(() => c.remove(), 1500);
+  }
+}
+
+function endGame() {
+  document.getElementById("game").style.display = "none";
+  document.getElementById("endScreen").style.display = "flex";
+  playSound(clapSound);
+
+  document.getElementById("scoreText").innerText = `Score: ${correctCount} / ${totalQuestions}`;
+  document.getElementById("remark").innerText = "Excellent Performance! 🎉 You reached the Trophy Zone!";
+}
 </script>
 
 </body>
