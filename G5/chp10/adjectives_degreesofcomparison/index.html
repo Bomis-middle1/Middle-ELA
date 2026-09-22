@@ -2,21 +2,43 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
   <title>Ice Cream Scoop Sorting Game</title>
   <style>
+    :root {
+      --purple: #5b2b82;
+      --lavender-bg-1: #fff9fd;
+      --lavender-bg-2: #f7f3ff;
+      --lavender-bg-3: #fff4f8;
+    }
     * { box-sizing: border-box; }
-    body {
+    html, body {
       margin: 0;
-      font-family: Arial, sans-serif;
-      background: radial-gradient(circle at top, #fff9fd 0%, #f7f3ff 45%, #fff4f8 100%);
+      height: 100%;
       overflow: hidden;
+      font-family: Arial, sans-serif;
+      background: radial-gradient(circle at top, var(--lavender-bg-1) 0%, var(--lavender-bg-2) 45%, var(--lavender-bg-3) 100%);
+      touch-action: none;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+    #viewport {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding-top: env(safe-area-inset-top, 0px);
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+      padding-left: env(safe-area-inset-left, 0px);
+      padding-right: env(safe-area-inset-right, 0px);
     }
     #game {
       position: relative;
       width: 1280px;
       height: 720px;
-      margin: 0 auto;
+      transform-origin: center center;
+      flex-shrink: 0;
     }
     #splash, #instructionsScreen, #playArea {
       position: absolute;
@@ -30,6 +52,7 @@
       justify-content: center;
       background: radial-gradient(circle at center, #ffffff 0%, #fff0fb 45%, #f1ddff 100%);
       z-index: 30;
+      border-radius: 18px;
     }
     #splashCard {
       width: 360px;
@@ -44,24 +67,16 @@
       gap: 18px;
       overflow: hidden;
     }
-    #splashLogo {
-      width: 240px;
-      height: 240px;
-      object-fit: contain;
-    }
-    #splashText {
-      font-size: 24px;
-      font-weight: 900;
-      color: #5b2b82;
-      text-align: center;
-    }
+    #splashLogo { width: 240px; height: 240px; object-fit: contain; }
+    #splashText { font-size: 24px; font-weight: 900; color: var(--purple); text-align: center; }
     #instructionsScreen {
       display: none;
       align-items: center;
       justify-content: center;
       flex-direction: column;
-      background: radial-gradient(circle at top, #fff9fd 0%, #f7f3ff 45%, #fff4f8 100%);
+      background: radial-gradient(circle at top, var(--lavender-bg-1) 0%, var(--lavender-bg-2) 45%, var(--lavender-bg-3) 100%);
       z-index: 20;
+      border-radius: 18px;
     }
     #instructionCard {
       width: 760px;
@@ -71,129 +86,75 @@
       box-shadow: 0 10px 22px rgba(0,0,0,0.12);
       text-align: center;
     }
-    #instructionCard h2 {
-      margin: 0 0 12px;
-      font-size: 34px;
-      color: #5b2b82;
-    }
-    #instructionCard p {
-      margin: 12px 0;
-      font-size: 22px;
-      color: #333;
-      font-weight: 700;
-    }
-    #startBtn {
+    #instructionCard h2 { margin: 0 0 12px; font-size: 34px; color: var(--purple); }
+    #instructionCard p { margin: 12px 0; font-size: 22px; color: #333; font-weight: 700; }
+    .bigBtn {
       margin-top: 18px;
-      padding: 14px 28px;
+      padding: 16px 32px;
       border: none;
       border-radius: 16px;
-      background: #5b2b82;
+      background: var(--purple);
       color: white;
-      font-size: 18px;
+      font-size: 20px;
       font-weight: 900;
       cursor: pointer;
+      touch-action: manipulation;
     }
-    #playArea {
-      display: none;
-      z-index: 10;
-    }
-    h1 {
-      position: absolute;
-      top: 10px;
-      left: 0;
-      width: 100%;
-      text-align: center;
-      margin: 0;
-      color: #5b2b82;
-      font-size: 40px;
-      text-shadow: 0 2px 0 rgba(255,255,255,0.75);
-    }
-    #subtitle {
-      position: absolute;
-      top: 60px;
-      left: 0;
-      width: 100%;
-      text-align: center;
-      color: #7a5ca5;
-      font-size: 18px;
-      font-weight: 700;
-    }
-    #instructions {
-      position: absolute;
-      top: 92px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(255,255,255,0.90);
-      color: #222;
-      padding: 10px 20px;
-      border-radius: 18px;
-      font-size: 17px;
-      font-weight: 900;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-      border: 2px solid #e3c9ff;
-    }
-    #status {
+    #soundToggle {
       position: absolute;
       top: 20px;
-      right: 35px;
-      color: #2f4f4f;
-      font-size: 20px;
-      font-weight: 700;
-      background: rgba(255,255,255,0.74);
-      padding: 8px 14px;
-      border-radius: 14px;
+      left: 35px;
+      z-index: 40;
+      background: rgba(255,255,255,0.85);
+      border: 2px solid #e3c9ff;
+      border-radius: 50%;
+      width: 52px;
+      height: 52px;
+      font-size: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+    #playArea { display: none; z-index: 10; border-radius: 18px; overflow: hidden; }
+    h1 {
+      position: absolute; top: 10px; left: 0; width: 100%; text-align: center; margin: 0;
+      color: var(--purple); font-size: 40px; text-shadow: 0 2px 0 rgba(255,255,255,0.75);
+    }
+    #subtitle { position: absolute; top: 60px; left: 0; width: 100%; text-align: center; color: #7a5ca5; font-size: 18px; font-weight: 700; }
+    #instructions {
+      position: absolute; top: 92px; left: 50%; transform: translateX(-50%);
+      background: rgba(255,255,255,0.90); color: #222; padding: 10px 20px; border-radius: 18px;
+      font-size: 17px; font-weight: 900; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border: 2px solid #e3c9ff;
+    }
+    #status {
+      position: absolute; top: 20px; right: 35px; color: #2f4f4f; font-size: 20px; font-weight: 700;
+      background: rgba(255,255,255,0.74); padding: 8px 14px; border-radius: 14px;
     }
     #wordBox {
-      position: absolute;
-      top: 165px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 34px;
-      font-weight: 900;
-      color: #222;
-      padding: 12px 26px;
-      border-radius: 18px;
-      background: rgba(255,255,255,0.95);
-      box-shadow: 0 6px 14px rgba(0,0,0,0.08);
-      min-width: 280px;
-      text-align: center;
+      position: absolute; top: 165px; left: 50%; transform: translateX(-50%);
+      font-size: 34px; font-weight: 900; color: #222; padding: 12px 26px; border-radius: 18px;
+      background: rgba(255,255,255,0.95); box-shadow: 0 6px 14px rgba(0,0,0,0.08); min-width: 280px; text-align: center;
     }
     #feedback {
-      position: absolute;
-      top: 218px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 22px;
-      font-weight: 900;
-      min-width: 220px;
-      text-align: center;
-      height: 30px;
+      position: absolute; top: 218px; left: 50%; transform: translateX(-50%);
+      font-size: 22px; font-weight: 900; min-width: 220px; text-align: center; height: 30px;
     }
     .cone {
-      position: absolute;
-      bottom: 48px;
-      width: 190px;
-      height: 280px;
-      filter: drop-shadow(0 10px 10px rgba(0,0,0,0.12));
+      position: absolute; bottom: 48px; width: 190px; height: 280px;
+      filter: drop-shadow(0 10px 10px rgba(0,0,0,0.12)); transition: transform 0.15s ease;
     }
+    .cone.dropTarget { transform: scale(1.06); }
     .coneTop {
-      width: 190px;
-      height: 115px;
-      border-radius: 35px 35px 0 0;
-      position: relative;
-      z-index: 2;
-      overflow: hidden;
-      border: 3px solid rgba(120,70,20,0.35);
+      width: 190px; height: 115px; border-radius: 35px 35px 0 0; position: relative; z-index: 2;
+      overflow: hidden; border: 3px solid rgba(120,70,20,0.35);
     }
     .coneBody {
-      width: 140px;
-      height: 190px;
-      margin: -10px auto 0;
+      width: 140px; height: 190px; margin: -10px auto 0;
       background: linear-gradient(180deg, #e4ab63 0%, #c98233 100%);
-      clip-path: polygon(50% 100%, 0 0, 100% 0);
-      border: 3px solid rgba(120,70,20,0.35);
-      position: relative;
-      z-index: 1;
+      clip-path: polygon(50% 100%, 0 0, 100% 0); border: 3px solid rgba(120,70,20,0.35);
+      position: relative; z-index: 1;
     }
     #conePos { left: 210px; }
     #coneComp { left: 470px; }
@@ -202,152 +163,128 @@
     #coneComp .coneTop { background: linear-gradient(180deg, #d7f5f8 0%, #8cdce4 100%); }
     #coneSup .coneTop { background: linear-gradient(180deg, #ffd2e4 0%, #ff9cc3 100%); }
     .coneLabel {
-      position: absolute;
-      bottom: 8px;
-      width: 190px;
-      text-align: center;
-      font-size: 30px;
-      font-weight: 1000;
-      text-shadow: 0 2px 0 rgba(255,255,255,0.8);
-      letter-spacing: 0.5px;
+      position: absolute; bottom: 8px; width: 190px; text-align: center; font-size: 30px;
+      font-weight: 1000; text-shadow: 0 2px 0 rgba(255,255,255,0.8); letter-spacing: 0.5px;
     }
     #labelPos { left: 210px; color: #875400; }
     #labelComp { left: 470px; color: #1e676e; }
     #labelSup { left: 830px; color: #9b295b; }
     #scoop {
-      position: absolute;
-      width: 235px;
-      height: 184px;
-      left: 522px;
-      top: 248px;
-      cursor: grab;
-      user-select: none;
-      touch-action: none;
-      z-index: 10;
+      position: absolute; width: 235px; height: 184px; left: 522px; top: 248px;
+      cursor: grab; user-select: none; touch-action: none; z-index: 10;
       filter: drop-shadow(0 10px 10px rgba(0,0,0,0.15));
     }
     #scoopBall {
-      position: absolute;
-      width: 235px;
-      height: 158px;
-      border-radius: 50% 50% 46% 46%;
+      position: absolute; width: 235px; height: 158px; border-radius: 50% 50% 46% 46%;
       background: radial-gradient(circle at 30% 25%, #ffffff 0%, #fffdf7 28%, #ffe6f1 62%, #f6b8da 100%);
-      border: 4px solid #8b5a2b;
-      overflow: hidden;
+      border: 4px solid #8b5a2b; overflow: hidden;
     }
     #scoopText {
-      position: absolute;
-      top: 58px;
-      left: 0;
-      width: 235px;
-      text-align: center;
-      font-size: 18px;
-      font-weight: 900;
-      color: #222;
-      padding: 0 16px;
-      line-height: 1.12;
-      z-index: 5;
+      position: absolute; top: 58px; left: 0; width: 235px; text-align: center; font-size: 18px;
+      font-weight: 900; color: #222; padding: 0 16px; line-height: 1.12; z-index: 5;
       text-shadow: 0 1px 0 rgba(255,255,255,0.7);
     }
-    #restartBtn {
-      position: absolute;
-      top: 270px;
-      left: 50%;
-      transform: translateX(-50%);
-      display: none;
-      padding: 14px 24px;
-      border: none;
-      border-radius: 16px;
-      background: #5b2b82;
-      color: white;
-      font-size: 18px;
-      font-weight: 900;
-      cursor: pointer;
-    }
+    #restartBtn { position: absolute; top: 270px; left: 50%; transform: translateX(-50%); display: none; }
   </style>
 </head>
 <body>
-  <div id="game">
-    <div id="splash">
-      <div id="splashCard">
-        <img id="splashLogo" src="assets/logo.png" alt="Innovine logo">
-        <div id="splashText">Innovine</div>
-      </div>
-    </div>
+  <div id="viewport">
+    <div id="game">
+      <button id="soundToggle" aria-label="Toggle sound">🔊</button>
 
-    <div id="instructionsScreen">
-      <div id="instructionCard">
-        <h2>How to Play</h2>
-        <p>Drag the scoop to the correct cone.</p>
-        <p>Positive, Comparative, or Superlative?</p>
-        <p>You have 2 chances.</p>
-        <button id="startBtn">Start Game</button>
-      </div>
-    </div>
-
-    <div id="playArea">
-      <h1>Degrees of Comparison</h1>
-      <div id="subtitle">Ice Cream Scoop Sorting Game</div>
-      <div id="instructions">Drag the scoop to the correct cone.</div>
-      <div id="status">Score: 0   Attempts: 2</div>
-      <div id="wordBox"></div>
-      <div id="feedback"></div>
-
-      <div id="conePos" class="cone"><div class="coneTop"></div><div class="coneBody"></div></div>
-      <div id="coneComp" class="cone"><div class="coneTop"></div><div class="coneBody"></div></div>
-      <div id="coneSup" class="cone"><div class="coneTop"></div><div class="coneBody"></div></div>
-
-      <div id="labelPos" class="coneLabel">Positive</div>
-      <div id="labelComp" class="coneLabel">Comparative</div>
-      <div id="labelSup" class="coneLabel">Superlative</div>
-
-      <div id="scoop">
-        <div id="scoopBall">
-          <div id="scoopText"></div>
+      <div id="splash">
+        <div id="splashCard">
+          <img id="splashLogo" src="data:image/png;base64,[YOUR_LOGO_BASE64]" alt="Innovine logo">
+          <div id="splashText">Innovine</div>
         </div>
       </div>
 
-      <button id="restartBtn">Play Again</button>
+      <div id="instructionsScreen">
+        <div id="instructionCard">
+          <h2>How to Play</h2>
+          <p>Drag the scoop to the correct cone.</p>
+          <p>Positive, Comparative, or Superlative?</p>
+          <p>You have 2 chances.</p>
+          <button id="startBtn" class="bigBtn">Start Game</button>
+        </div>
+      </div>
+
+      <div id="playArea">
+        <h1>Degrees of Comparison</h1>
+        <div id="subtitle">Ice Cream Scoop Sorting Game</div>
+        <div id="instructions">Drag the scoop to the correct cone.</div>
+        <div id="status">Score: 0&nbsp;&nbsp;&nbsp;Attempts: 2</div>
+        <div id="wordBox"></div>
+        <div id="feedback"></div>
+
+        <div id="conePos" class="cone"><div class="coneTop"></div><div class="coneBody"></div></div>
+        <div id="coneComp" class="cone"><div class="coneTop"></div><div class="coneBody"></div></div>
+        <div id="coneSup" class="cone"><div class="coneTop"></div><div class="coneBody"></div></div>
+
+        <div id="labelPos" class="coneLabel">Positive</div>
+        <div id="labelComp" class="coneLabel">Comparative</div>
+        <div id="labelSup" class="coneLabel">Superlative</div>
+
+        <div id="scoop">
+          <div id="scoopBall"><div id="scoopText"></div></div>
+        </div>
+
+        <button id="restartBtn" class="bigBtn">Play Again</button>
+      </div>
     </div>
   </div>
+
+  <audio id="sndCorrect" preload="auto" src="data:audio/mpeg;base64,[YOUR_CORRECT_MP3_BASE64]"></audio>
+  <audio id="sndWrong" preload="auto" src="data:audio/mpeg;base64,[YOUR_WRONG_MP3_BASE64]"></audio>
+  <audio id="sndClaps" preload="auto" src="data:audio/mpeg;base64,[YOUR_CLAPS_MP3_BASE64]"></audio>
 
   <script>
     const words = ["tallest","better","worse","farther","most","more expensive","noisier","kinder","prettiest","more careful","best","warmer","smaller"];
     const degrees = {
-      tallest: "Superlative",
-      better: "Comparative",
-      worse: "Comparative",
-      farther: "Comparative",
-      most: "Superlative",
-      "more expensive": "Comparative",
-      noisier: "Comparative",
-      kinder: "Comparative",
-      prettiest: "Superlative",
-      "more careful": "Comparative",
-      best: "Superlative",
-      warmer: "Comparative",
-      smaller: "Comparative"
+      tallest: "Superlative", better: "Comparative", worse: "Comparative", farther: "Comparative",
+      most: "Superlative", "more expensive": "Comparative", noisier: "Comparative", kinder: "Comparative",
+      prettiest: "Superlative", "more careful": "Comparative", best: "Superlative", warmer: "Comparative", smaller: "Comparative"
     };
 
+    const game = document.getElementById("game");
     const splash = document.getElementById("splash");
     const instructionsScreen = document.getElementById("instructionsScreen");
     const playArea = document.getElementById("playArea");
     const startBtn = document.getElementById("startBtn");
-
     const wordBox = document.getElementById("wordBox");
     const feedback = document.getElementById("feedback");
     const status = document.getElementById("status");
     const scoop = document.getElementById("scoop");
     const scoopText = document.getElementById("scoopText");
     const restartBtn = document.getElementById("restartBtn");
+    const soundToggle = document.getElementById("soundToggle");
+    const sndCorrect = document.getElementById("sndCorrect");
+    const sndWrong = document.getElementById("sndWrong");
+    const sndClaps = document.getElementById("sndClaps");
+
+    let soundOn = true;
+    function playSound(el) {
+      if (!soundOn) return;
+      try { el.currentTime = 0; el.play().catch(() => {}); } catch (e) {}
+    }
+    soundToggle.addEventListener("click", () => {
+      soundOn = !soundOn;
+      soundToggle.textContent = soundOn ? "🔊" : "🔇";
+    });
+
+    // Responsive scaling: fit the fixed 1280x720 board to any screen
+    function fitGame() {
+      const scale = Math.min(window.innerWidth / 1280, window.innerHeight / 720, 1) * 0.98;
+      game.style.transform = `scale(${scale})`;
+    }
+    window.addEventListener("resize", fitGame);
+    window.addEventListener("orientationchange", fitGame);
+    fitGame();
 
     let score = 0, attempts = 2, currentWord = "", currentDegree = "";
     let wordList = [], dragging = false, offsetX = 0, offsetY = 0;
 
-    function updateStatus() {
-      status.textContent = `Score: ${score}   Attempts: ${attempts}`;
-    }
-
+    function updateStatus() { status.textContent = `Score: ${score}   Attempts: ${attempts}`; }
     function shuffle(arr) {
       for (let i = arr.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -355,32 +292,28 @@
       }
       return arr;
     }
-
-    function showInstructions() {
-      splash.style.display = "none";
-      instructionsScreen.style.display = "flex";
-    }
+    function showInstructions() { splash.style.display = "none"; instructionsScreen.style.display = "flex"; }
 
     function startGame() {
       instructionsScreen.style.display = "none";
       playArea.style.display = "block";
-      score = 0;
-      attempts = 2;
+      score = 0; attempts = 2;
       wordList = shuffle([...words]);
       restartBtn.style.display = "none";
-      feedback.textContent = "";
-      wordBox.textContent = "";
+      feedback.textContent = ""; wordBox.textContent = "";
       scoop.style.display = "block";
       updateStatus();
       nextWord();
     }
 
     function nextWord() {
+      clearDropHighlights();
       if (wordList.length === 0) {
         wordBox.textContent = "Game Complete!";
         feedback.textContent = `Final Score: ${score}/13`;
         scoop.style.display = "none";
-        restartBtn.style.display = "block";
+        restartBtn.style.display = "inline-block";
+        playSound(sndClaps);
         return;
       }
       currentWord = wordList.shift();
@@ -392,13 +325,17 @@
       scoop.style.top = "248px";
     }
 
-    function getConeChoice(x, y) {
+    function clearDropHighlights() {
+      document.querySelectorAll(".cone").forEach(c => c.classList.remove("dropTarget"));
+    }
+
+    function coneAt(x, y) {
       const pos = document.getElementById("conePos").getBoundingClientRect();
       const comp = document.getElementById("coneComp").getBoundingClientRect();
       const sup = document.getElementById("coneSup").getBoundingClientRect();
-      if (x >= pos.left && x <= pos.right && y >= pos.top && y <= pos.bottom) return "Positive";
-      if (x >= comp.left && x <= comp.right && y >= comp.top && y <= comp.bottom) return "Comparative";
-      if (x >= sup.left && x <= sup.right && y >= sup.top && y <= sup.bottom) return "Superlative";
+      if (x >= pos.left && x <= pos.right && y >= pos.top && y <= pos.bottom) return { id: "Positive", el: document.getElementById("conePos") };
+      if (x >= comp.left && x <= comp.right && y >= comp.top && y <= comp.bottom) return { id: "Comparative", el: document.getElementById("coneComp") };
+      if (x >= sup.left && x <= sup.right && y >= sup.top && y <= sup.bottom) return { id: "Superlative", el: document.getElementById("coneSup") };
       return null;
     }
 
@@ -409,39 +346,56 @@
       dragging = true;
       scoop.setPointerCapture(e.pointerId);
       const rect = scoop.getBoundingClientRect();
-      offsetX = e.clientX - rect.left;
-      offsetY = e.clientY - rect.top;
+      const gameRect = game.getBoundingClientRect();
+      const scaleFactor = gameRect.width / 1280;
+      offsetX = (e.clientX - rect.left) / scaleFactor;
+      offsetY = (e.clientY - rect.top) / scaleFactor;
+      e.preventDefault();
     });
 
     scoop.addEventListener("pointermove", (e) => {
       if (!dragging) return;
-      scoop.style.left = (e.clientX - offsetX) + "px";
-      scoop.style.top = (e.clientY - offsetY) + "px";
+      const gameRect = game.getBoundingClientRect();
+      const scaleFactor = gameRect.width / 1280;
+      const localX = (e.clientX - gameRect.left) / scaleFactor;
+      const localY = (e.clientY - gameRect.top) / scaleFactor;
+      scoop.style.left = (localX - offsetX) + "px";
+      scoop.style.top = (localY - offsetY) + "px";
+      clearDropHighlights();
+      const target = coneAt(e.clientX, e.clientY);
+      if (target) target.el.classList.add("dropTarget");
+      e.preventDefault();
     });
 
-    scoop.addEventListener("pointerup", () => {
+    function endDrag() {
       if (!dragging) return;
       dragging = false;
+      clearDropHighlights();
       const rect = scoop.getBoundingClientRect();
-      const choice = getConeChoice(rect.left + rect.width / 2, rect.top + rect.height / 2);
+      const target = coneAt(rect.left + rect.width / 2, rect.top + rect.height / 2);
+      const choice = target ? target.id : null;
 
       if (choice === currentDegree) {
         score++;
         feedback.textContent = "Yay! Correct!";
+        playSound(sndCorrect);
         setTimeout(nextWord, 700);
       } else {
         attempts--;
         feedback.textContent = "Oops! Try again!";
+        playSound(sndWrong);
         if (attempts <= 0) {
           wordBox.textContent = "Game Over!";
           feedback.textContent = `Final Score: ${score}/13`;
           scoop.style.display = "none";
-          restartBtn.style.display = "block";
+          restartBtn.style.display = "inline-block";
         }
       }
       updateStatus();
-    });
+    }
 
+    scoop.addEventListener("pointerup", endDrag);
+    scoop.addEventListener("pointercancel", endDrag);
     restartBtn.addEventListener("click", startGame);
   </script>
 </body>
