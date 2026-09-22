@@ -13,9 +13,7 @@ project-folder/
 ├── index.html
 │
 └── assets/
-    ├── innovine-logo.png
-    ├── correct.mp3
-    └── wrong.mp3
+    └── innovine-logo.png
 
 =========================================================
 🌐 GITHUB PAGES SETUP
@@ -27,20 +25,10 @@ project-folder/
 2. Create folder:
    assets
 
-3. Put these inside assets:
+3. Put this inside assets:
    innovine-logo.png
-   correct.mp3
-   wrong.mp3
 
-4. Upload to GitHub
-
-5. Settings → Pages
-
-6. Select:
-   main branch + root
-
-7. SAVE
-
+4. Upload to GitHub → Settings → Pages → Select main branch + root → SAVE
 =========================================================
 -->
 
@@ -48,422 +36,357 @@ project-folder/
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport"
-content="width=device-width, initial-scale=1.0">
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>🕵️ Museum Heist Escape</title>
 
 <style>
-
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:Arial,sans-serif;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
-body{
-overflow:hidden;
-background:#111;
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #0d1117;
+  color: #fff;
 }
 
-#gameArea{
-position:relative;
-width:100vw;
-height:100vh;
-overflow:hidden;
-background:linear-gradient(to bottom,#263238,#000);
+#gameArea {
+  position: relative;
+  width: 100vw;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding: clamp(8px, 2vh, 16px);
+  background: radial-gradient(circle at center, #1f2937 0%, #0b0f17 100%);
+  overflow: hidden;
 }
 
-/* LOGO */
-
-#logoScreen{
-position:absolute;
-width:100%;
-height:100%;
-background:white;
-display:flex;
-justify-content:center;
-align-items:center;
-flex-direction:column;
-z-index:9999;
+/* LOGO SCREEN */
+#logoScreen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #ffffff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  transition: opacity 0.5s ease;
 }
 
-#logoScreen img{
-width:260px;
-max-width:80%;
+#logoScreen img {
+  width: min(280px, 70vw);
+  height: auto;
+  object-fit: contain;
 }
 
-#logoText{
-margin-top:20px;
-font-size:34px;
-font-weight:bold;
-color:#333;
-}
-
-/* START + END */
-
+/* START + END OVERLAYS */
 #startScreen,
-#endScreen{
-position:absolute;
-width:100%;
-height:100%;
-background:rgba(0,0,0,0.9);
-display:flex;
-justify-content:center;
-align-items:center;
-flex-direction:column;
-text-align:center;
-padding:20px;
-color:white;
-z-index:5000;
+#endScreen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(10, 14, 23, 0.95);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  text-align: center;
+  padding: 24px;
+  z-index: 5000;
 }
 
-.mainBtn{
-padding:16px 34px;
-font-size:22px;
-border:none;
-border-radius:18px;
-background:#ff9800;
-color:white;
-cursor:pointer;
-margin-top:25px;
-transition:0.3s;
+#startScreen h1,
+#endScreen h1 {
+  font-size: clamp(28px, 6vw, 48px);
+  color: #ffb74d;
+  text-shadow: 0 0 12px rgba(255, 183, 77, 0.4);
 }
 
-.mainBtn:hover{
-transform:scale(1.05);
+#startScreen p {
+  margin-top: 16px;
+  font-size: clamp(16px, 3.5vw, 22px);
+  max-width: 600px;
+  color: #e0e0e0;
+  line-height: 1.5;
 }
 
-/* TITLE */
-
-#titleBox{
-position:absolute;
-top:10px;
-left:50%;
-transform:translateX(-50%);
-width:92%;
-background:#212121;
-padding:15px;
-border-radius:20px;
-font-size:28px;
-font-weight:bold;
-text-align:center;
-color:#ffeb3b;
-border:5px solid #ff9800;
-z-index:100;
+.mainBtn {
+  padding: 14px 36px;
+  font-size: clamp(18px, 4vw, 22px);
+  font-weight: bold;
+  border: none;
+  border-radius: 50px;
+  background: linear-gradient(135deg, #ff9800, #f57c00);
+  color: #ffffff;
+  cursor: pointer;
+  margin-top: 28px;
+  box-shadow: 0 6px 20px rgba(255, 152, 0, 0.4);
+  transition: transform 0.2s, box-shadow 0.2s;
+  touch-action: manipulation;
 }
 
-/* SCORE */
-
-#scoreBoard{
-position:absolute;
-top:100px;
-left:20px;
-background:#212121;
-color:white;
-padding:12px 18px;
-border-radius:15px;
-font-size:18px;
-font-weight:bold;
-z-index:200;
-line-height:1.7;
-border:3px solid #ff9800;
+.mainBtn:active {
+  transform: scale(0.96);
 }
 
-/* VOLUME */
-
-#volumeBox{
-position:absolute;
-top:100px;
-right:20px;
-background:#212121;
-color:white;
-padding:12px;
-border-radius:15px;
-z-index:200;
-border:3px solid #ff9800;
+/* TOP HEADER & DASHBOARD */
+.headerContainer {
+  width: 100%;
+  max-width: 900px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 100;
 }
 
-/* MUSEUM */
-
-#museumArea{
-position:absolute;
-top:170px;
-left:50%;
-transform:translateX(-50%);
-width:95%;
-height:52%;
-background:#37474f;
-border-radius:25px;
-border:8px solid #607d8b;
-overflow:hidden;
+#titleBox {
+  width: 100%;
+  background: #1e293b;
+  padding: 8px 16px;
+  border-radius: 12px;
+  font-size: clamp(14px, 3vw, 20px);
+  font-weight: bold;
+  text-align: center;
+  color: #ffeb3b;
+  border: 2px solid #ff9800;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
 }
 
-/* ROOMS */
-
-.room{
-position:absolute;
-background:#455a64;
-border:4px solid #90a4ae;
-border-radius:20px;
+.dashboard {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
 }
 
-#room1{
-width:28%;
-height:38%;
-top:5%;
-left:3%;
+#scoreBoard {
+  flex: 1;
+  background: #1e293b;
+  color: white;
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-size: clamp(12px, 2.5vw, 15px);
+  font-weight: bold;
+  border: 2px solid #ff9800;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
 }
 
-#room2{
-width:28%;
-height:38%;
-top:5%;
-left:36%;
+#volumeBox {
+  background: #1e293b;
+  color: white;
+  padding: 8px 14px;
+  border-radius: 10px;
+  border: 2px solid #ff9800;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: clamp(12px, 2.5vw, 14px);
+  font-weight: bold;
 }
 
-#room3{
-width:28%;
-height:38%;
-top:5%;
-left:69%;
+#volumeSlider {
+  width: 70px;
+  accent-color: #ff9800;
+  cursor: pointer;
 }
 
-#room4{
-width:28%;
-height:38%;
-bottom:5%;
-left:20%;
+/* MUSEUM DISPLAY AREA */
+#museumArea {
+  position: relative;
+  width: 100%;
+  max-width: 900px;
+  flex: 1;
+  min-height: 180px;
+  margin: 8px 0;
+  background: #263238;
+  border-radius: 18px;
+  border: 4px solid #455a64;
+  overflow: hidden;
+  box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
 }
 
-#room5{
-width:28%;
-height:38%;
-bottom:5%;
-left:52%;
+.room {
+  position: absolute;
+  background: #37474f;
+  border: 2px dashed #607d8b;
+  border-radius: 12px;
 }
+
+#room1 { width: 28%; height: 40%; top: 6%; left: 4%; }
+#room2 { width: 28%; height: 40%; top: 6%; left: 36%; }
+#room3 { width: 28%; height: 40%; top: 6%; left: 68%; }
+#room4 { width: 40%; height: 40%; bottom: 6%; left: 8%; }
+#room5 { width: 40%; height: 40%; bottom: 6%; left: 52%; }
 
 /* ARTIFACTS */
-
-.artifact{
-position:absolute;
-font-size:50px;
-animation:glow 2s infinite;
+.artifact {
+  position: absolute;
+  font-size: clamp(24px, 5vw, 42px);
+  transform-origin: center;
+  animation: glow 2.5s infinite ease-in-out;
 }
 
-@keyframes glow{
-0%{
-transform:scale(1);
-filter:drop-shadow(0 0 5px yellow);
-}
-50%{
-transform:scale(1.1);
-filter:drop-shadow(0 0 15px cyan);
-}
-100%{
-transform:scale(1);
-filter:drop-shadow(0 0 5px yellow);
-}
+@keyframes glow {
+  0%, 100% { transform: scale(1); filter: drop-shadow(0 0 4px #ffeb3b); }
+  50% { transform: scale(1.1); filter: drop-shadow(0 0 12px #00e676); }
 }
 
 /* DETECTIVE */
-
-#detective{
-position:absolute;
-bottom:20px;
-left:30px;
-font-size:80px;
-transition:1s;
-z-index:500;
+#detective {
+  position: absolute;
+  font-size: clamp(32px, 7vw, 56px);
+  transition: all 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+  z-index: 50;
+  transform: translate(-50%, -50%);
+  will-change: top, left;
 }
 
 /* FOOTPRINTS */
-
-.footprint{
-position:absolute;
-font-size:30px;
-opacity:0.7;
-animation:fade 2s infinite;
+.footprint {
+  position: absolute;
+  font-size: clamp(14px, 3vw, 22px);
+  opacity: 0.6;
+  animation: fade 2s infinite ease-in-out;
 }
 
-@keyframes fade{
-0%{opacity:0.2;}
-50%{opacity:1;}
-100%{opacity:0.2;}
+@keyframes fade {
+  0%, 100% { opacity: 0.2; }
+  50% { opacity: 0.8; }
 }
 
 /* LASERS */
-
-.laser{
-position:absolute;
-background:red;
-box-shadow:0 0 15px red;
-animation:blink 1s infinite;
+.laser {
+  position: absolute;
+  background: #ff1744;
+  box-shadow: 0 0 10px #ff1744, 0 0 20px #ff1744;
+  animation: blink 1.2s infinite;
+  z-index: 10;
+  display: none;
 }
 
-#laser1{
-top:48%;
-left:0;
-width:100%;
-height:4px;
+#laser1 { top: 50%; left: 0; width: 100%; height: 3px; }
+#laser2 { left: 50%; top: 0; width: 3px; height: 100%; }
+
+@keyframes blink {
+  0%, 100% { opacity: 0.2; }
+  50% { opacity: 1; }
 }
 
-#laser2{
-left:50%;
-top:0;
-width:4px;
-height:100%;
+/* QUESTION BOX */
+#questionBox {
+  width: 100%;
+  max-width: 900px;
+  background: #ffffff;
+  padding: clamp(12px, 2.5vh, 20px);
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  z-index: 100;
 }
 
-@keyframes blink{
-0%{opacity:0.3;}
-50%{opacity:1;}
-100%{opacity:0.3;}
+#questionText {
+  font-size: clamp(15px, 3.2vw, 20px);
+  line-height: 1.4;
+  margin-bottom: 12px;
+  color: #1a202c;
+  text-align: center;
+  font-weight: 600;
 }
 
-/* QUESTION */
-
-#questionBox{
-position:absolute;
-bottom:10px;
-left:50%;
-transform:translateX(-50%);
-width:94%;
-max-width:900px;
-background:#fff8e1;
-padding:20px;
-border-radius:25px;
-z-index:1000;
-box-shadow:0 0 20px rgba(0,0,0,0.5);
+.optionContainer {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
 }
 
-#questionText{
-font-size:22px;
-line-height:1.6;
-margin-bottom:18px;
-color:#333;
-text-align:center;
+.optionBtn {
+  padding: clamp(10px, 2vh, 16px);
+  border: none;
+  border-radius: 12px;
+  background: #0288d1;
+  color: white;
+  font-size: clamp(13px, 2.8vw, 17px);
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+  touch-action: manipulation;
+  word-break: break-word;
 }
 
-.optionContainer{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:12px;
+.optionBtn:active {
+  background: #01579b;
+  transform: scale(0.98);
 }
 
-.optionBtn{
-padding:15px;
-border:none;
-border-radius:15px;
-background:#0288d1;
-color:white;
-font-size:18px;
-cursor:pointer;
-transition:0.3s;
+/* FEEDBACK POPUP */
+#feedbackPopup {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #ffffff;
+  padding: clamp(20px, 4vw, 32px);
+  border-radius: 20px;
+  width: min(90%, 550px);
+  display: none;
+  z-index: 9999;
+  text-align: center;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.6);
 }
 
-.optionBtn:hover{
-background:#01579b;
-transform:scale(1.03);
+#feedbackTitle {
+  font-size: clamp(22px, 5vw, 32px);
+  margin-bottom: 12px;
+  font-weight: bold;
 }
 
-/* FEEDBACK */
-
-#feedbackPopup{
-position:absolute;
-top:50%;
-left:50%;
-transform:translate(-50%,-50%);
-background:white;
-padding:30px;
-border-radius:25px;
-width:90%;
-max-width:650px;
-display:none;
-z-index:9999;
-text-align:center;
-box-shadow:0 0 30px rgba(0,0,0,0.5);
-animation:popup 0.4s;
-}
-
-#feedbackTitle{
-font-size:36px;
-margin-bottom:15px;
-font-weight:bold;
-}
-
-#feedbackText{
-font-size:22px;
-line-height:1.6;
-color:#333;
-}
-
-@keyframes popup{
-from{
-transform:translate(-50%,-50%) scale(0.5);
-opacity:0;
-}
-to{
-transform:translate(-50%,-50%) scale(1);
-opacity:1;
-}
+#feedbackText {
+  font-size: clamp(15px, 3.5vw, 20px);
+  line-height: 1.5;
+  color: #2d3748;
 }
 
 /* CONFETTI */
-
-.confetti{
-position:absolute;
-width:12px;
-height:12px;
-animation:fall 3s linear forwards;
+.confetti {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  pointer-events: none;
+  animation: fall linear forwards;
+  z-index: 9000;
 }
 
-@keyframes fall{
-from{
-transform:translateY(-100px) rotate(0deg);
-}
-to{
-transform:translateY(100vh) rotate(720deg);
-opacity:0;
-}
+@keyframes fall {
+  from { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+  to { transform: translateY(100vh) rotate(720deg); opacity: 0; }
 }
 
-/* MOBILE */
-
-@media(max-width:768px){
-
-#titleBox{
-font-size:18px;
+@media (max-width: 480px) {
+  .optionContainer {
+    grid-template-columns: 1fr;
+  }
+  #scoreBoard {
+    font-size: 11px;
+    padding: 6px 8px;
+  }
 }
-
-#questionText{
-font-size:17px;
-}
-
-.optionBtn{
-font-size:15px;
-padding:12px;
-}
-
-.artifact{
-font-size:35px;
-}
-
-#detective{
-font-size:60px;
-}
-
-#feedbackTitle{
-font-size:28px;
-}
-
-#feedbackText{
-font-size:18px;
-}
-
-}
-
 </style>
 </head>
 
@@ -471,538 +394,372 @@ font-size:18px;
 
 <div id="gameArea">
 
-<!-- LOGO -->
+  <!-- LOGO SCREEN -->
+  <div id="logoScreen">
+    <img src="assets/innovine-logo.png" alt="Logo" id="logoImg">
+  </div>
 
-<div id="logoScreen">
+  <!-- START SCREEN -->
+  <div id="startScreen" style="display:none;">
+    <h1>🕵️ Museum Heist Escape</h1>
+    <p>Solve preposition clues to track the thief and escape the museum!</p>
+    <button class="mainBtn" onclick="startGame()">Start Mission</button>
+  </div>
 
-<img src="assets/innovine-logo.png">
+  <!-- END SCREEN -->
+  <div id="endScreen" style="display:none;">
+    <h1>🏆 Mission Complete! 🏆</h1>
+    <h2 id="finalText" style="margin-top:16px; line-height:1.6; font-size: clamp(16px, 3.5vw, 22px); color:#e0e0e0;"></h2>
+    <button class="mainBtn" onclick="restartGame()">Play Again</button>
+  </div>
 
-<div id="logoText">
-Innovine Learning Adventures
-</div>
+  <!-- HEADER & DASHBOARD -->
+  <div class="headerContainer">
+    <div id="titleBox">🔦 Catch The Thief With Prepositions!</div>
+    
+    <div class="dashboard">
+      <div id="scoreBoard">
+        <span>✅ <span id="correctScore">0</span></span>
+        <span>❌ <span id="wrongScore">0</span></span>
+        <span>📘 <span id="questionNumber">1</span>/10</span>
+      </div>
 
-</div>
+      <div id="volumeBox">
+        <span>🔊</span>
+        <input type="range" id="volumeSlider" min="0" max="1" step="0.1" value="1">
+      </div>
+    </div>
+  </div>
 
-<!-- START -->
+  <!-- MUSEUM VISUAL MAP -->
+  <div id="museumArea">
+    <div class="room" id="room1"></div>
+    <div class="room" id="room2"></div>
+    <div class="room" id="room3"></div>
+    <div class="room" id="room4"></div>
+    <div class="room" id="room5"></div>
 
-<div id="startScreen"
-style="display:none;">
+    <div class="artifact" style="top:12%; left:12%;">🗿</div>
+    <div class="artifact" style="top:12%; left:46%;">💎</div>
+    <div class="artifact" style="top:12%; left:78%;">🖼️</div>
+    <div class="artifact" style="bottom:12%; left:22%;">🏺</div>
+    <div class="artifact" style="bottom:12%; left:66%;">👑</div>
 
-<h1 style="font-size:50px;">
-🕵️ Museum Heist Escape
-</h1>
+    <div class="footprint" style="top:48%; left:18%;">👣</div>
+    <div class="footprint" style="top:48%; left:38%;">👣</div>
+    <div class="footprint" style="top:48%; left:58%;">👣</div>
+    <div class="footprint" style="top:48%; left:78%;">👣</div>
 
-<p style="margin-top:20px;font-size:24px;max-width:700px;">
-Solve preposition clues to catch the thief and escape the museum!
-</p>
+    <div id="laser1" class="laser"></div>
+    <div id="laser2" class="laser"></div>
 
-<button class="mainBtn"
-onclick="startGame()">
-Start Mission
-</button>
+    <div id="detective">🕵️</div>
+  </div>
 
-</div>
+  <!-- QUESTION & OPTIONS -->
+  <div id="questionBox">
+    <div id="questionText">Loading mission...</div>
+    <div class="optionContainer" id="options"></div>
+  </div>
 
-<!-- END -->
-
-<div id="endScreen"
-style="display:none;">
-
-<h1>🏆 Mission Complete! 🏆</h1>
-
-<h2 id="finalText"
-style="margin-top:20px; line-height:1.8;"></h2>
-
-<button class="mainBtn"
-onclick="restartGame()">
-Play Again
-</button>
-
-</div>
-
-<!-- TITLE -->
-
-<div id="titleBox">
-🔦 Solve Preposition Clues To Catch The Thief!
-</div>
-
-<!-- SCORE -->
-
-<div id="scoreBoard">
-✅ Correct: <span id="correctScore">0</span><br>
-❌ Wrong: <span id="wrongScore">0</span><br>
-📘 Question: <span id="questionNumber">0</span>/10
-</div>
-
-<!-- VOLUME -->
-
-<div id="volumeBox">
-Volume
-<input type="range"
-id="volumeSlider"
-min="0"
-max="1"
-step="0.1"
-value="1">
-</div>
-
-<!-- MUSEUM -->
-
-<div id="museumArea">
-
-<div class="room" id="room1"></div>
-<div class="room" id="room2"></div>
-<div class="room" id="room3"></div>
-<div class="room" id="room4"></div>
-<div class="room" id="room5"></div>
-
-<div class="artifact"
-style="top:40px;left:8%;">
-🗿
-</div>
-
-<div class="artifact"
-style="top:40px;left:40%;">
-💎
-</div>
-
-<div class="artifact"
-style="top:40px;left:74%;">
-🖼️
-</div>
-
-<div class="artifact"
-style="bottom:50px;left:28%;">
-🏺
-</div>
-
-<div class="artifact"
-style="bottom:50px;left:60%;">
-👑
-</div>
-
-<div class="footprint"
-style="top:46%;left:18%;">
-👣
-</div>
-
-<div class="footprint"
-style="top:46%;left:35%;">
-👣
-</div>
-
-<div class="footprint"
-style="top:46%;left:52%;">
-👣
-</div>
-
-<div class="footprint"
-style="top:46%;left:70%;">
-👣
-</div>
-
-<div id="laser1" class="laser"></div>
-<div id="laser2" class="laser"></div>
-
-<div id="detective">
-🕵️
-</div>
-
-</div>
-
-<!-- QUESTION -->
-
-<div id="questionBox">
-
-<div id="questionText"></div>
-
-<div class="optionContainer"
-id="options"></div>
-
-</div>
-
-<!-- FEEDBACK -->
-
-<div id="feedbackPopup">
-
-<div id="feedbackTitle"></div>
-
-<div id="feedbackText"></div>
-
-</div>
+  <!-- FEEDBACK POPUP -->
+  <div id="feedbackPopup">
+    <div id="feedbackTitle"></div>
+    <div id="feedbackText"></div>
+  </div>
 
 </div>
 
 <script>
+/* ---------------------------------------------------------
+   WEB AUDIO API SYNTHESIZER (ZERO-DEPENDENCY AUDIO)
+--------------------------------------------------------- */
+let audioCtx = null;
+let masterVolume = 1;
 
-/* LOGO */
-
-setTimeout(()=>{
-
-document.getElementById("logoScreen")
-.style.display="none";
-
-document.getElementById("startScreen")
-.style.display="flex";
-
-},5000);
-
-/* AUDIO */
-
-const correctSound =
-new Audio("assets/correct.mp3");
-
-const wrongSound =
-new Audio("assets/wrong.mp3");
-
-const volumeSlider =
-document.getElementById("volumeSlider");
-
-function updateVolume(){
-
-correctSound.volume =
-volumeSlider.value;
-
-wrongSound.volume =
-volumeSlider.value;
-
+function initAudio() {
+  if (!audioCtx) {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (AudioContext) {
+      audioCtx = new AudioContext();
+    }
+  }
+  if (audioCtx && audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
 }
 
-volumeSlider.addEventListener(
-"input",
-updateVolume
-);
+const volumeSlider = document.getElementById("volumeSlider");
+volumeSlider.addEventListener("input", (e) => {
+  masterVolume = parseFloat(e.target.value);
+});
 
-updateVolume();
+function playSound(type) {
+  initAudio();
+  if (!audioCtx || masterVolume <= 0) return;
 
-/* QUESTIONS */
+  const now = audioCtx.currentTime;
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
 
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+
+  if (type === "correct") {
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(523.25, now); // C5
+    osc.frequency.exponentialRampToValueAtTime(659.25, now + 0.1); // E5
+    osc.frequency.exponentialRampToValueAtTime(783.99, now + 0.2); // G5
+    
+    gain.gain.setValueAtTime(0.3 * masterVolume, now);
+    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+    
+    osc.start(now);
+    osc.stop(now + 0.4);
+  } else if (type === "wrong") {
+    osc.type = "sawtooth";
+    osc.frequency.setValueAtTime(180, now);
+    osc.frequency.linearRampToValueAtTime(110, now + 0.3);
+    
+    gain.gain.setValueAtTime(0.3 * masterVolume, now);
+    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+    
+    osc.start(now);
+    osc.stop(now + 0.35);
+  }
+}
+
+/* ---------------------------------------------------------
+   LOGO INTRO SETUP
+--------------------------------------------------------- */
+window.addEventListener("load", () => {
+  const logo = document.getElementById("logoScreen");
+  const img = document.getElementById("logoImg");
+  
+  const proceed = () => {
+    logo.style.opacity = "0";
+    setTimeout(() => {
+      logo.style.display = "none";
+      document.getElementById("startScreen").style.display = "flex";
+    }, 500);
+  };
+
+  if (img.complete) {
+    setTimeout(proceed, 2000);
+  } else {
+    img.onload = () => setTimeout(proceed, 2000);
+    img.onerror = () => proceed(); // Fallback if logo file is missing
+  }
+});
+
+/* ---------------------------------------------------------
+   QUESTIONS DATASET
+--------------------------------------------------------- */
 const questions = [
-
-{
-q:"🗿 The thief hid ___ the giant dinosaur skeleton.",
-o:["under","through","during","across"],
-a:0,
-e:"'Under' shows place below something."
-},
-
-{
-q:"🚪 The detective ran ___ the secret tunnel.",
-o:["through","between","at","before"],
-a:0,
-e:"'Through' shows movement from one side to another."
-},
-
-{
-q:"🕰️ The security alarm rings ___ midnight.",
-o:["at","beside","across","under"],
-a:0,
-e:"'At' is used for exact times."
-},
-
-{
-q:"🖼️ The painting hangs ___ two windows.",
-o:["between","into","during","through"],
-a:0,
-e:"'Between' shows position in the middle of two things."
-},
-
-{
-q:"🏃 Arrange the chase correctly:<br><br>1. The thief jumped across the table<br>2. The guard entered the room<br>3. The thief escaped through the window",
-o:[
-"2 → 1 → 3",
-"1 → 3 → 2",
-"3 → 2 → 1",
-"2 → 3 → 1"
-],
-a:0,
-e:"The guard enters, the thief jumps, then escapes."
-},
-
-{
-q:"👑 The crown is hidden ___ the glass case.",
-o:["inside","before","during","across"],
-a:0,
-e:"'Inside' shows place within something."
-},
-
-{
-q:"🚨 The detective arrived ___ the museum opened.",
-o:["before","under","through","between"],
-a:0,
-e:"'Before' shows earlier time."
-},
-
-{
-q:"🕵️ The thief climbed ___ the staircase and disappeared.",
-o:["up","during","at","beside"],
-a:0,
-e:"'Up' shows upward movement."
-},
-
-{
-q:"🏺 The ancient vase stands ___ the statue and the painting.",
-o:["between","through","after","into"],
-a:0,
-e:"'Between' is used for two surrounding objects."
-},
-
-{
-q:"💎 The thief escaped ___ the crowd during the festival.",
-o:["through","under","at","before"],
-a:0,
-e:"'Through' shows movement within a group."
-}
-
+  {
+    q: "🗿 The thief hid ___ the giant dinosaur skeleton.",
+    o: ["under", "through", "during", "across"],
+    a: 0,
+    e: "'Under' indicates a position directly below an object."
+  },
+  {
+    q: "🚪 The detective ran ___ the secret tunnel.",
+    o: ["through", "between", "at", "before"],
+    a: 0,
+    e: "'Through' refers to movement inside a three-dimensional space."
+  },
+  {
+    q: "🕰️ The security alarm rings ___ midnight.",
+    o: ["at", "beside", "across", "under"],
+    a: 0,
+    e: "'At' is used for specific times on the clock."
+  },
+  {
+    q: "🖼️ The painting hangs ___ two large windows.",
+    o: ["between", "into", "during", "through"],
+    a: 0,
+    e: "'Between' designates a central position between two points."
+  },
+  {
+    q: "🏃 Select the logical sequence:<br>1. Jumped across table<br>2. Entered room<br>3. Escaped through window",
+    o: ["2 → 1 → 3", "1 → 3 → 2", "3 → 2 → 1", "2 → 3 → 1"],
+    a: 0,
+    e: "Sequence: Enter room first, jump table second, escape window third."
+  },
+  {
+    q: "👑 The crown is secured ___ the glass display case.",
+    o: ["inside", "before", "during", "across"],
+    a: 0,
+    e: "'Inside' indicates enclosed positioning."
+  },
+  {
+    q: "🚨 The detective arrived ___ the museum opened.",
+    o: ["before", "under", "through", "between"],
+    a: 0,
+    e: "'Before' specifies an earlier time point."
+  },
+  {
+    q: "🕵️ The suspect climbed ___ the spiral staircase.",
+    o: ["up", "during", "at", "beside"],
+    a: 0,
+    e: "'Up' shows upward directional movement."
+  },
+  {
+    q: "🏺 The ancient vase stands ___ the statue and the painting.",
+    o: ["between", "through", "after", "into"],
+    a: 0,
+    e: "'Between' is used when surrounded by two distinct items."
+  },
+  {
+    q: "💎 The suspect moved ___ the crowded hallway unnoticed.",
+    o: ["through", "under", "at", "before"],
+    a: 0,
+    e: "'Through' describes movement within a crowded space."
+  }
 ];
 
-/* VARIABLES */
-
+/* ---------------------------------------------------------
+   GAME STATE & LOGIC
+--------------------------------------------------------- */
 let currentQuestion = 0;
 let correct = 0;
 let wrong = 0;
+let isProcessing = false;
 
-/* START */
-
-function startGame(){
-
-document.getElementById("startScreen")
-.style.display="none";
-
-loadQuestion();
-
+function startGame() {
+  initAudio();
+  document.getElementById("startScreen").style.display = "none";
+  currentQuestion = 0;
+  correct = 0;
+  wrong = 0;
+  updateScoreboard();
+  loadQuestion();
 }
 
-/* LOAD QUESTION */
-
-function loadQuestion(){
-
-moveDetective();
-
-const q = questions[currentQuestion];
-
-document.getElementById("questionText")
-.innerHTML = q.q;
-
-const options =
-document.getElementById("options");
-
-options.innerHTML = "";
-
-q.o.forEach((option,index)=>{
-
-const btn =
-document.createElement("button");
-
-btn.classList.add("optionBtn");
-
-btn.innerHTML = option;
-
-btn.onclick = ()=>checkAnswer(index);
-
-options.appendChild(btn);
-
-});
-
+function updateScoreboard() {
+  document.getElementById("correctScore").innerText = correct;
+  document.getElementById("wrongScore").innerText = wrong;
+  document.getElementById("questionNumber").innerText = Math.min(currentQuestion + 1, 10);
 }
 
-/* MOVE DETECTIVE */
+function loadQuestion() {
+  isProcessing = false;
+  moveDetective();
+  
+  const q = questions[currentQuestion];
+  document.getElementById("questionText").innerHTML = q.q;
 
-function moveDetective(){
+  const optionsContainer = document.getElementById("options");
+  optionsContainer.innerHTML = "";
 
-const detective =
-document.getElementById("detective");
-
-const randomX =
-Math.random()*70 + 10;
-
-const randomY =
-Math.random()*40 + 20;
-
-detective.style.left =
-randomX + "%";
-
-detective.style.top =
-randomY + "%";
-
+  q.o.forEach((option, index) => {
+    const btn = document.createElement("button");
+    btn.className = "optionBtn";
+    btn.innerHTML = option;
+    btn.onclick = () => checkAnswer(index);
+    optionsContainer.appendChild(btn);
+  });
 }
 
-/* CHECK ANSWER */
-
-function checkAnswer(selected){
-
-const q = questions[currentQuestion];
-
-const popup =
-document.getElementById("feedbackPopup");
-
-popup.style.display = "block";
-
-if(selected === q.a){
-
-correct++;
-
-document.getElementById("correctScore")
-.innerHTML = correct;
-
-correctSound.play();
-
-createConfetti();
-
-document.getElementById("feedbackTitle")
-.innerHTML = "✅ Clue Solved!";
-
-document.getElementById("feedbackTitle")
-.style.color = "green";
-
-document.getElementById("feedbackText")
-.innerHTML = q.e;
-
-document.getElementById("laser1")
-.style.display = "none";
-
-document.getElementById("laser2")
-.style.display = "none";
-
-}else{
-
-wrong++;
-
-document.getElementById("wrongScore")
-.innerHTML = wrong;
-
-wrongSound.play();
-
-document.getElementById("feedbackTitle")
-.innerHTML = "❌ Alarm Triggered!";
-
-document.getElementById("feedbackTitle")
-.style.color = "red";
-
-document.getElementById("feedbackText")
-.innerHTML =
-`
-Correct Answer:<br><br>
-<b>${q.o[q.a]}</b><br><br>
-${q.e}
-`;
-
-document.getElementById("laser1")
-.style.display = "block";
-
-document.getElementById("laser2")
-.style.display = "block";
-
+function moveDetective() {
+  const detective = document.getElementById("detective");
+  const randomX = Math.floor(Math.random() * 70) + 15;
+  const randomY = Math.floor(Math.random() * 60) + 20;
+  detective.style.left = randomX + "%";
+  detective.style.top = randomY + "%";
 }
 
-document.getElementById("questionNumber")
-.innerHTML = currentQuestion + 1;
+function checkAnswer(selected) {
+  if (isProcessing) return;
+  isProcessing = true;
+  initAudio();
 
-setTimeout(()=>{
+  const q = questions[currentQuestion];
+  const popup = document.getElementById("feedbackPopup");
+  const laser1 = document.getElementById("laser1");
+  const laser2 = document.getElementById("laser2");
 
-popup.style.display = "none";
+  popup.style.display = "block";
 
-currentQuestion++;
+  if (selected === q.a) {
+    correct++;
+    playSound("correct");
+    createConfetti();
 
-if(currentQuestion >= 10){
+    document.getElementById("feedbackTitle").innerText = "✅ Clue Solved!";
+    document.getElementById("feedbackTitle").style.color = "#2e7d32";
+    document.getElementById("feedbackText").innerHTML = q.e;
 
-endGame();
+    laser1.style.display = "none";
+    laser2.style.display = "none";
+  } else {
+    wrong++;
+    playSound("wrong");
 
-}else{
+    document.getElementById("feedbackTitle").innerText = "❌ Alarm Triggered!";
+    document.getElementById("feedbackTitle").style.color = "#c62828";
+    document.getElementById("feedbackText").innerHTML = 
+      `Correct Answer: <b>${q.o[q.a]}</b><br><br>${q.e}`;
 
-loadQuestion();
+    laser1.style.display = "block";
+    laser2.style.display = "block";
+  }
 
+  updateScoreboard();
+
+  setTimeout(() => {
+    popup.style.display = "none";
+    laser1.style.display = "none";
+    laser2.style.display = "none";
+
+    currentQuestion++;
+    if (currentQuestion >= questions.length) {
+      endGame();
+    } else {
+      loadQuestion();
+    }
+  }, 2200);
 }
 
-},2500);
+function createConfetti() {
+  const count = window.innerWidth < 480 ? 20 : 35;
+  for (let i = 0; i < count; i++) {
+    const conf = document.createElement("div");
+    conf.className = "confetti";
+    conf.style.left = Math.random() * 100 + "%";
+    conf.style.background = `hsl(${Math.random() * 360}, 100%, 50%)`;
+    conf.style.animationDuration = (1.8 + Math.random() * 1.5) + "s";
+    document.body.appendChild(conf);
 
+    setTimeout(() => conf.remove(), 3200);
+  }
 }
 
-/* CONFETTI */
+function endGame() {
+  document.getElementById("endScreen").style.display = "flex";
+  const percentage = Math.round((correct / questions.length) * 100);
 
-function createConfetti(){
+  let message = "";
+  if (correct === 10) {
+    message = "🌟 PERFECT DETECTIVE WORK!<br>The thief was apprehended and all artifacts are secure!";
+  } else if (correct >= 7) {
+    message = "🕵️ Great Job!<br>You cracked key clues and escaped safely!";
+  } else {
+    message = "🎉 Mission Complete!<br>Review prepositions and try again to improve your score!";
+  }
 
-for(let i=0;i<40;i++){
-
-const conf =
-document.createElement("div");
-
-conf.classList.add("confetti");
-
-conf.style.left =
-Math.random()*100 + "%";
-
-conf.style.background =
-`hsl(${Math.random()*360},100%,50%)`;
-
-conf.style.animationDuration =
-(2 + Math.random()*2)+"s";
-
-document.body.appendChild(conf);
-
-setTimeout(()=>{
-conf.remove();
-},4000);
-
+  document.getElementById("finalText").innerHTML = `
+    ✅ Correct Answers: ${correct}/${questions.length}<br>
+    ❌ Wrong Answers: ${wrong}<br>
+    ⭐ Score: ${percentage}%<br><br>
+    ${message}
+  `;
 }
 
+function restartGame() {
+  document.getElementById("endScreen").style.display = "none";
+  startGame();
 }
-
-/* END */
-
-function endGame(){
-
-document.getElementById("endScreen")
-.style.display = "flex";
-
-let percentage =
-Math.round((correct / 10) * 100);
-
-let message = "";
-
-if(correct === 10){
-
-message =
-"🌟 PERFECT DETECTIVE WORK! The thief has been caught!";
-
-}else if(correct >= 8){
-
-message =
-"🕵️ Amazing Investigation Skills!";
-
-}else if(correct >= 6){
-
-message =
-"👏 Great Museum Detective Work!";
-
-}else{
-
-message =
-"🎉 Nice Try! The museum is safe again!";
-}
-
-document.getElementById("finalText")
-.innerHTML =
-`
-🏆 Correct Answers: ${correct}/10<br><br>
-
-❌ Wrong Answers: ${wrong}<br><br>
-
-⭐ Score Percentage: ${percentage}%<br><br>
-
-${message}
-`;
-
-}
-
-/* RESTART */
-
-function restartGame(){
-
-location.reload();
-
-}
-
 </script>
 
 </body>
