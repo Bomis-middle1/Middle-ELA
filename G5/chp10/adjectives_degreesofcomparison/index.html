@@ -194,7 +194,7 @@
 
       <div id="splash">
         <div id="splashCard">
-          <img id="splashLogo" src="data:image/png;base64,[YOUR_LOGO_BASE64]" alt="Innovine logo">
+          <img id="splashLogo" src="assets/logo.png" alt="Innovine logo">
           <div id="splashText">Innovine</div>
         </div>
       </div>
@@ -234,16 +234,20 @@
     </div>
   </div>
 
-  <audio id="sndCorrect" preload="auto" src="data:audio/mpeg;base64,[YOUR_CORRECT_MP3_BASE64]"></audio>
-  <audio id="sndWrong" preload="auto" src="data:audio/mpeg;base64,[YOUR_WRONG_MP3_BASE64]"></audio>
-  <audio id="sndClaps" preload="auto" src="data:audio/mpeg;base64,[YOUR_CLAPS_MP3_BASE64]"></audio>
+  <audio id="sndCorrect" preload="auto" src="assets/correct.mp3"></audio>
+  <audio id="sndWrong" preload="auto" src="assets/wrong.mp3"></audio>
+  <audio id="sndClaps" preload="auto" src="assets/freesound_community-claps-44774.mp3"></audio>
 
   <script>
-    const words = ["tallest","better","worse","farther","most","more expensive","noisier","kinder","prettiest","more careful","best","warmer","smaller"];
+    const words = [
+      "tall", "good", "careful", "noisy", "warm",
+      "taller", "better", "more careful", "noisier", "warmer",
+      "tallest", "best", "most careful", "noisiest", "warmest"
+    ];
     const degrees = {
-      tallest: "Superlative", better: "Comparative", worse: "Comparative", farther: "Comparative",
-      most: "Superlative", "more expensive": "Comparative", noisier: "Comparative", kinder: "Comparative",
-      prettiest: "Superlative", "more careful": "Comparative", best: "Superlative", warmer: "Comparative", smaller: "Comparative"
+      tall: "Positive", good: "Positive", careful: "Positive", noisy: "Positive", warm: "Positive",
+      taller: "Comparative", better: "Comparative", "more careful": "Comparative", noisier: "Comparative", warmer: "Comparative",
+      tallest: "Superlative", best: "Superlative", "most careful": "Superlative", noisiest: "Superlative", warmest: "Superlative"
     };
 
     const game = document.getElementById("game");
@@ -272,7 +276,6 @@
       soundToggle.textContent = soundOn ? "🔊" : "🔇";
     });
 
-    // Responsive scaling: fit the fixed 1280x720 board to any screen
     function fitGame() {
       const scale = Math.min(window.innerWidth / 1280, window.innerHeight / 720, 1) * 0.98;
       game.style.transform = `scale(${scale})`;
@@ -310,7 +313,7 @@
       clearDropHighlights();
       if (wordList.length === 0) {
         wordBox.textContent = "Game Complete!";
-        feedback.textContent = `Final Score: ${score}/13`;
+        feedback.textContent = `Final Score: ${score}/15`;
         scoop.style.display = "none";
         restartBtn.style.display = "inline-block";
         playSound(sndClaps);
@@ -386,7 +389,7 @@
         playSound(sndWrong);
         if (attempts <= 0) {
           wordBox.textContent = "Game Over!";
-          feedback.textContent = `Final Score: ${score}/13`;
+          feedback.textContent = `Final Score: ${score}/15`;
           scoop.style.display = "none";
           restartBtn.style.display = "inline-block";
         }
