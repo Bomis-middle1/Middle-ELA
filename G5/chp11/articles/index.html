@@ -2,16 +2,21 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>🍿 Popcorn Catch Cinema</title>
 
 <style>
-/* Keep all your existing CSS as is */
 *{
 margin:0;
 padding:0;
 box-sizing:border-box;
 font-family:Arial,sans-serif;
+-webkit-tap-highlight-color:transparent;
+}
+
+html,body{
+height:100%;
+overscroll-behavior:none;
 }
 
 body{
@@ -24,7 +29,9 @@ background:black;
 position:relative;
 width:100vw;
 height:100vh;
+height:100dvh; /* fixes mobile browser address-bar resizing */
 overflow:hidden;
+touch-action:none; /* stops pull-to-refresh / page scroll while playing */
 background:
 linear-gradient(to bottom,#0d1b2a,#1b263b,#415a77);
 }
@@ -38,6 +45,7 @@ background:rgba(255,255,255,0.06);
 border-radius:50%;
 filter:blur(40px);
 animation:moveLight 10s infinite alternate;
+pointer-events:none;
 }
 
 .light2{
@@ -75,17 +83,21 @@ max-width:80%;
 #startScreen,
 #endScreen{
 position:absolute;
+inset:0;
 width:100%;
 height:100%;
 background:rgba(0,0,0,0.85);
 display:flex;
-justify-content:center;
+justify-content:flex-start;
 align-items:center;
 flex-direction:column;
 text-align:center;
 color:white;
-padding:20px;
+padding:30px 20px 50px;
 z-index:5000;
+overflow-y:auto;
+-webkit-overflow-scrolling:touch;
+touch-action:pan-y;
 }
 
 .mainBtn{
@@ -97,7 +109,10 @@ background:#ff9800;
 color:white;
 cursor:pointer;
 margin-top:25px;
+margin-bottom:15px;
 transition:0.3s;
+touch-action:manipulation;
+flex-shrink:0;
 }
 
 .mainBtn:hover{
@@ -126,6 +141,7 @@ box-shadow:
 0 0 25px rgba(255,255,255,0.5),
 0 0 60px rgba(255,255,255,0.2);
 z-index:50;
+text-align:center;
 }
 
 /* PLAYER */
@@ -138,6 +154,7 @@ font-size:95px;
 filter:drop-shadow(0 0 15px gold);
 transition:left 0.06s linear;
 z-index:100;
+pointer-events:none;
 }
 
 /* FALLING ITEMS */
@@ -146,6 +163,7 @@ position:absolute;
 font-size:48px;
 animation:spin 3s linear infinite;
 filter:drop-shadow(0 0 10px white);
+pointer-events:none;
 }
 
 @keyframes spin{
@@ -163,9 +181,9 @@ position:absolute;
 top:15px;
 left:15px;
 background:white;
-padding:12px 18px;
+padding:10px 14px;
 border-radius:15px;
-font-size:20px;
+font-size:16px;
 font-weight:bold;
 z-index:200;
 }
@@ -176,9 +194,15 @@ position:absolute;
 top:15px;
 right:15px;
 background:white;
-padding:12px;
+padding:10px;
 border-radius:15px;
 z-index:200;
+font-size:13px;
+touch-action:manipulation;
+}
+
+#volumeSlider{
+touch-action:manipulation;
 }
 
 /* UNLOCK MESSAGE */
@@ -194,6 +218,8 @@ text-shadow:0 0 20px gold;
 display:none;
 z-index:3000;
 animation:pop 0.8s;
+text-align:center;
+width:90%;
 }
 
 /* QUESTIONS */
@@ -204,6 +230,9 @@ left:50%;
 transform:translate(-50%,-50%);
 width:92%;
 max-width:650px;
+max-height:85vh;
+max-height:85dvh;
+overflow-y:auto;
 background:#fff8e1;
 padding:28px;
 border-radius:25px;
@@ -211,6 +240,7 @@ display:none;
 z-index:4000;
 box-shadow:0 0 30px rgba(0,0,0,0.5);
 animation:popup 0.5s;
+touch-action:pan-y;
 }
 
 #questionTitle{
@@ -238,6 +268,7 @@ color:white;
 font-size:18px;
 cursor:pointer;
 transition:0.3s;
+touch-action:manipulation;
 }
 
 .optionBtn:hover{
@@ -269,6 +300,7 @@ position:absolute;
 width:12px;
 height:12px;
 animation:fall 3s linear forwards;
+pointer-events:none;
 }
 
 @keyframes fall{
@@ -311,27 +343,29 @@ opacity:1;
 
 /* HOW TO CATCH BOX */
 #howToCatch{
-margin-top:25px;
+margin-top:20px;
 background:rgba(255,255,255,0.15);
-padding:20px;
+padding:16px;
 border-radius:15px;
 max-width:600px;
+flex-shrink:0;
 }
 
 #howToCatch h3{
 color:#ff9800;
-margin-bottom:15px;
-font-size:24px;
+margin-bottom:12px;
+font-size:22px;
 }
 
 #howToCatch p{
-margin:8px 0;
-font-size:17px;
-line-height:1.5;
+margin:6px 0;
+font-size:16px;
+line-height:1.4;
+text-align:left;
 }
 
 #howToCatch .icon{
-font-size:28px;
+font-size:24px;
 margin-right:8px;
 }
 
@@ -339,36 +373,66 @@ margin-right:8px;
 @media(max-width:768px){
 
 #bucket{
-font-size:72px;
+font-size:60px;
 }
 
 .item{
-font-size:38px;
+font-size:34px;
 }
 
 #questionText{
-font-size:19px;
+font-size:18px;
+}
+
+#questionBox{
+padding:20px;
 }
 
 .optionBtn{
 font-size:16px;
+padding:14px;
 }
 
 #screen{
-font-size:24px;
-height:90px;
+font-size:18px;
+height:80px;
+width:88%;
+top:15px;
 }
 
 #unlockMessage{
-font-size:36px;
+font-size:32px;
+}
+
+#startScreen h1{
+font-size:34px !important;
+}
+
+#startScreen > p{
+font-size:17px !important;
 }
 
 #howToCatch h3{
-font-size:20px;
+font-size:18px;
 }
 
 #howToCatch p{
-font-size:15px;
+font-size:14px;
+}
+
+.mainBtn{
+font-size:18px;
+padding:14px 28px;
+}
+
+#scoreBoard{
+font-size:13px;
+padding:8px 10px;
+}
+
+#volumeBox{
+font-size:11px;
+padding:8px;
 }
 
 }
@@ -465,7 +529,7 @@ document.getElementById("logoScreen").style.display="none";
 document.getElementById("startScreen").style.display="flex";
 },5000);
 
-/* AUDIO - FIXED PATHS */
+/* AUDIO */
 const correctSound = new Audio("assets/correct.mp3");
 const wrongSound = new Audio("assets/wrong.mp3");
 const clapSound = new Audio("assets/freesound_community-claps-44774.mp3");
@@ -479,6 +543,18 @@ clapSound.volume = volumeSlider.value;
 }
 volumeSlider.addEventListener("input",updateVolume);
 updateVolume();
+
+/* Unlock audio playback on first user gesture (required by mobile browsers) */
+let audioUnlocked = false;
+function unlockAudio(){
+if(audioUnlocked) return;
+audioUnlocked = true;
+[correctSound,wrongSound,clapSound].forEach(a=>{
+a.play().then(()=>{ a.pause(); a.currentTime = 0; }).catch(()=>{});
+});
+}
+document.addEventListener("touchstart",unlockAudio,{once:true,passive:true});
+document.addEventListener("click",unlockAudio,{once:true});
 
 /* VARIABLES */
 const bucket = document.getElementById("bucket");
@@ -556,22 +632,31 @@ questions.sort(()=>Math.random()-0.5);
 /* START */
 function startGame(){
 document.getElementById("startScreen").style.display="none";
+bucketX = window.innerWidth/2;
+moveBucket();
 gameRunning = true;
 spawnItems();
 }
 
-/* MOVEMENT */
+/* MOVEMENT - keyboard (desktop/laptop) */
 document.addEventListener("keydown",(e)=>{
 if(e.key==="ArrowLeft"){ bucketX -= 45; }
 if(e.key==="ArrowRight"){ bucketX += 45; }
 moveBucket();
 });
 
-document.addEventListener("touchstart",(e)=>{
+/* MOVEMENT - touch (mobile/tablet), only while playing and never on top of UI elements */
+document.getElementById("gameArea").addEventListener("touchstart",(e)=>{
+if(!gameRunning) return;
+const target = e.target;
+if(target.closest("button, input, #questionBox, #startScreen, #endScreen, #volumeBox")) return;
 if(e.touches[0].clientX < window.innerWidth/2){ bucketX -= 55; }
 else{ bucketX += 55; }
 moveBucket();
-});
+},{passive:true});
+
+/* Keep bucket in bounds if the viewport is resized / rotated */
+window.addEventListener("resize",moveBucket);
 
 function moveBucket(){
 if(bucketX < 50) bucketX = 50;
@@ -649,13 +734,13 @@ const feedback = document.getElementById("feedback");
 if(selected === correct){
 feedback.innerHTML = "🎉 Correct!";
 feedback.className = "correct";
-correctSound.play();
-clapSound.play();
+correctSound.play().catch(()=>{});
+clapSound.play().catch(()=>{});
 createConfetti();
 }else{
 feedback.innerHTML = "❌ Wrong!";
 feedback.className = "wrong";
-wrongSound.play();
+wrongSound.play().catch(()=>{});
 }
 currentQuestion++;
 document.getElementById("questionCount").innerText = currentQuestion;
