@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
 <title>Preposition Simon Says</title>
 <style>
   :root{
@@ -17,14 +17,17 @@
     --soft:#f8fafc;
     --line:#dbeafe;
   }
-  *{box-sizing:border-box}
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
   html,body{
     height:100%;
     margin:0;
     font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
     background:linear-gradient(135deg,var(--bg1),var(--bg3));
     color:var(--ink);
-    overflow:hidden;
+    overflow-x:hidden;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+    overscroll-behavior:none;
   }
   .app{
     min-height:100%;
@@ -358,6 +361,7 @@
     font-weight:900;
     cursor:pointer;
     transition:transform .08s ease,filter .2s ease;
+    touch-action:manipulation;
   }
   button:active{transform:scale(.98)}
   .start{
@@ -422,6 +426,7 @@
     place-items:center;
     background:linear-gradient(135deg,rgba(124,58,237,.92),rgba(6,182,212,.9));
     z-index:30;
+    overflow-y:auto;
   }
   .overlay.hidden{display:none}
   .splash{
@@ -431,6 +436,7 @@
     padding:26px;
     box-shadow:0 30px 90px rgba(0,0,0,.25);
     text-align:center;
+    margin:auto;
   }
   .splash img{
     width:min(280px,70vw);
@@ -452,9 +458,13 @@
   }
 
   @media (max-width:900px){
+    .app{
+      align-items:flex-start;
+    }
     .shell{
       height:auto;
       min-height:calc(100vh - 28px);
+      min-height:calc(100dvh - 28px);
     }
     .main{
       grid-template-columns:1fr;
@@ -486,7 +496,7 @@
 <body>
 <div class="overlay" id="splash">
   <div class="splash">
-    <img src="assets/logo.png" alt="Logo">
+    <img src="data:image/png;base64,PASTE_YOUR_LOGO_BASE64_HERE" alt="Logo" onerror="this.style.display='none'">
     <h1 class="bigtitle">Preposition Simon Says</h1>
     <p>Get ready for a fun classroom game full of movement, colors, and prepositions!</p>
     <p><strong>Loading in 3 seconds...</strong></p>
