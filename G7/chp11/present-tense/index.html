@@ -2,373 +2,688 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Grammar Factory</title>
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Grammar Factory: Cyber Conveyor</title>
 <style>
-body{
-margin:0;
-font-family:Arial;
-background:linear-gradient(135deg,#1e3c72,#2a5298,#ffb347);
-overflow:hidden;
-color:white;
-}
+  :root {
+    --bg: #090d16;
+    --panel: #131b2e;
+    --accent: #00f2fe;
+    --accent-orange: #ff9f43;
+    --success: #10b981;
+    --danger: #ef4444;
+    --text: #f8fafc;
+  }
 
-/* SCREEN SYSTEM */
-.screen{
-position:fixed;
-inset:0;
-display:none;
-align-items:center;
-justify-content:center;
-flex-direction:column;
-text-align:center;
-}
-.active{display:flex;}
+  * {
+    box-sizing: border-box;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+  }
 
-/* LOGO */
-#logoScreen{background:#fff;}
-#logoScreen img{width:220px;}
+  body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
 
-/* TITLE */
-#titleScreen h1{font-size:30px;}
+  /* SCREEN SYSTEM */
+  .screen {
+    position: absolute;
+    inset: 0;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 15px;
+    z-index: 10;
+  }
 
-/* HUD */
-#hud{
-position:fixed;
-top:0;
-left:0;
-right:0;
-display:flex;
-justify-content:space-around;
-padding:10px;
-background:rgba(0,0,0,0.6);
-z-index:10;
-font-size:13px;
-}
+  .screen.active { display: flex; }
 
-/* GAME BOX */
-#gameBox{
-width:90%;
-max-width:650px;
-background:#fff;
-color:#000;
-border-radius:16px;
-padding:18px;
-margin-top:90px;
-}
+  /* SPLASH LOGO SCREEN */
+  #logoScreen {
+    background: #ffffff;
+    z-index: 100;
+  }
 
-#sentence{
-font-size:18px;
-font-weight:bold;
-margin-bottom:10px;
-}
+  #logoScreen img {
+    max-width: 75%;
+    width: 250px;
+    height: auto;
+    animation: logoPulse 1.2s ease-in-out infinite alternate;
+  }
 
-.options{
-display:flex;
-flex-wrap:wrap;
-gap:10px;
-justify-content:center;
-}
+  @keyframes logoPulse {
+    from { transform: scale(0.96); filter: drop-shadow(0 0 2px rgba(0,0,0,0.1)); }
+    to { transform: scale(1.04); filter: drop-shadow(0 0 12px rgba(0,242,254,0.4)); }
+  }
 
-.option{
-flex:1 1 45%;
-padding:10px;
-background:#f2f2f2;
-border-radius:10px;
-cursor:pointer;
-font-weight:bold;
-user-select:none;
-}
+  /* TITLE SCREEN */
+  #titleScreen {
+    background: radial-gradient(circle at center, #1e293b 0%, #090d16 100%);
+    text-align: center;
+  }
 
-.option:active{transform:scale(0.97);}
+  .factory-badge {
+    background: rgba(0, 242, 254, 0.1);
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
 
-.correct{background:#2ecc71;color:#fff;}
-.wrong{background:#e74c3c;color:#fff;}
+  h1 {
+    font-size: clamp(26px, 6vw, 40px);
+    margin: 0 0 10px 0;
+    background: linear-gradient(135deg, #fff 30%, var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
 
-/* POPUP */
-#popup{
-position:fixed;
-top:50%;
-left:50%;
-transform:translate(-50%,-50%);
-background:#000;
-color:#fff;
-padding:14px;
-border-radius:10px;
-display:none;
-z-index:999;
-}
+  p { color: #94a3b8; font-size: clamp(14px, 3.5vw, 16px); margin-bottom: 25px; max-width: 400px; }
 
-/* CONVEYOR */
-.conveyor{
-position:fixed;
-bottom:0;
-left:0;
-right:0;
-height:60px;
-background:repeating-linear-gradient(90deg,#444,#444 20px,#666 20px,#666 40px);
-opacity:0.6;
-}
+  .btn-play {
+    background: linear-gradient(135deg, #ff9f43, #ff5252);
+    color: white;
+    border: none;
+    padding: 14px 40px;
+    font-size: 18px;
+    font-weight: 800;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 0 20px rgba(255, 159, 67, 0.4);
+    transition: transform 0.1s, box-shadow 0.1s;
+  }
 
-/* BUTTON */
-button{
-padding:10px 16px;
-border:none;
-border-radius:10px;
-background:orange;
-font-weight:bold;
-cursor:pointer;
-}
+  .btn-play:active { transform: scale(0.95); }
+
+  /* GAME HUD */
+  #hud {
+    width: 100%;
+    max-width: 800px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    background: var(--panel);
+    border-bottom: 2px solid #1e293b;
+    z-index: 20;
+  }
+
+  .hud-card {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 6px 12px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .hud-card span { color: var(--accent); font-size: 15px; }
+
+  /* MAIN FACTORY STAGE */
+  #gameScreen {
+    padding: 0;
+    justify-content: flex-start;
+    background: linear-gradient(to bottom, #0f172a, #090d16);
+  }
+
+  .factory-stage {
+    width: 100%;
+    max-width: 800px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* CONVEYOR TRACK & CRATE */
+  .conveyor-zone {
+    width: 100%;
+    height: 180px;
+    position: relative;
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .conveyor-belt {
+    position: absolute;
+    bottom: 10px;
+    width: 100%;
+    height: 24px;
+    background: repeating-linear-gradient(90deg, #334155, #334155 20px, #1e293b 20px, #1e293b 40px);
+    border-top: 3px solid #64748b;
+    border-bottom: 3px solid #0f172a;
+    animation: beltSlide 1.5s linear infinite;
+  }
+
+  @keyframes beltSlide {
+    from { background-position: 0 0; }
+    to { background-position: 40px 0; }
+  }
+
+  /* CRATE MOVING ON BELT */
+  .crate {
+    position: relative;
+    width: 90%;
+    max-width: 600px;
+    background: linear-gradient(145deg, #1e293b, #0f172a);
+    border: 2px solid var(--accent);
+    border-radius: 16px;
+    padding: 18px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5), inset 0 0 15px rgba(0, 242, 254, 0.15);
+    text-align: center;
+    z-index: 5;
+    animation: floatCrate 3s ease-in-out infinite alternate;
+  }
+
+  @keyframes floatCrate {
+    from { transform: translateY(0px); }
+    to { transform: translateY(-6px); }
+  }
+
+  .sentence-text {
+    font-size: clamp(15px, 3.8vw, 19px);
+    font-weight: 700;
+    line-height: 1.5;
+    color: #f8fafc;
+  }
+
+  .drop-target {
+    display: inline-block;
+    min-width: 120px;
+    padding: 4px 12px;
+    margin: 0 4px;
+    background: rgba(0, 242, 254, 0.1);
+    border: 2px dashed var(--accent);
+    border-radius: 8px;
+    color: var(--accent);
+    font-size: inherit;
+    transition: all 0.3s ease;
+  }
+
+  .drop-target.correct-fit {
+    background: rgba(16, 185, 129, 0.2);
+    border: 2px solid var(--success);
+    color: var(--success);
+    box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
+  }
+
+  /* FUEL PODS / VERB PODS AREA */
+  .pods-zone {
+    width: 100%;
+    padding: 20px 15px 30px 15px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    z-index: 10;
+  }
+
+  .verb-pod {
+    background: linear-gradient(145deg, #1e293b, #131b2e);
+    border: 1px solid #334155;
+    color: #f8fafc;
+    padding: 16px 12px;
+    border-radius: 14px;
+    font-size: clamp(14px, 3.5vw, 16px);
+    font-weight: 700;
+    cursor: pointer;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .verb-pod::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+    transition: left 0.5s;
+  }
+
+  .verb-pod:active { transform: scale(0.96); }
+
+  .verb-pod.wrong-shake {
+    animation: shake 0.4s ease-in-out;
+    border-color: var(--danger);
+    background: rgba(239, 68, 68, 0.2);
+  }
+
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-8px); }
+    40%, 80% { transform: translateX(8px); }
+  }
+
+  /* MANUAL GEAR OVERLAY */
+  .rule-btn {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid #334155;
+    color: var(--accent);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    z-index: 25;
+  }
+
+  #ruleModal {
+    position: fixed;
+    inset: 0;
+    background: rgba(9, 13, 22, 0.9);
+    backdrop-filter: blur(8px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 200;
+  }
+
+  #ruleModal.active { display: flex; }
+
+  .modal-card {
+    background: var(--panel);
+    border: 1px solid var(--accent);
+    border-radius: 18px;
+    padding: 20px;
+    max-width: 450px;
+    width: 100%;
+    color: #cbd5e1;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  .modal-card h3 { color: #fff; margin-top: 0; border-bottom: 1px solid #334155; padding-bottom: 8px; }
+
+  /* OVERLAY PARTICLES / CELEBRATION */
+  #canvasParticles {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 15;
+  }
 </style>
 </head>
-
 <body>
 
-<!-- LOGO -->
+<!-- 1. SPLASH LOGO SCREEN (5 SECONDS) -->
 <div id="logoScreen" class="screen active">
-<img src="assets/innovine-logo.png">
+  <img src="assets/innovine-logo.png" alt="Innovine Logo" onerror="this.style.display='none'; document.getElementById('altLogo').style.display='block';">
+  <h1 id="altLogo" style="display:none; color:#0f172a; font-size:32px;">INNOVINE</h1>
 </div>
 
-<!-- TITLE -->
+<!-- 2. TITLE SCREEN -->
 <div id="titleScreen" class="screen">
-<div>
-<h1>🏭 Grammar Factory</h1>
-<p>Conveyor Belt Challenge</p>
-<button onclick="startGame()">Start Factory</button>
-</div>
+  <div class="factory-badge">Grade 7 • Chapter 11</div>
+  <h1>FACTORY CONVEYOR</h1>
+  <p>Load the moving crates with the correct Present Tense Verb Pods!</p>
+  <button class="btn-play" onclick="startGame()">START ASSEMBLY</button>
 </div>
 
-<!-- GAME -->
+<!-- 3. GAMEPLAY SCREEN -->
 <div id="gameScreen" class="screen">
+  <div id="hud">
+    <div class="hud-card">📦 Crate <span id="hudProg">1/10</span></div>
+    <div class="hud-card">⭐ Score <span id="hudScore">0</span></div>
+    <div class="hud-card">❤️ Energy <span id="hudAtt">2</span></div>
+  </div>
 
-<div id="hud">
-<div>📦 <span id="prog">0</span>/10</div>
-<div>⭐ <span id="score">0</span></div>
-<div>🪙 <span id="coins">0</span></div>
-<div>❤️ <span id="att">2</span></div>
+  <button class="rule-btn" onclick="toggleManual(true)">⚙️ Guide</button>
+
+  <div class="factory-stage">
+    <canvas id="canvasParticles"></canvas>
+
+    <!-- CONVEYOR SECTION -->
+    <div class="conveyor-zone">
+      <div class="crate" id="crateBox">
+        <div class="sentence-text" id="sentenceDisplay">
+          Loading sentence...
+        </div>
+      </div>
+      <div class="conveyor-belt"></div>
+    </div>
+
+    <!-- VERB POD SELECTION -->
+    <div class="pods-zone" id="podsContainer">
+      <!-- Generated via JS -->
+    </div>
+  </div>
 </div>
 
-<div id="gameBox">
-<div id="sentence"></div>
-<div class="options" id="options"></div>
-</div>
-
-<div class="conveyor"></div>
-
-</div>
-
-<!-- END -->
+<!-- 4. END SCREEN -->
 <div id="endScreen" class="screen">
-<h2>🏆 MASTER FACTORY ENGINEER</h2>
-<div id="result"></div>
-<button onclick="location.reload()">Play Again</button>
+  <div class="factory-badge">Assembly Complete</div>
+  <h1 style="margin-bottom:5px;">MASTER ENGINEER</h1>
+  <p id="finalStats">Score: 0 | Accuracy: 0%</p>
+  <button class="btn-play" onclick="startGame()">PLAY AGAIN</button>
 </div>
 
-<div id="popup"></div>
+<!-- GRAMMAR GUIDE MODAL -->
+<div id="ruleModal">
+  <div class="modal-card">
+    <h3>⚙️ Present Tense Quick Reference</h3>
+    <ul>
+      <li><strong>Simple Present:</strong> Habits, routines & facts[cite: 9] (e.g., <em>plays, wakes up, orbits</em>)[cite: 9]</li>
+      <li><strong>Present Continuous:</strong> Actions happening right now[cite: 9] (e.g., <em>is listening, is cooking</em>)[cite: 9]</li>
+      <li><strong>Present Perfect:</strong> Completed past action with present impact[cite: 9] (e.g., <em>have finished, have learned</em>)[cite: 9]</li>
+      <li><strong>Present Perfect Continuous:</strong> Ongoing action started in the past[cite: 9] (e.g., <em>have been waiting</em>)[cite: 9]</li>
+    </ul>
+    <button class="btn-play" style="padding:8px 20px; font-size:14px; margin-top:10px;" onclick="toggleManual(false)">CLOSE</button>
+  </div>
+</div>
 
 <script>
-
 /* ================= AUDIO SYSTEM ================= */
-const audio = {
-correct: new Audio("assets/correct.mp3"),
-wrong: new Audio("assets/wrong.mp3"),
-clap: new Audio("assets/clapping.mp3")
+const audioFiles = {
+  correct: new Audio("assets/correct.mp3"),
+  wrong: new Audio("assets/wrong.mp3"),
+  clap: new Audio("assets/clapping.mp3")
 };
 
-function playSound(type){
-let a = audio[type];
-if(!a) return;
-a.pause();
-a.currentTime = 0;
-a.play().catch(()=>{});
+const AudioCtx = window.AudioContext || window.webkitAudioContext;
+let audioCtx = null;
+
+function playAudio(type) {
+  let a = audioFiles[type];
+  if (a) {
+    a.currentTime = 0;
+    let p = a.play();
+    if(p) p.catch(() => synthAudio(type));
+  } else {
+    synthAudio(type);
+  }
 }
 
-/* ================= LOGIC ================= */
-const QUESTIONS = [
-{
-q:"She goes to school by bus every day.",
-a:"Present Simple",
-opts:["Present Simple","Present Continuous","Present Perfect","Present Perfect Continuous"],
-hint:"Daily routine"
-},
-{
-q:"They are decorating the classroom for the annual day celebration.",
-a:"Present Continuous",
-opts:["Present Perfect","Present Continuous","Present Simple","Present Perfect Continuous"],
-hint:"happening now"
-},
-{
-q:"We have finished our science project.",
-a:"Present Perfect",
-opts:["Present Continuous","Present Perfect","Present Simple","Present Perfect Continuous"],
-hint:"completed"
-},
-{
-q:"My brother has been practising the guitar for two hours.",
-a:"Present Perfect Continuous",
-opts:["Present Simple","Present Continuous","Present Perfect","Present Perfect Continuous"],
-hint:"ongoing action"
-},
-{
-q:"The Earth revolves around the Sun.",
-a:"Present Simple",
-opts:["Present Continuous","Present Perfect","Present Simple","Present Perfect Continuous"],
-hint:"fact"
-},
-{
-q:"Look! The children are flying kites.",
-a:"Present Continuous",
-opts:["Present Continuous","Present Perfect","Present Simple","Present Perfect Continuous"],
-hint:"now"
-},
-{
-q:"Our teacher has checked all notebooks.",
-a:"Present Perfect",
-opts:["Present Perfect","Present Continuous","Present Perfect Continuous","Present Simple"],
-hint:"done"
-},
-{
-q:"Riya has been reading since Monday.",
-a:"Present Perfect Continuous",
-opts:["Present Continuous","Present Perfect","Present Perfect Continuous","Present Simple"],
-hint:"since clue"
-},
-{
-q:"The bus arrives at 7:30 every day.",
-a:"Present Simple",
-opts:["Present Continuous","Present Perfect","Present Simple","Present Perfect Continuous"],
-hint:"schedule"
-},
-{
-q:"I am helping my mother right now.",
-a:"Present Continuous",
-opts:["Present Perfect","Present Continuous","Present Simple","Present Perfect Continuous"],
-hint:"now"
+function synthAudio(type) {
+  try {
+    if (!audioCtx) audioCtx = new AudioCtx();
+    let osc = audioCtx.createOscillator();
+    let gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    if (type === 'correct') {
+      osc.frequency.setValueAtTime(440, audioCtx.currentTime);
+      osc.frequency.setValueAtTime(880, audioCtx.currentTime + 0.1);
+      gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+      osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+    } else if (type === 'wrong') {
+      osc.frequency.setValueAtTime(180, audioCtx.currentTime);
+      osc.frequency.setValueAtTime(110, audioCtx.currentTime + 0.15);
+      gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.35);
+      osc.start(); osc.stop(audioCtx.currentTime + 0.35);
+    } else if (type === 'clap') {
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(520, audioCtx.currentTime);
+      gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+      osc.start(); osc.stop(audioCtx.currentTime + 0.4);
+    }
+  } catch(e) {}
 }
+
+/* ================= CURRICULUM DATA (CHAPTER 11) ================= */
+const QUESTIONS = [
+  {
+    before: "Rama ",
+    after: " to her favourite music right now.",
+    target: "is listening",
+    options: ["is listening", "am listening", "are listening", "listens"]
+  },
+  {
+    before: "My parents ",
+    after: " for over an hour.",
+    target: "have been waiting",
+    options: ["have been waiting", "has been waiting", "is waiting", "are wait"]
+  },
+  {
+    before: "John ",
+    after: " football every Saturday.",
+    target: "plays",
+    options: ["plays", "play", "playing", "played"]
+  },
+  {
+    before: "We ",
+    after: " English for two hours.",
+    target: "have been studying",
+    options: ["have been studying", "has been studying", "did study", "are study"]
+  },
+  {
+    before: "Recently, I ",
+    after: " how to play the guitar.",
+    target: "have learned",
+    options: ["have learned", "learn", "are learning", "was learning"]
+  },
+  {
+    before: "While the children play, Jenna ",
+    after: " her mystery novel.",
+    target: "is reading",
+    options: ["is reading", "has read", "reads", "read"]
+  },
+  {
+    before: "Grandma ",
+    after: " her lasagna in the kitchen right now.",
+    target: "is cooking",
+    options: ["is cooking", "cooks", "has cooked", "have cooked"]
+  },
+  {
+    before: "The Earth ",
+    after: " around the Sun.",
+    target: "orbits",
+    options: ["orbits", "is orbiting", "has orbited", "orbit"]
+  },
+  {
+    before: "They ",
+    after: " their homework already.",
+    target: "have finished",
+    options: ["have finished", "has finished", "are finishing", "finish"]
+  },
+  {
+    before: "Seema ",
+    after: " early every day.",
+    target: "wakes up",
+    options: ["wakes up", "is waking up", "has woken up", "wake up"]
+  }
 ];
 
-/* ================= STATE ================= */
-let order=[],i=0,score=0,coins=0,att=2,lock=false;
+/* ================= GAME ENGINE ================= */
+let qList = [], index = 0, score = 0, attempts = 2, isLocked = false;
 
-/* shuffle */
-function shuffle(a){return [...a].sort(()=>Math.random()-0.5);}
-
-/* ================= START ================= */
-setTimeout(()=>{
-document.getElementById("logoScreen").classList.remove("active");
-document.getElementById("titleScreen").classList.add("active");
-},5000);
-
-function startGame(){
-order = shuffle(QUESTIONS);
-i=0;score=0;coins=0;att=2;
-
-document.getElementById("titleScreen").classList.remove("active");
-document.getElementById("gameScreen").classList.add("active");
-
-loadQ();
-}
-
-/* ================= LOAD ================= */
-function loadQ(){
-
-if(i>=order.length){
-endGame();
-return;
-}
-
-lock=false;
-att=2;
-updateHUD();
-
-let q = order[i];
-
-document.getElementById("sentence").innerText = q.q;
-
-let opts = shuffle(q.opts);
-
-let box = document.getElementById("options");
-box.innerHTML="";
-
-opts.forEach(o=>{
-let d=document.createElement("div");
-d.className="option";
-d.innerText=o;
-d.onclick=()=>check(o,d);
-box.appendChild(d);
+window.addEventListener('load', () => {
+  initParticles();
+  setTimeout(() => {
+    switchScreen('titleScreen');
+  }, 5000);
 });
+
+function switchScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
 }
 
-/* ================= HUD ================= */
-function updateHUD(){
-document.getElementById("prog").innerText=i;
-document.getElementById("score").innerText=score;
-document.getElementById("coins").innerText=coins;
-document.getElementById("att").innerText=att;
+function shuffle(array) {
+  return [...array].sort(() => Math.random() - 0.5);
 }
 
-/* ================= CHECK ================= */
-function check(ans,el){
-
-if(lock) return;
-lock=true;
-
-let q = order[i];
-
-if(ans===q.a){
-
-score++;
-coins+=10;
-
-el.classList.add("correct");
-playSound("correct");
-playSound("clap");
-
-setTimeout(()=>{
-i++;
-loadQ();
-},900);
-
-}else{
-
-att--;
-updateHUD();
-
-el.classList.add("wrong");
-playSound("wrong");
-
-if(att>0){
-lock=false;
-}else{
-setTimeout(()=>{
-i++;
-loadQ();
-},1200);
-}
-}
+function startGame() {
+  qList = shuffle(QUESTIONS);
+  index = 0;
+  score = 0;
+  switchScreen('gameScreen');
+  loadCrate();
 }
 
-/* ================= END ================= */
-function endGame(){
+function loadCrate() {
+  if (index >= qList.length) {
+    finishGame();
+    return;
+  }
 
-document.getElementById("gameScreen").classList.remove("active");
-document.getElementById("endScreen").classList.add("active");
+  isLocked = false;
+  attempts = 2;
+  updateHUD();
 
-let acc = Math.round((score/order.length)*100);
+  let q = qList[index];
 
-document.getElementById("result").innerHTML=`
-⭐ Score: ${score}/${order.length}<br>
-🪙 Coins: ${coins}<br>
-🎯 Accuracy: ${acc}%
-`;
+  document.getElementById("sentenceDisplay").innerHTML = `
+    ${q.before}<span class="drop-target" id="targetSlot">⚡ [ POD ]</span>${q.after}
+  `;
 
-playSound("clap");
+  let container = document.getElementById("podsContainer");
+  container.innerHTML = "";
+
+  let shuffledOpts = shuffle(q.options);
+  shuffledOpts.forEach(opt => {
+    let btn = document.createElement("button");
+    btn.className = "verb-pod";
+    btn.innerHTML = `<span>⬡</span> ${opt}`;
+    btn.onclick = () => evaluateChoice(opt, btn);
+    container.appendChild(btn);
+  });
 }
 
+function updateHUD() {
+  document.getElementById("hudProg").innerText = `${index + 1}/${qList.length}`;
+  document.getElementById("hudScore").innerText = score;
+  document.getElementById("hudAtt").innerText = attempts;
+}
+
+function evaluateChoice(choice, el) {
+  if (isLocked) return;
+
+  let q = qList[index];
+  let slot = document.getElementById("targetSlot");
+
+  if (choice === q.target) {
+    isLocked = true;
+    slot.innerText = choice;
+    slot.classList.add("correct-fit");
+
+    score += (attempts === 2) ? 10 : 5;
+    updateHUD();
+
+    playAudio("correct");
+    playAudio("clap");
+    spawnParticles();
+
+    setTimeout(() => {
+      index++;
+      loadCrate();
+    }, 1100);
+
+  } else {
+    attempts--;
+    updateHUD();
+
+    playAudio("wrong");
+    el.classList.add("wrong-shake");
+
+    if (attempts <= 0) {
+      isLocked = true;
+      slot.innerText = q.target;
+      slot.style.borderColor = "var(--danger)";
+      slot.style.color = "var(--danger)";
+
+      setTimeout(() => {
+        index++;
+        loadCrate();
+      }, 1400);
+    }
+  }
+}
+
+function toggleManual(show) {
+  document.getElementById("ruleModal").classList.toggle("active", show);
+}
+
+function finishGame() {
+  switchScreen('endScreen');
+  let pct = Math.round((score / (qList.length * 10)) * 100);
+  document.getElementById("finalStats").innerText = `Total Score: ${score} | Accuracy: ${pct}%`;
+  playAudio("clap");
+}
+
+/* ================= CANVAS PARTICLE ENGINE ================= */
+let canvas, ctx, particles = [];
+
+function initParticles() {
+  canvas = document.getElementById("canvasParticles");
+  ctx = canvas.getContext("2d");
+  resizeCanvas();
+  window.addEventListener('resize', resizeCanvas);
+  requestAnimationFrame(updateParticles);
+}
+
+function resizeCanvas() {
+  if (!canvas) return;
+  canvas.width = canvas.parentElement.clientWidth;
+  canvas.height = canvas.parentElement.clientHeight;
+}
+
+function spawnParticles() {
+  for (let i = 0; i < 30; i++) {
+    particles.push({
+      x: canvas.width / 2,
+      y: canvas.height / 3,
+      vx: (Math.random() - 0.5) * 8,
+      vy: (Math.random() - 0.5) * 8,
+      color: Math.random() > 0.5 ? '#00f2fe' : '#10b981',
+      size: Math.random() * 5 + 3,
+      life: 1
+    });
+  }
+}
+
+function updateParticles() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  particles.forEach((p, i) => {
+    p.x += p.vx;
+    p.y += p.vy;
+    p.life -= 0.02;
+
+    ctx.fillStyle = p.color;
+    ctx.globalAlpha = Math.max(0, p.life);
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+    ctx.fill();
+
+    if (p.life <= 0) particles.splice(i, 1);
+  });
+  requestAnimationFrame(updateParticles);
+}
 </script>
-
-<div class="conveyor"></div>
-
 </body>
 </html>
