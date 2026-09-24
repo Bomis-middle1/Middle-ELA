@@ -2,17 +2,18 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-select=none">
-<title>Grammar Galactic Quest</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Galactic Grammar Defense - Non-Finites</title>
+
 <style>
 /* ==========================================================================
-   GALACTIC INTERACTIVE SYSTEM STYLES
+   GLOBAL RESET ENGINE & RESPONSIVE CONTAINERS
    ========================================================================== */
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Arial, sans-serif;
     -webkit-tap-highlight-color: transparent;
     user-select: none;
 }
@@ -25,64 +26,83 @@ body, html {
     color: #fff;
 }
 
-/* SCREEN MANAGEMENT CAPABILITIES */
-.game-viewport {
-    position: relative;
+/* SCREEN MANAGEMENT SYSTEM */
+.screen {
+    display: none;
     width: 100vw;
     height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.screen {
-    position: absolute;
+    height: 100svh;
+    position: fixed;
     inset: 0;
-    width: 100%;
-    height: 100%;
-    display: none;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
-    box-sizing: border-box;
+    flex-direction: column;
+    text-align: center;
     padding: 20px;
-    z-index: 10;
 }
 .screen.active { display: flex; }
 
-/* STAGE 1: INTRINSIC BRAND LOGO DISPLAY */
+/* STAGE 1: INTRINSIC BRAND LOGO DISPLAY (5s SPLASH) */
 #logoScreen {
     background: #ffffff;
-    z-index: 100;
+    z-index: 9999;
+    transition: opacity 0.5s ease;
 }
 .brand-wrapper {
-    width: 280px;
-    max-width: 75%;
-    animation: pulseLogo 2s ease-in-out infinite;
+    width: 300px;
+    max-width: 80%;
 }
 .brand-wrapper img { width: 100%; height: auto; display: block; }
+.logo-fallback { font-size: 32px; font-weight: 900; color: #140f3d; letter-spacing: 2px; }
 
-/* STAGE 2: ADVENTURE MENU CARDS */
-#menuScreen {
+/* STAGE 2: TITLE SCREEN */
+#titleScreen {
     background: radial-gradient(circle at center, #1e0b4a 0%, #07021c 100%);
+    z-index: 9000;
 }
-.menu-card {
+.topic {
+    font-size: 32px;
+    font-weight: 900;
+    color: #ffd60a;
+    text-shadow: 0 4px 15px rgba(255, 214, 10, 0.4);
+    line-height: 1.3;
+}
+
+/* CARDS AND PANELS */
+.card-panel {
     background: rgba(255, 255, 255, 0.96);
     color: #110933;
-    padding: 35px 25px;
     border-radius: 24px;
+    padding: 32px 24px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.6);
     max-width: 480px;
     width: 100%;
-    text-align: center;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.6);
     border-bottom: 6px solid #a855f7;
-    transform: translateY(0);
-    animation: floatCard 4s ease-in-out infinite;
 }
-.menu-card h1 { font-size: 28px; font-weight: 800; color: #6b21a8; margin-bottom: 12px; }
-.menu-card p { color: #4b5563; font-size: 15px; line-height: 1.5; margin-bottom: 25px; }
 
-/* HUD MONITOR DECORATION PANELS */
+/* GENERAL CTA BUTTONS */
+.cta-btn {
+    padding: 14px 28px;
+    border: none;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #fb8500, #ffb703);
+    color: #fff;
+    font-weight: bold;
+    font-size: 16px;
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(251, 133, 0, 0.4);
+    border-bottom: 4px solid #b86200;
+    width: 100%;
+}
+.cta-btn:active { transform: scale(0.98); }
+
+/* STAGE 4: MAIN GAME CANVAS & HUD */
+#playScreen {
+    padding: 0;
+    background: #000;
+    position: relative;
+}
+
 .hud-top {
     position: absolute;
     top: 15px;
@@ -95,578 +115,437 @@ body, html {
     pointer-events: none;
 }
 .hud-group {
-    background: rgba(13, 8, 41, 0.8);
-    padding: 10px 18px;
-    border-radius: 16px;
+    background: rgba(13, 8, 41, 0.85);
+    padding: 10px 16px;
+    border-radius: 14px;
     border: 1px solid rgba(168, 85, 247, 0.4);
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
     font-weight: bold;
     font-size: 14px;
     letter-spacing: 0.5px;
+    backdrop-filter: blur(6px);
 }
-.life-heart { color: #ef4444; font-size: 18px; animation: heartPump 1.5s infinite alternate; }
 
-/* MAIN HUD DIALOGUE OVERLAY QUESTION BOARD */
 .question-board {
     position: absolute;
-    top: 85px;
+    top: 75px;
     left: 50%;
     transform: translateX(-50%);
     width: 90%;
     max-width: 640px;
-    background: rgba(15, 10, 46, 0.9);
-    border: 2px solid #22c55e;
+    background: rgba(15, 10, 46, 0.92);
+    border: 2px solid #a855f7;
     border-radius: 16px;
     padding: 14px 20px;
     text-align: center;
-    box-shadow: 0 0 20px rgba(34, 197, 94, 0.3);
+    box-shadow: 0 0 20px rgba(168, 85, 247, 0.3);
     z-index: 20;
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 700;
     line-height: 1.4;
-    letter-spacing: 0.3px;
+    color: #fff;
+    backdrop-filter: blur(8px);
 }
 
-/* ARCADE SCREEN INTERACTION BUTTON CONTROLS (MOBILE-FRIENDLY LAYER) */
-.arcade-controls {
+.target-container {
     position: absolute;
-    bottom: 25px;
-    left: 25px;
-    right: 25px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    z-index: 25;
+    inset: 0;
+    z-index: 15;
+    pointer-events: none;
 }
-.action-pad {
-    width: 76px;
-    height: 76px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #a855f7, #6b21a8);
-    border: 3px solid #fff;
+
+.orbs-grid {
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 92%;
+    max-width: 600px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    z-index: 30;
+}
+
+.orb-btn {
+    background: linear-gradient(135deg, #2e1065, #0f052d);
     color: #fff;
-    font-weight: 900;
+    border: 2px solid #a855f7;
+    padding: 14px;
+    border-radius: 16px;
+    font-weight: bold;
     font-size: 15px;
     cursor: pointer;
-    box-shadow: 0 8px 20px rgba(107, 33, 168, 0.5);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.5);
+    transition: all 0.15s ease;
     display: flex;
     align-items: center;
     justify-content: center;
-    flex-direction: column;
+    text-align: center;
 }
-.action-pad:active { transform: scale(0.92); filter: brightness(1.2); }
+.orb-btn:active { transform: scale(0.95); }
+.orb-btn.correct { background: #15803d !important; border-color: #22c55e !important; color: #fff; }
+.orb-btn.wrong { background: #b91c1c !important; border-color: #ef4444 !important; color: #fff; }
 
-/* STAGE 4: ARCADE SUMMARY REPORT CAPSTONE CARD */
-#endScreen {
-    background: radial-gradient(circle at center, #0f172a 0%, #020617 100%);
-}
-
-/* GENERAL BUTTON STYLING COMPONENTS */
-.cta-btn {
-    padding: 14px 28px;
-    border: none;
-    border-radius: 14px;
-    background: linear-gradient(135deg, #fb8500, #ffb703);
-    color: #fff;
-    font-weight: bold;
-    font-size: 16px;
-    cursor: pointer;
-    box-shadow: 0 5px 15px rgba(251, 133, 0, 0.4);
-    border-bottom: 4px solid #b86200;
-}
-.cta-btn:active { transform: scale(0.98); }
-
-/* SCREEN VISUAL VIBRATION EFFECT TARGETS */
-.shake-screen { animation: screenVibrate 0.4s ease-in-out; }
-
-/* ANIMATION FRAMES KEYSETS */
-@keyframes pulseLogo { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
-@keyframes floatCard { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
-@keyframes heartPump { 0% { transform: scale(1); } 100% { transform: scale(1.15); } }
-@keyframes screenVibrate {
-    0%, 100% { transform: translate(0, 0); }
-    20% { transform: translate(-8px, 5px); }
-    40% { transform: translate(8px, -5px); }
-    60% { transform: translate(-5px, -3px); }
-    80% { transform: translate(5px, 3px); }
+canvas#spaceCanvas {
+    width: 100%;
+    height: 100%;
+    display: block;
 }
 
-/* LANDSCAPE ORIENTATION FINE TUNERS */
-@media (max-height: 520px) {
-    .question-board { padding: 8px 15px; font-size: 14px; top: 65px; }
-    .arcade-controls { bottom: 10px; }
-    .action-pad { width: 60px; height: 60px; font-size: 13px; }
+canvas#confettiCanvas { position: fixed; inset: 0; pointer-events: none; z-index: 99999; }
+
+@media (max-height: 550px) {
+    .question-board { font-size: 13px; padding: 8px 14px; top: 60px; }
+    .orbs-grid { bottom: 12px; gap: 8px; }
+    .orb-btn { padding: 10px; font-size: 13px; }
 }
 </style>
 </head>
+
 <body>
 
-<div class="game-viewport" id="viewportWrapper">
+<canvas id="confettiCanvas"></canvas>
 
-    <audio id="correctSound" src="assets/correct.mp3" preload="auto"></audio>
-    <audio id="wrongSound" src="assets/wrong.mp3" preload="auto"></audio>
-    <audio id="clapSound" src="assets/clapping.mp3" preload="auto"></audio>
+<!-- AUDIO ASSETS DIRECT FROM REPOSITORY -->
+<audio id="correctSound" src="assets/correct.mp3" preload="auto"></audio>
+<audio id="wrongSound" src="assets/wrong.mp3" preload="auto"></audio>
+<audio id="clapSound" src="assets/clapping.mp3" preload="auto"></audio>
 
-    <div id="logoScreen" class="screen active">
-        <div class="brand-wrapper">
-            <img src="assets/innovine-logo.png" alt="Innovine Logo">
-        </div>
+<!-- STAGE 1: LOGO SPLASH (5 SECONDS EXACTLY) -->
+<div id="logoScreen" class="screen active">
+    <div class="brand-wrapper">
+        <img src="assets/innovine-logo.png" alt="Innovine Logo" onerror="this.style.display='none'; document.getElementById('logoFallback').style.display='block';">
+        <div id="logoFallback" class="logo-fallback" style="display:none;">INNOVINE</div>
+    </div>
+</div>
+
+<!-- STAGE 2: TITLE SCREEN -->
+<div id="titleScreen" class="screen">
+    <div class="topic">🌌 Galactic Grammar Defense 🌌<br><span style="font-size: 20px; color: #fff;">Infinitives, Gerunds & Participles</span></div>
+</div>
+
+<!-- STAGE 3: INSTRUCTIONS -->
+<div id="startScreen" class="screen">
+    <div class="card-panel">
+        <h1>Welcome Defender!</h1>
+        <p style="color: #4b5563; margin: 15px 0 22px 0; font-size: 15px; line-height: 1.5;">
+            Alien meteors are attacking the starship! Read the sentence prompt from Chapter 8 and target the correct non-finite orb to destroy incoming threats.
+        </p>
+        <button class="cta-btn" onclick="startGameplay()">Launch Defense</button>
+    </div>
+</div>
+
+<!-- STAGE 4: GAMEPLAY -->
+<div id="playScreen" class="screen">
+    <div class="hud-top">
+        <div class="hud-group" id="stageHUD">STAGE: 1 / 10</div>
+        <div class="hud-group" id="scoreHUD">SCORE: 0</div>
     </div>
 
-    <div id="menuScreen" class="screen">
-        <div class="menu-card">
-            <h1>Grammar Galactic Quest</h1>
-            <p>Control Anya across the floating platform ruins! Jump up to smash your cosmic broadsword into the correct crystal matching the missing syntax profile parameters.</p>
-            <button class="cta-btn" onclick="engageAdventureRuntime()">Launch Starfighter</button>
-        </div>
+    <div class="question-board" id="promptDisplay">Loading encounter parameters...</div>
+
+    <canvas id="spaceCanvas"></canvas>
+
+    <div class="orbs-grid" id="optionsGrid"></div>
+</div>
+
+<!-- STAGE 5: SUMMARY -->
+<div id="endScreen" class="screen">
+    <div class="card-panel">
+        <div style="font-size: 64px; margin-bottom: 10px;">🏆</div>
+        <h2>Galaxy Secured!</h2>
+        <p id="finalScore" style="font-size: 18px; font-weight: 700; margin: 15px 0; color: #110933;"></p>
+        <button class="cta-btn" onclick="restartFullGame()">Deploy Again</button>
     </div>
-
-    <div id="playScreen" class="screen" style="padding: 0;">
-        
-        <div class="hud-top">
-            <div class="hud-group" id="stageHUD">STAGE: 1 / 10</div>
-            <div class="hud-group" id="scoreHUD">SCORE: 0</div>
-            <div class="hud-group" id="shieldHUD">
-                SHIELD: <span class="life-heart">❤️</span> <span class="life-heart">❤️</span>
-            </div>
-        </div>
-
-        <div class="question-board" id="promptDisplay">Loading encounter data stream...</div>
-
-        <div class="arcade-controls">
-            <button class="action-pad" id="mobileJumpBtn"><span>▲</span>JUMP</button>
-            <div style="color: rgba(255,255,255,0.4); font-size: 12px; font-weight: bold; background:rgba(0,0,0,0.4); padding:8px 12px; border-radius:8px;">[SPACEBAR] to Jump on PC</div>
-            <button class="action-pad" id="mobileAttackBtn" style="background: linear-gradient(135deg, #ef4444, #b91c1c); box-shadow: 0 8px 20px rgba(239, 68, 68, 0.4);">⚔️HIT</button>
-        </div>
-
-        <canvas id="gameCanvas" style="width: 100%; height: 100%; display: block;"></canvas>
-    </div>
-
-    <div id="endScreen" class="screen">
-        <div class="menu-card" style="border-bottom-color: #22c55e;">
-            <div style="font-size: 64px; margin-bottom: 10px;">🌌</div>
-            <h1 id="endTitle" style="color: #16a34a;">Mission Clear!</h1>
-            <p id="endMetrics" style="font-weight: 600; color: #374151;"></p>
-            <button class="cta-btn" onclick="restartFullGameWorkflow()">Deploy Again</button>
-        </div>
-    </div>
-
 </div>
 
 <script>
-/* ==========================================================================
-   GALACTIC QUEST ARCHITECTURE DATA ENGINE
-   ========================================================================== */
+/* QUESTION BANK SOURCE DIRECTLY DERIVED FROM CHAPTER 8 PDF EXERCISES */
 const mcqs = [
-    {q:'The infinitive in the sentence is: "Riya wants to learn coding during her summer vacation."',opts:["wants","learn","to learn","coding"],ans:"to learn"},
-    {q:'Which word is a gerund? "Swimming every morning makes Aryan feel energetic."',opts:["morning","energetic","feel","Swimming"],ans:"Swimming"},
-    {q:'Find the participle in the sentence: "The excited fans cheered loudly after the goal."',opts:["fans","goal","cheered","excited"],ans:"excited"},
-    {q:'Which option contains an infinitive?',opts:["Dancing is fun.","To dance is fun.","Danced happily.","Dancing happily."],ans:"To dance is fun."},
-    {q:'The gerund in the sentence is: "Playing video games can improve problem-solving skills."',opts:["improve","skills","Playing","games"],ans:"Playing"},
-    {q:'Choose the participle: "The barking dog woke everyone up."',opts:["woke","barking","everyone","dog"],ans:"barking"},
-    {q:'What is the underlined phrase? "The students gathered early to watch the science show."',opts:["Gerund","Participle","Infinitive Phrase","Noun Phrase"],ans:"Infinitive Phrase"},
-    {q:'Identify the gerund: "Maya enjoys painting superheroes in her notebook."',opts:["enjoys","superheroes","notebook","painting"],ans:"painting"},
-    {q:'Find the participle: "The broken skateboard lay beside the ramp."',opts:["lay","beside","broken","ramp"],ans:"broken"},
-    {q:'Which sentence contains a gerund?',opts:["I want to travel the world.","Running helps me stay fit.","The tired player rested.","She plans to win."],ans:"Running helps me stay fit."}
+    {
+        q: "Identify the infinitive: 'To learn a new language requires dedication and practice.'",
+        opts: ["requires", "dedication", "To learn", "practice"],
+        ans: "To learn"
+    },
+    {
+        q: "Identify the infinitive: 'She wants to read more books this summer.'",
+        opts: ["wants", "to read", "books", "summer"],
+        ans: "to read"
+    },
+    {
+        q: "Identify the participle in this sentence: 'The student studying in the library is preparing for the exams.'",
+        opts: ["studying", "library", "preparing", "exams"],
+        ans: "studying"
+    },
+    {
+        q: "Identify the participle in this sentence: 'The homework assigned by the teacher was very challenging.'",
+        opts: ["homework", "assigned", "teacher", "challenging"],
+        ans: "assigned"
+    },
+    {
+        q: "Fill in the blank with the appropriate gerund: 'Avoid _____ out in the heavy rains.'",
+        opts: ["to go", "going", "gone", "go"],
+        ans: "going"
+    },
+    {
+        q: "Fill in the blank with the appropriate gerund: 'My favourite pastime is _____ songs.'",
+        opts: ["sing", "to sing", "singing", "sang"],
+        ans: "singing"
+    },
+    {
+        q: "Choose the correct participle form: 'The _____ candle flickered in the dark room.'",
+        opts: ["burning", "burned", "burnt", "burns"],
+        ans: "burning"
+    },
+    {
+        q: "Choose the correct participle form: 'The _____ guest at the conference captivated the audience.'",
+        opts: ["inviting", "invited", "invites", "invite"],
+        ans: "invited"
+    },
+    {
+        q: "Identify the gerund functioning as a subject: 'Dancing allows me to relax and escape from reality.'",
+        opts: ["allows", "to relax", "Dancing", "escape"],
+        ans: "Dancing"
+    },
+    {
+        q: "Which verb form follows modal verbs as a bare infinitive in 'She can solve complex math problems'?",
+        opts: ["can", "solve", "complex", "problems"],
+        ans: "solve"
+    }
 ];
 
-let runtimeLevels = [];
-let levelIndex = 0;
-let pointsTotal = 0;
-let currentQuestionShields = 2; 
-let loopRequestId = null;
+let runtimeQuestions = [];
+let currentIndex = 0;
+let score = 0;
+let audioUnlocked = false;
+let loopId = null;
+let meteorY = 0;
+let targetAnswered = false;
 
-// DOM nodes tracking references
-const canvas = document.getElementById("gameCanvas");
-const ctx = canvas.getContext("2d");
 const audioTracks = {
     correct: document.getElementById("correctSound"),
     wrong: document.getElementById("wrongSound"),
     clap: document.getElementById("clapSound")
 };
 
-/* ==========================================================================
-   INITIAL LOADING & NAVIGATION PIPELINE
-   ========================================================================== */
+// BROWSER AUTOPLAY UNLOCK ENGINE
+function unlockAudio() {
+    if (audioUnlocked) return;
+    Object.values(audioTracks).forEach(track => {
+        if (track) {
+            track.play().then(() => {
+                track.pause();
+                track.currentTime = 0;
+            }).catch(() => {});
+        }
+    });
+    audioUnlocked = true;
+    window.removeEventListener('pointerdown', unlockAudio);
+}
+window.addEventListener('pointerdown', unlockAudio);
+
+// SEQUENCE CONTROL PIPELINE
 window.onload = () => {
+    // Stage 1: Innovine Logo Splash Screen for 5 seconds
     setTimeout(() => {
         document.getElementById("logoScreen").classList.remove("active");
-        document.getElementById("menuScreen").classList.add("active");
+        document.getElementById("titleScreen").classList.add("active");
+        
+        // Stage 2: Title Display Screen for 3 seconds
+        setTimeout(() => {
+            document.getElementById("titleScreen").classList.remove("active");
+            document.getElementById("startScreen").classList.add("active");
+        }, 3000);
+
     }, 5000);
 };
 
 function playAudioTrack(key) {
+    const track = audioTracks[key];
+    if (track) {
+        track.currentTime = 0;
+        track.play().catch(() => synthBeep(key === 'correct' || key === 'clap'));
+    }
+}
+
+// SYNTHESIZER FALLBACK FOR MISSING OR BLOCKED AUDIO
+function synthBeep(isGood) {
     try {
-        audioTracks[key].currentTime = 0;
-        audioTracks[key].play().catch(() => {});
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.frequency.value = isGood ? 587 : 220;
+        gain.gain.value = 0.1;
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.15);
     } catch(e) {}
 }
 
-function engageAdventureRuntime() {
-    document.getElementById("menuScreen").classList.remove("active");
+function startGameplay() {
+    document.getElementById("startScreen").classList.remove("active");
     document.getElementById("playScreen").classList.add("active");
-    
-    // Unlock core audio channel profiles
-    Object.values(audioTracks).forEach(track => { if(track) { track.play().then(()=>track.pause()).catch(()=>{}); } });
-    
-    setupFreshCampaign();
+    restartFullGame();
 }
 
-/* ==========================================================================
-   2D CORE SIMULATION GAME ENGINE ENGINE (CANVAS DRIVEN)
-   ========================================================================== */
-let gameWidth = 800;
-let gameHeight = 450;
-
-// Character parameters profile
-let player = {
-    x: 100,
-    y: 300,
-    w: 32,
-    h: 48,
-    vy: 0,
-    gravity: 0.6,
-    jumpForce: -13,
-    isGrounded: false,
-    isStriking: false,
-    strikeTimer: 0
-};
-
-let gamePlatforms = [];
-let interactiveCrystals = [];
-let explosiveParticles = [];
-let cosmicBackgroundStars = [];
-
-function setupFreshCampaign() {
-    runtimeLevels = [...mcqs].sort(() => Math.random() - 0.5);
-    levelIndex = 0;
-    pointsTotal = 0;
-    
-    initializeGameSpaceGrid();
-    buildLevelMetricsEnvironment();
-    beginGameLoopSequence();
+function restartFullGame() {
+    document.getElementById("endScreen").classList.remove("active");
+    runtimeQuestions = [...mcqs].sort(() => Math.random() - 0.5);
+    currentIndex = 0;
+    score = 0;
+    loadQuestionStage();
+    startCanvasLoop();
 }
 
-function initializeGameSpaceGrid() {
-    // Generate background ambient nodes
-    cosmicBackgroundStars = [];
-    for(let i=0; i<80; i++) {
-        cosmicBackgroundStars.push({ x: Math.random() * gameWidth, y: Math.random() * gameHeight, radius: Math.random() * 2, pulse: Math.random() * 0.05 });
-    }
+function loadQuestionStage() {
+    targetAnswered = false;
+    meteorY = -50;
+    const qData = runtimeQuestions[currentIndex];
     
-    // Solid architectural platforms setup
-    gamePlatforms = [
-        { x: 0, y: 380, w: gameWidth, h: 70 } // Ground surface platform line
-    ];
-}
-
-function buildLevelMetricsEnvironment() {
-    currentQuestionShields = 2;
-    updateHUDDisplays();
+    document.getElementById("stageHUD").innerText = `STAGE: ${currentIndex + 1} / ${runtimeQuestions.length}`;
+    document.getElementById("scoreHUD").innerText = `SCORE: ${score}`;
+    document.getElementById("promptDisplay").innerText = qData.q;
     
-    const levelData = runtimeLevels[levelIndex];
-    document.getElementById("promptDisplay").innerText = levelData.q;
+    const optionsGrid = document.getElementById("optionsGrid");
+    optionsGrid.innerHTML = "";
     
-    interactiveCrystals = [];
-    let crystalCount = levelData.opts.length;
-    let gridSegment = gameWidth / (crystalCount + 1);
-    
-    // Distribute answer choices across floating horizontal matrices
-    levelData.opts.forEach((optionText, idx) => {
-        interactiveCrystals.push({
-            x: gridSegment * (idx + 1) - 40,
-            y: 160 + (idx % 2 * 30), // Offset heights slightly for gameplay variety
-            w: 80,
-            h: 50,
-            text: optionText,
-            isCorrect: (optionText === levelData.ans),
-            color: `hsl(${(idx * 360 / crystalCount)}, 85%, 65%)`,
-            isShattered: false
-        });
+    qData.opts.forEach(opt => {
+        let btn = document.createElement("button");
+        btn.className = "orb-btn";
+        btn.innerText = opt;
+        btn.onclick = () => handleOptionClick(opt, btn);
+        optionsGrid.appendChild(btn);
     });
 }
 
-function updateHUDDisplays() {
-    document.getElementById("stageHUD").innerText = `STAGE: ${levelIndex + 1} / ${runtimeLevels.length}`;
-    document.getElementById("scoreHUD").innerText = `SCORE: ${pointsTotal}`;
+function handleOptionClick(chosen, btn) {
+    if (targetAnswered) return;
+    targetAnswered = true;
     
-    let shieldsMarkup = "SHIELD: ";
-    for(let i=0; i<currentQuestionShields; i++) { shieldsMarkup += "❤️ "; }
-    if(currentQuestionShields === 0) { shieldsMarkup += "⚠️ CRITICAL"; }
-    document.getElementById("shieldHUD").innerHTML = shieldsMarkup;
-}
-
-/* ==========================================================================
-   INPUTS & SYSTEMS LISTENERS DELEGATES
-   ========================================================================== */
-window.addEventListener("keydown", (e) => {
-    if(e.code === "Space" || e.code === "ArrowUp") triggerPlayerJump();
-    if(e.code === "KeyX" || e.code === "KeyF") triggerPlayerStrike();
-});
-
-document.getElementById("mobileJumpBtn").addEventListener("touchstart", (e) => { e.preventDefault(); triggerPlayerJump(); });
-document.getElementById("mobileAttackBtn").addEventListener("touchstart", (e) => { e.preventDefault(); triggerPlayerStrike(); });
-
-function triggerPlayerJump() {
-    if(player.isGrounded) {
-        player.vy = player.jumpForce;
-        player.isGrounded = false;
-    }
-}
-
-function triggerPlayerStrike() {
-    if(!player.isStriking) {
-        player.isStriking = true;
-        player.strikeTimer = 12; // active animation frames range
-        evaluateShatterCollisionDetection();
-    }
-}
-
-/* ==========================================================================
-   GAME LOOP TIMELINE PIPELINE
-   ========================================================================== */
-function beginGameLoopSequence() {
-    if(loopRequestId) cancelAnimationFrame(loopRequestId);
+    const qData = runtimeQuestions[currentIndex];
+    const allBtns = document.querySelectorAll(".orb-btn");
     
-    function executionFrame() {
-        adjustCanvasLayoutRescale();
-        updateGamePhysicsEngine();
-        renderGraphicsScene();
-        loopRequestId = requestAnimationFrame(executionFrame);
-    }
-    loopRequestId = requestAnimationFrame(executionFrame);
-}
-
-function adjustCanvasLayoutRescale() {
-    const dpr = window.devicePixelRatio || 1;
-    const rect = canvas.getBoundingClientRect();
-    if (canvas.width !== rect.width * dpr || canvas.height !== rect.height * dpr) {
-        canvas.width = rect.width * dpr;
-        canvas.height = rect.height * dpr;
-    }
-}
-
-function updateGamePhysicsEngine() {
-    // Kinematics and gravity calculations
-    player.vy += player.gravity;
-    player.y += player.vy;
-    
-    // Platform collision boundaries loops
-    player.isGrounded = false;
-    gamePlatforms.forEach(plat => {
-        if(player.x + player.w > plat.x && player.x < plat.x + plat.w) {
-            if(player.y + player.h >= plat.y && player.y + player.h - player.vy <= plat.y) {
-                player.y = plat.y - player.h;
-                player.vy = 0;
-                player.isGrounded = true;
-            }
-        }
-    });
-    
-    // Retract striking active window properties
-    if(player.isStriking) {
-        player.strikeTimer--;
-        if(player.strikeTimer <= 0) player.isStriking = false;
-    }
-    
-    // Process drifting particle trajectories
-    explosiveParticles.forEach((p, idx) => {
-        p.x += p.vx;
-        p.y += p.vy;
-        p.life--;
-        if(p.life <= 0) explosiveParticles.splice(idx, 1);
-    });
-}
-
-function evaluateShatterCollisionDetection() {
-    // Expand player hitting reach zone during action frames
-    let weaponReach = {
-        x: player.x - 20,
-        y: player.y - 30,
-        w: player.w + 40,
-        h: player.h + 40
-    };
-    
-    interactiveCrystals.forEach(crystal => {
-        if(!crystal.isShattered && 
-           weaponReach.x < crystal.x + crystal.w && weaponReach.x + weaponReach.w > crystal.x &&
-           weaponReach.y < crystal.y + crystal.h && weaponReach.y + weaponReach.h > crystal.y) {
-            
-            crystal.isShattered = true;
-            generateShockwaveBursts(crystal.x + crystal.w/2, crystal.y + crystal.h/2, crystal.color);
-            
-            if(crystal.isCorrect) {
-                executeCorrectAnswerSequence();
-            } else {
-                executeWrongAnswerSequence(crystal);
-            }
-        }
-    });
-}
-
-function executeCorrectAnswerSequence() {
-    pointsTotal += 10;
-    playAudioTrack('correct');
-    playAudioTrack('clap');
-    updateHUDDisplays();
-    
-    // Freeze room briefly for visual reward display feedback tracking
-    setTimeout(() => {
-        advanceCampaignSequenceProgress();
-    }, 1200);
-}
-
-function executeWrongAnswerSequence(shatteredCrystal) {
-    currentQuestionShields--;
-    playAudioTrack('wrong');
-    updateHUDDisplays();
-    
-    document.getElementById("viewportWrapper").classList.add("shake-screen");
-    setTimeout(() => { document.getElementById("viewportWrapper").classList.remove("shake-screen"); }, 400);
-    
-    if(currentQuestionShields <= 0) {
-        // Exceeded attempts limit threshold profile
-        const activeLevel = runtimeLevels[levelIndex];
-        document.getElementById("promptDisplay").innerText = `⚠️ System Bypass! Correct profile target was: ${activeLevel.ans}`;
-        
-        // Expose correct glowing component mapping coordinates trace visually
-        interactiveCrystals.forEach(c => { if(c.isCorrect) c.color = "#22c55e"; });
-        
-        setTimeout(() => {
-            advanceCampaignSequenceProgress();
-        }, 2000);
-    }
-}
-
-function advanceCampaignSequenceProgress() {
-    levelIndex++;
-    if(levelIndex >= runtimeLevels.length) {
-        terminateAdventureWorkflow();
+    if (chosen === qData.ans) {
+        btn.classList.add("correct");
+        score += 10;
+        playAudioTrack("correct");
+        triggerConfetti();
     } else {
-        buildLevelMetricsEnvironment();
-    }
-}
-
-function generateShockwaveBursts(cx, cy, color) {
-    for(let i=0; i<30; i++) {
-        explosiveParticles.push({
-            x: cx,
-            y: cy,
-            vx: (Math.random() - 0.5) * 8,
-            vy: (Math.random() - 0.5) * 8 - 2,
-            size: Math.random() * 4 + 2,
-            color: color,
-            life: Math.random() * 20 + 20
+        btn.classList.add("wrong");
+        playAudioTrack("wrong");
+        allBtns.forEach(b => {
+            if (b.innerText === qData.ans) b.classList.add("correct");
         });
     }
+    
+    document.getElementById("scoreHUD").innerText = `SCORE: ${score}`;
+    
+    setTimeout(() => {
+        currentIndex++;
+        if (currentIndex >= runtimeQuestions.length) {
+            endGameSequence();
+        } else {
+            loadQuestionStage();
+        }
+    }, 1400);
 }
 
-/* ==========================================================================
-   CANVAS DRAWING RENDERING GRAPHICS FUNCTIONS
-   ========================================================================== */
-function renderGraphicsScene() {
-    // Dynamic aspect layout coordinate conversions matrix calculations
-    ctx.save();
-    ctx.scale(canvas.width / gameWidth, canvas.height / gameHeight);
-    
-    // Clear viewport backbuffer surface
-    ctx.fillStyle = "#0c0628";
-    ctx.fillRect(0, 0, gameWidth, gameHeight);
-    
-    // Stars fields render
-    cosmicBackgroundStars.forEach(star => {
-        ctx.fillStyle = `rgba(255, 255, 255, ${0.4 + Math.sin(Date.now() * star.pulse) * 0.4})`;
-        ctx.beginPath();
-        ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
-        ctx.fill();
-    });
-    
-    // Render support platform environments grids
-    ctx.fillStyle = "#1e1154";
-    gamePlatforms.forEach(plat => {
-        ctx.fillRect(plat.x, plat.y, plat.w, plat.h);
-        // Highlight ledge edge lines tracing components
-        ctx.fillStyle = "#a855f7";
-        ctx.fillRect(plat.x, plat.y, plat.w, 4);
-    });
-    
-    // Render interactive float crystals options elements
-    interactiveCrystals.forEach(crystal => {
-        if(crystal.isShattered) return;
-        
-        // Pulsing floating altitude displacement offsets
-        let floatOffset = Math.sin(Date.now() * 0.004 + crystal.x) * 6;
-        
-        // Draw physical glowing geometric crystalline vectors shapes
-        ctx.fillStyle = crystal.color;
-        ctx.shadowBlur = 15;
-        ctx.shadowColor = crystal.color;
-        
-        ctx.beginPath();
-        ctx.moveTo(crystal.x + crystal.w/2, crystal.y + floatOffset);
-        ctx.lineTo(crystal.x + crystal.w, crystal.y + crystal.h/2 + floatOffset);
-        ctx.lineTo(crystal.x + crystal.w/2, crystal.y + crystal.h + floatOffset);
-        ctx.lineTo(crystal.x, crystal.y + crystal.h/2 + floatOffset);
-        ctx.closePath();
-        ctx.fill();
-        
-        // Reset tracking filters shadows configurations
-        ctx.shadowBlur = 0;
-        
-        // Internal data labels text values overlays mapping
-        ctx.fillStyle = "#000000";
-        ctx.font = "bold 12px sans-serif";
-        ctx.textAlign = "center";
-        ctx.fillText(crystal.text, crystal.x + crystal.w/2, crystal.y + crystal.h/2 + 4 + floatOffset);
-    });
-    
-    // Draw explosive particles systems elements trace layout
-    explosiveParticles.forEach(p => {
-        ctx.fillStyle = p.color;
-        ctx.fillRect(p.x, p.y, p.size, p.size);
-    });
-    
-    // Draw the main character avatar sprite nodes configurations
-    ctx.fillStyle = "#38bdf8"; // Astronaut armor primary tint hue palette
-    ctx.fillRect(player.x, player.y, player.w, player.h);
-    
-    // Visor helmet interface plate overlay accent blocks
-    ctx.fillStyle = "#ffffff";
-    ctx.fillRect(player.x + 14, player.y + 6, 14, 10);
-    
-    // Strike stance weapon slice visualization arcs parameters
-    if(player.isStriking) {
-        ctx.strokeStyle = "#fb7185";
-        ctx.lineWidth = 4;
-        ctx.beginPath();
-        ctx.arc(player.x + player.w/2 + 15, player.y + player.h/2, 35, -Math.PI/2, Math.PI/2);
-        ctx.stroke();
-    }
-    
-    ctx.restore();
-}
-
-/* ==========================================================================
-   CONCLUDING OPERATIONS MANAGEMENT PIPELINE
-   ========================================================================== */
-function terminateAdventureWorkflow() {
-    if(loopRequestId) cancelAnimationFrame(loopRequestId);
-    
+function endGameSequence() {
+    cancelAnimationFrame(loopId);
     document.getElementById("playScreen").classList.remove("active");
     document.getElementById("endScreen").classList.add("active");
-    
-    const metricSummaryNode = document.getElementById("endMetrics");
-    metricSummaryNode.innerText = `You secured a terminal evaluation matching ${pointsTotal} operational points across the syntax grid configuration!`;
+    document.getElementById("finalScore").innerText = `Final Score: ${score} / ${runtimeQuestions.length * 10}`;
+    playAudioTrack("clap");
 }
 
-function restartFullGameWorkflow() {
-    document.getElementById("endScreen").classList.remove("active");
-    document.getElementById("menuScreen").classList.add("active");
+/* ==========================================================================
+   CANVAS ANIMATION ENGINE
+   ========================================================================== */
+const canvas = document.getElementById("spaceCanvas");
+const ctx = canvas.getContext("2d");
+
+let stars = [];
+
+function initSpaceCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    stars = Array.from({length: 60}, () => ({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        size: Math.random() * 2 + 1,
+        speed: Math.random() * 0.5 + 0.2
+    }));
+}
+window.addEventListener('resize', initSpaceCanvas);
+
+function startCanvasLoop() {
+    initSpaceCanvas();
+    
+    function render() {
+        ctx.fillStyle = "#05021a";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // Draw Stars
+        ctx.fillStyle = "#ffffff";
+        stars.forEach(s => {
+            s.y += s.speed;
+            if (s.y > canvas.height) s.y = 0;
+            ctx.beginPath();
+            ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+            ctx.fill();
+        });
+        
+        // Draw Falling Threat Orb/Meteor
+        if (!targetAnswered) {
+            meteorY += 0.8;
+            if (meteorY > canvas.height - 200) meteorY = -50;
+        }
+        
+        let cx = canvas.width / 2;
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(cx, meteorY, 30, 0, Math.PI * 2);
+        ctx.fillStyle = "#a855f7";
+        ctx.shadowColor = "#c084fc";
+        ctx.shadowBlur = 20;
+        ctx.fill();
+        ctx.restore();
+        
+        loopId = requestAnimationFrame(render);
+    }
+    
+    if (loopId) cancelAnimationFrame(loopId);
+    render();
+}
+
+/* CONFETTI ENGINE */
+const confettiCanvas = document.getElementById("confettiCanvas");
+const cCtx = confettiCanvas.getContext("2d");
+function triggerConfetti() {
+    confettiCanvas.width = window.innerWidth;
+    confettiCanvas.height = window.innerHeight;
+    let pieces = Array.from({length: 40}, () => ({
+        x: Math.random() * confettiCanvas.width,
+        y: -10,
+        w: 8, h: 8,
+        ys: Math.random() * 4 + 2,
+        color: ["#a855f7","#fb8500","#ffd60a","#22c55e"][Math.floor(Math.random()*4)]
+    }));
+    let frames = 0;
+    function loop() {
+        cCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+        pieces.forEach(p => {
+            p.y += p.ys;
+            cCtx.fillStyle = p.color;
+            cCtx.fillRect(p.x, p.y, p.w, p.h);
+        });
+        if (++frames < 60) requestAnimationFrame(loop);
+        else cCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+    }
+    loop();
 }
 </script>
+
 </body>
 </html>
