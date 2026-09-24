@@ -12,6 +12,8 @@
       margin: 0;
       padding: 0;
       font-family: 'Comic Sans MS', 'Chalkboard SE', 'Fredoka One', cursive, sans-serif;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
     }
 
     body {
@@ -20,7 +22,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      padding: 15px;
+      padding: 12px;
       overflow-x: hidden;
       color: #2c3e50;
     }
@@ -42,8 +44,8 @@
     }
 
     #splash-screen img {
-      max-width: 320px;
-      width: 75%;
+      max-width: 280px;
+      width: 70%;
       height: auto;
       animation: pulse 1.5s infinite ease-in-out;
     }
@@ -58,11 +60,11 @@
     .game-card {
       background: #ffffff;
       border: 4px solid #ff9f43;
-      border-radius: 28px;
-      box-shadow: 0 12px 30px rgba(0,0,0,0.15);
-      max-width: 650px;
+      border-radius: 24px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+      max-width: 600px;
       width: 100%;
-      padding: 25px;
+      padding: 20px;
       text-align: center;
       position: relative;
     }
@@ -71,45 +73,49 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 15px;
+      margin-bottom: 12px;
+      gap: 10px;
     }
 
     .volume-box {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       background: #fff3e0;
-      padding: 8px 14px;
-      border-radius: 14px;
+      padding: 6px 10px;
+      border-radius: 12px;
       border: 2px solid #ffe0b2;
-      font-size: 0.95rem;
+      font-size: 0.85rem;
       font-weight: bold;
       color: #e67e22;
     }
 
     .volume-box input[type="range"] {
-      width: 90px;
+      width: 75px;
       cursor: pointer;
+      accent-color: #ff9f43;
     }
 
     .score-badge {
       background: #ff6b6b;
       color: #ffffff;
-      padding: 8px 18px;
-      border-radius: 20px;
+      padding: 6px 14px;
+      border-radius: 16px;
       font-weight: bold;
-      font-size: 1.1rem;
+      font-size: 0.95rem;
+      box-shadow: 0 3px 0 #d63031;
     }
 
     .badge {
       display: inline-block;
       background: #ff9f43;
       color: white;
-      padding: 6px 20px;
-      border-radius: 15px;
-      font-size: 1rem;
+      padding: 5px 16px;
+      border-radius: 12px;
+      font-size: 0.95rem;
       font-weight: bold;
-      margin-bottom: 15px;
+      margin-bottom: 12px;
+      box-shadow: 0 3px 0 #e67e22;
     }
 
     /* --- Comic Dialogue Stage --- */
@@ -119,10 +125,11 @@
       align-items: flex-end;
       background: #f1f2f6;
       border: 3px dashed #4ecdc4;
-      border-radius: 20px;
-      padding: 20px 10px;
-      margin-bottom: 20px;
-      min-height: 260px;
+      border-radius: 16px;
+      padding: 15px 8px;
+      margin-bottom: 15px;
+      min-height: 230px;
+      gap: 8px;
     }
 
     .character-box {
@@ -134,16 +141,16 @@
     }
 
     .avatar {
-      font-size: 4.5rem;
+      font-size: 3.5rem;
       transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+      filter: drop-shadow(0 3px 4px rgba(0,0,0,0.1));
     }
 
     .character-name {
-      font-size: 0.85rem;
+      font-size: 0.78rem;
       font-weight: bold;
       color: #7f8c8d;
-      margin-top: 5px;
+      margin-top: 4px;
     }
 
     /* Speech Bubbles */
@@ -151,27 +158,28 @@
       position: relative;
       background: #ffffff;
       border: 3px solid #2c3e50;
-      border-radius: 18px;
-      padding: 12px 14px;
-      font-size: 0.95rem;
-      line-height: 1.4;
+      border-radius: 16px;
+      padding: 10px 12px;
+      font-size: 0.88rem;
+      line-height: 1.35;
       color: #2c3e50;
-      margin-bottom: 15px;
+      margin-bottom: 12px;
       width: 100%;
-      min-height: 80px;
+      min-height: 75px;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 4px 0 #2c3e50;
+      text-align: center;
+      box-shadow: 0 3px 0 #2c3e50;
     }
 
     .speech-bubble::after {
       content: '';
       position: absolute;
-      bottom: -13px;
+      bottom: -11px;
       left: 50%;
       transform: translateX(-50%);
-      border-width: 12px 10px 0;
+      border-width: 10px 8px 0;
       border-style: solid;
       border-color: #2c3e50 transparent;
       display: block;
@@ -180,9 +188,9 @@
 
     .blank-target {
       display: inline-block;
-      min-width: 85px;
-      padding: 2px 8px;
-      margin: 0 4px;
+      min-width: 75px;
+      padding: 2px 5px;
+      margin: 0 3px;
       border-bottom: 3px dashed #ff9f43;
       color: #e67e22;
       font-weight: bold;
@@ -192,8 +200,8 @@
     .options-grid {
       display: grid;
       grid-template-columns: 1fr;
-      gap: 12px;
-      margin-bottom: 10px;
+      gap: 10px;
+      margin-bottom: 5px;
     }
 
     @media (min-width: 480px) {
@@ -206,35 +214,35 @@
       background: #ffffff;
       border: 3px solid #ced6e0;
       color: #2f3542;
-      padding: 14px 18px;
-      border-radius: 18px;
-      font-size: 1.05rem;
+      padding: 12px 14px;
+      border-radius: 14px;
+      font-size: 0.98rem;
       font-weight: bold;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all 0.15s ease;
       word-break: break-word;
-      box-shadow: 0 5px 0 #ced6e0;
+      box-shadow: 0 4px 0 #ced6e0;
     }
 
-    .btn-opt:hover:not(:disabled) {
+    .btn-opt:hover:not(:disabled), .btn-opt:active:not(:disabled) {
       border-color: #ff9f43;
       color: #ff9f43;
       transform: translateY(-2px);
-      box-shadow: 0 7px 0 #ff9f43;
+      box-shadow: 0 6px 0 #ff9f43;
     }
 
     .btn-opt.correct {
       background: #2ed573 !important;
       border-color: #26af5f !important;
       color: white !important;
-      box-shadow: 0 5px 0 #26af5f !important;
+      box-shadow: 0 4px 0 #26af5f !important;
     }
 
     .btn-opt.wrong {
       background: #ff4757 !important;
       border-color: #d63031 !important;
       color: white !important;
-      box-shadow: 0 5px 0 #d63031 !important;
+      box-shadow: 0 4px 0 #d63031 !important;
     }
 
     .btn-opt:disabled {
@@ -246,12 +254,12 @@
       display: none;
       flex-direction: column;
       align-items: center;
-      gap: 20px;
-      padding: 20px 0;
+      gap: 15px;
+      padding: 15px 0;
     }
 
     .end-screen h2 {
-      font-size: 2.2rem;
+      font-size: 2rem;
       color: #ff9f43;
     }
 
@@ -259,33 +267,34 @@
       background: #ff9f43;
       border: none;
       color: white;
-      padding: 16px 36px;
-      border-radius: 22px;
-      font-size: 1.25rem;
+      padding: 14px 30px;
+      border-radius: 18px;
+      font-size: 1.15rem;
       font-weight: bold;
       cursor: pointer;
-      box-shadow: 0 6px 0 #e67e22;
-      transition: all 0.2s ease;
-      margin-top: 10px;
+      box-shadow: 0 5px 0 #e67e22;
+      transition: all 0.15s ease;
+      margin-top: 5px;
     }
 
     .restart-btn:hover {
       background: #ffa801;
       transform: translateY(-2px);
-      box-shadow: 0 8px 0 #e67e22;
+      box-shadow: 0 7px 0 #e67e22;
     }
 
     .restart-btn:active {
-      transform: translateY(4px);
+      transform: translateY(3px);
       box-shadow: 0 2px 0 #e67e22;
     }
   </style>
 </head>
 <body>
 
-  <!-- 5-Second Innovine Splash Screen -->
+  <!-- Splash Screen -->
   <div id="splash-screen">
-    <img src="assets/innovine-logo.png" alt="Innovine Logo" />
+    <img src="assets/innovine-logo.png" alt="Innovine Logo" onerror="this.style.display='none'; document.getElementById('fallback-logo').style.display='block';" />
+    <h1 id="fallback-logo" style="display:none; color: #ff9f43; letter-spacing: 2px; font-size: 1.8rem;">INNOVINE</h1>
   </div>
 
   <!-- Audio Elements -->
@@ -327,22 +336,22 @@
       <div class="options-grid" id="optionsGrid"></div>
     </div>
 
-    <!-- End Screen (Restart Button at Bottom) -->
+    <!-- End Screen -->
     <div class="end-screen" id="endScreen">
       <h2>🎉 Case Solved!</h2>
-      <p id="finalScoreText" style="font-size: 1.3rem; color: #2c3e50;">Your Final Score: 0 / 0</p>
+      <p id="finalScoreText" style="font-size: 1.2rem; color: #2c3e50;">Your Final Score: 0 / 0</p>
       <button class="restart-btn" onclick="restartGame()">Play Again 🔄</button>
     </div>
   </div>
 
   <script>
-    // Chapter 15 Phrasal Verbs Question Bank (Dialogue Detective Format)
+    // Phrasal Verbs Question Bank
     const baseCases = [
       {
         speakerA: "Did you fix your car's engine yet?",
         speakerB: "Yes, but I had to ________ it to test where the sound came from.",
         options: ["break down", "hand in", "look into", "run out"],
-        answer: 0,
+        answer: 2,
         avatars: { normalA: "🧐", normalB: "🚗", correctA: "💡", correctB: "🛠️", wrongA: "🤦‍♂️", wrongB: "💥" }
       },
       {
@@ -428,7 +437,7 @@
         setTimeout(() => {
           splashScreen.style.visibility = "hidden";
         }, 800);
-      }, 5000); // 5 Seconds Splash Duration
+      }, 5000);
 
       initGame();
     });
@@ -445,7 +454,6 @@
 
     // Initialize or Reset Game State
     function initGame() {
-      // Randomize question sequence each time game loads
       gameCases = shuffleArray(baseCases);
       currentCaseIndex = 0;
       score = 0;
@@ -459,17 +467,14 @@
     function loadCase() {
       const cData = gameCases[currentCaseIndex];
 
-      // Speech bubble contents
       bubbleA.innerText = cData.speakerA;
       bubbleB.innerHTML = cData.speakerB.replace("________", `<span class="blank-target">_______</span>`);
 
-      // Reset character avatars
       avatarA.innerText = cData.avatars.normalA;
       avatarB.innerText = cData.avatars.normalB;
       avatarA.style.transform = "scale(1)";
       avatarB.style.transform = "scale(1)";
 
-      // Prepare options grid and shuffle choices per question
       optionsGrid.innerHTML = "";
       const mappedOptions = cData.options.map((opt, idx) => ({
         text: opt,
@@ -489,16 +494,13 @@
 
     // Handle User Answer Selection
     function handleChoice(selectedOpt, clickedBtn, caseData) {
-      // Disable all option buttons to prevent multiple clicks
       const buttons = optionsGrid.querySelectorAll(".btn-opt");
       buttons.forEach(btn => btn.disabled = true);
 
       if (selectedOpt.isCorrect) {
-        // Correct Answer
-        bubbleB.innerHTML = caseData.speakerB.replace("________", `<span class="blank-target" style="color:#2ecc71">${selectedOpt.text}</span>`);
+        bubbleB.innerHTML = caseData.speakerB.replace("________", `<span class="blank-target" style="color:#2ed573; border-bottom: 3px solid #2ed573;">${selectedOpt.text}</span>`);
         clickedBtn.classList.add("correct");
 
-        // React Character Avatars
         avatarA.innerText = caseData.avatars.correctA;
         avatarB.innerText = caseData.avatars.correctB;
         avatarA.style.transform = "scale(1.2)";
@@ -509,17 +511,14 @@
         playSound(soundCorrect);
         triggerConfetti();
       } else {
-        // Wrong Answer
         clickedBtn.classList.add("wrong");
 
-        // Highlight correct button
         buttons.forEach(btn => {
           if (btn.innerText === caseData.options[caseData.answer]) {
             btn.classList.add("correct");
           }
         });
 
-        // React Character Avatars
         avatarA.innerText = caseData.avatars.wrongA;
         avatarB.innerText = caseData.avatars.wrongB;
         avatarA.style.transform = "scale(0.9)";
@@ -528,7 +527,6 @@
         playSound(soundWrong);
       }
 
-      // Automatically move to the next question after 1.5 seconds
       nextTimeout = setTimeout(() => {
         currentCaseIndex++;
         if (currentCaseIndex < gameCases.length) {
@@ -536,23 +534,21 @@
         } else {
           showEndScreen();
         }
-      }, 1500);
+      }, 1600);
     }
 
     // Sound Player with Autoplay Fail-Safe
     function playSound(audioEl) {
       audioEl.currentTime = 0;
-      audioEl.play().catch(() => {
-        // Smoothly handle browser autoplay restrictions
-      });
+      audioEl.play().catch(() => {});
     }
 
     // Canvas Confetti Effect
     function triggerConfetti() {
       if (typeof confetti === 'function') {
         confetti({
-          particleCount: 60,
-          spread: 70,
+          particleCount: 50,
+          spread: 60,
           origin: { y: 0.6 }
         });
       }
@@ -567,8 +563,8 @@
 
       if (typeof confetti === 'function') {
         confetti({
-          particleCount: 120,
-          spread: 100,
+          particleCount: 100,
+          spread: 90,
           origin: { y: 0.5 }
         });
       }
