@@ -2,158 +2,682 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Future Tense Space Race</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Future Diner Dash: Year 3000</title>
 <style>
-body{margin:0;font-family:Arial;background:#0b1d51;color:#fff;overflow:hidden;}
-#logoScreen,#gameScreen,#endScreen{display:none;width:100%;height:100vh;align-items:center;justify-content:center;flex-direction:column;}
-#logoScreen img{width:200px;margin-top:40px;}
-h1{text-align:center;color:#ffd60a;margin:10px;}
-#scoreText{font-size:20px;margin:10px;}
-#questionText{text-align:center;margin:10px;font-size:18px;}
-#options{display:flex;flex-direction:column;align-items:center;gap:10px;margin-top:15px;}
-.option{background:#ff6f61;padding:10px 20px;border-radius:12px;cursor:pointer;font-weight:bold;width:80%;text-align:center;}
-.option.correct{background:#4caf50;}
-.option.wrong{background:#e53935;}
-#track{position:relative;width:90%;height:100px;background:#222;border:2px solid #fff;margin-top:20px;overflow:hidden;}
-#spaceship{position:absolute;bottom:5px;left:0px;width:60px;transition:left 0.6s ease;}
-button{padding:10px 16px;margin-top:20px;border-radius:10px;border:none;background:#ff6f61;color:#fff;font-weight:bold;cursor:pointer;}
-#endScreen{text-align:center;}
+  :root {
+    --bg-dark: #050811;
+    --panel-bg: rgba(15, 23, 42, 0.9);
+    --neon-cyan: #00f2fe;
+    --neon-pink: #ff007f;
+    --neon-gold: #ffb703;
+    --neon-green: #10b981;
+    --text-light: #f8fafc;
+  }
+
+  * {
+    box-sizing: border-box;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: var(--bg-dark);
+    color: var(--text-light);
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .screen {
+    position: absolute;
+    inset: 0;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px;
+    z-index: 10;
+    width: 100%;
+    height: 100%;
+  }
+
+  .screen.active { display: flex; }
+
+  /* 1. SPLASH LOGO (EXACTLY 5 SECONDS) */
+  #logoScreen {
+    background: #ffffff;
+    justify-content: center;
+    z-index: 100;
+  }
+
+  #logoScreen img {
+    max-width: 70%;
+    width: 260px;
+    height: auto;
+    animation: pulse 1.2s infinite alternate ease-in-out;
+  }
+
+  @keyframes pulse {
+    from { transform: scale(0.95); opacity: 0.9; }
+    to { transform: scale(1.05); opacity: 1; }
+  }
+
+  /* 2. TITLE SCREEN */
+  #titleScreen {
+    background: radial-gradient(circle at center, #1f0933 0%, #050811 100%);
+    justify-content: center;
+    text-align: center;
+    gap: 20px;
+  }
+
+  .badge {
+    background: rgba(0, 242, 254, 0.12);
+    border: 1px solid var(--neon-cyan);
+    color: var(--neon-cyan);
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 2px;
+  }
+
+  h1.title-text {
+    font-size: clamp(28px, 6vw, 42px);
+    font-weight: 900;
+    background: linear-gradient(135deg, #fff 20%, var(--neon-pink) 60%, var(--neon-cyan));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    line-height: 1.2;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--neon-pink), var(--neon-cyan));
+    color: white;
+    border: none;
+    padding: 14px 38px;
+    font-size: 18px;
+    font-weight: 800;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 0 20px rgba(255, 0, 127, 0.4);
+    transition: transform 0.1s ease;
+  }
+
+  .btn-primary:active { transform: scale(0.95); }
+
+  /* 3. GAMEPLAY SCREEN */
+  #gameScreen {
+    background: linear-gradient(to bottom, #0d1322, #050811);
+    justify-content: flex-start;
+    gap: 12px;
+  }
+
+  .top-hud {
+    width: 100%;
+    max-width: 500px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--panel-bg);
+    border: 1px solid rgba(0, 242, 254, 0.3);
+    padding: 10px 16px;
+    border-radius: 14px;
+  }
+
+  .hud-stat { font-size: 13px; font-weight: 700; color: #94a3b8; }
+  .hud-stat span { color: var(--neon-cyan); font-size: 16px; }
+
+  /* CUSTOMER ORDER AREA */
+  .customer-card {
+    width: 100%;
+    max-width: 500px;
+    background: var(--panel-bg);
+    border: 2px solid var(--neon-pink);
+    border-radius: 18px;
+    padding: 16px;
+    text-align: center;
+    box-shadow: 0 0 25px rgba(255, 0, 127, 0.2);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .alien-avatar {
+    font-size: 48px;
+    line-height: 1;
+  }
+
+  .order-speech {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 12px;
+    font-size: clamp(15px, 3.8vw, 18px);
+    font-weight: 700;
+    color: #ffffff;
+    line-height: 1.4;
+    width: 100%;
+  }
+
+  .patience-bar-container {
+    width: 100%;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .patience-bar {
+    height: 100%;
+    width: 100%;
+    background: var(--neon-green);
+    transition: width 0.1s linear, background-color 0.3s ease;
+  }
+
+  /* COOKING APPLIANCES (STATIONS) */
+  .appliances-grid {
+    width: 100%;
+    max-width: 500px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin-top: auto;
+    margin-bottom: auto;
+  }
+
+  .appliance-btn {
+    background: rgba(30, 41, 59, 0.9);
+    border: 1px solid rgba(0, 242, 254, 0.3);
+    border-radius: 14px;
+    padding: 14px 18px;
+    color: white;
+    cursor: pointer;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: all 0.15s ease;
+  }
+
+  .appliance-btn:active {
+    transform: scale(0.98);
+    background: rgba(0, 242, 254, 0.2);
+  }
+
+  .appliance-info {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .appliance-title {
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--neon-cyan);
+  }
+
+  .appliance-formula {
+    font-size: 12px;
+    color: var(--neon-gold);
+    font-weight: 700;
+  }
+
+  .appliance-verb {
+    font-size: 16px;
+    font-weight: 800;
+    color: #fff;
+  }
+
+  /* 4. EXPLANATION MODAL */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(5, 8, 17, 0.88);
+    backdrop-filter: blur(6px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 200;
+  }
+
+  .modal-overlay.active { display: flex; }
+
+  .modal-box {
+    background: #0f172a;
+    border: 2px solid var(--neon-cyan);
+    border-radius: 20px;
+    padding: 22px;
+    max-width: 440px;
+    width: 100%;
+    text-align: center;
+  }
+
+  .modal-box h3 {
+    font-size: 20px;
+    margin-bottom: 10px;
+  }
+
+  .modal-box p {
+    font-size: 14px;
+    color: #cbd5e1;
+    margin-bottom: 20px;
+    line-height: 1.5;
+  }
+
+  #canvas {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 15;
+  }
 </style>
 </head>
 <body>
 
-<div id="logoScreen">
-<img src="assets/innovine-logo.png">
-<h2>Launching Mission...</h2>
+<!-- 1. SPLASH LOGO SCREEN (EXACTLY 5 SECONDS) -->
+<div id="logoScreen" class="screen active">
+  <img src="assets/innovine-logo.png" alt="Innovine Logo" onerror="this.style.display='none'; document.getElementById('altText').style.display='block';">
+  <h1 id="altText" style="display:none; color:#0f172a; font-size:36px; font-weight:900;">INNOVINE</h1>
 </div>
 
-<div id="gameScreen">
-<h1>Future Tense Space Race</h1>
-<div id="scoreText">Score: 0</div>
-<div id="questionText"></div>
-<div id="options"></div>
-<div id="track">
-<img id="spaceship" src="assets/spaceship.png" onerror="this.src='https://img.icons8.com/color/96/rocket.png'">
-</div>
+<!-- 2. TITLE SCREEN -->
+<div id="titleScreen" class="screen">
+  <div class="badge">CYBERPUNK GRAMMAR • YEAR 3000</div>
+  <h1 class="title-text">FUTURE DINER<br>DASH</h1>
+  <p style="color: #94a3b8; max-width: 320px; font-size: 14px;">Serve alien customers by selecting the exact future tense appliance for their time-based cooking requests!</p>
+  <button class="btn-primary" onclick="startGame()">START SHIFT</button>
 </div>
 
-<div id="endScreen">
-<h1>Mission Complete!</h1>
-<p id="finalScore"></p>
-<button onclick="restartGame()">Play Again</button>
+<!-- 3. GAMEPLAY SCREEN -->
+<div id="gameScreen" class="screen">
+  <div class="top-hud">
+    <div class="hud-stat">Orders: <span id="hudProg">1/10</span></div>
+    <div class="hud-stat">Credits: <span id="hudScore">0</span></div>
+  </div>
+
+  <div class="customer-card">
+    <div class="alien-avatar" id="alienAvatar">👾</div>
+    <div class="order-speech" id="orderSpeech">Loading customer order...</div>
+    <div class="patience-bar-container">
+      <div class="patience-bar" id="patienceBar"></div>
+    </div>
+  </div>
+
+  <div class="appliances-grid" id="appliancesGrid">
+    <!-- Dynamic Cooking Stations Generated Here -->
+  </div>
 </div>
 
-<audio id="correctSound" src="assets/correct.mp3"></audio>
-<audio id="wrongSound" src="assets/wrong.mp3"></audio>
-<audio id="clapSound" src="assets/clapping.mp3"></audio>
+<!-- 4. EXPLANATION MODAL -->
+<div class="modal-overlay" id="feedbackModal">
+  <div class="modal-box">
+    <h3 id="modalTitle">Dish Served Perfectly!</h3>
+    <p id="modalExplanation"></p>
+    <button class="btn-primary" onclick="nextQuestion()">NEXT CUSTOMER</button>
+  </div>
+</div>
+
+<!-- 5. END SHIFT SCREEN -->
+<div id="endScreen" class="screen" style="justify-content: center; text-align: center; gap: 20px;">
+  <div class="badge">Shift Completed</div>
+  <h1 class="title-text">MASTER CYBER CHEF</h1>
+  <p id="finalScore" style="font-size: 22px; color: var(--neon-gold); font-weight: 800;"></p>
+  <button class="btn-primary" onclick="startGame()">PLAY AGAIN</button>
+</div>
+
+<canvas id="canvas"></canvas>
 
 <script>
-// Questions
-const sentences=[
-{q:"Which sentence is Simple Future?",a:"I will visit Paris next summer.",options:["I will visit Paris next summer.","She will be reading when I arrive.","They will have finished homework by 8 PM."]},
-{q:"Which sentence is Future Continuous?",a:"She will be reading when I arrive.",options:["She will be reading when I arrive.","I will visit Paris next summer.","We will have completed project by Friday."]},
-{q:"Which sentence is Future Perfect?",a:"They will have finished homework by 8 PM.",options:["They will have finished homework by 8 PM.","He will travel tomorrow.","I will be studying at 10 AM."]},
-{q:"Which sentence is Simple Future?",a:"He will travel to London tomorrow.",options:["He will travel to London tomorrow.","I will have sent the email before lunch.","They will be playing football at 5 PM."]},
-{q:"Which sentence is Future Continuous?",a:"I will be studying at 10 AM.",options:["I will be studying at 10 AM.","She will attend meeting next week.","He will call after dinner."]},
-{q:"Which sentence is Future Perfect?",a:"We will have completed the project by Friday.",options:["We will have completed the project by Friday.","I will visit Paris next summer.","She will be reading when I arrive."]},
-{q:"Which sentence is Simple Future?",a:"She will attend the meeting next week.",options:["She will attend the meeting next week.","They will be playing football at 5 PM.","I will have sent the email before lunch."]},
-{q:"Which sentence is Future Continuous?",a:"They will be playing football at 5 PM.",options:["They will be playing football at 5 PM.","I will call you after dinner.","We will have completed project by Friday."]},
-{q:"Which sentence is Future Perfect?",a:"I will have sent the email before lunch.",options:["I will have sent the email before lunch.","She will attend meeting next week.","He will travel to London tomorrow."]},
-{q:"Which sentence is Simple Future?",a:"He will call you after dinner.",options:["He will call you after dinner.","I will be studying at 10 AM.","They will have finished homework by 8 PM."]},
-{q:"Which sentence is Future Continuous?",a:"She will be attending the class tomorrow.",options:["She will be attending the class tomorrow.","I will visit Paris next summer.","We will have completed project by Friday."]},
-{q:"Which sentence is Future Perfect?",a:"They will have submitted the report by 5 PM.",options:["They will have submitted the report by 5 PM.","He will travel tomorrow.","I will be studying at 10 AM."]}
+/* ================= AUDIO CONTROLLER ================= */
+const sounds = {
+  correct: new Audio("assets/correct.mp3"),
+  wrong: new Audio("assets/wrong.mp3"),
+  clap: new Audio("assets/clapping.mp3")
+};
+
+let audioCtx = null;
+
+function playSound(type) {
+  let audio = sounds[type];
+  if (audio) {
+    audio.currentTime = 0;
+    let promise = audio.play();
+    if (promise !== undefined) {
+      promise.catch(() => runSynthFallback(type));
+    }
+  } else {
+    runSynthFallback(type);
+  }
+}
+
+function runSynthFallback(type) {
+  try {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    let osc = audioCtx.createOscillator();
+    let gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    if (type === 'correct') {
+      osc.frequency.setValueAtTime(523.25, audioCtx.currentTime);
+      osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1);
+      gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+      osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+    } else if (type === 'wrong') {
+      osc.frequency.setValueAtTime(220, audioCtx.currentTime);
+      osc.frequency.setValueAtTime(146.83, audioCtx.currentTime + 0.12);
+      gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.35);
+      osc.start(); osc.stop(audioCtx.currentTime + 0.35);
+    } else if (type === 'clap') {
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(440, audioCtx.currentTime);
+      gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+      osc.start(); osc.stop(audioCtx.currentTime + 0.4);
+    }
+  } catch(e){}
+}
+
+/* ================= DINER ORDERS (CHAPTER 13: FUTURE TENSES) ================= */
+const ALIENS = ["👾", "👽", "🤖", "🤖", "🛸", "👾"];
+
+const ORDERS = [
+  {
+    order: "I need my synth-burger completely cooked BEFORE 7 PM sharp!",
+    verbBase: "cook",
+    targetTense: "Future Perfect",
+    options: [
+      { name: "Instant Microwave", formula: "Simple Future", text: "will cook" },
+      { name: "Continuous Fryer", formula: "Future Continuous", text: "will be cooking" },
+      { name: "Quantum Auto-Chef", formula: "Future Perfect", text: "will have cooked" }
+    ],
+    correctText: "will have cooked",
+    explanation: "Use Future Perfect ('will have cooked') because the burger must be completed before a specific future time (7 PM)."
+  },
+  {
+    order: "At 8 PM, I want to watch my pizza actively baking inside the oven!",
+    verbBase: "bake",
+    targetTense: "Future Continuous",
+    options: [
+      { name: "Solar Oven", formula: "Simple Future", text: "will bake" },
+      { name: "Stasis Rotisserie", formula: "Future Continuous", text: "will be baking" },
+      { name: "Chronos Cooker", formula: "Future Perfect", text: "will have baked" }
+    ],
+    correctText: "will be baking",
+    explanation: "Use Future Continuous ('will be baking') for an ongoing action taking place at a specific moment in the future."
+  },
+  {
+    order: "I am hungry right now! Please prepare a plasma drink for me immediately.",
+    verbBase: "prepare",
+    targetTense: "Simple Future",
+    options: [
+      { name: "Laser Blender", formula: "Simple Future", text: "will prepare" },
+      { name: "Stream Mixer", formula: "Future Continuous", text: "will be preparing" },
+      { name: "Time Vacuum", formula: "Future Perfect", text: "will have prepared" }
+    ],
+    correctText: "will prepare",
+    explanation: "Use Simple Future ('will prepare') for quick decisions, promises, or simple future events."
+  },
+  {
+    order: "By midnight, our space crew ________ all the galactic ramen noodles.",
+    verbBase: "eat",
+    targetTense: "Future Perfect",
+    options: [
+      { name: "Quick Pot", formula: "Simple Future", text: "will eat" },
+      { name: "Flow Boiler", formula: "Future Continuous", text: "will be eating" },
+      { name: "Vault Processor", formula: "Future Perfect", text: "will have eaten" }
+    ],
+    correctText: "will have eaten",
+    explanation: "Use Future Perfect ('will have eaten') to express an action finished prior to a future deadline."
+  },
+  {
+    order: "Tomorrow morning at 9 AM, the head chef ________ the futuristic kitchen.",
+    verbBase: "clean",
+    targetTense: "Future Continuous",
+    options: [
+      { name: "Sanitizer Unit", formula: "Simple Future", text: "will clean" },
+      { name: "Active Sonic Beam", formula: "Future Continuous", text: "will be cleaning" },
+      { name: "Sterile Chamber", formula: "Future Perfect", text: "will have cleaned" }
+    ],
+    correctText: "will be cleaning",
+    explanation: "Use Future Continuous ('will be cleaning') for an action in progress at a specific time tomorrow."
+  },
+  {
+    order: "Don't worry, I promise I ________ you your bill in a moment.",
+    verbBase: "bring",
+    targetTense: "Simple Future",
+    options: [
+      { name: "Express Drone", formula: "Simple Future", text: "will bring" },
+      { name: "Hover Transport", formula: "Future Continuous", text: "will be bringing" },
+      { name: "Warp Sender", formula: "Future Perfect", text: "will have brought" }
+    ],
+    correctText: "will bring",
+    explanation: "Use Simple Future ('will bring') when offering help or making a direct promise."
+  },
+  {
+    order: "By the time the store closes, we ________ over 100 cyber pies!",
+    verbBase: "sell",
+    targetTense: "Future Perfect",
+    options: [
+      { name: "Basic Register", formula: "Simple Future", text: "will sell" },
+      { name: "Live Counter", formula: "Future Continuous", text: "will be selling" },
+      { name: "Master Ledger", formula: "Future Perfect", text: "will have sold" }
+    ],
+    correctText: "will have sold",
+    explanation: "Use Future Perfect ('will have sold') to show a total completed before a specific future time."
+  },
+  {
+    order: "When you arrive tonight, the androids ________ live music in the diner.",
+    verbBase: "play",
+    targetTense: "Future Continuous",
+    options: [
+      { name: "Audio Pod", formula: "Simple Future", text: "will play" },
+      { name: "Hologram Stage", formula: "Future Continuous", text: "will be playing" },
+      { name: "Memory Bank", formula: "Future Perfect", text: "will have played" }
+    ],
+    correctText: "will be playing",
+    explanation: "Use Future Continuous ('will be playing') because the music will be actively ongoing when you arrive."
+  },
+  {
+    order: "If you ask nicely, the robotic waiter ________ you a bonus dessert.",
+    verbBase: "give",
+    targetTense: "Simple Future",
+    options: [
+      { name: "Service Arm", formula: "Simple Future", text: "will give" },
+      { name: "Stream Dispenser", formula: "Future Continuous", text: "will be giving" },
+      { name: "Vault Dropper", formula: "Future Perfect", text: "will have given" }
+    ],
+    correctText: "will give",
+    explanation: "Use Simple Future ('will give') for conditional future results."
+  },
+  {
+    order: "By next week, the head barista ________ her training course.",
+    verbBase: "finish",
+    targetTense: "Future Perfect",
+    options: [
+      { name: "Basic Pod", formula: "Simple Future", text: "will finish" },
+      { name: "Active Track", formula: "Future Continuous", text: "will be finishing" },
+      { name: "Diploma Matrix", formula: "Future Perfect", text: "will have finished" }
+    ],
+    correctText: "will have finished",
+    explanation: "Use Future Perfect ('will have finished') to indicate completion before next week."
+  }
 ];
 
-let current=0;
-let score=0;
-let shipPosition=0;
+let currentIndex = 0;
+let score = 0;
+let patienceTimer = null;
+let currentPatience = 100;
 
-// DOM
-const gameScreen=document.getElementById('gameScreen');
-const logoScreen=document.getElementById('logoScreen');
-const endScreen=document.getElementById('endScreen');
-const questionText=document.getElementById('questionText');
-const optionsDiv=document.getElementById('options');
-const scoreText=document.getElementById('scoreText');
-const spaceship=document.getElementById('spaceship');
-const finalScore=document.getElementById('finalScore');
-const correctAudio=document.getElementById('correctSound');
-const wrongAudio=document.getElementById('wrongSound');
-const clapAudio=document.getElementById('clapSound');
+/* ================= GAME INITIALIZATION ================= */
+window.addEventListener('load', () => {
+  initCanvas();
+  // EXACTLY 5 SECONDS SPLASH TIMER
+  setTimeout(() => { switchScreen('titleScreen'); }, 5000);
+});
 
-// Show logo 5s
-logoScreen.style.display='flex';
-setTimeout(()=>{
-  logoScreen.style.display='none';
-  gameScreen.style.display='flex';
-  showQuestion();
-},5000);
+function switchScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
 
-// Show current question
-function showQuestion(){
-  optionsDiv.innerHTML='';
-  if(current>=sentences.length){ endGame(); return;}
-  let s=sentences[current];
-  questionText.innerText=s.q;
-  let shuffled=s.options.sort(()=>Math.random()-0.5);
-  shuffled.forEach(opt=>{
-    const btn=document.createElement('div');
-    btn.className='option';
-    btn.innerText=opt;
-    btn.onclick=()=>checkAnswer(btn,opt,s.a);
-    optionsDiv.appendChild(btn);
+function shuffle(arr) { return [...arr].sort(() => Math.random() - 0.5); }
+
+function startGame() {
+  currentIndex = 0;
+  score = 0;
+  switchScreen('gameScreen');
+  loadQuestion();
+}
+
+function loadQuestion() {
+  clearInterval(patienceTimer);
+  currentPatience = 100;
+
+  let q = ORDERS[currentIndex];
+  document.getElementById("hudProg").innerText = `${currentIndex + 1}/${ORDERS.length}`;
+  document.getElementById("hudScore").innerText = score;
+  document.getElementById("alienAvatar").innerText = ALIENS[currentIndex % ALIENS.length];
+  document.getElementById("orderSpeech").innerText = `"${q.order}"`;
+
+  let pBar = document.getElementById("patienceBar");
+  pBar.style.width = "100%";
+  pBar.style.backgroundColor = "var(--neon-green)";
+
+  // PATIENCE TIMER (12 SECONDS PER ORDER)
+  patienceTimer = setInterval(() => {
+    currentPatience -= 1.5;
+    pBar.style.width = `${Math.max(0, currentPatience)}%`;
+    if (currentPatience < 40) pBar.style.backgroundColor = "var(--neon-gold)";
+    if (currentPatience < 20) pBar.style.backgroundColor = "#ef4444";
+
+    if (currentPatience <= 0) {
+      clearInterval(patienceTimer);
+      handleChoice(null, "TIMEOUT", q);
+    }
+  }, 150);
+
+  let grid = document.getElementById("appliancesGrid");
+  grid.innerHTML = "";
+
+  let shuffledOpts = shuffle(q.options);
+  shuffledOpts.forEach(opt => {
+    let btn = document.createElement("button");
+    btn.className = "appliance-btn";
+    btn.innerHTML = `
+      <div class="appliance-info">
+        <span class="appliance-title">${opt.name}</span>
+        <span class="appliance-formula">${opt.formula}</span>
+      </div>
+      <span class="appliance-verb">${opt.text}</span>
+    `;
+    btn.onclick = () => handleChoice(btn, opt.text, q);
+    grid.appendChild(btn);
   });
 }
 
-// Check answer and move ship
-function checkAnswer(btn,selected,correct){
-  if(selected===correct){
-    btn.classList.add('correct');
-    correctAudio.currentTime=0; correctAudio.play();
-    moveSpaceship();
-  }else{
-    btn.classList.add('wrong');
-    wrongAudio.currentTime=0; wrongAudio.play();
-    setTimeout(()=>btn.classList.remove('wrong'),300);
+function handleChoice(btnElem, selected, q) {
+  clearInterval(patienceTimer);
+  let allBtns = document.querySelectorAll('.appliance-btn');
+  allBtns.forEach(b => b.style.pointerEvents = 'none');
+
+  if (selected === q.correctText) {
+    if (btnElem) btnElem.style.borderColor = "var(--neon-green)";
+    score += Math.round(currentPatience);
+    playSound('correct');
+    triggerParticles();
+    showFeedback(true, "Dish Served Perfectly! 🛸", q.explanation);
+  } else {
+    if (btnElem) btnElem.style.borderColor = "#ef4444";
+    playSound('wrong');
+    let title = selected === "TIMEOUT" ? "Customer Left! ⏰" : "Wrong Appliance! 💥";
+    showFeedback(false, title, q.explanation);
   }
-  setTimeout(()=>{
-    current++;
-    showQuestion();
-  },700);
 }
 
-// Move spaceship step-by-step
-function moveSpaceship(){
-  score++;
-  scoreText.innerText=`Score: ${score}`;
-  let maxWidth=document.getElementById('track').offsetWidth - 60;
-  let step=maxWidth/sentences.length;
-  shipPosition+=step;
-  if(shipPosition>maxWidth) shipPosition=maxWidth;
-  spaceship.style.left=shipPosition+'px';
+function showFeedback(isCorrect, title, exp) {
+  setTimeout(() => {
+    let modal = document.getElementById("feedbackModal");
+    let modalTitle = document.getElementById("modalTitle");
+    modalTitle.innerText = title;
+    modalTitle.style.color = isCorrect ? "var(--neon-green)" : "var(--neon-pink)";
+    document.getElementById("modalExplanation").innerText = exp;
+    modal.classList.add("active");
+  }, 350);
 }
 
-// End game
-function endGame(){
-  gameScreen.style.display='none';
-  endScreen.style.display='flex';
-  finalScore.innerText=`Score: ${score} / ${sentences.length}`;
-  clapAudio.play();
+function nextQuestion() {
+  document.getElementById("feedbackModal").classList.remove("active");
+  currentIndex++;
+  if (currentIndex >= ORDERS.length) {
+    endGame();
+  } else {
+    loadQuestion();
+  }
 }
 
-// Restart
-function restartGame(){
-  current=0;
-  score=0;
-  shipPosition=0;
-  spaceship.style.left='0px';
-  endScreen.style.display='none';
-  gameScreen.style.display='flex';
-  scoreText.innerText='Score: 0';
-  showQuestion();
+function endGame() {
+  switchScreen('endScreen');
+  document.getElementById("finalScore").innerText = `Final Credits Earned: ${score}`;
+  playSound('clap');
+}
+
+/* ================= VISUAL PARTICLES ================= */
+let canvas, ctx, particles = [];
+
+function initCanvas() {
+  canvas = document.getElementById("canvas");
+  ctx = canvas.getContext("2d");
+  resize();
+  window.addEventListener('resize', resize);
+  requestAnimationFrame(anim);
+}
+
+function resize() {
+  if (!canvas) return;
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+
+function triggerParticles() {
+  for(let i=0; i<35; i++) {
+    particles.push({
+      x: canvas.width / 2,
+      y: canvas.height / 3,
+      vx: (Math.random() - 0.5) * 12,
+      vy: (Math.random() - 0.5) * 12,
+      color: Math.random() > 0.5 ? '#00f2fe' : '#ff007f',
+      size: Math.random() * 6 + 2,
+      life: 1
+    });
+  }
+}
+
+function anim() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  particles.forEach((p, i) => {
+    p.x += p.vx;
+    p.y += p.vy;
+    p.life -= 0.025;
+    ctx.fillStyle = p.color;
+    ctx.globalAlpha = Math.max(0, p.life);
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+    ctx.fill();
+    if(p.life <= 0) particles.splice(i, 1);
+  });
+  requestAnimationFrame(anim);
 }
 </script>
-
 </body>
 </html>
