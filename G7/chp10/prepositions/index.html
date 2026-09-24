@@ -2,304 +2,561 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>The Class Trip Adventure</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Sentence Constructor Lab: Preposition Pipelines</title>
 
 <style>
-body{
-margin:0;
-font-family:Arial,sans-serif;
-background:linear-gradient(135deg,#a1c4fd,#c2e9fb,#fbc2eb);
-display:flex;
-align-items:center;
-justify-content:center;
-height:100vh;
-overflow:hidden;
+/* ==========================================================================
+   LABORATORY STYLING & ENGINE
+   ========================================================================== */
+:root {
+    --bg-dark: #090d16;
+    --panel-bg: rgba(18, 26, 43, 0.95);
+    --cyan-glow: #06b6d4;
+    --cyan-bright: #22d3ee;
+    --amber-gold: #fbbf24;
+    --pipe-slot: #1e293b;
+    --success-green: #10b981;
+    --error-red: #ef4444;
+    --text-main: #f8fafc;
 }
 
-.screen{
-display:none;
-width:100%;
-height:100%;
-flex-direction:column;
-align-items:center;
-justify-content:center;
-text-align:center;
-padding:20px;
-box-sizing:border-box;
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
 }
 
-.active{display:flex;}
-
-/* LOGO */
-#logoScreen img{
-width:220px;
-animation:pop 1s ease;
+body, html {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: var(--bg-dark);
+    color: var(--text-main);
 }
 
-@keyframes pop{
-from{transform:scale(0.5);opacity:0;}
-to{transform:scale(1);opacity:1;}
+.screen {
+    display: none;
+    width: 100vw;
+    height: 100vh;
+    height: 100svh;
+    position: fixed;
+    inset: 0;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+    padding: 16px;
+}
+.screen.active { display: flex; }
+
+/* STAGE 1: LOGO SPLASH SCREEN (EXACTLY 5 SECONDS) */
+#logoScreen {
+    background: #ffffff;
+    z-index: 9999;
+}
+.logo-container { width: 240px; max-width: 80%; }
+.logo-container img { width: 100%; height: auto; display: block; }
+.logo-fallback { font-size: 28px; font-weight: 900; color: #0f172a; letter-spacing: 2px; }
+
+/* STAGE 2: TITLE SCREEN */
+#titleScreen {
+    background: radial-gradient(circle at center, #1e293b 0%, #090d16 100%);
+    z-index: 9000;
 }
 
-/* TITLE */
-.title{
-font-size:28px;
-font-weight:bold;
-color:#222;
-animation:flash 1s infinite alternate;
+.lab-card {
+    background: var(--panel-bg);
+    border: 2px solid var(--cyan-glow);
+    border-radius: 20px;
+    padding: 24px;
+    box-shadow: 0 0 30px rgba(6, 182, 212, 0.25);
+    max-width: 500px;
+    width: 100%;
+    backdrop-filter: blur(10px);
 }
 
-@keyframes flash{
-from{transform:scale(1);opacity:0.7;}
-to{transform:scale(1.1);opacity:1;}
+.title-header {
+    font-size: 26px;
+    font-weight: 900;
+    color: var(--cyan-bright);
+    margin-bottom: 8px;
+    text-shadow: 0 0 12px rgba(34, 211, 238, 0.4);
 }
 
-/* CARD */
-.card{
-background:#ffffffee;
-padding:18px;
-border-radius:15px;
-width:95%;
-max-width:650px;
-box-shadow:0 10px 20px rgba(0,0,0,0.2);
+.btn-lab {
+    padding: 14px 24px;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--cyan-bright), var(--cyan-glow));
+    color: #090d16;
+    font-weight: 800;
+    font-size: 16px;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 16px;
+    box-shadow: 0 4px 15px rgba(6, 182, 212, 0.4);
+}
+.btn-lab:active { transform: scale(0.98); }
+
+/* STAGE 4: MAIN GAMEPLAY PIPELINE */
+#gameScreen {
+    justify-content: space-between;
+    padding: 12px;
 }
 
-/* OPTIONS */
-.option{
-background:#ffb703;
-padding:12px;
-margin:8px;
-border-radius:10px;
-cursor:pointer;
-font-weight:bold;
+.hud-bar {
+    width: 100%;
+    max-width: 520px;
+    display: flex;
+    justify-content: space-between;
+    background: var(--panel-bg);
+    border: 1px solid var(--cyan-glow);
+    padding: 10px 16px;
+    border-radius: 12px;
+    font-weight: 800;
+    font-size: 14px;
+    color: var(--cyan-bright);
 }
 
-/* SCORE */
-#scoreBoard{
-font-weight:bold;
-margin-bottom:10px;
-font-size:18px;
+/* CIRCUIT PIPELINE DISPLAY */
+.pipeline-container {
+    width: 100%;
+    max-width: 520px;
+    background: rgba(30, 41, 59, 0.6);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 20px 16px;
+    margin: auto 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
 }
 
-/* FEEDBACK */
-#feedback{
-min-height:20px;
-margin-top:10px;
-font-weight:bold;
+.circuit-sentence {
+    font-size: 17px;
+    font-weight: 700;
+    line-height: 1.5;
+    color: #fff;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
 }
 
-/* BUTTON */
-button{
-padding:12px;
-border:none;
-border-radius:12px;
-background:#ff9800;
-color:#fff;
-font-size:16px;
-font-weight:bold;
-cursor:pointer;
-width:100%;
-margin-top:10px;
+.drop-slot {
+    min-width: 120px;
+    height: 48px;
+    background: var(--pipe-slot);
+    border: 2px dashed var(--cyan-glow);
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 12px;
+    font-weight: 800;
+    color: var(--amber-gold);
+    transition: all 0.2s;
+}
+.drop-slot.drag-over { background: rgba(6, 182, 212, 0.2); border-style: solid; }
+.drop-slot.filled-correct { background: rgba(16, 185, 129, 0.2); border: 2px solid var(--success-green); color: var(--success-green); }
+.drop-slot.filled-wrong { background: rgba(239, 68, 68, 0.2); border: 2px solid var(--error-red); color: var(--error-red); }
+
+/* CONNECTOR TRAY */
+.pipe-tray {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+    width: 100%;
+    max-width: 520px;
+    margin-bottom: 10px;
 }
 
-/* CONFETTI */
-.confetti{
-position:fixed;
-width:10px;
-height:10px;
-top:-10px;
-animation:fall 2s linear forwards;
+.pipe-connector {
+    background: linear-gradient(135deg, #334155, #1e293b);
+    border: 2px solid var(--amber-gold);
+    color: var(--amber-gold);
+    padding: 12px 18px;
+    border-radius: 12px;
+    font-weight: 800;
+    font-size: 15px;
+    cursor: grab;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    touch-action: none;
+}
+.pipe-connector:active { cursor: grabbing; transform: scale(1.05); }
+
+.feedback-bar {
+    min-height: 24px;
+    font-size: 14px;
+    font-weight: 800;
+    color: var(--cyan-bright);
 }
 
-@keyframes fall{
-to{
-transform:translateY(100vh) rotate(360deg);
-opacity:0;
-}
+canvas#confettiCanvas { position: fixed; inset: 0; pointer-events: none; z-index: 99999; }
+
+@media (max-width: 480px) {
+    .title-header { font-size: 22px; }
+    .circuit-sentence { font-size: 15px; }
+    .pipe-connector { padding: 10px 14px; font-size: 13px; }
+    .drop-slot { min-width: 100px; height: 42px; }
 }
 </style>
 </head>
 
 <body>
 
-<!-- 🔵 LOGO -->
+<canvas id="confettiCanvas"></canvas>
+
+<!-- AUDIO ASSETS -->
+<audio id="correctSound" src="assets/correct.mp3" preload="auto"></audio>
+<audio id="wrongSound" src="assets/wrong.mp3" preload="auto"></audio>
+<audio id="clapSound" src="assets/clapping.mp3" preload="auto"></audio>
+
+<!-- STAGE 1: LOGO SPLASH (EXACTLY 5 SECONDS) -->
 <div id="logoScreen" class="screen active">
-<img src="assets/innovine-logo.png">
+    <div class="logo-container">
+        <img src="assets/innovine-logo.png" alt="Innovine Logo" onerror="this.style.display='none'; document.getElementById('logoFallback').style.display='block';">
+        <div id="logoFallback" class="logo-fallback" style="display:none;">INNOVINE</div>
+    </div>
 </div>
 
-<!-- 🟡 TITLE -->
+<!-- STAGE 2: TITLE SCREEN -->
 <div id="titleScreen" class="screen">
-<div class="title">🚌 The Class Trip Adventure</div>
-<button onclick="startGame()">Start Game</button>
+    <div class="title-header" style="font-size: 32px;">⚡ SENTENCE CONSTRUCTOR LAB</div>
+    <p style="color: #94a3b8; font-size: 16px;">Preposition Circuit Engine</p>
 </div>
 
-<!-- 🟢 GAME -->
+<!-- STAGE 3: INSTRUCTIONS BRIEFING -->
+<div id="startScreen" class="screen">
+    <div class="lab-card">
+        <div class="title-header">Lab Briefing</div>
+        <p style="color: #cbd5e1; margin: 12px 0; font-size: 14px; line-height: 1.5; text-align: left;">
+            Prepositions connect words in a sentence like circuit pipes! Drag the correct preposition connector into the broken pipe slot to complete the electrical circuit.
+        </p>
+        <button class="btn-lab" onclick="launchGameplay()">START EXPERIMENT</button>
+    </div>
+</div>
+
+<!-- STAGE 4: MAIN GAMEPLAY -->
 <div id="gameScreen" class="screen">
-<div class="card">
+    <div class="hud-bar">
+        <div>CIRCUIT: <span id="stageHUD">0 / 10</span></div>
+        <div>ENERGY: <span id="scoreHUD">0</span></div>
+    </div>
 
-<div id="scoreBoard">Score: 0 / 10</div>
+    <div class="pipeline-container">
+        <div class="circuit-sentence" id="sentenceContainer">
+            <!-- Dynamically Rendered -->
+        </div>
+    </div>
 
-<h3 id="storyText"></h3>
-<h2 id="questionText"></h2>
+    <div class="feedback-bar" id="feedbackText">Drag a connector into the slot</div>
 
-<div id="optionsBox"></div>
-
-<div id="feedback"></div>
-
+    <div class="pipe-tray" id="trayBox">
+        <!-- Dynamically Rendered Connectors -->
+    </div>
 </div>
-</div>
 
-<!-- 🏁 END -->
+<!-- STAGE 5: SUMMARY SCREEN -->
 <div id="endScreen" class="screen">
-<div class="card">
-<h2>🎉 Trip Completed!</h2>
-
-<div id="finalScore"></div>
-<div id="remark"></div>
-
-<button onclick="restartGame()">Restart</button>
+    <div class="lab-card">
+        <div style="font-size: 50px; margin-bottom: 8px;">🔬</div>
+        <div class="title-header">CIRCUIT COMPLETE!</div>
+        <p id="finalScore" style="font-size: 18px; font-weight: 700; margin: 12px 0; color: #fff;"></p>
+        <p id="remarkMsg" style="color: var(--cyan-bright); font-weight: 700; margin-bottom: 16px;"></p>
+        <button class="btn-lab" onclick="restartGame()">RESTART EXPERIMENT</button>
+    </div>
 </div>
-</div>
-
-<!-- AUDIO -->
-<audio id="correctSound" src="assets/correct.mp3"></audio>
-<audio id="wrongSound" src="assets/wrong.mp3"></audio>
-<audio id="clapSound" src="assets/clapping.mp3"></audio>
 
 <script>
-
-/* ================= STRICT STORY FLOW (DO NOT CHANGE ORDER) ================= */
-const levels = [
-{ story:"It is Monday morning. Everyone is excited for the class trip. Ms. Anita checks the time.", q:"The bus will leave ___ 7:30 a.m.", opts:["at","on","in"], ans:"at" },
-{ story:"The teacher reminds everyone about the trip.", q:"Our trip is ___ Friday.", opts:["on","at","in"], ans:"on" },
-{ story:"The bus finally arrives.", q:"The students are waiting ___ the bus stop.", opts:["at","on","under"], ans:"at" },
-{ story:"Everyone finds a seat.", q:"Rina is sitting ___ her best friend.", opts:["beside","under","between"], ans:"beside" },
-{ story:"The bus begins its journey.", q:"We are travelling ___ bus.", opts:["by","on","in"], ans:"by" },
-{ story:"The students enter the museum.", q:"The dinosaur skeleton is ___ the entrance.", opts:["near","in","on"], ans:"near" },
-{ story:"Students look for clues.", q:"The next clue is hidden ___ the old tree.", opts:["under","between","on"], ans:"under" },
-{ story:"Everyone sits together.", q:"Our lunch break starts ___ noon.", opts:["at","on","in"], ans:"at" },
-{ story:"The trip ends.", q:"The students got ___ the bus happily.", opts:["on","in","under"], ans:"on" },
-{ story:"The teacher smiles.", q:"We arrived home ___ the evening.", opts:["in","at","on"], ans:"in" }
+/* CHAPTER 10 DATASET (Derived from Chapter 10 PDF) */
+const labCircuits = [
+    {
+        prefix: "The ancient artifacts were found",
+        suffix: "the depths of the cave.",
+        opts: ["in", "at", "on"],
+        ans: "in"
+    },
+    {
+        prefix: "The science committee meeting starts",
+        suffix: "noon sharp.",
+        opts: ["at", "in", "on"],
+        ans: "at"
+    },
+    {
+        prefix: "We travelled",
+        suffix: "the national museum by bus.",
+        opts: ["to", "from", "at"],
+        ans: "to"
+    },
+    {
+        prefix: "",
+        suffix: "the weather report, it will rain today.",
+        opts: ["According to", "Instead of", "Because of"],
+        ans: "According to"
+    },
+    {
+        prefix: "She has always been fascinated",
+        suffix: "ancient mysteries.",
+        opts: ["by", "with", "on"],
+        ans: "by"
+    },
+    {
+        prefix: "He is exceptionally good",
+        suffix: "solving math puzzles.",
+        opts: ["at", "in", "with"],
+        ans: "at"
+    },
+    {
+        prefix: "She was born",
+        suffix: "July 15th.",
+        opts: ["on", "at", "in"],
+        ans: "on"
+    },
+    {
+        prefix: "Raina chose the red hat",
+        suffix: "the blue one.",
+        opts: ["instead of", "because of", "on top of"],
+        ans: "instead of"
+    },
+    {
+        prefix: "We went on a vacation trip",
+        suffix: "last summer.",
+        opts: ["[No Preposition]", "in", "on"],
+        ans: "[No Preposition]"
+    },
+    {
+        prefix: "She was frightened",
+        suffix: "the sudden loud noise.",
+        opts: ["of", "at", "on"],
+        ans: "of"
+    }
 ];
 
-let i = 0;
-let score = 0;
+let circuitIndex = 0, currentScore = 0;
+let soundUnlocked = false;
 
-/* ================= SHUFFLE ONLY OPTIONS ================= */
-function shuffle(arr){
-return arr.sort(()=>Math.random()-0.5);
-}
-
-/* ================= INTRO FLOW ================= */
-window.onload = () => {
-setTimeout(()=>{
-document.getElementById("logoScreen").classList.remove("active");
-document.getElementById("titleScreen").classList.add("active");
-},5000);
+const audioMap = {
+    correct: document.getElementById("correctSound"),
+    wrong: document.getElementById("wrongSound"),
+    clap: document.getElementById("clapSound")
 };
 
-function startGame(){
-document.getElementById("titleScreen").classList.remove("active");
-document.getElementById("gameScreen").classList.add("active");
-loadQ();
+function unlockAudio() {
+    if (soundUnlocked) return;
+    Object.values(audioMap).forEach(track => {
+        if (track) {
+            track.play().then(() => {
+                track.pause();
+                track.currentTime = 0;
+            }).catch(() => {});
+        }
+    });
+    soundUnlocked = true;
+    window.removeEventListener('pointerdown', unlockAudio);
+}
+window.addEventListener('pointerdown', unlockAudio);
+
+/* INTRO FLOW PIPELINE */
+window.onload = () => {
+    // 5-second strict Innovine logo splash
+    setTimeout(() => {
+        document.getElementById("logoScreen").classList.remove("active");
+        document.getElementById("titleScreen").classList.add("active");
+        
+        setTimeout(() => {
+            document.getElementById("titleScreen").classList.remove("active");
+            document.getElementById("startScreen").classList.add("active");
+        }, 2500);
+
+    }, 5000);
+};
+
+function playSound(type) {
+    const track = audioMap[type];
+    if (track) {
+        track.currentTime = 0;
+        track.play().catch(() => synthBeep(type === 'correct' || type === 'clap'));
+    }
 }
 
-/* ================= LOAD QUESTION ================= */
-function loadQ(){
-
-if(i >= levels.length){
-endGame();
-return;
+function synthBeep(isGood) {
+    try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.frequency.value = isGood ? 600 : 220;
+        gain.gain.value = 0.1;
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.15);
+    } catch(e) {}
 }
 
-let L = levels[i];
-
-document.getElementById("scoreBoard").innerText =
-`Score: ${score} / ${levels.length}`;
-
-document.getElementById("storyText").innerText = L.story;
-document.getElementById("questionText").innerText = L.q;
-
-let box = document.getElementById("optionsBox");
-box.innerHTML = "";
-
-document.getElementById("feedback").innerText = "";
-
-/* 🔥 ONLY OPTIONS SHUFFLED (FLOW SAFE) */
-let options = shuffle([...L.opts]);
-
-options.forEach(o=>{
-let d = document.createElement("div");
-d.className = "option";
-d.innerText = o;
-
-d.onclick = () => check(o);
-
-box.appendChild(d);
-});
+function launchGameplay() {
+    document.getElementById("startScreen").classList.remove("active");
+    document.getElementById("gameScreen").classList.add("active");
+    restartGame();
 }
 
-/* ================= CHECK ANSWER ================= */
-function check(opt){
-
-let L = levels[i];
-
-if(opt === L.ans){
-score++;
-document.getElementById("correctSound").play().catch(()=>{});
-confetti();
-document.getElementById("feedback").innerText = "✔ Correct!";
-}else{
-document.getElementById("wrongSound").play().catch(()=>{});
-document.getElementById("feedback").innerText = "❌ Wrong!";
+function restartGame() {
+    document.getElementById("endScreen").classList.remove("active");
+    circuitIndex = 0;
+    currentScore = 0;
+    loadCircuit();
 }
 
-setTimeout(()=>{
-i++;
-loadQ();
-},900);
+function updateHUD() {
+    document.getElementById("stageHUD").innerText = `${circuitIndex + 1} / ${labCircuits.length}`;
+    document.getElementById("scoreHUD").innerText = currentScore;
 }
 
-/* ================= END GAME ================= */
-function endGame(){
+function loadCircuit() {
+    if (circuitIndex >= labCircuits.length) {
+        showEndScreen();
+        return;
+    }
 
-document.getElementById("gameScreen").classList.remove("active");
-document.getElementById("endScreen").classList.add("active");
+    updateHUD();
+    const data = labCircuits[circuitIndex];
+    document.getElementById("feedbackText").innerText = "Drag a connector into the slot";
+    document.getElementById("feedbackText").style.color = "var(--cyan-bright)";
 
-let percent = (score / levels.length) * 100;
+    // Render Sentence Circuit
+    const container = document.getElementById("sentenceContainer");
+    container.innerHTML = `
+        <span>${data.prefix}</span>
+        <div class="drop-slot" id="dropSlot" ondragover="allowDrop(event)" ondragleave="leaveDrop(event)" ondrop="handleDrop(event)">[ SNAP PIPE ]</div>
+        <span>${data.suffix}</span>
+    `;
 
-let remark =
-percent >= 80 ? "🌟 Excellent!"
-: percent >= 60 ? "👍 Good Job!"
-: percent >= 45 ? "🙂 Well Tried!"
-: "📘 Let's Revise and Come Back!";
-
-document.getElementById("finalScore").innerText =
-`You answered ${score} out of ${levels.length} correct`;
-
-document.getElementById("remark").innerText = remark;
-
-document.getElementById("clapSound").play().catch(()=>{});
+    // Render Pipe Tray
+    const tray = document.getElementById("trayBox");
+    tray.innerHTML = "";
+    
+    let shuffled = [...data.opts].sort(() => Math.random() - 0.5);
+    shuffled.forEach((opt, idx) => {
+        let chip = document.createElement("div");
+        chip.className = "pipe-connector";
+        chip.innerText = opt;
+        chip.draggable = true;
+        chip.id = "pipe_" + idx;
+        
+        // Touch Drag & Mouse Events
+        chip.ondragstart = (e) => e.dataTransfer.setData("text", opt);
+        addTouchDragListeners(chip, opt);
+        
+        tray.appendChild(chip);
+    });
 }
 
-/* ================= RESTART ================= */
-function restartGame(){
-location.reload();
+/* DRAG AND DROP HANDLERS */
+function allowDrop(e) { e.preventDefault(); e.target.classList.add("drag-over"); }
+function leaveDrop(e) { e.target.classList.remove("drag-over"); }
+
+function handleDrop(e) {
+    e.preventDefault();
+    const val = e.dataTransfer.getData("text");
+    evaluatePipe(val);
 }
 
-/* ================= CONFETTI ================= */
-function confetti(){
-for(let j = 0; j < 30; j++){
-let c = document.createElement("div");
-c.className = "confetti";
-c.style.left = Math.random() * 100 + "vw";
-c.style.background = ["#ff0","#0ff","#f0f","#0f0","#f60"][Math.floor(Math.random()*5)];
-document.body.appendChild(c);
-setTimeout(()=>c.remove(),2000);
-}
+function evaluatePipe(val) {
+    const data = labCircuits[circuitIndex];
+    const slot = document.getElementById("dropSlot");
+    slot.innerText = val;
+    
+    if (val === data.ans) {
+        slot.className = "drop-slot filled-correct";
+        currentScore += 10;
+        playSound("correct");
+        triggerConfetti();
+        document.getElementById("feedbackText").innerText = "⚡ Circuit Connected! Voltage Stable.";
+        document.getElementById("feedbackText").style.color = "var(--success-green)";
+        
+        setTimeout(() => {
+            circuitIndex++;
+            loadCircuit();
+        }, 1200);
+    } else {
+        slot.className = "drop-slot filled-wrong";
+        playSound("wrong");
+        document.getElementById("feedbackText").innerText = `❌ Circuit Overload! Correct pipe: "${data.ans}"`;
+        document.getElementById("feedbackText").style.color = "var(--error-red)";
+        
+        setTimeout(() => {
+            circuitIndex++;
+            loadCircuit();
+        }, 1500);
+    }
 }
 
+/* MOBILE TOUCH DRAG ENGINE */
+function addTouchDragListeners(el, val) {
+    let activeTouch = false;
+    
+    el.addEventListener("touchstart", (e) => {
+        activeTouch = true;
+    }, {passive: true});
+
+    el.addEventListener("touchend", (e) => {
+        if (!activeTouch) return;
+        activeTouch = false;
+        
+        let touch = e.changedTouches[0];
+        let target = document.elementFromPoint(touch.clientX, touch.clientY);
+        
+        if (target && (target.id === "dropSlot" || target.closest("#dropSlot"))) {
+            evaluatePipe(val);
+        }
+    });
+}
+
+function showEndScreen() {
+    document.getElementById("gameScreen").classList.remove("active");
+    document.getElementById("endScreen").classList.add("active");
+    
+    document.getElementById("finalScore").innerText = `Energy Output: ${currentScore} / ${labCircuits.length * 10}`;
+    
+    let remark = currentScore >= 80 ? "🌟 Master Constructor!" : currentScore >= 60 ? "👍 Good Effort!" : "📘 Review Chapter 10 Preposition Rules!";
+    document.getElementById("remarkMsg").innerText = remark;
+    
+    playSound("clap");
+}
+
+/* CONFETTI SYSTEM */
+const canvas = document.getElementById("confettiCanvas");
+const ctx = canvas.getContext("2d");
+function triggerConfetti() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    let particles = Array.from({length: 30}, () => ({
+        x: Math.random() * canvas.width,
+        y: -10,
+        w: 8, h: 8,
+        ys: Math.random() * 3 + 2,
+        color: ["#22d3ee","#fbbf24","#10b981","#3b82f6"][Math.floor(Math.random()*4)]
+    }));
+    let frames = 0;
+    function render() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        particles.forEach(p => {
+            p.y += p.ys;
+            ctx.fillStyle = p.color;
+            ctx.fillRect(p.x, p.y, p.w, p.h);
+        });
+        if (++frames < 45) requestAnimationFrame(render);
+        else ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+    render();
+}
 </script>
 
 </body>
