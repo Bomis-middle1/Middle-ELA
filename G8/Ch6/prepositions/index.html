@@ -1,646 +1,943 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-<title>Innovine - Prepositions Bubble Burst Challenge</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Innovine - Preposition Express: Skyward Voyage</title>
 <style>
-:root {
-    --card-bg: rgba(255, 255, 255, 0.94);
-    --primary-purple: #4a148c;
-    --accent-pink: #d81b60;
-    --accent-blue: #0288d1;
-    --accent-amber: #f57c00;
-    --accent-green: #2e7d32;
-    --text-main: #120b24;
-    --text-muted: #53457a;
-    --border-color: rgba(255, 255, 255, 0.7);
-    --shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
-}
+  :root {
+    --sky-top: #0a192f;
+    --sky-bottom: #1e3a8a;
+    --accent-teal: #00f2fe;
+    --accent-pink: #ff007f;
+    --accent-gold: #ffd700;
+    --success-green: #00e676;
+    --danger-red: #ff1744;
+    --card-bg: rgba(15, 23, 42, 0.88);
+    --border-glow: rgba(0, 242, 254, 0.4);
+    --text-light: #f8fafc;
+  }
 
-* {
+  * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
     user-select: none;
-}
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+  }
 
-/* Cosmic Aqua Animated Background */
-body {
-    background: linear-gradient(-45deg, #0f2027, #203a43, #2c5364, #120b24);
-    background-size: 300% 300%;
-    animation: gradientBG 14s ease infinite;
-    color: var(--text-main);
-    min-height: 100vh;
+  body, html {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #050b14;
+    color: var(--text-light);
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 12px;
-    overflow-x: hidden;
-}
+  }
 
-@keyframes gradientBG {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-}
-
-.view-panel {
-    position: relative;
-    width: 100%;
-    max-width: 900px;
-    background: var(--card-bg);
-    backdrop-filter: blur(12px);
-    border-radius: 24px;
-    padding: clamp(16px, 4vw, 28px);
-    box-shadow: var(--shadow);
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    border: 2px solid var(--border-color);
-    animation: fadeIn 0.4s ease-out;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: scale(0.97); }
-    to { opacity: 1; transform: scale(1); }
-}
-
-/* SCREEN 1: Innovine Logo Screen (Strictly 5 Seconds) */
-#screen-logo {
+  /* ========================================================
+     SCREEN 1: INNOVINE SPLASH SCREEN (STRICT 5 SECONDS)
+     ======================================================== */
+  #screen-logo {
     position: fixed;
     inset: 0;
-    background: #090314;
+    background: #030712;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    z-index: 9999;
-    transition: opacity 0.6s ease;
-    padding: 20px;
-}
+    z-index: 10000;
+    transition: opacity 0.5s ease;
+  }
 
-.innovine-logo-img {
+  .logo-img {
     max-width: 280px;
-    width: 70vw;
+    width: 65vw;
     height: auto;
     object-fit: contain;
-    animation: logoPop 1.2s ease-out;
-    filter: drop-shadow(0 0 25px rgba(255, 255, 255, 0.2));
-}
+    filter: drop-shadow(0 0 20px rgba(0, 242, 254, 0.3));
+  }
 
-@keyframes logoPop {
-    0% { transform: scale(0.85); opacity: 0; }
-    100% { transform: scale(1); opacity: 1; }
-}
-
-.logo-fallback-box {
+  .logo-fallback {
     display: none;
-    align-items: center;
-    gap: 14px;
-    animation: logoPop 1.2s ease-out;
-}
-
-.logo-fallback-mark {
-    width: 54px;
-    height: 54px;
-    background: linear-gradient(135deg, #00f2fe, #ff007f);
-    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.8rem;
-    color: white;
-}
-
-.logo-fallback-text {
-    font-size: clamp(2.5rem, 7vw, 4rem);
+    font-size: clamp(2rem, 6vw, 3.5rem);
     font-weight: 900;
-    letter-spacing: 3px;
-    background: linear-gradient(45deg, #ffffff, #00f2fe, #ff007f);
+    letter-spacing: 4px;
+    background: linear-gradient(45deg, var(--accent-teal), var(--accent-pink));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-}
+  }
 
-.logo-timer-bar {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    height: 6px;
-    background: linear-gradient(90deg, #00f2fe, #ff007f);
+  .loader-track {
+    width: 200px;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+    margin-top: 30px;
+    overflow: hidden;
+  }
+
+  .loader-fill {
+    height: 100%;
     width: 0%;
-    transition: width 0.05s linear;
-}
+    background: linear-gradient(90deg, var(--accent-teal), var(--accent-pink));
+    animation: splashFill 5s linear forwards;
+  }
 
-/* SCREEN 2: Instruction Screen */
-#screen-instructions {
-    display: none;
-    text-align: center;
-    align-items: center;
-    gap: 20px;
-}
+  @keyframes splashFill {
+    to { width: 100%; }
+  }
 
-.instruction-title {
-    font-size: clamp(1.8rem, 4vw, 2.5rem);
-    color: var(--primary-purple);
-    font-weight: 900;
-}
-
-.instruction-box {
-    background: rgba(255, 255, 255, 0.85);
-    border: 1px solid rgba(0,0,0,0.08);
-    border-radius: 18px;
-    padding: 22px;
-    text-align: left;
-    width: 100%;
-    max-width: 650px;
+  /* ========================================================
+     SCREEN 2: INSTRUCTIONS & INTRO
+     ======================================================== */
+  .game-container {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    max-width: 1024px;
+    max-height: 768px;
+    background: linear-gradient(180deg, var(--sky-top) 0%, var(--sky-bottom) 100%);
+    box-shadow: 0 0 50px rgba(0, 0, 0, 0.8);
     display: flex;
     flex-direction: column;
-    gap: 14px;
-}
+    overflow: hidden;
+  }
 
-.instruction-item {
+  .view-panel {
+    position: absolute;
+    inset: 0;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 100;
+    background: var(--card-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  .view-panel.active {
+    display: flex;
+  }
+
+  .game-title {
+    font-size: clamp(1.8rem, 5vw, 2.8rem);
+    font-weight: 900;
+    text-align: center;
+    background: linear-gradient(45deg, var(--accent-teal), #ffffff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 10px;
+  }
+
+  .rules-box {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-glow);
+    border-radius: 16px;
+    padding: 20px;
+    max-width: 550px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .rule-item {
     display: flex;
     align-items: center;
-    gap: 14px;
-    font-size: clamp(0.95rem, 2.2vw, 1.1rem);
-    font-weight: 700;
-    color: var(--text-main);
-}
+    gap: 12px;
+    font-size: clamp(0.9rem, 2.5vw, 1.05rem);
+    line-height: 1.4;
+  }
 
-.inst-num {
-    background: var(--primary-purple);
-    color: white;
+  .rule-icon {
     width: 32px;
     height: 32px;
     border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent-teal), var(--accent-pink));
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: 800;
+    font-weight: 900;
     flex-shrink: 0;
-}
+    font-size: 0.9rem;
+  }
 
-/* SCREEN 3: Game Play Area */
-#screen-game {
-    display: none;
-    flex-direction: column;
-}
+  .btn-action {
+    background: linear-gradient(45deg, var(--accent-pink), #7c4dff);
+    color: white;
+    border: none;
+    padding: 14px 36px;
+    border-radius: 30px;
+    font-size: 1.1rem;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 6px 20px rgba(255, 0, 127, 0.4);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
 
-.header {
+  .btn-action:active {
+    transform: scale(0.95);
+  }
+
+  /* ========================================================
+     SCREEN 3: HUD & CANVAS GAMEPLAY ARENA
+     ======================================================== */
+  .hud-header {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 70px;
+    padding: 10px 16px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 2px solid rgba(0, 0, 0, 0.08);
-    padding-bottom: 12px;
-}
+    z-index: 10;
+    background: rgba(10, 25, 47, 0.6);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
 
-.grade-badge {
-    background: linear-gradient(45deg, #00c6ff, #0072ff);
-    color: white;
-    padding: 4px 14px;
-    border-radius: 12px;
-    font-weight: 800;
-    font-size: 0.85rem;
-}
-
-.title {
-    font-size: clamp(1rem, 2.5vw, 1.3rem);
-    color: var(--primary-purple);
-    font-weight: 800;
-}
-
-.status-bar {
-    display: flex;
-    gap: 10px;
-    font-size: 0.85rem;
-    font-weight: 800;
-}
-
-.badge {
-    padding: 6px 14px;
+  .hud-badge {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--border-glow);
+    padding: 6px 12px;
     border-radius: 20px;
-    background: #ffffff;
-    border: 1px solid #dcd0ea;
-    color: var(--primary-purple);
-}
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--accent-teal);
+  }
 
-/* Question Banner */
-.question-card {
-    background: linear-gradient(135deg, #e0f7fa, #b2ebf2);
-    border-left: 5px solid #00acc1;
-    padding: 16px;
+  .prompt-card {
+    position: absolute;
+    top: 78px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100% - 32px);
+    max-width: 700px;
+    background: rgba(15, 23, 42, 0.92);
+    border: 1.5px solid var(--accent-teal);
+    border-radius: 14px;
+    padding: 12px 18px;
+    text-align: center;
+    z-index: 10;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  }
+
+  .prompt-category {
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: var(--accent-gold);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .prompt-sentence {
+    font-size: clamp(1rem, 2.8vw, 1.3rem);
+    font-weight: 700;
+    color: #ffffff;
+    margin-top: 4px;
+  }
+
+  .blank-highlight {
+    color: var(--accent-teal);
+    border-bottom: 2px dashed var(--accent-teal);
+    padding: 0 6px;
+  }
+
+  /* CANVAS */
+  #gameCanvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+    cursor: crosshair;
+  }
+
+  /* AIM GUIDE BANNER OVERLAY */
+  .aim-guide {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    padding: 8px 16px;
+    font-size: 0.85rem;
+    color: var(--accent-teal);
+    pointer-events: none;
+    z-index: 10;
+    font-weight: 600;
+  }
+
+  /* ========================================================
+     SCREEN 4: COMPLETION & SCORECARD
+     ======================================================== */
+  .trophy-icon {
+    font-size: 4rem;
+    margin-bottom: 10px;
+    animation: bounce 2s infinite;
+  }
+
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-12px); }
+  }
+
+  .score-matrix {
+    display: flex;
+    gap: 20px;
+    margin: 20px 0;
+  }
+
+  .score-card-stat {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--border-glow);
+    padding: 14px 24px;
     border-radius: 14px;
     text-align: center;
-}
+  }
 
-.category-tag {
+  .stat-val {
+    font-size: 1.8rem;
+    font-weight: 900;
+    color: var(--accent-teal);
+  }
+
+  .stat-lbl {
     font-size: 0.75rem;
+    color: #94a3b8;
     text-transform: uppercase;
-    font-weight: 900;
-    color: #007791;
-    letter-spacing: 1px;
-    margin-bottom: 4px;
-}
-
-.question-text {
-    font-size: clamp(1.1rem, 2.5vw, 1.4rem);
-    font-weight: 800;
-    color: #004d40;
-}
-
-/* Bubble Playfield Arena */
-.bubble-arena {
-    position: relative;
-    width: 100%;
-    height: 280px;
-    background: radial-gradient(circle, rgba(224, 247, 250, 0.4) 0%, rgba(178, 235, 242, 0.2) 100%);
-    border: 2px dashed rgba(0, 172, 193, 0.4);
-    border-radius: 20px;
-    overflow: hidden;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: center;
-    gap: 15px;
-    padding: 15px;
-}
-
-.bubble {
-    width: 90px;
-    height: 90px;
-    border-radius: 50%;
-    background: radial-gradient(circle at 30% 30%, #ffffff, #80deea 60%, #00acc1);
-    box-shadow: 0 8px 20px rgba(0, 172, 193, 0.3), inset -4px -4px 10px rgba(0, 77, 64, 0.2), inset 4px 4px 10px rgba(255, 255, 255, 0.8);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.1rem;
-    font-weight: 900;
-    color: #004d40;
-    cursor: pointer;
-    animation: floatBob 3s ease-in-out infinite alternate;
-    transition: transform 0.2s ease, opacity 0.3s ease;
-}
-
-.bubble:nth-child(even) {
-    animation-duration: 2.5s;
-    animation-delay: 0.5s;
-}
-
-.bubble:nth-child(3n) {
-    animation-duration: 3.5s;
-    animation-delay: 0.2s;
-}
-
-.bubble:hover {
-    transform: scale(1.1);
-}
-
-@keyframes floatBob {
-    0% { transform: translateY(0px) rotate(-2deg); }
-    100% { transform: translateY(-12px) rotate(2deg); }
-}
-
-/* Burst Pop Animation */
-.bubble.popping {
-    animation: popEffect 0.3s forwards ease-out !important;
-}
-
-@keyframes popEffect {
-    0% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(1.3); opacity: 0.8; background: #ff4081; }
-    100% { transform: scale(0); opacity: 0; }
-}
-
-.action-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 12px;
-}
-
-.feedback-bar {
-    flex: 1;
-    background: white;
-    border-radius: 12px;
-    padding: 12px;
-    font-size: 0.95rem;
-    font-weight: 800;
-    color: var(--text-muted);
-    text-align: center;
-}
-
-.btn-main {
-    background: linear-gradient(45deg, #ff007f, #0072ff);
-    color: white;
-    border: 0;
-    padding: 12px 28px;
-    border-radius: 25px;
-    font-weight: 900;
-    font-size: 0.95rem;
-    cursor: pointer;
-    box-shadow: 0 4px 15px rgba(0, 114, 255, 0.35);
-    transition: transform 0.15s ease;
-}
-
-.btn-main:hover {
-    transform: scale(1.04);
-}
-
-/* SCREEN 4: Completion Screen */
-#screen-completion {
-    display: none;
-    text-align: center;
-    align-items: center;
-    gap: 20px;
-    padding: 20px 10px;
-}
-
-.trophy-glow {
-    font-size: 5rem;
-    animation: bounce 2s infinite ease-in-out;
-}
-
-@keyframes bounce {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-15px); }
-}
-
-.congrats-title {
-    font-size: clamp(2rem, 5vw, 3rem);
-    font-weight: 900;
-    background: linear-gradient(45deg, #00c6ff, #ff007f);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
+    margin-top: 2px;
+  }
 </style>
 </head>
 <body>
 
-<!-- AUDIO ASSETS -->
-<audio id="snd-correct" src="assets/correct.mp3" preload="auto"></audio>
-<audio id="snd-wrong" src="assets/wrong.mp3" preload="auto"></audio>
+  <!-- ASSET AUDIO FILES -->
+  <audio id="snd-correct" src="assets/correct.mp3" preload="auto"></audio>
+  <audio id="snd-wrong" src="assets/wrong.mp3" preload="auto"></audio>
+  <audio id="snd-applause" src="assets/freesound_community-claps-44774.mp3" preload="auto"></audio>
 
-<!-- SCREEN 1: Innovine Logo Screen (Strictly 5 Seconds) -->
-<div id="screen-logo">
-    <img 
-        src="assets/logo.png" 
-        alt="Innovine Logo" 
-        class="innovine-logo-img" 
-        onerror="this.style.display='none'; document.getElementById('logo-fallback').style.display='flex';"
-    />
-    
-    <div id="logo-fallback" class="logo-fallback-box">
-        <div class="logo-fallback-mark">✦</div>
-        <div class="logo-fallback-text">INNOVINE</div>
+  <!-- SPLASH LOGO SCREEN (5 SECONDS STRICT) -->
+  <div id="screen-logo">
+    <img src="assets/logo.png" alt="Innovine Logo" class="logo-img" onerror="this.style.display='none'; document.getElementById('logo-fallback').style.display='block';">
+    <div id="logo-fallback" class="logo-fallback">INNOVINE</div>
+    <div class="loader-track">
+      <div class="loader-fill"></div>
     </div>
+  </div>
 
-    <div class="logo-timer-bar" id="logo-progress"></div>
-</div>
+  <div class="game-container">
 
-<!-- SCREEN 2: Instruction Screen (No Logo) -->
-<div id="screen-instructions" class="view-panel">
-    <div class="instruction-title">Preposition Bubble Burst</div>
-    
-    <div class="instruction-box">
-        <div class="instruction-item">
-            <div class="inst-num">1</div>
-            <div>Read the incomplete preposition sentence in the top box.</div>
+    <!-- INSTRUCTIONS SCREEN -->
+    <div id="screen-intro" class="view-panel active">
+      <h1 class="game-title">Preposition Express: Skyward Voyage</h1>
+      <p style="color: #94a3b8; font-size: 0.95rem; margin-bottom: 20px; text-align: center;">
+        Grade 8 ELA • Prepositions of Time, Place, Direction & Travel
+      </p>
+
+      <div class="rules-box">
+        <div class="rule-item">
+          <div class="rule-icon">1</div>
+          <div><strong>Read the prompt:</strong> Identify the missing preposition in the top sentence.</div>
         </div>
-        <div class="instruction-item">
-            <div class="inst-num">2</div>
-            <div>Find and <strong>pop/burst</strong> the floating bubble containing the correct preposition.</div>
+        <div class="rule-item">
+          <div class="rule-icon">2</div>
+          <div><strong>Aim & Launch:</strong> Touch/click and drag backward on the Hot-Air Balloon to set angle & speed.</div>
         </div>
-        <div class="instruction-item">
-            <div class="inst-num">3</div>
-            <div>You get <strong>2 attempts</strong> per level. Burst carefully!</div>
+        <div class="rule-item">
+          <div class="rule-icon">3</div>
+          <div><strong>Hit the Target:</strong> Launch your balloon into the floating cloud containing the correct preposition.</div>
         </div>
-    </div>
-
-    <button class="btn-main" onclick="startGame()">Start Game</button>
-</div>
-
-<!-- SCREEN 3: Game Play Area -->
-<div id="screen-game" class="view-panel">
-    <div class="header">
-        <div style="display: flex; align-items: center; gap: 8px;">
-            <div class="grade-badge">G8 ENGLISH</div>
-            <div class="title">Prepositions: Time & Travel</div>
+        <div class="rule-item">
+          <div class="rule-icon">4</div>
+          <div><strong>Watch the Wind:</strong> Gusts change between levels. 2 launcher attempts per question!</div>
         </div>
-        <div class="status-bar">
-            <div class="badge">Level: <span id="lbl-q">1</span>/8</div>
-            <div class="badge">Attempts Left: <span id="lbl-attempts">2</span></div>
+      </div>
+
+      <button class="btn-action" onclick="startGame()">TAKE FLIGHT</button>
+    </div>
+
+    <!-- GAMEPLAY HUD & CANVAS AREA -->
+    <div class="hud-header">
+      <div class="hud-badge">LEVEL <span id="lbl-level">1</span>/10</div>
+      <div class="hud-badge">WIND: <span id="lbl-wind">0 km/h</span></div>
+      <div class="hud-badge">ATTEMPTS: <span id="lbl-attempts">2</span></div>
+      <div class="hud-badge">SCORE: <span id="lbl-score">0</span></div>
+    </div>
+
+    <div class="prompt-card">
+      <div class="prompt-category" id="lbl-category">PREPOSITION CATEGORY</div>
+      <div class="prompt-sentence" id="lbl-sentence">Loading grammar challenge...</div>
+    </div>
+
+    <div class="aim-guide" id="aim-guide">Drag launcher balloon backward to aim & release!</div>
+
+    <canvas id="gameCanvas"></canvas>
+
+    <!-- COMPLETION SCREEN -->
+    <div id="screen-end" class="view-panel">
+      <div class="trophy-icon">✈️🏆</div>
+      <h1 class="game-title">MISSION COMPLETE!</h1>
+      <p style="color: #94a3b8; text-align: center; max-width: 450px;">
+        Outstanding flight navigation! You have demonstrated mastery over Grade 8 Prepositions.
+      </p>
+
+      <div class="score-matrix">
+        <div class="score-card-stat">
+          <div class="stat-val" id="final-score">0</div>
+          <div class="stat-lbl">Final Score</div>
         </div>
+        <div class="score-card-stat">
+          <div class="stat-val" id="final-accuracy">0%</div>
+          <div class="stat-lbl">Accuracy</div>
+        </div>
+      </div>
+
+      <button class="btn-action" onclick="location.reload()">FLY AGAIN</button>
     </div>
 
-    <div class="question-card">
-        <div class="category-tag" id="lbl-category">Preposition Rule</div>
-        <div class="question-text" id="lbl-question">Loading sentence...</div>
-    </div>
-
-    <!-- Bubble Arena -->
-    <div class="bubble-arena" id="bubble-arena">
-        <!-- Bubbles injected dynamically -->
-    </div>
-
-    <div class="action-bar">
-        <div class="feedback-bar" id="lbl-feedback">Tap the floating bubble to burst it!</div>
-    </div>
-</div>
-
-<!-- SCREEN 4: Completion Screen -->
-<div id="screen-completion" class="view-panel">
-    <div class="trophy-glow">🫧✨</div>
-    <div class="congrats-title">Mastery Achieved!</div>
-    <p style="color: var(--text-muted); font-size: 1.1rem; max-width: 520px; font-weight: 600; line-height: 1.5;">
-        You burst all the correct prepositions across Travel (image_66a9bd.png) and Time (image_66a9f6.png) rules!
-    </p>
-    <button class="btn-main" onclick="location.reload()">Play Again</button>
-</div>
+  </div>
 
 <script>
-const $ = id => document.getElementById(id);
-
-let currentQ = 0;
-let attemptsLeft = 2;
-let isProcessing = false;
-
-/* Helper functions to play sound effects */
-function playCorrectSound() {
-    const snd = $('snd-correct');
-    if (snd) {
-        snd.currentTime = 0;
-        snd.play().catch(e => console.log('Audio playback prevented:', e));
-    }
-}
-
-function playWrongSound() {
-    const snd = $('snd-wrong');
-    if (snd) {
-        snd.currentTime = 0;
-        snd.play().catch(e => console.log('Audio playback prevented:', e));
-    }
-}
-
-/* Question Bank direct from image_66a9bd.png & image_66a9f6.png */
+/* ========================================================
+   CURRICULUM DATABASE: GRADE 8 PREPOSITIONS
+   ======================================================== */
 const questionBank = [
-    {
-        category: "Preposition of Travel (image_66a9bd.png)",
-        sentence: "We are travelling _____ Paris next week.",
-        correct: "to",
-        options: ["to", "from", "on", "in", "at"]
-    },
-    {
-        category: "Preposition of Travel (image_66a9bd.png)",
-        sentence: "The train departs _____ London at 9:00 AM.",
-        correct: "from",
-        options: ["from", "to", "through", "by", "on"]
-    },
-    {
-        category: "Preposition of Travel (image_66a9bd.png)",
-        sentence: "We travelled _____ a car across the country.",
-        correct: "in",
-        options: ["in", "on", "by", "at", "to"]
-    },
-    {
-        category: "Preposition of Travel (image_66a9bd.png)",
-        sentence: "We travelled _____ plane to reach our destination.",
-        correct: "by",
-        options: ["by", "in", "on", "through", "at"]
-    },
-    {
-        category: "Preposition of Travel (image_66a9bd.png)",
-        sentence: "We journeyed _____ the mountains to reach the valley.",
-        correct: "through",
-        options: ["through", "from", "to", "on", "at"]
-    },
-    {
-        category: "Preposition of Time (image_66a9f6.png)",
-        sentence: "The meeting is scheduled _____ 3 PM sharp.",
-        correct: "at",
-        options: ["at", "on", "in", "by", "to"]
-    },
-    {
-        category: "Preposition of Time (image_66a9f6.png)",
-        sentence: "She was born _____ January 1st.",
-        correct: "on",
-        options: ["on", "in", "at", "from", "through"]
-    },
-    {
-        category: "Preposition of Time (image_66a9f6.png)",
-        sentence: "We love going skiing _____ winter.",
-        correct: "in",
-        options: ["in", "on", "at", "to", "by"]
-    }
+  {
+    category: "Preposition of Travel & Direction",
+    sentence: "The express train departs <span class='blank-highlight'>______</span> platform 4 at midnight.",
+    correct: "from",
+    options: ["from", "to", "through", "into"]
+  },
+  {
+    category: "Preposition of Travel & Transport",
+    sentence: "We traveled across the archipelago <span class='blank-highlight'>______</span> a private ferry.",
+    correct: "on",
+    options: ["on", "by", "in", "at"]
+  },
+  {
+    category: "Preposition of Movement & Place",
+    sentence: "The research drone soared <span class='blank-highlight'>______</span> the storm clouds smoothly.",
+    correct: "through",
+    options: ["through", "across", "into", "onto"]
+  },
+  {
+    category: "Preposition of Time (Specific Points)",
+    sentence: "The international flight will land precisely <span class='blank-highlight'>______</span> 06:45 AM.",
+    correct: "at",
+    options: ["at", "on", "in", "by"]
+  },
+  {
+    category: "Preposition of Time (Dates & Days)",
+    sentence: "Our expedition team arrives in Cairo <span class='blank-highlight'>______</span> the first of October.",
+    correct: "on",
+    options: ["on", "in", "at", "during"]
+  },
+  {
+    category: "Preposition of Time (Months & Seasons)",
+    sentence: "Navigators avoid crossing the North Atlantic <span class='blank-highlight'>______</span> winter.",
+    correct: "in",
+    options: ["in", "at", "on", "for"]
+  },
+  {
+    category: "Preposition of Travel Mode",
+    sentence: "Delegates will travel to the summit <span class='blank-highlight'>______</span> air.",
+    correct: "by",
+    options: ["by", "in", "on", "with"]
+  },
+  {
+    category: "Preposition of Direction / Destination",
+    sentence: "The migratory birds flew directly <span class='blank-highlight'>______</span> the warmer southern coast.",
+    correct: "towards",
+    options: ["towards", "into", "at", "through"]
+  },
+  {
+    category: "Preposition of Position & Enclosure",
+    sentence: "The vital navigation log was hidden <span class='blank-highlight'>______</span> the captain's desk drawer.",
+    correct: "inside",
+    options: ["inside", "onto", "across", "through"]
+  },
+  {
+    category: "Preposition of Time (Duration)",
+    sentence: "The pilot maintained steady radio silence <span class='blank-highlight'>______</span> three hours.",
+    correct: "for",
+    options: ["for", "since", "during", "until"]
+  }
 ];
 
-// Screen 1 Timer (5 Seconds)
-const LOGO_DURATION = 5000;
-let logoElapsed = 0;
+/* ========================================================
+   AUDIO SYSTEM (WITH SYNTHESIZER FALLBACK)
+   ======================================================== */
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-let logoInterval = setInterval(() => {
-    logoElapsed += 50;
-    let pct = Math.min((logoElapsed / LOGO_DURATION) * 100, 100);
-    $('logo-progress').style.width = pct + '%';
+function playSound(type) {
+  let id = 'snd-correct';
+  if (type === 'wrong') id = 'snd-wrong';
+  if (type === 'applause') id = 'snd-applause';
 
-    if (logoElapsed >= LOGO_DURATION) {
-        clearInterval(logoInterval);
-        $('screen-logo').style.opacity = 0;
-        setTimeout(() => {
-            $('screen-logo').style.display = 'none';
-            $('screen-instructions').style.display = 'flex';
-        }, 600);
+  const el = document.getElementById(id);
+  if (el && el.readyState >= 2) {
+    el.currentTime = 0;
+    el.play().catch(() => synthSound(type));
+  } else {
+    synthSound(type);
+  }
+}
+
+function synthSound(type) {
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+
+  if (type === 'correct') {
+    osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
+    osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.25); // A5
+    gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.3);
+  } else if (type === 'wrong') {
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(220, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(110, audioCtx.currentTime + 0.3);
+    gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.3);
+  } else {
+    // Fanfare / Applause fallback
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(440, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(659.25, audioCtx.currentTime + 0.5);
+    gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.6);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.6);
+  }
+}
+
+/* ========================================================
+   GAME ENGINE & CANVAS PHYSICS
+   ======================================================== */
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+
+let currentLevel = 0;
+let score = 0;
+let attemptsLeft = 2;
+let totalHits = 0;
+let windSpeed = 0; // Negative = left, Positive = right
+
+// Game state flags
+let isDragging = false;
+let isLaunched = false;
+let particles = [];
+let targetClouds = [];
+
+// Slingshot / Launcher position
+let launcher = { x: 0, y: 0, radius: 28 };
+let balloon = { x: 0, y: 0, vx: 0, vy: 0, radius: 22 };
+let dragStart = { x: 0, y: 0 };
+let dragCurrent = { x: 0, y: 0 };
+
+function resizeCanvas() {
+  const container = canvas.parentElement;
+  canvas.width = container.clientWidth;
+  canvas.height = container.clientHeight;
+  
+  launcher.x = canvas.width * 0.5;
+  launcher.y = canvas.height - 80;
+  if (!isLaunched) resetBalloon();
+}
+
+window.addEventListener('resize', resizeCanvas);
+
+/* Initialize Level */
+function setupLevel() {
+  const q = questionBank[currentLevel];
+  document.getElementById('lbl-level').textContent = currentLevel + 1;
+  document.getElementById('lbl-category').textContent = q.category;
+  document.getElementById('lbl-sentence').innerHTML = q.sentence;
+  document.getElementById('lbl-score').textContent = score;
+  
+  attemptsLeft = 2;
+  document.getElementById('lbl-attempts').textContent = attemptsLeft;
+
+  // Wind setup (-2.5 to 2.5)
+  windSpeed = (Math.random() * 4 - 2);
+  const windDir = windSpeed >= 0 ? "➔" : "⬅";
+  document.getElementById('lbl-wind').textContent = `${windDir} ${Math.abs(windSpeed * 10).toFixed(0)} knots`;
+
+  resetBalloon();
+  createTargetClouds(q.options);
+}
+
+function resetBalloon() {
+  isLaunched = false;
+  isDragging = false;
+  balloon.x = launcher.x;
+  balloon.y = launcher.y;
+  balloon.vx = 0;
+  balloon.vy = 0;
+  document.getElementById('aim-guide').style.opacity = '1';
+}
+
+function createTargetClouds(options) {
+  targetClouds = [];
+  const count = options.length;
+  const startY = 180;
+  const spacingX = canvas.width / (count + 1);
+
+  options.forEach((opt, idx) => {
+    targetClouds.push({
+      text: opt,
+      x: spacingX * (idx + 1),
+      y: startY + (idx % 2 === 0 ? -20 : 20),
+      radius: 42,
+      baseX: spacingX * (idx + 1),
+      floatOffset: Math.random() * Math.PI * 2,
+      hit: false
+    });
+  });
+}
+
+/* INPUT HANDLERS (MOUSE & TOUCH) */
+function getEventPos(e) {
+  const rect = canvas.getBoundingClientRect();
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+  return {
+    x: clientX - rect.left,
+    y: clientY - rect.top
+  };
+}
+
+function onPointerDown(e) {
+  if (isLaunched) return;
+  const pos = getEventPos(e);
+  const dist = Math.hypot(pos.x - balloon.x, pos.y - balloon.y);
+  if (dist < balloon.radius * 2) {
+    isDragging = true;
+    dragStart = pos;
+    dragCurrent = pos;
+  }
+}
+
+function onPointerMove(e) {
+  if (!isDragging) return;
+  dragCurrent = getEventPos(e);
+  
+  // Limit drag distance
+  const maxDrag = 110;
+  const dx = dragCurrent.x - launcher.x;
+  const dy = dragCurrent.y - launcher.y;
+  const dist = Math.hypot(dx, dy);
+
+  if (dist > maxDrag) {
+    const angle = Math.atan2(dy, dx);
+    balloon.x = launcher.x + Math.cos(angle) * maxDrag;
+    balloon.y = launcher.y + Math.sin(angle) * maxDrag;
+  } else {
+    balloon.x = dragCurrent.x;
+    balloon.y = dragCurrent.y;
+  }
+}
+
+function onPointerUp() {
+  if (!isDragging) return;
+  isDragging = false;
+  isLaunched = true;
+  document.getElementById('aim-guide').style.opacity = '0';
+
+  // Calculate launch velocity vector
+  const dx = launcher.x - balloon.x;
+  const dy = launcher.y - balloon.y;
+  balloon.vx = dx * 0.18;
+  balloon.vy = dy * 0.18;
+}
+
+canvas.addEventListener('mousedown', onPointerDown);
+canvas.addEventListener('mousemove', onPointerMove);
+window.addEventListener('mouseup', onPointerUp);
+
+canvas.addEventListener('touchstart', onPointerDown, { passive: true });
+canvas.addEventListener('touchmove', onPointerMove, { passive: true });
+window.addEventListener('touchend', onPointerUp);
+
+/* MAIN GAME LOOP */
+function gameLoop() {
+  update();
+  render();
+  requestAnimationFrame(gameLoop);
+}
+
+function update() {
+  // Update Target Clouds Floating
+  targetClouds.forEach(cloud => {
+    cloud.floatOffset += 0.03;
+    cloud.y += Math.sin(cloud.floatOffset) * 0.4;
+  });
+
+  // Update Launcher Balloon Physics
+  if (isLaunched) {
+    balloon.vx += windSpeed * 0.015; // Apply wind drift
+    balloon.vy += 0.12; // Apply gravity
+    balloon.x += balloon.vx;
+    balloon.y += balloon.vy;
+
+    // Check Collision with Target Clouds
+    targetClouds.forEach(cloud => {
+      if (cloud.hit) return;
+      const dist = Math.hypot(balloon.x - cloud.x, balloon.y - cloud.y);
+      if (dist < balloon.radius + cloud.radius) {
+        handleCloudImpact(cloud);
+      }
+    });
+
+    // Check Out-of-bounds Boundaries
+    if (
+      balloon.x < -50 ||
+      balloon.x > canvas.width + 50 ||
+      balloon.y > canvas.height + 50 ||
+      balloon.y < 0
+    ) {
+      handleMiss();
     }
-}, 50);
+  }
+
+  // Particle Effects Update
+  for (let i = particles.length - 1; i >= 0; i--) {
+    const p = particles[i];
+    p.x += p.vx;
+    p.y += p.vy;
+    p.alpha -= 0.02;
+    if (p.alpha <= 0) particles.splice(i, 1);
+  }
+}
+
+function handleCloudImpact(cloud) {
+  const currentQ = questionBank[currentLevel];
+  cloud.hit = true;
+
+  if (cloud.text === currentQ.correct) {
+    playSound('correct');
+    spawnParticles(cloud.x, cloud.y, '#00e676', 35);
+    score += 100 * attemptsLeft;
+    totalHits++;
+    document.getElementById('lbl-score').textContent = score;
+
+    setTimeout(() => {
+      currentLevel++;
+      if (currentLevel < questionBank.length) {
+        setupLevel();
+      } else {
+        finishGame();
+      }
+    }, 1200);
+
+  } else {
+    playSound('wrong');
+    spawnParticles(cloud.x, cloud.y, '#ff1744', 25);
+    handleMiss();
+  }
+}
+
+function handleMiss() {
+  attemptsLeft--;
+  document.getElementById('lbl-attempts').textContent = attemptsLeft;
+
+  if (attemptsLeft > 0) {
+    resetBalloon();
+  } else {
+    // Reveal correct cloud
+    const currentQ = questionBank[currentLevel];
+    const correctCloud = targetClouds.find(c => c.text === currentQ.correct);
+    if (correctCloud) spawnParticles(correctCloud.x, correctCloud.y, '#ffd700', 40);
+
+    setTimeout(() => {
+      currentLevel++;
+      if (currentLevel < questionBank.length) {
+        setupLevel();
+      } else {
+        finishGame();
+      }
+    }, 1500);
+  }
+}
+
+function spawnParticles(x, y, color, count) {
+  for (let i = 0; i < count; i++) {
+    const angle = Math.random() * Math.PI * 2;
+    const speed = Math.random() * 5 + 2;
+    particles.push({
+      x, y,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed,
+      color,
+      alpha: 1,
+      size: Math.random() * 5 + 3
+    });
+  }
+}
+
+/* RENDERING FUNCTION */
+function render() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // 1. Draw Trajectory Prediction Line while dragging
+  if (isDragging) {
+    ctx.beginPath();
+    ctx.setLineDash([6, 6]);
+    ctx.strokeStyle = "rgba(0, 242, 254, 0.6)";
+    ctx.lineWidth = 3;
+
+    let simX = launcher.x;
+    let simY = launcher.y;
+    let simVx = (launcher.x - balloon.x) * 0.18;
+    let simVy = (launcher.y - balloon.y) * 0.18;
+
+    ctx.moveTo(simX, simY);
+    for (let i = 0; i < 20; i++) {
+      simVx += windSpeed * 0.015;
+      simVy += 0.12;
+      simX += simVx;
+      simY += simVy;
+      ctx.lineTo(simX, simY);
+    }
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  // 2. Draw Target Clouds
+  targetClouds.forEach(cloud => {
+    ctx.save();
+    ctx.translate(cloud.x, cloud.y);
+
+    // Cloud Puff Shapes
+    ctx.fillStyle = cloud.hit ? 'rgba(255, 255, 255, 0.2)' : 'rgba(255, 255, 255, 0.92)';
+    ctx.shadowColor = 'rgba(0, 242, 254, 0.4)';
+    ctx.shadowBlur = 15;
+
+    ctx.beginPath();
+    ctx.arc(0, 0, cloud.radius, 0, Math.PI * 2);
+    ctx.arc(-22, 5, 26, 0, Math.PI * 2);
+    ctx.arc(22, 5, 26, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Text Label inside Cloud
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = '#0f172a';
+    ctx.font = '900 18px "Segoe UI", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(cloud.text, 0, 2);
+
+    ctx.restore();
+  });
+
+  // 3. Draw Slingshot Launcher Pad
+  ctx.save();
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.arc(launcher.x, launcher.y, 35, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.restore();
+
+  // 4. Draw Launcher Elastic Rubber Bands
+  if (isDragging) {
+    ctx.strokeStyle = '#ff007f';
+    ctx.lineWidth = 5;
+    ctx.beginPath();
+    ctx.moveTo(launcher.x - 20, launcher.y);
+    ctx.lineTo(balloon.x, balloon.y);
+    ctx.moveTo(launcher.x + 20, launcher.y);
+    ctx.lineTo(balloon.x, balloon.y);
+    ctx.stroke();
+  }
+
+  // 5. Draw Hot-Air Balloon
+  ctx.save();
+  ctx.translate(balloon.x, balloon.y);
+
+  // Balloon Basket
+  ctx.fillStyle = '#b45309';
+  ctx.fillRect(-6, 18, 12, 10);
+
+  // Ropes
+  ctx.strokeStyle = '#f59e0b';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(-5, 18); ctx.lineTo(-10, 8);
+  ctx.moveTo(5, 18); ctx.lineTo(10, 8);
+  ctx.stroke();
+
+  // Balloon Envelope Body
+  const grad = ctx.createLinearGradient(-balloon.radius, -balloon.radius, balloon.radius, balloon.radius);
+  grad.addColorStop(0, '#ff007f');
+  grad.addColorStop(0.5, '#7c4dff');
+  grad.addColorStop(1, '#00f2fe');
+
+  ctx.fillStyle = grad;
+  ctx.beginPath();
+  ctx.arc(0, -2, balloon.radius, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.restore();
+
+  // 6. Draw Particles
+  particles.forEach(p => {
+    ctx.save();
+    ctx.globalAlpha = p.alpha;
+    ctx.fillStyle = p.color;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  });
+}
+
+/* ========================================================
+   INIT & SCREEN CONTROL
+   ======================================================== */
+window.addEventListener('load', () => {
+  // Splash Screen 5-Second Timer
+  setTimeout(() => {
+    const splash = document.getElementById('screen-logo');
+    splash.style.opacity = '0';
+    setTimeout(() => {
+      splash.style.display = 'none';
+    }, 500);
+  }, 5000);
+});
 
 function startGame() {
-    $('screen-instructions').style.display = 'none';
-    $('screen-game').style.display = 'flex';
-    loadLevel();
+  document.getElementById('screen-intro').classList.remove('active');
+  resizeCanvas();
+  setupLevel();
+  requestAnimationFrame(gameLoop);
 }
 
-function loadLevel() {
-    if (currentQ >= questionBank.length) {
-        $('screen-game').style.display = 'none';
-        $('screen-completion').style.display = 'flex';
-        return;
-    }
-
-    attemptsLeft = 2;
-    isProcessing = false;
-    $('lbl-q').innerText = currentQ + 1;
-    $('lbl-attempts').innerText = attemptsLeft;
-    $('lbl-feedback').innerText = "Tap the floating bubble to burst it!";
-    $('lbl-feedback').style.color = "var(--text-muted)";
-
-    let data = questionBank[currentQ];
-    $('lbl-category').innerText = data.category;
-    $('lbl-question').innerText = data.sentence;
-
-    let arena = $('bubble-arena');
-    arena.innerHTML = '';
-
-    // Shuffle options
-    let shuffled = [...data.options].sort(() => Math.random() - 0.5);
-
-    shuffled.forEach(option => {
-        let bubble = document.createElement('div');
-        bubble.className = 'bubble';
-        bubble.innerText = option;
-        bubble.onclick = () => burstBubble(bubble, option);
-        arena.appendChild(bubble);
-    });
-}
-
-function burstBubble(bubbleElem, selectedVal) {
-    if (isProcessing) return;
-
-    let data = questionBank[currentQ];
-
-    // Add popping animation class
-    bubbleElem.classList.add('popping');
-
-    if (selectedVal === data.correct) {
-        isProcessing = true;
-        playCorrectSound();
-        $('lbl-feedback').innerText = `💥 POP! Correct! "${data.sentence.replace('_____', selectedVal)}"`;
-        $('lbl-feedback').style.color = "var(--accent-green)";
-
-        setTimeout(() => {
-            currentQ++;
-            loadLevel();
-        }, 1500);
-    } else {
-        attemptsLeft--;
-        $('lbl-attempts').innerText = attemptsLeft;
-        playWrongSound();
-
-        if (attemptsLeft > 0) {
-            $('lbl-feedback').innerText = `❌ Burst the wrong bubble! 1 attempt left.`;
-            $('lbl-feedback').style.color = "var(--accent-amber)";
-            setTimeout(() => {
-                bubbleElem.style.display = 'none';
-            }, 300);
-        } else {
-            isProcessing = true;
-            $('lbl-feedback').innerText = `⚡ Out of attempts! Right answer: "${data.correct}"`;
-            $('lbl-feedback').style.color = "var(--accent-pink)";
-
-            // Highlight correct bubble
-            let allBubbles = Array.from(document.querySelectorAll('.bubble'));
-            let correctBubble = allBubbles.find(b => b.innerText === data.correct);
-            if (correctBubble) {
-                correctBubble.style.background = '#00e676';
-            }
-
-            setTimeout(() => {
-                currentQ++;
-                loadLevel();
-            }, 2500);
-        }
-    }
+function finishGame() {
+  playSound('applause');
+  document.getElementById('screen-end').classList.add('active');
+  document.getElementById('final-score').textContent = score;
+  
+  const accuracy = Math.round((totalHits / questionBank.length) * 100);
+  document.getElementById('final-accuracy').textContent = `${accuracy}%`;
 }
 </script>
 </body>
