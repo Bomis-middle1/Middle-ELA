@@ -1,1191 +1,765 @@
-
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-
-<title>Conveyor Belt Chaos</title>
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Grammar Factory: Phrase & Clause Express</title>
 <style>
-
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:Arial,sans-serif;
-}
-
-body{
-background:linear-gradient(to bottom,#b2f7ef,#effaf5);
-height:100vh;
-overflow:hidden;
-}
-
-/* SPLASH */
-
-#splash{
-position:fixed;
-inset:0;
-background:white;
-display:flex;
-flex-direction:column;
-justify-content:center;
-align-items:center;
-z-index:9999;
-}
-
-#splash img{
-width:220px;
-max-width:80%;
-}
-
-#splash h2{
-margin-top:20px;
-color:#1565c0;
-}
-
-/* INTRO */
-
-#intro{
-display:none;
-position:fixed;
-inset:0;
-background:linear-gradient(135deg,#2196f3,#64b5f6);
-color:white;
-justify-content:center;
-align-items:center;
-flex-direction:column;
-text-align:center;
-padding:20px;
-}
-
-#intro h1{
-margin-bottom:20px;
-}
-
-#intro p{
-max-width:800px;
-line-height:1.7;
-margin-bottom:25px;
-}
-
-#startBtn{
-padding:15px 30px;
-font-size:18px;
-font-weight:bold;
-border:none;
-border-radius:12px;
-background:#ffeb3b;
-cursor:pointer;
-}
-
-/* GAME */
-
-#game{
-display:none;
-height:100vh;
-position:relative;
-}
-
-/* TOP BAR */
-
-#topBar{
-position:absolute;
-top:10px;
-left:50%;
-transform:translateX(-50%);
-background:white;
-padding:10px 20px;
-border-radius:15px;
-display:flex;
-gap:20px;
-flex-wrap:wrap;
-font-weight:bold;
-z-index:100;
-}
-
-.progress{
-width:180px;
-height:16px;
-background:#ddd;
-border-radius:20px;
-overflow:hidden;
-}
-
-#fill{
-width:0%;
-height:100%;
-background:#4caf50;
-}
-
-/* MACHINE */
-
-#machine{
-position:absolute;
-top:90px;
-left:30px;
-font-size:100px;
-}
-
-/* CONVEYOR */
-
-#belt{
-
-position:absolute;
-
-top:190px;
-
-left:120px;
-
-right:20px;
-
-height:70px;
-
-background:#666;
-
-border-radius:15px;
-
-overflow:hidden;
-
-}
-
-#belt::before{
-
-content:"";
-
-position:absolute;
-
-inset:0;
-
-background:repeating-linear-gradient(
-90deg,
-#777 0px,
-#777 20px,
-#999 20px,
-#999 40px
-);
-
-animation:beltMove 2s linear infinite;
-
-}
-
-@keyframes beltMove{
-
-from{
-transform:translateX(0);
-}
-
-to{
-transform:translateX(40px);
-}
-
-}
-
-/* MOVING PIECE */
-
-#piece{
-
-position:absolute;
-
-top:150px;
-
-left:150px;
-
-background:white;
-
-padding:12px 18px;
-
-border-radius:12px;
-
-font-weight:bold;
-
-font-size:20px;
-
-box-shadow:0 3px 8px rgba(0,0,0,.3);
-
-display:none;
-
-max-width:280px;
-
-text-align:center;
-
-z-index:50;
-
-}
-
-/* BINS */
-
-#bins{
-
-position:absolute;
-
-bottom:15px;
-
-left:0;
-
-right:0;
-
-display:flex;
-
-justify-content:center;
-
-gap:10px;
-
-flex-wrap:wrap;
-
-padding:10px;
-
-}
-
-.bin{
-
-width:160px;
-
-height:90px;
-
-background:white;
-
-border:4px solid #1565c0;
-
-border-radius:12px;
-
-display:flex;
-
-justify-content:center;
-
-align-items:center;
-
-text-align:center;
-
-font-weight:bold;
-
-cursor:pointer;
-
-transition:.2s;
-
-}
-
-.bin:hover{
-
-transform:scale(1.05);
-
-}
-
-.correct{
-
-background:#81c784 !important;
-
-}
-
-.wrong{
-
-background:#ef5350 !important;
-
-color:white;
-
-}
-
-/* FEEDBACK */
-
-#feedback{
-
-position:absolute;
-
-top:45%;
-
-left:50%;
-
-transform:translate(-50%,-50%);
-
-font-size:36px;
-
-font-weight:bold;
-
-display:none;
-
-z-index:500;
-
-}
-
-/* END */
-
-#endScreen{
-
-display:none;
-
-position:fixed;
-
-inset:0;
-
-background:rgba(0,0,0,.9);
-
-color:white;
-
-justify-content:center;
-
-align-items:center;
-
-flex-direction:column;
-
-text-align:center;
-
-padding:20px;
-
-}
-
-#restartBtn{
-
-margin-top:20px;
-
-padding:15px 25px;
-
-font-size:18px;
-
-border:none;
-
-border-radius:10px;
-
-background:#4caf50;
-
-color:white;
-
-cursor:pointer;
-
-}
-
-@media(max-width:768px){
-
-#machine{
-
-font-size:70px;
-
-}
-
-#piece{
-
-font-size:16px;
-
-max-width:220px;
-
-}
-
-.bin{
-
-width:120px;
-
-height:80px;
-
-font-size:13px;
-
-}
-
-}
-
+  :root {
+    --primary: #1e88e5;
+    --primary-dark: #0d47a1;
+    --accent: #ffb300;
+    --success: #4caf50;
+    --danger: #f44336;
+    --bg-dark: #121824;
+    --panel-bg: #1e293b;
+    --text-light: #f8fafc;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: var(--bg-dark);
+    color: var(--text-light);
+    height: 100vh;
+    height: 100dvh;
+    width: 100vw;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* SPLASH SCREEN */
+  #splashScreen {
+    position: fixed;
+    inset: 0;
+    background: #ffffff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    transition: opacity 0.5s ease;
+  }
+
+  #splashScreen img {
+    max-width: 220px;
+    width: 60%;
+    height: auto;
+    animation: pulse 1.5s infinite alternate;
+  }
+
+  #splashScreen h2 {
+    margin-top: 20px;
+    color: #1a252f;
+    font-size: 1.2rem;
+    letter-spacing: 1px;
+  }
+
+  .loader-bar {
+    width: 160px;
+    height: 6px;
+    background: #e2e8f0;
+    border-radius: 3px;
+    margin-top: 15px;
+    overflow: hidden;
+  }
+
+  .loader-fill {
+    width: 0%;
+    height: 100%;
+    background: var(--primary);
+    animation: loadFill 5s linear forwards;
+  }
+
+  @keyframes loadFill {
+    to { width: 100%; }
+  }
+
+  @keyframes pulse {
+    from { transform: scale(0.96); }
+    to { transform: scale(1.04); }
+  }
+
+  /* SCREEN LAYOUTS */
+  .screen {
+    display: none;
+    width: 100%;
+    height: 100%;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    position: relative;
+  }
+
+  .screen.active {
+    display: flex;
+  }
+
+  /* INTRO SCREEN */
+  #introScreen {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    justify-content: center;
+    gap: 20px;
+    text-align: center;
+  }
+
+  .title-badge {
+    background: var(--accent);
+    color: #000;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-weight: 800;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    display: inline-block;
+  }
+
+  #introScreen h1 {
+    font-size: clamp(1.8rem, 5vw, 2.8rem);
+    color: #fff;
+    line-height: 1.2;
+  }
+
+  .instructions-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 20px;
+    max-width: 500px;
+    text-align: left;
+    font-size: clamp(0.9rem, 2.5vw, 1.05rem);
+    line-height: 1.5;
+    color: #cbd5e1;
+  }
+
+  .instructions-card ul {
+    list-style-type: none;
+    margin-top: 10px;
+  }
+
+  .instructions-card li {
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .btn-action {
+    background: linear-gradient(180deg, #3b82f6 0%, #1d4ed8 100%);
+    color: white;
+    border: none;
+    padding: 16px 40px;
+    font-size: 1.2rem;
+    font-weight: 700;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
+    transition: transform 0.1s, box-shadow 0.1s;
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .btn-action:active {
+    transform: scale(0.96);
+  }
+
+  /* GAMEPLAY SCREEN */
+  #gameScreen {
+    padding: 10px;
+    gap: 10px;
+  }
+
+  /* TOP HUD */
+  .hud {
+    width: 100%;
+    max-width: 800px;
+    background: var(--panel-bg);
+    border-radius: 12px;
+    padding: 10px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  }
+
+  .hud-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .hud-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    color: #94a3b8;
+    letter-spacing: 1px;
+  }
+
+  .hud-value {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: var(--accent);
+  }
+
+  .progress-container {
+    flex-grow: 1;
+    margin: 0 15px;
+    max-width: 200px;
+  }
+
+  .progress-bar {
+    width: 100%;
+    height: 10px;
+    background: #334155;
+    border-radius: 5px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    width: 0%;
+    background: var(--success);
+    transition: width 0.3s ease;
+  }
+
+  /* STAGE / CONVEYOR */
+  .stage {
+    flex-grow: 1;
+    width: 100%;
+    max-width: 800px;
+    background: #0f172a;
+    border-radius: 16px;
+    border: 2px solid #334155;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .conveyor-track {
+    position: absolute;
+    width: 100%;
+    height: 40px;
+    background: #334155;
+    bottom: 30%;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+  }
+
+  .conveyor-pattern {
+    width: 200%;
+    height: 100%;
+    background: repeating-linear-gradient(
+      45deg,
+      #1e293b,
+      #1e293b 15px,
+      #475569 15px,
+      #475569 30px
+    );
+    animation: moveBelt 2s linear infinite;
+  }
+
+  @keyframes moveBelt {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50px); }
+  }
+
+  /* MOVING PACKAGE */
+  #grammarPackage {
+    position: absolute;
+    background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);
+    color: #0f172a;
+    padding: 14px 20px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: clamp(0.95rem, 3vw, 1.25rem);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5), 0 0 0 3px var(--primary);
+    text-align: center;
+    max-width: 85%;
+    z-index: 10;
+    top: 35%;
+    left: -100%;
+    transform: translate(-50%, -50%);
+    transition: top 0.2s ease, transform 0.2s ease;
+    word-break: break-word;
+  }
+
+  /* FEEDBACK OVERLAY */
+  #feedbackMsg {
+    position: absolute;
+    top: 20%;
+    font-size: clamp(1.2rem, 4vw, 2rem);
+    font-weight: 900;
+    opacity: 0;
+    transform: scale(0.5);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    pointer-events: none;
+    z-index: 20;
+    text-shadow: 0 4px 10px rgba(0,0,0,0.5);
+  }
+
+  #feedbackMsg.show {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  /* BINS GRID */
+  .bins-grid {
+    width: 100%;
+    max-width: 800px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 8px;
+    z-index: 30;
+  }
+
+  .bin-btn {
+    background: var(--panel-bg);
+    border: 2px solid #334155;
+    border-radius: 10px;
+    padding: 12px 6px;
+    color: var(--text-light);
+    font-weight: 700;
+    font-size: clamp(0.75rem, 2.2vw, 0.9rem);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    transition: all 0.15s ease;
+    min-height: 60px;
+  }
+
+  .bin-btn:active {
+    transform: scale(0.95);
+    background: #334155;
+  }
+
+  .bin-btn.correct-flash {
+    background: var(--success) !important;
+    border-color: #81c784 !important;
+    color: white;
+  }
+
+  .bin-btn.wrong-flash {
+    background: var(--danger) !important;
+    border-color: #e57373 !important;
+    color: white;
+  }
+
+  /* END SCREEN */
+  #endScreen {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    justify-content: center;
+    gap: 20px;
+    text-align: center;
+  }
+
+  .score-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 25px;
+    width: 100%;
+    max-width: 400px;
+  }
+
+  .score-card h2 {
+    font-size: 2rem;
+    color: var(--accent);
+    margin-bottom: 10px;
+  }
+
+  .score-card p {
+    font-size: 1.1rem;
+    color: #cbd5e1;
+    margin: 6px 0;
+  }
+
+  .badge-rank {
+    margin-top: 15px;
+    display: inline-block;
+    padding: 8px 18px;
+    background: var(--primary);
+    border-radius: 30px;
+    font-weight: 800;
+    letter-spacing: 1px;
+  }
+
+  @media (max-width: 480px) {
+    .bins-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .hud {
+      padding: 8px 10px;
+    }
+  }
 </style>
-
 </head>
-
 <body>
 
-<div id="splash">
-
-<img src="assets/innovine-logo.png">
-
-<h2>🏭 Conveyor Belt Chaos</h2>
-
-</div>
-
-<div id="intro">
-
-<h1>🏭 Conveyor Belt Chaos</h1>
-
-<p>
-
-The Grammar Factory conveyor belt is overloaded!
-
-Grammar pieces are travelling across the belt.
-
-Sort each piece into the correct factory container before it reaches the end.
-
-Collect 10 gears to repair the Super Factory.
-
-Categories include:
-
-Noun Phrases,
-Adjective Phrases,
-Adverb Phrases,
-Main Clauses,
-and Subordinate Clauses.
-
-</p>
-
-<button id="startBtn">
-
-START FACTORY
-
-</button>
-
-</div>
-
-<div id="game">
-
-<div id="topBar">
-
-<div>Score: <span id="score">0</span></div>
-
-<div>Gears: <span id="gearCount">0</span>/10</div>
-
-<div class="progress">
-
-<div id="fill"></div>
-
-</div>
-
-</div>
-
-<div id="machine">
-
-🏭
-
-</div>
-
-<div id="belt"></div>
-
-<div id="piece"></div>
-
-<div id="feedback"></div>
-
-<div id="bins">
-
-<div class="bin" data-answer="Noun Phrase">
-📦 Noun Phrase
-</div>
-
-<div class="bin" data-answer="Adjective Phrase">
-📦 Adjective Phrase
-</div>
-
-<div class="bin" data-answer="Adverb Phrase">
-📦 Adverb Phrase
-</div>
-
-<div class="bin" data-answer="Main Clause">
-📦 Main Clause
-</div>
-
-<div class="bin" data-answer="Subordinate Clause">
-📦 Subordinate Clause
-</div>
-
-</div>
-
-</div>
-
-<div id="endScreen">
-
-<h1>🏭 SUPER FACTORY REPAIRED!</h1>
-
-<h2 id="finalScore"></h2>
-
-<button id="restartBtn">
-
-🔄 Play Again
-
-</button>
-
-</div>
-
-<audio id="correctSound" src="assets/correct.mp3"></audio>
-<audio id="wrongSound" src="assets/wrong.mp3"></audio>
-<audio id="clapSound" src="assets/clapping.mp3"></audio><script>
-
-/* =========================
-   GRAMMAR BANK (40 ITEMS)
-   ========================= */
-
-const grammarBank = [
-
-/* NOUN PHRASES */
-
-{
-text:"the boy with the red backpack",
-answer:"Noun Phrase"
-},
-
-{
-text:"the athlete with the gold medal",
-answer:"Noun Phrase"
-},
-
-{
-text:"the girl near the library entrance",
-answer:"Noun Phrase"
-},
-
-{
-text:"the puppy under the wooden table",
-answer:"Noun Phrase"
-},
-
-{
-text:"the students in the science lab",
-answer:"Noun Phrase"
-},
-
-{
-text:"the old man beside the fountain",
-answer:"Noun Phrase"
-},
-
-{
-text:"the captain of the football team",
-answer:"Noun Phrase"
-},
-
-{
-text:"the cyclist wearing a yellow helmet",
-answer:"Noun Phrase"
-},
-
-/* ADJECTIVE PHRASES */
-
-{
-text:"full of excitement",
-answer:"Adjective Phrase"
-},
-
-{
-text:"ready for the competition",
-answer:"Adjective Phrase"
-},
-
-{
-text:"rich in vitamins",
-answer:"Adjective Phrase"
-},
-
-{
-text:"covered in colourful stickers",
-answer:"Adjective Phrase"
-},
-
-{
-text:"proud of her achievement",
-answer:"Adjective Phrase"
-},
-
-{
-text:"eager to learn new things",
-answer:"Adjective Phrase"
-},
-
-{
-text:"afraid of the dark tunnel",
-answer:"Adjective Phrase"
-},
-
-{
-text:"famous for its beautiful beaches",
-answer:"Adjective Phrase"
-},
-
-/* ADVERB PHRASES */
-
-{
-text:"with great speed",
-answer:"Adverb Phrase"
-},
-
-{
-text:"without any hesitation",
-answer:"Adverb Phrase"
-},
-
-{
-text:"during the lunch break",
-answer:"Adverb Phrase"
-},
-
-{
-text:"with great determination",
-answer:"Adverb Phrase"
-},
-
-{
-text:"at the end of the match",
-answer:"Adverb Phrase"
-},
-
-{
-text:"in complete silence",
-answer:"Adverb Phrase"
-},
-
-{
-text:"before sunrise",
-answer:"Adverb Phrase"
-},
-
-{
-text:"with a cheerful smile",
-answer:"Adverb Phrase"
-},
-
-/* MAIN CLAUSES */
-
-{
-text:"The train arrived on time.",
-answer:"Main Clause"
-},
-
-{
-text:"The crowd cheered loudly.",
-answer:"Main Clause"
-},
-
-{
-text:"The students completed the project.",
-answer:"Main Clause"
-},
-
-{
-text:"The dog barked at the stranger.",
-answer:"Main Clause"
-},
-
-{
-text:"The athlete crossed the finish line.",
-answer:"Main Clause"
-},
-
-{
-text:"The teacher explained the lesson.",
-answer:"Main Clause"
-},
-
-{
-text:"The band performed beautifully.",
-answer:"Main Clause"
-},
-
-{
-text:"The children played outside.",
-answer:"Main Clause"
-},
-
-/* SUBORDINATE CLAUSES */
-
-{
-text:"because it was raining",
-answer:"Subordinate Clause"
-},
-
-{
-text:"although it was difficult",
-answer:"Subordinate Clause"
-},
-
-{
-text:"when the bell rang",
-answer:"Subordinate Clause"
-},
-
-{
-text:"while the students were working",
-answer:"Subordinate Clause"
-},
-
-{
-text:"since the road was closed",
-answer:"Subordinate Clause"
-},
-
-{
-text:"after the match ended",
-answer:"Subordinate Clause"
-},
-
-{
-text:"before the guests arrived",
-answer:"Subordinate Clause"
-},
-
-{
-text:"whenever the alarm sounded",
-answer:"Subordinate Clause"
-}
-
+  <!-- SPLASH SCREEN -->
+  <div id="splashScreen">
+    <img src="assets/innovine-logo.png" alt="Innovine Logo" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'200\' height=\'60\' viewBox=\'0 0 200 60\'><rect width=\'200\' height=\'60\' fill=\'%231e88e5\' rx=\'10\'/><text x=\'50%\' y=\'50%\' dominant-baseline=\'middle\' text-anchor=\'middle\' fill=\'white\' font-family=\'sans-serif\' font-weight=\'bold\' font-size=\'20\'>INNOVINE</text></svg>'">
+    <h2>FACTORY SORTING LAB</h2>
+    <div class="loader-bar"><div class="loader-fill"></div></div>
+  </div>
+
+  <!-- INTRO SCREEN -->
+  <div id="introScreen" class="screen">
+    <div>
+      <span class="title-badge">Grade 7 ELA • Chapter 16</span>
+      <h1>Phrases & Clauses Express</h1>
+    </div>
+
+    <div class="instructions-card">
+      <p><strong>Factory Goal:</strong> Sort incoming grammar packages into the correct factory bins before they fall off the belt!</p>
+      <ul>
+        <li>📦 <strong>Phrases:</strong> Groups of words without a subject-verb pair.</li>
+        <li>⚡ <strong>Clauses:</strong> Groups of words with a subject and verb.</li>
+      </ul>
+    </div>
+
+    <button class="btn-action" id="startBtn">START EXPRESS</button>
+  </div>
+
+  <!-- GAME SCREEN -->
+  <div id="gameScreen" class="screen">
+    <div class="hud">
+      <div class="hud-stat">
+        <span class="hud-label">Score</span>
+        <span class="hud-value" id="scoreVal">0</span>
+      </div>
+      <div class="progress-container">
+        <div class="progress-bar">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+      </div>
+      <div class="hud-stat">
+        <span class="hud-label">Item</span>
+        <span class="hud-value" id="itemVal">1/10</span>
+      </div>
+    </div>
+
+    <div class="stage">
+      <div id="feedbackMsg"></div>
+      <div id="grammarPackage">...</div>
+      <div class="conveyor-track">
+        <div class="conveyor-pattern"></div>
+      </div>
+    </div>
+
+    <div class="bins-grid" id="binsContainer">
+      <button class="bin-btn" data-type="Noun Phrase">📦<span>Noun Phrase</span></button>
+      <button class="bin-btn" data-type="Adjective Phrase">🎨<span>Adj. Phrase</span></button>
+      <button class="bin-btn" data-type="Adverb Phrase">🏃<span>Adv. Phrase</span></button>
+      <button class="bin-btn" data-type="Main Clause">⭐<span>Main Clause</span></button>
+      <button class="bin-btn" data-type="Subordinate Clause">🔗<span>Sub. Clause</span></button>
+    </div>
+  </div>
+
+  <!-- END SCREEN -->
+  <div id="endScreen" class="screen">
+    <h1>SHIFT COMPLETED!</h1>
+    
+    <div class="score-card">
+      <h2 id="finalScore">0 / 100</h2>
+      <p id="accuracyText">Accuracy: 0%</p>
+      <div class="badge-rank" id="rankBadge">APPRENTICE</div>
+    </div>
+
+    <button class="btn-action" id="restartBtn">PLAY AGAIN</button>
+  </div>
+
+  <!-- EXTERNAL AUDIO ENGINE WITH AUDIO CONTEXT FALLBACK -->
+  <audio id="sndCorrect" src="assets/correct.mp3" preload="auto"></audio>
+  <audio id="sndWrong" src="assets/wrong.mp3" preload="auto"></audio>
+  <audio id="sndClap" src="assets/clapping.mp3" preload="auto"></audio>
+
+<script>
+/* ========================================================
+   QUESTION BANK DERIVED FROM G7 CHAPTER 16 PDF
+   ======================================================== */
+const grammarDatabase = [
+  // Noun Phrases
+  { text: "the quick brown fox", type: "Noun Phrase" },
+  { text: "a basket of apples", type: "Noun Phrase" },
+  { text: "fifty soldiers of the army", type: "Noun Phrase" },
+  { text: "a bunch of white flowers", type: "Noun Phrase" },
+  { text: "those pretty big pink lotuses", type: "Noun Phrase" },
+  
+  // Adjective Phrases
+  { text: "full of excitement", type: "Adjective Phrase" },
+  { text: "covered with dust", type: "Adjective Phrase" },
+  { text: "extremely talented", type: "Adjective Phrase" },
+  { text: "full of vibrant colours", type: "Adjective Phrase" },
+  { text: "treacherous and steep", type: "Adjective Phrase" },
+
+  // Adverb Phrases
+  { text: "with great enthusiasm", type: "Adverb Phrase" },
+  { text: "in the middle of the night", type: "Adverb Phrase" },
+  { text: "at full speed", type: "Adverb Phrase" },
+  { text: "in a very lively manner", type: "Adverb Phrase" },
+  { text: "with ease", type: "Adverb Phrase" },
+
+  // Main Clauses (Independent)
+  { text: "She finished her homework.", type: "Main Clause" },
+  { text: "She plays the piano beautifully.", type: "Main Clause" },
+  { text: "The sun sets in the west.", type: "Main Clause" },
+  { text: "The dog barked loudly.", type: "Main Clause" },
+  { text: "I find this journal useful.", type: "Main Clause" },
+
+  // Subordinate Clauses (Dependent)
+  { text: "Even though it was raining", type: "Subordinate Clause" },
+  { text: "because she enjoys basketball", type: "Subordinate Clause" },
+  { text: "When the bell rang", type: "Subordinate Clause" },
+  { text: "Although she was tired", type: "Subordinate Clause" },
+  { text: "What she said", type: "Subordinate Clause" },
+  { text: "where the hidden treasure is", type: "Subordinate Clause" },
+  { text: "who won the race", type: "Subordinate Clause" }
 ];
 
-/* =========================
-   GAME VARIABLES
-   ========================= */
-
-let selectedPieces = [];
+/* ========================================================
+   GAME STATE VARIABLES
+   ======================================================== */
+const TOTAL_QUESTIONS = 10;
+let currentItems = [];
 let currentIndex = 0;
 let score = 0;
-let gears = 0;
-let currentAnswer = "";
-let beltTimer = null;
+let isAnimating = false;
+let animationFrameId = null;
+let beltStartTime = null;
+let duration = 8000; // 8 Seconds per belt movement
 
-/* =========================
-   SHUFFLE FUNCTION
-   ========================= */
+/* ========================================================
+   AUDIO SYSTEM WITH SYNTHESIZER FALLBACK
+   ======================================================== */
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-function shuffle(array){
-
-for(let i=array.length-1;i>0;i--){
-
-const j =
-Math.floor(Math.random()*(i+1));
-
-[array[i],array[j]] =
-[array[j],array[i]];
-
+function playSound(type) {
+  const audioEl = document.getElementById(type === 'correct' ? 'sndCorrect' : type === 'wrong' ? 'sndWrong' : 'sndClap');
+  
+  // Try playing DOM audio
+  if (audioEl && audioEl.readyState >= 2) {
+    audioEl.currentTime = 0;
+    audioEl.play().catch(() => playSynthSound(type));
+  } else {
+    playSynthSound(type);
+  }
 }
 
-return array;
+function playSynthSound(type) {
+  if (audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
 
+  if (type === 'correct') {
+    osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
+    osc.frequency.exponentialRampToValueAtTime(659.25, audioCtx.currentTime + 0.15); // E5
+    gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.3);
+  } else if (type === 'wrong') {
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(180, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(110, audioCtx.currentTime + 0.2);
+    gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.3);
+  } else { // Clap / Finish
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(440, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.4);
+    gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.5);
+  }
 }
 
-/* =========================
-   PREPARE GAME
-   RANDOM 10 EACH TIME
-   ========================= */
-
-function prepareGame(){
-
-selectedPieces =
-shuffle([...grammarBank]).slice(0,10);
-
-}
-
-/* =========================
-   PROGRESS UPDATE
-   ========================= */
-
-function updateProgress(){
-
-document.getElementById("score").textContent =
-score;
-
-document.getElementById("gearCount").textContent =
-gears;
-
-document.getElementById("fill").style.width =
-(currentIndex/10)*100 + "%";
-
-}
-
-/* =========================
-   AUDIO VOLUME
-   ========================= */
-
-function updateVolume(){
-
-const correct =
-document.getElementById("correctSound");
-
-const wrong =
-document.getElementById("wrongSound");
-
-const clap =
-document.getElementById("clapSound");
-
-correct.volume = 1;
-wrong.volume = 1;
-clap.volume = 1;
-
-}
-
-/* =========================
-   SHOW NEXT PIECE
-   (Part 3 will animate it)
-   ========================= */
-
-function loadNextPiece(){
-
-if(currentIndex >= selectedPieces.length){
-
-finishGame();
-return;
-
-}
-
-const item =
-selectedPieces[currentIndex];
-
-currentAnswer =
-item.answer;
-
-const piece =
-document.getElementById("piece");
-
-piece.innerHTML =
-item.text;
-
-piece.style.display =
-"block";
-
-}
-/* =========================
-   CONVEYOR MOVEMENT
-   ========================= */
-
-function animatePiece(){
-
-const piece =
-document.getElementById("piece");
-
-let position = 150;
-
-/*
-Slow movement:
-~9 seconds across screen
-*/
-
-clearInterval(beltTimer);
-
-beltTimer = setInterval(()=>{
-
-position += 3;
-
-piece.style.left =
-position + "px";
-
-/* Piece reached end */
-
-if(position > window.innerWidth - 150){
-
-clearInterval(beltTimer);
-
-wrongTimeout();
-
-}
-
-},40);
-
-}
-
-/* =========================
-   AUTO MISS
-   ========================= */
-
-function wrongTimeout(){
-
-document.getElementById("wrongSound").currentTime = 0;
-document.getElementById("wrongSound").play();
-
-const feedback =
-document.getElementById("feedback");
-
-feedback.style.display = "block";
-feedback.style.color = "#d32f2f";
-feedback.innerHTML = "🗑️ LOST ON BELT!";
-
-setTimeout(()=>{
-
-feedback.style.display = "none";
-
-currentIndex++;
-
-updateProgress();
-
-loadNextPiece();
-animatePiece();
-
-},1200);
-
-}
-
-/* =========================
-   BIN CLICK
-   ========================= */
-
-document.querySelectorAll(".bin").forEach(bin=>{
-
-bin.addEventListener("click",()=>{
-
-if(currentIndex >= selectedPieces.length) return;
-
-const chosen =
-bin.dataset.answer;
-
-if(chosen === currentAnswer){
-
-handleCorrect(bin);
-
-}else{
-
-handleWrong(bin);
-
-}
-
+/* ========================================================
+   SCREEN SWITCHING & INITIALIZATION
+   ======================================================== */
+window.addEventListener('load', () => {
+  // Splash Screen exactly 5 seconds
+  setTimeout(() => {
+    const splash = document.getElementById('splashScreen');
+    splash.style.opacity = '0';
+    setTimeout(() => {
+      splash.style.display = 'none';
+      showScreen('introScreen');
+    }, 500);
+  }, 5000);
 });
 
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+/* ========================================================
+   GAMEPLAY LOGIC
+   ======================================================== */
+document.getElementById('startBtn').addEventListener('click', startGame);
+document.getElementById('restartBtn').addEventListener('click', startGame);
+
+function shuffleArray(arr) {
+  return [...arr].sort(() => Math.random() - 0.5);
+}
+
+function startGame() {
+  currentItems = shuffleArray(grammarDatabase).slice(0, TOTAL_QUESTIONS);
+  currentIndex = 0;
+  score = 0;
+  updateHUD();
+  showScreen('gameScreen');
+  nextQuestion();
+}
+
+function updateHUD() {
+  document.getElementById('scoreVal').textContent = score;
+  document.getElementById('itemVal').textContent = `${currentIndex + 1}/${TOTAL_QUESTIONS}`;
+  document.getElementById('progressFill').style.width = `${(currentIndex / TOTAL_QUESTIONS) * 100}%`;
+}
+
+function nextQuestion() {
+  if (currentIndex >= TOTAL_QUESTIONS) {
+    endGame();
+    return;
+  }
+
+  updateHUD();
+  isAnimating = true;
+
+  const pkg = document.getElementById('grammarPackage');
+  pkg.style.top = '35%';
+  pkg.style.transform = 'translate(-50%, -50%)';
+  pkg.textContent = currentItems[currentIndex].text;
+
+  // Reset Belt Animation
+  cancelAnimationFrame(animationFrameId);
+  beltStartTime = performance.now();
+  animationFrameId = requestAnimationFrame(animateBelt);
+}
+
+function animateBelt(timestamp) {
+  if (!beltStartTime) beltStartTime = timestamp;
+  const elapsed = timestamp - beltStartTime;
+  const progress = elapsed / duration;
+
+  const pkg = document.getElementById('grammarPackage');
+  // Move smoothly from -20% screen width to 120% screen width
+  const currentPos = -20 + progress * 140;
+  pkg.style.left = `${currentPos}%`;
+
+  if (progress < 1 && isAnimating) {
+    animationFrameId = requestAnimationFrame(animateBelt);
+  } else if (isAnimating) {
+    // Time out (Missed item)
+    handleAnswer(null);
+  }
+}
+
+/* ========================================================
+   USER INTERACTION & ANSWER EVALUATION
+   ======================================================== */
+document.querySelectorAll('.bin-btn').forEach(btn => {
+  btn.addEventListener('click', (e) => {
+    if (!isAnimating) return;
+    const selectedType = btn.getAttribute('data-type');
+    handleAnswer(selectedType, btn);
+  });
 });
 
-/* =========================
-   CORRECT
-   ========================= */
+function handleAnswer(selectedType, btnElement = null) {
+  isAnimating = false;
+  cancelAnimationFrame(animationFrameId);
 
-function handleCorrect(bin){
+  const correctType = currentItems[currentIndex].type;
+  const isCorrect = selectedType === correctType;
 
-clearInterval(beltTimer);
+  if (isCorrect) {
+    score += 10;
+    playSound('correct');
+    showFeedback('⚙️ CORRECT!', '#4caf50');
+    if (btnElement) flashButton(btnElement, 'correct-flash');
+  } else {
+    playSound('wrong');
+    showFeedback(selectedType === null ? '⏰ TOO SLOW!' : '❌ INCORRECT', '#f44336');
+    if (btnElement) flashButton(btnElement, 'wrong-flash');
+  }
 
-updateVolume();
+  // Animate package drop
+  const pkg = document.getElementById('grammarPackage');
+  pkg.style.top = '80%';
+  pkg.style.transform = 'translate(-50%, -50%) scale(0.5)';
 
-document.getElementById("correctSound").currentTime = 0;
-document.getElementById("correctSound").play();
-
-bin.classList.add("correct");
-
-const feedback =
-document.getElementById("feedback");
-
-feedback.style.display = "block";
-feedback.style.color = "#2e7d32";
-feedback.innerHTML = "⚙️ GEAR COLLECTED!";
-
-score += 10;
-
-if(gears < 10){
-
-gears++;
-
+  setTimeout(() => {
+    currentIndex++;
+    nextQuestion();
+  }, 1200);
 }
 
-setTimeout(()=>{
-
-bin.classList.remove("correct");
-
-feedback.style.display = "none";
-
-currentIndex++;
-
-updateProgress();
-
-loadNextPiece();
-animatePiece();
-
-},1200);
-
+function flashButton(btn, className) {
+  btn.classList.add(className);
+  setTimeout(() => btn.classList.remove(className), 800);
 }
 
-/* =========================
-   WRONG
-   ========================= */
-
-function handleWrong(bin){
-
-clearInterval(beltTimer);
-
-updateVolume();
-
-document.getElementById("wrongSound").currentTime = 0;
-document.getElementById("wrongSound").play();
-
-bin.classList.add("wrong");
-
-const feedback =
-document.getElementById("feedback");
-
-feedback.style.display = "block";
-feedback.style.color = "#d32f2f";
-feedback.innerHTML = "❌ WRONG BIN";
-
-setTimeout(()=>{
-
-bin.classList.remove("wrong");
-
-feedback.style.display = "none";
-
-currentIndex++;
-
-updateProgress();
-
-loadNextPiece();
-animatePiece();
-
-},1200);
-
+function showFeedback(text, color) {
+  const msg = document.getElementById('feedbackMsg');
+  msg.textContent = text;
+  msg.style.color = color;
+  msg.classList.add('show');
+  setTimeout(() => msg.classList.remove('show'), 1000);
 }
 
-/* =========================
-   LOAD PIECE
-   ========================= */
+/* ========================================================
+   END GAME SUMMARY
+   ======================================================== */
+function endGame() {
+  playSound('clap');
+  showScreen('endScreen');
 
-function loadNextPiece(){
+  document.getElementById('finalScore').textContent = `${score} / 100`;
+  const accuracy = (score / (TOTAL_QUESTIONS * 10)) * 100;
+  document.getElementById('accuracyText').textContent = `Accuracy: ${accuracy}%`;
 
-if(currentIndex >= selectedPieces.length){
-
-finishGame();
-return;
-
+  const rankEl = document.getElementById('rankBadge');
+  if (score >= 90) {
+    rankEl.textContent = '🏆 MASTER GRAMMAR ENGINEER';
+    rankEl.style.background = '#2e7d32';
+  } else if (score >= 70) {
+    rankEl.textContent = '⭐ FACTORY EXPERT';
+    rankEl.style.background = '#1565c0';
+  } else if (score >= 50) {
+    rankEl.textContent = '🔧 FACTORY TECHNICIAN';
+    rankEl.style.background = '#f57c00';
+  } else {
+    rankEl.textContent = '🛠️ APPRENTICE ENGINEER';
+    rankEl.style.background = '#c62828';
+  }
 }
-
-const item =
-selectedPieces[currentIndex];
-
-currentAnswer =
-item.answer;
-
-const piece =
-document.getElementById("piece");
-
-piece.style.display = "block";
-
-piece.innerHTML =
-item.text;
-
-piece.style.left =
-"150px";
-
-}
-
-/* =========================
-   FINISH GAME
-   ========================= */
-
-function finishGame(){
-
-clearInterval(beltTimer);
-
-document.getElementById("game").style.display =
-"none";
-
-document.getElementById("endScreen").style.display =
-"flex";
-
-document.getElementById("clapSound").currentTime = 0;
-document.getElementById("clapSound").play();
-
-let rank = "";
-
-if(score >= 90){
-
-rank =
-"🏆 MASTER GRAMMAR ENGINEER";
-
-}
-else if(score >= 70){
-
-rank =
-"⭐ FACTORY EXPERT";
-
-}
-else if(score >= 50){
-
-rank =
-"👍 FACTORY TECHNICIAN";
-
-}
-else{
-
-rank =
-"🔧 APPRENTICE ENGINEER";
-
-}
-
-document.getElementById("finalScore").innerHTML =
-
-`
-<p>Score: ${score}/100</p>
-<p>Gears Collected: ${gears}/10</p>
-<br>
-<p>${rank}</p>
-`;
-
-}
-
-/* =========================
-   START GAME
-   ========================= */
-
-function startGame(){
-
-prepareGame();
-
-currentIndex = 0;
-score = 0;
-gears = 0;
-
-updateProgress();
-
-document.getElementById("intro").style.display =
-"none";
-
-document.getElementById("game").style.display =
-"block";
-
-loadNextPiece();
-animatePiece();
-
-}
-
-/* =========================
-   RESTART
-   ========================= */
-
-document
-.getElementById("restartBtn")
-.addEventListener("click",()=>{
-
-document.getElementById("endScreen").style.display =
-"none";
-
-document.getElementById("game").style.display =
-"block";
-
-/*
-Fresh shuffle every replay
-*/
-
-prepareGame();
-
-currentIndex = 0;
-score = 0;
-gears = 0;
-
-updateProgress();
-
-loadNextPiece();
-animatePiece();
-
-});
-
-/* =========================
-   START BUTTON
-   ========================= */
-
-document
-.getElementById("startBtn")
-.addEventListener("click",startGame);
-
-/* =========================
-   SPLASH SCREEN
-   ========================= */
-
-setTimeout(()=>{
-
-document.getElementById("splash").style.display =
-"none";
-
-document.getElementById("intro").style.display =
-"flex";
-
-},5000);
-
-/* =========================
-   INITIALIZE
-   ========================= */
-
-updateProgress();
-
 </script>
-
 </body>
 </html>
