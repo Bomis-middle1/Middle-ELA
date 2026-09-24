@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-select=none"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
 <title>Adverb Parkour Runner</title>
 
 <style>
@@ -16,14 +16,18 @@
     font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Arial, sans-serif;
     -webkit-tap-highlight-color: transparent;
     user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
 }
 
-body {
+html, body {
     overflow: hidden;
     background: #090d16;
     color: #fff;
     height: 100vh;
+    height: 100svh;
     width: 100vw;
+    position: fixed;
 }
 
 /* ================= SYSTEM DISPLAY STAGES ================= */
@@ -31,6 +35,7 @@ body {
     display: none;
     width: 100vw;
     height: 100vh;
+    height: 100svh;
     position: fixed;
     inset: 0;
     align-items: center;
@@ -38,6 +43,7 @@ body {
     flex-direction: column;
     text-align: center;
     padding: 20px;
+    box-sizing: border-box;
 }
 .screen.active {
     display: flex;
@@ -50,9 +56,15 @@ body {
 }
 .logo {
     width: 65%;
-    max-width: 260px;
+    max-width: 240px;
     height: auto;
     animation: smoothPulse 1.5s infinite alternate ease-in-out;
+}
+.logo-fallback {
+    font-size: 32px;
+    font-weight: 900;
+    color: #1e293b;
+    letter-spacing: 2px;
 }
 @keyframes smoothPulse {
     from { transform: scale(1); filter: drop-shadow(0 0 0 rgba(0,0,0,0)); }
@@ -62,13 +74,13 @@ body {
 /* STAGE 2 & 5: TEXT CARD WRAPPERS */
 .card {
     width: 100%;
-    max-width: 540px;
+    max-width: 520px;
     background: rgba(255, 255, 255, 0.96);
     color: #1e293b;
     border-radius: 24px;
-    padding: 35px 25px;
+    padding: 30px 20px;
     box-shadow: 0 20px 50px rgba(0,0,0,0.4);
-    animation: popUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    animation: popUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
 }
 @keyframes popUp {
     from { transform: translateY(30px); opacity: 0; }
@@ -76,20 +88,20 @@ body {
 }
 
 .card h2 {
-    font-size: 28px;
-    margin-bottom: 15px;
+    font-size: 26px;
+    margin-bottom: 12px;
     color: #0f172a;
 }
 .card p {
-    font-size: 16px;
-    line-height: 1.6;
+    font-size: 15px;
+    line-height: 1.5;
     color: #475569;
     margin-bottom: 12px;
 }
 
 /* SHARED INTERACTIVE CONTROLS */
 button {
-    padding: 14px 40px;
+    padding: 14px 36px;
     border: none;
     border-radius: 50px;
     background: linear-gradient(135deg, #f59e0b, #d97706);
@@ -98,9 +110,12 @@ button {
     font-size: 18px;
     cursor: pointer;
     box-shadow: 0 5px 15px rgba(217, 119, 6, 0.4);
-    transition: transform 0.2s, filter 0.2s;
-    margin-top: 15px;
+    transition: transform 0.15s, filter 0.15s;
+    margin-top: 10px;
     min-height: 48px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 button:hover {
     transform: translateY(-2px);
@@ -114,6 +129,7 @@ button:active {
 #gameWorld {
     background: linear-gradient(to bottom, #1e3a8a 0%, #3b82f6 50%, #93c5fd 100%);
     z-index: 10;
+    overflow: hidden;
 }
 
 .ground {
@@ -121,27 +137,29 @@ button:active {
     bottom: 0;
     left: 0;
     width: 200%;
-    height: 120px;
+    height: 100px;
     background: #22c55e;
     border-top: 6px solid #16a34a;
+    will-change: transform;
 }
 .ground.scrolling {
-    animation: groundScroll 4s linear infinite;
+    animation: groundScroll 3s linear infinite;
 }
 @keyframes groundScroll {
-    from { transform: translateX(0); }
-    to { transform: translateX(-50%); }
+    from { transform: translate3d(0, 0, 0); }
+    to { transform: translate3d(-50%, 0, 0); }
 }
 
 /* GAME HERO NODE */
 .player {
     position: absolute;
-    bottom: 114px;
-    left: 60px;
-    font-size: 68px;
+    bottom: 94px;
+    left: 40px;
+    font-size: 58px;
     z-index: 10;
-    filter: drop-shadow(0px 8px 4px rgba(0,0,0,0.3));
-    transition: bottom 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    filter: drop-shadow(0px 6px 3px rgba(0,0,0,0.3));
+    transition: transform 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    will-change: transform;
 }
 .player.running {
     animation: runnerBounce 0.35s infinite alternate ease-in-out;
@@ -151,15 +169,15 @@ button:active {
     to { transform: translateY(-6px); }
 }
 .player.jump {
-    bottom: 240px;
+    transform: translateY(-110px);
     animation: none;
 }
 
 /* ACTIVE ENVIRONMENT OBSTACLES */
 .obstacle {
     position: absolute;
-    bottom: 114px;
-    font-size: 50px;
+    bottom: 94px;
+    font-size: 46px;
     z-index: 9;
     will-change: right;
     filter: drop-shadow(0px 4px 4px rgba(0,0,0,0.25));
@@ -168,22 +186,22 @@ button:active {
 /* HEADS UP DISPLAY PANEL */
 .hud {
     position: absolute;
-    top: 20px;
-    left: 10px;
-    right: 10px;
+    top: 12px;
+    left: 8px;
+    right: 8px;
     display: flex;
     justify-content: center;
-    gap: 8px;
+    gap: 6px;
     flex-wrap: wrap;
     z-index: 100;
     pointer-events: none;
 }
 .hud div {
-    background: rgba(15, 23, 42, 0.75);
+    background: rgba(15, 23, 42, 0.8);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
-    border: 1px solid rgba(255,255,255,0.1);
-    padding: 8px 14px;
+    border: 1px solid rgba(255,255,255,0.15);
+    padding: 6px 12px;
     border-radius: 12px;
     font-weight: 800;
     font-size: 13px;
@@ -195,42 +213,48 @@ button:active {
 /* DYNAMIC INTERACTIVE QUESTION CONTROLLER */
 .questionBox {
     position: absolute;
-    bottom: 20px;
+    bottom: 12px;
     left: 50%;
     transform: translateX(-50%);
     width: 92%;
-    max-width: 680px;
+    max-width: 640px;
     background: rgba(255, 255, 255, 0.96);
     color: #0f172a;
-    padding: 20px;
+    padding: 16px;
     border-radius: 20px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.3);
     z-index: 50;
+    max-height: 48vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 #qText {
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 700;
-    line-height: 1.4;
-    margin-bottom: 15px;
+    line-height: 1.35;
+    margin-bottom: 12px;
+    text-align: center;
 }
 .options {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
+    gap: 10px;
 }
 .option {
     background: #f1f5f9;
     border: 2px solid #e2e8f0;
-    padding: 12px;
-    border-radius: 14px;
+    padding: 10px;
+    border-radius: 12px;
     font-weight: 700;
-    font-size: 15px;
+    font-size: 14px;
     cursor: pointer;
     transition: all 0.15s ease;
     display: flex;
     align-items: center;
     justify-content: center;
     min-height: 44px;
+    word-break: break-word;
 }
 .option:hover {
     background: #e2e8f0;
@@ -247,7 +271,7 @@ button:active {
 /* CELEBRATION COIN NODE PARTICLES */
 .coin {
     position: absolute;
-    font-size: 24px;
+    font-size: 22px;
     z-index: 60;
     pointer-events: none;
     will-change: transform, opacity;
@@ -255,29 +279,39 @@ button:active {
 }
 @keyframes coinFly {
     0% { transform: translate(0, 0) scale(1); opacity: 1; }
-    50% { transform: translate(var(--mx), -60px) scale(1.2); opacity: 1; }
-    100% { transform: translate(var(--cx), -140px) scale(0.5); opacity: 0; }
+    50% { transform: translate(var(--mx), -50px) scale(1.2); opacity: 1; }
+    100% { transform: translate(var(--cx), -120px) scale(0.5); opacity: 0; }
 }
 
 .trophy {
-    font-size: 74px;
-    margin-bottom: 10px;
-    animation: bounce Trophy 1s infinite alternate ease-in-out;
+    font-size: 64px;
+    margin-bottom: 8px;
+    animation: bounceTrophy 1s infinite alternate ease-in-out;
+}
+@keyframes bounceTrophy {
+    from { transform: translateY(0); }
+    to { transform: translateY(-8px); }
 }
 
 /* ================= VIEWPORT STYLING OVERRIDES ================= */
 @media (max-width: 480px) {
-    .options { grid-template-columns: 1fr; gap: 8px; }
-    #qText { font-size: 15px; margin-bottom: 10px; }
-    .option { padding: 10px; font-size: 14px; }
-    .player { font-size: 56px; left: 30px; bottom: 114px; }
-}
-@media (orientation: landscape) and (max-height: 460px) {
-    .questionBox { padding: 10px; bottom: 10px; max-width: 85%; }
+    .options { grid-template-columns: 1fr; gap: 6px; }
     #qText { font-size: 14px; margin-bottom: 8px; }
-    .options { gap: 6px; }
-    .option { padding: 6px; font-size: 13px; min-height: 34px; }
-    .player { font-size: 48px; left: 40px; }
+    .option { padding: 8px; font-size: 13px; min-height: 40px; }
+    .player { font-size: 48px; left: 20px; bottom: 84px; }
+    .ground { height: 90px; }
+    .obstacle { font-size: 38px; bottom: 84px; }
+    .hud div { font-size: 11px; padding: 4px 8px; }
+}
+@media (orientation: landscape) and (max-height: 500px) {
+    .questionBox { padding: 10px; bottom: 8px; max-width: 80%; }
+    #qText { font-size: 13px; margin-bottom: 6px; }
+    .options { grid-template-columns: repeat(2, 1fr); gap: 6px; }
+    .option { padding: 4px 8px; font-size: 12px; min-height: 34px; }
+    .player { font-size: 42px; left: 30px; bottom: 64px; }
+    .ground { height: 70px; }
+    .obstacle { font-size: 32px; bottom: 64px; }
+    .hud { top: 6px; }
 }
 </style>
 </head>
@@ -289,13 +323,14 @@ button:active {
 <audio id="clapSound" src="assets/clapping.mp3" preload="auto"></audio>
 
 <div id="splash" class="screen active">
-    <img src="assets/innovine-logo.png" class="logo" alt="Innovine Logo"/>
+    <img src="assets/innovine-logo.png" class="logo" alt="Innovine Logo" onerror="this.style.display='none'; document.getElementById('logoFallback').style.display='block';"/>
+    <div id="logoFallback" class="logo-fallback" style="display:none;">INNOVINE</div>
 </div>
 
 <div id="instructions" class="screen">
     <div class="card">
         <h2>🏃 Adverb Parkour Runner</h2>
-        <p>Analyze the sentence scenarios inside the runner control array. Identify the proper adverb category modifier, and make the runner leap safely over the incoming obstacles!</p>
+        <p>Analyze the sentence scenarios inside the runner control array. Identify the proper adverb category modifier, and make the runner leap safely over incoming obstacles!</p>
         <p><strong>Mechanics Matrix:</strong> You are granted 2 matching diagnostic baseline attempts per checkpoint node.</p>
         <button onclick="startGame()">Start Run</button>
     </div>
@@ -322,7 +357,7 @@ button:active {
     <div class="card">
         <div class="trophy">🏆</div>
         <h2>Parkour Champion!</h2>
-        <p id="final" style="font-size: 20px; font-weight: 700; color: #0284c7; margin: 15px 0;"></p>
+        <p id="final" style="font-size: 18px; font-weight: 700; color: #0284c7; margin: 12px 0;"></p>
         <button onclick="location.reload()">Play Again</button>
     </div>
 </div>
@@ -372,8 +407,30 @@ function dispatchAudio(key) {
     if (!track) return;
     try {
         track.currentTime = 0;
-        track.play().catch(() => {});
-    } catch(e) {}
+        track.play().catch(() => {
+            // Synthesize audio feedback fallback if sound files fail to fetch
+            synthAudioBeep(key === "correct" || key === "clap");
+        });
+    } catch(e) {
+        synthAudioBeep(key === "correct" || key === "clap");
+    }
+}
+
+function synthAudioBeep(isPositive) {
+    try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        const ctx = new AudioCtx();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = isPositive ? 'sine' : 'square';
+        osc.frequency.setValueAtTime(isPositive ? 587.33 : 220, ctx.currentTime);
+        gain.gain.setValueAtTime(0.1, ctx.currentTime);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.15);
+    } catch(err) {}
 }
 
 function startGame() {
@@ -416,7 +473,6 @@ function loadCheckpointNode() {
 }
 
 function spawnObstacleNode() {
-    // Clear out residual runtime leakage obstacles
     if (currentObstacleRef && currentObstacleRef.parentNode) currentObstacleRef.remove();
     if (obstacleLoopRef) clearInterval(obstacleLoopRef);
 
@@ -455,7 +511,6 @@ function verifyInputResponse(selectedElement, chosenValue) {
         triggerHeroLeap();
         triggerCoinSprayParticles();
 
-        // Lock item nodes to prevent secondary clicks during transition
         document.querySelectorAll(".option").forEach(el => el.style.pointerEvents = "none");
         setTimeout(() => shiftNextMatrixNode(), 800);
 
@@ -466,7 +521,6 @@ function verifyInputResponse(selectedElement, chosenValue) {
         selectedElement.className = "option wrong-flash";
 
         if (attemptsLeft <= 0) {
-            // Out of attempts on current question: Reveal correct answer briefly, then skip
             document.querySelectorAll(".option").forEach(el => {
                 el.style.pointerEvents = "none";
                 if (el.innerText === activeTask.answer) {
@@ -488,7 +542,7 @@ function triggerHeroLeap() {
     setTimeout(() => {
         hero.classList.remove("jump");
         hero.classList.add("running");
-    }, 350000 / 1400); // Scaled jump length sync matching transition speeds
+    }, 500); 
 }
 
 function triggerCoinSprayParticles() {
@@ -496,10 +550,9 @@ function triggerCoinSprayParticles() {
         let goldCoin = document.createElement("div");
         goldCoin.className = "coin";
         goldCoin.innerText = "🪙";
-        goldCoin.style.left = (60 + Math.random() * 80) + "px";
-        goldCoin.style.bottom = "140px";
+        goldCoin.style.left = (40 + Math.random() * 60) + "px";
+        goldCoin.style.bottom = "120px";
         
-        // Compute randomized motion paths
         let motionX = (Math.random() * 60 - 30) + "px";
         let targetX = (Math.random() * 80 - 40) + "px";
         goldCoin.style.setProperty('--mx', motionX);
