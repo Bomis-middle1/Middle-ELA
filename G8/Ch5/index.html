@@ -1,718 +1,596 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-<title>Innovine - The Whispering Observatory Mystery</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Innovine - Perfect Continuous Tense Challenge</title>
 <style>
-:root {
-    --card-bg: rgba(255, 255, 255, 0.94);
-    --primary-cosmic: #311b92;
-    --accent-magenta: #e91e63;
+  :root {
+    --bg-dark: #0a0612;
+    --card-bg: rgba(23, 15, 38, 0.9);
+    --primary: #7c4dff;
     --accent-teal: #00e5ff;
-    --accent-amber: #ff9100;
-    --accent-green: #00e676;
-    --text-main: #120b24;
-    --text-muted: #53457a;
-    --border-color: rgba(255, 255, 255, 0.7);
-    --shadow: 0 15px 35px rgba(18, 11, 36, 0.3);
-}
+    --accent-pink: #ff4081;
+    --accent-gold: #ffd700;
+    --success: #00e676;
+    --danger: #ff1744;
+    --text-main: #f3f0ff;
+    --text-muted: #a799cc;
+    --border-color: rgba(124, 77, 255, 0.3);
+  }
 
-* {
+  * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
     font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
     user-select: none;
-}
+    -webkit-user-select: none;
+    touch-action: manipulation;
+  }
 
-/* Beautiful Cosmic Responsive Background */
-body {
-    background: linear-gradient(-45deg, #120b24, #311b92, #6a1b9a, #001220);
-    background-size: 300% 300%;
-    animation: gradientBG 15s ease infinite;
+  body {
+    background: radial-gradient(circle at center, #1a0b36 0%, #080310 100%);
     color: var(--text-main);
     min-height: 100vh;
+    min-height: 100dvh;
+    width: 100vw;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 12px;
-    overflow-x: hidden;
-}
+    overflow: hidden;
+  }
 
-@keyframes gradientBG {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-}
-
-/* Core Responsive Panel Container */
-.view-panel {
-    position: relative;
-    width: 100%;
-    max-width: 900px;
-    background: var(--card-bg);
-    backdrop-filter: blur(12px);
-    border-radius: 24px;
-    padding: clamp(16px, 4vw, 28px);
-    box-shadow: var(--shadow);
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    border: 2px solid var(--border-color);
-    animation: fadeIn 0.4s ease-out;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: scale(0.97); }
-    to { opacity: 1; transform: scale(1); }
-}
-
-/* SCREEN 1: Logo Screen (Strictly 5 Seconds) */
-#screen-logo {
+  /* SPLASH LOGO (STRICT 5s) */
+  #splash-screen {
     position: fixed;
     inset: 0;
-    background: #090314;
+    background: #05020a;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     z-index: 9999;
-    transition: opacity 0.6s ease;
-    padding: 20px;
-}
+    transition: opacity 0.5s ease;
+  }
 
-.innovine-logo-img {
-    max-width: 280px;
-    width: 70vw;
+  .logo-img {
+    max-width: 260px;
+    width: 65vw;
     height: auto;
     object-fit: contain;
-    animation: logoPop 1.2s ease-out;
-}
+  }
 
-@keyframes logoPop {
-    0% { transform: scale(0.85); opacity: 0; }
-    100% { transform: scale(1); opacity: 1; }
-}
-
-.logo-fallback-box {
+  .logo-fallback {
     display: none;
-    align-items: center;
-    gap: 14px;
-    animation: logoPop 1.2s ease-out;
-}
-
-.logo-fallback-mark {
-    width: 54px;
-    height: 54px;
-    background: linear-gradient(135deg, var(--accent-teal), var(--accent-magenta));
-    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.8rem;
-    color: white;
-}
-
-.logo-fallback-text {
-    font-size: clamp(2.5rem, 7vw, 4rem);
+    font-size: clamp(2rem, 6vw, 3.5rem);
     font-weight: 900;
-    letter-spacing: 3px;
-    background: linear-gradient(45deg, #ffffff, var(--accent-teal), var(--accent-magenta));
+    letter-spacing: 4px;
+    background: linear-gradient(45deg, var(--accent-teal), var(--accent-pink));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-}
+  }
 
-.logo-timer-bar {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    height: 6px;
-    background: linear-gradient(90deg, var(--accent-teal), var(--accent-magenta));
+  .loader-container {
+    width: 180px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+    margin-top: 25px;
+    overflow: hidden;
+  }
+
+  .loader-fill {
+    height: 100%;
     width: 0%;
-    transition: width 0.05s linear;
-}
+    background: linear-gradient(90deg, var(--accent-teal), var(--accent-pink));
+    animation: fillProgress 5s linear forwards;
+  }
 
-/* SCREEN 2: Instruction Screen */
-#screen-instructions {
-    display: none;
-    text-align: center;
-    align-items: center;
-    gap: 20px;
-}
+  @keyframes fillProgress {
+    to { width: 100%; }
+  }
 
-.instruction-title {
-    font-size: clamp(1.8rem, 4vw, 2.5rem);
-    color: var(--primary-cosmic);
-    font-weight: 900;
-    letter-spacing: -0.5px;
-}
-
-.instruction-box {
-    background: rgba(255, 255, 255, 0.85);
-    border: 1px solid rgba(0,0,0,0.06);
-    border-radius: 18px;
-    padding: 22px;
-    text-align: left;
+  /* MAIN CARD */
+  .game-panel {
     width: 100%;
-    max-width: 650px;
+    max-width: 750px;
+    background: var(--card-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    padding: clamp(16px, 4vw, 28px);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
     display: flex;
     flex-direction: column;
-    gap: 14px;
-}
+    gap: 16px;
+  }
 
-.instruction-item {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    font-size: clamp(0.95rem, 2.2vw, 1.1rem);
-    font-weight: 700;
-    color: var(--text-main);
-}
-
-.inst-num {
-    background: var(--primary-cosmic);
-    color: white;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 800;
-    flex-shrink: 0;
-}
-
-/* SCREEN 3: Game Play Area */
-#screen-game {
+  .screen {
     display: none;
     flex-direction: column;
-}
-
-.header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 2px solid rgba(0, 0, 0, 0.08);
-    padding-bottom: 12px;
-}
-
-.grade-badge {
-    background: linear-gradient(45deg, #8e2de2, var(--primary-cosmic));
-    color: white;
-    padding: 4px 14px;
-    border-radius: 12px;
-    font-weight: 800;
-    font-size: 0.85rem;
-}
-
-.title {
-    font-size: clamp(1rem, 2.5vw, 1.3rem);
-    color: var(--primary-cosmic);
-    font-weight: 800;
-}
-
-.status-bar {
-    display: flex;
-    gap: 10px;
-    font-size: 0.85rem;
-    font-weight: 800;
-}
-
-.badge {
-    padding: 6px 14px;
-    border-radius: 20px;
-    background: #ffffff;
-    border: 1px solid #dcd0ea;
-    color: var(--primary-cosmic);
-}
-
-/* Story Scene Showcase */
-.story-scene-card {
-    display: flex;
     gap: 16px;
-    background: rgba(255, 255, 255, 0.8);
-    border: 1px solid var(--border-color);
-    border-radius: 18px;
-    padding: 16px;
-    align-items: center;
-}
+    width: 100%;
+  }
 
-@media(max-width: 600px) {
-    .story-scene-card { flex-direction: column; text-align: center; }
-}
-
-.scene-icon {
-    font-size: 3.2rem;
-    background: white;
-    padding: 12px;
-    border-radius: 16px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-    flex-shrink: 0;
-}
-
-.scene-info {
+  .screen.active {
     display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
+  }
 
-.scene-chapter {
-    font-size: 0.75rem;
-    font-weight: 900;
-    color: var(--accent-magenta);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-.scene-story-text {
-    font-size: 1rem;
-    font-weight: 600;
-    color: var(--text-main);
-    line-height: 1.4;
-}
-
-/* Question Banner */
-.question-card {
-    background: linear-gradient(135deg, #f3e5f5, #e1bee7);
-    border-left: 5px solid var(--primary-cosmic);
-    padding: 12px 16px;
-    border-radius: 12px;
-}
-
-.q-tense-type {
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    font-weight: 900;
-    color: var(--accent-magenta);
-    margin-bottom: 2px;
-}
-
-.question-text {
-    font-size: clamp(0.95rem, 2vw, 1.1rem);
-    font-weight: 700;
-}
-
-/* Slots Assembly Area */
-.slot-container {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-}
-
-@media(max-width: 650px) {
-    .slot-container { grid-template-columns: 1fr; }
-}
-
-.slot-box {
-    background: #ffffff;
-    border: 2px dashed var(--accent-blue);
-    border-radius: 14px;
-    min-height: 65px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 8px;
-    transition: all 0.2s ease;
-    cursor: pointer;
-}
-
-.slot-box.filled {
-    border-style: solid;
-    background: #f0f4c3;
-    border-color: #afb42b;
-}
-
-.slot-label {
-    font-size: 0.68rem;
-    text-transform: uppercase;
-    font-weight: 800;
-    color: var(--text-muted);
-}
-
-.slot-content {
-    font-weight: 800;
-    font-size: 0.95rem;
-    color: #2e7d32;
+  .title-hdr {
+    font-size: clamp(1.4rem, 4vw, 2rem);
+    color: var(--accent-teal);
     text-align: center;
-}
+    font-weight: 900;
+  }
 
-/* Word Bank Palette */
-.tiles-bank {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    min-height: 75px;
-    background: rgba(255, 255, 255, 0.7);
-    padding: 12px;
-    border-radius: 16px;
-    border: 1px solid var(--border-color);
-    align-items: center;
-    justify-content: center;
-}
-
-.tile {
-    background: white;
-    border: 2px solid #8e2de2;
-    color: var(--text-main);
-    padding: 8px 14px;
-    border-radius: 12px;
-    font-weight: 800;
-    font-size: 0.88rem;
-    cursor: pointer;
-    transition: all 0.15s ease;
-    box-shadow: 0 3px 8px rgba(142, 45, 226, 0.15);
-}
-
-.tile:hover {
-    background: var(--primary-cosmic);
-    color: white;
-}
-
-.action-bar {
+  /* HUD HEADER */
+  .hud {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 12px;
-}
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 10px;
+  }
 
-.feedback-bar {
-    flex: 1;
-    background: white;
+  .badge {
+    padding: 6px 14px;
     border-radius: 12px;
+    background: rgba(124, 77, 255, 0.2);
+    border: 1px solid var(--border-color);
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--accent-teal);
+  }
+
+  /* QUESTION CARD */
+  .question-card {
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 14px;
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .target-tense-tag {
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: var(--accent-gold);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .sentence-box {
+    font-size: clamp(1.05rem, 2.5vw, 1.3rem);
+    line-height: 1.5;
+    color: #fff;
+    font-weight: 600;
+  }
+
+  .blank {
+    color: var(--accent-teal);
+    border-bottom: 2px dashed var(--accent-teal);
+    padding: 0 8px;
+    font-weight: 800;
+  }
+
+  .context-hint {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    font-style: italic;
+  }
+
+  /* OPTIONS GRID */
+  .options-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .opt-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color);
+    color: var(--text-main);
+    padding: 14px 18px;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 700;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .opt-btn:hover {
+    background: rgba(124, 77, 255, 0.25);
+    border-color: var(--primary);
+  }
+
+  .opt-btn.correct {
+    background: rgba(0, 230, 118, 0.2) !important;
+    border-color: var(--success) !important;
+    color: var(--success) !important;
+  }
+
+  .opt-btn.incorrect {
+    background: rgba(255, 23, 68, 0.2) !important;
+    border-color: var(--danger) !important;
+    color: var(--danger) !important;
+  }
+
+  /* FEEDBACK BOX */
+  .feedback-box {
+    min-height: 48px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
     padding: 10px 14px;
     font-size: 0.9rem;
-    font-weight: 800;
-    color: var(--text-muted);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     text-align: center;
-}
+  }
 
-.btn-main {
-    background: linear-gradient(45deg, var(--accent-magenta), var(--primary-cosmic));
+  .btn-main {
+    background: linear-gradient(45deg, var(--primary), var(--accent-pink));
     color: white;
-    border: 0;
-    padding: 12px 28px;
-    border-radius: 25px;
-    font-weight: 900;
-    font-size: 0.95rem;
+    border: none;
+    padding: 14px 28px;
+    border-radius: 30px;
+    font-weight: 800;
+    font-size: 1rem;
     cursor: pointer;
-    box-shadow: 0 4px 15px rgba(121, 40, 202, 0.35);
-    transition: transform 0.15s ease;
-}
+    box-shadow: 0 4px 15px rgba(233, 30, 99, 0.3);
+    transition: transform 0.15s;
+    width: 100%;
+    max-width: 260px;
+    margin: 0 auto;
+  }
 
-.btn-main:hover {
-    transform: scale(1.04);
-}
+  .btn-main:active {
+    transform: scale(0.96);
+  }
 
-/* SCREEN 4: Completion Screen */
-#screen-completion {
-    display: none;
+  #end-screen {
     text-align: center;
     align-items: center;
-    gap: 20px;
-    padding: 20px 10px;
-}
+    gap: 16px;
+  }
 
-.trophy-glow {
-    font-size: 5rem;
-    animation: bounce 2s infinite ease-in-out;
-}
-
-@keyframes bounce {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-15px); }
-}
-
-.congrats-title {
-    font-size: clamp(2rem, 5vw, 3rem);
+  .score-display {
+    font-size: 3rem;
     font-weight: 900;
-    background: linear-gradient(45deg, #8e2de2, var(--accent-magenta));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
+    color: var(--accent-teal);
+  }
 </style>
 </head>
 <body>
 
-<!-- SCREEN 1: Innovine Logo Screen (Strictly 5 Seconds) -->
-<div id="screen-logo">
-    <img 
-        src="assets/logo.png" 
-        alt="Innovine Logo" 
-        class="innovine-logo-img" 
-        onerror="this.style.display='none'; document.getElementById('logo-fallback').style.display='flex';"
-    />
-    
-    <div id="logo-fallback" class="logo-fallback-box">
-        <div class="logo-fallback-mark">✦</div>
-        <div class="logo-fallback-text">INNOVINE</div>
+  <!-- SPLASH SCREEN (STRICTLY 5s) -->
+  <div id="splash-screen">
+    <img src="assets/logo.png" alt="Innovine Logo" class="logo-img" onerror="this.style.display='none'; document.getElementById('logo-fallback').style.display='block';">
+    <div id="logo-fallback" class="logo-fallback">INNOVINE</div>
+    <div class="loader-container">
+      <div class="loader-fill"></div>
+    </div>
+  </div>
+
+  <div class="game-panel">
+
+    <!-- INTRO SCREEN -->
+    <div id="intro-screen" class="screen active">
+      <h1 class="title-hdr">Observatory Grammar Assessment</h1>
+      <p style="text-align: center; color: var(--text-muted); font-size: 0.95rem;">
+        Test your knowledge of Grade 8 Perfect Continuous Tenses across 10 assessment questions.
+      </p>
+      <button class="btn-main" id="start-btn">BEGIN TEST</button>
     </div>
 
-    <div class="logo-timer-bar" id="logo-progress"></div>
-</div>
+    <!-- GAME / TEST SCREEN -->
+    <div id="game-screen" class="screen">
+      <div class="hud">
+        <div class="badge">G8 ELA • CHAPTER 16</div>
+        <div class="badge">Question: <span id="lbl-q">1</span>/10</div>
+        <div class="badge">Score: <span id="lbl-score">0</span></div>
+      </div>
 
-<!-- SCREEN 2: Instruction Screen (No Logo) -->
-<div id="screen-instructions" class="view-panel">
-    <div class="instruction-title">Story Completion Challenge</div>
-    
-    <div class="instruction-box">
-        <div class="instruction-item">
-            <div class="inst-num">1</div>
-            <div>Read the narrative chapters of <strong>"The Whispering Observatory Mystery"</strong>.</div>
-        </div>
-        <div class="instruction-item">
-            <div class="inst-num">2</div>
-            <div>Tap the syntax tiles to construct the correct <strong>Perfect Continuous Tense</strong>.</div>
-        </div>
-        <div class="instruction-item">
-            <div class="inst-num">3</div>
-            <div>You get exactly <strong>2 chances</strong> per chapter. Double-faulting will automatically reveal the correct key.</div>
-        </div>
+      <div class="question-card">
+        <span class="target-tense-tag" id="target-tense">Target Tense</span>
+        <div class="sentence-box" id="sentence-prompt">Sentence loading...</div>
+        <div class="context-hint" id="context-hint">Context hint...</div>
+      </div>
+
+      <div class="options-grid" id="options-container">
+        <!-- Options injected dynamically -->
+      </div>
+
+      <div class="feedback-box" id="feedback-box">
+        Select the correct option to fill the blank.
+      </div>
+
+      <button class="btn-main" id="next-btn" style="display: none;" onclick="nextQuestion()">NEXT QUESTION</button>
     </div>
 
-    <button class="btn-main" onclick="startGame()">Start Chronicle</button>
-</div>
-
-<!-- SCREEN 3: Game Play Area -->
-<div id="screen-game" class="view-panel">
-    <div class="header">
-        <div style="display: flex; align-items: center; gap: 8px;">
-            <div class="grade-badge">G8 ENGLISH</div>
-            <div class="title">The Whispering Observatory</div>
-        </div>
-        <div class="status-bar">
-            <div class="badge">Chapter: <span id="lbl-q">1</span>/6</div>
-            <div class="badge">Attempts Left: <span id="lbl-attempts">2</span></div>
-        </div>
+    <!-- END SCREEN -->
+    <div id="end-screen" class="screen">
+      <h1 class="title-hdr">ASSESSMENT COMPLETE!</h1>
+      <div class="score-display" id="final-score">0 / 10</div>
+      <p id="final-message" style="color: var(--text-muted); font-size: 0.95rem; max-width: 450px;">
+        Great effort!
+      </p>
+      <button class="btn-main" onclick="location.reload()">RETRY TEST</button>
     </div>
 
-    <!-- Story Context Area -->
-    <div class="story-scene-card">
-        <div class="scene-icon" id="scene-icon">📡</div>
-        <div class="scene-info">
-            <span class="scene-chapter" id="scene-chapter">Chapter 1</span>
-            <div class="scene-story-text" id="scene-story-text">Loading story...</div>
-        </div>
-    </div>
+  </div>
 
-    <div class="question-card">
-        <div class="q-tense-type" id="lbl-tense-type">Present Perfect Continuous</div>
-        <div class="question-text" id="lbl-question">Loading question...</div>
-    </div>
-
-    <div class="builder-area">
-        <div class="slot-container">
-            <div class="slot-box" id="slot-0" onclick="clearSlot(0)">
-                <span class="slot-label">Subject Phrase</span>
-                <span class="slot-content" id="slot-val-0">Select Tile</span>
-            </div>
-            <div class="slot-box" id="slot-1" onclick="clearSlot(1)">
-                <span class="slot-label">Auxiliary Verb</span>
-                <span class="slot-content" id="slot-val-1">Select Tile</span>
-            </div>
-            <div class="slot-box" id="slot-2" onclick="clearSlot(2)">
-                <span class="slot-label">Continuous Action</span>
-                <span class="slot-content" id="slot-val-2">Select Tile</span>
-            </div>
-        </div>
-
-        <div class="tiles-bank" id="tiles-bank"></div>
-    </div>
-
-    <div class="action-bar">
-        <div class="feedback-bar" id="lbl-feedback">Tap tiles to complete the cosmic log.</div>
-        <button class="btn-main" onclick="verifyAnswer()">Lock Sequence</button>
-    </div>
-</div>
-
-<!-- SCREEN 4: Completion Screen -->
-<div id="screen-completion" class="view-panel">
-    <div class="trophy-glow">🌌✨</div>
-    <div class="congrats-title">Mystery Unraveled!</div>
-    <p style="color: var(--text-muted); font-size: 1.1rem; max-width: 520px; font-weight: 600; line-height: 1.5;">
-        Spectacular work! You successfully assisted Dr. Aris in documenting the signal while mastering Present, Past, and Future Perfect Continuous grammar structures.
-    </p>
-    <button class="btn-main" onclick="location.reload()">Re-initialize Chronicle</button>
-</div>
+  <audio id="snd-correct" src="assets/correct.mp3" preload="auto"></audio>
+  <audio id="snd-wrong" src="assets/wrong.mp3" preload="auto"></audio>
 
 <script>
-const $ = id => document.getElementById(id);
-
-let currentQ = 0;
-let attemptsLeft = 2;
-let slotValues = ["", "", ""];
-
-/* Completely original story independent of the textbook images */
-const storyDatabase = [
-    {
-        chapter: "Chapter 1: The First Signal",
-        storyText: "High up on the dark mountain, Dr. Aris monitors the control panels of the observatory. A glowing pulse suddenly begins to ping across her screens.",
-        question: "How do we describe Dr. Aris's ongoing action up until this exact moment?",
-        tenseType: "Present Perfect Continuous Tense",
-        icon: "📡🌌",
-        slots: ["Dr. Aris", "has been tracking", "a cosmic radio signal since midnight."],
-        bankOptions: ["has been tracking", "a cosmic radio signal since midnight.", "Dr. Aris", "had been tracking", "will have been tracking", "is tracking"]
-    },
-    {
-        chapter: "Chapter 2: Decades of Research",
-        storyText: "Before achieving tonight's breakthrough, she spent years running simulations on complex stellar pattern equations without finding a matches.",
-        question: "How do we describe her continuous academic efforts before the breakthrough happened?",
-        tenseType: "Past Perfect Continuous Tense",
-        icon: "💻🔍",
-        slots: ["The astronomer", "had been decoding", "telemetry arrays prior to her breakthrough."],
-        bankOptions: ["had been decoding", "telemetry arrays prior to her breakthrough.", "The astronomer", "has been decoding", "will have been decoding", "decodes"]
-    },
-    {
-        chapter: "Chapter 3: The Deep-Space Probe",
-        storyText: "Tomorrow morning, the expedition space probe will reach the outermost border of the solar system, continuing its voyage without pause.",
-        question: "How do we project the probe's continuous flight duration up to tomorrow morning?",
-        tenseType: "Future Perfect Continuous Tense",
-        icon: "🚀🛸",
-        slots: ["The probe", "will have been traveling", "through deep space for ten years."],
-        bankOptions: ["will have been traveling", "through deep space for ten years.", "The probe", "has been traveling", "had been traveling", "travels"]
-    },
-    {
-        chapter: "Chapter 4: Generator Endurance",
-        storyText: "Down in the generator room, the emergency power systems are hum steadily to support the heavy telescope gears.",
-        question: "How do we describe the continuous operation of the power units currently?",
-        tenseType: "Present Perfect Continuous Tense",
-        icon: "⚙️🔥",
-        slots: ["The power systems", "have been operating", "continuously for three days."],
-        bankOptions: ["have been operating", "continuously for three days.", "The power systems", "had been operating", "will have been operating", "are operating"]
-    },
-    {
-        chapter: "Chapter 5: The Sudden Blackout",
-        storyText: "Last night, the main computers were actively processing critical tracking coordinates when a massive solar flare caused an unexpected failure.",
-        question: "What had the maincomputers been doing right before the system crashed?",
-        tenseType: "Past Perfect Continuous Tense",
-        icon: "🔌💥",
-        slots: ["The computers", "had been calculating", "satellite coordinates prior to the crash."],
-        bankOptions: ["had been calculating", "satellite coordinates prior to the crash.", "The computers", "has been calculating", "will have been calculating", "calculated"]
-    },
-    {
-        chapter: "Chapter 6: The Ultimate Milestone",
-        storyText: "Next month, Dr. Aris and her elite scientific team will celebrate a massive milestone of continuous observatory tracking operations.",
-        question: "How do we phrase their continuous observation project reaching into next month?",
-        tenseType: "Future Perfect Continuous Tense",
-        icon: "🔭🏆",
-        slots: ["The scientific team", "will have been monitoring", "the galaxy for a full year."],
-        bankOptions: ["will have been monitoring", "the galaxy for a full year.", "The scientific team", "has been monitoring", "had been monitoring", "is monitoring"]
-    }
+/* ========================================================
+   GRAMMAR TEST DATABASE (10 GRADE 8 QUESTIONS)
+   ======================================================== */
+const questions = [
+  {
+    tense: "Present Perfect Continuous",
+    sentence: "Dr. Aris <span class='blank'>______</span> radio signals from the Andromeda galaxy since midnight.",
+    hint: "Context: Singular subject ('Dr. Aris') with an action that started in the past and continues now.",
+    options: [
+      { text: "has been tracking", correct: true },
+      { text: "had been tracking", correct: false, explanation: "Incorrect. 'Had been' is Past Perfect Continuous." },
+      { text: "will have been tracking", correct: false, explanation: "Incorrect. 'Will have been' is Future Perfect Continuous." },
+      { text: "is tracking", correct: false, explanation: "Incorrect. 'Is tracking' lacks the perfect duration helper 'been'." }
+    ]
+  },
+  {
+    tense: "Past Perfect Continuous",
+    sentence: "The research team <span class='blank'>______</span> telemetry data for days before the computer crashed.",
+    hint: "Context: An ongoing past action happening prior to another past event ('before the computer crashed').",
+    options: [
+      { text: "has been analyzing", correct: false, explanation: "Incorrect. 'Has been' implies the action continues into the present." },
+      { text: "had been analyzing", correct: true },
+      { text: "will have been analyzing", correct: false, explanation: "Incorrect. This refers to a future milestone." },
+      { text: "was analyzing", correct: false, explanation: "Incorrect. Does not express continuous duration prior to a past point." }
+    ]
+  },
+  {
+    tense: "Future Perfect Continuous",
+    sentence: "By tomorrow morning, the satellite <span class='blank'>______</span> through deep space for ten years.",
+    hint: "Context: Looking forward to a specific future point in time ('By tomorrow morning').",
+    options: [
+      { text: "will have been traveling", correct: true },
+      { text: "has been traveling", correct: false, explanation: "Incorrect. 'Has been' is for present duration up to now." },
+      { text: "had been traveling", correct: false, explanation: "Incorrect. 'Had been' is for past duration." },
+      { text: "will be traveling", correct: false, explanation: "Incorrect. 'Will be traveling' is simple Future Continuous." }
+    ]
+  },
+  {
+    tense: "Present Perfect Continuous",
+    sentence: "The main vault generators <span class='blank'>______</span> continuously for three days now.",
+    hint: "Context: Plural subject ('generators') with an action continuing up to 'now'.",
+    options: [
+      { text: "has been operating", correct: false, explanation: "Incorrect. Subject 'generators' is plural, so use 'have' instead of 'has'." },
+      { text: "have been operating", correct: true },
+      { text: "had been operating", correct: false, explanation: "Incorrect. 'Had been' refers strictly to past duration." },
+      { text: "are operating", correct: false, explanation: "Incorrect. Missing the perfect continuous duration helper 'been'." }
+    ]
+  },
+  {
+    tense: "Past Perfect Continuous",
+    sentence: "Before the power surge occurred, the astronomers <span class='blank'>______</span> new star clusters.",
+    hint: "Context: An ongoing process happening before a specific past event ('occurred').",
+    options: [
+      { text: "had been documenting", correct: true },
+      { text: "have been documenting", correct: false, explanation: "Incorrect. The power surge already interrupted the past action." },
+      { text: "will have been documenting", correct: false, explanation: "Incorrect. This is future tense." },
+      { text: "were documenting", correct: false, explanation: "Incorrect. Need 'had been' for continuous duration before a past point." }
+    ]
+  },
+  {
+    tense: "Future Perfect Continuous",
+    sentence: "By next month, Dr. Aris <span class='blank'>______</span> the observatory for a full decade.",
+    hint: "Context: Projecting a duration up to a specific future date ('By next month').",
+    options: [
+      { text: "will have been managing", correct: true },
+      { text: "has been managing", correct: false, explanation: "Incorrect. 'Has been' refers to time up to the present moment." },
+      { text: "had been managing", correct: false, explanation: "Incorrect. 'Had been' is for past durations." },
+      { text: "will manage", correct: false, explanation: "Incorrect. Simple future does not express continuous ongoing duration." }
+    ]
+  },
+  {
+    tense: "Present Perfect Continuous (Time Preposition)",
+    sentence: "The space probe has been sending telemetry signals back to Earth <span class='blank'>______</span> 2018.",
+    hint: "Context: Choose between 'for' (duration) and 'since' (starting point in time).",
+    options: [
+      { text: "since", correct: true },
+      { text: "for", correct: false, explanation: "Incorrect. 'For' is used for a duration/length of time (e.g., 'for 8 years'), not a specific starting year." },
+      { text: "from", correct: false, explanation: "Incorrect. Perfect continuous tenses use 'since' to mark the starting point." },
+      { text: "during", correct: false, explanation: "Incorrect. 'During' cannot introduce a specific starting year in perfect tenses." }
+    ]
+  },
+  {
+    tense: "Past Perfect Continuous",
+    sentence: "The lens heaters <span class='blank'>______</span> for hours before the engineer restored full power.",
+    hint: "Context: Plural subject ('heaters') describing duration before a past restoration event.",
+    options: [
+      { text: "had been failing", correct: true },
+      { text: "has been failing", correct: false, explanation: "Incorrect. Subject is plural and the action took place entirely in the past." },
+      { text: "will have been failing", correct: false, explanation: "Incorrect. This is future tense." },
+      { text: "was failing", correct: false, explanation: "Incorrect. 'Heaters' is plural, so 'was' is grammatically incorrect." }
+    ]
+  },
+  {
+    tense: "Present Perfect Continuous",
+    sentence: "How long <span class='blank'>______</span> you <span class='blank'>______</span> the deep space radar arrays?",
+    hint: "Context: Interrogative present perfect continuous sentence with subject 'you'.",
+    options: [
+      { text: "have ... been calibrating", correct: true },
+      { text: "has ... been calibrating", correct: false, explanation: "Incorrect. Subject 'you' takes 'have', not 'has'." },
+      { text: "had ... been calibrating", correct: false, explanation: "Incorrect. Focuses on present inquiry ('How long have you...')." },
+      { text: "are ... calibrating", correct: false, explanation: "Incorrect. Present continuous lacks the perfect duration helper 'been'." }
+    ]
+  },
+  {
+    tense: "Future Perfect Continuous (Time Preposition)",
+    sentence: "By 10:00 PM tonight, the observatory system will have been recording data continuous <span class='blank'>______</span> six hours.",
+    hint: "Context: Choose between 'for' (length of duration) and 'since' (starting point).",
+    options: [
+      { text: "for", correct: true },
+      { text: "since", correct: false, explanation: "Incorrect. 'Since' marks a starting point (e.g., 'since 4:00 PM'), whereas 'six hours' is a period of duration." },
+      { text: "until", correct: false, explanation: "Incorrect. Duration periods in perfect continuous tenses use 'for'." },
+      { text: "by", correct: false, explanation: "Incorrect. 'By' indicates a deadline, not duration." }
+    ]
+  }
 ];
 
-// Screen 1: 5-Second Innovine Logo Timer
-const LOGO_DURATION = 5000;
-let logoElapsed = 0;
+/* ========================================================
+   GAME STATE & AUDIO
+   ======================================================== */
+let currentQ = 0;
+let score = 0;
+let answered = false;
 
-let logoInterval = setInterval(() => {
-    logoElapsed += 50;
-    let pct = Math.min((logoElapsed / LOGO_DURATION) * 100, 100);
-    $('logo-progress').style.width = pct + '%';
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-    if (logoElapsed >= LOGO_DURATION) {
-        clearInterval(logoInterval);
-        $('screen-logo').style.opacity = 0;
-        setTimeout(() => {
-            $('screen-logo').style.display = 'none';
-            $('screen-instructions').style.display = 'flex';
-        }, 600);
-    }
-}, 50);
-
-function startGame() {
-    $('screen-instructions').style.display = 'none';
-    $('screen-game').style.display = 'flex';
-    loadQuestion();
+function playSound(type) {
+  const el = document.getElementById(type === 'correct' ? 'snd-correct' : 'snd-wrong');
+  if (el && el.readyState >= 2) {
+    el.currentTime = 0;
+    el.play().catch(() => synthSound(type));
+  } else {
+    synthSound(type);
+  }
 }
+
+function synthSound(type) {
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+
+  if (type === 'correct') {
+    osc.frequency.setValueAtTime(440, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.2);
+    gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.25);
+  } else {
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(220, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(110, audioCtx.currentTime + 0.25);
+    gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.25);
+  }
+}
+
+/* ========================================================
+   INIT & TIMER
+   ======================================================== */
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    const splash = document.getElementById('splash-screen');
+    splash.style.opacity = '0';
+    setTimeout(() => {
+      splash.style.display = 'none';
+    }, 500);
+  }, 5000);
+});
+
+document.getElementById('start-btn').addEventListener('click', () => {
+  document.getElementById('intro-screen').classList.remove('active');
+  document.getElementById('game-screen').classList.add('active');
+  loadQuestion();
+});
 
 function loadQuestion() {
-    if (currentQ >= storyDatabase.length) {
-        $('screen-game').style.display = 'none';
-        $('screen-completion').style.display = 'flex';
-        return;
-    }
+  answered = false;
+  document.getElementById('next-btn').style.display = 'none';
+  
+  const q = questions[currentQ];
+  document.getElementById('lbl-q').textContent = currentQ + 1;
+  document.getElementById('lbl-score').textContent = score;
+  document.getElementById('target-tense').textContent = `Target Tense: ${q.tense}`;
+  document.getElementById('sentence-prompt').innerHTML = q.sentence;
+  document.getElementById('context-hint').textContent = q.hint;
+  
+  const fb = document.getElementById('feedback-box');
+  fb.textContent = "Select the correct option to fill the blank.";
+  fb.style.color = "var(--text-muted)";
 
-    attemptsLeft = 2;
-    slotValues = ["", "", ""];
-    $('lbl-q').innerText = currentQ + 1;
-    $('lbl-attempts').innerText = attemptsLeft;
-    $('lbl-feedback').innerText = "Tap tiles to complete the story sentence.";
-    $('lbl-feedback').style.color = "var(--text-muted)";
+  const container = document.getElementById('options-container');
+  container.innerHTML = '';
 
-    let data = storyDatabase[currentQ];
-    $('scene-chapter').innerText = data.chapter;
-    $('scene-story-text').innerText = data.storyText;
-    $('scene-icon').innerText = data.icon;
-    $('lbl-tense-type').innerText = data.tenseType;
-    $('lbl-question').innerText = data.question;
+  q.options.forEach((opt, idx) => {
+    const btn = document.createElement('button');
+    btn.className = 'opt-btn';
+    btn.innerHTML = `<span>${opt.text}</span>`;
+    btn.onclick = () => selectOption(btn, opt);
+    container.appendChild(btn);
+  });
+}
 
-    for (let i = 0; i < 3; i++) {
-        $(`slot-${i}`).className = "slot-box";
-        $(`slot-val-${i}`).innerText = "Select Tile";
-    }
+function selectOption(selectedBtn, opt) {
+  if (answered) return;
+  answered = true;
 
-    let bank = $('tiles-bank');
-    bank.innerHTML = '';
-    let shuffled = [...data.bankOptions].sort(() => Math.random() - 0.5);
+  const fb = document.getElementById('feedback-box');
 
-    shuffled.forEach(text => {
-        let tile = document.createElement('div');
-        tile.className = 'tile';
-        tile.innerText = text;
-        tile.onclick = () => selectTile(text);
-        bank.appendChild(tile);
+  if (opt.correct) {
+    playSound('correct');
+    selectedBtn.classList.add('correct');
+    score++;
+    document.getElementById('lbl-score').textContent = score;
+    fb.textContent = "✓ Correct! Perfect Continuous tense correctly applied.";
+    fb.style.color = "var(--success)";
+  } else {
+    playSound('wrong');
+    selectedBtn.classList.add('incorrect');
+    fb.textContent = opt.explanation || "✕ Incorrect grammar structure.";
+    fb.style.color = "var(--danger)";
+
+    // Highlight the correct answer
+    const buttons = document.querySelectorAll('.opt-btn');
+    questions[currentQ].options.forEach((o, i) => {
+      if (o.correct) buttons[i].classList.add('correct');
     });
+  }
+
+  document.getElementById('next-btn').style.display = 'block';
 }
 
-function selectTile(text) {
-    let emptyIndex = slotValues.indexOf("");
-    if (emptyIndex !== -1) {
-        slotValues[emptyIndex] = text;
-        $(`slot-val-${emptyIndex}`).innerText = text;
-        $(`slot-${emptyIndex}`).classList.add('filled');
-    }
+function nextQuestion() {
+  currentQ++;
+  if (currentQ < questions.length) {
+    loadQuestion();
+  } else {
+    showEndScreen();
+  }
 }
 
-function clearSlot(index) {
-    slotValues[index] = "";
-    $(`slot-val-${index}`).innerText = "Select Tile";
-    $(`slot-${index}`).classList.remove('filled');
-}
-
-function verifyAnswer() {
-    let data = storyDatabase[currentQ];
-    let isCorrect = slotValues.join(" ") === data.slots.join(" ");
-
-    if (isCorrect) {
-        $('lbl-feedback').innerText = "✓ Sequence authorized! Chapter complete.";
-        $('lbl-feedback').style.color = "var(--accent-green)";
-        setTimeout(() => {
-            currentQ++;
-            loadQuestion();
-        }, 1500);
-    } else {
-        attemptsLeft--;
-        $('lbl-attempts').innerText = attemptsLeft;
-
-        if (attemptsLeft > 0) {
-            $('lbl-feedback').innerText = "✕ Calibration failed. You have 1 final chance!";
-            $('lbl-feedback').style.color = "var(--accent-amber)";
-        } else {
-            $('lbl-feedback').innerText = `⚡ Override Sentence: "${data.slots.join(' ')}"`;
-            $('lbl-feedback').style.color = "var(--accent-magenta)";
-
-            for (let i = 0; i < 3; i++) {
-                $(`slot-val-${i}`).innerText = data.slots[i];
-                $(`slot-${i}`).className = "slot-box filled";
-            }
-
-            setTimeout(() => {
-                currentQ++;
-                loadQuestion();
-            }, 3000);
-        }
-    }
+function showEndScreen() {
+  document.getElementById('game-screen').classList.remove('active');
+  document.getElementById('end-screen').classList.add('active');
+  
+  document.getElementById('final-score').textContent = `${score} / ${questions.length}`;
+  const msg = document.getElementById('final-message');
+  if (score === questions.length) {
+    msg.textContent = "Perfect Score! You have fully mastered Grade 8 Perfect Continuous Tenses!";
+  } else if (score >= 7) {
+    msg.textContent = "Great job! You have a strong grasp of Perfect Continuous Tenses.";
+  } else {
+    msg.textContent = "Keep practicing! Review the rules for Present, Past, and Future Perfect Continuous tenses.";
+  }
 }
 </script>
 </body>
