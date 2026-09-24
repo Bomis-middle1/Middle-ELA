@@ -3,18 +3,19 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-<title>Innovine - Sentence Mystery Solver</title>
+<title>Innovine - Sentence Mystery Lab</title>
 <style>
 :root {
-    --card-bg: rgba(255, 255, 255, 0.95);
+    --card-bg: rgba(20, 14, 36, 0.95);
     --primary-purple: #3a1c81;
-    --accent-pink: #d81b60;
+    --accent-pink: #ff007f;
     --accent-gold: #ffb300;
-    --accent-green: #2e7d32;
-    --text-main: #120b24;
-    --text-muted: #53457a;
-    --border-color: rgba(255, 255, 255, 0.7);
-    --shadow: 0 15px 35px rgba(0, 0, 0, 0.35);
+    --accent-cyan: #00f2fe;
+    --accent-green: #00e676;
+    --text-main: #f1f5f9;
+    --text-muted: #94a3b8;
+    --border-glow: rgba(138, 43, 226, 0.4);
+    --shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
 }
 
 * {
@@ -23,12 +24,11 @@
     padding: 0;
     font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
     user-select: none;
+    -webkit-tap-highlight-color: transparent;
 }
 
 body {
-    background: linear-gradient(-45deg, #0f2027, #203a43, #2c5364, #1a0826);
-    background-size: 300% 300%;
-    animation: gradientBG 14s ease infinite;
+    background: #090314;
     color: var(--text-main);
     min-height: 100vh;
     display: flex;
@@ -36,27 +36,41 @@ body {
     justify-content: center;
     padding: 12px;
     overflow-x: hidden;
+    position: relative;
 }
 
-@keyframes gradientBG {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
+body::before {
+    content: '';
+    position: fixed;
+    inset: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at 30% 30%, #2a085c 0%, transparent 40%),
+                radial-gradient(circle at 70% 70%, #05405e 0%, transparent 40%),
+                radial-gradient(circle at 50% 20%, #4a0e4e 0%, transparent 35%);
+    z-index: -1;
+    animation: pulseMesh 14s ease-in-out infinite alternate;
+}
+
+@keyframes pulseMesh {
+    0% { transform: scale(1) rotate(0deg); }
+    100% { transform: scale(1.08) rotate(4deg); }
 }
 
 .view-panel {
     position: relative;
     width: 100%;
-    max-width: 900px;
+    max-width: 920px;
     background: var(--card-bg);
-    backdrop-filter: blur(12px);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
     border-radius: 24px;
-    padding: clamp(16px, 4vw, 28px);
+    padding: clamp(16px, 4vw, 24px);
     box-shadow: var(--shadow);
     display: flex;
     flex-direction: column;
     gap: 16px;
-    border: 2px solid var(--border-color);
+    border: 1.5px solid var(--border-glow);
     animation: fadeIn 0.4s ease-out;
 }
 
@@ -65,11 +79,11 @@ body {
     to { opacity: 1; transform: scale(1); }
 }
 
-/* SCREEN 1: Innovine Logo Screen */
+/* SCREEN 1: Innovine Logo Screen (5 Seconds) */
 #screen-logo {
     position: fixed;
     inset: 0;
-    background: #090314;
+    background: #05020a;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -84,8 +98,8 @@ body {
     width: 70vw;
     height: auto;
     object-fit: contain;
+    filter: drop-shadow(0 0 20px rgba(0, 242, 254, 0.3));
     animation: logoPop 1.2s ease-out;
-    filter: drop-shadow(0 0 25px rgba(255, 255, 255, 0.2));
 }
 
 @keyframes logoPop {
@@ -97,26 +111,23 @@ body {
     display: none;
     align-items: center;
     gap: 14px;
-    animation: logoPop 1.2s ease-out;
 }
 
 .logo-fallback-mark {
-    width: 54px;
-    height: 54px;
-    background: linear-gradient(135deg, #ffb300, #ff007f);
-    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, var(--accent-cyan), var(--accent-pink));
+    border-radius: 12px;
+    display: grid;
+    place-items: center;
     font-size: 1.8rem;
-    color: white;
 }
 
 .logo-fallback-text {
-    font-size: clamp(2.5rem, 7vw, 4rem);
+    font-size: clamp(2.5rem, 7vw, 3.8rem);
     font-weight: 900;
     letter-spacing: 3px;
-    background: linear-gradient(45deg, #ffffff, #ffb300, #ff007f);
+    background: linear-gradient(45deg, #ffffff, var(--accent-cyan), var(--accent-pink));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
@@ -125,13 +136,13 @@ body {
     position: absolute;
     bottom: 0;
     left: 0;
-    height: 6px;
-    background: linear-gradient(90deg, #ffb300, #ff007f);
+    height: 5px;
+    background: linear-gradient(90deg, var(--accent-cyan), var(--accent-pink));
     width: 0%;
     transition: width 0.05s linear;
 }
 
-/* SCREEN 2: Instruction / Briefing Screen */
+/* SCREEN 2: Instruction Briefing */
 #screen-instructions {
     display: none;
     text-align: center;
@@ -140,19 +151,21 @@ body {
 }
 
 .instruction-title {
-    font-size: clamp(1.8rem, 4vw, 2.5rem);
-    color: var(--primary-purple);
+    font-size: clamp(1.8rem, 4vw, 2.6rem);
     font-weight: 900;
+    background: linear-gradient(135deg, #ffffff, var(--accent-cyan));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
 .instruction-box {
-    background: rgba(255, 255, 255, 0.85);
-    border: 1px solid rgba(0,0,0,0.08);
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 18px;
-    padding: 22px;
+    padding: 20px;
     text-align: left;
     width: 100%;
-    max-width: 650px;
+    max-width: 680px;
     display: flex;
     flex-direction: column;
     gap: 14px;
@@ -162,51 +175,48 @@ body {
     display: flex;
     align-items: center;
     gap: 14px;
-    font-size: clamp(0.95rem, 2.2vw, 1.1rem);
-    font-weight: 700;
+    font-size: clamp(0.95rem, 2.2vw, 1.05rem);
+    font-weight: 600;
     color: var(--text-main);
 }
 
 .inst-num {
-    background: var(--primary-purple);
+    background: linear-gradient(135deg, var(--accent-pink), var(--primary-purple));
     color: white;
     width: 32px;
     height: 32px;
     border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: grid;
+    place-items: center;
     font-weight: 800;
     flex-shrink: 0;
 }
 
-/* SCREEN 3: Mystery Game Play Area */
+/* SCREEN 3: Interactive Drag Area */
 #screen-game {
     display: none;
     flex-direction: column;
+    gap: 16px;
 }
 
 .header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 2px solid rgba(0, 0, 0, 0.08);
-    padding-bottom: 12px;
+    background: rgba(0, 0, 0, 0.35);
+    padding: 10px 16px;
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .grade-badge {
-    background: linear-gradient(45deg, #ff9100, #d81b60);
+    background: linear-gradient(135deg, var(--accent-pink), var(--primary-purple));
     color: white;
-    padding: 4px 14px;
-    border-radius: 12px;
+    padding: 4px 12px;
+    border-radius: 8px;
     font-weight: 800;
-    font-size: 0.85rem;
-}
-
-.title {
-    font-size: clamp(1rem, 2.5vw, 1.3rem);
-    color: var(--primary-purple);
-    font-weight: 800;
+    font-size: 0.75rem;
+    letter-spacing: 1px;
 }
 
 .status-bar {
@@ -217,131 +227,174 @@ body {
 }
 
 .badge {
-    padding: 6px 14px;
+    padding: 4px 12px;
     border-radius: 20px;
-    background: #ffffff;
-    border: 1px solid #dcd0ea;
-    color: var(--primary-purple);
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(0, 242, 254, 0.2);
+    color: var(--accent-cyan);
 }
 
-/* Suspect Case Card */
-.case-card {
-    background: #1e152a;
+/* Draggable Clue Tile Arena */
+.clue-arena {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 140px;
+    position: relative;
+    padding: 8px;
+}
+
+.draggable-card {
+    background: linear-gradient(135deg, #1e152a, #120924);
     color: white;
-    padding: 20px;
+    padding: 16px 20px;
     border-radius: 18px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
-    border-left: 6px solid #ffb300;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    border: 2px solid var(--accent-gold);
+    cursor: grab;
+    touch-action: none;
+    width: 100%;
+    max-width: 650px;
+    transition: transform 0.1s ease, box-shadow 0.2s ease;
+    z-index: 10;
+}
+
+.draggable-card:active {
+    cursor: grabbing;
+    transform: scale(1.02);
+    box-shadow: 0 15px 35px rgba(255, 179, 0, 0.4);
+}
+
+.draggable-card.dragging {
+    opacity: 0.9;
+    z-index: 1000;
+    pointer-events: none;
 }
 
 .suspect-header {
     display: flex;
     align-items: center;
     gap: 12px;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
 }
 
 .suspect-avatar {
-    font-size: 2.2rem;
+    font-size: 1.8rem;
     background: rgba(255,255,255,0.1);
-    padding: 8px;
+    padding: 6px;
     border-radius: 50%;
 }
 
-.suspect-info {
-    display: flex;
-    flex-direction: column;
-}
-
 .suspect-name {
-    font-size: 1.1rem;
+    font-size: 1rem;
     font-weight: 800;
-    color: #ffb300;
-}
-
-.clue-label {
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    color: #b3a2c7;
-    letter-spacing: 1px;
+    color: var(--accent-gold);
 }
 
 .statement-text {
-    font-size: clamp(1.1rem, 2.3vw, 1.35rem);
+    font-size: clamp(1rem, 2.2vw, 1.2rem);
     font-weight: 600;
-    line-height: 1.5;
-    background: rgba(255, 255, 255, 0.05);
-    padding: 14px;
-    border-radius: 10px;
-    margin-top: 8px;
-    border: 1px dashed rgba(255,255,255,0.2);
+    line-height: 1.4;
+    color: var(--text-main);
 }
 
-/* Choices Grid */
-.choices-grid {
+.drag-prompt {
+    font-size: 0.8rem;
+    color: var(--accent-cyan);
+    font-weight: 700;
+    margin-top: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* Drop Targets (Evidence Bags) */
+.drop-zones-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: 14px;
-    margin-top: 10px;
+    margin-top: 6px;
 }
 
-.btn-choice {
-    background: white;
-    border: 2px solid #3a1c71;
-    color: #3a1c71;
-    border-radius: 16px;
-    padding: 16px;
-    font-size: 1.1rem;
-    font-weight: 800;
-    cursor: pointer;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    transition: all 0.2s ease;
+.drop-zone {
+    background: rgba(255, 255, 255, 0.03);
+    border: 2px dashed rgba(255, 255, 255, 0.2);
+    border-radius: 18px;
+    padding: 18px 12px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 4px;
+    justify-content: center;
+    gap: 8px;
+    text-align: center;
+    transition: all 0.2s ease;
+    min-height: 130px;
 }
 
-.btn-choice:hover {
-    background: #3a1c71;
-    color: white;
-    transform: translateY(-2px);
+.drop-zone.hovered {
+    background: rgba(0, 242, 254, 0.12);
+    border-color: var(--accent-cyan);
+    transform: scale(1.03);
 }
 
-.btn-choice span.subtext {
-    font-size: 0.75rem;
+.drop-zone.correct-flash {
+    background: rgba(0, 230, 118, 0.2) !important;
+    border-color: var(--accent-green) !important;
+}
+
+.drop-zone.wrong-flash {
+    background: rgba(255, 0, 127, 0.2) !important;
+    border-color: var(--accent-pink) !important;
+}
+
+.zone-icon {
+    font-size: 2.2rem;
+}
+
+.zone-title {
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: var(--text-main);
+}
+
+.zone-subtext {
+    font-size: 0.78rem;
+    color: var(--text-muted);
     font-weight: 600;
-    opacity: 0.8;
 }
 
+/* Feedback & Actions */
 .action-bar {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 12px;
 }
 
 .feedback-bar {
-    flex: 1;
-    background: white;
+    width: 100%;
+    background: rgba(0, 0, 0, 0.35);
     border-radius: 12px;
     padding: 12px;
-    font-size: 0.95rem;
-    font-weight: 800;
+    font-size: 0.92rem;
+    font-weight: 700;
     color: var(--text-muted);
     text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .btn-main {
-    background: linear-gradient(45deg, #ff007f, #0072ff);
+    background: linear-gradient(135deg, var(--accent-pink), var(--primary-purple));
     color: white;
     border: 0;
-    padding: 12px 28px;
+    padding: 12px 32px;
     border-radius: 25px;
-    font-weight: 900;
-    font-size: 0.95rem;
+    font-weight: 800;
+    font-size: 1rem;
     cursor: pointer;
-    box-shadow: 0 4px 15px rgba(0, 114, 255, 0.35);
+    box-shadow: 0 6px 20px rgba(255, 0, 127, 0.35);
     transition: transform 0.15s ease;
 }
 
@@ -359,19 +412,20 @@ body {
 }
 
 .trophy-glow {
-    font-size: 5rem;
-    animation: bounce 2s infinite ease-in-out;
+    font-size: 4.8rem;
+    animation: float 3s ease-in-out infinite;
+    filter: drop-shadow(0 0 15px var(--accent-gold));
 }
 
-@keyframes bounce {
+@keyframes float {
     0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-15px); }
+    50% { transform: translateY(-10px); }
 }
 
 .congrats-title {
-    font-size: clamp(2rem, 5vw, 3rem);
+    font-size: clamp(2rem, 5vw, 2.8rem);
     font-weight: 900;
-    background: linear-gradient(45deg, #ffb300, #ff007f);
+    background: linear-gradient(135deg, var(--accent-gold), var(--accent-pink));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
@@ -393,7 +447,7 @@ body {
     />
     
     <div id="logo-fallback" class="logo-fallback-box">
-        <div class="logo-fallback-mark">🔍</div>
+        <div class="logo-fallback-mark">✦</div>
         <div class="logo-fallback-text">INNOVINE</div>
     </div>
 
@@ -402,69 +456,82 @@ body {
 
 <!-- SCREEN 2: Instruction Screen -->
 <div id="screen-instructions" class="view-panel">
-    <div class="instruction-title">The Grammar Mystery Solver</div>
+    <div class="instruction-title">Conjunction Mystery Lab</div>
     
     <div class="instruction-box">
         <div class="instruction-item">
             <div class="inst-num">1</div>
-            <div>A mysterious thief left encrypted statements at the crime scene!</div>
+            <div>A mysterious case requires classifying encrypted suspect statements!</div>
         </div>
         <div class="instruction-item">
             <div class="inst-num">2</div>
-            <div>Examine each suspect statement and identify if it is <strong>Simple</strong>, <strong>Compound</strong>, or <strong>Complex</strong> </div>
+            <div><strong>Drag & Drop</strong> each card into the correct Evidence Bag (Coordinating, Subordinating, or Compound).</div>
         </div>
         <div class="instruction-item">
             <div class="inst-num">3</div>
-            <div>You have <strong>2 attempts</strong> per clue. Crack all clues to solve the mystery!</div>
+            <div>You have <strong>2 attempts</strong> per statement. Solve all 12 clues to close the case!</div>
         </div>
     </div>
 
-    <button class="btn-main" onclick="startGame()">Solve the Case</button>
+    <button class="btn-main" onclick="startGame()">Start Investigation</button>
 </div>
 
 <!-- SCREEN 3: Game Play Area -->
 <div id="screen-game" class="view-panel">
     <div class="header">
         <div style="display: flex; align-items: center; gap: 8px;">
-            <div class="grade-badge">ENGLISH MYSTERY</div>
-            <div class="title">Sentence Structure Investigation</div>
+            <div class="grade-badge">GRADE 8 ELA</div>
+            <div style="font-weight: 800; font-size: 0.95rem; color: #fff;">Conjunction Classification</div>
         </div>
         <div class="status-bar">
-            <div class="badge">Clue: <span id="lbl-q">1</span>/5</div>
+            <div class="badge">Clue: <span id="lbl-q">1</span>/12</div>
             <div class="badge">Attempts: <span id="lbl-attempts">2</span></div>
+            <div class="badge">Score: <span id="lbl-score">0</span></div>
         </div>
     </div>
 
-    <div class="case-card">
-        <div class="suspect-header">
-            <div class="suspect-avatar" id="lbl-avatar">🕵️‍♂️</div>
-            <div class="suspect-info">
-                <div class="clue-label" id="lbl-suspect-title">Suspect Statement #1</div>
-                <div class="suspect-name" id="lbl-suspect-name">Interrogating Suspect...</div>
+    <!-- Active Draggable Clue Tile Arena -->
+    <div class="clue-arena" id="clue-arena">
+        <div class="draggable-card" id="active-card">
+            <div class="suspect-header">
+                <div class="suspect-avatar" id="lbl-avatar">🕵️‍♂️</div>
+                <div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;" id="lbl-suspect-title">CLUE #1</div>
+                    <div class="suspect-name" id="lbl-suspect-name">Suspect Statement</div>
+                </div>
+            </div>
+            <div class="statement-text" id="lbl-statement">
+                Loading clue statement...
+            </div>
+            <div class="drag-prompt">
+                ✊ Drag this card into a bag below
             </div>
         </div>
-        <div class="statement-text" id="lbl-statement">
-            "Loading clue statement..."
-        </div>
     </div>
 
-    <div class="choices-grid">
-        <button class="btn-choice" onclick="makeGuess('Simple')">
-            📌 Simple Sentence
-            <span class="subtext">1 Independent Clause</span>
-        </button>
-        <button class="btn-choice" onclick="makeGuess('Compound')">
-            🔗 Compound Sentence
-            <span class="subtext">2+ Independent (FANBOYS)</span>
-        </button>
-        <button class="btn-choice" onclick="makeGuess('Complex')">
-            🧩 Complex Sentence
-            <span class="subtext">1 Independent + Dependent</span>
-        </button>
+    <!-- Drop Zones (Evidence Bags) -->
+    <div class="drop-zones-grid">
+        <div class="drop-zone" data-type="Coordinating">
+            <div class="zone-icon">💼</div>
+            <div class="zone-title">Coordinating</div>
+            <div class="zone-subtext">FANBOYS Connectors</div>
+        </div>
+
+        <div class="drop-zone" data-type="Subordinating">
+            <div class="zone-icon">📁</div>
+            <div class="zone-title">Subordinating</div>
+            <div class="zone-subtext">Dependent Clauses</div>
+        </div>
+
+        <div class="drop-zone" data-type="Compound">
+            <div class="zone-icon">🗂️</div>
+            <div class="zone-title">Compound</div>
+            <div class="zone-subtext">Multi-word Phrases</div>
+        </div>
     </div>
 
     <div class="action-bar">
-        <div class="feedback-bar" id="lbl-feedback">Select the correct sentence structure to verify the clue.</div>
+        <div class="feedback-bar" id="lbl-feedback">Drag and drop the clue card into the matching evidence bag!</div>
     </div>
 </div>
 
@@ -472,9 +539,12 @@ body {
 <div id="screen-completion" class="view-panel">
     <div class="trophy-glow">🕵️‍♀️🏆</div>
     <div class="congrats-title">Case Solved!</div>
-    <p style="color: var(--text-muted); font-size: 1.1rem; max-width: 540px; font-weight: 600; line-height: 1.5;">
-        You decoded all 5 suspect clues using the exact rules for Simple, Compound, and Complex sentences from image_66c3a5.png!
+    <p style="color: var(--text-muted); font-size: 1.05rem; max-width: 540px; font-weight: 600; line-height: 1.5;">
+        You accurately categorized all 12 conjunction clues!
     </p>
+    <div style="font-size: 1.8rem; font-weight: 900; color: var(--accent-gold);">
+        Final Score: <span id="lbl-final-score">0</span>
+    </div>
     <button class="btn-main" onclick="location.reload()">Re-Open Case</button>
 </div>
 
@@ -483,64 +553,40 @@ const $ = id => document.getElementById(id);
 
 let currentClue = 0;
 let attemptsLeft = 2;
+let totalScore = 0;
 let isProcessing = false;
 
-function playCorrectSound() {
-    const snd = $('snd-correct');
+/* Sound Triggering */
+function playSound(id) {
+    const snd = $(id);
     if (snd) {
         snd.currentTime = 0;
         snd.play().catch(e => {});
     }
 }
 
-function playWrongSound() {
-    const snd = $('snd-wrong');
-    if (snd) {
-        snd.currentTime = 0;
-        snd.play().catch(e => {});
-    }
-}
-
-/* Clue Dataset direct from image_66c3a5.png section I */
+/* 12 Grade-8 Curriculum Aligned Questions */
 const mysteryClues = [
-    {
-        suspect: "John the Scholar",
-        avatar: "🧔‍♂️",
-        statement: "Although he studied hard, John couldn't pass the test, so he decided to seek help from his tutor.",
-        correct: "Complex",
-        explanation: "Contains dependent clause ('Although he studied hard') and independent clauses."
-    },
-    {
-        suspect: "Lady Scarlet",
-        avatar: "💃",
-        statement: "She finished her homework early, but she still couldn't go out to play.",
-        correct: "Compound",
-        explanation: "Two independent clauses joined by coordinating conjunction 'but'."
-    },
-    {
-        suspect: "The School Boy",
-        avatar: "👦",
-        statement: "When the bell rang, the students rushed out of the classroom.",
-        correct: "Complex",
-        explanation: "Contains dependent clause ('When the bell rang') and independent clause."
-    },
-    {
-        suspect: "The Picnic Organizer",
-        avatar: "🧺",
-        statement: "Because it was raining heavily, they cancelled the outdoor picnic.",
-        correct: "Complex",
-        explanation: "Contains dependent clause ('Because it was raining heavily') and independent clause."
-    },
-    {
-        suspect: "Maria the Dancer",
-        avatar: "🩰",
-        statement: "Maria loves to dance, and she practices every day to improve her skills.",
-        correct: "Compound",
-        explanation: "Two independent clauses connected by coordinating conjunction 'and'."
-    }
+    // Coordinating Conjunctions
+    { avatar: "🧔‍♂️", suspect: "John the Scholar", statement: "She wanted to go to the concert, but she had already promised to babysit her brother.", correct: "Coordinating", explanation: "'but' is a coordinating conjunction (FANBOYS)." },
+    { avatar: "💃", suspect: "Lady Scarlet", statement: "The storm was severe, so the flight was delayed for several hours.", correct: "Coordinating", explanation: "'so' connects two independent clauses." },
+    { avatar: "👦", suspect: "The School Boy", statement: "He was excited about the new video game, yet he had to wait until his birthday.", correct: "Coordinating", explanation: "'yet' introduces a coordinating contrast." },
+    { avatar: "🧺", suspect: "The Picnic Organizer", statement: "Neither Penny nor Tommy was able to make it to the cinema on time.", correct: "Coordinating", explanation: "'nor' pairs as a coordinating conjunction." },
+
+    // Subordinating Conjunctions
+    { avatar: "🎨", suspect: "Maria the Artist", statement: "He decided to go for a walk even though it was raining heavily outside.", correct: "Subordinating", explanation: "'even though' joins a dependent clause." },
+    { avatar: "🧪", suspect: "Dr. Apex", statement: "Unless you practice regularly, you will not improve your piano skills.", correct: "Subordinating", explanation: "'Unless' creates a dependent condition clause." },
+    { avatar: "📚", suspect: "Professor Mark", statement: "The teacher explained the lesson clearly, although some students still found it difficult.", correct: "Subordinating", explanation: "'although' introduces a subordinate concession." },
+    { avatar: "🚲", suspect: "The Courier", statement: "I will call you as soon as I arrive at the station.", correct: "Subordinating", explanation: "'as soon as' creates a subordinating time relationship." },
+
+    // Compound Conjunctions
+    { avatar: "🎭", suspect: "Actor Oliver", statement: "She enjoys singing as well as dancing in her free time.", correct: "Compound", explanation: "'as well as' functions as a compound conjunction." },
+    { avatar: "🛠️", suspect: "Builder Bob", statement: "He left early so that he could catch the first bus to town.", correct: "Compound", explanation: "'so that' acts as a compound connector expressing purpose." },
+    { avatar: "♟️", suspect: "The Grandmaster", statement: "You can borrow my car provided that you promise to drive carefully.", correct: "Compound", explanation: "'provided that' serves as a compound condition." },
+    { avatar: "🧭", suspect: "Navigator Roy", statement: "Even if it rains, the outdoor concert will proceed as planned.", correct: "Compound", explanation: "'as' in context connects the compound structure." }
 ];
 
-// Screen 1 Timer (5 Seconds)
+// Screen 1 Timer (Strictly 5 Seconds)
 const LOGO_DURATION = 5000;
 let logoElapsed = 0;
 
@@ -551,32 +597,38 @@ let logoInterval = setInterval(() => {
 
     if (logoElapsed >= LOGO_DURATION) {
         clearInterval(logoInterval);
-        $('screen-logo').style.opacity = 0;
+        $('screen-logo').style.opacity = '0';
         setTimeout(() => {
-            $('screen-logo').style.display = 'none';
-            $('screen-instructions').style.display = 'flex';
+            $('screen-logo').style.display = 'none';$('screen-instructions').style.display = 'flex';
         }, 600);
     }
 }, 50);
 
 function startGame() {
-    $('screen-instructions').style.display = 'none';
-    $('screen-game').style.display = 'flex';
+    $('screen-instructions').style.display = 'none';$('screen-game').style.display = 'flex';
+    setupDragEvents();
     loadClue();
 }
 
 function loadClue() {
     if (currentClue >= mysteryClues.length) {
         $('screen-game').style.display = 'none';
-        $('screen-completion').style.display = 'flex';
+        $('screen-completion').style.display = 'flex';$('lbl-final-score').innerText = totalScore;
         return;
     }
 
     attemptsLeft = 2;
     isProcessing = false;
+
+    // Reset Card Position
+    const card = $('active-card');
+    card.style.transform = 'translate(0px, 0px)';
+    card.style.display = 'block';
+
     $('lbl-q').innerText = currentClue + 1;
     $('lbl-attempts').innerText = attemptsLeft;
-    $('lbl-feedback').innerText = "Examine the statement and choose the sentence type.";
+    $('lbl-score').innerText = totalScore;
+    $('lbl-feedback').innerText = "Drag the clue card into the matching evidence bag!";
     $('lbl-feedback').style.color = "var(--text-muted)";
 
     let clue = mysteryClues[currentClue];
@@ -586,38 +638,132 @@ function loadClue() {
     $('lbl-statement').innerText = `"${clue.statement}"`;
 }
 
-function makeGuess(selectedType) {
-    if (isProcessing) return;
+/* Touch & Mouse Drag and Drop Engine */
+function setupDragEvents() {
+    const card = $('active-card');
+    const dropZones = document.querySelectorAll('.drop-zone');
 
+    let startX = 0, startY = 0;
+    let currentX = 0, currentY = 0;
+    let isDragging = false;
+
+    function onPointerDown(e) {
+        if (isProcessing) return;
+        isDragging = true;
+        card.classList.add('dragging');
+
+        startX = e.clientX || e.touches[0].clientX;
+        startY = e.clientY || e.touches[0].clientY;
+
+        document.addEventListener('pointermove', onPointerMove);
+        document.addEventListener('pointerup', onPointerUp);
+        document.addEventListener('touchmove', onPointerMove, { passive: false });
+        document.addEventListener('touchend', onPointerUp);
+    }
+
+    function onPointerMove(e) {
+        if (!isDragging) return;
+        if (e.cancelable) e.preventDefault();
+
+        const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+        const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+
+        currentX = clientX - startX;
+        currentY = clientY - startY;
+
+        card.style.transform = `translate(${currentX}px, ${currentY}px)`;
+
+        // Check hover target
+        dropZones.forEach(zone => {
+            const rect = zone.getBoundingClientRect();
+            if (clientX >= rect.left && clientX <= rect.right && clientY >= rect.top && clientY <= rect.bottom) {
+                zone.classList.add('hovered');
+            } else {
+                zone.classList.remove('hovered');
+            }
+        });
+    }
+
+    function onPointerUp(e) {
+        if (!isDragging) return;
+        isDragging = false;
+        card.classList.remove('dragging');
+
+        document.removeEventListener('pointermove', onPointerMove);
+        document.removeEventListener('pointerup', onPointerUp);
+        document.removeEventListener('touchmove', onPointerMove);
+        document.removeEventListener('touchend', onPointerUp);
+
+        let droppedZone = null;
+        dropZones.forEach(zone => {
+            const rect = zone.getBoundingClientRect();
+            const clientX = e.clientX || (e.changedTouches && e.changedTouches[0].clientX);
+            const clientY = e.clientY || (e.changedTouches && e.changedTouches[0].clientY);
+
+            if (clientX >= rect.left && clientX <= rect.right && clientY >= rect.top && clientY <= rect.bottom) {
+                droppedZone = zone;
+            }
+            zone.classList.remove('hovered');
+        });
+
+        if (droppedZone) {
+            verifyDrop(droppedZone.dataset.type, droppedZone);
+        } else {
+            // Snap back if dropped outside
+            card.style.transition = 'transform 0.2s ease';
+            card.style.transform = 'translate(0px, 0px)';
+            setTimeout(() => card.style.transition = '', 200);
+        }
+    }
+
+    card.addEventListener('pointerdown', onPointerDown);
+    card.addEventListener('touchstart', onPointerDown, { passive: true });
+}
+
+function verifyDrop(selectedType, zoneElem) {
     let clue = mysteryClues[currentClue];
+    const card = $('active-card');
 
     if (selectedType === clue.correct) {
         isProcessing = true;
-        playCorrectSound();
-        $('lbl-feedback').innerText = `🔍 CLUE UNLOCKED! Correct (${clue.correct}). ${clue.explanation}`;
+        playSound('snd-correct');
+        zoneElem.classList.add('correct-flash');
+
+        totalScore += (attemptsLeft === 2) ? 10 : 5;
+        $('lbl-score').innerText = totalScore;
+        $('lbl-feedback').innerText = `✨ CORRECT! Categorized under ${clue.correct}. ${clue.explanation}`;
         $('lbl-feedback').style.color = "var(--accent-green)";
 
         setTimeout(() => {
+            zoneElem.classList.remove('correct-flash');
             currentClue++;
             loadClue();
-        }, 2200);
+        }, 1800);
     } else {
         attemptsLeft--;
         $('lbl-attempts').innerText = attemptsLeft;
-        playWrongSound();
+        playSound('snd-wrong');
+        zoneElem.classList.add('wrong-flash');
+
+        setTimeout(() => zoneElem.classList.remove('wrong-flash'), 600);
 
         if (attemptsLeft > 0) {
-            $('lbl-feedback').innerText = `❌ False deduction! 1 attempt remaining for this clue.`;
+            $('lbl-feedback').innerText = `❌ Incorrect Bag! 1 attempt remaining for this clue.`;
             $('lbl-feedback').style.color = "var(--accent-pink)";
+
+            // Reset Card Position
+            card.style.transition = 'transform 0.2s ease';
+            card.style.transform = 'translate(0px, 0px)';
+            setTimeout(() => card.style.transition = '', 200);
         } else {
             isProcessing = true;
-            $('lbl-feedback').innerText = `⚡ Out of attempts! Right type: ${clue.correct}. (${clue.explanation})`;
+            $('lbl-feedback').innerText = `⚡ Out of attempts! Correct Bag: ${clue.correct}. (${clue.explanation})`;
             $('lbl-feedback').style.color = "var(--accent-gold)";
 
             setTimeout(() => {
                 currentClue++;
                 loadClue();
-            }, 3000);
+            }, 2500);
         }
     }
 }
