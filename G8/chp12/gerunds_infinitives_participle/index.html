@@ -3,35 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dungeon Tower Climb - Grammar Quest</title>
-    <!-- Canvas Confetti Library for animations -->
+    <title>Spire of Grammar - Elite Challenge</title>
+    <!-- Canvas Confetti Library -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         :root {
-            --primary-bg: #4A90E2;
-            --card-bg: #FFFFFF;
-            --accent: #FF6B6B;
-            --text-color: #2C3E50;
-            --success: #2ECC71;
-            --gold: #F1C40F;
-            --tower-bg: #34495E;
+            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            --panel-bg: rgba(30, 41, 59, 0.7);
+            --card-bg: #1e293b;
+            --accent-gold: #f59e0b;
+            --accent-gold-glow: rgba(245, 158, 11, 0.25);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --success: #10b981;
+            --danger: #ef4444;
+            --border-color: rgba(255, 255, 255, 0.1);
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
+            user-select: none;
         }
 
         body {
-            font-family: 'Fredoka', 'Comic Sans MS', 'Chalkboard SE', 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #74ebe5 0%, #89f7fe 100%);
-            color: var(--text-color);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: var(--bg-gradient);
+            color: var(--text-primary);
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            padding: 15px;
+            padding: 20px;
         }
 
         /* 5-Second Splash Screen */
@@ -41,79 +45,86 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: #ffffff;
+            background-color: #0b1120;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             z-index: 9999;
-            transition: opacity 0.5s ease;
+            transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         #splashScreen img {
-            max-width: 250px;
-            max-height: 250px;
+            max-width: 220px;
+            max-height: 220px;
             object-fit: contain;
-            animation: pulse 1.5s infinite;
+            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5));
+            animation: fadeIn 1s ease-out;
         }
 
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
         }
 
         /* Game Layout */
         .game-container {
             display: flex;
             flex-direction: row;
-            gap: 20px;
-            max-width: 900px;
+            gap: 24px;
+            max-width: 960px;
             width: 100%;
-            background: var(--card-bg);
+            background: var(--panel-bg);
+            backdrop-filter: blur(16px);
             border-radius: 20px;
-            padding: 25px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-            border: 4px solid #FFF;
+            padding: 28px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--border-color);
         }
 
-        /* Tower Sidebar */
+        /* Tower Sidebar / Elevator Gauge */
         .tower-sidebar {
-            width: 160px;
-            background: var(--tower-bg);
-            border-radius: 12px;
-            padding: 10px;
+            width: 180px;
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: 14px;
+            padding: 12px;
             display: flex;
             flex-direction: column-reverse;
-            gap: 6px;
-            max-height: 500px;
+            gap: 8px;
+            max-height: 520px;
             overflow-y: auto;
+            border: 1px solid var(--border-color);
         }
 
         .tower-floor {
-            padding: 8px;
-            text-align: center;
-            background: #2C3E50;
+            padding: 10px 14px;
+            text-align: left;
+            background: rgba(255, 255, 255, 0.03);
             border-radius: 8px;
             font-size: 0.85rem;
-            font-weight: bold;
-            color: #BDC3C7;
-            transition: all 0.3s ease;
+            font-weight: 600;
+            color: var(--text-secondary);
+            transition: all 0.25s ease;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border: 1px solid transparent;
         }
 
         .tower-floor.current {
-            background: var(--gold);
-            color: #2C3E50;
-            transform: scale(1.03);
-            box-shadow: 0 0 8px var(--gold);
+            background: var(--accent-gold-glow);
+            color: var(--accent-gold);
+            border-color: var(--accent-gold);
+            transform: translateX(4px);
         }
 
         .tower-floor.cleared {
-            background: var(--success);
-            color: white;
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+            border-color: rgba(16, 185, 129, 0.2);
         }
 
-        /* Main Game Panel */
+        /* Main Game Area */
         .main-game {
             flex: 1;
             display: flex;
@@ -125,21 +136,35 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 3px dashed #E0E0E0;
-            padding-bottom: 12px;
-            margin-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 16px;
+            margin-bottom: 20px;
+        }
+
+        .header h2 {
+            font-size: 1.35rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            color: var(--text-primary);
         }
 
         .audio-control {
             display: flex;
             align-items: center;
-            gap: 8px;
-            font-size: 0.9rem;
-            font-weight: bold;
+            gap: 10px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
         }
 
         .audio-control input[type=range] {
+            accent-color: var(--accent-gold);
             cursor: pointer;
+        }
+
+        .score-box {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--accent-gold);
         }
 
         .question-box {
@@ -147,102 +172,115 @@
         }
 
         .question-text {
-            font-size: 1.25rem;
-            font-weight: bold;
-            margin-bottom: 20px;
-            line-height: 1.4;
-            color: #2C3E50;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 24px;
+            line-height: 1.5;
+            color: var(--text-primary);
         }
 
         .options-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 1fr;
             gap: 12px;
         }
 
         .btn-option {
-            background: #F0F4F8;
-            color: #2C3E50;
-            border: 2px solid #CBD5E1;
-            padding: 14px 16px;
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            padding: 16px 20px;
             border-radius: 12px;
             cursor: pointer;
-            font-size: 1rem;
-            font-weight: bold;
+            font-size: 0.98rem;
+            font-weight: 500;
             transition: all 0.2s ease;
             text-align: left;
+            display: flex;
+            align-items: center;
         }
 
         .btn-option:hover {
-            background: #E2E8F0;
-            border-color: var(--primary-bg);
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--accent-gold);
             transform: translateY(-2px);
         }
 
         .feedback {
-            margin-top: 15px;
-            font-weight: bold;
-            font-size: 1.1rem;
-            min-height: 30px;
+            margin-top: 20px;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            min-height: 48px;
             text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
         }
 
-        .feedback.correct { color: var(--success); }
-        .feedback.incorrect { color: var(--accent); }
+        .feedback.correct {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--success);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
 
-        /* Restart Button at bottom */
+        .feedback.incorrect {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--danger);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        /* Action Buttons */
         .restart-container {
-            margin-top: 20px;
+            margin-top: 24px;
             text-align: center;
         }
 
         .btn-restart {
-            background: var(--success);
-            color: white;
+            background: var(--accent-gold);
+            color: #0f172a;
             border: none;
-            padding: 12px 28px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            border-radius: 30px;
+            padding: 12px 32px;
+            font-size: 1rem;
+            font-weight: 700;
+            border-radius: 10px;
             cursor: pointer;
-            box-shadow: 0 4px 10px rgba(46, 204, 113, 0.3);
-            transition: transform 0.2s, background-color 0.2s;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 14px var(--accent-gold-glow);
         }
 
         .btn-restart:hover {
-            background: #27AE60;
-            transform: scale(1.05);
+            opacity: 0.9;
+            transform: translateY(-1px);
         }
 
-        /* Mobile / Tablet Responsiveness */
+        /* Responsive Breakpoints */
         @media (max-width: 768px) {
             .game-container {
                 flex-direction: column-reverse;
-                padding: 15px;
+                padding: 18px;
             }
             .tower-sidebar {
                 width: 100%;
-                max-height: 80px;
+                max-height: 70px;
                 flex-direction: row;
                 overflow-x: auto;
             }
             .tower-floor {
-                min-width: 70px;
-            }
-            .options-grid {
-                grid-template-columns: 1fr;
-            }
-            .question-text {
-                font-size: 1.1rem;
+                min-width: 85px;
+                justify-content: center;
             }
         }
     </style>
 </head>
 <body>
 
-<!-- 1. Innovine Logo Splash Screen -->
+<!-- 1. Splash Screen -->
 <div id="splashScreen">
-    <img src="assets/innovine-logo.png" alt="Innovine Logo">
+    <img src="assets/innovine-logo.png" alt="Innovine Logo" onerror="this.style.display='none'; document.getElementById('fallback-logo').style.display='block';">
+    <h1 id="fallback-logo" style="display:none; color: var(--accent-gold); letter-spacing: 2px;">INNOVINE</h1>
 </div>
 
 <!-- Audio Assets -->
@@ -251,42 +289,40 @@
 <audio id="soundClapping" src="assets/clapping.mp3" preload="auto"></audio>
 
 <div class="game-container">
-    <!-- Tower Progress Sidebar -->
+    <!-- Tower Gauge -->
     <div class="tower-sidebar" id="towerSidebar"></div>
 
     <!-- Main Game Panel -->
     <div class="main-game">
         <div class="header">
-            <h2>🏰 Grammar Tower</h2>
+            <h2>Spire of Grammar</h2>
             <div class="audio-control">
                 🔊 <input type="range" id="volumeControl" min="0" max="1" step="0.1" value="1" onchange="adjustVolume(this.value)">
             </div>
-            <div>Score: <span id="scoreDisplay" style="color: var(--gold); font-weight: bold; font-size: 1.2rem;">0</span></div>
+            <div class="score-box">Score: <span id="scoreDisplay">0</span></div>
         </div>
 
         <div id="quizSection">
             <div class="question-box">
-                <p id="questionText" class="question-text">Loading...</p>
+                <p id="questionText" class="question-text">Initializing assessment...</p>
                 <div id="optionsGrid" class="options-grid"></div>
             </div>
-            <div id="feedback" class="feedback"></div>
+            <div id="feedback" class="feedback" style="visibility: hidden;"></div>
         </div>
 
-        <div id="victorySection" style="display: none; text-align: center; padding: 30px 0;">
-            <h1 style="color: var(--gold); font-size: 2.2rem;">🎉 Tower Conquered! 🎉</h1>
-            <p style="font-size: 1.2rem; margin: 15px 0;">Great job completing all 12 floors!</p>
-            <p style="font-size: 1.1rem;">Final Score: <strong id="finalScore">0</strong> / 120</p>
+        <div id="victorySection" style="display: none; text-align: center; padding: 40px 0;">
+            <h1 style="color: var(--accent-gold); font-size: 2rem; margin-bottom: 12px;">Spire Conquered</h1>
+            <p style="font-size: 1.05rem; color: var(--text-secondary); margin-bottom: 20px;">You have demonstrated mastery over non-finite verb forms.</p>
+            <p style="font-size: 1.2rem; font-weight: 700;">Final Score: <span id="finalScore" style="color: var(--accent-gold);">0</span> / 120</p>
         </div>
 
-        <!-- Restart Button at bottom -->
         <div class="restart-container" id="restartContainer" style="display: none;">
-            <button class="btn-restart" onclick="restartGame()">🔄 Play Again</button>
+            <button class="btn-restart" onclick="restartGame()">Re-attempt Spire</button>
         </div>
     </div>
 </div>
 
 <script>
-    // Audio Elements
     const audioCorrect = document.getElementById('soundCorrect');
     const audioWrong = document.getElementById('soundWrong');
     const audioClapping = document.getElementById('soundClapping');
@@ -297,68 +333,19 @@
         audioClapping.volume = val;
     }
 
-    // Question Bank (Derived strictly from Chapter 12)
     const baseQuestions = [
-        {
-            q: "She enjoys ___________ mystery novels during her free time.",
-            options: ["A) to read", "B) reading", "C) read", "D) reads"],
-            correct: 1
-        },
-        {
-            q: "His hobby is ___________ landscapes.",
-            options: ["A) painting", "B) to paint", "C) painted", "D) paint"],
-            correct: 0
-        },
-        {
-            q: "She agreed ___________ her friend with the project after school.",
-            options: ["A) helping", "B) help", "C) to help", "D) helped"],
-            correct: 2
-        },
-        {
-            q: "The manager offered ___________ additional training for the new employees.",
-            options: ["A) provide", "B) to provide", "C) providing", "D) provided"],
-            correct: 1
-        },
-        {
-            q: "According to the chapter, what is a gerund?",
-            options: ["A) A verb form made of 'to + verb'", "B) A verb ending in '-ing' that acts as a noun", "C) A verb used only after modal verbs", "D) A word that describes an adjective"],
-            correct: 1
-        },
-        {
-            q: "How is an infinitive formed?",
-            options: ["A) verb + '-ed'", "B) verb + '-ing'", "C) 'to' + verb", "D) 'having' + past participle"],
-            correct: 2
-        },
-        {
-            q: "Identify the infinitive in this sentence:\n'Sarah hopes to become a doctor and help people in need.'",
-            options: ["A) hopes", "B) to become", "C) people", "D) need"],
-            correct: 1
-        },
-        {
-            q: "Identify the gerund in this sentence:\n'Reading improves your vocabulary.'",
-            options: ["A) Reading", "B) improves", "C) your", "D) vocabulary"],
-            correct: 0
-        },
-        {
-            q: "Which option uses a bare infinitive correctly after a modal verb?",
-            options: ["A) He could to swim across the lake.", "B) He could swim across the lake effortlessly.", "C) He could swimming across the lake.", "D) He could swam across the lake."],
-            correct: 1
-        },
-        {
-            q: "In the sentence 'The running water sounded soothing,' what type of word is 'running'?",
-            options: ["A) Infinitive", "B) Present Participle", "C) Past Participle", "D) Bare Infinitive"],
-            correct: 1
-        },
-        {
-            q: "In the sentence 'The broken vase lay on the floor,' what type of word is 'broken'?",
-            options: ["A) Present Participle", "B) Past Participle", "C) Gerund", "D) Infinitive"],
-            correct: 1
-        },
-        {
-            q: "What type of participle is formed using 'having + past participle'?",
-            options: ["A) Present Participle", "B) Past Participle", "C) Perfect Participle", "D) Bare Infinitive"],
-            correct: 2
-        }
+        { q: "She enjoys ___________ mystery novels during her free time.", options: ["to read", "reading", "read", "reads"], correct: 1 },
+        { q: "His hobby is ___________ landscapes.", options: ["painting", "to paint", "painted", "paint"], correct: 0 },
+        { q: "She agreed ___________ her friend with the project after school.", options: ["helping", "help", "to help", "helped"], correct: 2 },
+        { q: "The manager offered ___________ additional training for the new employees.", options: ["provide", "to provide", "providing", "provided"], correct: 1 },
+        { q: "By definition, what constitutes a gerund?", options: ["A verb form starting with 'to'", "A verb ending in '-ing' functioning as a noun", "A verb used exclusively with modal auxiliaries", "A modifier for adjectives"], correct: 1 },
+        { q: "How is a full infinitive correctly structured?", options: ["verb + '-ed'", "verb + '-ing'", "'to' + base verb", "'having' + past participle"], correct: 2 },
+        { q: "Identify the infinitive: 'Sarah hopes to become a doctor and help people in need.'", options: ["hopes", "to become", "people", "need"], correct: 1 },
+        { q: "Identify the gerund: 'Reading improves your vocabulary.'", options: ["Reading", "improves", "your", "vocabulary"], correct: 0 },
+        { q: "Select the correct bare infinitive usage after a modal verb:", options: ["He could to swim across the lake.", "He could swim across the lake effortlessly.", "He could swimming across the lake.", "He could swam across the lake."], correct: 1 },
+        { q: "In 'The running water sounded soothing,' what role does 'running' fulfill?", options: ["Infinitive", "Present Participle", "Past Participle", "Bare Infinitive"], correct: 1 },
+        { q: "In 'The broken vase lay on the floor,' identify the word type of 'broken':", options: ["Present Participle", "Past Participle", "Gerund", "Infinitive"], correct: 1 },
+        { q: "Which structure forms a Perfect Participle?", options: ["Present Participle + Object", "Past Participle alone", "'having' + Past Participle", "Bare Infinitive"], correct: 2 }
     ];
 
     let questions = [];
@@ -366,7 +353,6 @@
     let score = 0;
     let answered = false;
 
-    // Helper function to shuffle questions array
     function shuffleArray(array) {
         let shuffled = [...array];
         for (let i = shuffled.length - 1; i > 0; i--) {
@@ -376,14 +362,11 @@
         return shuffled;
     }
 
-    // Handle Splash Screen (5 Seconds)
     window.onload = () => {
         setTimeout(() => {
             const splash = document.getElementById('splashScreen');
             splash.style.opacity = '0';
-            setTimeout(() => {
-                splash.style.display = 'none';
-            }, 500);
+            setTimeout(() => { splash.style.display = 'none'; }, 600);
         }, 5000);
 
         initGame();
@@ -408,18 +391,19 @@
             const floorDiv = document.createElement('div');
             floorDiv.className = `tower-floor ${i === currentFloor ? 'current' : ''}`;
             floorDiv.id = `floor-${i}`;
-            floorDiv.innerText = `Floor ${i + 1}`;
+            floorDiv.innerHTML = `<span>Level ${i + 1}</span>`;
             sidebar.appendChild(floorDiv);
         }
     }
 
     function loadFloor() {
         answered = false;
-        document.getElementById('feedback').innerText = '';
-        document.getElementById('feedback').className = 'feedback';
+        const feedback = document.getElementById('feedback');
+        feedback.style.visibility = 'hidden';
+        feedback.className = 'feedback';
 
         const qData = questions[currentFloor];
-        document.getElementById('questionText').innerText = `Floor ${currentFloor + 1}: ${qData.q}`;
+        document.getElementById('questionText').innerText = qData.q;
 
         const optionsGrid = document.getElementById('optionsGrid');
         optionsGrid.innerHTML = '';
@@ -427,7 +411,7 @@
         qData.options.forEach((opt, idx) => {
             const btn = document.createElement('button');
             btn.className = 'btn-option';
-            btn.innerText = opt;
+            btn.innerText = `${String.fromCharCode(65 + idx)}. ${opt}`;
             btn.onclick = () => selectOption(idx);
             optionsGrid.appendChild(btn);
         });
@@ -443,40 +427,31 @@
         const feedback = document.getElementById('feedback');
         const buttons = document.querySelectorAll('.btn-option');
 
+        feedback.style.visibility = 'visible';
+
         if (index === qData.correct) {
             score += 10;
             document.getElementById('scoreDisplay').innerText = score;
-            feedback.innerText = "✨ Correct!";
+            feedback.innerText = "Correct response.";
             feedback.className = "feedback correct";
             buttons[index].style.borderColor = "var(--success)";
-            buttons[index].style.background = "#E8F8F0";
+            buttons[index].style.background = "rgba(16, 185, 129, 0.15)";
 
-            // Play correct audio
             audioCorrect.currentTime = 0;
             audioCorrect.play().catch(() => {});
 
-            // Trigger Confetti Animation
-            confetti({
-                particleCount: 50,
-                spread: 60,
-                origin: { y: 0.7 }
-            });
-
+            confetti({ particleCount: 40, spread: 50, origin: { y: 0.7 } });
         } else {
-            feedback.innerText = `❌ Wrong! Correct answer: ${qData.options[qData.correct]}`;
+            feedback.innerText = `Incorrect. Correct answer: ${qData.options[qData.correct]}`;
             feedback.className = "feedback incorrect";
-            buttons[index].style.borderColor = "var(--accent)";
+            buttons[index].style.borderColor = "var(--danger)";
             buttons[qData.correct].style.borderColor = "var(--success)";
 
-            // Play wrong audio
             audioWrong.currentTime = 0;
             audioWrong.play().catch(() => {});
         }
 
-        // Auto transition to next question after 2 seconds
-        setTimeout(() => {
-            nextFloor();
-        }, 2000);
+        setTimeout(() => { nextFloor(); }, 2000);
     }
 
     function nextFloor() {
@@ -508,21 +483,15 @@
         document.getElementById('restartContainer').style.display = 'block';
         document.getElementById('finalScore').innerText = score;
 
-        // Play Clapping Audio & Grand Confetti
         audioClapping.currentTime = 0;
         audioClapping.play().catch(() => {});
 
-        confetti({
-            particleCount: 150,
-            spread: 100,
-            origin: { y: 0.6 }
-        });
+        confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 } });
     }
 
     function restartGame() {
         initGame();
     }
 </script>
-
 </body>
 </html>
