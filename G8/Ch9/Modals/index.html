@@ -3,19 +3,19 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-<title>Innovine - Modals Catch the Correct Word</title>
+<title>Innovine - Cyber Modal Catch</title>
 <style>
 :root {
-    --card-bg: rgba(255, 255, 255, 0.95);
-    --primary-blue: #025091;
-    --secondary-blue: #0373cf;
-    --accent-gold: #ffb300;
-    --accent-pink: #d81b60;
-    --accent-green: #2e7d32;
-    --text-main: #120b24;
-    --text-muted: #53457a;
-    --border-color: rgba(255, 255, 255, 0.7);
-    --shadow: 0 15px 35px rgba(0, 0, 0, 0.35);
+    --card-bg: rgba(13, 10, 26, 0.92);
+    --neon-blue: #00f0ff;
+    --neon-pink: #ff0055;
+    --neon-purple: #9d00ff;
+    --neon-gold: #ffb700;
+    --neon-green: #00ff66;
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --glass-border: rgba(0, 240, 255, 0.3);
+    --shadow-glow: 0 0 25px rgba(0, 240, 255, 0.25);
 }
 
 * {
@@ -24,12 +24,11 @@
     padding: 0;
     font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
     user-select: none;
+    -webkit-tap-highlight-color: transparent;
 }
 
 body {
-    background: linear-gradient(-45deg, #0f2027, #203a43, #2c5364, #1a0826);
-    background-size: 300% 300%;
-    animation: gradientBG 14s ease infinite;
+    background: #06020e;
     color: var(--text-main);
     min-height: 100vh;
     display: flex;
@@ -37,12 +36,28 @@ body {
     justify-content: center;
     padding: 12px;
     overflow-x: hidden;
+    position: relative;
 }
 
-@keyframes gradientBG {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
+/* Cyber Grid Background */
+body::before {
+    content: '';
+    position: fixed;
+    inset: -50%;
+    width: 200%;
+    height: 200%;
+    background: 
+        linear-gradient(rgba(0, 240, 255, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 240, 255, 0.05) 1px, transparent 1px);
+    background-size: 40px 40px;
+    transform: perspective(500px) rotateX(60deg);
+    animation: gridMove 10s linear infinite;
+    z-index: -1;
+}
+
+@keyframes gridMove {
+    0% { transform: perspective(500px) rotateX(60deg) translateY(0); }
+    100% { transform: perspective(500px) rotateX(60deg) translateY(40px); }
 }
 
 .view-panel {
@@ -50,27 +65,27 @@ body {
     width: 100%;
     max-width: 900px;
     background: var(--card-bg);
-    backdrop-filter: blur(12px);
+    backdrop-filter: blur(16px);
     border-radius: 24px;
-    padding: clamp(16px, 4vw, 28px);
-    box-shadow: var(--shadow);
+    padding: clamp(16px, 4vw, 24px);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.8), var(--shadow-glow);
     display: flex;
     flex-direction: column;
     gap: 16px;
-    border: 2px solid var(--border-color);
+    border: 1.5px solid var(--glass-border);
     animation: fadeIn 0.4s ease-out;
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; transform: scale(0.97); }
+    from { opacity: 0; transform: scale(0.96); }
     to { opacity: 1; transform: scale(1); }
 }
 
-/* SCREEN 1: Innovine Logo Screen */
+/* SCREEN 1: Innovine Logo Screen (5 Seconds) */
 #screen-logo {
     position: fixed;
     inset: 0;
-    background: #090314;
+    background: #04010a;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -85,12 +100,12 @@ body {
     width: 70vw;
     height: auto;
     object-fit: contain;
+    filter: drop-shadow(0 0 20px rgba(0, 240, 255, 0.5));
     animation: logoPop 1.2s ease-out;
-    filter: drop-shadow(0 0 25px rgba(255, 255, 255, 0.2));
 }
 
 @keyframes logoPop {
-    0% { transform: scale(0.85); opacity: 0; }
+    0% { transform: scale(0.8); opacity: 0; }
     100% { transform: scale(1); opacity: 1; }
 }
 
@@ -98,26 +113,24 @@ body {
     display: none;
     align-items: center;
     gap: 14px;
-    animation: logoPop 1.2s ease-out;
 }
 
 .logo-fallback-mark {
-    width: 54px;
-    height: 54px;
-    background: linear-gradient(135deg, #ffb300, #ff007f);
-    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, var(--neon-blue), var(--neon-pink));
+    border-radius: 12px;
+    display: grid;
+    place-items: center;
     font-size: 1.8rem;
-    color: white;
+    box-shadow: 0 0 15px var(--neon-blue);
 }
 
 .logo-fallback-text {
-    font-size: clamp(2.5rem, 7vw, 4rem);
+    font-size: clamp(2.5rem, 7vw, 3.8rem);
     font-weight: 900;
-    letter-spacing: 3px;
-    background: linear-gradient(45deg, #ffffff, #ffb300, #ff007f);
+    letter-spacing: 4px;
+    background: linear-gradient(45deg, #ffffff, var(--neon-blue), var(--neon-pink));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
@@ -126,8 +139,8 @@ body {
     position: absolute;
     bottom: 0;
     left: 0;
-    height: 6px;
-    background: linear-gradient(90deg, #ffb300, #ff007f);
+    height: 5px;
+    background: linear-gradient(90deg, var(--neon-blue), var(--neon-pink));
     width: 0%;
     transition: width 0.05s linear;
 }
@@ -141,16 +154,19 @@ body {
 }
 
 .instruction-title {
-    font-size: clamp(1.8rem, 4vw, 2.5rem);
-    color: var(--primary-blue);
+    font-size: clamp(1.8rem, 4vw, 2.6rem);
     font-weight: 900;
+    background: linear-gradient(135deg, #ffffff, var(--neon-blue));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
 }
 
 .instruction-box {
-    background: rgba(255, 255, 255, 0.85);
-    border: 1px solid rgba(0,0,0,0.08);
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 18px;
-    padding: 22px;
+    padding: 20px;
     text-align: left;
     width: 100%;
     max-width: 650px;
@@ -163,126 +179,144 @@ body {
     display: flex;
     align-items: center;
     gap: 14px;
-    font-size: clamp(0.95rem, 2.2vw, 1.1rem);
-    font-weight: 700;
-    color: var(--text-main);
+    font-size: clamp(0.95rem, 2.2vw, 1.05rem);
+    font-weight: 600;
 }
 
 .inst-num {
-    background: var(--primary-blue);
+    background: linear-gradient(135deg, var(--neon-purple), var(--neon-pink));
     color: white;
     width: 32px;
     height: 32px;
     border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: grid;
+    place-items: center;
     font-weight: 800;
     flex-shrink: 0;
+    box-shadow: 0 0 10px var(--neon-pink);
 }
 
 /* SCREEN 3: Game Play Area */
 #screen-game {
     display: none;
     flex-direction: column;
+    gap: 14px;
 }
 
 .header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 2px solid rgba(0, 0, 0, 0.08);
-    padding-bottom: 12px;
+    background: rgba(0, 0, 0, 0.4);
+    padding: 10px 16px;
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .grade-badge {
-    background: linear-gradient(45deg, #025091, #0373cf);
+    background: linear-gradient(135deg, var(--neon-purple), var(--neon-blue));
     color: white;
-    padding: 4px 14px;
-    border-radius: 12px;
+    padding: 4px 12px;
+    border-radius: 8px;
     font-weight: 800;
-    font-size: 0.85rem;
-}
-
-.title {
-    font-size: clamp(1rem, 2.5vw, 1.3rem);
-    color: var(--primary-blue);
-    font-weight: 800;
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+    box-shadow: 0 0 10px rgba(0, 240, 255, 0.3);
 }
 
 .status-bar {
     display: flex;
-    gap: 10px;
+    gap: 8px;
     font-size: 0.85rem;
     font-weight: 800;
 }
 
 .badge {
-    padding: 6px 14px;
+    padding: 4px 12px;
     border-radius: 20px;
-    background: #ffffff;
-    border: 1px solid #cce3f5;
-    color: var(--primary-blue);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--glass-border);
+    color: var(--neon-blue);
 }
 
-/* Task Card */
+/* Cyber Task Card */
 .task-card {
-    background: #112233;
+    background: linear-gradient(135deg, rgba(20, 10, 40, 0.9), rgba(10, 5, 25, 0.9));
     color: white;
-    padding: 20px;
+    padding: 18px;
     border-radius: 18px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
-    border-left: 6px solid var(--accent-gold);
+    box-shadow: inset 0 0 15px rgba(0, 240, 255, 0.1);
+    border: 1.5px solid var(--glass-border);
     text-align: center;
+    position: relative;
 }
 
 .category-label {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     text-transform: uppercase;
-    color: var(--accent-gold);
-    letter-spacing: 1.5px;
+    color: var(--neon-gold);
+    letter-spacing: 2px;
     font-weight: 800;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
 }
 
 .sentence-text {
-    font-size: clamp(1.2rem, 2.5vw, 1.45rem);
-    font-weight: 600;
-    line-height: 1.5;
-    background: rgba(255, 255, 255, 0.05);
-    padding: 16px;
+    font-size: clamp(1.15rem, 2.5vw, 1.4rem);
+    font-weight: 700;
+    line-height: 1.4;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 14px;
     border-radius: 12px;
-    border: 1px dashed rgba(255, 255, 255, 0.2);
+    border: 1px dashed var(--glass-border);
+    color: var(--text-main);
 }
 
-/* Floating Target Arena */
+.slot-highlight {
+    color: var(--neon-gold);
+    border-bottom: 2px dashed var(--neon-gold);
+    padding: 0 8px;
+}
+
+/* Floating Cyber Target Arena */
 .catch-area {
     position: relative;
     width: 100%;
-    height: 250px;
-    background: #eef7ff;
-    border: 2px dashed #0373cf;
+    height: 260px;
+    background: radial-gradient(circle at center, rgba(15, 5, 30, 0.8), rgba(5, 2, 12, 0.95));
+    border: 2px dashed var(--glass-border);
     border-radius: 18px;
     overflow: hidden;
-    margin-top: 10px;
+    cursor: crosshair;
+}
+
+.catch-area::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at var(--cx, 50%) var(--cy, 50%), rgba(0, 240, 255, 0.15) 0%, transparent 60%);
+    pointer-events: none;
 }
 
 .word-tile {
     position: absolute;
-    background: var(--primary-blue);
-    color: white;
+    background: linear-gradient(135deg, rgba(0, 240, 255, 0.15), rgba(157, 0, 255, 0.25));
+    border: 1.5px solid var(--neon-blue);
+    color: #ffffff;
     padding: 10px 22px;
-    border-radius: 25px;
+    border-radius: 30px;
     font-weight: 800;
-    font-size: 1.1rem;
+    font-size: 1.15rem;
     cursor: pointer;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    transition: transform 0.1s ease, background 0.2s ease;
+    box-shadow: 0 0 15px rgba(0, 240, 255, 0.2);
+    backdrop-filter: blur(8px);
+    transition: transform 0.1s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    will-change: left, top;
 }
 
 .word-tile:hover {
-    background: var(--secondary-blue);
-    transform: scale(1.05);
+    border-color: var(--neon-pink);
+    box-shadow: 0 0 25px var(--neon-pink);
+    transform: scale(1.1);
 }
 
 .action-bar {
@@ -294,30 +328,32 @@ body {
 
 .feedback-bar {
     flex: 1;
-    background: white;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 12px;
     padding: 12px;
     font-size: 0.95rem;
-    font-weight: 800;
+    font-weight: 700;
     color: var(--text-muted);
     text-align: center;
 }
 
 .btn-main {
-    background: linear-gradient(45deg, #025091, #0072ff);
+    background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
     color: white;
     border: 0;
-    padding: 12px 28px;
+    padding: 12px 32px;
     border-radius: 25px;
-    font-weight: 900;
-    font-size: 0.95rem;
+    font-weight: 800;
+    font-size: 1rem;
     cursor: pointer;
-    box-shadow: 0 4px 15px rgba(0, 114, 255, 0.35);
-    transition: transform 0.15s ease;
+    box-shadow: 0 6px 20px rgba(255, 0, 85, 0.35);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 .btn-main:hover {
     transform: scale(1.04);
+    box-shadow: 0 8px 25px rgba(255, 0, 85, 0.5);
 }
 
 /* SCREEN 4: Completion Screen */
@@ -331,18 +367,19 @@ body {
 
 .trophy-glow {
     font-size: 5rem;
-    animation: bounce 2s infinite ease-in-out;
+    animation: float 3s ease-in-out infinite;
+    filter: drop-shadow(0 0 20px var(--neon-gold));
 }
 
-@keyframes bounce {
+@keyframes float {
     0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-15px); }
+    50% { transform: translateY(-12px); }
 }
 
 .congrats-title {
-    font-size: clamp(2rem, 5vw, 3rem);
+    font-size: clamp(2rem, 5vw, 2.8rem);
     font-weight: 900;
-    background: linear-gradient(45deg, #025091, #ff007f);
+    background: linear-gradient(135deg, var(--neon-gold), var(--neon-pink));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
@@ -354,7 +391,7 @@ body {
 <audio id="snd-correct" src="assets/correct.mp3" preload="auto"></audio>
 <audio id="snd-wrong" src="assets/wrong.mp3" preload="auto"></audio>
 
-<!-- SCREEN 1: Innovine Logo Screen (Strict 5 Seconds) -->
+<!-- SCREEN 1: Innovine Logo Screen (Strictly 5 Seconds) -->
 <div id="screen-logo">
     <img 
         src="assets/logo.png" 
@@ -364,7 +401,7 @@ body {
     />
     
     <div id="logo-fallback" class="logo-fallback-box">
-        <div class="logo-fallback-mark">🎯</div>
+        <div class="logo-fallback-mark">⚡</div>
         <div class="logo-fallback-text">INNOVINE</div>
     </div>
 
@@ -373,24 +410,24 @@ body {
 
 <!-- SCREEN 2: Instruction Screen -->
 <div id="screen-instructions" class="view-panel">
-    <div class="instruction-title">Modals Catch Game</div>
+    <div class="instruction-title">Cyber Modal Catch</div>
     
     <div class="instruction-box">
         <div class="instruction-item">
             <div class="inst-num">1</div>
-            <div>Read the sentence and check its category (Requests, Suggestions, Obligation, Possibility, or Certainty).</div>
+            <div>Analyze the targeted sentence and inspect its Modal Category.</div>
         </div>
         <div class="instruction-item">
             <div class="inst-num">2</div>
-            <div>Click or tap the correct floating modal word.</div>
+            <div>Track and click/tap the correct floating modal target inside the cyber arena.</div>
         </div>
         <div class="instruction-item">
             <div class="inst-num">3</div>
-            <div>Questions are <strong>randomized</strong> each game! You have 2 attempts per question across 10 rounds.</div>
+            <div>Maintain high accuracy to build your score multiplier across 10 rounds!</div>
         </div>
     </div>
 
-    <button class="btn-main" onclick="startGame()">Start Game</button>
+    <button class="btn-main" onclick="startGame()">Initiate System</button>
 </div>
 
 <!-- SCREEN 3: Game Play Area -->
@@ -398,11 +435,12 @@ body {
     <div class="header">
         <div style="display: flex; align-items: center; gap: 8px;">
             <div class="grade-badge">MODAL VERBS</div>
-            <div class="title">Catch the Correct Word</div>
+            <div style="font-weight: 800; font-size: 0.95rem; color: #fff;">Catch Engine</div>
         </div>
         <div class="status-bar">
             <div class="badge">Round: <span id="lbl-q">1</span>/10</div>
             <div class="badge">Attempts: <span id="lbl-attempts">2</span></div>
+            <div class="badge">Score: <span id="lbl-score">0</span></div>
         </div>
     </div>
 
@@ -418,18 +456,21 @@ body {
     </div>
 
     <div class="action-bar">
-        <div class="feedback-bar" id="lbl-feedback">Catch the correct modal verb floating in the arena!</div>
+        <div class="feedback-bar" id="lbl-feedback">Lock target on the correct modal word!</div>
     </div>
 </div>
 
 <!-- SCREEN 4: Completion Screen -->
 <div id="screen-completion" class="view-panel">
-    <div class="trophy-glow">🎓🏆</div>
-    <div class="congrats-title">Mastery Achieved!</div>
-    <p style="color: var(--text-muted); font-size: 1.1rem; max-width: 540px; font-weight: 600; line-height: 1.5;">
-        You completed all 10 randomized rounds across Requests, Suggestions, Obligations, Possibilities, and Certainties according to image_6799b8.png!
+    <div class="trophy-glow">🎯🏆</div>
+    <div class="congrats-title">System Mastered!</div>
+    <p style="color: var(--text-muted); font-size: 1.05rem; max-width: 540px; font-weight: 600; line-height: 1.5;">
+        You successfully locked in all 10 modal verb scenarios with maximum precision!
     </p>
-    <button class="btn-main" onclick="startGame()">Play Again (Reshuffle)</button>
+    <div style="font-size: 1.8rem; font-weight: 900; color: var(--neon-gold);">
+        Final Score: <span id="lbl-final-score">0</span>
+    </div>
+    <button class="btn-main" onclick="startGame()">Re-Run Matrix</button>
 </div>
 
 <script>
@@ -438,100 +479,92 @@ const $ = id => document.getElementById(id);
 let activeQuestions = [];
 let currentRound = 0;
 let attemptsLeft = 2;
+let totalScore = 0;
 let isProcessing = false;
 let floatInterval = null;
 
-function playCorrectSound() {
-    const snd = $('snd-correct');
+function playSound(id) {
+    const snd = $(id);
     if (snd) {
         snd.currentTime = 0;
         snd.play().catch(e => {});
     }
 }
 
-function playWrongSound() {
-    const snd = $('snd-wrong');
-    if (snd) {
-        snd.currentTime = 0;
-        snd.play().catch(e => {});
-    }
-}
-
-/* 10 Total Questions directly referencing image_6799b8.png */
+/* 10 Curriculum Aligned Modal Verbs Questions */
 const questionBank = [
     {
         category: "Requests",
         sentence: "[ ____ ] you pass the salt, please?",
         correct: "Can",
         options: ["Can", "Must", "Should", "Might"],
-        rule: "Used to ask for something politely (can, could, will, would)."
+        rule: "Used to ask for something politely."
     },
     {
         category: "Requests",
         sentence: "[ ____ ] you please lend me your pen?",
         correct: "Could",
-        options: ["Could", "Must", "Might", "Ought to"],
-        rule: "Used to ask for something politely (can, could, will, would)."
+        options: ["Could", "Must", "Might", "Ought"],
+        rule: "Polite request in formal contexts."
     },
     {
         category: "Requests",
         sentence: "[ ____ ] you mind opening the window?",
         correct: "Would",
         options: ["Would", "May", "Should", "Must"],
-        rule: "Used to ask for something politely (can, could, will, would)."
+        rule: "'Would you mind' forms a courteous request."
     },
     {
         category: "Suggestions",
-        sentence: "You [ ____ ] eat more vegetables.",
+        sentence: "You [ ____ ] eat more fresh vegetables.",
         correct: "should",
         options: ["should", "must", "may", "will"],
-        rule: "Offers advice or recommendations (should, ought to)."
+        rule: "Offers advice or recommendations."
     },
     {
         category: "Suggestions",
         sentence: "You [ ____ ] to visit the museum; it's fascinating.",
         correct: "ought",
         options: ["ought", "must", "might", "can"],
-        rule: "Offers advice or recommendations (should, ought to)."
+        rule: "'Ought to' expresses moral advice."
     },
     {
         category: "Obligation or Necessity",
-        sentence: "You [ ____ ] finish your homework before watching TV.",
+        sentence: "You [ ____ ] finish your assignment before watching TV.",
         correct: "must",
         options: ["must", "might", "could", "would"],
-        rule: "Indicates duties or necessary actions (must, have to, should)."
+        rule: "Indicates a firm obligation or rule."
     },
     {
         category: "Obligation or Necessity",
-        sentence: "I [ ____ ] to attend the meeting.",
+        sentence: "I [ ____ ] to attend the mandatory briefing.",
         correct: "have",
         options: ["have", "might", "could", "would"],
-        rule: "Indicates duties or necessary actions (must, have to, should)."
+        rule: "'Have to' expresses external necessity."
     },
     {
         category: "Possibility",
-        sentence: "It [ ____ ] rain later.",
+        sentence: "It [ ____ ] rain later this afternoon.",
         correct: "might",
         options: ["might", "will", "must", "should"],
-        rule: "Expresses uncertainty or likelihood (might, may, could)."
+        rule: "Expresses a possibility or uncertainty."
     },
     {
         category: "Possibility",
-        sentence: "She [ ____ ] come to the party.",
+        sentence: "She [ ____ ] come to the ceremony if she finishes early.",
         correct: "may",
         options: ["may", "must", "will", "should"],
-        rule: "Expresses uncertainty or likelihood (might, may, could)."
+        rule: "Denotes formal possibility."
     },
     {
         category: "Certainty and Prediction",
         sentence: "I [ ____ ] definitely pass the exam.",
         correct: "will",
         options: ["will", "might", "could", "should"],
-        rule: "Expresses confidence about a future event (will, would, must)."
+        rule: "Expresses absolute future certainty."
     }
 ];
 
-// Array Randomizer (Fisher-Yates Shuffle)
 function shuffleArray(arr) {
     let array = [...arr];
     for (let i = array.length - 1; i > 0; i--) {
@@ -541,7 +574,7 @@ function shuffleArray(arr) {
     return array;
 }
 
-// Screen 1 Timer (Strict 5 Seconds)
+// Screen 1 Timer (Strictly 5 Seconds)
 const LOGO_DURATION = 5000;
 let logoElapsed = 0;
 
@@ -552,20 +585,25 @@ let logoInterval = setInterval(() => {
 
     if (logoElapsed >= LOGO_DURATION) {
         clearInterval(logoInterval);
-        $('screen-logo').style.opacity = 0;
+        $('screen-logo').style.opacity = '0';
         setTimeout(() => {
-            $('screen-logo').style.display = 'none';
-            $('screen-instructions').style.display = 'flex';
+            $('screen-logo').style.display = 'none';$('screen-instructions').style.display = 'flex';
         }, 600);
     }
 }, 50);
 
+// Mouse Crosshair Tracking inside Arena
+$('catch-arena').addEventListener('mousemove', (e) => {
+    const rect = $('catch-arena').getBoundingClientRect();
+    $('catch-arena').style.setProperty('--cx', (e.clientX - rect.left) + 'px');$('catch-arena').style.setProperty('--cy', (e.clientY - rect.top) + 'px');
+});
+
 function startGame() {
     activeQuestions = shuffleArray(questionBank);
     currentRound = 0;
+    totalScore = 0;
     $('screen-instructions').style.display = 'none';
-    $('screen-completion').style.display = 'none';
-    $('screen-game').style.display = 'flex';
+    $('screen-completion').style.display = 'none';$('screen-game').style.display = 'flex';
     loadRound();
 }
 
@@ -573,7 +611,7 @@ function loadRound() {
     if (currentRound >= activeQuestions.length) {
         clearInterval(floatInterval);
         $('screen-game').style.display = 'none';
-        $('screen-completion').style.display = 'flex';
+        $('screen-completion').style.display = 'flex';$('lbl-final-score').innerText = totalScore;
         return;
     }
 
@@ -581,12 +619,13 @@ function loadRound() {
     isProcessing = false;
     $('lbl-q').innerText = currentRound + 1;
     $('lbl-attempts').innerText = attemptsLeft;
-    $('lbl-feedback').innerText = "Catch the correct floating modal word!";
+    $('lbl-score').innerText = totalScore;
+    $('lbl-feedback').innerText = "Lock target on the correct modal word!";
     $('lbl-feedback').style.color = "var(--text-muted)";
 
     let task = activeQuestions[currentRound];
     $('lbl-category').innerText = `Category: ${task.category}`;
-    $('lbl-sentence').innerText = `"${task.sentence}"`;
+    $('lbl-sentence').innerHTML = `"${task.sentence.replace('[ ____ ]', '<span class="slot-highlight">[ ____ ]</span>')}"`;
 
     spawnFloatingWords(task);
 }
@@ -604,11 +643,10 @@ function spawnFloatingWords(task) {
         tile.className = 'word-tile';
         tile.innerText = word;
         
-        // Random placement inside arena
         let x = Math.random() * (arena.clientWidth - 110);
         let y = Math.random() * (arena.clientHeight - 50);
-        let dx = (Math.random() - 0.5) * 3.2;
-        let dy = (Math.random() - 0.5) * 3.2;
+        let dx = (Math.random() - 0.5) * 3.5;
+        let dy = (Math.random() - 0.5) * 3.5;
 
         tile.style.left = `${x}px`;
         tile.style.top = `${y}px`;
@@ -619,7 +657,7 @@ function spawnFloatingWords(task) {
         tiles.push({ el: tile, x, y, dx, dy });
     });
 
-    // Floating motion loop
+    // Arcade Floating Motion Loop
     floatInterval = setInterval(() => {
         tiles.forEach(t => {
             t.x += t.dx;
@@ -631,7 +669,7 @@ function spawnFloatingWords(task) {
             t.el.style.left = `${t.x}px`;
             t.el.style.top = `${t.y}px`;
         });
-    }, 30);
+    }, 25);
 }
 
 function catchWord(selectedWord) {
@@ -641,32 +679,37 @@ function catchWord(selectedWord) {
 
     if (selectedWord.toLowerCase() === task.correct.toLowerCase()) {
         isProcessing = true;
-        playCorrectSound();
-        $('lbl-feedback').innerText = `🎯 EXCELLENT CATCH! "${task.correct}" is correct. (${task.rule})`;
-        $('lbl-feedback').style.color = "var(--accent-green)";
-        $('lbl-sentence').innerText = `"${task.sentence.replace('[ ____ ]', task.correct)}"`;
+        playSound('snd-correct');
+        
+        totalScore += (attemptsLeft === 2) ? 10 : 5;
+        $('lbl-score').innerText = totalScore;
+        
+        $('lbl-feedback').innerText = `🎯 TARGET LOCKED! "${task.correct}" is correct. (${task.rule})`;
+        $('lbl-feedback').style.color = "var(--neon-green)";
+        
+        $('lbl-sentence').innerHTML = `"${task.sentence.replace('[ ____ ]', `<span style="color: var(--neon-green); font-weight:800;">${task.correct}</span>`)}"`;
 
         setTimeout(() => {
             currentRound++;
             loadRound();
-        }, 2000);
+        }, 1800);
     } else {
         attemptsLeft--;
         $('lbl-attempts').innerText = attemptsLeft;
-        playWrongSound();
+        playSound('snd-wrong');
 
         if (attemptsLeft > 0) {
-            $('lbl-feedback').innerText = `❌ Incorrect modal caught! 1 attempt remaining.`;
-            $('lbl-feedback').style.color = "var(--accent-pink)";
+            $('lbl-feedback').innerText = `❌ Incorrect Target! 1 attempt remaining.`;
+            $('lbl-feedback').style.color = "var(--neon-pink)";
         } else {
             isProcessing = true;
-            $('lbl-feedback').innerText = `⚡ Out of attempts! Correct modal: "${task.correct}". (${task.rule})`;
-            $('lbl-feedback').style.color = "var(--accent-gold)";
+            $('lbl-feedback').innerText = `⚡ Target Missed! Correct Modal: "${task.correct}". (${task.rule})`;
+            $('lbl-feedback').style.color = "var(--neon-gold)";
 
             setTimeout(() => {
                 currentRound++;
                 loadRound();
-            }, 2800);
+            }, 2400);
         }
     }
 }
