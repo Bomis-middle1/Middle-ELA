@@ -3,276 +3,578 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Conjunction Detective Case File</title>
+<title>Conjunction Detective: Case File Challenge</title>
 
 <style>
+/* ==========================================================================
+   GLOBAL STYLES & RESPONSIVE LAYOUT ENGINE
+   ========================================================================== */
 :root {
-    --bg-dark: #0f1016;
-    --board-bg: #1e1e2f;
-    --accent-gold: #ffd166;
-    --evidence-card: #2b2b40;
-    --text-light: #f4f4f9;
-    --correct-green: #06d6a0;
-    --wrong-red: #ef476f;
+    --bg-dark: #0a0c16;
+    --panel-bg: rgba(22, 27, 46, 0.95);
+    --gold: #ffd166;
+    --gold-dark: #d4a329;
+    --card-bg: #1e243b;
+    --card-hover: #2a3252;
+    --text-main: #f4f4f9;
+    --correct-green: #22c55e;
+    --wrong-red: #ef4444;
 }
 
-* { box-sizing: border-box; }
-
-body {
+* {
+    box-sizing: border-box;
     margin: 0;
-    font-family: Arial;
+    padding: 0;
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+}
+
+body, html {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
     background: var(--bg-dark);
-    color: var(--text-light);
-    display: flex;
-    justify-content: center;
+    color: var(--text-main);
+}
+
+/* SCREEN MANAGEMENT SYSTEM */
+.screen {
+    display: none;
+    width: 100vw;
+    height: 100vh;
+    height: 100svh;
+    position: fixed;
+    inset: 0;
     align-items: center;
-    min-height: 100vh;
-}
-
-.screen { display: none; width: 100%; max-width: 600px; padding: 20px; }
-.active { display: block; text-align: center; }
-
-.title { color: var(--accent-gold); font-size: 22px; font-weight: bold; }
-
-.instructions-box {
-    background: var(--board-bg);
-    padding: 15px;
-    border-radius: 10px;
-    margin: 15px 0;
-    text-align: left;
-}
-
-.game-container {
-    background: var(--board-bg);
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
     padding: 20px;
-    border-radius: 12px;
+}
+.screen.active { display: flex; }
+
+/* STAGE 1: LOGO SPLASH SCREEN (5s) */
+#logoScreen {
+    background: #ffffff;
+    z-index: 9999;
+}
+.logo-box {
+    width: 280px;
+    max-width: 80%;
+}
+.logo-box img { width: 100%; height: auto; display: block; }
+.logo-fallback { font-size: 32px; font-weight: 900; color: #140f3d; letter-spacing: 2px; }
+
+/* STAGE 2: TITLE SCREEN */
+#titleScreen {
+    background: radial-gradient(circle at center, #1b2138 0%, #080a12 100%);
+    z-index: 9000;
 }
 
-.options-grid {
+/* CONTAINER PANELS */
+.modal-panel {
+    background: var(--panel-bg);
+    border: 2px solid var(--gold);
+    border-radius: 20px;
+    padding: 28px 22px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.7);
+    max-width: 480px;
+    width: 100%;
+    backdrop-filter: blur(8px);
+}
+
+.title-header {
+    font-size: 26px;
+    font-weight: 900;
+    color: var(--gold);
+    text-shadow: 0 3px 10px rgba(255, 209, 102, 0.3);
+    margin-bottom: 12px;
+}
+
+.cta-btn {
+    padding: 14px 24px;
+    border: none;
+    border-radius: 14px;
+    background: linear-gradient(135deg, var(--gold), #f3a712);
+    color: #000;
+    font-weight: 800;
+    font-size: 16px;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 15px;
+    box-shadow: 0 4px 15px rgba(255, 209, 102, 0.3);
+}
+.cta-btn:active { transform: scale(0.98); }
+
+/* STAGE 4: MAIN GAME PLAYBOARD */
+#gameScreen {
+    padding: 15px;
+    justify-content: space-between;
+}
+
+.hud-bar {
+    width: 100%;
+    max-width: 600px;
+    display: flex;
+    justify-content: space-between;
+    background: var(--panel-bg);
+    border: 1px solid rgba(255, 209, 102, 0.3);
+    padding: 12px 18px;
+    border-radius: 12px;
+    font-weight: bold;
+    font-size: 14px;
+    color: var(--gold);
+}
+
+.vault-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+    width: 100%;
+    max-width: 600px;
+    margin: auto 0;
+}
+
+.vault-door {
+    aspect-ratio: 1/1;
+    background: linear-gradient(145deg, #252c48, #181d30);
+    border: 2px solid rgba(255, 209, 102, 0.4);
+    border-radius: 14px;
+    color: var(--gold);
+    font-weight: 800;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+    transition: all 0.2s;
+}
+.vault-door.unlocked {
+    background: rgba(34, 197, 94, 0.15);
+    border-color: var(--correct-green);
+    color: var(--correct-green);
+    pointer-events: none;
+}
+
+/* MCQ EVIDENCE OVERLAY MODAL */
+#evidenceModal {
+    position: absolute;
+    inset: 0;
+    background: rgba(5, 6, 12, 0.85);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 500;
+    padding: 20px;
+}
+
+.evidence-box {
+    background: var(--panel-bg);
+    border: 2px solid var(--gold);
+    border-radius: 20px;
+    padding: 24px;
+    width: 100%;
+    max-width: 500px;
+    text-align: left;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+}
+
+.evidence-title {
+    font-size: 14px;
+    font-weight: 800;
+    color: var(--gold);
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+}
+
+.evidence-question {
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.45;
+    margin-bottom: 18px;
+    color: #fff;
+}
+
+.options-container {
+    display: flex;
+    flex-direction: column;
     gap: 10px;
 }
 
 .evidence-card {
-    background: var(--evidence-card);
-    padding: 12px;
+    background: var(--card-bg);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-left: 4px solid var(--gold);
+    padding: 12px 16px;
     border-radius: 10px;
     cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--text-main);
+    transition: background 0.2s;
+}
+.evidence-card.correct { background: var(--correct-green) !important; color: #fff; border-left-color: #fff; }
+.evidence-card.wrong { background: var(--wrong-red) !important; color: #fff; border-left-color: #fff; }
+
+.status-feedback {
+    margin-top: 12px;
+    font-size: 13px;
+    font-weight: bold;
+    color: var(--wrong-red);
+    min-height: 18px;
 }
 
-.correct { background: var(--correct-green) !important; }
-.wrong { background: var(--wrong-red) !important; }
+canvas#confettiCanvas { position: fixed; inset: 0; pointer-events: none; z-index: 99999; }
 
-button {
-    margin-top: 15px;
-    padding: 12px 20px;
-    border: none;
-    border-radius: 25px;
-    background: var(--accent-gold);
-    font-weight: bold;
+@media (max-width: 480px) {
+    .vault-grid { grid-template-columns: repeat(5, 1fr); gap: 6px; }
+    .vault-door { font-size: 13px; }
+    .evidence-question { font-size: 14px; }
+    .evidence-card { font-size: 13px; padding: 10px 12px; }
 }
 </style>
 </head>
 
 <body>
 
-<!-- LOGO -->
+<canvas id="confettiCanvas"></canvas>
+
+<!-- AUDIO ASSETS -->
+<audio id="correctSound" src="assets/correct.mp3" preload="auto"></audio>
+<audio id="wrongSound" src="assets/wrong.mp3" preload="auto"></audio>
+<audio id="clapSound" src="assets/clapping.mp3" preload="auto"></audio>
+
+<!-- STAGE 1: LOGO SPLASH (EXACTLY 5 SECONDS) -->
 <div id="logoScreen" class="screen active">
-    <img src="assets/innovine-logo.png" style="width:180px;">
+    <div class="logo-box">
+        <img src="assets/innovine-logo.png" alt="Innovine Logo" onerror="this.style.display='none'; document.getElementById('logoFallback').style.display='block';">
+        <div id="logoFallback" class="logo-fallback" style="display:none;">INNOVINE</div>
+    </div>
 </div>
 
-<!-- INSTRUCTIONS -->
+<!-- STAGE 2: TITLE SCREEN -->
 <div id="titleScreen" class="screen">
-    <div class="title">🕵️ CONJUNCTION DETECTIVE</div>
-    <div class="instructions-box">
-        Identify the correct conjunction type.<br>
-        You have 2 attempts per question.
-    </div>
-    <button onclick="startGame()">START</button>
+    <div class="title-header" style="font-size: 30px;">🕵️ CONJUNCTION DETECTIVE</div>
+    <div style="font-size: 18px; color: #fff;">Case File Challenge: Chapter 9</div>
 </div>
 
-<!-- GAME -->
-<div id="quizScreen" class="screen">
-    <div class="game-container">
-        <div id="questionText"></div>
-        <div class="options-grid" id="optionsBox"></div>
-        <div id="statusMsg"></div>
+<!-- STAGE 3: INSTRUCTIONS BRIEFING -->
+<div id="startScreen" class="screen">
+    <div class="modal-panel">
+        <div class="title-header">Case Briefing</div>
+        <p style="color: #cbd5e1; margin: 15px 0 20px 0; font-size: 14px; line-height: 1.5; text-align: left;">
+            A series of vault locks have been secured using Chapter 9 Conjunction rules[cite: 8]. Tap any vault module to inspect the evidence and select the correct conjunction type to crack the case[cite: 8].
+        </p>
+        <button class="cta-btn" onclick="launchGameplay()">ACCEPT MISSION</button>
     </div>
 </div>
 
-<!-- END -->
+<!-- STAGE 4: MAIN GAMEPLAY -->
+<div id="gameScreen" class="screen">
+    <div class="hud-bar">
+        <div>EVIDENCE CRACKED: <span id="progressHUD">0 / 10</span></div>
+        <div>SCORE: <span id="scoreHUD">0</span></div>
+    </div>
+
+    <div class="vault-grid" id="vaultGrid"></div>
+
+    <!-- OVERLAY MCQ MODAL -->
+    <div id="evidenceModal">
+        <div class="evidence-box">
+            <div class="evidence-title" id="evidenceID">EVIDENCE FILE #1</div>
+            <div class="evidence-question" id="questionText">Loading query...</div>
+            <div class="options-container" id="optionsBox"></div>
+            <div class="status-feedback" id="statusMsg"></div>
+            <button id="continueBtn" class="cta-btn" style="display:none;" onclick="closeEvidenceModal()">SECURE FILE</button>
+        </div>
+    </div>
+</div>
+
+<!-- STAGE 5: CASE CLOSED SUMMARY -->
 <div id="endScreen" class="screen">
-    <h2 class="title">CASE CLOSED</h2>
-    <p id="finalScore"></p>
-    <button onclick="restartGame()">PLAY AGAIN</button>
+    <div class="modal-panel">
+        <div style="font-size: 60px; margin-bottom: 10px;">🏆</div>
+        <div class="title-header">CASE CLOSED!</div>
+        <p id="finalScore" style="font-size: 18px; font-weight: 700; margin: 15px 0; color: #fff;"></p>
+        <button class="cta-btn" onclick="restartGame()">RE-INVESTIGATE</button>
+    </div>
 </div>
-
-<!-- AUDIO -->
-<audio id="correctSound" src="assets/correct.mp3"></audio>
-<audio id="wrongSound" src="assets/wrong.mp3"></audio>
-<audio id="clapSound" src="assets/clapping.mp3"></audio>
 
 <script>
-
-/* ✅ FINAL AUDITED QUESTION BANK */
+/* CHAPTER 9 CONJUNCTIONS QUESTION BANK */
 const masterMCQs = [
-{
-q:`"Although it was midnight, the thief escaped." What type of conjunction is although?`,
-opts:["Coordinating","Relative","Concessive","Comparative"],
-ans:"Concessive"
-},
-{
-q:`Identify the sentence containing a Conditional Conjunction.`,
-opts:[
-"I stayed home because it rained.",
-"If you find the key, open the chest.",
-"The player was tired but won.",
-"The bike is faster than the scooter."
-],
-ans:"If you find the key, open the chest."
-},
-{
-q:`A corrupt database script created a grammatical error. Which sentence uses the wrong conjunction?`,
-opts:[
-"The tiger is stronger than the fox.",
-"She studied so that she could pass.",
-"Almost he was hungry, he ate lunch.",
-"If it rains, we will stay inside."
-],
-ans:"Almost he was hungry, he ate lunch."
-},
-{
-q:`The high-security vault opens only with a Purpose Conjunction. Which sentence uses one?`,
-opts:[
-"The knight trained so that he could defeat the dragon.",
-"The knight trained because he was bored.",
-"The knight trained although he was tired.",
-"The knight trained and became stronger."
-],
-ans:"The knight trained so that he could defeat the dragon."
-},
-{
-q:`What does the conjunction because do?`,
-opts:["Shows comparison","Shows condition","Gives a reason","Gives extra information"],
-ans:"Gives a reason"
-},
-{
-q:`The spaceship that landed here is invisible. What type of conjunction is that?`,
-opts:["Relative","Comparative","Coordinating","Conditional"],
-ans:"Relative"
-},
-{
-q:`Which sentence contains a Coordinating Conjunction?`,
-opts:[
-"The runner trained because she wanted to win.",
-"The runner trained although she was tired.",
-"The runner trained and improved her speed.",
-"The runner trained so that she could compete."
-],
-ans:"The runner trained and improved her speed."
-},
-{
-q:`Which conjunction belongs to a different category?`,
-opts:["Although","Even though","Though","Because"],
-ans:"Because"
-},
-{
-q:`Which pair belongs to the same type of conjunction?`,
-opts:["if, unless","and, although","because, than","that, but"],
-ans:"if, unless"
-},
-{
-q:`How many different conjunction types are used in: "The wizard carried a map so that he could find the treasure, although the journey was dangerous."`,
-opts:["One","Two","Three","Four"],
-ans:"Two"
-}
-
+    {
+        q: `"Although it was midnight, the thief escaped." What type of conjunction is 'although'?[cite: 8]`,
+        opts: ["Coordinating", "Relative", "Concessive", "Comparative"],
+        ans: "Concessive"
+    },
+    {
+        q: `Identify the sentence containing a Conditional Conjunction[cite: 8].`,
+        opts: [
+            "I stayed home because it rained.",
+            "If you find the key, open the chest.",
+            "The player was tired but won.",
+            "The bike is faster than the scooter."
+        ],
+        ans: "If you find the key, open the chest."
+    },
+    {
+        q: `Which sentence contains a grammatical error in its conjunction usage?`,
+        opts: [
+            "The tiger is stronger than the fox.",
+            "She studied so that she could pass.",
+            "Almost he was hungry, he ate lunch.",
+            "If it rains, we will stay inside."
+        ],
+        ans: "Almost he was hungry, he ate lunch."
+    },
+    {
+        q: `The high-security vault opens only with a Purpose Conjunction. Which sentence uses one?[cite: 8]`,
+        opts: [
+            "The knight trained so that he could defeat the dragon.",
+            "The knight trained because he was bored.",
+            "The knight trained although he was tired.",
+            "The knight trained and became stronger."
+        ],
+        ans: "The knight trained so that he could defeat the dragon."
+    },
+    {
+        q: `What relationship does the subordinating conjunction 'because' express?[cite: 8]`,
+        opts: ["Shows comparison", "Shows condition", "Gives a reason", "Gives extra information"],
+        ans: "Gives a reason"
+    },
+    {
+        q: `"This is the house where I grew up." What type of conjunction is 'where'?[cite: 8]`,
+        opts: ["Relative", "Comparative", "Coordinating", "Conditional"],
+        ans: "Relative"
+    },
+    {
+        q: `Which sentence contains a Coordinating Conjunction?[cite: 8]`,
+        opts: [
+            "The runner trained because she wanted to win.",
+            "The runner trained although she was tired.",
+            "The runner trained and improved her speed.",
+            "The runner trained so that she could compete."
+        ],
+        ans: "The runner trained and improved her speed."
+    },
+    {
+        q: `Which conjunction belongs to a different category than the others?[cite: 8]`,
+        opts: ["Although", "Even though", "Though", "Because"],
+        ans: "Because"
+    },
+    {
+        q: `Which pair belongs to the same type of conjunction?[cite: 8]`,
+        opts: ["if, unless", "and, although", "because, than", "that, but"],
+        ans: "if, unless"
+    },
+    {
+        q: `How many different conjunction types are used in: "The wizard carried a map so that he could find the treasure, although the journey was dangerous."[cite: 8]`,
+        opts: ["One", "Two", "Three", "Four"],
+        ans: "Two"
+    }
 ];
 
-let questions=[],idx=0,score=0,attempts=0;
+let gameQuestions = [], selectedIdx = null, score = 0, crackedCount = 0, attempts = 0;
+let audioUnlocked = false;
 
-window.onload=()=>{
- setTimeout(()=>{
-   logoScreen.classList.remove("active");
-   titleScreen.classList.add("active");
- },5000);
+const audioTracks = {
+    correct: document.getElementById("correctSound"),
+    wrong: document.getElementById("wrongSound"),
+    clap: document.getElementById("clapSound")
 };
 
-function startGame(){
- titleScreen.classList.remove("active");
- quizScreen.classList.add("active");
+// UNLOCK AUDIO ON FIRST USER INTERACTION
+function unlockAudio() {
+    if (audioUnlocked) return;
+    Object.values(audioTracks).forEach(track => {
+        if (track) {
+            track.play().then(() => {
+                track.pause();
+                track.currentTime = 0;
+            }).catch(() => {});
+        }
+    });
+    audioUnlocked = true;
+    window.removeEventListener('pointerdown', unlockAudio);
+}
+window.addEventListener('pointerdown', unlockAudio);
 
- questions=[...masterMCQs].sort(()=>Math.random()-0.5);
- idx=0;score=0;
- loadQ();
+// SEQUENCE CONTROL PIPELINE
+window.onload = () => {
+    // Stage 1: Innovine Logo Splash Screen for 5 seconds
+    setTimeout(() => {
+        document.getElementById("logoScreen").classList.remove("active");
+        document.getElementById("titleScreen").classList.add("active");
+        
+        // Stage 2: Title Screen for 3 seconds
+        setTimeout(() => {
+            document.getElementById("titleScreen").classList.remove("active");
+            document.getElementById("startScreen").classList.add("active");
+        }, 3000);
+
+    }, 5000);
+};
+
+function playAudioTrack(key) {
+    const track = audioTracks[key];
+    if (track) {
+        track.currentTime = 0;
+        track.play().catch(() => synthBeep(key === 'correct' || key === 'clap'));
+    }
 }
 
-function loadQ(){
- attempts=0;
- let q=questions[idx];
-
- questionText.innerText=q.q;
- optionsBox.innerHTML="";
-
- q.opts.sort(()=>Math.random()-0.5).forEach(o=>{
-   let div=document.createElement("div");
-   div.className="evidence-card";
-   div.innerText=o;
-   div.onclick=()=>check(o,div);
-   optionsBox.appendChild(div);
- });
+// SYNTHESIZER FALLBACK
+function synthBeep(isGood) {
+    try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.frequency.value = isGood ? 587 : 220;
+        gain.gain.value = 0.1;
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.15);
+    } catch(e) {}
 }
 
-function check(opt,el){
- let q=questions[idx];
-
- if(el.classList.contains("correct")||el.classList.contains("wrong")) return;
-
- attempts++;
-
- if(opt===q.ans){
-   el.classList.add("correct");
-   score++;
-   play("correctSound");
-   setTimeout(next,1000);
- } else {
-   el.classList.add("wrong");
-   play("wrongSound");
-
-   if(attempts>=2){
-     document.querySelectorAll(".evidence-card").forEach(x=>{
-       if(x.innerText===q.ans) x.classList.add("correct");
-     });
-     setTimeout(next,1500);
-   }
- }
+function launchGameplay() {
+    document.getElementById("startScreen").classList.remove("active");
+    document.getElementById("gameScreen").classList.add("active");
+    restartGame();
 }
 
-function next(){
- idx++;
- if(idx>=questions.length){
-   endGame();
- } else loadQ();
+function restartGame() {
+    document.getElementById("endScreen").classList.remove("active");
+    gameQuestions = [...masterMCQs].sort(() => Math.random() - 0.5).map((q, i) => ({ ...q, solved: false, id: i }));
+    score = 0;
+    crackedCount = 0;
+    updateHUD();
+    buildVaultGrid();
 }
 
-function endGame(){
- quizScreen.classList.remove("active");
- endScreen.classList.add("active");
- finalScore.innerText = `Score: ${score}/${questions.length}`;
- play("clapSound");
+function buildVaultGrid() {
+    const grid = document.getElementById("vaultGrid");
+    grid.innerHTML = "";
+    gameQuestions.forEach((item, index) => {
+        let btn = document.createElement("button");
+        btn.className = "vault-door" + (item.solved ? " unlocked" : "");
+        btn.innerText = item.solved ? "🔓" : `LOCK ${index + 1}`;
+        btn.onclick = () => openEvidenceModal(index);
+        grid.appendChild(btn);
+    });
 }
 
-function restartGame(){
- location.reload();
+function updateHUD() {
+    document.getElementById("progressHUD").innerText = `${crackedCount} / ${gameQuestions.length}`;
+    document.getElementById("scoreHUD").innerText = score;
 }
 
-function play(id){
- let a=document.getElementById(id);
- a.currentTime=0;
- a.play().catch(()=>{});
+function openEvidenceModal(index) {
+    if (gameQuestions[index].solved) return;
+    selectedIdx = index;
+    attempts = 0;
+    
+    const qData = gameQuestions[index];
+    document.getElementById("evidenceID").innerText = `EVIDENCE FILE #${index + 1}`;
+    document.getElementById("questionText").innerText = qData.q;
+    document.getElementById("statusMsg").innerText = "";
+    document.getElementById("continueBtn").style.display = "none";
+    
+    const box = document.getElementById("optionsBox");
+    box.innerHTML = "";
+    
+    // Shuffle options
+    let shuffledOpts = [...qData.opts].sort(() => Math.random() - 0.5);
+    shuffledOpts.forEach(opt => {
+        let div = document.createElement("div");
+        div.className = "evidence-card";
+        div.innerText = opt;
+        div.onclick = () => checkEvidence(opt, div);
+        box.appendChild(div);
+    });
+    
+    document.getElementById("evidenceModal").style.display = "flex";
 }
 
+function checkEvidence(chosen, el) {
+    const qData = gameQuestions[selectedIdx];
+    const allCards = document.querySelectorAll(".evidence-card");
+    
+    if (el.classList.contains("correct") || el.classList.contains("wrong")) return;
+    
+    attempts++;
+    
+    if (chosen === qData.ans) {
+        el.classList.add("correct");
+        score += 10;
+        playAudioTrack("correct");
+        triggerConfetti();
+        allCards.forEach(c => c.style.pointerEvents = "none");
+        document.getElementById("continueBtn").style.display = "block";
+    } else {
+        el.classList.add("wrong");
+        playAudioTrack("wrong");
+        
+        if (attempts >= 2) {
+            allCards.forEach(c => {
+                c.style.pointerEvents = "none";
+                if (c.innerText === qData.ans) c.classList.add("correct");
+            });
+            document.getElementById("statusMsg").innerText = `Correct Answer: ${qData.ans}`;
+            document.getElementById("continueBtn").style.display = "block";
+        } else {
+            document.getElementById("statusMsg").innerText = "❌ Lock combination incorrect! 1 attempt remaining.";
+        }
+    }
+}
+
+function closeEvidenceModal() {
+    document.getElementById("evidenceModal").style.display = "none";
+    gameQuestions[selectedIdx].solved = true;
+    crackedCount++;
+    updateHUD();
+    buildVaultGrid();
+    
+    if (crackedCount >= gameQuestions.length) {
+        setTimeout(() => {
+            document.getElementById("gameScreen").classList.remove("active");
+            document.getElementById("endScreen").classList.add("active");
+            document.getElementById("finalScore").innerText = `Score: ${score} / ${gameQuestions.length * 10}`;
+            playAudioTrack("clap");
+        }, 500);
+    }
+}
+
+/* CONFETTI ENGINE */
+const canvas = document.getElementById("confettiCanvas");
+const ctx = canvas.getContext("2d");
+function triggerConfetti() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    let pieces = Array.from({length: 40}, () => ({
+        x: Math.random() * canvas.width,
+        y: -10,
+        w: 8, h: 8,
+        ys: Math.random() * 4 + 2,
+        color: ["#ffd166","#22c55e","#ef4444","#3b82f6"][Math.floor(Math.random()*4)]
+    }));
+    let frames = 0;
+    function loop() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        pieces.forEach(p => {
+            p.y += p.ys;
+            ctx.fillStyle = p.color;
+            ctx.fillRect(p.x, p.y, p.w, p.h);
+        });
+        if (++frames < 60) requestAnimationFrame(loop);
+        else ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+    loop();
+}
 </script>
 
 </body>
