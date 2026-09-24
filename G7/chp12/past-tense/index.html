@@ -2,181 +2,645 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Past Tense Conveyor Game - Jumbled</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Block Quest: Past Tense Challenge</title>
 <style>
-body{margin:0;font-family:Arial,sans-serif;background:#1a1a2e;color:#fff;overflow:hidden;}
-#logoScreen,#gameScreen,#endScreen{display:none;width:100%;height:100vh;align-items:center;justify-content:center;flex-direction:column;}
-#logoScreen img{width:200px;margin-top:50px;}
-h1{color:#ffd60a;text-align:center;margin:10px;}
-#scoreText{margin:10px;}
-#conveyor{position:relative;width:100%;height:300px;overflow:hidden;border-top:2px solid #fff;border-bottom:2px solid #fff;margin:10px 0;}
-.sentence{position:absolute;padding:10px 15px;background:#ff6f61;color:#fff;border-radius:12px;cursor:grab;white-space:nowrap;font-weight:bold;}
-.binContainer{display:flex;justify-content:space-around;width:100%;margin-top:20px;}
-.bin{width:22%;padding:40px;background:#ffb703;color:#2d2340;border-radius:12px;text-align:center;font-weight:bold;min-height:120px;}
-.streamer{position:absolute;width:4px;height:40px;background:linear-gradient(to bottom,#ffd700,#ff4500);animation:fall 1s ease-out forwards;}
-@keyframes fall{0%{opacity:1;transform:translateY(0) rotate(0deg);}100%{opacity:0;transform:translateY(200px) rotate(720deg);}}
-button{padding:10px 16px;margin-top:20px;border-radius:12px;border:none;background:#ff6f61;color:#fff;font-weight:bold;cursor:pointer;font-size:16px;}
-#endScreen{text-align:center;}
+  :root {
+    --bg-dark: #080c14;
+    --card-bg: rgba(18, 26, 43, 0.9);
+    --cyan: #00f2fe;
+    --gold: #ffb703;
+    --accent: #4f46e5;
+    --text-main: #f8fafc;
+    --grid-bg: #111827;
+    --grid-border: #1f2937;
+  }
+
+  * {
+    box-sizing: border-box;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .screen {
+    position: absolute;
+    inset: 0;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px;
+    z-index: 10;
+  }
+
+  .screen.active { display: flex; }
+
+  /* 1. SPLASH LOGO (5 SECONDS) */
+  #logoScreen {
+    background: #ffffff;
+    justify-content: center;
+    z-index: 100;
+  }
+
+  #logoScreen img {
+    max-width: 60%;
+    width: 240px;
+    height: auto;
+    animation: pulse 1.2s infinite alternate ease-in-out;
+  }
+
+  @keyframes pulse {
+    from { transform: scale(0.95); opacity: 0.9; }
+    to { transform: scale(1.05); opacity: 1; }
+  }
+
+  /* 2. TITLE SCREEN */
+  #titleScreen {
+    background: radial-gradient(circle at center, #1e1b4b 0%, #080c14 100%);
+    justify-content: center;
+    text-align: center;
+    gap: 20px;
+  }
+
+  .badge {
+    background: rgba(0, 242, 254, 0.1);
+    border: 1px solid var(--cyan);
+    color: var(--cyan);
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 2px;
+  }
+
+  h1.title-text {
+    font-size: clamp(28px, 6vw, 40px);
+    font-weight: 900;
+    background: linear-gradient(135deg, #fff 30%, var(--cyan));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    line-height: 1.2;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, #4f46e5, #00f2fe);
+    color: white;
+    border: none;
+    padding: 16px 40px;
+    font-size: 18px;
+    font-weight: 800;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 0 25px rgba(0, 242, 254, 0.4);
+  }
+
+  .btn-primary:active { transform: scale(0.95); }
+
+  /* 3. GAMEPLAY SCREEN */
+  #gameScreen {
+    justify-content: flex-start;
+    background: linear-gradient(to bottom, #0f172a, #080c14);
+    gap: 12px;
+  }
+
+  .top-hud {
+    width: 100%;
+    max-width: 480px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--card-bg);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 10px 16px;
+    border-radius: 14px;
+  }
+
+  .hud-stat { font-size: 13px; font-weight: 700; color: #94a3b8; }
+  .hud-stat span { color: var(--cyan); font-size: 16px; }
+
+  /* PUZZLE BOARD */
+  .puzzle-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    max-width: 480px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    grid-template-rows: repeat(8, 1fr);
+    gap: 3px;
+    background: var(--grid-bg);
+    padding: 8px;
+    border-radius: 12px;
+    border: 2px solid var(--grid-border);
+    width: 100%;
+    aspect-ratio: 1;
+    max-width: 340px;
+  }
+
+  .cell {
+    background: #1f2937;
+    border-radius: 4px;
+    transition: background 0.15s;
+  }
+
+  .cell.filled {
+    background: linear-gradient(135deg, #00f2fe, #3b82f6);
+    box-shadow: inset 0 0 5px rgba(255,255,255,0.4);
+  }
+
+  /* BLOCK TRAY */
+  .tray {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    width: 100%;
+    min-height: 90px;
+    background: rgba(15, 23, 42, 0.6);
+    border-radius: 12px;
+    padding: 8px;
+  }
+
+  .piece-wrapper {
+    display: grid;
+    gap: 2px;
+    cursor: grab;
+    padding: 6px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.03);
+  }
+
+  .piece-cell {
+    width: 16px;
+    height: 16px;
+    background: var(--gold);
+    border-radius: 2px;
+  }
+
+  /* 4. GRAMMAR QUESTION MODAL (UNLOCKED ON LINE CLEAR) */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(8, 12, 20, 0.9);
+    backdrop-filter: blur(8px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 200;
+  }
+
+  .modal-overlay.active { display: flex; }
+
+  .modal-box {
+    background: #0f172a;
+    border: 2px solid var(--cyan);
+    border-radius: 20px;
+    padding: 24px;
+    max-width: 440px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 0 30px rgba(0,242,254,0.2);
+  }
+
+  .modal-box h3 {
+    color: var(--gold);
+    font-size: 16px;
+    margin-bottom: 12px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .question-text {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    line-height: 1.4;
+  }
+
+  .options-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .option-btn {
+    background: #1e293b;
+    border: 1px solid rgba(255,255,255,0.1);
+    color: white;
+    padding: 12px;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .option-btn:active { transform: scale(0.98); }
+
+  #canvas {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 15;
+  }
 </style>
 </head>
 <body>
 
-<div id="logoScreen">
-<img src="assets/innovine-logo.png" alt="Logo">
-<h2>Loading Time Machine...</h2>
+<!-- 1. SPLASH LOGO SCREEN (5 SECONDS EXACT) -->
+<div id="logoScreen" class="screen active">
+  <img src="assets/innovine-logo.png" alt="Innovine Logo" onerror="this.style.display='none'; document.getElementById('altText').style.display='block';">
+  <h1 id="altText" style="display:none; color:#0f172a; font-size:36px; font-weight:900;">INNOVINE</h1>
 </div>
 
-<div id="gameScreen">
-<h1>Past Tense Conveyor Game</h1>
-<div id="scoreText">Score: 0</div>
-<div id="conveyor"></div>
-<div class="binContainer">
-  <div class="bin" id="SimpleBin">Past Simple</div>
-  <div class="bin" id="ContinuousBin">Past Continuous</div>
-  <div class="bin" id="PerfectBin">Past Perfect</div>
-  <div class="bin" id="PerfectContinuousBin">Past Perfect Continuous</div>
-</div>
+<!-- 2. TITLE SCREEN -->
+<div id="titleScreen" class="screen">
+  <div class="badge">Grade 7 • Chapter 12</div>
+  <h1 class="title-text">BLOCK QUEST:<br>PAST TENSE CLEAR</h1>
+  <p style="color: #94a3b8; max-width: 320px; font-size: 14px;">Place blocks to clear a row or column and unlock Past Tense questions!</p>
+  <button class="btn-primary" onclick="startGame()">PLAY GAME</button>
 </div>
 
-<div id="endScreen">
-<h1>Mission Complete!</h1>
-<p id="finalScore"></p>
-<button onclick="restartGame()">Play Again</button>
+<!-- 3. GAMEPLAY SCREEN -->
+<div id="gameScreen" class="screen">
+  <div class="top-hud">
+    <div class="hud-stat">Progress: <span id="hudProg">1/15</span></div>
+    <div class="hud-stat">Score: <span id="hudScore">0</span></div>
+  </div>
+
+  <div class="puzzle-container">
+    <canvas id="canvas"></canvas>
+
+    <div class="grid" id="gridBoard">
+      <!-- 8x8 Grid Cells -->
+    </div>
+
+    <p style="font-size: 12px; color: #94a3b8;">Click/Tap a block below to place it automatically!</p>
+
+    <div class="tray" id="pieceTray">
+      <!-- 3 Block Pieces -->
+    </div>
+  </div>
 </div>
 
-<audio id="correctSound" src="assets/correct.mp3"></audio>
-<audio id="wrongSound" src="assets/wrong.mp3"></audio>
-<audio id="clapSound" src="assets/clapping.mp3"></audio>
+<!-- 4. GRAMMAR UNLOCK MODAL -->
+<div class="modal-overlay" id="questionModal">
+  <div class="modal-box">
+    <h3>⚡ LINE CLEARED! QUESTION UNLOCKED</h3>
+    <div class="question-text" id="qText">Loading question...</div>
+    <div class="options-list" id="qOptions"></div>
+  </div>
+</div>
+
+<!-- 5. END RESULTS SCREEN -->
+<div id="endScreen" class="screen" style="justify-content: center; text-align: center; gap: 20px;">
+  <div class="badge">Game Complete</div>
+  <h1 class="title-text">PUZZLE MASTER</h1>
+  <p id="finalScore" style="font-size: 18px; color: var(--gold); font-weight: 700;"></p>
+  <button class="btn-primary" onclick="startGame()">PLAY AGAIN</button>
+</div>
 
 <script>
-// Full 10 sentences
-let sentences=[
-  {text:"I visited Paris last year.", type:"Simple"},
-  {text:"I was visiting Paris when it rained.", type:"Continuous"},
-  {text:"I had visited Paris before I went to Rome.", type:"Perfect"},
-  {text:"I had been visiting Paris for hours before I left.", type:"PerfectContinuous"},
-  {text:"She was reading when I called.", type:"Continuous"},
-  {text:"He finished his homework.", type:"Simple"},
-  {text:"They had left before the party started.", type:"Perfect"},
-  {text:"She had been studying for 3 hours.", type:"PerfectContinuous"},
-  {text:"We played football yesterday.", type:"Simple"},
-  {text:"He was cooking dinner.", type:"Continuous"}
+/* ================= AUDIO CONTROLLER ================= */
+const sounds = {
+  correct: new Audio("assets/correct.mp3"),
+  wrong: new Audio("assets/wrong.mp3"),
+  clap: new Audio("assets/clapping.mp3")
+};
+
+let audioCtx = null;
+
+function playSound(type) {
+  let audio = sounds[type];
+  if (audio) {
+    audio.currentTime = 0;
+    let p = audio.play();
+    if (p) p.catch(() => runSynthFallback(type));
+  } else {
+    runSynthFallback(type);
+  }
+}
+
+function runSynthFallback(type) {
+  try {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    let osc = audioCtx.createOscillator();
+    let gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    if (type === 'correct') {
+      osc.frequency.setValueAtTime(523.25, audioCtx.currentTime);
+      osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1);
+      gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+      osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+    } else if (type === 'wrong') {
+      osc.frequency.setValueAtTime(220, audioCtx.currentTime);
+      osc.frequency.setValueAtTime(146.83, audioCtx.currentTime + 0.15);
+      gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.35);
+      osc.start(); osc.stop(audioCtx.currentTime + 0.35);
+    } else if (type === 'clap') {
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(440, audioCtx.currentTime);
+      gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+      osc.start(); osc.stop(audioCtx.currentTime + 0.4);
+    }
+  } catch(e){}
+}
+
+/* ================= CURRICULUM QUESTIONS (CHAPTER 12: PAST TENSE) ================= */
+const QUESTIONS = [
+  // Simple Past Tense
+  { text: "She ________ her friend yesterday.", answer: "visited", options: ["visited", "was visiting", "had visited", "visits"] },
+  { text: "They ________ a movie last night.", answer: "watched", options: ["watched", "were watching", "had watched", "watches"] },
+  { text: "He ________ for the exam all night.", answer: "studied", options: ["studied", "was studying", "had studied", "studies"] },
+  { text: "We ________ football in the park yesterday.", answer: "played", options: ["played", "were playing", "had played", "play"] },
+  { text: "I ________ my homework before dinner.", answer: "finished", options: ["finished", "was finishing", "had finished", "finish"] },
+
+  // Past Continuous Tense
+  { text: "While I ________ on my project, my phone rang.", answer: "was working", options: ["was working", "worked", "had worked", "am working"] },
+  { text: "They ________ dinner when the power went out.", answer: "were having", options: ["were having", "had", "had had", "are having"] },
+  { text: "She ________ a book while waiting for the bus.", answer: "was reading", options: ["was reading", "read", "had read", "is reading"] },
+  { text: "He ________ to work when his car broke down.", answer: "was driving", options: ["was driving", "drove", "had driven", "drives"] },
+  { text: "We ________ TV when the earthquake happened.", answer: "were watching", options: ["were watching", "watched", "had watched", "are watching"] },
+
+  // Past Perfect Tense
+  { text: "By the time she arrived, they ________ the meal.", answer: "had finished", options: ["had finished", "were finishing", "finished", "finish"] },
+  { text: "Before the concert started, he ________ the tickets.", answer: "had bought", options: ["had bought", "was buying", "bought", "buys"] },
+  { text: "When I got home, she ________ for work.", answer: "had already left", options: ["had already left", "was leaving", "already left", "leaves"] },
+  { text: "By the end of the day, they ________ the project.", answer: "had completed", options: ["had completed", "were completing", "completed", "complete"] },
+  { text: "After she ________ her homework, she went to bed.", answer: "had finished", options: ["had finished", "was finishing", "finished", "finishes"] }
 ];
 
-let score=0;
-let current=0;
-const conveyor=document.getElementById('conveyor');
-const scoreText=document.getElementById('scoreText');
-const logoScreen=document.getElementById('logoScreen');
-const gameScreen=document.getElementById('gameScreen');
-const endScreen=document.getElementById('endScreen');
-const finalScore=document.getElementById('finalScore');
-const correctAudio=document.getElementById('correctSound');
-const wrongAudio=document.getElementById('wrongSound');
-const clapAudio=document.getElementById('clapSound');
+/* BLOCK SHAPES (TETRIS STYLE) */
+const SHAPES = [
+  [[1,1],[1,1]], // 2x2 Square
+  [[1,1,1]],     // 1x3 Line
+  [[1],[1],[1]], // 3x1 Vertical Line
+  [[1,0],[1,1]], // L Shape
+  [[1,1,1,1]]    // 1x4 Line
+];
 
-// Shuffle helper
-function shuffle(array){
-  for(let i=array.length-1;i>0;i--){
-    let j=Math.floor(Math.random()*(i+1));
-    [array[i],array[j]]=[array[j],array[i]];
-  }
-  return array;
-}
+/* ================= GAME LOGIC & GRID ENGINE ================= */
+let grid = Array(8).fill(0).map(() => Array(8).fill(0));
+let currentQuestionIndex = 0;
+let score = 0;
+let activePieces = [];
 
-// Logo 5 sec
-logoScreen.style.display='flex';
-setTimeout(()=>{
-  logoScreen.style.display='none';
-  gameScreen.style.display='flex';
-  sentences = shuffle(sentences); // shuffle at start
-  showNextSentence();
-},5000);
-
-function showNextSentence(){
-  conveyor.innerHTML='';
-  if(current>=sentences.length){ endGame(); return; }
-  createSentenceBox(sentences[current],0);
-}
-
-function createSentenceBox(s,i){
-  const div=document.createElement('div');
-  div.className='sentence';
-  div.innerText=s.text;
-  div.dataset.type=s.type;
-  div.style.top = 100 + 'px';
-  div.style.left = conveyor.offsetWidth +'px';
-  div.draggable = true;
-  div.ondragstart = e=>{
-    e.dataTransfer.setData("text", s.type);
-    e.dataTransfer.setData("id", i);
-  }
-  conveyor.appendChild(div);
-  moveSentence(div);
-}
-
-function moveSentence(div){
-  let interval=setInterval(()=>{
-    let left=parseFloat(div.style.left);
-    left-=1; // speed reasonable
-    if(left < -div.offsetWidth){ div.remove(); clearInterval(interval);}
-    else div.style.left=left+'px';
-  },15);
-}
-
-['SimpleBin','ContinuousBin','PerfectBin','PerfectContinuousBin'].forEach(id=>{
-  const bin=document.getElementById(id);
-  bin.ondragover = e=>e.preventDefault();
-  bin.ondrop = e=>{
-    const type = e.dataTransfer.getData("text");
-    const div=document.querySelector('.sentence');
-    if(!div) return;
-    if((type==='Simple' && id==='SimpleBin')||
-       (type==='Continuous' && id==='ContinuousBin')||
-       (type==='Perfect' && id==='PerfectBin')||
-       (type==='PerfectContinuous' && id==='PerfectContinuousBin')){
-      div.remove();
-      createStreamer(div);
-      score++;
-      scoreText.innerText=`Score: ${score}`;
-      current++;
-      correctAudio.currentTime=0; correctAudio.play();
-      setTimeout(showNextSentence,500);
-    } else{
-      wrongAudio.currentTime=0; wrongAudio.play();
-      div.style.background="#ffccd5";
-      setTimeout(()=>{div.style.background="#ff6f61"},300);
-    }
-  }
+window.addEventListener('load', () => {
+  initCanvas();
+  setTimeout(() => { switchScreen('titleScreen'); }, 5000);
 });
 
-function createStreamer(div){
-  for(let i=0;i<10;i++){
-    const s=document.createElement('div');
-    s.className='streamer';
-    s.style.left = div.offsetLeft + Math.random()*50 +'px';
-    s.style.top = div.offsetTop + Math.random()*50 +'px';
-    document.body.appendChild(s);
-    setTimeout(()=>{s.remove()},1000);
+function switchScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function shuffle(arr) { return [...arr].sort(() => Math.random() - 0.5); }
+
+function startGame() {
+  grid = Array(8).fill(0).map(() => Array(8).fill(0));
+  currentQuestionIndex = 0;
+  score = 0;
+  switchScreen('gameScreen');
+  renderGrid();
+  generatePieces();
+}
+
+function renderGrid() {
+  let board = document.getElementById("gridBoard");
+  board.innerHTML = "";
+  for (let r = 0; r < 8; r++) {
+    for (let c = 0; c < 8; c++) {
+      let cell = document.createElement("div");
+      cell.className = "cell" + (grid[r][c] ? " filled" : "");
+      board.appendChild(cell);
+    }
+  }
+  document.getElementById("hudProg").innerText = `${currentQuestionIndex + 1}/${QUESTIONS.length}`;
+  document.getElementById("hudScore").innerText = score;
+}
+
+function generatePieces() {
+  let tray = document.getElementById("pieceTray");
+  tray.innerHTML = "";
+  activePieces = [
+    SHAPES[Math.floor(Math.random() * SHAPES.length)],
+    SHAPES[Math.floor(Math.random() * SHAPES.length)],
+    SHAPES[Math.floor(Math.random() * SHAPES.length)]
+  ];
+
+  activePieces.forEach((shape, index) => {
+    let p = document.createElement("div");
+    p.className = "piece-wrapper";
+    p.style.gridTemplateColumns = `repeat(${shape[0].length}, 16px)`;
+
+    shape.forEach(row => {
+      row.forEach(val => {
+        let cell = document.createElement("div");
+        if (val) cell.className = "piece-cell";
+        p.appendChild(cell);
+      });
+    });
+
+    p.onclick = () => autoPlacePiece(shape, p);
+    tray.appendChild(p);
+  });
+}
+
+function autoPlacePiece(shape, pieceElem) {
+  // Find first available spot on the board
+  let placed = false;
+  for (let r = 0; r <= 8 - shape.length; r++) {
+    for (let c = 0; c <= 8 - shape[0].length; c++) {
+      if (canPlace(shape, r, c)) {
+        placeShape(shape, r, c);
+        pieceElem.style.visibility = "hidden";
+        placed = true;
+        break;
+      }
+    }
+    if (placed) break;
+  }
+
+  if (placed) {
+    renderGrid();
+    checkLineClears();
   }
 }
 
-function endGame(){
-  gameScreen.style.display='none';
-  endScreen.style.display='flex';
-  finalScore.innerText=`Your Score: ${score} / ${sentences.length}`;
-  clapAudio.play();
+function canPlace(shape, r, c) {
+  for (let row = 0; row < shape.length; row++) {
+    for (let col = 0; col < shape[0].length; col++) {
+      if (shape[row][col] && grid[r + row][c + col]) return false;
+    }
+  }
+  return true;
 }
 
-function restartGame(){
-  current=0;
-  score=0;
-  endScreen.style.display='none';
-  gameScreen.style.display='flex';
-  scoreText.innerText=`Score: 0`;
-  sentences = shuffle(sentences); // reshuffle
-  showNextSentence();
+function placeShape(shape, r, c) {
+  for (let row = 0; row < shape.length; row++) {
+    for (let col = 0; col < shape[0].length; col++) {
+      if (shape[row][col]) grid[r + row][c + col] = 1;
+    }
+  }
+}
+
+function checkLineClears() {
+  let clearedLines = 0;
+
+  // Check Rows
+  for (let r = 0; r < 8; r++) {
+    if (grid[r].every(val => val === 1)) {
+      grid[r] = Array(8).fill(0);
+      clearedLines++;
+    }
+  }
+
+  // Check Columns
+  for (let c = 0; c < 8; c++) {
+    let colFull = true;
+    for (let r = 0; r < 8; r++) {
+      if (grid[r][c] === 0) { colFull = false; break; }
+    }
+    if (colFull) {
+      for (let r = 0; r < 8; r++) grid[r][c] = 0;
+      clearedLines++;
+    }
+  }
+
+  if (clearedLines > 0) {
+    score += clearedLines * 20;
+    triggerParticles();
+    playSound('correct');
+    openQuestionModal();
+  } else {
+    // Check if tray is empty
+    let tray = document.getElementById("pieceTray");
+    let visiblePieces = Array.from(tray.children).filter(c => c.style.visibility !== "hidden");
+    if (visiblePieces.length === 0) {
+      generatePieces();
+    }
+  }
+}
+
+function openQuestionModal() {
+  if (currentQuestionIndex >= QUESTIONS.length) {
+    endGame();
+    return;
+  }
+
+  let q = QUESTIONS[currentQuestionIndex];
+  document.getElementById("qText").innerText = q.text;
+  let optionsBox = document.getElementById("qOptions");
+  optionsBox.innerHTML = "";
+
+  let shuffledOpts = shuffle(q.options);
+  shuffledOpts.forEach(opt => {
+    let btn = document.createElement("button");
+    btn.className = "option-btn";
+    btn.innerText = opt;
+    btn.onclick = () => handleAnswer(opt, q.answer);
+    optionsBox.appendChild(btn);
+  });
+
+  document.getElementById("questionModal").classList.add("active");
+}
+
+function handleAnswer(selected, correct) {
+  document.getElementById("questionModal").classList.remove("active");
+
+  if (selected === correct) {
+    score += 10;
+    playSound('clap');
+  } else {
+    playSound('wrong');
+  }
+
+  currentQuestionIndex++;
+  renderGrid();
+
+  if (currentQuestionIndex >= QUESTIONS.length) {
+    endGame();
+  } else {
+    generatePieces();
+  }
+}
+
+function endGame() {
+  switchScreen('endScreen');
+  document.getElementById("finalScore").innerText = `Total Score: ${score}`;
+  playSound('clap');
+}
+
+/* ================= CANVAS PARTICLES ================= */
+let canvas, ctx, particles = [];
+
+function initCanvas() {
+  canvas = document.getElementById("canvas");
+  ctx = canvas.getContext("2d");
+  resize();
+  window.addEventListener('resize', resize);
+  requestAnimationFrame(anim);
+}
+
+function resize() {
+  if (!canvas) return;
+  canvas.width = canvas.parentElement.clientWidth;
+  canvas.height = canvas.parentElement.clientHeight;
+}
+
+function triggerParticles() {
+  for(let i=0; i<25; i++) {
+    particles.push({
+      x: canvas.width / 2,
+      y: canvas.height / 3,
+      vx: (Math.random() - 0.5) * 8,
+      vy: (Math.random() - 0.5) * 8,
+      color: Math.random() > 0.5 ? '#00f2fe' : '#ffb703',
+      size: Math.random() * 5 + 2,
+      life: 1
+    });
+  }
+}
+
+function anim() {
+  ctx.clearRect(0,0,canvas.width, canvas.height);
+  particles.forEach((p, i) => {
+    p.x += p.vx;
+    p.y += p.vy;
+    p.life -= 0.03;
+    ctx.fillStyle = p.color;
+    ctx.globalAlpha = Math.max(0, p.life);
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.size, 0, Math.PI*2);
+    ctx.fill();
+    if(p.life <= 0) particles.splice(i, 1);
+  });
+  requestAnimationFrame(anim);
 }
 </script>
 </body>
