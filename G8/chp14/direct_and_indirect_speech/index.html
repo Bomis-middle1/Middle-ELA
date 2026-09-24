@@ -8,24 +8,26 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         :root {
-            --primary-bg: #2C3E50;
-            --card-bg: #FFFFFF;
-            --accent: #E74C3C;
-            --text-color: #2C3E50;
-            --success: #2ECC71;
-            --gold: #F1C40F;
-            --news-header: #34495E;
+            --primary-bg: #1e293b;
+            --card-bg: #ffffff;
+            --accent: #ef4444;
+            --text-color: #1e293b;
+            --success: #10b981;
+            --gold: #f59e0b;
+            --news-header: #334155;
+            --border-color: rgba(0, 0, 0, 0.1);
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
+            user-select: none;
         }
 
         body {
-            font-family: 'Fredoka', 'Segoe UI', 'Comic Sans MS', sans-serif;
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: radial-gradient(circle at center, #334155 0%, #0f172a 100%);
             color: var(--text-color);
             display: flex;
             justify-content: center;
@@ -34,146 +36,274 @@
             padding: 15px;
         }
 
-        /* 5-Second Splash Screen */
+        /* Splash Screen */
         #splashScreen {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: #ffffff;
+            background-color: #0b1120;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             z-index: 9999;
-            transition: opacity 0.5s ease;
+            transition: opacity 0.6s ease;
         }
 
         #splashScreen img {
-            max-width: 250px;
-            max-height: 250px;
+            max-width: 220px;
+            max-height: 220px;
             object-fit: contain;
+            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5));
             animation: pulse 1.5s infinite;
         }
 
         @keyframes pulse {
             0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
+            50% { transform: scale(1.04); }
             100% { transform: scale(1); }
         }
 
-        /* Game Layout */
+        /* Game Container */
         .game-container {
-            max-width: 800px;
+            max-width: 820px;
             width: 100%;
             background: var(--card-bg);
             border-radius: 20px;
-            padding: 25px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
-            border: 4px solid #FFF;
+            padding: 24px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+            border: 4px solid #475569;
+            position: relative;
         }
 
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 3px dashed #CBD5E1;
-            padding-bottom: 12px;
-            margin-bottom: 20px;
+            border-bottom: 2px dashed #cbd5e1;
+            padding-bottom: 14px;
+            margin-bottom: 18px;
+        }
+
+        .header h2 {
+            font-size: 1.3rem;
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .audio-control {
             display: flex;
             align-items: center;
-            gap: 8px;
-            font-size: 0.9rem;
+            gap: 6px;
+            font-size: 0.85rem;
             font-weight: bold;
+            color: #64748b;
         }
 
         .audio-control input[type=range] {
+            accent-color: var(--gold);
             cursor: pointer;
         }
 
-        /* News Ticker Progress */
+        /* News Ticker Bar */
         .news-ticker {
             background: var(--news-header);
             color: white;
-            padding: 10px 15px;
+            padding: 10px 16px;
             border-radius: 12px;
             font-weight: bold;
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 20px;
+            font-size: 0.95rem;
         }
 
         .report-badge {
             background: var(--gold);
-            color: #2C3E50;
+            color: #0f172a;
             padding: 4px 12px;
             border-radius: 20px;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
         }
 
-        .question-box {
-            margin: 15px 0;
-        }
-
-        .speech-bubble {
-            background: #F8FAFC;
-            border: 2px solid #CBD5E1;
-            border-left: 6px solid #3B82F6;
+        /* Teletype Wire Panel */
+        .wire-card {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-left: 6px solid #3b82f6;
             border-radius: 12px;
             padding: 18px;
-            font-size: 1.15rem;
-            font-weight: bold;
-            line-height: 1.4;
-            color: #1E293B;
-            margin-bottom: 20px;
-            position: relative;
-            white-space: pre-line;
-        }
-
-        .options-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 12px;
-        }
-
-        .btn-option {
-            background: #F1F5F9;
-            color: #334155;
-            border: 2px solid #CBD5E1;
-            padding: 14px 18px;
-            border-radius: 12px;
-            cursor: pointer;
-            font-size: 0.95rem;
+            font-size: 1.1rem;
             font-weight: 600;
-            transition: all 0.2s ease;
-            text-align: left;
+            line-height: 1.5;
+            color: #1e293b;
+            margin-bottom: 20px;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
         }
 
-        .btn-option:hover {
-            background: #E2E8F0;
-            border-color: #3B82F6;
-            transform: translateX(4px);
+        .wire-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #64748b;
+            margin-bottom: 6px;
+            font-weight: 700;
+        }
+
+        /* Interactive Construction Zone */
+        .builder-workspace {
+            min-height: 64px;
+            background: #f1f5f9;
+            border: 2px dashed #94a3b8;
+            border-radius: 12px;
+            padding: 12px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .phrase-tile {
+            background: #3b82f6;
+            color: #fff;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.92rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 3px 10px rgba(59, 130, 246, 0.3);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .phrase-tile:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.1);
+        }
+
+        /* Tile Bank */
+        .tile-bank {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 24px;
+        }
+
+        .bank-tile {
+            background: #ffffff;
+            border: 2px solid #cbd5e1;
+            color: #334155;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.92rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .bank-tile:hover {
+            border-color: #3b82f6;
+            background: #eff6ff;
+            transform: translateY(-2px);
+        }
+
+        .bank-tile.used {
+            opacity: 0.25;
+            pointer-events: none;
+            transform: none;
+            background: #e2e8f0;
+        }
+
+        /* Action Controls */
+        .controls {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .btn-action {
+            padding: 12px 26px;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-publish {
+            background: var(--gold);
+            color: #0f172a;
+            box-shadow: 0 4px 14px rgba(245, 158, 11, 0.3);
+        }
+
+        .btn-publish:hover {
+            filter: brightness(1.08);
+            transform: translateY(-1px);
+        }
+
+        .btn-clear {
+            background: #f1f5f9;
+            color: #64748b;
+            border: 2px solid #cbd5e1;
+        }
+
+        .btn-clear:hover {
+            background: #e2e8f0;
+            color: #1e293b;
         }
 
         .feedback {
-            margin-top: 15px;
-            font-weight: bold;
-            font-size: 1.1rem;
-            min-height: 30px;
+            margin-top: 16px;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 1rem;
+            min-height: 46px;
             text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            visibility: hidden;
         }
 
-        .feedback.correct { color: var(--success); }
-        .feedback.incorrect { color: var(--accent); }
+        .feedback.correct {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--success);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            visibility: visible;
+        }
 
-        /* Restart Button */
+        .feedback.incorrect {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--accent);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            visibility: visible;
+        }
+
+        /* Shake Animation */
+        .shake {
+            animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+        }
+
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-2px, 0, 0); }
+            20%, 80% { transform: translate3d(4px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-6px, 0, 0); }
+            40%, 60% { transform: translate3d(6px, 0, 0); }
+        }
+
         .restart-container {
-            margin-top: 25px;
+            margin-top: 24px;
             text-align: center;
         }
 
@@ -182,40 +312,31 @@
             color: white;
             border: none;
             padding: 14px 32px;
-            font-size: 1.15rem;
+            font-size: 1rem;
             font-weight: bold;
             border-radius: 30px;
             cursor: pointer;
-            box-shadow: 0 4px 12px rgba(46, 204, 113, 0.4);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
             transition: transform 0.2s, background-color 0.2s;
         }
 
         .btn-restart:hover {
-            background: #27AE60;
+            background: #059669;
             transform: scale(1.05);
         }
 
-        /* Mobile Responsiveness */
         @media (max-width: 600px) {
-            .game-container {
-                padding: 15px;
-            }
-            .speech-bubble {
-                font-size: 1rem;
-                padding: 14px;
-            }
-            .btn-option {
-                font-size: 0.88rem;
-                padding: 12px 14px;
-            }
+            .game-container { padding: 16px; }
+            .wire-card { font-size: 1rem; padding: 14px; }
         }
     </style>
 </head>
 <body>
 
-<!-- 1. Innovine Logo Splash Screen -->
+<!-- Splash Screen -->
 <div id="splashScreen">
-    <img src="assets/innovine-logo.png" alt="Innovine Logo">
+    <img src="assets/innovine-logo.png" alt="Innovine Logo" onerror="this.style.display='none'; document.getElementById('fallback-logo').style.display='block';">
+    <h1 id="fallback-logo" style="display:none; color: var(--gold); letter-spacing: 2px;">INNOVINE</h1>
 </div>
 
 <!-- Audio Assets -->
@@ -223,45 +344,62 @@
 <audio id="soundWrong" src="assets/wrong.mp3" preload="auto"></audio>
 <audio id="soundClapping" src="assets/clapping.mp3" preload="auto"></audio>
 
-<div class="game-container">
+<div class="game-container" id="gameWindow">
     <div class="header">
         <h2>🎙️ Reporter's Speech Decoder</h2>
         <div class="audio-control">
             🔊 <input type="range" id="volumeControl" min="0" max="1" step="0.1" value="1" onchange="adjustVolume(this.value)">
         </div>
-        <div>Score: <span id="scoreDisplay" style="color: var(--gold); font-weight: bold; font-size: 1.3rem;">0</span></div>
+        <div style="font-size: 1.1rem; font-weight: bold; color: #334155;">
+            Score: <span id="scoreDisplay" style="color: var(--gold); font-size: 1.3rem;">0</span>
+        </div>
     </div>
 
     <!-- News Ticker Progress Bar -->
     <div class="news-ticker" id="newsTicker">
-        <span>📰 BREAKING REPORT</span>
+        <span>📰 LIVE WIRE FEED</span>
         <span class="report-badge" id="reportBadge">Report 1 of 12</span>
     </div>
 
-    <!-- Quiz Panel -->
+    <!-- Interactive Workspace Section -->
     <div id="quizSection">
-        <div class="question-box">
-            <div id="questionText" class="speech-bubble">Loading headline...</div>
-            <div id="optionsGrid" class="options-grid"></div>
+        <div class="wire-card">
+            <div class="wire-label" id="instructionLabel">Incoming Teletype Quote</div>
+            <div id="sourceSentence">Loading transmission...</div>
         </div>
+
+        <div style="font-size: 0.82rem; text-transform: uppercase; font-weight: 700; color: #64748b; margin-bottom: 6px;">Assemble Broadcast Dispatch:</div>
+        <!-- Assembly Area -->
+        <div class="builder-workspace" id="workspace">
+            <span style="color: #94a3b8; font-size: 0.9rem;" id="workspacePlaceholder">Click word tiles below to build your reported speech...</span>
+        </div>
+
+        <!-- Tile Bank -->
+        <div class="tile-bank" id="tileBank"></div>
+
+        <!-- Controls -->
+        <div class="controls">
+            <button class="btn-action btn-clear" onclick="clearWorkspace()">Clear Desk</button>
+            <button class="btn-action btn-publish" onclick="publishDispatch()">Publish Dispatch 📰</button>
+        </div>
+
         <div id="feedback" class="feedback"></div>
     </div>
 
     <!-- Victory Panel -->
     <div id="victorySection" style="display: none; text-align: center; padding: 30px 0;">
-        <h1 style="color: var(--gold); font-size: 2.2rem;">🎉 Master News Anchor! 🎉</h1>
-        <p style="font-size: 1.2rem; margin: 15px 0;">You successfully decoded all 12 speech reports!</p>
-        <p style="font-size: 1.1rem;">Final Score: <strong id="finalScore">0</strong> / 120</p>
+        <h1 style="color: var(--gold); font-size: 2.2rem; margin-bottom: 12px;">🎉 Master News Anchor! 🎉</h1>
+        <p style="font-size: 1.15rem; color: #475569; margin-bottom: 15px;">You successfully decoded and published all 12 news dispatches!</p>
+        <p style="font-size: 1.2rem; font-weight: bold;">Final Editorial Score: <span id="finalScore" style="color: var(--gold);">0</span> / 120</p>
     </div>
 
     <!-- Restart Button -->
     <div class="restart-container" id="restartContainer" style="display: none;">
-        <button class="btn-restart" onclick="restartGame()">🔄 Play Again</button>
+        <button class="btn-restart" onclick="restartGame()">🔄 New Press Run</button>
     </div>
 </div>
 
 <script>
-    // Audio Elements
     const audioCorrect = document.getElementById('soundCorrect');
     const audioWrong = document.getElementById('soundWrong');
     const audioClapping = document.getElementById('soundClapping');
@@ -272,129 +410,100 @@
         audioClapping.volume = val;
     }
 
-    // Question Bank (All options explicitly detailed from Chapter 14)
+    /* Interactive Puzzle Question Bank derived from Chapter 14 */
     const baseQuestions = [
         {
-            q: "Convert to Indirect Speech:\n\"I will submit the project by the end of the week,\" Alice assured her team.",
-            options: [
-                "(A) Alice assured her team that she would submit the project by the end of the week.",
-                "(B) Alice assures her team that she will submit the project by the end of the week.",
-                "(C) Alice assured her team that she will submit the project by the end of the week."
-            ],
-            correct: 0
+            type: "Indirect",
+            source: "\"I will submit the project by the end of the week,\" Alice assured her team.",
+            instruction: "Assemble the Indirect Speech Report",
+            correctTokens: ["Alice", "assured", "her", "team", "that", "she", "would", "submit", "the", "project", "by", "the", "end", "of", "the", "week."],
+            distractors: ["will", "assures", "today", "tomorrow"]
         },
         {
-            q: "Convert to Indirect Speech:\n\"You should visit the museum if you are interested in art,\" the guide suggested.",
-            options: [
-                "(A) The guide suggests that they should visit the museum if they are interested in art.",
-                "(B) The guide suggested that they should visit the museum if they were interested in art.",
-                "(C) The guide suggested visiting the museum if they are interested in art."
-            ],
-            correct: 1
+            type: "Indirect",
+            source: "\"You should visit the museum if you are interested in art,\" the guide suggested.",
+            instruction: "Assemble the Indirect Speech Report",
+            correctTokens: ["The", "guide", "suggested", "that", "they", "should", "visit", "the", "museum", "if", "they", "were", "interested", "in", "art."],
+            distractors: ["are", "suggests", "will", "today"]
         },
         {
-            q: "Convert to Indirect Speech:\n\"We have been working on this assignment for three days,\" the students complained.",
-            options: [
-                "(A) The students complained that they have been working on this assignment for three days.",
-                "(B) The students complained that they had been working on that assignment for three days.",
-                "(C) The students complain that they have been working on that assignment for three days."
-            ],
-            correct: 1
+            type: "Indirect",
+            source: "\"We have been working on this assignment for three days,\" the students complained.",
+            instruction: "Assemble the Indirect Speech Report",
+            correctTokens: ["The", "students", "complained", "that", "they", "had", "been", "working", "on", "that", "assignment", "for", "three", "days."],
+            distractors: ["have", "this", "complain", "are"]
         },
         {
-            q: "Convert to Indirect Speech:\n\"I cannot believe that you forgot my birthday,\" Sarah said to John.",
-            options: [
-                "(A) Sarah told to John that she cannot believe that he forgot her birthday.",
-                "(B) Sarah said to John that she could not believe that he forgot her birthday.",
-                "(C) Sarah said that she could not believe that he had forgotten her birthday."
-            ],
-            correct: 2
+            type: "Indirect",
+            source: "\"I cannot believe that you forgot my birthday,\" Sarah said to John.",
+            instruction: "Assemble the Indirect Speech Report",
+            correctTokens: ["Sarah", "said", "that", "she", "could", "not", "believe", "that", "he", "had", "forgotten", "her", "birthday."],
+            distractors: ["forgot", "can", "told", "my"]
         },
         {
-            q: "Convert to Indirect Speech:\n\"If it rains tomorrow, the event will be postponed,\" the organiser announced.",
-            options: [
-                "(A) The organiser announced that if it rained tomorrow, the event would be postponed.",
-                "(B) The organiser announced that if it rains tomorrow, the event would be postponed.",
-                "(C) The organiser announced that if it rained the next day, the event would be postponed."
-            ],
-            correct: 2
+            type: "Indirect",
+            source: "\"If it rains tomorrow, the event will be postponed,\" the organiser announced.",
+            instruction: "Assemble the Indirect Speech Report",
+            correctTokens: ["The", "organiser", "announced", "that", "if", "it", "rained", "the", "next", "day,", "the", "event", "would", "be", "postponed."],
+            distractors: ["rains", "tomorrow", "will", "is"]
         },
         {
-            q: "Convert to Direct Speech:\nMaria mentioned that she would finish her homework before dinner.\nMaria said,",
-            options: [
-                "a) \"I will finish my homework before dinner.\"",
-                "b) \"I should finish my homework before dinner.\"",
-                "c) \"I would finish my homework before dinner.\"",
-                "d) \"I can finish my homework before dinner.\""
-            ],
-            correct: 0
+            type: "Direct",
+            source: "Maria mentioned that she would finish her homework before dinner.\n[Reconstruct direct statement:]",
+            instruction: "Assemble the Direct Speech Quote",
+            correctTokens: ["\"I", "will", "finish", "my", "homework", "before", "dinner.\""],
+            distractors: ["would", "should", "can", "did"]
         },
         {
-            q: "Convert to Direct Speech:\nThe teacher informed the students that the science fair was scheduled for next month.\nThe teacher said,",
-            options: [
-                "a) \"The science fair is scheduled for next month.\"",
-                "b) \"The science fair will be scheduled for next month.\"",
-                "c) \"The science fair was scheduled for next month.\"",
-                "d) \"The science fair has been scheduled for next month.\""
-            ],
-            correct: 0
+            type: "Direct",
+            source: "The teacher informed the students that the science fair was scheduled for next month.\n[Reconstruct direct statement:]",
+            instruction: "Assemble the Direct Speech Quote",
+            correctTokens: ["\"The", "science", "fair", "is", "scheduled", "for", "next", "month.\""],
+            distractors: ["was", "will", "has", "scheduled"]
         },
         {
-            q: "Convert to Direct Speech:\nAlex explained that he couldn't attend the party because he was feeling unwell.\nAlex said,",
-            options: [
-                "a) \"I can't attend the party because I am feeling unwell.\"",
-                "b) \"I couldn't attend the party because I was feeling unwell.\"",
-                "c) \"I cannot attend the party because I am feeling unwell.\"",
-                "d) \"I couldn't attend the party because I am feeling unwell.\""
-            ],
-            correct: 0
+            type: "Direct",
+            source: "Alex explained that he couldn't attend the party because he was feeling unwell.\n[Reconstruct direct statement:]",
+            instruction: "Assemble the Direct Speech Quote",
+            correctTokens: ["\"I", "can't", "attend", "the", "party", "because", "I", "am", "feeling", "unwell.\""],
+            distractors: ["couldn't", "was", "did", "not"]
         },
         {
-            q: "Convert to Direct Speech:\nThe tour guide explained that the museum would be closed on Mondays for maintenance.\nThe tour guide said,",
-            options: [
-                "a) \"The museum will be closed on Mondays for maintenance.\"",
-                "b) \"The museum would be closed on Mondays for maintenance.\"",
-                "c) \"The museum is closed on Mondays for maintenance.\"",
-                "d) \"The museum has been closed on Mondays for maintenance.\""
-            ],
-            correct: 0
+            type: "Direct",
+            source: "The tour guide explained that the museum would be closed on Mondays for maintenance.\n[Reconstruct direct statement:]",
+            instruction: "Assemble the Direct Speech Quote",
+            correctTokens: ["\"The", "museum", "will", "be", "closed", "on", "Mondays", "for", "maintenance.\""],
+            distractors: ["would", "is", "was", "has"]
         },
         {
-            q: "Convert to Direct Speech:\nJennifer complained that she had lost her favourite book in the library.\nJennifer said,",
-            options: [
-                "a) \"I lost my favourite book in the library.\"",
-                "b) \"I had lost my favourite book in the library.\"",
-                "c) \"I have lost my favourite book in the library.\"",
-                "d) \"I will lose my favourite book in the library.\""
-            ],
-            correct: 0
+            type: "Direct",
+            source: "Jennifer complained that she had lost her favourite book in the library.\n[Reconstruct direct statement:]",
+            instruction: "Assemble the Direct Speech Quote",
+            correctTokens: ["\"I", "lost", "my", "favourite", "book", "in", "the", "library.\""],
+            distractors: ["had", "have", "will", "lost"]
         },
         {
-            q: "Convert to Indirect Speech:\n\"I will finish my homework by tomorrow,\" Sarah promised her teacher.",
-            options: [
-                "a) Sarah promised her teacher that she would finish her homework by the next day.",
-                "b) Sarah promised her teacher that she will finish her homework tomorrow.",
-                "c) Sarah promised her teacher that I will finish my homework by tomorrow."
-            ],
-            correct: 0
+            type: "Indirect",
+            source: "\"I will finish my homework by tomorrow,\" Sarah promised her teacher.",
+            instruction: "Assemble the Indirect Speech Report",
+            correctTokens: ["Sarah", "promised", "her", "teacher", "that", "she", "would", "finish", "her", "homework", "by", "the", "next", "day."],
+            distractors: ["will", "tomorrow", "I", "my"]
         },
         {
-            q: "Convert to Indirect Speech:\n\"Can you help me with this math problem?\" asked John.",
-            options: [
-                "a) John asked if I could help him with that math problem.",
-                "b) John asked can you help me with this math problem.",
-                "c) John asked that I can help him with that math problem."
-            ],
-            correct: 0
+            type: "Indirect",
+            source: "\"Can you help me with this math problem?\" asked John.",
+            instruction: "Assemble the Indirect Speech Report",
+            correctTokens: ["John", "asked", "if", "I", "could", "help", "him", "with", "that", "math", "problem."],
+            distractors: ["can", "this", "me", "you"]
         }
     ];
 
     let questions = [];
     let currentQuestion = 0;
     let score = 0;
-    let answered = false;
+    let assembledPhrases = [];
 
-    // Shuffle questions
+    // Shuffle helper
     function shuffleArray(array) {
         let shuffled = [...array];
         for (let i = shuffled.length - 1; i > 0; i--) {
@@ -404,14 +513,11 @@
         return shuffled;
     }
 
-    // Splash Screen Handler (5 Seconds)
     window.onload = () => {
         setTimeout(() => {
             const splash = document.getElementById('splashScreen');
             splash.style.opacity = '0';
-            setTimeout(() => {
-                splash.style.display = 'none';
-            }, 500);
+            setTimeout(() => { splash.style.display = 'none'; }, 500);
         }, 5000);
 
         initGame();
@@ -422,82 +528,122 @@
         currentQuestion = 0;
         score = 0;
         document.getElementById('scoreDisplay').innerText = score;
+
         document.getElementById('quizSection').style.display = 'block';
         document.getElementById('newsTicker').style.display = 'flex';
         document.getElementById('victorySection').style.display = 'none';
         document.getElementById('restartContainer').style.display = 'none';
+
         loadQuestion();
     }
 
     function loadQuestion() {
-        answered = false;
-        document.getElementById('feedback').innerText = '';
-        document.getElementById('feedback').className = 'feedback';
-        document.getElementById('reportBadge').innerText = `Report ${currentQuestion + 1} of 12`;
+        assembledPhrases = [];
+        renderWorkspace();
+
+        const feedback = document.getElementById('feedback');
+        feedback.className = 'feedback';
+        feedback.style.visibility = 'hidden';
 
         const qData = questions[currentQuestion];
-        document.getElementById('questionText').innerText = `💬 ${qData.q}`;
+        document.getElementById('instructionLabel').innerText = qData.instruction;
+        document.getElementById('reportBadge').innerText = `Report ${currentQuestion + 1} of 12`;
+        document.getElementById('sourceSentence').innerText = qData.source;
 
-        const optionsGrid = document.getElementById('optionsGrid');
-        optionsGrid.innerHTML = '';
+        // Shuffle correct words + distractors for the tile bank
+        const allTiles = shuffleArray([...qData.correctTokens, ...qData.distractors]);
+        const bank = document.getElementById('tileBank');
+        bank.innerHTML = '';
 
-        qData.options.forEach((opt, idx) => {
+        allTiles.forEach((text, i) => {
             const btn = document.createElement('button');
-            btn.className = 'btn-option';
-            btn.innerText = opt;
-            btn.onclick = () => selectOption(idx);
-            optionsGrid.appendChild(btn);
+            btn.className = 'bank-tile';
+            btn.innerText = text;
+            btn.id = `tile-${i}`;
+            btn.onclick = () => selectTile(text, `tile-${i}`);
+            bank.appendChild(btn);
         });
     }
 
-    function selectOption(index) {
-        if (answered) return;
-        answered = true;
+    function selectTile(text, tileId) {
+        assembledPhrases.push({ text, tileId });
+        document.getElementById(tileId).classList.add('used');
+        renderWorkspace();
+    }
+
+    function removeTile(index) {
+        const removed = assembledPhrases.splice(index, 1)[0];
+        document.getElementById(removed.tileId).classList.remove('used');
+        renderWorkspace();
+    }
+
+    function clearWorkspace() {
+        assembledPhrases.forEach(item => {
+            document.getElementById(item.tileId).classList.remove('used');
+        });
+        assembledPhrases = [];
+        renderWorkspace();
+    }
+
+    function renderWorkspace() {
+        const ws = document.getElementById('workspace');
+        if (assembledPhrases.length === 0) {
+            ws.innerHTML = `<span style="color: #94a3b8; font-size: 0.9rem;">Click word tiles below to build your reported speech...</span>`;
+            return;
+        }
+
+        ws.innerHTML = '';
+        assembledPhrases.forEach((item, idx) => {
+            const tile = document.createElement('div');
+            tile.className = 'phrase-tile';
+            tile.innerText = item.text;
+            tile.onclick = () => removeTile(idx);
+            ws.appendChild(tile);
+        });
+    }
+
+    function publishDispatch() {
+        if (assembledPhrases.length === 0) return;
 
         const qData = questions[currentQuestion];
-        const feedback = document.getElementById('feedback');
-        const buttons = document.querySelectorAll('.btn-option');
+        const userConstruct = assembledPhrases.map(p => p.text).join(' ');
+        const targetConstruct = qData.correctTokens.join(' ');
 
-        if (index === qData.correct) {
+        const feedback = document.getElementById('feedback');
+        const gameWindow = document.getElementById('gameWindow');
+
+        if (userConstruct === targetConstruct) {
             score += 10;
             document.getElementById('scoreDisplay').innerText = score;
 
-            feedback.innerText = "✨ Correctly Reported!";
+            feedback.innerText = "✨ Dispatch Published Successfully!";
             feedback.className = "feedback correct";
-            buttons[index].style.borderColor = "var(--success)";
-            buttons[index].style.background = "#E8F8F0";
 
-            // Play correct audio
             audioCorrect.currentTime = 0;
             audioCorrect.play().catch(() => {});
 
-            // Confetti effect
-            confetti({
-                particleCount: 50,
-                spread: 60,
-                origin: { y: 0.7 }
-            });
+            confetti({ particleCount: 45, spread: 60, origin: { y: 0.6 } });
 
+            setTimeout(nextReport, 2000);
         } else {
-            feedback.innerText = `❌ Reporting Error! Correct: ${qData.options[qData.correct]}`;
+            feedback.innerText = `❌ Editorial Error! Correct: "${targetConstruct}"`;
             feedback.className = "feedback incorrect";
-            buttons[index].style.borderColor = "var(--accent)";
-            buttons[qData.correct].style.borderColor = "var(--success)";
 
-            // Play wrong audio
+            gameWindow.classList.add('shake');
+            setTimeout(() => gameWindow.classList.remove('shake'), 400);
+
             audioWrong.currentTime = 0;
             audioWrong.play().catch(() => {});
         }
+    }
 
-        // Transition to next report after 2 seconds
-        setTimeout(() => {
-            currentQuestion++;
-            if (currentQuestion < questions.length) {
-                loadQuestion();
-            } else {
-                showVictory();
-            }
-        }, 2000);
+    function nextReport() {
+        currentQuestion++;
+        if (currentQuestion < questions.length) {
+            loadQuestion();
+        } else {
+            showVictory();
+        }
     }
 
     function showVictory() {
@@ -507,15 +653,10 @@
         document.getElementById('restartContainer').style.display = 'block';
         document.getElementById('finalScore').innerText = score;
 
-        // Play Clapping Audio & Grand Confetti
         audioClapping.currentTime = 0;
         audioClapping.play().catch(() => {});
 
-        confetti({
-            particleCount: 150,
-            spread: 100,
-            origin: { y: 0.6 }
-        });
+        confetti({ particleCount: 140, spread: 90, origin: { y: 0.6 } });
     }
 
     function restartGame() {
