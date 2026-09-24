@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-select=none">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Sentence Shredder — Grade 7 Grammar Engine</title>
 
 <style>
@@ -13,191 +13,286 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+}
+
+html, body {
+    width: 100%;
+    min-height: 100vh;
+    min-height: 100dvh;
+    background: #090d16;
+    color: #f8fafc;
+    overflow-x: hidden;
 }
 
 body {
-    background: #090d16;
-    color: #f8fafc;
-    overflow: hidden;
-    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     position: relative;
 }
 
-/* GLOBAL SPACE-STATION GRADIENTS */
+/* GLOBAL AMBIENT LIGHTING */
 body::before {
     content: "";
-    position: absolute;
-    width: 400px;
-    height: 400px;
-    background: radial-gradient(circle, rgba(16, 185, 129, 0.12) 0%, transparent 70%);
+    position: fixed;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(16, 185, 129, 0.15) 0%, transparent 70%);
     border-radius: 50%;
-    left: -150px;
-    top: -150px;
+    left: -100px;
+    top: -100px;
     pointer-events: none;
+    z-index: 0;
 }
 
 body::after {
     content: "";
-    position: absolute;
-    width: 350px;
-    height: 350px;
-    background: radial-gradient(circle, rgba(249, 115, 22, 0.12) 0%, transparent 70%);
+    position: fixed;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(249, 115, 22, 0.15) 0%, transparent 70%);
     border-radius: 50%;
     right: -100px;
     bottom: -100px;
     pointer-events: none;
+    z-index: 0;
 }
 
 .screen {
-    position: fixed;
-    inset: 0;
+    position: relative;
+    width: 100%;
+    max-width: 800px;
+    min-height: 100vh;
+    min-height: 100dvh;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    padding: 24px;
+    padding: 16px;
     text-align: center;
-    z-index: 100;
+    z-index: 10;
 }
 
 /* TIMED INTRO ANIMATIONS */
-#splash { background: #ffffff; z-index: 9999; }
-#logo { width: 220px; max-width: 80%; animation: pulseLogo 2s infinite alternate ease-in-out; }
+#splash { 
+    position: fixed;
+    inset: 0;
+    background: #ffffff; 
+    z-index: 9999; 
+    display: flex;
+}
+#logo { 
+    width: 200px; 
+    max-width: 75%; 
+    height: auto;
+    animation: pulseLogo 2s infinite alternate ease-in-out; 
+}
 @keyframes pulseLogo {
     from { transform: scale(1); filter: drop-shadow(0 0 0px rgba(16,185,129,0)); }
     to { transform: scale(1.04); filter: drop-shadow(0 4px 15px rgba(16,185,129,0.2)); }
 }
-#splash h2 { margin-top: 16px; font-size: 22px; color: #334155; }
 
-#topic { background: radial-gradient(circle at center, #020617 0%, #090d16 100%); z-index: 9000; display: none; }
-#topic h1 { font-size: 46px; font-weight: 900; color: #10b981; text-shadow: 0 0 20px rgba(16,185,129,0.4); margin-bottom: 12px; }
-#topic h2 { font-size: 22px; color: #f59e0b; letter-spacing: 1px; }
+#topic { 
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(circle at center, #020617 0%, #090d16 100%); 
+    z-index: 9000; 
+    display: none; 
+}
+#topic h1 { 
+    font-size: clamp(28px, 8vw, 46px); 
+    font-weight: 900; 
+    color: #10b981; 
+    text-shadow: 0 0 20px rgba(16,185,129,0.4); 
+    margin-bottom: 12px; 
+}
+#topic h2 { 
+    font-size: clamp(16px, 4vw, 22px); 
+    color: #f59e0b; 
+    letter-spacing: 0.5px; 
+    padding: 0 10px;
+}
 
 /* LAYOUT CONTAINER INTERFACES */
 .dashboard-card {
-    background: rgba(15, 23, 42, 0.6);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    padding: 36px;
-    border-radius: 28px;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-    max-width: 650px;
+    background: rgba(15, 23, 42, 0.75);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    padding: 28px 20px;
+    border-radius: 24px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
     width: 100%;
+    max-width: 600px;
+    margin: auto 0;
 }
 
 #startScreen, #resultScreen { display: none; z-index: 8000; }
-.dashboard-card h1 { font-size: 38px; font-weight: 800; color: #f97316; margin-bottom: 12px; }
-.dashboard-card p { font-size: 17px; color: #94a3b8; line-height: 1.6; margin-bottom: 24px; }
+.dashboard-card h1 { 
+    font-size: clamp(26px, 6vw, 36px); 
+    font-weight: 800; 
+    color: #f97316; 
+    margin-bottom: 12px; 
+}
+.dashboard-card p { 
+    font-size: clamp(14px, 3.8vw, 16px); 
+    color: #94a3b8; 
+    line-height: 1.5; 
+    margin-bottom: 24px; 
+}
 
 /* THE INTERACTIVE HUD WORKBENCH */
 #gameScreen { display: none; flex-direction: column; justify-content: center; }
-.workbench-layout { width: 100%; max-width: 800px; display: flex; flex-direction: column; gap: 20px; }
+.workbench-layout { 
+    width: 100%; 
+    display: flex; 
+    flex-direction: column; 
+    gap: 16px; 
+    margin: auto 0;
+}
 
-.hud-row { display: flex; justify-content: space-between; align-items: center; width: 100%; }
-#progressBadge { font-size: 14px; font-weight: 700; color: #10b981; background: rgba(16, 185, 129, 0.1); padding: 8px 16px; border-radius: 20px; border: 1px solid rgba(16, 185, 129, 0.2); }
-#scoreBadge { font-size: 14px; font-weight: 700; color: #f59e0b; background: rgba(245, 158, 11, 0.1); padding: 8px 16px; border-radius: 20px; border: 1px solid rgba(245, 158, 11, 0.2); }
+.hud-row { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    width: 100%; 
+    gap: 8px;
+}
+#progressBadge { 
+    font-size: clamp(12px, 3.2vw, 14px); 
+    font-weight: 700; 
+    color: #10b981; 
+    background: rgba(16, 185, 129, 0.12); 
+    padding: 8px 14px; 
+    border-radius: 20px; 
+    border: 1px solid rgba(16, 185, 129, 0.25); 
+}
+#scoreBadge { 
+    font-size: clamp(12px, 3.2vw, 14px); 
+    font-weight: 700; 
+    color: #f59e0b; 
+    background: rgba(245, 158, 11, 0.12); 
+    padding: 8px 14px; 
+    border-radius: 20px; 
+    border: 1px solid rgba(245, 158, 11, 0.25); 
+}
 
 /* TARGET PROMPT CARD */
 .mission-control {
     background: #1e293b;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    padding: 16px;
     border-radius: 16px;
     box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
 }
-#missionDirective { font-size: 22px; font-weight: 800; color: #38bdf8; text-transform: uppercase; letter-spacing: 0.5px; }
+#missionDirective { 
+    font-size: clamp(17px, 4.5vw, 22px); 
+    font-weight: 800; 
+    color: #38bdf8; 
+    text-transform: uppercase; 
+    letter-spacing: 0.5px; 
+}
 
-/* ==========================================================================
-   THE TEXT INTERACTION SHREDDER BLOCKS (THE LIVE SENTENCE)
-   ========================================================================= */
+/* WORD SHREDDER BLOCKS */
 .sentence-shredder-box {
-    background: rgba(15, 23, 42, 0.8);
-    border: 2px dashed rgba(255, 255, 255, 0.15);
-    padding: 32px 24px;
+    background: rgba(15, 23, 42, 0.85);
+    border: 2px dashed rgba(255, 255, 255, 0.18);
+    padding: 20px 14px;
     border-radius: 20px;
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 10px;
-    min-height: 120px;
-    align-items: center;
+    align-content: center;
+    gap: 8px;
+    min-height: 140px;
+    max-height: 45vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 .word-block {
-    font-size: 24px;
+    font-size: clamp(16px, 4.2vw, 22px);
     font-weight: 600;
-    padding: 6px 14px;
+    padding: 8px 12px;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     background: #1e293b;
-    border: 1px solid rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.12);
     border-radius: 10px;
     cursor: pointer;
     color: #e2e8f0;
     user-select: none;
-    transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    -webkit-user-select: none;
+    transition: background 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
 }
-.word-block:hover:not(.locked) {
+
+.word-block:active:not(.locked) {
+    transform: scale(0.96);
     background: #334155;
-    transform: scale(1.05) translateY(-2px);
-    border-color: #38bdf8;
-    box-shadow: 0 4px 12px rgba(56, 189, 248, 0.2);
 }
+
 .word-block.selected {
-    background: #38bdf8;
-    color: #0f172a;
-    border-color: #7dd3fc;
-    transform: scale(1.03);
-    box-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
+    background: #38bdf8 !important;
+    color: #0f172a !important;
+    border-color: #7dd3fc !important;
+    font-weight: 700;
+    box-shadow: 0 0 12px rgba(56, 189, 248, 0.4);
 }
 
 /* FEEDBACK GRAPHICS STATE STYLES */
-.word-block.success-flash { background: #10b981 !important; color: white !important; border-color: #34d399 !important; }
-.word-block.error-flash { background: #ef4444 !important; color: white !important; border-color: #f87171 !important; }
-.word-block.missed-flash { background: rgba(16, 185, 129, 0.25) !important; border: 2px dashed #10b981 !important; color: #4ade80 !important; }
+.word-block.success-flash { background: #10b981 !important; color: #ffffff !important; border-color: #34d399 !important; }
+.word-block.error-flash { background: #ef4444 !important; color: #ffffff !important; border-color: #f87171 !important; }
+.word-block.missed-flash { background: rgba(16, 185, 129, 0.2) !important; border: 2px dashed #10b981 !important; color: #4ade80 !important; }
 
-/* ACTION ENGINE TRIGGER INJECTORS */
+/* ACTION BUTTONS */
 .action-button {
-    padding: 16px 44px;
-    font-size: 18px;
-    font-weight: bold;
+    padding: 14px 32px;
+    font-size: clamp(15px, 4vw, 18px);
+    font-weight: 700;
     border: none;
     border-radius: 50px;
     color: white;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: transform 0.15s ease, opacity 0.15s ease, filter 0.15s ease;
+    width: 100%;
+    max-width: 320px;
+    margin: 0 auto;
+    display: block;
 }
+
 #submitBtn {
     background: linear-gradient(135deg, #f59e0b, #ea580c);
-    box-shadow: 0 4px 14px rgba(234, 88, 12, 0.4);
-    margin: 10px auto 0 auto;
-    display: block;
+    box-shadow: 0 4px 14px rgba(234, 88, 12, 0.35);
 }
 #submitBtn:disabled {
     background: #334155;
     color: #64748b;
     box-shadow: none;
     cursor: not-allowed;
+    opacity: 0.6;
 }
-#startBtn { background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4); }
-#restartBtn { background: linear-gradient(135deg, #38bdf8, #2563eb); box-shadow: 0 4px 14px rgba(56, 189, 248, 0.4); }
+#startBtn { background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35); }
+#restartBtn { background: linear-gradient(135deg, #38bdf8, #2563eb); box-shadow: 0 4px 14px rgba(56, 189, 248, 0.35); }
 
-.action-button:hover:not(:disabled) { transform: translateY(-3px); filter: brightness(1.1); }
-.action-button:active:not(:disabled) { transform: translateY(0); }
+.action-button:active:not(:disabled) { transform: scale(0.97); }
 
-.volume-rack { display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 24px; color: #64748b; font-size: 14px; }
-input[type=range] { accent-color: #10b981; cursor: pointer; width: 120px; }
+.volume-rack { 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    gap: 10px; 
+    margin-top: 20px; 
+    color: #64748b; 
+    font-size: 13px; 
+}
+input[type=range] { accent-color: #10b981; cursor: pointer; width: 100px; height: 24px; }
 
 #confetti { position: fixed; inset: 0; pointer-events: none; z-index: 999; width: 100vw; height: 100vh; }
-
-/* MOBILE BREAKPOINT CORRECTIONS */
-@media (max-width: 640px) {
-    #topic h1 { font-size: 32px; }
-    .dashboard-card h1 { font-size: 28px; }
-    #missionDirective { font-size: 18px; }
-    .word-block { font-size: 18px; padding: 4px 10px; }
-}
 </style>
 </head>
 
@@ -212,7 +307,8 @@ input[type=range] { accent-color: #10b981; cursor: pointer; width: 120px; }
 
 <!-- SCREEN 1: SPLASH -->
 <div id="splash" class="screen">
-    <img src="assets/innovine-logo.png" id="logo" alt="Innovine Logo">
+    <img src="assets/innovine-logo.png" id="logo" alt="Innovine Logo" onerror="this.style.display='none'; document.getElementById('altLogo').style.display='block';">
+    <h2 id="altLogo" style="display:none; color:#10b981; font-weight:900;">INNOVINE</h2>
 </div>
 
 <!-- SCREEN 2: TOPIC HEADER TRAILER -->
@@ -230,7 +326,7 @@ input[type=range] { accent-color: #10b981; cursor: pointer; width: 120px; }
         <button id="startBtn" class="action-button">LAUNCH COMPILER</button>
 
         <div class="volume-rack">
-            <span>🔊 Audio Volume</span>
+            <span>🔊 Volume</span>
             <input type="range" id="volume" min="0" max="1" value="0.8" step="0.1">
         </div>
     </div>
@@ -260,7 +356,7 @@ input[type=range] { accent-color: #10b981; cursor: pointer; width: 120px; }
     <div class="dashboard-card">
         <h1 style="color: #10b981;">🚀 Evaluation Finished</h1>
         <p>Your diagnostic processing performance output score:</p>
-        <div id="finalScore" style="font-size: 54px; font-weight: 900; color: #f59e0b; margin: 16px 0;">0 / 10</div>
+        <div id="finalScore" style="font-size: clamp(40px, 10vw, 54px); font-weight: 900; color: #f59e0b; margin: 16px 0;">0 / 10</div>
         <button id="restartBtn" class="action-button">RELOAD DATASTREAMS</button>
     </div>
 </div>
@@ -289,20 +385,49 @@ const audioTracks = {
     clap: document.getElementById("clapSound")
 };
 
-let rawQuestions = [], parsedQuestions = [], activeIndex = 0, currentScore = 0;
-let userSelectionIndices = [];
+let globalVolume = 0.8;
+let audioCtx = null;
 
-// Static Volume Synchronization
+// Fallback Web Audio Synthesizer for low-spec or audio-restricted mobile devices
+function playSynthSound(type) {
+    try {
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        const now = audioCtx.currentTime;
+        gain.gain.value = globalVolume * 0.3;
+
+        if (type === 'correct') {
+            osc.frequency.setValueAtTime(523.25, now); // C5
+            osc.frequency.exponentialRampToValueAtTime(659.25, now + 0.15); // E5
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+            osc.start(now);
+            osc.stop(now + 0.3);
+        } else if (type === 'wrong') {
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(220, now); // A3
+            osc.frequency.exponentialRampToValueAtTime(130.81, now + 0.2); // C3
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+            osc.start(now);
+            osc.stop(now + 0.25);
+        }
+    } catch(e) {}
+}
+
 document.getElementById("volume").oninput = function() {
-    Object.values(audioTracks).forEach(t => { if(t) t.volume = this.value; });
+    globalVolume = parseFloat(this.value);
+    Object.values(audioTracks).forEach(t => { if(t) t.volume = globalVolume; });
 };
 
-/* 
-   ==========================================================================
-   AUDITED SCHEMA MATRIX WITH EXPLICIT ZERO-BASED INDEX TARGETS
-   ==========================================================================
-*/
-rawQuestions = [
+const rawQuestions = [
     {
         sentence: "The students completed the science project on time.",
         target: "Subject",
@@ -321,7 +446,7 @@ rawQuestions = [
     {
         sentence: "The sky became dark.",
         target: "Complement",
-        targetIndices: [3] // "dark" (Subject Complement following linking verb 'became')
+        targetIndices: [3] // "dark"
     },
     {
         sentence: "My brother plays basketball every Saturday.",
@@ -331,7 +456,7 @@ rawQuestions = [
     {
         sentence: "After school, the children visited the library.",
         target: "Subject",
-        targetIndices: [2, 3] // "the children" ('After school,' is an introductory adverbial phrase)
+        targetIndices: [2, 3] // "the children"
     },
     {
         sentence: "The teacher explained the lesson clearly.",
@@ -341,7 +466,7 @@ rawQuestions = [
     {
         sentence: "Our classroom looks beautiful after the decorations.",
         target: "Complement",
-        targetIndices: [2] // "beautiful" (Subject Complement following linking verb 'looks')
+        targetIndices: [2] // "beautiful"
     },
     {
         sentence: "Several colorful birds flew across the lake.",
@@ -355,34 +480,47 @@ rawQuestions = [
     }
 ];
 
-// Linear Cinematic Timeline Gates
-setTimeout(() => { ui.splash.style.display = "none"; ui.topic.style.display = "flex"; }, 3500);
-setTimeout(() => { ui.topic.style.display = "none"; ui.start.style.display = "flex"; }, 6500);
+let parsedQuestions = [], activeIndex = 0, currentScore = 0;
+let userSelectionIndices = [];
+
+// Linear Timeline Sequence
+setTimeout(() => { ui.splash.style.display = "none"; ui.topic.style.display = "flex"; }, 2500);
+setTimeout(() => { ui.topic.style.display = "none"; ui.start.style.display = "flex"; }, 5000);
 
 function triggerAudio(key) {
     const track = audioTracks[key];
-    if(!track) return;
-    try {
-        track.currentTime = 0;
-        track.play().catch(() => {});
-    } catch(err) {}
+    let played = false;
+    if (track) {
+        try {
+            track.currentTime = 0;
+            track.volume = globalVolume;
+            const p = track.play();
+            if (p !== undefined) {
+                p.then(() => { played = true; }).catch(() => { playSynthSound(key); });
+            }
+        } catch(err) { playSynthSound(key); }
+    } else {
+        playSynthSound(key);
+    }
 }
 
 document.getElementById("startBtn").onclick = function() {
     ui.start.style.display = "none";
     ui.game.style.display = "flex";
 
-    // Unblock sandboxed mobile audio instantly
+    // Initialize audio context for mobile browser restrictions
+    if (window.AudioContext || window.webkitAudioContext) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
     Object.values(audioTracks).forEach(t => { if(t) { t.play().then(() => t.pause()).catch(() => {}); } });
 
     activeIndex = 0;
     currentScore = 0;
     
-    // Parse structural components dynamically
-    parsedQuestions = rawQuestions.map(item => {
-        const wordsArray = item.sentence.split(" ");
-        return { ...item, wordTokens: wordsArray };
-    });
+    parsedQuestions = rawQuestions.map(item => ({
+        ...item, 
+        wordTokens: item.sentence.split(" ")
+    }));
 
     parsedQuestions.sort(() => Math.random() - 0.5);
     loadQuestionStage();
@@ -403,7 +541,13 @@ function loadQuestionStage() {
         const block = document.createElement("div");
         block.className = "word-block";
         block.innerText = word;
-        block.onclick = () => toggleWordBlock(idx, block);
+        
+        // Touch & Click listeners for responsive mobile input
+        block.addEventListener("click", (e) => {
+            e.preventDefault();
+            toggleWordBlock(idx, block);
+        });
+        
         ui.shredderBox.appendChild(block);
     });
 }
@@ -432,7 +576,6 @@ ui.submitBtn.onclick = function() {
 
     let errorsFound = false;
     
-    // 1. Validate if choices have incorrect structural targets
     userSelectionIndices.forEach(idx => {
         if (targetSet.includes(idx)) {
             blocks[idx].classList.remove("selected");
@@ -444,7 +587,6 @@ ui.submitBtn.onclick = function() {
         }
     });
 
-    // 2. Map structural elements missed out by player selection
     targetSet.forEach(idx => {
         if (!userSelectionIndices.includes(idx)) {
             blocks[idx].classList.add("missed-flash");
@@ -467,7 +609,7 @@ ui.submitBtn.onclick = function() {
         } else {
             showEvaluationSummary();
         }
-    }, 2400);
+    }, 2000);
 };
 
 function showEvaluationSummary() {
@@ -487,27 +629,31 @@ document.getElementById("restartBtn").onclick = function() {
 };
 
 /* ==========================================================================
-   CONFETTI ENGINE ANIMATION BLOCKS
+   LIGHTWEIGHT MOBILE CONFETTI ENGINE
    ========================================================================== */
 const canvas = document.getElementById("confetti");
 const ctx = canvas.getContext("2d");
 let confettiData = [], animFrameRef = null;
 
-function scaleCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+function scaleCanvas() { 
+    canvas.width = window.innerWidth; 
+    canvas.height = window.innerHeight; 
+}
 window.addEventListener("resize", scaleCanvas);
 scaleCanvas();
 
 function launchCelebrationConfetti() {
     confettiData = [];
     cancelAnimationFrame(animFrameRef);
-    for (let i = 0; i < 110; i++) {
+    const count = window.innerWidth < 600 ? 50 : 90; // Reduced count on mobile screens for high FPS
+    for (let i = 0; i < count; i++) {
         confettiData.push({
             x: Math.random() * canvas.width,
             y: -20,
-            size: Math.random() * 6 + 5,
-            speedY: Math.random() * 5 + 3,
-            speedX: Math.random() * 4 - 2,
-            color: `hsl(${Math.random() * 360}, 95%, 55%)`
+            size: Math.random() * 5 + 4,
+            speedY: Math.random() * 4 + 2,
+            speedX: Math.random() * 3 - 1.5,
+            color: `hsl(${Math.random() * 360}, 90%, 60%)`
         });
     }
     let lifespan = 0;
@@ -519,7 +665,7 @@ function launchCelebrationConfetti() {
             p.y += p.speedY; p.x += p.speedX;
         });
         lifespan++;
-        if (lifespan < 130) { animFrameRef = requestAnimationFrame(cycle); }
+        if (lifespan < 100) { animFrameRef = requestAnimationFrame(cycle); }
         else { ctx.clearRect(0, 0, canvas.width, canvas.height); }
     }
     cycle();
