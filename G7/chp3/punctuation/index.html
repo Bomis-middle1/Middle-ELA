@@ -200,7 +200,7 @@ body {
 }
 #hintText {
     font-size: 14px;
-    color: #ef4444;
+    color: #f59e0b;
     margin-top: 8px;
     font-weight: 700;
     display: none;
@@ -347,7 +347,7 @@ canvas { position: fixed; inset: 0; pointer-events: none; z-index: 99999; width:
     </div>
     <div id="questionBox">
         <div id="question">Parsing syntax string channels...</div>
-        <div id="hintText">ATTEMPT FAILED: Look closely at the grammatical structure!</div>
+        <div id="hintText"></div>
     </div>
 </div>
 
@@ -379,18 +379,68 @@ const audioChannels = {
     clap: document.getElementById("clapSound")
 };
 
-// BALANCED MATRIX TARGETING ONLY REQUESTED MANDATORY CONTENT RULES
+// BALANCED MATRIX WITH GUIDING HINTS TO ENCOURAGE CRITICAL THINKING
 const questions = [
-    {q: "I can’t believe we finally finished the assignment ___", a: [".", "!", "?"], c: "!"},
-    {q: "Are we going to the museum after lunch ___", a: [".", "!", "?"], c: "?"},
-    {q: "The weather was cold ___ yet we decided to go for a walk.", a: [";", ",", "!"], c: ","},
-    {q: "You need to bring the following items ___ a sleeping bag and a flashlight.", a: [";", ",", ":"], c: ":"},
-    {q: "___What a beautiful morning!___ shouted Sarah.", a: ["' '", '“ ”', ', ,'], c: '“ ”'},
-    {q: "The student___s desk was loaded with heavy textbooks.", a: ["’", "’s", "s’"], c: "’"},
-    {q: "___we visited the Grand Canyon during our summer vacation.", a: ["we", "We", "WE"], c: "We"},
-    {q: "The train arrived exactly on time ___", a: [".", ",", "?"], c: "."},
-    {q: "He is looking for his sister___s missing laptop computer.", a: ["s", "’s", "s’"], c: "’s"},
-    {q: "___paris is one of the most visited cities in Europe.", a: ["paris", "Paris", "pAris"], c: "Paris"}
+    {
+        q: "I can’t believe we finally finished the assignment ___", 
+        a: [".", "!", "?"], 
+        c: "!", 
+        hint: "Think about the emotion in the sentence: is it showing strong excitement or shock?"
+    },
+    {
+        q: "Are we going to the museum after lunch ___", 
+        a: [".", "!", "?"], 
+        c: "?", 
+        hint: "Is this statement asking for information or making a point?"
+    },
+    {
+        q: "The weather was cold ___ yet we decided to go for a walk.", 
+        a: [";", ",", "!"], 
+        c: ",", 
+        hint: "Look at the coordinating conjunction ('yet'). What punctuation mark joins clauses before it?"
+    },
+    {
+        q: "You need to bring the following items ___ a sleeping bag and a flashlight.", 
+        a: [";", ",", ":"], 
+        c: ":", 
+        hint: "What mark is used to introduce a list or explanation following a complete thought?"
+    },
+    {
+        q: "___What a beautiful morning!___ shouted Sarah.", 
+        a: ["' '", '“ ”', ', ,'], 
+        c: '“ ”', 
+        hint: "Which punctuation marks enclose exact spoken words in dialogue?"
+    },
+    {
+        q: "The student___s desk was loaded with heavy textbooks.", 
+        a: ["’", "’s", "s’"], 
+        c: "’", 
+        hint: "Notice that 'students' ends in 's' for plural possessive. Where does the apostrophe belong?"
+    },
+    {
+        q: "___we visited the Grand Canyon during our summer vacation.", 
+        a: ["we", "We", "WE"], 
+        c: "We", 
+        hint: "Check standard capitalization rules for the first word of a sentence."
+    },
+    {
+        q: "The train arrived exactly on time ___", 
+        a: [".", ",", "?"], 
+        c: ".", 
+        hint: "This is a direct statement or declarative sentence. What standard mark ends it?"
+    },
+    {
+        q: "He is looking for his sister___s missing laptop computer.", 
+        a: ["s", "’s", "s’"], 
+        c: "’s", 
+        hint: "The laptop belongs to one sister (singular noun). How do we show singular possession?"
+    },
+    {
+        q: "___paris is one of the most visited cities in Europe.", 
+        a: ["paris", "Paris", "pAris"], 
+        c: "Paris", 
+        hint: "Specific names of cities are proper nouns. How should proper nouns be capitalized?"
+    }
 ];
 
 let activeIdx = 0;
@@ -400,7 +450,7 @@ let expectedAnswer = "";
 let engineLoopRef = null;
 let dynamicBalloonPool = [];
 
-// TIME TRANSITION PIPELINE ACCORDING TO SPECIFICATIONS (5 SECONDS TOTAL LOGO HOLD)
+// TIME TRANSITION PIPELINE
 setTimeout(() => { 
     screens.logo.style.opacity = "0"; 
     screens.logo.style.visibility = "hidden";
@@ -524,12 +574,13 @@ function executeNodeBurst(targetNode, clickedSymbol) {
         triggerAudio("wrong");
         document.getElementById("score").innerText = "SCORE: " + runtimeScore;
         
+        const hintElement = document.getElementById("hintText");
+        hintElement.style.display = "block";
+
         if (attemptsCount >= 2) {
-            document.getElementById("hintText").innerText = `Hint: The expected answer is "${expectedAnswer}"`;
-            document.getElementById("hintText").style.display = "block";
+            hintElement.innerText = `HINT: ${questions[activeIdx].hint}`;
         } else {
-            document.getElementById("hintText").innerText = "ATTEMPT FAILED: Try searching for another option!";
-            document.getElementById("hintText").style.display = "block";
+            hintElement.innerText = "NOT QUITE: Re-read the sentence and consider its structure!";
         }
     }
 }
