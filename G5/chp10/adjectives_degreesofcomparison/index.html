@@ -1,405 +1,277 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
-  <title>Ice Cream Scoop Sorting Game</title>
-  <style>
-    :root {
-      --purple: #5b2b82;
-      --lavender-bg-1: #fff9fd;
-      --lavender-bg-2: #f7f3ff;
-      --lavender-bg-3: #fff4f8;
-    }
-    * { box-sizing: border-box; }
-    html, body {
-      margin: 0;
-      height: 100%;
-      overflow: hidden;
-      font-family: Arial, sans-serif;
-      background: radial-gradient(circle at top, var(--lavender-bg-1) 0%, var(--lavender-bg-2) 45%, var(--lavender-bg-3) 100%);
-      touch-action: none;
-      -webkit-user-select: none;
-      user-select: none;
-    }
-    #viewport {
-      position: fixed;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding-top: env(safe-area-inset-top, 0px);
-      padding-bottom: env(safe-area-inset-bottom, 0px);
-      padding-left: env(safe-area-inset-left, 0px);
-      padding-right: env(safe-area-inset-right, 0px);
-    }
-    #game {
-      position: relative;
-      width: 1280px;
-      height: 720px;
-      transform-origin: center center;
-      flex-shrink: 0;
-    }
-    #splash, #instructionsScreen, #playArea {
-      position: absolute;
-      inset: 0;
-      width: 1280px;
-      height: 720px;
-    }
-    #splash {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: radial-gradient(circle at center, #ffffff 0%, #fff0fb 45%, #f1ddff 100%);
-      z-index: 30;
-      border-radius: 18px;
-    }
-    #splashCard {
-      width: 360px;
-      height: 360px;
-      border-radius: 36px;
-      background: linear-gradient(180deg, #ffffff 0%, #fbeeff 100%);
-      box-shadow: 0 12px 28px rgba(0,0,0,0.15);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      gap: 18px;
-      overflow: hidden;
-    }
-    #splashLogo { width: 240px; height: 240px; object-fit: contain; }
-    #splashText { font-size: 24px; font-weight: 900; color: var(--purple); text-align: center; }
-    #instructionsScreen {
-      display: none;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      background: radial-gradient(circle at top, var(--lavender-bg-1) 0%, var(--lavender-bg-2) 45%, var(--lavender-bg-3) 100%);
-      z-index: 20;
-      border-radius: 18px;
-    }
-    #instructionCard {
-      width: 760px;
-      padding: 30px 34px;
-      border-radius: 28px;
-      background: rgba(255,255,255,0.92);
-      box-shadow: 0 10px 22px rgba(0,0,0,0.12);
-      text-align: center;
-    }
-    #instructionCard h2 { margin: 0 0 12px; font-size: 34px; color: var(--purple); }
-    #instructionCard p { margin: 12px 0; font-size: 22px; color: #333; font-weight: 700; }
-    .bigBtn {
-      margin-top: 18px;
-      padding: 16px 32px;
-      border: none;
-      border-radius: 16px;
-      background: var(--purple);
-      color: white;
-      font-size: 20px;
-      font-weight: 900;
-      cursor: pointer;
-      touch-action: manipulation;
-    }
-    #soundToggle {
-      position: absolute;
-      top: 20px;
-      left: 35px;
-      z-index: 40;
-      background: rgba(255,255,255,0.85);
-      border: 2px solid #e3c9ff;
-      border-radius: 50%;
-      width: 52px;
-      height: 52px;
-      font-size: 24px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      touch-action: manipulation;
-    }
-    #playArea { display: none; z-index: 10; border-radius: 18px; overflow: hidden; }
-    h1 {
-      position: absolute; top: 10px; left: 0; width: 100%; text-align: center; margin: 0;
-      color: var(--purple); font-size: 40px; text-shadow: 0 2px 0 rgba(255,255,255,0.75);
-    }
-    #subtitle { position: absolute; top: 60px; left: 0; width: 100%; text-align: center; color: #7a5ca5; font-size: 18px; font-weight: 700; }
-    #instructions {
-      position: absolute; top: 92px; left: 50%; transform: translateX(-50%);
-      background: rgba(255,255,255,0.90); color: #222; padding: 10px 20px; border-radius: 18px;
-      font-size: 17px; font-weight: 900; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border: 2px solid #e3c9ff;
-    }
-    #status {
-      position: absolute; top: 20px; right: 35px; color: #2f4f4f; font-size: 20px; font-weight: 700;
-      background: rgba(255,255,255,0.74); padding: 8px 14px; border-radius: 14px;
-    }
-    #wordBox {
-      position: absolute; top: 165px; left: 50%; transform: translateX(-50%);
-      font-size: 34px; font-weight: 900; color: #222; padding: 12px 26px; border-radius: 18px;
-      background: rgba(255,255,255,0.95); box-shadow: 0 6px 14px rgba(0,0,0,0.08); min-width: 280px; text-align: center;
-    }
-    #feedback {
-      position: absolute; top: 218px; left: 50%; transform: translateX(-50%);
-      font-size: 22px; font-weight: 900; min-width: 220px; text-align: center; height: 30px;
-    }
-    .cone {
-      position: absolute; bottom: 48px; width: 190px; height: 280px;
-      filter: drop-shadow(0 10px 10px rgba(0,0,0,0.12)); transition: transform 0.15s ease;
-    }
-    .cone.dropTarget { transform: scale(1.06); }
-    .coneTop {
-      width: 190px; height: 115px; border-radius: 35px 35px 0 0; position: relative; z-index: 2;
-      overflow: hidden; border: 3px solid rgba(120,70,20,0.35);
-    }
-    .coneBody {
-      width: 140px; height: 190px; margin: -10px auto 0;
-      background: linear-gradient(180deg, #e4ab63 0%, #c98233 100%);
-      clip-path: polygon(50% 100%, 0 0, 100% 0); border: 3px solid rgba(120,70,20,0.35);
-      position: relative; z-index: 1;
-    }
-    #conePos { left: 210px; }
-    #coneComp { left: 470px; }
-    #coneSup { left: 830px; }
-    #conePos .coneTop { background: linear-gradient(180deg, #fff1b8 0%, #f4c24f 100%); }
-    #coneComp .coneTop { background: linear-gradient(180deg, #d7f5f8 0%, #8cdce4 100%); }
-    #coneSup .coneTop { background: linear-gradient(180deg, #ffd2e4 0%, #ff9cc3 100%); }
-    .coneLabel {
-      position: absolute; bottom: 8px; width: 190px; text-align: center; font-size: 30px;
-      font-weight: 1000; text-shadow: 0 2px 0 rgba(255,255,255,0.8); letter-spacing: 0.5px;
-    }
-    #labelPos { left: 210px; color: #875400; }
-    #labelComp { left: 470px; color: #1e676e; }
-    #labelSup { left: 830px; color: #9b295b; }
-    #scoop {
-      position: absolute; width: 235px; height: 184px; left: 522px; top: 248px;
-      cursor: grab; user-select: none; touch-action: none; z-index: 10;
-      filter: drop-shadow(0 10px 10px rgba(0,0,0,0.15));
-    }
-    #scoopBall {
-      position: absolute; width: 235px; height: 158px; border-radius: 50% 50% 46% 46%;
-      background: radial-gradient(circle at 30% 25%, #ffffff 0%, #fffdf7 28%, #ffe6f1 62%, #f6b8da 100%);
-      border: 4px solid #8b5a2b; overflow: hidden;
-    }
-    #scoopText {
-      position: absolute; top: 58px; left: 0; width: 235px; text-align: center; font-size: 18px;
-      font-weight: 900; color: #222; padding: 0 16px; line-height: 1.12; z-index: 5;
-      text-shadow: 0 1px 0 rgba(255,255,255,0.7);
-    }
-    #restartBtn { position: absolute; top: 270px; left: 50%; transform: translateX(-50%); display: none; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ice Cream Scoop Rush: Degrees of Comparison</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{font-family:'Trebuchet MS','Comic Sans MS',system-ui,sans-serif;color:#4a2470;overflow:hidden;touch-action:manipulation;user-select:none;-webkit-user-select:none;
+  background:#fff3f9 radial-gradient(circle,#ffd6e8 3px,transparent 4px) 0 0/34px 34px}
+#awning{position:fixed;top:0;left:0;right:0;height:30px;z-index:30;pointer-events:none;background:repeating-linear-gradient(90deg,#ff7fa8 0 36px,#fff 36px 72px);border-radius:0 0 26px 26px;box-shadow:0 5px 0 rgba(0,0,0,.12)}
+.screen{position:fixed;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:44px 14px 14px;gap:12px;z-index:10;overflow-y:auto}
+.screen.on{display:flex}
+h1{font-size:clamp(30px,7vw,54px);line-height:1.05;color:#d6336c;text-shadow:3px 3px 0 #fff}
+.screen p{font-size:clamp(16px,3.6vw,19px);max-width:540px;line-height:1.45}
+#logo{width:min(170px,42vw);animation:bob 2.6s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-9px)}}
+button{font:inherit;font-weight:700;border:0;border-radius:20px;padding:14px 38px;font-size:24px;color:#fff;cursor:pointer;background:linear-gradient(#ff8fb3,#f0457e);box-shadow:0 7px 0 #b5285a;transition:transform .1s}
+button:active{transform:translateY(5px);box-shadow:0 2px 0 #b5285a}
+:focus-visible{outline:4px solid #7a4bff;outline-offset:3px}
+.how{background:#fff;border-radius:18px;padding:12px 16px;text-align:left;box-shadow:0 5px 0 rgba(0,0,0,.08)}
+.row{font-size:46px}
+
+#play{justify-content:flex-start;padding:38px 8px calc(6px + env(safe-area-inset-bottom,0px));gap:6px}
+#hud{width:100%;max-width:760px;display:flex;justify-content:space-between;align-items:center;font-size:20px;font-weight:700;gap:6px}
+#hud button{padding:4px 12px;font-size:18px;border-radius:12px;box-shadow:0 3px 0 #b5285a}
+#cmb{color:#ff6a00;min-width:84px}
+#prog{width:100%;max-width:760px;height:10px;background:#fff;border-radius:99px;overflow:hidden}
+#pfill{display:block;height:100%;width:0;background:linear-gradient(90deg,#ffd43b,#ff7fa8);transition:width .4s}
+#chef{width:100%;max-width:760px;display:flex;align-items:center;gap:8px}
+#face{font-size:48px}
+#say{flex:1;background:#fff;border:3px solid #d6336c;border-radius:16px;padding:6px 12px;font-size:clamp(14px,3.6vw,18px);font-weight:700;min-height:52px;display:flex;align-items:center;text-align:left}
+#meltbox{width:100%;max-width:760px;height:14px;background:#fff;border-radius:99px;overflow:hidden;border:2px solid #f7b6cf}
+#bar{height:100%;width:100%;background:#40c057;border-radius:99px}
+#field{position:relative;flex:1;width:100%;max-width:760px;overflow:hidden;border-radius:22px;background:rgba(255,255,255,.55);border:3px solid #fff;display:flex;flex-direction:column;justify-content:flex-end}
+
+#scoop{position:absolute;left:0;top:0;width:min(170px,42vw);padding:22px 8px 30px;border-radius:50% 50% 46% 46%;text-align:center;font-weight:700;font-size:clamp(19px,5vw,26px);line-height:1.1;color:#3b2350;cursor:grab;touch-action:none;
+  background:var(--f);box-shadow:inset -8px -10px 0 rgba(0,0,0,.1),inset 6px 6px 0 rgba(255,255,255,.35),0 8px 0 rgba(0,0,0,.14);z-index:20;will-change:transform;display:none}
+#scoop:before,#scoop:after{content:"";position:absolute;bottom:-16px;width:15px;height:26px;border-radius:0 0 50% 50%;background:var(--f)}
+#scoop:before{left:20%}#scoop:after{left:64%;height:34px}
+#scoop.drag{cursor:grabbing;scale:1.08;box-shadow:0 18px 26px rgba(0,0,0,.28)}
+#scoop.low{animation:wob .3s infinite}
+@keyframes wob{50%{rotate:3deg}}
+#scoop.melted{transition:all .7s;opacity:0;scale:1.2 .1;transform-origin:bottom}
+
+#slots{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;height:52%;padding:0 6px 6px}
+.slot{display:flex;flex-direction:column;justify-content:flex-end;align-items:center;cursor:pointer;border-radius:16px;transition:background .15s,transform .15s}
+.slot.hover{background:rgba(255,127,168,.25);transform:scale(1.04)}
+.stack{display:flex;flex-direction:column-reverse;align-items:center;margin-bottom:-12px;z-index:2}
+.ball{width:clamp(44px,13vw,66px);aspect-ratio:1;border-radius:50%;background:var(--f);margin-top:-14px;box-shadow:inset -5px -6px 0 rgba(0,0,0,.12),inset 4px 4px 0 rgba(255,255,255,.35);animation:drop .45s cubic-bezier(.3,1.6,.5,1)}
+@keyframes drop{from{transform:translateY(-90px) scale(.6);opacity:0}}
+.cone{width:0;height:0;border-left:clamp(34px,10vw,54px) solid transparent;border-right:clamp(34px,10vw,54px) solid transparent;border-top:clamp(80px,20vw,120px) solid #e3a45c;filter:drop-shadow(0 4px 0 rgba(0,0,0,.12))}
+.lab{margin-top:6px;padding:4px 10px;border-radius:14px;color:#3b2350;line-height:1.1}
+.lab b{display:block;font-size:clamp(13px,3.4vw,19px)}
+.lab small{font-size:clamp(10px,2.6vw,12px)}
+[data-d="0"] .lab{background:#ffe680}[data-d="1"] .lab{background:#a5ecf2}[data-d="2"] .lab{background:#ffb3d1}
+.wob{animation:wobs .6s}
+@keyframes wobs{25%{transform:rotate(-5deg) scale(1.06)}50%{transform:rotate(5deg)}75%{transform:rotate(-2deg)}}
+.no{animation:no .5s}
+@keyframes no{20%{transform:translateX(-10px)}40%{transform:translateX(10px)}60%{transform:translateX(-6px)}80%{transform:translateX(6px)}}
+#endStars{font-size:60px;letter-spacing:6px}
+#stats{display:flex;gap:24px;flex-wrap:wrap;justify-content:center;font-size:18px}
+#stats b{display:block;font-size:34px;color:#d6336c}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}
+</style>
 </head>
 <body>
-  <div id="viewport">
-    <div id="game">
-      <button id="soundToggle" aria-label="Toggle sound">🔊</button>
+<div id="awning"></div>
 
-      <div id="splash">
-        <div id="splashCard">
-          <img id="splashLogo" src="assets/logo.png" alt="Innovine logo">
-          <div id="splashText">Innovine</div>
-        </div>
-      </div>
+<div id="start" class="screen on">
+  <img id="logo" src="assets/logo.png" alt="Logo" onerror="this.style.display='none'">
+  <h1>Ice Cream Scoop Rush</h1>
+  <div class="row">🍦🍨🍧</div>
+  <p>Chef Scoopy needs help! Each scoop has a word on it. Put it on the right cone before it melts!</p>
+  <div class="how">
+    🟡 <b>Positive</b>: describes ONE thing (tall)<br>
+    🔵 <b>Comparative</b>: compares TWO things (taller, more careful)<br>
+    🩷 <b>Superlative</b>: the MOST of all (tallest, most careful)<br>
+    👆 Drag the scoop to a cone, or tap a cone.<br>
+    💧 Wrong cone or a melted scoop = you lose a 🍦 (you have 5).
+  </div>
+  <button id="go">🍦 Start scooping</button>
+  <p id="best"></p>
+</div>
 
-      <div id="instructionsScreen">
-        <div id="instructionCard">
-          <h2>How to Play</h2>
-          <p>Drag the scoop to the correct cone.</p>
-          <p>Positive, Comparative, or Superlative?</p>
-          <p>You have 2 chances.</p>
-          <button id="startBtn" class="bigBtn">Start Game</button>
-        </div>
-      </div>
-
-      <div id="playArea">
-        <h1>Degrees of Comparison</h1>
-        <div id="subtitle">Ice Cream Scoop Sorting Game</div>
-        <div id="instructions">Drag the scoop to the correct cone.</div>
-        <div id="status">Score: 0&nbsp;&nbsp;&nbsp;Attempts: 2</div>
-        <div id="wordBox"></div>
-        <div id="feedback"></div>
-
-        <div id="conePos" class="cone"><div class="coneTop"></div><div class="coneBody"></div></div>
-        <div id="coneComp" class="cone"><div class="coneTop"></div><div class="coneBody"></div></div>
-        <div id="coneSup" class="cone"><div class="coneTop"></div><div class="coneBody"></div></div>
-
-        <div id="labelPos" class="coneLabel">Positive</div>
-        <div id="labelComp" class="coneLabel">Comparative</div>
-        <div id="labelSup" class="coneLabel">Superlative</div>
-
-        <div id="scoop">
-          <div id="scoopBall"><div id="scoopText"></div></div>
-        </div>
-
-        <button id="restartBtn" class="bigBtn">Play Again</button>
-      </div>
+<div id="play" class="screen">
+  <div id="hud"><span id="lv"></span><span>⭐ <b id="sc">0</b></span><span id="cmb"></span><button id="mute" aria-label="Sound on or off">🔊</button></div>
+  <div id="prog"><i id="pfill"></i></div>
+  <div id="chef"><div id="face">🧑‍🍳</div><div id="say"></div></div>
+  <div id="meltbox"><div id="bar"></div></div>
+  <div id="field">
+    <div id="scoop"></div>
+    <div id="slots">
+      <div class="slot" data-d="0"><div class="stack"></div><div class="cone"></div><div class="lab"><b>Positive</b><small>one thing</small></div></div>
+      <div class="slot" data-d="1"><div class="stack"></div><div class="cone"></div><div class="lab"><b>Comparative</b><small>two things</small></div></div>
+      <div class="slot" data-d="2"><div class="stack"></div><div class="cone"></div><div class="lab"><b>Superlative</b><small>the most</small></div></div>
     </div>
   </div>
+</div>
 
-  <audio id="sndCorrect" preload="auto" src="assets/correct.mp3"></audio>
-  <audio id="sndWrong" preload="auto" src="assets/wrong.mp3"></audio>
-  <audio id="sndClaps" preload="auto" src="assets/freesound_community-claps-44774.mp3"></audio>
+<div id="end" class="screen">
+  <div id="endStars"></div>
+  <h1 id="endTitle"></h1>
+  <p id="endMsg"></p>
+  <div id="stats"></div>
+  <button id="again">🔁 Play again</button>
+</div>
 
-  <script>
-    const words = [
-      "tall", "good", "careful", "noisy", "warm",
-      "taller", "better", "more careful", "noisier", "warmer",
-      "tallest", "best", "most careful", "noisiest", "warmest"
-    ];
-    const degrees = {
-      tall: "Positive", good: "Positive", careful: "Positive", noisy: "Positive", warm: "Positive",
-      taller: "Comparative", better: "Comparative", "more careful": "Comparative", noisier: "Comparative", warmer: "Comparative",
-      tallest: "Superlative", best: "Superlative", "most careful": "Superlative", noisiest: "Superlative", warmest: "Superlative"
-    };
+<audio id="correctSound" src="assets/correct.mp3" preload="auto"></audio>
+<audio id="wrongSound" src="assets/wrong.mp3" preload="auto"></audio>
+<audio id="clapSound" src="assets/freesound_community-claps-44774.mp3" preload="auto"></audio>
 
-    const game = document.getElementById("game");
-    const splash = document.getElementById("splash");
-    const instructionsScreen = document.getElementById("instructionsScreen");
-    const playArea = document.getElementById("playArea");
-    const startBtn = document.getElementById("startBtn");
-    const wordBox = document.getElementById("wordBox");
-    const feedback = document.getElementById("feedback");
-    const status = document.getElementById("status");
-    const scoop = document.getElementById("scoop");
-    const scoopText = document.getElementById("scoopText");
-    const restartBtn = document.getElementById("restartBtn");
-    const soundToggle = document.getElementById("soundToggle");
-    const sndCorrect = document.getElementById("sndCorrect");
-    const sndWrong = document.getElementById("sndWrong");
-    const sndClaps = document.getElementById("sndClaps");
+<script>
+/* 24 word families: [positive, comparative, superlative] */
+const T=[
+["tall","taller","tallest"],["fast","faster","fastest"],["happy","happier","happiest"],["big","bigger","biggest"],
+["brave","braver","bravest"],["careful","more careful","most careful"],["noisy","noisier","noisiest"],["warm","warmer","warmest"],
+["good","better","best"],["bad","worse","worst"],["far","farther","farthest"],["funny","funnier","funniest"],
+["beautiful","more beautiful","most beautiful"],["expensive","more expensive","most expensive"],["hot","hotter","hottest"],["slow","slower","slowest"],
+["cold","colder","coldest"],["delicious","more delicious","most delicious"],["heavy","heavier","heaviest"],["dangerous","more dangerous","most dangerous"],
+["lazy","lazier","laziest"],["thin","thinner","thinnest"],["quiet","quieter","quietest"],["wise","wiser","wisest"]
+];
+const HINT=["Hint: Positive describes just ONE thing.","Hint: Comparative compares TWO things (look for -er or \"more\").","Hint: Superlative shows the MOST of all (look for -est or \"most\")."];
+const CHEER=["Yum! 🍦","Perfect scoop!","Sweet!","Cool job!","Delicious!","Scoop-tacular!"];
+const FL=["#ff9ec4","#8fe3c8","#9ab6ff","#ffe27a","#c49a7a","#ffb36b","#c9a0ff"];
+const N=15,$=id=>document.getElementById(id);
+const field=$("field"),scoop=$("scoop");
+let deck,idx,score,lives,combo,bestCombo,wrongs,fails,cur,active=false,tLimit,t0,raf=0,muted=false,drag=null,hov=null,sx=0,sy=0;
 
-    let soundOn = true;
-    function playSound(el) {
-      if (!soundOn) return;
-      try { el.currentTime = 0; el.play().catch(() => {}); } catch (e) {}
-    }
-    soundToggle.addEventListener("click", () => {
-      soundOn = !soundOn;
-      soundToggle.textContent = soundOn ? "🔊" : "🔇";
-    });
+const getBest=()=>{try{return +localStorage.getItem("ic_best")||0}catch(e){return 0}};
+const setBest=v=>{try{localStorage.setItem("ic_best",v)}catch(e){}};
+if(getBest())$("best").textContent="Best score: ⭐ "+getBest();
 
-    function fitGame() {
-      const scale = Math.min(window.innerWidth / 1280, window.innerHeight / 720, 1) * 0.98;
-      game.style.transform = `scale(${scale})`;
-    }
-    window.addEventListener("resize", fitGame);
-    window.addEventListener("orientationchange", fitGame);
-    fitGame();
+/* sound: your mp3s first, beeps if missing */
+let ac;
+function tone(f,d,w=0,t="triangle"){try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();const o=ac.createOscillator(),g=ac.createGain();o.type=t;o.frequency.value=f;g.gain.setValueAtTime(.15,ac.currentTime+w);g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+w+d);o.connect(g);g.connect(ac.destination);o.start(ac.currentTime+w);o.stop(ac.currentTime+w+d)}catch(e){}}
+const fb={correctSound:()=>{tone(523,.12);tone(784,.18,.09)},wrongSound:()=>{tone(260,.2,0,"sine");tone(200,.25,.15,"sine")},clapSound:()=>[523,659,784,1047].forEach((f,i)=>tone(f,.25,i*.12))};
+function play(id){if(muted)return;const a=$(id);try{a.currentTime=0;const p=a.play();if(p&&p.catch)p.catch(fb[id])}catch(e){fb[id]()}}
+$("mute").onclick=()=>{muted=!muted;$("mute").textContent=muted?"🔇":"🔊"};
 
-    let score = 0, attempts = 2, currentWord = "", currentDegree = "";
-    let wordList = [], dragging = false, offsetX = 0, offsetY = 0;
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+const show=id=>{document.querySelectorAll(".screen").forEach(s=>s.classList.remove("on"));$(id).classList.add("on")};
+const pick=a=>a[Math.random()*a.length|0];
+function say(t,f){$("say").textContent=t;$("face").textContent=f||"🧑‍🍳"}
+function bump(el,c,ms){el.classList.remove(c);void el.offsetWidth;el.classList.add(c);setTimeout(()=>el.classList.remove(c),ms)}
+function burst(x,y,n=22){
+  const em=["⭐","🍬","✨","🍒","💖","🌟"];
+  for(let i=0;i<n;i++){
+    const p=document.createElement("div");p.textContent=em[i%6];
+    p.style.cssText=`position:fixed;left:${x}px;top:${y}px;font-size:${16+Math.random()*16}px;pointer-events:none;z-index:70`;
+    document.body.appendChild(p);
+    const a=Math.random()*6.28,r=60+Math.random()*130;
+    p.animate([{transform:"translate(0,0)",opacity:1},{transform:`translate(${Math.cos(a)*r}px,${Math.sin(a)*r-40}px) rotate(${Math.random()*540}deg)`,opacity:0}],{duration:800+Math.random()*400,easing:"ease-out"}).onfinish=()=>p.remove();
+  }
+}
+const why=q=>q.d===0?`"${q.w}" describes ONE thing: Positive.`:q.d===1?`"${q.w}" compares TWO things: Comparative. (${q.base} → ${q.w})`:`"${q.w}" means the MOST of all: Superlative.`;
+function hud(){
+  $("lv").textContent="🍦".repeat(lives)+"💧".repeat(5-lives);
+  $("sc").textContent=score;$("cmb").textContent=combo>=2?"🔥 x"+combo:"";
+  $("pfill").style.width=(idx/N*100)+"%";
+}
 
-    function updateStatus() { status.textContent = `Score: ${score}   Attempts: ${attempts}`; }
-    function shuffle(arr) {
-      for (let i = arr.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [arr[i], arr[j]] = [arr[j], arr[i]];
-      }
-      return arr;
-    }
-    function showInstructions() { splash.style.display = "none"; instructionsScreen.style.display = "flex"; }
+/* mixed deck: 5 of each degree, never 3 of the same degree in a row, every word from a different family */
+function buildDeck(){
+  let degs;
+  for(let k=0;k<300;k++){
+    degs=shuffle([0,0,0,0,0,1,1,1,1,1,2,2,2,2,2]);
+    let ok=true;for(let i=2;i<N;i++)if(degs[i]===degs[i-1]&&degs[i]===degs[i-2]){ok=false;break}
+    if(ok)break;
+  }
+  const fam=shuffle(T).slice(0,N);
+  return degs.map((d,i)=>({w:fam[i][d],d,base:fam[i][0]}));
+}
 
-    function startGame() {
-      instructionsScreen.style.display = "none";
-      playArea.style.display = "block";
-      score = 0; attempts = 2;
-      wordList = shuffle([...words]);
-      restartBtn.style.display = "none";
-      feedback.textContent = ""; wordBox.textContent = "";
-      scoop.style.display = "block";
-      updateStatus();
-      nextWord();
-    }
+/* flow */
+function startGame(){
+  deck=buildDeck();idx=0;score=0;lives=5;combo=0;bestCombo=0;wrongs=0;
+  document.querySelectorAll(".stack").forEach(s=>s.innerHTML="");
+  show("play");hud();nextScoop();
+  cancelAnimationFrame(raf);raf=requestAnimationFrame(loop);
+}
+function resetScoop(anim){
+  sx=(field.clientWidth-scoop.offsetWidth)/2;sy=12;
+  if(anim){scoop.style.transition="transform .3s cubic-bezier(.3,1.6,.5,1)";setTimeout(()=>scoop.style.transition="",320)}
+  place();
+}
+const place=()=>scoop.style.transform=`translate(${sx}px,${sy}px)`;
+function nextScoop(){
+  if(idx>=N)return end(true);
+  cur=deck[idx];fails=0;
+  scoop.className="";scoop.textContent=cur.w;scoop.style.display="block";
+  scoop.style.setProperty("--f",pick(FL));
+  resetScoop();
+  tLimit=Math.max(6500,11000-idx*280);t0=performance.now();active=true;
+  say(idx===0?"Drag the scoop onto the right cone!":"New scoop coming up!","🧑‍🍳");
+  hud();
+}
+function loop(t){
+  if(active){
+    const left=1-(t-t0)/tLimit;
+    $("bar").style.width=Math.max(0,left)*100+"%";
+    $("bar").style.background=left>.5?"#40c057":left>.25?"#ffb400":"#ff4d4d";
+    scoop.classList.toggle("low",left<.25);
+    if(left<=0)melt();
+  }
+  raf=requestAnimationFrame(loop);
+}
+function melt(){
+  active=false;drag=null;lives--;combo=0;wrongs++;play("wrongSound");
+  scoop.classList.remove("drag","low");scoop.classList.add("melted");
+  say("Oh no, it melted! "+why(cur),"😢");idx++;hud();
+  if(lives<=0)return setTimeout(()=>end(false),1200);
+  setTimeout(nextScoop,2600);
+}
+function feed(slot){
+  if(!active)return;
+  const d=+slot.dataset.d,left=Math.max(0,1-(performance.now()-t0)/tLimit);
+  if(d===cur.d){
+    active=false;combo++;bestCombo=Math.max(bestCombo,combo);
+    const pts=10+Math.round(left*8)+Math.min(combo,5)*2;score+=pts;
+    const b=document.createElement("div");b.className="ball";b.style.setProperty("--f",scoop.style.getPropertyValue("--f"));
+    slot.querySelector(".stack").appendChild(b);scoop.style.display="none";
+    bump(slot,"wob",600);play("correctSound");
+    const r=slot.getBoundingClientRect();burst(r.left+r.width/2,r.top+30);
+    say(pick(CHEER)+" +"+pts+"  "+why(cur),"🥳");idx++;hud();
+    setTimeout(nextScoop,2200);
+  }else{
+    fails++;combo=0;lives--;wrongs++;play("wrongSound");bump(slot,"no",500);hud();
+    if(lives<=0){active=false;say("Oh no, the ice cream melted!","😢");return setTimeout(()=>end(false),1200)}
+    if(fails>=2){
+      active=false;say("Here's the answer: "+why(cur),"🤗");
+      scoop.classList.add("melted");idx++;hud();setTimeout(nextScoop,3000);
+    }else{say("Not quite! "+HINT[cur.d],"🙈");resetScoop(true)}
+  }
+}
 
-    function nextWord() {
-      clearDropHighlights();
-      if (wordList.length === 0) {
-        wordBox.textContent = "Game Complete!";
-        feedback.textContent = `Final Score: ${score}/15`;
-        scoop.style.display = "none";
-        restartBtn.style.display = "inline-block";
-        playSound(sndClaps);
-        return;
-      }
-      currentWord = wordList.shift();
-      currentDegree = degrees[currentWord];
-      wordBox.textContent = currentWord.toUpperCase();
-      feedback.textContent = "Drag the scoop!";
-      scoopText.textContent = currentWord;
-      scoop.style.left = "522px";
-      scoop.style.top = "248px";
-    }
+/* drag + drop (mouse and touch) */
+const slots=[...document.querySelectorAll(".slot")];
+function slotAt(x,y){for(const s of slots){const r=s.getBoundingClientRect();if(x>=r.left&&x<=r.right&&y>=r.top-60&&y<=r.bottom)return s}return null}
+scoop.addEventListener("pointerdown",e=>{
+  if(!active)return;e.preventDefault();
+  const r=field.getBoundingClientRect();drag={ox:e.clientX-r.left-sx,oy:e.clientY-r.top-sy};
+  scoop.setPointerCapture(e.pointerId);scoop.classList.add("drag");
+  try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();ac.resume()}catch(_){}
+});
+scoop.addEventListener("pointermove",e=>{
+  if(!drag)return;
+  const r=field.getBoundingClientRect();sx=e.clientX-r.left-drag.ox;sy=e.clientY-r.top-drag.oy;place();
+  const s=slotAt(e.clientX,e.clientY);
+  if(s!==hov){hov&&hov.classList.remove("hover");hov=s;s&&s.classList.add("hover")}
+});
+function drop(e){
+  if(!drag)return;drag=null;scoop.classList.remove("drag");
+  hov&&hov.classList.remove("hover");hov=null;
+  const s=slotAt(e.clientX,e.clientY);
+  if(s)feed(s);else if(active)resetScoop(true);
+}
+scoop.addEventListener("pointerup",drop);scoop.addEventListener("pointercancel",drop);
+slots.forEach(s=>s.addEventListener("click",()=>{if(!drag)feed(s)}));
 
-    function clearDropHighlights() {
-      document.querySelectorAll(".cone").forEach(c => c.classList.remove("dropTarget"));
-    }
-
-    function coneAt(x, y) {
-      const pos = document.getElementById("conePos").getBoundingClientRect();
-      const comp = document.getElementById("coneComp").getBoundingClientRect();
-      const sup = document.getElementById("coneSup").getBoundingClientRect();
-      if (x >= pos.left && x <= pos.right && y >= pos.top && y <= pos.bottom) return { id: "Positive", el: document.getElementById("conePos") };
-      if (x >= comp.left && x <= comp.right && y >= comp.top && y <= comp.bottom) return { id: "Comparative", el: document.getElementById("coneComp") };
-      if (x >= sup.left && x <= sup.right && y >= sup.top && y <= sup.bottom) return { id: "Superlative", el: document.getElementById("coneSup") };
-      return null;
-    }
-
-    startBtn.addEventListener("click", startGame);
-    setTimeout(showInstructions, 3000);
-
-    scoop.addEventListener("pointerdown", (e) => {
-      dragging = true;
-      scoop.setPointerCapture(e.pointerId);
-      const rect = scoop.getBoundingClientRect();
-      const gameRect = game.getBoundingClientRect();
-      const scaleFactor = gameRect.width / 1280;
-      offsetX = (e.clientX - rect.left) / scaleFactor;
-      offsetY = (e.clientY - rect.top) / scaleFactor;
-      e.preventDefault();
-    });
-
-    scoop.addEventListener("pointermove", (e) => {
-      if (!dragging) return;
-      const gameRect = game.getBoundingClientRect();
-      const scaleFactor = gameRect.width / 1280;
-      const localX = (e.clientX - gameRect.left) / scaleFactor;
-      const localY = (e.clientY - gameRect.top) / scaleFactor;
-      scoop.style.left = (localX - offsetX) + "px";
-      scoop.style.top = (localY - offsetY) + "px";
-      clearDropHighlights();
-      const target = coneAt(e.clientX, e.clientY);
-      if (target) target.el.classList.add("dropTarget");
-      e.preventDefault();
-    });
-
-    function endDrag() {
-      if (!dragging) return;
-      dragging = false;
-      clearDropHighlights();
-      const rect = scoop.getBoundingClientRect();
-      const target = coneAt(rect.left + rect.width / 2, rect.top + rect.height / 2);
-      const choice = target ? target.id : null;
-
-      if (choice === currentDegree) {
-        score++;
-        feedback.textContent = "Yay! Correct!";
-        playSound(sndCorrect);
-        setTimeout(nextWord, 700);
-      } else {
-        attempts--;
-        feedback.textContent = "Oops! Try again!";
-        playSound(sndWrong);
-        if (attempts <= 0) {
-          wordBox.textContent = "Game Over!";
-          feedback.textContent = `Final Score: ${score}/15`;
-          scoop.style.display = "none";
-          restartBtn.style.display = "inline-block";
-        }
-      }
-      updateStatus();
-    }
-
-    scoop.addEventListener("pointerup", endDrag);
-    scoop.addEventListener("pointercancel", endDrag);
-    restartBtn.addEventListener("click", startGame);
-  </script>
+function end(win){
+  active=false;cancelAnimationFrame(raf);
+  const stars=win?(wrongs<=2?3:wrongs<=5?2:1):0;
+  $("endStars").textContent=win?"⭐".repeat(stars)+"☆".repeat(3-stars):"🫠";
+  $("endTitle").textContent=win?"Sundae Superstar! 🎉":"The ice cream melted!";
+  $("endMsg").textContent=win?["Good job! Keep practising!","Great scooping!","Perfect! You know your degrees of comparison! 🏆"][stars-1]:"You scooped "+idx+" of "+N+". Try again and beat the melt!";
+  $("stats").innerHTML=`<div><b>${score}</b>score</div><div><b>${Math.min(idx,N)}/${N}</b>scoops</div><div><b>${bestCombo}</b>best combo</div>`;
+  const b=getBest();if(score>b)setBest(score);
+  $("best").textContent="Best score: ⭐ "+Math.max(b,score);
+  show("end");
+  if(win){play("clapSound");burst(innerWidth/2,innerHeight/3,50)}
+}
+$("go").onclick=startGame;$("again").onclick=startGame;
+</script>
 </body>
 </html>
