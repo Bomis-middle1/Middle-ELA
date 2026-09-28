@@ -2,644 +2,266 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Kinds of Sentences: Feed the Monsters</title>
 <style>
-* { box-sizing: border-box; margin:0; padding:0; }
-body {
-  font-family: 'Arial', sans-serif;
-  background: linear-gradient(135deg, #fff6d1, #ffd1e0, #d1f0ff);
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  overflow-x: hidden;
-  position: relative;
-}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{font-family:'Trebuchet MS','Comic Sans MS',system-ui,sans-serif;color:#2c1f5c;overflow:hidden;touch-action:manipulation;user-select:none;-webkit-user-select:none;
+  background:linear-gradient(180deg,#ffe8f3 0%,#e3f4ff 55%,#c8f3c0 100%)}
+.spr{position:fixed;font-size:34px;opacity:.55;animation:fl 9s ease-in-out infinite;pointer-events:none}
+@keyframes fl{50%{transform:translateY(-22px) rotate(12deg)}}
+.screen{position:fixed;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:16px;gap:12px;z-index:10;overflow-y:auto}
+.screen.on{display:flex}
+h1{font-size:clamp(30px,7vw,54px);line-height:1.05;color:#5a2bff;text-shadow:3px 3px 0 #fff}
+.screen p{font-size:clamp(16px,3.6vw,19px);max-width:540px;line-height:1.45}
+#logo{width:min(180px,45vw);animation:bob 2.6s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-9px)}}
+button{font:inherit;font-weight:700;border:0;border-radius:20px;padding:14px 38px;font-size:24px;color:#fff;cursor:pointer;background:linear-gradient(#5fd35f,#2fa82f);box-shadow:0 7px 0 #1d7a1d;transition:transform .1s}
+button:active{transform:translateY(5px);box-shadow:0 2px 0 #1d7a1d}
+:focus-visible{outline:4px solid #5a2bff;outline-offset:3px}
+.how{background:#fff;border-radius:18px;padding:12px 16px;text-align:left;box-shadow:0 5px 0 rgba(0,0,0,.1)}
+.row{display:flex;gap:10px;font-size:44px}
 
-/* Floating stars background */
-body::before {
-  content: '';
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background-image: radial-gradient(circle, #fff7 1px, #fff0 1px);
-  background-size: 25px 25px;
-  pointer-events: none;
-  animation: moveStars 20s linear infinite;
-}
-@keyframes moveStars {
-  0% { background-position: 0 0; }
-  100% { background-position: 1000px 500px; }
-}
+/* play */
+#play{justify-content:flex-start;padding:calc(8px + env(safe-area-inset-top,0px)) 8px calc(6px + env(safe-area-inset-bottom,0px));gap:6px}
+#hud{width:100%;max-width:760px;display:flex;justify-content:space-between;align-items:center;font-size:21px;font-weight:700;gap:6px}
+#hud button{padding:4px 12px;font-size:18px;border-radius:12px;box-shadow:0 3px 0 #1d7a1d}
+#cmb{color:#ff5d2b;min-width:84px}
+#bar{width:100%;max-width:760px;height:12px;background:rgba(255,255,255,.7);border-radius:99px;overflow:hidden}
+#fill{display:block;height:100%;width:0;background:linear-gradient(90deg,#ffb400,#ff5d7a);transition:width .4s}
+#field{position:relative;flex:1;width:100%;max-width:760px;overflow:hidden;border-radius:22px;background:rgba(255,255,255,.45);border:3px solid #fff}
+#toast{position:absolute;left:50%;top:8px;transform:translate(-50%,-140%);background:#fff;border:3px solid #5a2bff;border-radius:16px;padding:8px 14px;font-weight:700;font-size:clamp(14px,3.6vw,18px);
+  width:min(94%,520px);text-align:center;transition:transform .3s cubic-bezier(.3,1.5,.5,1);z-index:20;pointer-events:none}
+#toast.show{transform:translate(-50%,0)}
+#toast.bad{border-color:#ff5d2b}#toast.good{border-color:#2fa82f}
 
-/* Splash Logo */
-#splash {
-  position: fixed;
-  inset: 0;
-  background: #fff9f0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
-  animation: fadeOut 1s ease 4s forwards;
-}
-#splash img { width: 220px; max-width: 80%; animation: pulse 2s infinite; }
-@keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
-@keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+.snack{position:absolute;left:0;top:0;width:min(230px,58vw);padding:10px 12px 10px 38px;background:#fff;border-radius:18px;font-size:clamp(15px,3.7vw,19px);font-weight:700;line-height:1.25;cursor:grab;touch-action:none;
+  box-shadow:0 5px 0 rgba(0,0,0,.18);border:3px solid var(--c);z-index:5;will-change:transform;text-align:left}
+.snack:before{content:"🍪";position:absolute;left:8px;top:8px;font-size:22px}
+.snack.drag{cursor:grabbing;z-index:15;box-shadow:0 14px 22px rgba(0,0,0,.28);scale:1.06}
+.snack.eaten{transition:all .3s;opacity:0;scale:.2}
+.snack.splat{transition:all .3s;opacity:0;scale:1.4}
 
-h1 {
-  margin: 20px;
-  color: #2b4eff;
-  text-align: center;
-  font-size: 30px;
-  font-weight: bold;
-  text-shadow: 2px 2px 4px rgba(43, 78, 255, 0.2);
-}
-
-/* Instructions */
-#instructions-screen {
-  width: 90%; max-width: 700px;
-  background: rgba(255, 255, 255, 0.95);
-  padding: 25px;
-  border-radius: 16px;
-  margin-bottom: 20px;
-  text-align: center;
-  font-size: 18px;
-  box-shadow: 0 8px 30px rgba(43, 78, 255, 0.15);
-  border: 2px solid rgba(43, 78, 255, 0.1);
-}
-#instructions-screen h2 {
-  color: #2b4eff;
-  margin-bottom: 12px;
-  font-size: 26px;
-  font-weight: bold;
-}
-#instructions-screen p {
-  font-size: 16px;
-  color: #333;
-  margin: 8px 0;
-  line-height: 1.5;
-}
-#instructions-screen .tip {
-  font-size: 17px;
-  color: #4caf50;
-  font-weight: bold;
-  margin: 10px 0;
-}
-#start-btn {
-  padding: 14px 30px;
-  font-size: 18px;
-  background: linear-gradient(135deg, #4caf50, #45a049);
-  color: white;
-  border: none;
-  border-radius: 12px;
-  cursor: pointer;
-  font-weight: bold;
-  margin-top: 12px;
-  box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
-  transition: 0.3s;
-}
-#start-btn:hover {
-  background: linear-gradient(135deg, #45a049, #3d8b40);
-  transform: translateY(-3px);
-  box-shadow: 0 6px 20px rgba(76, 175, 80, 0.5);
-}
-
-/* Game Area */
-#game-area {
-  width: 90%; max-width: 900px;
-  background: rgba(255, 255, 255, 0.85);
-  border-radius: 20px;
-  padding: 25px;
-  display: none;
-  position: relative;
-  box-shadow: 0 8px 30px rgba(43, 78, 255, 0.1);
-  border: 2px solid rgba(43, 78, 255, 0.1);
-}
-
-/* Sentence card (the "food" being fed to a monster) */
-#sentence-card {
-  font-size: 22px;
-  font-weight: bold;
-  color: #2b4eff;
-  line-height: 1.4;
-  padding: 18px;
-  background: rgba(43, 78, 255, 0.05);
-  border-radius: 14px;
-  text-align: center;
-  margin-bottom: 20px;
-  transition: transform 0.25s ease, background 0.25s ease;
-}
-
-/* Correct/Wrong flashes on the sentence card */
-.correct-answer {
-  background: linear-gradient(135deg, #66ff99, #33cc66) !important;
-  color: white !important;
-  animation: correctPulse 0.5s;
-}
-.wrong-answer {
-  background: linear-gradient(135deg, #ff6666, #ff3333) !important;
-  color: white !important;
-  animation: wrongShake 0.5s;
-}
-@keyframes correctPulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.08); }
-}
-@keyframes wrongShake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-6px); }
-  75% { transform: translateX(6px); }
-}
-
-/* Monsters row */
-#monsters {
-  display: flex;
-  justify-content: center;
-  align-items: flex-end;
-  gap: 18px;
-  flex-wrap: wrap;
-  margin: 10px 0 20px;
-}
-.monster-wrap {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 130px;
-}
-.monster {
-  width: 92px;
-  height: 92px;
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: relative;
-  cursor: pointer;
-  box-shadow: 0 6px 16px rgba(0,0,0,0.2);
-  transition: transform 0.15s ease;
-}
-.monster:hover { transform: translateY(-4px) scale(1.05); }
-.monster:active { transform: scale(0.95); }
-.monster-eyes { font-size: 22px; position: absolute; top: 18px; }
-.monster-mouth {
-  position: absolute;
-  bottom: 16px;
-  width: 34px;
-  height: 12px;
-  background: rgba(0,0,0,0.55);
-  border-radius: 0 0 16px 16px;
-  transition: height 0.15s ease, transform 0.15s ease;
-}
-.monster-badge {
-  position: absolute;
-  top: -6px;
-  right: -6px;
-  background: white;
-  border-radius: 50%;
-  width: 26px;
-  height: 26px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 15px;
-  font-weight: bold;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.25);
-}
-.monster-label {
-  margin-top: 8px;
-  font-weight: bold;
-  font-size: 14px;
-  text-align: center;
-  color: #333;
-}
-.monster-label span {
-  display: block;
-  font-weight: normal;
-  font-size: 11px;
-  color: #777;
-}
-
-#monster-Declarative { background: radial-gradient(circle, #7fb2ff, #3366ff); }
-#monster-Interrogative { background: radial-gradient(circle, #c99bff, #7a33ff); }
-#monster-Imperative { background: radial-gradient(circle, #ffb266, #ff6600); }
-#monster-Exclamatory { background: radial-gradient(circle, #ff8fb3, #ff3366); }
-
-/* chomp = correct feed, mouth pops open then shuts, whole monster bounces */
-.chomp { animation: chompBounce 0.6s ease; }
-.chomp .monster-mouth { animation: chompMouth 0.6s ease; }
-@keyframes chompBounce {
-  0% { transform: scale(1); }
-  30% { transform: scale(1.25) rotate(-4deg); }
-  60% { transform: scale(0.95) rotate(3deg); }
-  100% { transform: scale(1); }
-}
-@keyframes chompMouth {
-  0% { height: 12px; }
-  40% { height: 34px; }
-  100% { height: 12px; }
-}
-
-/* spit = wrong feed, monster shakes head no */
-.spit { animation: spitShake 0.5s ease; }
-@keyframes spitShake {
-  0%, 100% { transform: translateX(0) rotate(0deg); }
-  20% { transform: translateX(-8px) rotate(-8deg); }
-  40% { transform: translateX(8px) rotate(8deg); }
-  60% { transform: translateX(-6px) rotate(-6deg); }
-  80% { transform: translateX(6px) rotate(6deg); }
-}
-.monster.locked { cursor: not-allowed; opacity: 0.85; }
-
-/* Result & Score */
-#result {
-  margin-top: 8px;
-  font-size: 20px;
-  min-height: 28px;
-  color: #2b4eff;
-  font-weight: bold;
-  text-align: center;
-  padding: 10px;
-  background: rgba(255, 255, 255, 0.6);
-  border-radius: 10px;
-}
-#score {
-  margin-top: 15px;
-  font-size: 18px;
-  color: #333;
-  font-weight: bold;
-  background: rgba(255, 255, 255, 0.8);
-  padding: 8px 20px;
-  border-radius: 10px;
-  box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-  text-align: center;
-}
-
-/* Progress Bar */
-#progress-bar {
-  width: 100%;
-  max-width: 700px;
-  height: 10px;
-  background: rgba(255, 255, 255, 0.6);
-  border-radius: 8px;
-  margin: 15px auto;
-  overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
-#progress-fill {
-  height: 100%;
-  background: linear-gradient(90deg, #4caf50, #66ff99);
-  width: 0%;
-  transition: width 0.5s ease;
-  box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
-}
-
-/* Attempts Indicator */
-#attempts {
-  font-size: 16px;
-  color: #e76f51;
-  font-weight: bold;
-  margin: 10px 0;
-  padding: 8px 15px;
-  background: rgba(231, 111, 81, 0.1);
-  border-radius: 8px;
-  display: none;
-  text-align: center;
-}
-
-/* Confetti */
-.confetti {
-  position: fixed;
-  font-size: 22px;
-  animation: fall 2.5s linear forwards;
-  pointer-events: none;
-  z-index: 10000;
-}
-@keyframes fall {
-  0% { transform: translateY(-10px) rotate(0deg); opacity: 1; }
-  100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
-}
-
-/* Final Screen */
-#final-screen {
-  display: none;
-  width: 90%; max-width: 700px;
-  background: rgba(255, 255, 255, 0.95);
-  padding: 30px;
-  border-radius: 20px;
-  text-align: center;
-  box-shadow: 0 8px 30px rgba(43, 78, 255, 0.15);
-}
-#final-screen h2 {
-  color: #2b4eff;
-  font-size: 32px;
-  margin-bottom: 15px;
-}
-#final-score {
-  font-size: 48px;
-  color: #4caf50;
-  font-weight: bold;
-  margin: 20px 0;
-}
-#restart-btn {
-  padding: 14px 30px;
-  font-size: 18px;
-  background: linear-gradient(135deg, #ff6b6b, #ee5a5a);
-  color: white;
-  border: none;
-  border-radius: 12px;
-  cursor: pointer;
-  font-weight: bold;
-  margin-top: 15px;
-  box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
-}
-#restart-btn:hover {
-  background: linear-gradient(135deg, #ee5a5a, #dd4a4a);
-  transform: translateY(-3px);
-}
-
-@media (max-width: 500px) {
-  .monster { width: 76px; height: 76px; }
-  .monster-mouth { width: 26px; }
-  .monster-wrap { width: 100px; }
-  #sentence-card { font-size: 18px; }
-}
+#mons{position:absolute;left:0;right:0;bottom:0;display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:6px 6px 8px;background:linear-gradient(transparent,rgba(120,200,110,.55) 45%)}
+.mon{display:flex;flex-direction:column;align-items:center;text-align:center;transition:transform .15s;cursor:pointer}
+.mon.hover{transform:scale(1.1)}
+.body{position:relative;width:min(23vw,110px);aspect-ratio:1;border-radius:50% 50% 44% 44%;display:flex;align-items:center;justify-content:center;font-size:clamp(34px,10vw,58px);box-shadow:inset -6px -8px 0 rgba(0,0,0,.15),0 6px 0 rgba(0,0,0,.15)}
+.badge{position:absolute;top:-6px;right:-4px;width:26px;height:26px;border-radius:50%;background:#fff;font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 5px rgba(0,0,0,.25)}
+.mon b{font-size:clamp(11px,2.8vw,15px);margin-top:4px;line-height:1.1}
+.mon small{font-size:clamp(9px,2.3vw,12px);color:#5b4d85}
+.mon em{font-style:normal;font-size:12px;font-weight:700;min-height:16px}
+[data-type=Declarative] .body{background:radial-gradient(circle at 35% 30%,#8fc0ff,#3a72ff)}
+[data-type=Interrogative] .body{background:radial-gradient(circle at 35% 30%,#d3aaff,#8036ff)}
+[data-type=Imperative] .body{background:radial-gradient(circle at 35% 30%,#ffc48a,#ff7a1a)}
+[data-type=Exclamatory] .body{background:radial-gradient(circle at 35% 30%,#ff9fbe,#ff3a70)}
+.chomp .body{animation:chomp .6s}
+@keyframes chomp{30%{transform:scale(1.3,.8)}55%{transform:scale(.9,1.2)}}
+.yuck .body{animation:yuck .5s}
+@keyframes yuck{20%{transform:translateX(-9px) rotate(-8deg)}40%{transform:translateX(9px) rotate(8deg)}60%{transform:translateX(-6px)}80%{transform:translateX(6px)}}
+#endStars{font-size:60px;letter-spacing:6px}
+#stats{display:flex;gap:24px;flex-wrap:wrap;justify-content:center;font-size:18px}
+#stats b{display:block;font-size:34px;color:#5a2bff}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}
 </style>
 </head>
 <body>
+<span class="spr" style="left:6%;top:12%">🍬</span><span class="spr" style="right:8%;top:30%;animation-delay:2s">⭐</span><span class="spr" style="left:12%;top:55%;animation-delay:4s">🍭</span>
 
-<!-- Splash Logo -->
-<div id="splash">
-  <img src="assets/logo.png" alt="Innovine Logo">
+<div id="start" class="screen on">
+  <img id="logo" src="assets/logo.png" alt="Logo" onerror="this.style.display='none'">
+  <h1>Feed the Monsters!</h1>
+  <div class="row"><span>👾</span><span>🐙</span><span>🦖</span><span>🐲</span></div>
+  <p>Four hungry monsters love different kinds of sentences. Feed each snack to the right one!</p>
+  <div class="how">
+    🍪 <b>Drag</b> each falling sentence to its monster (or tap a monster to feed the lowest snack).<br>
+    ✅ Right monster: CHOMP, stars and combo points.<br>
+    🤢 Wrong monster: Yuck! You lose a heart.<br>
+    ❤️ Don't let snacks hit the ground. You have 5 hearts!
+  </div>
+  <button id="go">▶ Start feeding</button>
+  <p id="best"></p>
 </div>
 
-<h1>📚 Kinds of Sentences Quiz</h1>
-
-<!-- Instructions -->
-<div id="instructions-screen">
-  <h2>✨ How to Play</h2>
-  <p>Read each sentence and feed it to the monster who "eats" that type:</p>
-  <p><strong>Declarative</strong> (statement) • <strong>Interrogative</strong> (question) • <strong>Imperative</strong> (command) • <strong>Exclamatory</strong> (excitement)</p>
-  <div class="tip">🔄 You have 2 attempts per question!</div>
-  <div class="tip">✅ Correct: Monster chomps it + Sound + Confetti</div>
-  <div class="tip">❌ Wrong: Monster spits it out + Move to next after 2 tries</div>
-  <button id="start-btn">🚀 Start Quiz</button>
-</div>
-
-<!-- Game Area -->
-<div id="game-area">
-  <div id="sentence-card"></div>
-  <div id="attempts">Attempts left: 2</div>
-
-  <div id="monsters">
-    <div class="monster-wrap">
-      <div class="monster" id="monster-Declarative">
-        <div class="monster-badge">.</div>
-        <div class="monster-eyes">👀</div>
-        <div class="monster-mouth"></div>
-      </div>
-      <div class="monster-label">Declarative<span>Statement</span></div>
-    </div>
-    <div class="monster-wrap">
-      <div class="monster" id="monster-Interrogative">
-        <div class="monster-badge">?</div>
-        <div class="monster-eyes">👀</div>
-        <div class="monster-mouth"></div>
-      </div>
-      <div class="monster-label">Interrogative<span>Question</span></div>
-    </div>
-    <div class="monster-wrap">
-      <div class="monster" id="monster-Imperative">
-        <div class="monster-badge">👉</div>
-        <div class="monster-eyes">👀</div>
-        <div class="monster-mouth"></div>
-      </div>
-      <div class="monster-label">Imperative<span>Command</span></div>
-    </div>
-    <div class="monster-wrap">
-      <div class="monster" id="monster-Exclamatory">
-        <div class="monster-badge">!</div>
-        <div class="monster-eyes">👀</div>
-        <div class="monster-mouth"></div>
-      </div>
-      <div class="monster-label">Exclamatory<span>Excitement</span></div>
+<div id="play" class="screen">
+  <div id="hud"><span id="hp">❤️❤️❤️❤️❤️</span><span>⭐ <b id="sc">0</b></span><span id="cmb"></span><button id="mute" aria-label="Sound on or off">🔊</button></div>
+  <div id="bar"><i id="fill"></i></div>
+  <div id="field">
+    <div id="toast"></div>
+    <div id="mons">
+      <div class="mon" data-type="Declarative"><div class="body"><span class="badge">.</span><span class="face">👾</span></div><b>Declarative</b><small>Statement</small><em></em></div>
+      <div class="mon" data-type="Interrogative"><div class="body"><span class="badge">?</span><span class="face">🐙</span></div><b>Interrogative</b><small>Question</small><em></em></div>
+      <div class="mon" data-type="Imperative"><div class="body"><span class="badge">👉</span><span class="face">🦖</span></div><b>Imperative</b><small>Command</small><em></em></div>
+      <div class="mon" data-type="Exclamatory"><div class="body"><span class="badge">!</span><span class="face">🐲</span></div><b>Exclamatory</b><small>Excitement</small><em></em></div>
     </div>
   </div>
-
-  <div id="result"></div>
-  <div id="score">Score: 0 / 15</div>
-  <div id="progress-bar"><div id="progress-fill"></div></div>
 </div>
 
-<!-- Final Screen -->
-<div id="final-screen">
-  <h2>🏆 Quiz Completed!</h2>
-  <div id="final-score">Score: 0 / 15</div>
-  <p id="final-message"></p>
-  <button id="restart-btn">🔄 Play Again</button>
+<div id="end" class="screen">
+  <div id="endStars"></div>
+  <h1 id="endTitle"></h1>
+  <p id="endMsg"></p>
+  <div id="stats"></div>
+  <button id="again">🔁 Play again</button>
 </div>
 
-<audio id="correct-sound" src="assets/correct.mp3"></audio>
-<audio id="wrong-sound" src="assets/wrong.mp3"></audio>
-<audio id="clap-sound" src="assets/freesound_community-claps-44774.mp3"></audio>
+<audio id="correctSound" src="assets/correct.mp3" preload="auto"></audio>
+<audio id="wrongSound" src="assets/wrong.mp3" preload="auto"></audio>
+<audio id="clapSound" src="assets/freesound_community-claps-44774.mp3" preload="auto"></audio>
 
 <script>
-const questions = [
-  {sentence:"I enjoy reading novels.", type:"Declarative"},
-  {sentence:"Did you finish your homework?", type:"Interrogative"},
-  {sentence:"Close the window, please.", type:"Imperative"},
-  {sentence:"What a magnificent painting!", type:"Exclamatory"},
-  {sentence:"The children are playing in the garden.", type:"Declarative"},
-  {sentence:"Can you solve this puzzle?", type:"Interrogative"},
-  {sentence:"Write your name on the board.", type:"Imperative"},
-  {sentence:"Wow! That was incredible!", type:"Exclamatory"},
-  {sentence:"My dog loves to chase balls.", type:"Declarative"},
-  {sentence:"Have you seen my notebook?", type:"Interrogative"},
-  {sentence:"Stand up and stretch.", type:"Imperative"},
-  {sentence:"Hurrah! We won the match!", type:"Exclamatory"},
-  {sentence:"The teacher explained the lesson clearly.", type:"Declarative"},
-  {sentence:"Where did you put the keys?", type:"Interrogative"},
-  {sentence:"Don't touch the wet paint!", type:"Imperative"}
+const Q=[
+["I enjoy reading novels.","Declarative"],["Did you finish your homework?","Interrogative"],["Close the window, please.","Imperative"],["What a magnificent painting!","Exclamatory"],
+["The children are playing in the garden.","Declarative"],["Can you solve this puzzle?","Interrogative"],["Write your name on the board.","Imperative"],["Wow! That was incredible!","Exclamatory"],
+["My dog loves to chase balls.","Declarative"],["Have you seen my notebook?","Interrogative"],["Stand up and stretch.","Imperative"],["Hurrah! We won the match!","Exclamatory"],
+["The teacher explained the lesson clearly.","Declarative"],["Where did you put the keys?","Interrogative"],["Don't touch the wet paint!","Imperative"]
 ];
+const WHY={Declarative:"It tells us something, so it's a statement.",Interrogative:"It asks something, so it's a question.",Imperative:"It gives an order or request, so it's a command.",Exclamatory:"It shows strong feeling, so it's an exclamation."};
+const FACES={Declarative:"👾",Interrogative:"🐙",Imperative:"🦖",Exclamatory:"🐲"};
+const CH=["Chomp! 😋","Yummy!","Delicious!","Nom nom nom!","Burp! Thanks!"];
+const PAL=["#ff6b81","#3d8bff","#20c997","#ffb400","#a259ff"];
+const $=id=>document.getElementById(id);
+const field=$("field"),mons=$("mons");
+let queue,snacks=[],hearts,score,combo,bestCombo,done,fed,running=false,last=0,spawnT=0,raf=0,muted=false,toastT;
 
-let current = 0;
-let score = 0;
-let attempts = 2;
-let selectedQuestion = null;
-let locked = false;
+const getBest=()=>{try{return +localStorage.getItem("fm_best")||0}catch(e){return 0}};
+const setBest=v=>{try{localStorage.setItem("fm_best",v)}catch(e){}};
+if(getBest())$("best").textContent="Best score: ⭐ "+getBest();
 
-const startBtn = document.getElementById('start-btn');
-const instructionsScreen = document.getElementById('instructions-screen');
-const gameArea = document.getElementById('game-area');
-const finalScreen = document.getElementById('final-screen');
-const sentenceCard = document.getElementById('sentence-card');
-const resultEl = document.getElementById('result');
-const scoreEl = document.getElementById('score');
-const attemptsEl = document.getElementById('attempts');
-const progressFill = document.getElementById('progress-fill');
-const finalScoreEl = document.getElementById('final-score');
-const finalMessageEl = document.getElementById('final-message');
-const restartBtn = document.getElementById('restart-btn');
-const correctSound = document.getElementById('correct-sound');
-const wrongSound = document.getElementById('wrong-sound');
-const clapSound = document.getElementById('clap-sound');
+/* sound: your mp3s first, beeps if missing */
+let ac;
+function tone(f,d,w=0,t="triangle"){try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();const o=ac.createOscillator(),g=ac.createGain();o.type=t;o.frequency.value=f;g.gain.setValueAtTime(.15,ac.currentTime+w);g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+w+d);o.connect(g);g.connect(ac.destination);o.start(ac.currentTime+w);o.stop(ac.currentTime+w+d)}catch(e){}}
+const fb={correctSound:()=>{tone(523,.12);tone(784,.18,.09)},wrongSound:()=>{tone(260,.2,0,"sine");tone(200,.25,.15,"sine")},clapSound:()=>[523,659,784,1047].forEach((f,i)=>tone(f,.25,i*.12))};
+function play(id){if(muted)return;const a=$(id);try{a.currentTime=0;const p=a.play();if(p&&p.catch)p.catch(fb[id])}catch(e){fb[id]()}}
+$("mute").onclick=()=>{muted=!muted;$("mute").textContent=muted?"🔇":"🔊"};
 
-const monsterTypes = ['Declarative', 'Interrogative', 'Imperative', 'Exclamatory'];
-const monsters = {};
-monsterTypes.forEach(type => {
-  const el = document.getElementById('monster-' + type);
-  monsters[type] = el;
-  el.addEventListener('click', () => feedMonster(type, el));
-});
-
-// Guards against a missing/blocked audio file ever freezing the game.
-function safePlay(audioEl) {
-  try {
-    audioEl.currentTime = 0;
-    const p = audioEl.play();
-    if (p && typeof p.catch === "function") {
-      p.catch(() => {});
-    }
-  } catch (e) {}
-}
-
-function shuffle(array) {
-  for(let i=array.length-1;i>0;i--){
-    const j = Math.floor(Math.random()*(i+1));
-    [array[i],array[j]]=[array[j],array[i]];
-  }
-  return array;
-}
-
-function getHint(type) {
-  if(type === 'Declarative') return 'It makes a statement or tells something';
-  if(type === 'Interrogative') return 'It asks a question (has ?)';
-  if(type === 'Imperative') return 'It gives a command or request';
-  if(type === 'Exclamatory') return 'It shows strong emotion (has !)';
-  return '';
-}
-
-function loadQuestion() {
-  resultEl.innerText = '';
-  sentenceCard.className = '';
-  attemptsEl.style.display = 'none';
-  locked = false;
-
-  if(current >= questions.length) {
-    showFinalScreen();
-    return;
-  }
-
-  selectedQuestion = questions[current];
-  sentenceCard.innerText = selectedQuestion.sentence;
-  attempts = 2;
-  attemptsEl.innerText = 'Attempts left: ' + attempts;
-  attemptsEl.style.display = 'block';
-
-  progressFill.style.width = ((current) / questions.length * 100) + '%';
-}
-
-function feedMonster(selectedType, monsterEl) {
-  if (locked || !selectedQuestion) return;
-
-  if(selectedType === selectedQuestion.type) {
-    locked = true;
-    sentenceCard.classList.add('correct-answer');
-    monsterEl.classList.add('chomp');
-    resultEl.innerText = '🎉 Correct! Amazing!';
-    resultEl.style.color = '#4caf50';
-
-    safePlay(correctSound);
-    safePlay(clapSound);
-    createConfetti();
-
-    score++;
-    scoreEl.innerText = 'Score: ' + score + ' / ' + questions.length;
-
-    current++;
-    setTimeout(() => {
-      monsterEl.classList.remove('chomp');
-      loadQuestion();
-    }, 1200);
-  } else {
-    monsterEl.classList.add('spit');
-    sentenceCard.classList.add('wrong-answer');
-    setTimeout(() => {
-      monsterEl.classList.remove('spit');
-      sentenceCard.classList.remove('wrong-answer');
-    }, 500);
-
-    attempts--;
-    attemptsEl.innerText = 'Attempts left: ' + attempts;
-
-    if(attempts === 0) {
-      locked = true;
-      resultEl.innerText = '❌ Wrong! Correct answer is: ' + selectedQuestion.type;
-      resultEl.style.color = '#e76f51';
-      safePlay(wrongSound);
-
-      current++;
-      setTimeout(loadQuestion, 1500);
-    } else {
-      resultEl.innerText = '❌ Try again! Hint: ' + getHint(selectedQuestion.type);
-      resultEl.style.color = '#e76f51';
-      safePlay(wrongSound);
-    }
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+const show=id=>{document.querySelectorAll(".screen").forEach(s=>s.classList.remove("on"));$(id).classList.add("on")};
+const pick=a=>a[Math.random()*a.length|0];
+function toast(t,cls,ms=2200){const e=$("toast");e.textContent=t;e.className="show "+cls;clearTimeout(toastT);toastT=setTimeout(()=>e.className="",ms)}
+function burst(x,y,n=22){
+  const em=["⭐","🎉","✨","🍬","💖","🌟"];
+  for(let i=0;i<n;i++){
+    const p=document.createElement("div");p.textContent=em[i%6];
+    p.style.cssText=`position:fixed;left:${x}px;top:${y}px;font-size:${16+Math.random()*16}px;pointer-events:none;z-index:70`;
+    document.body.appendChild(p);
+    const a=Math.random()*6.28,r=60+Math.random()*130;
+    p.animate([{transform:"translate(0,0)",opacity:1},{transform:`translate(${Math.cos(a)*r}px,${Math.sin(a)*r-40}px) rotate(${Math.random()*540}deg)`,opacity:0}],{duration:800+Math.random()*400,easing:"ease-out"}).onfinish=()=>p.remove();
   }
 }
-
-function createConfetti() {
-  for(let i=0;i<30;i++){
-    const conf = document.createElement('div');
-    conf.classList.add('confetti');
-    conf.innerHTML = ['⭐','🎉','✨','🌟'][Math.floor(Math.random()*4)];
-    conf.style.left = Math.random() * 100 + 'vw';
-    conf.style.top = '-10px';
-    conf.style.fontSize = (Math.random() * 25 + 15) + 'px';
-    document.body.appendChild(conf);
-    setTimeout(() => conf.remove(), 2500);
-  }
+function bump(el,cls,ms){el.classList.remove(cls);void el.offsetWidth;el.classList.add(cls);setTimeout(()=>el.classList.remove(cls),ms)}
+function hud(){
+  $("hp").textContent="❤️".repeat(hearts)+"🖤".repeat(5-hearts);
+  $("sc").textContent=score;
+  $("cmb").textContent=combo>=2?"🔥 x"+combo:"";
+  $("fill").style.width=(done/Q.length*100)+"%";
 }
 
-function showFinalScreen() {
-  gameArea.style.display = 'none';
-  finalScreen.style.display = 'block';
-  progressFill.style.width = '100%';
-
-  finalScoreEl.innerText = 'Score: ' + score + ' / 15';
-
-  if(score >= 12) {
-    finalMessageEl.innerText = '🏆 AMAZING! You are a sentence expert!';
-  } else if(score >= 8) {
-    finalMessageEl.innerText = '😊 Good job! Keep practicing!';
-  } else {
-    finalMessageEl.innerText = '💪 Try again to improve your score!';
+/* flow */
+function startGame(){
+  queue=shuffle(Q);snacks.forEach(s=>s.el.remove());snacks=[];
+  hearts=5;score=0;combo=0;bestCombo=0;done=0;fed=0;
+  document.querySelectorAll(".mon em").forEach(e=>e.textContent="");
+  show("play");hud();
+  running=true;last=performance.now();spawnT=.4;
+  cancelAnimationFrame(raf);raf=requestAnimationFrame(loop);
+}
+function spawn(){
+  const [text,type]=queue.pop();
+  const el=document.createElement("div");el.className="snack";el.textContent=text;
+  el.style.setProperty("--c",pick(PAL));
+  field.appendChild(el);
+  const s={el,text,type,x:Math.random()*Math.max(0,field.clientWidth-el.offsetWidth),y:-el.offsetHeight,drag:false};
+  place(s);
+  el.addEventListener("pointerdown",e=>startDrag(e,s));
+  snacks.push(s);
+}
+function place(s){s.el.style.transform=`translate(${s.x}px,${s.y}px)`}
+function limit(s){return field.clientHeight-mons.offsetHeight-s.el.offsetHeight+10}
+function loop(t){
+  if(!running)return;
+  const dt=Math.min((t-last)/1000,.05);last=t;
+  spawnT-=dt;
+  if(queue.length&&(snacks.length===0||(snacks.length<2&&spawnT<=0))){spawn();spawnT=Math.max(2.2,4-done*.12)}
+  const v=36+done*3;
+  for(const s of [...snacks]){
+    if(s.drag)continue;
+    s.y+=v*dt;place(s);
+    if(s.y>limit(s))miss(s);
   }
-
-  if(score >= 10) {
-    createConfetti();
-  }
+  if(!queue.length&&!snacks.length){end(true);return}
+  raf=requestAnimationFrame(loop);
+}
+function remove(s){snacks=snacks.filter(x=>x!==s)}
+function miss(s){
+  remove(s);done++;combo=0;hearts--;play("wrongSound");
+  s.el.classList.add("splat");setTimeout(()=>s.el.remove(),300);
+  toast("Oh no, a snack dropped! It was "+s.type+". "+WHY[s.type],"bad",2800);
+  hud();if(hearts<=0){running=false;setTimeout(()=>end(false),700)}
 }
 
-startBtn.addEventListener('click', () => {
-  instructionsScreen.style.display = 'none';
-  gameArea.style.display = 'block';
-  shuffle(questions);
-  current = 0;
-  score = 0;
-  scoreEl.innerText = 'Score: 0 / ' + questions.length;
-  loadQuestion();
-});
+/* drag + drop */
+let ds=null,ox=0,oy=0,hov=null;
+function monAt(x,y){for(const m of mons.children){const r=m.getBoundingClientRect();if(x>=r.left&&x<=r.right&&y>=r.top-10&&y<=r.bottom)return m}return null}
+function startDrag(e,s){
+  if(!running)return;e.preventDefault();
+  ds=s;s.drag=true;s.el.classList.add("drag");
+  const r=field.getBoundingClientRect();ox=e.clientX-r.left-s.x;oy=e.clientY-r.top-s.y;
+  s.el.setPointerCapture(e.pointerId);
+  try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();ac.resume()}catch(_){}
+  s.el.onpointermove=ev=>{
+    const r=field.getBoundingClientRect();
+    s.x=ev.clientX-r.left-ox;s.y=ev.clientY-r.top-oy;place(s);
+    const m=monAt(ev.clientX,ev.clientY);
+    if(m!==hov){hov&&hov.classList.remove("hover");hov=m;m&&m.classList.add("hover")}
+  };
+  s.el.onpointerup=s.el.onpointercancel=ev=>{
+    s.el.onpointermove=s.el.onpointerup=s.el.onpointercancel=null;
+    s.drag=false;s.el.classList.remove("drag");ds=null;
+    hov&&hov.classList.remove("hover");hov=null;
+    const m=monAt(ev.clientX,ev.clientY);
+    if(m)feed(s,m);
+  };
+}
+function feed(s,m){
+  if(!running||!snacks.includes(s))return;
+  const type=m.dataset.type,face=m.querySelector(".face"),r=m.getBoundingClientRect();
+  if(type===s.type){
+    remove(s);done++;fed++;combo++;bestCombo=Math.max(bestCombo,combo);
+    const pts=10+Math.min(combo,5)*2;score+=pts;
+    s.el.classList.add("eaten");setTimeout(()=>s.el.remove(),300);
+    bump(m,"chomp",600);face.textContent="😋";setTimeout(()=>face.textContent=FACES[type],700);
+    const c=m.querySelector("em");c.textContent="🍪 x"+(+c.textContent.replace(/\D/g,"")+1);
+    play("correctSound");burst(r.left+r.width/2,r.top+10);
+    toast(pick(CH)+" +"+pts+"  "+WHY[type],"good");
+    hud();
+  }else{
+    combo=0;hearts--;play("wrongSound");
+    bump(m,"yuck",500);face.textContent="🤢";setTimeout(()=>face.textContent=FACES[type],800);
+    toast("Yuck! That's a "+s.type.toLowerCase()+" sentence. "+WHY[s.type],"bad",3000);
+    s.y=-s.el.offsetHeight;s.x=Math.random()*Math.max(0,field.clientWidth-s.el.offsetWidth);place(s);
+    hud();if(hearts<=0){running=false;setTimeout(()=>end(false),700)}
+  }
+}
+/* tap a monster = feed the lowest snack */
+[...mons.children].forEach(m=>m.addEventListener("click",()=>{
+  if(!running||ds||!snacks.length)return;
+  feed(snacks.reduce((a,b)=>b.y>a.y?b:a),m);
+}));
 
-restartBtn.addEventListener('click', () => {
-  finalScreen.style.display = 'none';
-  instructionsScreen.style.display = 'block';
-  current = 0;
-  score = 0;
-  progressFill.style.width = '0%';
-});
+function end(win){
+  running=false;cancelAnimationFrame(raf);snacks.forEach(s=>s.el.remove());snacks=[];
+  const stars=win?(hearts>=4?3:hearts>=2?2:1):0;
+  $("endStars").textContent=win?"⭐".repeat(stars)+"☆".repeat(3-stars):"😴";
+  $("endTitle").textContent=win?"All fed! 🎉":"The monsters are still hungry!";
+  $("endMsg").textContent=win?["Good job! Keep practising!","Great job! The monsters are happy!","Superstar! You know your sentences! 🏆"][stars-1]:"You fed "+fed+" snacks. Try again to fill their bellies!";
+  $("stats").innerHTML=`<div><b>${score}</b>score</div><div><b>${fed}/${Q.length}</b>fed right</div><div><b>${bestCombo}</b>best combo</div>`;
+  const b=getBest();if(score>b)setBest(score);
+  $("best").textContent="Best score: ⭐ "+Math.max(b,score);
+  show("end");
+  if(win){play("clapSound");burst(innerWidth/2,innerHeight/3,50)}
+}
+$("go").onclick=startGame;$("again").onclick=startGame;
 </script>
-
 </body>
 </html>
