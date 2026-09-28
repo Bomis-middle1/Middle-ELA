@@ -2,231 +2,281 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Figures of Speech Sorting Lab</title>
-
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&display=swap" rel="stylesheet">
 <style>
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: linear-gradient(135deg, #f3e5f5, #f8bbd0);
-  overflow: hidden;
-}
+:root{--ink:#3b2666;--sim:#ff6b81;--met:#3d8bff;--per:#20c997;--hyp:#ffb400;--good:#1fa971;--bad:#ff7a45}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;margin:0}
+body{font-family:'Fredoka','Comic Sans MS',system-ui,sans-serif;font-weight:500;color:var(--ink);overflow:hidden;
+  background:linear-gradient(180deg,#bfe9ff 0%,#fff1f7 60%,#ffe9a8 100%)}
+.cloud{position:fixed;font-size:60px;opacity:.7;animation:drift 40s linear infinite;pointer-events:none}
+@keyframes drift{from{transform:translateX(-120px)}to{transform:translateX(110vw)}}
+.screen{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;padding:12px;overflow-y:auto;z-index:2}
+.screen.on{display:flex}
+button{font:inherit;font-weight:700;cursor:pointer;border:0;border-radius:22px;padding:14px 38px;font-size:26px;color:#fff;background:linear-gradient(#ff8fa3,#ff5d7a);box-shadow:0 7px 0 #c93a58;transition:transform .1s}
+button:active{transform:translateY(5px);box-shadow:0 2px 0 #c93a58}
+.small{font-size:20px;padding:8px 14px;border-radius:16px;background:#fff;color:var(--ink);box-shadow:0 4px 0 #cdbfe8}
+:focus-visible{outline:4px solid var(--met);outline-offset:3px}
 
-/* SPLASH */
-#splash {
-  position: fixed;
-  inset: 0;
-  background: white;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  z-index: 99999;
-}
+/* start + end */
+#start,#end{justify-content:center;text-align:center;gap:12px}
+#logo{width:min(200px,45vw);animation:bob 2.5s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-10px) rotate(2deg)}}
+h1{font-size:clamp(34px,8vw,64px);line-height:1.05;margin:0;text-shadow:3px 3px 0 #fff}
+#start p,#end p{margin:0;font-size:20px;max-width:460px}
+.chips{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.chip{padding:6px 14px;border-radius:99px;color:#fff;font-weight:700;font-size:18px}
+#owl{font-size:80px;animation:bob 2s ease-in-out infinite}
+#endStars{font-size:70px;letter-spacing:6px}
+#stats{display:flex;gap:26px;font-size:20px;flex-wrap:wrap;justify-content:center}
+#stats b{display:block;font-size:38px}
 
-#splash img {
-  width: 180px;
-}
-
-/* GAME */
-#game {
-  display: none;
-  text-align: center;
-  padding: 10px;
-}
-
-#score {
-  font-size: 18px;
-  margin: 10px;
-}
-
-/* DRAG ITEMS */
-#items {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 10px;
-  margin: 20px 0;
-}
-
-.item {
-  background: #ffb300;
-  padding: 10px 15px;
-  border-radius: 10px;
-  cursor: grab;
-  user-select: none;
-  max-width: 220px;
-}
-
-/* BUCKETS */
-#buckets {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 15px;
-}
-
-.bucket {
-  width: 200px;
-  min-height: 150px;
-  border: 3px dashed #444;
-  border-radius: 12px;
-  padding: 10px;
-  background: rgba(255,255,255,0.5);
-}
-
-.bucket h3 {
-  margin: 5px;
-}
-
-/* END */
-#endScreen {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.85);
-  color: white;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  z-index: 9999;
-}
+/* play */
+#hud{width:100%;max-width:680px;display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:22px;font-weight:700}
+#dots{display:flex;gap:6px;margin:8px 0}
+#dots i{width:18px;height:18px;border-radius:50%;background:#fff;border:3px solid var(--ink)}
+#dots i.now{transform:scale(1.35);background:var(--hyp)}
+#dots i.g{background:var(--good)}#dots i.m{background:var(--bad)}
+#mascot{display:flex;align-items:center;gap:10px;width:100%;max-width:680px}
+#mascot .face{font-size:64px;transition:transform .2s}
+#mascot .face.hop{animation:hop .5s}
+@keyframes hop{30%{transform:translateY(-22px) rotate(-8deg)}60%{transform:translateY(0) rotate(8deg)}}
+#say{background:#fff;border:3px solid var(--ink);border-radius:20px;padding:10px 16px;font-size:19px;flex:1;position:relative;min-height:56px;display:flex;align-items:center}
+#say:before{content:"";position:absolute;left:-13px;top:50%;margin-top:-9px;border:9px solid transparent;border-right:12px solid var(--ink);border-left:0}
+#speed{width:100%;max-width:680px;height:10px;background:rgba(59,38,102,.15);border-radius:99px;overflow:hidden;margin:6px 0}
+#bar{height:100%;width:100%;background:var(--hyp);border-radius:99px}
+#stage{position:relative;width:100%;max-width:680px;min-height:130px;display:flex;justify-content:center;align-items:center;gap:10px}
+#card{background:#fff;border:4px solid var(--ink);border-radius:26px;padding:22px 26px;font-size:clamp(22px,5.5vw,32px);font-weight:700;text-align:center;max-width:78%;
+  cursor:grab;touch-action:none;user-select:none;box-shadow:0 9px 0 rgba(59,38,102,.35);z-index:5}
+#card.drag{cursor:grabbing;box-shadow:0 20px 30px rgba(0,0,0,.3)}
+#card.back{transition:transform .3s cubic-bezier(.3,1.7,.5,1)}
+#card.enter{animation:pop .4s cubic-bezier(.3,1.7,.5,1)}
+@keyframes pop{from{transform:scale(.4) rotate(-8deg);opacity:0}to{transform:none;opacity:1}}
+@keyframes shake{20%{transform:translateX(-12px)}40%{transform:translateX(12px)}60%{transform:translateX(-7px)}80%{transform:translateX(7px)}}
+.shake{animation:shake .4s}
+#tools{display:flex;gap:10px;margin:10px 0}
+#buckets{width:100%;max-width:680px;display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.bucket{border-radius:26px;padding:12px 8px;text-align:center;color:#fff;border:5px dashed rgba(255,255,255,.85);min-height:104px;display:flex;flex-direction:column;justify-content:center;
+  cursor:pointer;transition:transform .15s,opacity .2s;box-shadow:0 8px 0 rgba(0,0,0,.2)}
+.bucket .e{font-size:34px;line-height:1}
+.bucket b{font-size:clamp(19px,4.6vw,26px)}
+.bucket small{font-size:15px;font-weight:500}
+.bucket.hover{transform:scale(1.08);border-style:solid;border-color:#fff}
+.bucket.ok{animation:flash .6s}
+.bucket.dim{opacity:.25;pointer-events:none}
+@keyframes flash{50%{transform:scale(1.15);filter:brightness(1.25)}}
+[data-type=Simile]{background:var(--sim)}[data-type=Metaphor]{background:var(--met)}
+[data-type=Personification]{background:var(--per)}[data-type=Hyperbole]{background:var(--hyp);color:#4a3300}
+.pt{position:fixed;pointer-events:none;z-index:60;font-weight:700;font-size:34px;color:var(--good);text-shadow:2px 2px 0 #fff}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}
 </style>
 </head>
-
 <body>
+<span class="cloud" style="top:6%">☁️</span><span class="cloud" style="top:38%;animation-duration:60s">☁️</span>
 
-<!-- SPLASH -->
-<div id="splash">
-  <img src="assets/logo.png">
+<div id="start" class="screen on">
+  <img id="logo" src="assets/logo.png" alt="Logo" onerror="this.style.display='none'">
+  <div id="owl">🦉</div>
+  <h1>Figures of Speech<br>Sorting Lab</h1>
+  <div class="chips">
+    <span class="chip" style="background:var(--sim)">🔗 Simile</span>
+    <span class="chip" style="background:var(--met)">🎭 Metaphor</span>
+    <span class="chip" style="background:var(--per)">🧸 Personification</span>
+    <span class="chip" style="background:var(--hyp);color:#4a3300">🎈 Hyperbole</span>
+  </div>
+  <p>Hi! I'm Professor Hoot. Help me sort each sentence into the right bucket. Mistakes are okay, we learn from them!</p>
+  <button id="go">▶ Let's play!</button>
+  <p id="best"></p>
 </div>
 
-<!-- GAME -->
-<div id="game">
-
-  <h2>Figures of Speech Sorting Lab</h2>
-  <div id="score">Score: 0</div>
-
-  <div id="items"></div>
-
+<div id="play" class="screen">
+  <div id="hud"><span id="score">⭐ 0</span><span id="streak"></span><button class="small" id="mute" aria-label="Sound on or off">🔊</button></div>
+  <div id="dots"></div>
+  <div id="mascot"><div class="face" id="face">🦉</div><div id="say"></div></div>
+  <div id="speed"><div id="bar"></div></div>
+  <div id="stage"><div id="card"></div></div>
+  <div id="tools">
+    <button class="small" id="read">🔈 Read to me</button>
+    <button class="small" id="hint">💡 Hint</button>
+  </div>
   <div id="buckets">
-
-    <div class="bucket" data-type="Simile"><h3>Simile</h3></div>
-    <div class="bucket" data-type="Metaphor"><h3>Metaphor</h3></div>
-    <div class="bucket" data-type="Personification"><h3>Personification</h3></div>
-    <div class="bucket" data-type="Hyperbole"><h3>Hyperbole</h3></div>
-
+    <div class="bucket" data-type="Simile" tabindex="0"><span class="e">🔗</span><b>Simile</b><small>uses "like" or "as"</small></div>
+    <div class="bucket" data-type="Metaphor" tabindex="0"><span class="e">🎭</span><b>Metaphor</b><small>"is" or "was" something else</small></div>
+    <div class="bucket" data-type="Personification" tabindex="0"><span class="e">🧸</span><b>Personification</b><small>a thing acts like a person</small></div>
+    <div class="bucket" data-type="Hyperbole" tabindex="0"><span class="e">🎈</span><b>Hyperbole</b><small>a super big exaggeration</small></div>
   </div>
 </div>
 
-<!-- END -->
-<div id="endScreen">
-  <h1>Great Job 🎉</h1>
-  <h2 id="finalScore"></h2>
+<div id="end" class="screen">
+  <div id="endStars"></div>
+  <h1 id="endTitle"></h1>
+  <p id="endMsg"></p>
+  <div id="stats"></div>
+  <p id="endBest"></p>
+  <button id="again">🔁 Play again</button>
 </div>
 
-<audio id="correctSound" src="assets/correct.mp3"></audio>
-<audio id="wrongSound" src="assets/wrong.mp3"></audio>
-<audio id="clapSound" src="assets/freesound_community-claps-44774.mp3"></audio>
+<!-- Your files from the assets folder -->
+<audio id="correctSound" src="assets/correct.mp3" preload="auto"></audio>
+<audio id="wrongSound" src="assets/wrong.mp3" preload="auto"></audio>
+<audio id="clapSound" src="assets/freesound_community-claps-44774.mp3" preload="auto"></audio>
 
 <script>
-
-const questions = [
-{ text:"He is as brave as a lion", type:"Simile" },
-{ text:"Her smile is like sunshine", type:"Simile" },
-{ text:"Time is a thief", type:"Metaphor" },
-{ text:"The classroom was a zoo", type:"Metaphor" },
-{ text:"The wind whispered through the trees", type:"Personification" },
-{ text:"The stars danced in the sky", type:"Personification" },
-{ text:"I’m so hungry I could eat a horse", type:"Hyperbole" },
-{ text:"He ran faster than the wind", type:"Hyperbole" }
+const POOL=[
+["He is as brave as a lion","Simile","It uses \"as ... as\" to compare."],
+["Her smile is like sunshine","Simile","It uses \"like\" to compare."],
+["The baby slept like a log","Simile","It uses \"like\" to compare."],
+["My little sister is as busy as a bee","Simile","It uses \"as ... as\" to compare."],
+["Life is like a box of chocolates","Simile","It uses \"like\" to compare."],
+["Time is a thief","Metaphor","It says time IS a thief. No \"like\" or \"as\"!"],
+["The classroom was a zoo","Metaphor","It says the classroom WAS a zoo."],
+["Books are windows to other worlds","Metaphor","It says books ARE windows."],
+["My brother is a night owl","Metaphor","It says he IS an owl, directly."],
+["The city is a jungle","Metaphor","It says the city IS a jungle."],
+["The wind whispered through the trees","Personification","Wind can't whisper. Only people can!"],
+["The stars danced in the sky","Personification","Stars can't dance. Only people can!"],
+["The sun smiled down on us","Personification","The sun is given a human smile."],
+["My phone is begging for a charge","Personification","A phone can't beg like a person."],
+["The old house groaned in the storm","Personification","A house can't groan like a person."],
+["I'm so hungry I could eat a horse","Hyperbole","A giant exaggeration. Nobody eats a horse!"],
+["I've told you a million times","Hyperbole","Nobody counted a million times."],
+["This bag weighs a ton","Hyperbole","A big exaggeration for fun."],
+["I waited forever at the bus stop","Hyperbole","Nobody waits literally forever."],
+["He's so tall he can touch the clouds","Hyperbole","Impossible, so it's an exaggeration!"]
 ];
+const CHEER=["Yay! 🎉","Brilliant!","You got it!","Hoot hoot hooray!","Super smart!","Awesome!","Nailed it!"];
+const OOPS=["Oops! Try again, you can do it! 💪","Almost! Take another look.","Not quite. Read it once more!"];
+const ROUNDS=10,BONUS_MS=10000;
+const $=id=>document.getElementById(id);
+let deck,idx,score,streak,bestStreak,perfect,tries,cur,locked=true,muted=false,t0,timerId,fails;
 
-let score = 0;
-let remaining = [...questions];
+/* storage (safe) */
+const getBest=()=>{try{return +localStorage.getItem("fos_best")||0}catch(e){return 0}};
+const setBest=v=>{try{localStorage.setItem("fos_best",v)}catch(e){}};
+if(getBest())$("best").textContent="Your best: ⭐ "+getBest();
 
-const itemsDiv = document.getElementById("items");
-const scoreDiv = document.getElementById("score");
+/* sound: your mp3 files first, built-in beeps if a file is missing */
+let ac;
+function tone(f,d,t="triangle",w=0){try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();const o=ac.createOscillator(),g=ac.createGain();o.type=t;o.frequency.value=f;g.gain.setValueAtTime(.15,ac.currentTime+w);g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+w+d);o.connect(g);g.connect(ac.destination);o.start(ac.currentTime+w);o.stop(ac.currentTime+w+d)}catch(e){}}
+const fb={correctSound:()=>{tone(523,.12);tone(784,.18,"triangle",.09)},wrongSound:()=>{tone(260,.2,"sine");tone(200,.25,"sine",.15)},clapSound:()=>[523,659,784,1047].forEach((f,i)=>tone(f,.25,"triangle",i*.12))};
+function play(id){if(muted)return;const a=$(id);try{a.currentTime=0;const p=a.play();if(p&&p.catch)p.catch(fb[id])}catch(e){fb[id]()}}
+$("mute").onclick=()=>{muted=!muted;$("mute").textContent=muted?"🔇":"🔊";if(muted)speechSynthesis&&speechSynthesis.cancel()};
+function speak(t){if(muted||!window.speechSynthesis)return;speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.rate=.9;u.pitch=1.15;speechSynthesis.speak(u)}
+$("read").onclick=()=>speak(cur[0]);
 
-const correctSound = document.getElementById("correctSound");
-const wrongSound = document.getElementById("wrongSound");
-const clapSound = document.getElementById("clapSound");
+/* helpers */
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+const show=id=>{document.querySelectorAll(".screen").forEach(s=>s.classList.remove("on"));$(id).classList.add("on")};
+const pick=a=>a[Math.random()*a.length|0];
+function say(t,face){$("say").textContent=t;const f=$("face");f.textContent=face||"🦉";f.classList.remove("hop");void f.offsetWidth;f.classList.add("hop")}
+function confetti(x,y,n=34){
+  const em=["🎉","⭐","✨","🎈","💖","🌟"];
+  for(let i=0;i<n;i++){
+    const p=document.createElement("div");p.textContent=em[i%6];
+    p.style.cssText=`position:fixed;left:${x}px;top:${y}px;font-size:${18+Math.random()*16}px;pointer-events:none;z-index:70`;
+    document.body.appendChild(p);
+    const a=Math.random()*Math.PI*2,r=70+Math.random()*150;
+    p.animate([{transform:"translate(0,0) scale(.5)",opacity:1},{transform:`translate(${Math.cos(a)*r}px,${Math.sin(a)*r+80}px) rotate(${Math.random()*540}deg) scale(1)`,opacity:0}],{duration:900+Math.random()*500,easing:"cubic-bezier(.2,.8,.3,1)"}).onfinish=()=>p.remove();
+  }
+}
+function floatPts(t,x,y){const e=document.createElement("div");e.className="pt";e.textContent=t;e.style.left=x+"px";e.style.top=y+"px";document.body.appendChild(e);e.animate([{transform:"translateY(0)",opacity:1},{transform:"translateY(-80px)",opacity:0}],{duration:1000}).onfinish=()=>e.remove()}
 
-/* SPLASH (5 sec lock) */
-window.onload = () => {
-  setTimeout(() => {
-    document.getElementById("splash").style.display = "none";
-    document.getElementById("game").style.display = "block";
-    loadItems();
-    enableDrop();
-  }, 5000);
+/* flow */
+function startGame(){
+  deck=shuffle(POOL).slice(0,ROUNDS);idx=0;score=0;streak=0;bestStreak=0;perfect=0;
+  $("dots").innerHTML="<i></i>".repeat(ROUNDS);
+  show("play");updateHud();nextCard();
+}
+function updateHud(){
+  $("score").textContent="⭐ "+score;
+  $("streak").textContent=streak>=2?"🔥 "+streak+" in a row!":"";
+  [...$("dots").children].forEach((d,i)=>{if(i===idx)d.classList.add("now");else d.classList.remove("now")});
+}
+function nextCard(){
+  if(idx>=ROUNDS)return endGame();
+  cur=deck[idx];tries=0;fails=0;
+  document.querySelectorAll(".bucket").forEach(b=>b.classList.remove("dim"));
+  const c=$("card");c.style.cssText="";c.className="enter";c.textContent=cur[0];
+  say(idx===0?"Drag the sentence into the right bucket!":"Here's the next one. What is it?","🦉");
+  updateHud();locked=false;t0=performance.now();
+  clearInterval(timerId);
+  timerId=setInterval(()=>{$("bar").style.width=Math.max(0,1-(performance.now()-t0)/BONUS_MS)*100+"%"},60);
+  setTimeout(()=>speak(cur[0]),350);
+}
+function answer(type){
+  if(locked)return;
+  const c=$("card"),r=c.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top;
+  if(type===cur[1]){
+    locked=true;clearInterval(timerId);
+    const left=Math.max(0,1-(performance.now()-t0)/BONUS_MS);
+    const first=fails===0;
+    if(first){streak++;perfect++}else streak=0;
+    bestStreak=Math.max(bestStreak,streak);
+    const pts=Math.round((first?10:5)+left*5+Math.min(streak,5)*2);
+    score+=pts;play("correctSound");confetti(cx,cy);floatPts("+"+pts+" ⭐",cx-30,cy-10);
+    const b=document.querySelector(`.bucket[data-type="${type}"]`);b.classList.add("ok");setTimeout(()=>b.classList.remove("ok"),600);
+    $("dots").children[idx].className=first?"g":"m";
+    say(pick(CHEER)+" "+cur[2],"🥳");speak(cur[2]);
+    c.style.transition="all .25s";c.style.transform="scale(.2)";c.style.opacity="0";
+    idx++;updateHud();setTimeout(nextCard,2600);
+  }else{
+    fails++;streak=0;play("wrongSound");
+    c.className="shake";c.style.transform="";
+    updateHud();
+    if(fails>=2){
+      locked=true;clearInterval(timerId);
+      $("dots").children[idx].className="m";
+      say("That one is a "+cur[1]+"! "+cur[2],"🤗");speak("That one is a "+cur[1]+". "+cur[2]);
+      document.querySelector(`.bucket[data-type="${cur[1]}"]`).classList.add("ok");
+      idx++;setTimeout(()=>{document.querySelectorAll(".bucket").forEach(b=>b.classList.remove("ok"));nextCard()},3600);
+    }else say(pick(OOPS),"🙈");
+  }
+}
+$("hint").onclick=()=>{
+  if(locked)return;
+  const wrong=shuffle(["Simile","Metaphor","Personification","Hyperbole"].filter(t=>t!==cur[1])).slice(0,2);
+  wrong.forEach(t=>document.querySelector(`.bucket[data-type="${t}"]`).classList.add("dim"));
+  say("I hid two wrong buckets for you! 🔍","🧐");
 };
-
-/* LOAD ITEMS */
-function loadItems() {
-  itemsDiv.innerHTML = "";
-
-  remaining.forEach(q => {
-    let div = document.createElement("div");
-    div.className = "item";
-    div.draggable = true;
-    div.innerText = q.text;
-    div.dataset.type = q.type;
-
-    div.ondragstart = (e) => {
-      e.dataTransfer.setData("text/plain", JSON.stringify(q));
-    };
-
-    itemsDiv.appendChild(div);
-  });
+function endGame(){
+  clearInterval(timerId);
+  const stars=perfect>=9?3:perfect>=6?2:1;
+  $("endStars").textContent="⭐".repeat(stars)+"☆".repeat(3-stars);
+  $("endTitle").textContent=["Good try!","Great job!","Superstar!"][stars-1];
+  $("endMsg").textContent=["Keep practising and you'll be a word wizard!","You really know your figures of speech!","Professor Hoot is so proud of you! 🦉"][stars-1];
+  $("stats").innerHTML=`<div><b>${score}</b>stars earned</div><div><b>${perfect}/${ROUNDS}</b>first-try wins</div><div><b>${bestStreak}</b>best streak</div>`;
+  const b=getBest();
+  $("endBest").textContent=score>b?"🏆 New best score!":"Your best: ⭐ "+b;
+  if(score>b)setBest(score);
+  $("best").textContent="Your best: ⭐ "+Math.max(b,score);
+  show("end");play("clapSound");confetti(innerWidth/2,innerHeight/3,60);
 }
 
-/* DROP SYSTEM (TRUE CALM CHOICE STYLE) */
-function enableDrop() {
-
-  document.querySelectorAll(".bucket").forEach(bucket => {
-
-    bucket.ondragover = (e) => {
-      e.preventDefault();
-    };
-
-    bucket.ondrop = (e) => {
-      e.preventDefault();
-
-      let data = JSON.parse(e.dataTransfer.getData("text/plain"));
-
-      if (data.type === bucket.dataset.type) {
-        correctSound.play();
-        score += 10;
-        scoreDiv.innerText = "Score: " + score;
-
-        remaining = remaining.filter(i => i.text !== data.text);
-
-      } else {
-        wrongSound.play();
-      }
-
-      loadItems();
-
-      if (remaining.length === 0) {
-        endGame();
-      }
-    };
-
-  });
-}
-
-/* END GAME */
-function endGame() {
-  document.getElementById("game").style.display = "none";
-  document.getElementById("endScreen").style.display = "flex";
-
-  clapSound.play();
-  document.getElementById("finalScore").innerText =
-    "Score: " + score + " / " + questions.length * 10;
-}
-
+/* drag (mouse + touch) */
+const card=$("card");let dragging=false,sx,sy,hoverB=null;
+function bucketAt(x,y){for(const b of document.querySelectorAll(".bucket")){const r=b.getBoundingClientRect();if(x>=r.left&&x<=r.right&&y>=r.top&&y<=r.bottom)return b}return null}
+card.addEventListener("pointerdown",e=>{if(locked)return;dragging=true;sx=e.clientX;sy=e.clientY;card.setPointerCapture(e.pointerId);card.className="drag";try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();ac.resume()}catch(_){}});
+card.addEventListener("pointermove",e=>{
+  if(!dragging)return;
+  card.style.transform=`translate(${e.clientX-sx}px,${e.clientY-sy}px) rotate(${(e.clientX-sx)/25}deg)`;
+  const b=bucketAt(e.clientX,e.clientY);
+  if(b!==hoverB){hoverB&&hoverB.classList.remove("hover");hoverB=b;b&&b.classList.add("hover")}
+});
+card.addEventListener("pointerup",e=>{
+  if(!dragging)return;dragging=false;
+  const b=bucketAt(e.clientX,e.clientY);
+  hoverB&&hoverB.classList.remove("hover");hoverB=null;
+  card.className="back";card.style.transform="";
+  if(b)answer(b.dataset.type);
+});
+card.addEventListener("pointercancel",()=>{dragging=false;card.className="back";card.style.transform=""});
+document.querySelectorAll(".bucket").forEach(b=>{
+  b.addEventListener("click",()=>answer(b.dataset.type));
+  b.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();answer(b.dataset.type)}});
+});
+$("go").onclick=startGame;$("again").onclick=startGame;
 </script>
-
 </body>
 </html>
