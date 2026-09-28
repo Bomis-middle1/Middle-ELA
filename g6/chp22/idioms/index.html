@@ -208,7 +208,6 @@ return t.replace(/'/g,"&#39;");
 function choose(btn,ans){
 if(locked)return;
 let c=cases[idx];
-attempt++;
 totalAttempts++;
 
 if(ans===c.a){
@@ -217,21 +216,24 @@ score++;
 btn.classList.add("correct");
 solve(true);
 }else{
+attempt++;
 btn.classList.add("wrong");
 btn.disabled=true;
-feedback.innerHTML='<span class="stamp badstamp">Wrong Lead!</span>';
+feedback.innerHTML='<span class="stamp badstamp">Wrong Lead! Try Again</span>';
 playWrong();
-if(attempt===2){
-hint.innerHTML=`<div class="hint"><b>💡 Detective Note:</b> ${c.h}</div>`;
-}
-if(attempt>=3){
+
+if(attempt===1){
+// First wrong attempt: allow 1 retry
+hint.innerHTML=`<div class="hint"><b>💡 Detective Note:</b> That wasn't correct. You have one retry remaining!</div>`;
+}else if(attempt>=2){
+// Second wrong attempt: show correct answer with brief explanation and move on
 locked=true;
-hint.innerHTML+=`<div class="hint"><b>✔ Case Reveal:</b> The correct idiom is <b>${c.a}</b>.</div>`;
+hint.innerHTML=`<div class="hint"><b>✔ Case Reveal:</b> The correct idiom is <b>${c.a}</b>.<br><b>Explanation:</b> ${c.h}</div>`;
 document.querySelectorAll(".opt").forEach(b=>{
 if(b.textContent.includes(c.a))b.classList.add("correct");
 b.disabled=true;
 });
-setTimeout(()=>solve(false),1200);
+setTimeout(()=>solve(false),2200);
 }
 }
 updateHud();
@@ -240,24 +242,26 @@ updateHud();
 function solve(point){
 let c=cases[idx];
 closed[idx]=true;
+if(point){
 solvedCount++;
 badges.innerHTML+="<div class='badge'>🏅</div>";
 feedback.innerHTML='<span class="stamp">✔ CASE SOLVED</span>';
-document.querySelectorAll(".opt").forEach(b=>b.disabled=true);
 playCorrect();
 confetti(35);
+}
+document.querySelectorAll(".opt").forEach(b=>b.disabled=true);
 renderBoard();
 updateHud();
 setTimeout(()=>{
 idx++;
 if(idx>=10)finish();
 else render();
-},1800);
+},point?1800:2200);
 }
 
 function playCorrect(){
 stopSounds();
-play(correctSound);
+play(correctStock=correctSound);
 setTimeout(()=>play(clapSound),420);
 }
 
