@@ -2,295 +2,230 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>🚀 Verb Rocket Space Mission</title>
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Arial', sans-serif; }
-body { background: linear-gradient(180deg, #0f0c29, #302b63, #24243e); min-height: 100vh; overflow: hidden; }
-#splash { position: fixed; inset: 0; background: #fff; display: flex; justify-content: center; align-items: center; z-index: 9999; transition: opacity 1s ease; }
-#splash img { max-width: 320px; width: 80%; }
-#splash p { margin-top: 20px; font-size: 18px; color: #0f0c29; font-weight: bold; letter-spacing: 1px; animation: pulse 1.2s ease-in-out infinite; }
-@keyframes pulse { 0%,100%{opacity:.4} 50%{opacity:1} }
-#stars { position: fixed; inset: 0; z-index: 0; }
-.star { position: absolute; width: 3px; height: 3px; background: white; border-radius: 50%; animation: moveStar 3s linear infinite; }
-@keyframes moveStar { from { transform: translateY(-100px); } to { transform: translateY(100vh); } }
-#intro { position: fixed; inset: 0; background: linear-gradient(180deg, #0f0c29, #302b63); display: flex; justify-content: center; align-items: center; z-index: 5000; flex-direction: column; text-align: center; color: white; padding: 20px; }
-#intro h1 { font-size: 42px; margin-bottom: 15px; color: #00d4ff; text-shadow: 0 0 20px #00d4ff; }
-#intro p { font-size: 20px; max-width: 700px; margin-bottom: 10px; line-height: 1.5; }
-.startBtn { padding: 16px 40px; font-size: 22px; background: linear-gradient(135deg, #00d4ff, #0099ff); color: white; border: none; border-radius: 15px; cursor: pointer; margin-top: 20px; font-weight: bold; }
-.startBtn:hover { transform: translateY(-3px); }
-#gameArea { position: relative; width: 100vw; height: 100vh; overflow: hidden; z-index: 1; }
-#rocket { position: absolute; bottom: 150px; left: 50%; transform: translateX(-50%); font-size: 100px; z-index: 100; }
-#rocket.boost { filter: drop-shadow(0 0 50px #00ff88); transform: translateX(-50%) scale(1.1); }
-#rocket.crash { filter: drop-shadow(0 0 50px #ff4444); animation: crashAnim 0.5s; }
-@keyframes crashAnim { 0%,100%{transform:translateX(-50%) rotate(0deg);} 25%{transform:translateX(-50%) rotate(-20deg);} 75%{transform:translateX(-50%) rotate(20deg);} }
-.obstacle { position: absolute; font-size: 50px; animation: fall 4s linear infinite; z-index: 50; }
-@keyframes fall { from { transform: translateY(-100px); } to { transform: translateY(100vh); } }
-#questionModal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 20px; }
-.questionBox { background: linear-gradient(135deg, #1a1a2e, #16213e); border-radius: 25px; padding: 30px; max-width: 750px; width: 95%; border: 2px solid #00d4ff; }
-.questionBox h2 { color: #00d4ff; font-size: 24px; margin-bottom: 15px; text-align: center; }
-.questionText { font-size: 18px; color: #fff; line-height: 1.7; margin-bottom: 20px; background: rgba(0,212,255,0.1); padding: 15px; border-radius: 12px; }
-.options { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.optionBtn { padding: 14px 18px; font-size: 16px; background: linear-gradient(135deg, #0099ff, #0066cc); color: white; border: none; border-radius: 12px; cursor: pointer; font-weight: bold; }
-.optionBtn:hover { transform: scale(1.05); }
-.optionBtn.correct { background: linear-gradient(135deg, #00ff88, #00cc66); }
-.optionBtn.wrong { background: linear-gradient(135deg, #ff4444, #cc0000); }
-.feedback { margin-top: 15px; padding: 12px; border-radius: 12px; text-align: center; font-size: 18px; font-weight: bold; }
-.feedback.good { background: rgba(0,255,136,0.2); color: #00ff88; }
-.feedback.bad { background: rgba(255,68,68,0.2); color: #ff4444; }
-#scoreBoard { position: fixed; top: 15px; left: 15px; background: rgba(0,212,255,0.2); padding: 12px 18px; border-radius: 12px; color: white; font-size: 16px; font-weight: bold; z-index: 200; border: 2px solid #00d4ff; }
-#progressBar { position: fixed; top: 15px; right: 15px; width: 200px; height: 20px; background: rgba(0,0,0,0.5); border-radius: 10px; z-index: 200; border: 2px solid #00d4ff; }
-#progressFill { height: 100%; background: linear-gradient(90deg, #00d4ff, #00ff88); width: 0%; transition: width 0.5s ease; }
-#speedMeter { position: fixed; bottom: 15px; left: 15px; background: rgba(0,212,255,0.2); padding: 10px 15px; border-radius: 12px; color: white; font-size: 14px; font-weight: bold; z-index: 200; border: 2px solid #00d4ff; }
-#levelCounter { position: fixed; bottom: 15px; right: 15px; background: rgba(0,212,255,0.2); padding: 10px 15px; border-radius: 12px; color: white; font-size: 16px; font-weight: bold; z-index: 200; border: 2px solid #00d4ff; }
-#result { position: fixed; inset: 0; background: linear-gradient(180deg, #0f0c29, #302b63); display: none; justify-content: center; align-items: center; z-index: 5000; flex-direction: column; text-align: center; color: white; padding: 20px; }
-#result h1 { font-size: 48px; margin-bottom: 15px; color: #00ff88; }
-#result h2 { font-size: 36px; color: #00d4ff; margin-bottom: 10px; }
-#result h3 { font-size: 52px; color: #ffd700; margin: 20px 0; }
-#result p { font-size: 22px; margin-bottom: 20px; }
-.restartBtn { padding: 16px 40px; font-size: 22px; background: linear-gradient(135deg, #ff6b6b, #ee5a5a); color: white; border: none; border-radius: 15px; cursor: pointer; font-weight: bold; }
-.restartBtn:hover { transform: translateY(-3px); }
-.confetti { position: fixed; width: 12px; height: 12px; animation: fallConfetti 3s linear forwards; z-index: 2000; }
-@keyframes fallConfetti { from { transform: translateY(-100px) rotate(0deg); opacity: 1; } to { transform: translateY(100vh) rotate(720deg); opacity: 0; } }
-#planet { position: fixed; bottom: -150px; left: 50%; transform: translateX(-50%); font-size: 200px; z-index: 1; animation: approach 10s linear; }
-@keyframes approach { from { bottom: -150px; } to { bottom: 30%; } }
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:'Trebuchet MS','Segoe UI',Arial,sans-serif;color:#fff;background:linear-gradient(180deg,#0f0c29,#302b63 60%,#24243e);overflow:hidden;touch-action:manipulation;user-select:none;-webkit-user-select:none}
+#stars{position:fixed;inset:0;opacity:.85;background-size:200px 220px;animation:scroll 5s linear infinite;
+  background-image:radial-gradient(2px 2px at 20px 30px,#fff,transparent),radial-gradient(2px 2px at 90px 120px,#fff,transparent),radial-gradient(1.5px 1.5px at 160px 60px,#bde,transparent),radial-gradient(1.5px 1.5px at 60px 190px,#fff,transparent)}
+@keyframes scroll{to{background-position:0 220px}}
+.screen{position:fixed;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px;gap:12px;z-index:10}
+.screen.on{display:flex}
+h1{font-size:clamp(30px,7vw,52px);color:#00d4ff;text-shadow:0 0 18px #00d4ff}
+.screen p{font-size:clamp(16px,3.6vw,20px);max-width:560px;line-height:1.5}
+#logo{width:min(200px,50vw);background:#fff;border-radius:16px;padding:8px}
+button{font:inherit;font-weight:700;border:0;border-radius:16px;padding:14px 36px;font-size:22px;color:#fff;cursor:pointer;background:linear-gradient(135deg,#00d4ff,#0077ff);box-shadow:0 6px 0 #0049a8;transition:transform .1s}
+button:active{transform:translateY(4px);box-shadow:0 2px 0 #0049a8}
+:focus-visible{outline:3px solid #ffd700;outline-offset:3px}
+.how{background:rgba(255,255,255,.1);border-radius:16px;padding:12px 16px;text-align:left}
+
+/* play */
+#play{justify-content:flex-start;padding:calc(8px + env(safe-area-inset-top,0px)) 10px calc(8px + env(safe-area-inset-bottom,0px));gap:6px}
+#hud{width:100%;max-width:720px;display:flex;justify-content:space-between;align-items:center;font-weight:700;font-size:20px;gap:8px}
+#hud button{padding:4px 12px;font-size:18px;border-radius:12px;box-shadow:0 3px 0 #0049a8}
+#cmb{color:#ffd700;min-width:90px}
+#track{position:relative;width:100%;max-width:720px;height:26px;background:rgba(255,255,255,.15);border-radius:99px}
+#ship{position:absolute;top:-2px;left:0;font-size:24px;transition:left .8s;transform:rotate(45deg)}
+#pl{position:absolute;right:4px;top:-2px;font-size:24px}
+#goal{font-size:clamp(18px,4.5vw,24px);font-weight:700}
+#goal b{padding:2px 12px;border-radius:99px;background:#ff5d7a}
+#goal b.Modal{background:#a259ff}#goal b.Main{background:#1fa971}#goal b.Auxiliary{background:#ff8a00}
+#sentence{font-size:clamp(17px,4.2vw,22px);background:rgba(255,255,255,.12);border-radius:14px;padding:8px 14px;max-width:720px}
+#sentence mark{background:#ffd700;color:#222;border-radius:6px;padding:0 6px}
+#tip{font-size:15px;color:#bfe9ff;min-height:20px}
+#field{position:relative;flex:1;width:100%;max-width:720px;overflow:hidden;border-radius:18px;background:rgba(0,0,0,.25);border:2px solid rgba(0,212,255,.4)}
+#field.shake{animation:shake .35s}
+@keyframes shake{20%{transform:translateX(-10px)}40%{transform:translateX(10px)}60%{transform:translateX(-6px)}80%{transform:translateX(6px)}}
+.rock{position:absolute;left:0;top:0;padding:10px 18px;border-radius:999px;font-size:clamp(18px,4.8vw,26px);font-weight:700;cursor:pointer;white-space:nowrap;
+  box-shadow:inset -4px -5px 0 rgba(0,0,0,.25),0 0 14px rgba(255,255,255,.25);transition:opacity .3s;will-change:transform;touch-action:manipulation}
+.rock.hit{background:#00ff88!important;color:#052}
+.rock.bad{background:#ff4444!important;opacity:0}
+#rocket{position:absolute;bottom:6px;left:50%;font-size:48px;transform:translateX(-50%) rotate(-45deg);transition:left .12s;filter:drop-shadow(0 0 14px #00d4ff);z-index:5}
+.laser{position:absolute;width:6px;border-radius:3px;background:linear-gradient(#fff,#00ffcc);box-shadow:0 0 12px #00ffcc;pointer-events:none;z-index:4}
+#banner{position:absolute;left:50%;top:38%;transform:translate(-50%,-50%) scale(.6);opacity:0;pointer-events:none;background:#fff;color:#1a1a3a;font-weight:700;font-size:clamp(17px,4.4vw,22px);
+  padding:16px 22px;border-radius:20px;width:min(90%,460px);text-align:center;transition:all .25s cubic-bezier(.3,1.5,.5,1);z-index:8}
+#banner.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
+#endStars{font-size:60px;letter-spacing:6px}
+#stats{display:flex;gap:24px;flex-wrap:wrap;justify-content:center;font-size:18px}
+#stats b{display:block;font-size:34px;color:#ffd700}
+@media (prefers-reduced-motion:reduce){#stars{animation:none}}
 </style>
 </head>
 <body>
-
-<div id="splash">
-  <div style="text-align:center">
-    <img src="assets/logo.png" onerror="this.style.display='none'">
-    <p>Loading mission...</p>
-  </div>
-</div>
 <div id="stars"></div>
-<div id="rocket">🚀</div>
-<div id="planet">🪐</div>
 
-<div id="intro">
-  <h1>🚀 Verb Rocket Space Mission</h1>
-  <p>Pilot your rocket through space and answer challenging Main & Auxiliary Verb questions!</p>
-  <p>✅ Correct = Speed Boost + Pass Obstacles</p>
-  <p>❌ Wrong = One more attempt remains!</p>
-  <p>🎯 Complete all 15 levels to reach the Verb Planet!</p>
-  <button class="startBtn" onclick="startGame()">🚀 LAUNCH ROCKET</button>
-</div>
-
-<div id="gameArea"></div>
-<div id="scoreBoard">Score: <span id="score">0</span> | Level: <span id="level">0</span>/15</div>
-<div id="progressBar"><div id="progressFill"></div></div>
-<div id="speedMeter">Speed: <span id="speed">Normal</span></div>
-<div id="levelCounter">Level <span id="currentLevel">1</span>/15</div>
-
-<div id="questionModal">
-  <div class="questionBox">
-    <h2>Level <span id="questionLevel">1</span></h2>
-    <div class="questionText" id="questionText"></div>
-    <div class="options" id="options"></div>
-    <div class="feedback" id="feedback"></div>
+<div id="start" class="screen on">
+  <img id="logo" src="assets/logo.png" alt="Logo" onerror="this.style.display='none'">
+  <h1>🚀 Verb Rocket<br>Space Mission</h1>
+  <p>Word asteroids are falling from the sentence. Blast the right verb before it reaches your rocket!</p>
+  <div class="how">
+    🎯 Read the mission, then <b>tap</b> the falling word that matches.<br>
+    ✅ Right word = laser blast + points + combo.<br>
+    🛡️ Wrong word = you lose a shield (you have 5).<br>
+    🪐 Clear all 12 missions to reach the Verb Planet!
   </div>
+  <button id="go">🚀 LAUNCH</button>
+  <p id="best"></p>
 </div>
 
-<div id="result">
-  <h1>🪐 MISSION COMPLETE!</h1>
-  <h2>You reached the Verb Planet!</h2>
-  <h3 id="rank"></h3>
-  <p id="finalScore"></p>
-  <button class="restartBtn" onclick="location.reload()">🚀 PLAY AGAIN</button>
+<div id="play" class="screen">
+  <div id="hud"><span>🛡️ <b id="sh">5</b></span><span>⭐ <b id="sc">0</b></span><span id="cmb"></span><button id="mute" aria-label="Sound on or off">🔊</button></div>
+  <div id="track"><span id="ship">🚀</span><span id="pl">🪐</span></div>
+  <div id="goal"></div>
+  <div id="sentence"></div>
+  <div id="tip"></div>
+  <div id="field"><div id="rocket">🚀</div><div id="banner"></div></div>
 </div>
 
-<audio id="correctSound" src="assets/correct.mp3"></audio>
-<audio id="wrongSound" src="assets/wrong.mp3"></audio>
-<audio id="clapSound" src="assets/freesound_community-claps-44774.mp3"></audio>
+<div id="end" class="screen">
+  <div id="endStars"></div>
+  <h1 id="endTitle"></h1>
+  <p id="endMsg"></p>
+  <div id="stats"></div>
+  <button id="again">🔁 FLY AGAIN</button>
+</div>
+
+<audio id="correctSound" src="assets/correct.mp3" preload="auto"></audio>
+<audio id="wrongSound" src="assets/wrong.mp3" preload="auto"></audio>
+<audio id="clapSound" src="assets/freesound_community-claps-44774.mp3" preload="auto"></audio>
 
 <script>
-window.addEventListener('DOMContentLoaded', function() {
-  createStars();
-  setTimeout(hideSplash, 5000);
-});
-
-function hideSplash() {
-  const splash = document.getElementById('splash');
-  const intro = document.getElementById('intro');
-  splash.style.opacity = '0';
-  setTimeout(() => {
-    splash.style.display = 'none';
-    intro.style.display = 'flex';
-  }, 1000);
-}
-
-function createStars() {
-  const stars = document.getElementById('stars');
-  for(let i=0; i<50; i++) {
-    const star = document.createElement('div');
-    star.className = 'star';
-    star.style.left = Math.random() * 100 + '%';
-    star.style.animationDelay = Math.random() * 3 + 's';
-    stars.appendChild(star);
-  }
-}
-
-const correctSound = document.getElementById('correctSound');
-const wrongSound = document.getElementById('wrongSound');
-const clapSound = document.getElementById('clapSound');
-
-const questions = [
-  {q: "Although Maria was extremely nervous before her final dance performance, her teacher told her that she <u>is dancing</u> beautifully and <u>has practiced</u> for many hours. What is the AUXILIARY verb in 'has practiced'?", options: ["practiced", "has", "is", "will"], correct: 1},
-  {q: "The students who <u>had been studying</u> for the entire week were finally able to complete their project, and they <u>have submitted</u> it to the principal. Identify the MAIN verb in 'have submitted'.", options: ["have", "submitted", "been", "had"], correct: 1},
-  {q: "When the teacher asked if anyone <u>could solve</u> the complex mathematics problem, only three students <u>were able to</u> provide the correct answer. Which word is a MODAL auxiliary verb?", options: ["were", "to", "could", "with"], correct: 2},
-  {q: "Although the team <u>was working</u> on the project for months, they <u>had not finished</u> it by the deadline. What is the PRIMARY auxiliary verb in 'had not finished'?", options: ["not", "finished", "was", "had"], correct: 3},
-  {q: "The scientist explained that if the experiment <u>is conducted</u> properly, the results <u>will be published</u> in the journal. Identify the AUXILIARY verb indicating future tense in 'will be published'.", options: ["be", "published", "is", "will"], correct: 3},
-  {q: "My sister <u>has been teaching</u> at the same school for over fifteen years. What type of auxiliary verb is 'has' in 'has been teaching'?", options: ["Main verb", "Modal auxiliary", "Conjunction", "Primary auxiliary"], correct: 3},
-  {q: "The manager announced that all employees <u>must attend</u> the mandatory training session tomorrow. Which word is a MODAL auxiliary expressing obligation?", options: ["should", "attend", "can", "must"], correct: 3},
-  {q: "While the children <u>were playing</u> in the garden, their mother <u>was reading</u> a book. Identify the MAIN verb in 'were playing'.", options: ["the", "were", "playing", "in"], correct: 2},
-  {q: "The professor stated that students <u>should have completed</u> the assignment before the class. What is the AUXILIARY verb expressing past perfect in 'should have completed'?", options: ["should", "did", "completed", "have"], correct: 3},
-  {q: "Although the weather <u>was terrible</u> during our trip, we <u>still managed</u> to visit all the museums. Which auxiliary verb indicates PAST CONTINUOUS tense?", options: ["managed", "will", "still", "was"], correct: 3},
-  {q: "The coach explained that if the players <u>train diligently</u> every day, they <u>will be able to</u> win the championship. Identify the MODAL auxiliary verb that shows necessity.", options: ["will", "be", "must", "able"], correct: 2},
-  {q: "Yesterday, when I <u>was walking</u> to the store, I <u>saw</u> my friend. What is the MAIN verb in 'was walking'?", options: ["walking", "was", "to", "the"], correct: 0},
-  {q: "The teacher mentioned that the students <u>might receive</u> extra homework if they <u>do not complete</u> their assignments. Which auxiliary verb expresses possibility?", options: ["do", "should", "might", "not"], correct: 2},
-  {q: "Even though she <u>had studied</u> extensively for the examination, she <u>was feeling</u> anxious. Identify the AUXILIARY verb in the past perfect tense 'had studied'.", options: ["studied", "feeling", "has", "had"], correct: 3},
-  {q: "The artist explained that the painting <u>was created</u> using traditional techniques. What type of verb form is 'created' in 'was created'?", options: ["Present participle", "Past participle", "Infinitive", "Gerund"], correct: 1}
+const M=[
+{s:"She has finished her homework.",k:"Auxiliary",t:"has",e:"\"has\" is an auxiliary verb. It helps the main verb \"finished\"."},
+{s:"They are playing in the park.",k:"Main",t:"playing",e:"\"playing\" is the main verb. It shows the action."},
+{s:"We will visit the museum tomorrow.",k:"Modal",t:"will",e:"\"will\" is a modal verb. It talks about the future."},
+{s:"The birds are singing loudly.",k:"Auxiliary",t:"are",e:"\"are\" is an auxiliary verb. It helps the main verb \"singing\"."},
+{s:"He can swim very fast.",k:"Modal",t:"can",e:"\"can\" is a modal verb. It shows ability."},
+{s:"I have been waiting for an hour.",k:"Main",t:"waiting",e:"\"waiting\" is the main verb. \"have been\" only help it."},
+{s:"Sam did not forget his book.",k:"Auxiliary",t:"did",e:"\"did\" is an auxiliary verb. It helps make the sentence negative."},
+{s:"You must wear a helmet.",k:"Modal",t:"must",e:"\"must\" is a modal verb. It shows something is necessary."},
+{s:"Maria has been practising all week.",k:"Main",t:"practising",e:"\"practising\" is the main verb. It shows the action."},
+{s:"It might rain this evening.",k:"Modal",t:"might",e:"\"might\" is a modal verb. It shows something is possible."},
+{s:"Our team had won the match.",k:"Auxiliary",t:"had",e:"\"had\" is an auxiliary verb. It helps the main verb \"won\"."},
+{s:"Do you like ice cream?",k:"Main",t:"like",e:"\"like\" is the main verb. \"Do\" only helps to ask the question."}
 ];
+const TIP={Auxiliary:"Hint: an auxiliary verb HELPS the main verb.",Main:"Hint: the main verb is the ACTION word.",Modal:"Hint: a modal shows ability, need or possibility (can, must, might, will)."};
+const COLORS=[200,330,150,45,265,15];
+const $=id=>document.getElementById(id);
+const field=$("field"),rocket=$("rocket");
+let mi,score,shields,combo,best,wrongs,objs=[],running=false,last=0,spawnT=0,queue=[],raf=0,muted=false;
 
-let currentLevel = 0;
-let score = 0;
-let attempts = 0;
+/* saved best (safe) */
+const getBest=()=>{try{return +localStorage.getItem("vr_best")||0}catch(e){return 0}};
+const setBest=v=>{try{localStorage.setItem("vr_best",v)}catch(e){}};
+if(getBest())$("best").textContent="Best score: ⭐ "+getBest();
 
-const rocket = document.getElementById('rocket');
-const questionModal = document.getElementById('questionModal');
-const questionText = document.getElementById('questionText');
-const optionsDiv = document.getElementById('options');
-const feedback = document.getElementById('feedback');
-const scoreEl = document.getElementById('score');
-const levelEl = document.getElementById('level');
-const currentLevelEl = document.getElementById('currentLevel');
-const questionLevelEl = document.getElementById('questionLevel');
-const progressFill = document.getElementById('progressFill');
-const speedEl = document.getElementById('speed');
-const result = document.getElementById('result');
+/* sound: your mp3s first, beeps if a file is missing */
+let ac;
+function tone(f,d,w=0,t="triangle"){try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();const o=ac.createOscillator(),g=ac.createGain();o.type=t;o.frequency.value=f;g.gain.setValueAtTime(.15,ac.currentTime+w);g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+w+d);o.connect(g);g.connect(ac.destination);o.start(ac.currentTime+w);o.stop(ac.currentTime+w+d)}catch(e){}}
+const fb={correctSound:()=>{tone(523,.12);tone(784,.18,.09)},wrongSound:()=>{tone(200,.25,0,"sawtooth");tone(150,.25,.14,"sawtooth")},clapSound:()=>[523,659,784,1047].forEach((f,i)=>tone(f,.25,i*.12))};
+function play(id){if(muted)return;const a=$(id);try{a.currentTime=0;const p=a.play();if(p&&p.catch)p.catch(fb[id])}catch(e){fb[id]()}}
+$("mute").onclick=()=>{muted=!muted;$("mute").textContent=muted?"🔇":"🔊"};
 
-function startGame() {
-  document.getElementById('intro').style.display = 'none';
-  score = 0;
-  currentLevel = 0;
-  updateScore();
-  startGameLoop();
-}
-
-function startGameLoop() {
-  document.getElementById('gameArea').innerHTML = ''; // clear previous level's obstacles first
-  for(let i=0; i<5; i++) {
-    const obs = document.createElement('div');
-    obs.className = 'obstacle';
-    obs.innerHTML = '❌';
-    obs.style.left = Math.random() * 80 + '%';
-    obs.style.top = '-100px';
-    obs.style.animationDelay = i * 0.8 + 's';
-    document.getElementById('gameArea').appendChild(obs);
+/* helpers */
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+const show=id=>{document.querySelectorAll(".screen").forEach(s=>s.classList.remove("on"));$(id).classList.add("on")};
+function boom(x,y,n=18){
+  const em=["✨","💥","⭐","🌟"],r0=field.getBoundingClientRect();
+  for(let i=0;i<n;i++){
+    const p=document.createElement("div");p.textContent=em[i%4];
+    p.style.cssText=`position:fixed;left:${r0.left+x}px;top:${r0.top+y}px;font-size:${16+Math.random()*14}px;pointer-events:none;z-index:70`;
+    document.body.appendChild(p);
+    const a=Math.random()*6.28,r=50+Math.random()*110;
+    p.animate([{transform:"translate(0,0)",opacity:1},{transform:`translate(${Math.cos(a)*r}px,${Math.sin(a)*r}px) rotate(${Math.random()*540}deg)`,opacity:0}],{duration:700+Math.random()*400,easing:"ease-out"}).onfinish=()=>p.remove();
   }
-  setTimeout(() => showQuestion(), 1000);
 }
+function laser(cx,y){
+  const l=document.createElement("div");l.className="laser";
+  l.style.left=(cx-3)+"px";l.style.top=y+"px";l.style.height=Math.max(10,field.clientHeight-70-y)+"px";
+  field.appendChild(l);
+  l.animate([{opacity:1},{opacity:0}],{duration:260}).onfinish=()=>l.remove();
+}
+function banner(t){const b=$("banner");b.textContent=t;b.classList.add("show")}
 
-function showQuestion() {
-  attempts = 0;
-  feedback.innerHTML = '';
-  feedback.className = 'feedback';
-  const q = questions[currentLevel];
-  questionLevelEl.textContent = currentLevel + 1;
-  questionText.innerHTML = q.q;
-  optionsDiv.innerHTML = '';
-  q.options.forEach((opt, i) => {
-    const btn = document.createElement('button');
-    btn.className = 'optionBtn';
-    btn.textContent = opt;
-    btn.onclick = () => checkAnswer(i, btn);
-    optionsDiv.appendChild(btn);
+/* flow */
+function startGame(){
+  mi=0;score=0;shields=5;combo=0;best=0;wrongs=0;
+  show("play");beginMission();
+}
+function updateHud(){
+  $("sh").textContent=shields;$("sc").textContent=score;
+  $("cmb").textContent=combo>=2?"🔥 x"+combo:"";
+  $("ship").style.left=(mi/M.length)*(($("track").clientWidth)-34)+"px";
+}
+function beginMission(){
+  const m=M[mi];
+  $("goal").innerHTML=`Mission ${mi+1}/${M.length}: blast the <b class="${m.k}">${m.k.toUpperCase()}</b> verb`;
+  $("sentence").textContent=m.s;$("tip").textContent=TIP[m.k];
+  $("banner").classList.remove("show");
+  queue=[];objs.forEach(o=>o.el.remove());objs=[];
+  rocket.style.left="50%";
+  running=true;last=performance.now();spawnT=.2;updateHud();
+  cancelAnimationFrame(raf);raf=requestAnimationFrame(loop);
+}
+function spawn(){
+  const m=M[mi];
+  if(!queue.length)queue=shuffle(m.s.replace(/[.?!,]/g,"").split(" "));
+  const w=queue.pop(),el=document.createElement("div");
+  el.className="rock";el.textContent=w;
+  el.style.background=`hsl(${COLORS[Math.random()*6|0]},80%,55%)`;
+  field.appendChild(el);
+  const o={el,w,x:Math.random()*Math.max(0,field.clientWidth-el.offsetWidth),y:-50,v:60+mi*7+Math.random()*25,ok:w.toLowerCase()===m.t};
+  el.onpointerdown=e=>{e.preventDefault();hit(o)};
+  objs.push(o);
+}
+function loop(t){
+  if(!running)return;
+  const dt=Math.min((t-last)/1000,.05);last=t;
+  spawnT-=dt;if(spawnT<=0){spawn();spawnT=.95-Math.min(mi,8)*.04}
+  const lim=field.clientHeight-70;
+  objs=objs.filter(o=>{
+    o.y+=o.v*dt;o.el.style.transform=`translate(${o.x}px,${o.y}px)`;
+    if(o.y>lim){o.el.remove();if(o.ok&&combo){combo=0;updateHud()}return false}
+    return true;
   });
-  questionModal.style.display = 'flex';
+  raf=requestAnimationFrame(loop);
 }
-
-function checkAnswer(selected, btn) {
-  const q = questions[currentLevel];
-  const allBtns = optionsDiv.querySelectorAll('.optionBtn');
-  allBtns.forEach(b => b.disabled = true);
-  
-  if(selected === q.correct) {
-    btn.classList.add('correct');
-    feedback.innerHTML = '🎉 CORRECT! Speed Boost Activated!';
-    feedback.className = 'feedback good';
-    correctSound.play();
-    clapSound.play();
-    createConfetti();
-    score++;
-    speedEl.textContent = 'FAST ⚡';
-    rocket.classList.add('boost');
-    setTimeout(() => {
-      rocket.classList.remove('boost');
-      speedEl.textContent = 'Normal';
-    }, 3000);
-    setTimeout(() => {
-      questionModal.style.display = 'none';
-      currentLevel++;
-      if(currentLevel < questions.length) {
-        updateScore();
-        setTimeout(startGameLoop, 500);
-      } else {
-        finishGame();
-      }
-    }, 2000);
-  } else {
-    btn.classList.add('wrong');
-    feedback.innerHTML = '❌ Wrong! One more attempt remains!';
-    feedback.className = 'feedback bad';
-    wrongSound.play();
-    rocket.classList.add('crash');
-    setTimeout(() => rocket.classList.remove('crash'), 500);
-    setTimeout(() => {
-      feedback.innerHTML = '';
-      allBtns.forEach(b => b.disabled = false);
-    }, 2000);
-  }
-  updateScore();
-}
-
-function updateScore() {
-  scoreEl.textContent = score;
-  levelEl.textContent = currentLevel;
-  currentLevelEl.textContent = currentLevel + 1;
-  progressFill.style.width = ((currentLevel) / questions.length * 100) + '%';
-}
-
-function createConfetti() {
-  for(let i=0; i<30; i++) {
-    const conf = document.createElement('div');
-    conf.className = 'confetti';
-    conf.style.left = Math.random() * 100 + '%';
-    conf.style.background = `hsl(${Math.random()*360}, 100%, 50%)`;
-    document.body.appendChild(conf);
-    setTimeout(() => conf.remove(), 3000);
+function hit(o){
+  if(!running)return;
+  const m=M[mi],cx=o.x+o.el.offsetWidth/2;
+  rocket.style.left=cx+"px";laser(cx,o.y+20);
+  if(o.ok){
+    running=false;cancelAnimationFrame(raf);
+    combo++;best=Math.max(best,combo);
+    const pts=10+Math.min(combo,5)*2;score+=pts;
+    play("correctSound");boom(cx,o.y+20);
+    o.el.classList.add("hit");
+    objs.forEach(x=>{if(x!==o)x.el.style.opacity=0});
+    $("sentence").innerHTML=m.s.replace(new RegExp("\\b"+m.t+"\\b","i"),s=>`<mark>${s}</mark>`);
+    banner("🎉 +"+pts+"  "+m.e);
+    updateHud();
+    setTimeout(()=>{mi++;updateHud();if(mi>=M.length)end(true);else beginMission()},2800);
+  }else{
+    shields--;combo=0;wrongs++;play("wrongSound");
+    o.el.classList.add("bad");objs=objs.filter(x=>x!==o);setTimeout(()=>o.el.remove(),300);
+    field.classList.add("shake");setTimeout(()=>field.classList.remove("shake"),350);
+    $("tip").textContent="Oops! "+TIP[m.k].replace("Hint: ","");
+    updateHud();
+    if(shields<=0){running=false;cancelAnimationFrame(raf);setTimeout(()=>end(false),700)}
   }
 }
-
-function finishGame() {
-  rocket.style.bottom = '30%';
-  setTimeout(() => {
-    result.style.display = 'flex';
-    const rankEl = document.getElementById('rank');
-    const finalEl = document.getElementById('finalScore');
-    finalEl.textContent = `You scored ${score} out of 15!`;
-    if(score >= 13) {
-      rankEl.textContent = '🏅 MASTER SPACE PILOT';
-      createConfetti();
-      clapSound.play();
-    } else if(score >= 9) {
-      rankEl.textContent = '⭐ CADET VERB EXPLORER';
-    } else {
-      rankEl.textContent = '🌙 MOON LEARNER';
-    }
-  }, 3000);
+function end(win){
+  running=false;cancelAnimationFrame(raf);objs.forEach(o=>o.el.remove());objs=[];
+  const stars=win?(wrongs<=2?3:wrongs<=5?2:1):0;
+  $("endStars").textContent=win?"⭐".repeat(stars)+"☆".repeat(3-stars):"🛠️";
+  $("endTitle").textContent=win?"🪐 Mission Complete!":"Shields down!";
+  $("endMsg").textContent=win?["You reached the Verb Planet!","Great flying, Space Cadet!","Master Space Pilot! 🏅"][stars-1]:"You cleared "+mi+" of "+M.length+" missions. Refuel and try again!";
+  $("stats").innerHTML=`<div><b>${score}</b>score</div><div><b>${mi}/${M.length}</b>missions</div><div><b>${best}</b>best combo</div>`;
+  const b=getBest();if(score>b)setBest(score);
+  $("best").textContent="Best score: ⭐ "+Math.max(b,score);
+  show("end");
+  if(win){play("clapSound");boom(innerWidth/2,innerHeight/3,50)}
 }
+$("go").onclick=()=>{try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();ac.resume()}catch(e){}startGame()};
+$("again").onclick=startGame;
 </script>
-
 </body>
 </html>
